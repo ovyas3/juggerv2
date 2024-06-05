@@ -4,12 +4,10 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import styles from './style/LoginHeader.css';
-
+import LoginLogo from '../.././assets/logo.svg';
 const Title = () => (
     <Link href="/">
-        <a>
-            <Image className={styles.logo} alt="logo" src="/assets/logo.svg" width={100} height={100} />
-        </a>
+            <Image className={styles.logo} alt="logo" src={LoginLogo} width={100} height={100} />
     </Link>
 );
 

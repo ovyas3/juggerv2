@@ -12,9 +12,11 @@ export const metadata: Metadata = {
   description: "Rail Management System",
 };
 
-function RootLayout({
+export default function RootLayout({
   children,
-}: AppProps & { children: React.ReactNode }) {
+}: {
+  children: React.ReactNode
+}) {
   return (
     <html lang="en">
       <body className={inter.className}>
@@ -26,4 +28,4 @@ function RootLayout({
   );
 }
 
-export default appWithTranslation(RootLayout);
+// export default appWithTranslation(RootLayout);
