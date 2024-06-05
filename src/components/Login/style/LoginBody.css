@@ -1,0 +1,139 @@
+.main {
+    width: 100%;
+    height: 93vh;
+  }
+  
+  
+  .section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 104px;
+    height: 87%;
+  }
+  
+  .left {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .content {
+    font-weight: 700;
+    font-family: "Inter";
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .title_heading {
+    font-size: 48px;
+    color: #131722;
+    width: 487px;
+    height: 117px;
+  }
+  
+  .sub_title {
+    font-size: 16px;
+    color: #131722;
+  }
+  
+  .login_form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 32px;
+  }
+  
+  .input_box {
+    position: relative;
+    width: 92%;
+  }
+  
+  .custom_label {
+    color: #71747A;
+    font-family: "Inter";
+    font-size: 14px;
+    position: absolute;
+    top: 50%;
+    left: 20px;
+    transform: translateY(-50%);
+    pointer-events: none;
+    transition: top 0.3s, font-size 0.3s;
+  }
+  
+  .input_box input {
+    background: #FFFFFF;
+    border: 1px solid #DFE3EB;
+    border-radius: 6px;
+    height: 36px;
+    width: 100%;
+    padding: 10px 20px;
+    outline: none;
+    color: #42454E;
+    font-size: 16px;
+    font-weight: 500;
+  }
+  
+  .input_box input:focus + .custom_label,
+  .input_box input:not(:placeholder-shown) + .custom_label {
+    top: 10px;
+    font-size: 12px;
+  }
+  
+  .eye_icon {
+    position: absolute;
+    top: 50%;
+    right: 20px;
+    transform: translateY(-50%);
+    cursor: pointer;
+    z-index: 99;
+  }
+  
+  .fogot_password {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: -8px;
+    color: #3351FF;
+    font-size: 10px;
+    margin-right: 18px;
+    cursor: pointer;
+  }
+  
+  .login_btn {
+    margin-top: 24px;
+    width: 97%;
+    height: 48px;
+    background: #3351FF;
+    border-radius: 6px;
+    color: #FFFFFF;
+    font-size: 14px;
+    font-weight: bold;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+  }
+  
+  .right {
+    margin-top: -44px;
+  }
+  
+  @media only screen and (max-width: 768px) {
+    .right {
+      display: none !important;
+    }
+  
+    .title_heading {
+      font-size: 20px !important;
+      color: #131722;
+      font-weight: bold;
+      width: 100% !important;
+      height: 48px !important;
+    }
+  
+    .header {
+      gap: 0px !important;
+    }
+  }
+  

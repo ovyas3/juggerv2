@@ -1,0 +1,13 @@
+{
+  "LOGIN": {
+    "loginButton": "LOG IN",
+    "forgotPasswordButton": "Forgot Password?",
+    "userName": "EMAIL ID",
+    "password": "**********",
+    "title":"Start here for your optimal supply chain",
+    "subTitle": "For real-time insights, analytics, and efficiency",
+    "enterEmailAddress": "Enter email address",
+    "rememberMe": "Remember Me",
+    "passWord": "Password"
+  }
+}

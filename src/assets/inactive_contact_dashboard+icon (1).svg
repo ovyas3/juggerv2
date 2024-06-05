@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+  <g id="inactive_contact_dashboard_icon" data-name="inactive_contact_dashboard+icon" transform="translate(-9.642 -64.642)">
+    <rect id="Rectangle_4792" data-name="Rectangle 4792" width="24" height="24" transform="translate(9.642 64.642)" fill="none"/>
+    <path id="Path_16686" data-name="Path 16686" d="M18.407,7.092a1.741,1.741,0,0,1,1.741,1.741v3.481a1.741,1.741,0,0,1-1.741,1.741h-.924a6.964,6.964,0,0,1-6.909,6.092V18.407A5.222,5.222,0,0,0,15.8,13.185V7.963a5.222,5.222,0,0,0-10.444,0v6.092H2.741A1.741,1.741,0,0,1,1,12.315V8.833A1.741,1.741,0,0,1,2.741,7.092h.924a6.964,6.964,0,0,1,13.818,0ZM6.883,13.868l.923-1.476a5.227,5.227,0,0,0,5.536,0l.923,1.476a6.969,6.969,0,0,1-7.382,0Z" transform="translate(11.068 66.068)" fill="#fff"/>
+  </g>
+</svg>

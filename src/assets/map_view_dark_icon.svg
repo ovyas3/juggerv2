@@ -1,0 +1,8 @@
+<svg id="map_view_icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+  <path id="Path_16929" data-name="Path 16929" d="M0,0H24V24H0Z" fill="none"/>
+  <path id="Path_16930" data-name="Path 16930" d="M12,18.5,9,17,3,20V7L9,4l6,3,6-3v7" fill="none" stroke="#42454E" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+  <path id="Path_16931" data-name="Path 16931" d="M9,4V17" fill="none" stroke="#42454E" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+  <path id="Path_16932" data-name="Path 16932" d="M15,7v5" fill="none" stroke="#42454E" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+  <path id="Path_16933" data-name="Path 16933" d="M21.121,20.121a3,3,0,1,0-4.242,0Q17.506,20.75,19,22,20.577,20.665,21.121,20.121Z" fill="none" stroke="#42454E" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+  <path id="Path_16934" data-name="Path 16934" d="M19,18v.01" fill="none" stroke="#42454E" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+</svg>
