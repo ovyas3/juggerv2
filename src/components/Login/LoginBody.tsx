@@ -9,7 +9,6 @@ import LoginPageIllustration from '../.././assets/login-page-illustration.svg';
 import OpenEyEIcon from '../.././assets/open_eye_icon.svg';
 import LoginHeader from './LoginHeader';
 import { useTranslation } from 'react-i18next';
-// import { LOGIN } from '../../constants';
 import './style/LoginBody.css'
 
 const LoginBody = () => {
