@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import './Drawer.css'
 import defaultLogo from '@/assets/logo_default_icon.svg';
-import fnrIcon from '@/assets/active_fnr_dashboard_icon.svg'
+// import fnrIcon from '@/assets/active_fnr_dashboard_icon.svg'
 import contactIcon from '@/assets/inactive_contact_dashboard+icon.svg'
 import { useState } from 'react';
 import TrainIcon from '@mui/icons-material/Train';
