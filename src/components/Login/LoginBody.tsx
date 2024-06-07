@@ -8,11 +8,11 @@ import { useRouter } from 'next/navigation'
 import LoginPageIllustration from '../.././assets/login-page-illustration.svg';
 import OpenEyEIcon from '../.././assets/open_eye_icon.svg';
 import LoginHeader from './LoginHeader';
-import { useTranslation } from 'react-i18next';
+import {useTranslations} from 'next-intl';
 import './style/LoginBody.css'
 
 const LoginBody = () => {
-  const { t } = useTranslation('common');
+  const t = useTranslations('LOGIN');
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -43,13 +43,13 @@ const LoginBody = () => {
       <div className="section">
         <div className="left">
           <div className="content">
-            <div className="title_heading">{t('LOGIN.title')}</div>
-            <div className="sub_title">{t('LOGIN.subTitle')}</div>
+            <div className="title_heading">{t('title')}</div>
+            <div className="sub_title">{t('subTitle')}</div>
           </div>
           <div className="login_form">
             <div className="input_box">
               <label className="custom_label" htmlFor="emailInput">
-                {t('LOGIN.enterEmailAddress')}
+                {t('enterEmailAddress')}
               </label>
               <input
                 type="text"
@@ -60,7 +60,7 @@ const LoginBody = () => {
             </div>
             <div className="input_box">
               <label className="custom_label" htmlFor="passwordInput">
-                {t('LOGIN.enterPassword')}
+                {t('passWord')}
               </label>
               <input
                 type="password"
@@ -74,12 +74,12 @@ const LoginBody = () => {
             </div>
             <div className="fogot_password">
               <a href="/forgot" className="router-link-active">
-                {t('LOGIN.forgotPasswordButton')}
+                {t('forgotPasswordButton')}
               </a>
             </div>
           </div>
           <div onClick={handleLogin} className="login_btn">
-            {t('LOGIN.loginButton')}
+            {t('loginButton')}
           </div>
         </div>
         <div className="right">
