@@ -5,7 +5,6 @@ import React from 'react';
 // import { OrderList } from '../components/order-list';
 // import { Order } from '../types';
 import Header from '@/components/Header/header';
-import TableData from '@/components/table/table';
 
 const orders: any = [
   {
