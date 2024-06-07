@@ -1,7 +1,7 @@
-.container{
+.containerDrawer{
     background-color:#20114d;
-    height:100vh;
-    display: flex;
+    /* height:100vh; */
+    /* display: flex; */
     flex-direction: column; 
 }
 
