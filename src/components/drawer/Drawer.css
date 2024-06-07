@@ -1,0 +1,53 @@
+.container{
+    background-color:#20114d;
+    height:100vh;
+    display: flex;
+    flex-direction: column; 
+}
+
+.fnr-icon{
+    height:42px;
+    background-color: white;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    margin-top: 16px;
+    margin-bottom: 12px;
+    margin-inline:14px;
+    display: flex;
+    align-items: center;
+}
+
+.contact-icon{
+    height:42px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    margin-bottom: 21px;
+    margin-inline:14px;
+
+}
+
+.fnr_text {
+    font-size: 13px;
+    margin-left: 12px;
+    font-weight: 600;
+    animation: fadeIn 0.2s ease-in forwards;
+   
+}
+
+.fnr_text_none {
+    display: none;
+    transition: all 0.2s ease-in;
+  
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+

@@ -1,8 +1,9 @@
 import { useState } from "react";
 import Image from "next/image";
 import { Select, MenuItem, FormControl, SelectChangeEvent } from "@mui/material";
-import dropdownIcon from "./../../assets/dropdown_small_icon.svg";
-import styles from "./dropdown.module.css";
+import dropdownIcon from "@/assets/dropdown_small_icon.svg";
+import "./dropdown.css";
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 
 const options = [
   { value: "raigarh", label: "Raigarh" },
@@ -22,20 +23,22 @@ const Dropdown = () => {
   };
 
   return (
-    <FormControl sx={{ minWidth: 150 }}>
+    <FormControl sx={{ minWidth: 166 }}>
       <Select
-        className={styles["dropdown-select"]}
-        sx={{ color: "black", background: "#F0F3F9" }}
+        className="dropdown-select"
+        sx={{ color: "black", background: "#F0F3F9" , '& .MuiOutlinedInput-notchedOutline': {
+          border: 'none',
+        },
+        '&:hover .MuiOutlinedInput-notchedOutline': {
+          border: 'none',
+        },
+        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+          border: 'none',
+        }, fontSize:14 }}
         label="Choose an option"
         value={selectedValue}
         onChange={(event: SelectChangeEvent<string>) => handleChange(event)}
-        IconComponent={() => (
-          <Image
-            style={{ paddingRight: "12px", cursor: "pointer" }}
-            src={dropdownIcon}
-            alt="dropdown"
-          />
-        )}>
+        IconComponent={() => (<ArrowDropDownIcon/>)}>
         {options.map((option) => (
           <MenuItem key={option.value} value={option.value}>
             {option.label}
