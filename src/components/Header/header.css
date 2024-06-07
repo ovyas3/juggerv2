@@ -1,0 +1,50 @@
+.container{
+    width: 100%;
+    height: 56px;
+    padding-inline: 24px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    border-color: #DFE3EB;
+    border-width: 1px;
+    border-style: solid;
+    background-color: white;
+}
+
+.shipment_text{
+    font-size: 20px;
+    font-weight: bold;
+    color: #42454E;
+}
+.header_name{
+    font-size: 14px;
+    font-weight: 500;
+    margin-right: 8px;
+}
+.divder{
+    border-color: #DFE3EB;
+    border-width: 1px;
+    border-style: solid;
+    height: 20px;
+    width: 0px;
+    margin-left: 17px;
+    margin-right: 16px;
+}
+.bell_icon{
+    background-color: #F0F3F9;
+    height: 32px;
+    width: 32px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    cursor: pointer
+}
+.profile_pic{
+    height: 40px;
+    width: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

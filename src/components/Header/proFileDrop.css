@@ -1,0 +1,28 @@
+.box{
+    
+    background-color: greenyellow;
+    width:10px;
+    height: 10px;
+    top:10
+    
+}
+
+.menuItem {
+    font-size: 14px;
+    height: 48px;
+}
+
+.iconContainer {
+    height: 20px;
+    width: 20px;
+    background-color: #DFE3EB;
+    margin-right: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+}
+
+.translateIcon{
+    color: #707070;
+}

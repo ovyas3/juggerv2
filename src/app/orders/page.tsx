@@ -1,8 +1,11 @@
 // write example code
 
+import SideDrawer from '@/components/drawer/Drawer';
 import React from 'react';
 // import { OrderList } from '../components/order-list';
 // import { Order } from '../types';
+import Header from '@/components/Header/header';
+import TableData from '@/components/table/table';
 
 const orders: any = [
   {
@@ -22,20 +25,24 @@ const orders: any = [
   },
 ];
 
-const Order = ({ orderData }: { orderData: any }) => {
-  return <div key={orderData.id}>
-    <h2>{orderData.name}</h2>
-    <p>{orderData.description}</p>
-  </div>
-}
+// const Order = ({ orderData }: { orderData: any }) => {
+//   return <div key={orderData.id}>
+//     <h2>{orderData.name}</h2>
+//     <p>{orderData.description}</p>
+//   </div>
+// }
 
-Order.displayName = 'order';
+// Order.displayName = 'order';
 
 const OrdersPage = () => {
     return (
-      <div>
-        <h1>Orders</h1>
-        {orders && orders.length > 0 ? orders.map((orderData: any) => < Order orderData={orderData} key={orderData.id}  />) : <p>No orders found</p>}
+      <div style={{display:'flex', flexDirection:'row',}}>
+        <div ><SideDrawer/></div>
+        <div style={{backgroundColor:'green', }}>
+          <div><Header></Header></div>
+          <div>headhjbfjkvjevhjekjvejvhjerker</div>
+          <div>content</div>
+        </div>
       </div>
     );
 };
