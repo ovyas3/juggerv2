@@ -1,5 +1,5 @@
 
-import LeftDrawer from "./Drawer/drawer";
+import LeftDrawer from "../Drawer/Drawer";
 import L from 'leaflet';
 import { Box, Grid, Button, ButtonBase, CardMedia, IconButton, useMediaQuery } from "@mui/material";
 import Footer from "../Footer/footer";
@@ -167,8 +167,9 @@ const ActivityTimeLineChart = (props: any) => {
     } else {
       setLowPings(true)
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [numberOfStops])
-  const handleLoadMore = (e) => {
+  const handleLoadMore = (e: any) => {
     e.preventDefault();
     setShowPings(!showPings);
   }
@@ -223,7 +224,7 @@ const ActivityTimeLineChart = (props: any) => {
       </Grid>
       <Grid container spacing={2} direction={"row"} color={"#42454E"} maxHeight={"70%"} justifyContent={"flex-start"} >
       {
-          (lowPings || showPings) && props.trackingDetails.map((details, index) => {
+          (lowPings || showPings) && props.trackingDetails.map((details: {currentStatus: string}, index: number) => {
             return (<Grid container spacing={2} item xs={12} key={index} >
               {/* <Grid justifyContent={"flex-end"} item xs={4} fontSize={"10px"} >
                 {dateConvertor(details.created_at)}
@@ -246,7 +247,7 @@ const ActivityTimeLineChart = (props: any) => {
           })
         }
         {
-          (!showPings && startingPings.length) ? startingPings.map((details, index) => {
+          (!showPings && startingPings.length) ? startingPings.map((details: { currentStatus: string } , index: number) => {
             return (<Grid container spacing={2} item xs={12} key={index} >
               {/* <Grid justifyContent={"flex-end"} item xs={4} fontSize={"10px"} >
                 {dateConvertor(details.created_at)}
@@ -291,7 +292,7 @@ const ActivityTimeLineChart = (props: any) => {
                     justifyContent: "center",
                   }}
                 /> */}
-                <ButtonBase fontSize={"10px"} onClick={handleLoadMore} >Load More</ButtonBase>
+                <ButtonBase style={{fontSize:'10px'}} onClick={handleLoadMore} >Load More</ButtonBase>
             </Grid>
             <Grid item display={"flex"} margin-left={"20px"} justifyContent={"center"} height={'10px'}  alignItems={"center"} xs={10}>
                 <CardMedia
@@ -307,7 +308,7 @@ const ActivityTimeLineChart = (props: any) => {
           </Grid>
           :null}
         {
-          (!showPings && endingPings.length) ? endingPings.map((details, index) => {
+          (!showPings && endingPings.length) ? endingPings.map(( details: {currentStatus: string}, index: number) => {
             return (<Grid container spacing={2} item xs={12} key={index} >
               {/* <Grid justifyContent={"flex-end"} item xs={4} fontSize={"10px"} >
                 {dateConvertor(details.created_at)}

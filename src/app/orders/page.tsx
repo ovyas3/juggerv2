@@ -1,6 +1,6 @@
 // write example code
 
-import SideDrawer from '@/components/drawer/Drawer';
+import SideDrawer from '@/components/Drawer/Drawer';
 import React from 'react';
 // import { OrderList } from '../components/order-list';
 // import { Order } from '../types';
