@@ -9,5 +9,17 @@
     "enterEmailAddress": "Enter email address",
     "rememberMe": "Remember Me",
     "passWord": "Password"
+  },
+  "HEADER":{
+    "shipments":"Shipments"
+  },
+  "ORDERS":{
+    "inbound":"Inbound",
+    "outbound":"Outbound"
+
+  },
+  "DRAWER":{
+    "shipments":"shipments",
+    "contactDashboard":"Contact Dashboard"
   }
 }
