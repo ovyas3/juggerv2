@@ -1,0 +1,82 @@
+
+
+/* CSS */
+.date-range-container {
+    height: 36px;
+    width: 242px;
+    border-radius: 4px;
+    border: 1px solid #E9E9EB;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+}
+
+.date-range-container .date-icon {
+    color: #7C7E8C;
+}
+
+.date-range-container .date-text {
+    font-size: 14px;
+    color: #7C7E8C;
+}
+
+/* CSS */
+.custom-container {
+    height: 36px;
+    width: 134px;
+    border-radius: 4px;
+    border: 1px solid #E9E9EB;
+    display: flex;
+    padding-inline: 12px; /* Note: 'padding-inline' is used for inline padding */
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+}
+
+.custom-text {
+    font-size: 14px;
+    color: #7C7E8C;
+}
+
+.custom-icon {
+    color: #7C7E8C;
+}
+
+/* CSS */
+.upload-container {
+    height: 36px;
+    width: 134px;
+    border-radius: 4px;
+    border: 1px solid #E9E9EB;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+    gap: 8px;
+}
+
+.upload-icon {
+    color: #7C7E8C;
+}
+
+.upload-text {
+    font-size: 14px;
+    color: #7C7E8C;
+}
+
+/* CSS */
+.filter-container {
+    height: 36px;
+    width: 36px;
+    border-radius: 4px;
+    border: 1px solid #E9E9EB;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+}
+
+.filter-icon {
+    color: #7C7E8C;
+}
