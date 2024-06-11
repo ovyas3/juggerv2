@@ -9,34 +9,60 @@ import SearchIcon from '@mui/icons-material/Search';
 import ReplayIcon from '@mui/icons-material/Replay';
 import Filters from '@/components/Filters/filters';
 import TableData from '@/components/Table/table';
-// import useMediaQuery from '@mui/material/useMediaQuery';
-import { useMediaQuery } from '@mui/material';
 import MobileDrawer from "@/components/Drawer/mobile_drawer";
 import MobileHeader from "@/components/Header/mobileHeader";
+import { useWindowSize } from "@/utils/hooks";
+import { ShipmentsObjectPayload } from "@/utils/interface";
+import { httpsPost } from "@/utils/Communication";
+import { GET_SHIPMENTS } from "@/utils/helper";
 
 
-const useWindowSize = (width: number): Boolean => {
-  const [isWide, setIsWide] = useState(window.innerWidth >= width);
-
-  useEffect(() => {
-    const handleResize = () => {
-      setIsWide(window.innerWidth >= width);
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
-  }, [width]);
-
-  return isWide;
-};
 
 
 const OrdersPage = () => {
 
   const mobile = useWindowSize(600);
-  console.log(mobile)
+  const [allShipment, setAllShipment] = useState([]);
+
+  //shipment payload
+  const [ShipmentsPayload, setShipmentsPayload] = useState({
+    is_outbound: true,
+    from: '',
+    to: '',
+  })
+
+  //adding to and from to shipmentpayload
+  const handleToFromChange = (to : string, from: string) => {
+    setShipmentsPayload(prevState => ({
+      ...prevState,
+      to: to,
+      from: from
+    }));
+  };
+
+  //adding limit and skip to shipmentpayload
+  const handleSkipLimitChange = (limit : number, skip: number) => {
+    setShipmentsPayload(prevState => ({
+      ...prevState,
+      limit: limit,
+      skip: skip
+    }));
+  }
+
+  // function which bring allshipment
+  async function getAllShipment (){
+    const response =await httpsPost(GET_SHIPMENTS,ShipmentsPayload);
+    setAllShipment(response.data.data)
+
+  }
+
+  useEffect(()=>{
+    if(ShipmentsPayload.from && ShipmentsPayload.to) getAllShipment();
+  },[ShipmentsPayload])
+
+
+  // console.log(ShipmentsPayload)
+  console.log(allShipment)
 
   return (
     <div  >
@@ -105,6 +131,7 @@ const OrdersPage = () => {
             {mobile ?
               <div className='outbound_inbound'>
                 <div style={{ width: 99, textAlign: 'center', alignContent: 'center', color: '#2962FF', borderBottomColor: '#2962FF', borderBottomWidth: 2, borderBottomStyle: 'solid' }}>{en.ORDERS.outbound}</div>
+
                 <div style={{ width: 87, textAlign: 'center', alignContent: 'center', color: '#7C7E8C' }}>{en.ORDERS.inbound}</div>
               </div>
               :
@@ -117,12 +144,12 @@ const OrdersPage = () => {
 
             {/* ----filter---- */}
             <div className='filters'>
-              <Filters />
+              <Filters onToFromChange={handleToFromChange} />
             </div>
 
             {/* ----table---- */}
             <div>
-              <TableData />
+              <TableData onSkipLimit={handleSkipLimitChange} allShipments={allShipment} />
             </div>
 
           </div>

@@ -14,10 +14,12 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import DescriptionIcon from '@mui/icons-material/Description';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import Checkbox from '@mui/material/Checkbox';
-import {useState, useEffect} from 'react'
+import { useState, useEffect } from 'react'
 import './table.css'
+import { all } from 'axios';
 
-function formatDateTime(date : Date) : object {
+function formatDateTime(date: Date): object {
+    console.log(date)
     let hours = date.getHours();
     const minutes = date.getMinutes().toString().padStart(2, '0');
     const seconds = date.getSeconds().toString().padStart(2, '0');
@@ -33,9 +35,39 @@ function formatDateTime(date : Date) : object {
     const month = shortMonthNames[date.getMonth()];
     const year = date.getFullYear();
     const formattedDate = `${day} ${month} ${year}`;
-    
+
     return { timeString, formattedDate };
 }
+
+
+const convertArrayToFilteredArray = (inputArray: any) => {
+    return inputArray.map((item: { is_fois_fetched?: any; edemand_no?: any; FNR?: any; delivery_location?: any; others?: any; remarks?: any; }) => {
+
+        const { edemand_no, FNR, allFNRs, delivery_location, others, remarks } = item;
+
+        return {
+            edemand: edemand_no,
+            fnr: {
+                primary: FNR,
+                allFNRs: allFNRs || 'NA',
+            },
+            destination: {
+                name: delivery_location.name || 'NA',
+                code: delivery_location.code || 'NA'
+            },
+            material: others.demandedCommodity || 'NA',
+            pickupdate: others.confirmationDate || 'NA',
+            // ownedby: 'NA',
+            status: item.is_fois_fetched || 'NA',
+            // initialETA: 'NA',
+            currentEta: 'NA',
+            remarks: 'NA',
+            handlingAgent: 'NA',
+            action: '',
+            iconheader: ''
+        }
+    });
+};
 
 // Define the Column interface
 interface Column {
@@ -46,263 +78,72 @@ interface Column {
 }
 
 // Define the Data interface
-interface Data {
-    edemand: string;
-    fnr: object;
-    destination: string;
-    material: string;
-    pickupdate: Date;
-    ownedby: string;
-    status: object;
-    initialETA: Date;
-    currentEta: Date;
-    remarks: string;
-    handlingAgent: string;
-    action: any;
-    iconheader: any;
-}
-
-// Column definitions
+// interface Data {
+//     edemand: string;
+//     fnr: object;
+//     destination: string;
+//     material: string;
+//     pickupdate: Date;
+//     ownedby: string;
+//     status: object;
+//     initialETA: Date;
+//     currentEta: Date;
+//     remarks: string;
+//     handlingAgent: string;
+//     action: any;
+//     iconheader: any;
+// }
 
 
-// Function to create data
-function createData(
-    edemand: string,
-    fnr: object,
-    destination: string,
-    material: string,
-    pickupdate: Date,
-    ownedby: string,
-    status: object,
-    initialETA: Date,
-    currentEta: Date,
-    remarks: string,
-    handlingAgent: string,
-    action: any,
-    iconheader: any
-): Data {
-    return {
-        edemand,
-        fnr,
-        destination,
-        material,
-        pickupdate,
-        ownedby,
-        status,
-        initialETA,
-        currentEta,
-        remarks,
-        handlingAgent,
-        action,
-        iconheader: ''
+// // Function to create data
+// function createData(
+//     edemand: string,
+//     fnr: object,
+//     destination: string,
+//     material: string,
+//     pickupdate: Date,
+//     ownedby: string,
+//     status: object,
+//     initialETA: Date,
+//     currentEta: Date,
+//     remarks: string,
+//     handlingAgent: string,
+//     action: any,
+//     iconheader: any
+// ): Data {
+//     return {
+//         edemand,
+//         fnr,
+//         destination,
+//         material,
+//         pickupdate,
+//         ownedby,
+//         status,
+//         initialETA,
+//         currentEta,
+//         remarks,
+//         handlingAgent,
+//         action,
+//         iconheader: ''
 
-    };
-}
+//     };
+// }
 
-// Sample rows data
-const rows = [
-
-    createData(
-        'BRHK126NGKO',
-        {
-            standard: 'primary',
-            num: '96297261867',
-            count: 5,
-            nachoes: 'CT'
-        },
-        'JWS - Ballery Gwalior',
-        'Hot Roll String',
-        new Date('2024-06-01T10:30:00'),
-        'Capative Rake',
-        {
-            status: 'In Transit',
-            address: 'foundation building, 134/A maal road, 1122015',
-            eta: new Date('2024-06-05T10:30:00'),
-        },
-        new Date('2024-06-05T10:30:00'),
-        new Date('2024-06-03T20:00:00'),
-        'Delay by 1 day due to alien attack',
-        'Jai Shri Ram',
-        '',
-        ''
-    ),
-    createData(
-        'JKLO789TUVM',
-        {
-            standard: 'express',
-            num: '98765432109',
-            count: 2,
-            nachoes: 'CA'
-        },
-        'Speedy Deliveries Inc. - California',
-        'Spicy Tofu Wrap',
-        new Date('2024-06-03T09:00:00'),
-        'Air Freight',
-        {
-            status: 'Delivery',
-            address: '456 Elm St, Los Angeles, CA 90001',
-            eta: new Date('2024-06-03T12:30:00'),
-        },
-        new Date('2024-06-03T12:30:00'),
-        new Date('2024-06-03T06:00:00'),
-        'Delayed due to weather conditions',
-        'Please deliver before 3:00 PM',
-        '',
-        ''
-    ),
-    createData(
-        'ABCD123WXYZ',
-        {
-            standard: 'standard',
-            num: '24681357900',
-            count: 1,
-            nachoes: 'TX'
-        },
-        'Texan Logistics - Dallas',
-        'BBQ Pulled Pork Sandwich',
-        new Date('2024-06-04T11:15:00'),
-        'Ground Shipping',
-        {
-            status: 'In Transit',
-            address: '789 Oak St, Dallas, TX 75201',
-            eta: new Date('2024-06-06T11:00:00'),
-        },
-        new Date('2024-06-06T11:00:00'),
-        new Date('2024-06-06T07:30:00'),
-        'Traffic congestion delaying delivery',
-        'Your patience is appreciated',
-        '',
-        ''
-    ),
-    createData(
-        'PQRS567ABCD',
-        {
-            standard: 'primary',
-            num: '13579246800',
-            count: 4,
-            nachoes: 'FL'
-        },
-        'Sunshine Express - Miami',
-        'Fish Tacos',
-        new Date('2024-06-05T13:00:00'),
-        'Sea Freight',
-        {
-            status: 'Arrived',
-            address: '321 Palm St, Miami, FL 33101',
-            eta: new Date('2024-06-06T10:00:00'),
-        },
-        new Date('2024-06-06T10:00:00'),
-        new Date('2024-06-06T06:30:00'),
-        'Customs clearance in progress',
-        'Almost there!',
-        '',
-        ''
-    ),
-    createData(
-        'EFGH456IJKL',
-        {
-            standard: 'secondary',
-            num: '10293847560',
-            count: 2,
-            nachoes: 'WA'
-        },
-        'Cascade Logistics - Seattle',
-        'Salmon Sushi Roll',
-        new Date('2024-06-06T16:30:00'),
-        'Rail Freight',
-        {
-            status: 'In Transit',
-            address: '567 Pine St, Seattle, WA 98101',
-            eta: new Date('2024-06-07T14:00:00'),
-        },
-        new Date('2024-06-07T14:00:00'),
-        new Date('2024-06-07T09:30:00'),
-        'Mechanical issues with train',
-        'We apologize for the inconvenience',
-        '',
-        ''
-    ),
-    createData(
-        'QRST789UVWX',
-        {
-            standard: 'standard',
-            num: '76543210987',
-            count: 3,
-            nachoes: 'IL'
-        },
-        'Windy City Couriers - Chicago',
-        'Deep Dish Pizza',
-        new Date('2024-06-07T12:00:00'),
-        'Ground Shipping',
-        {
-            status: 'Delivery',
-            address: '890 Maple Ave, Chicago, IL 60601',
-            eta: new Date('2024-06-07T14:30:00'),
-        },
-        new Date('2024-06-07T14:30:00'),
-        new Date('2024-06-07T10:00:00'),
-        'Heavy traffic on delivery route',
-        'Delivery expected soon',
-        '',
-        ''
-    ),
-    createData(
-        'LMNO678PQRS',
-        {
-            standard: 'express',
-            num: '98765432101',
-            count: 1,
-            nachoes: 'NY'
-        },
-        'Metro Express - New York',
-        'New York Cheesecake',
-        new Date('2024-06-08T10:45:00'),
-        'Air Freight',
-        {
-            status: 'Delivered',
-            address: '123 Broadway, New York, NY 10002',
-            eta: new Date('2024-06-08T09:30:00'),
-        },
-        new Date('2024-06-08T09:30:00'),
-        new Date('2024-06-08T06:00:00'),
-        'Delivered ahead of schedule',
-        'Enjoy your dessert!',
-        '',
-        ''
-    ),
-    createData(
-        'WXYZ123QRST',
-        {
-            standard: 'primary',
-            num: '09876543210',
-            count: 2,
-            nachoes: 'CA'
-        },
-        'Golden State Couriers - San Francisco',
-        'Avocado Toast',
-        new Date('2024-06-09T08:30:00'),
-        'Ground Shipping',
-        {
-            status: 'In Transit',
-            address: '456 Pine St, San Francisco, CA 94101',
-            eta: new Date('2024-06-10T10:00:00'),
-        },
-        new Date('2024-06-10T10:00:00'),
-        new Date('2024-06-10T06:30:00'),
-        'Delay due to road construction',
-        'Thank you for your understanding',
-        '',
-        ''
-    )
-];
 
 // Main component
-export default function TableData() {
+export default function TableData({ onSkipLimit, allShipments }: any) {
+
     const [page, setPage] = React.useState(0);
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
     const [edemand, setEdemand] = React.useState(true);
     const [showEdemand, setShowEdemad] = React.useState(false);
     const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
+
+    // console.log(allShipments)
+
+
+    const response = convertArrayToFilteredArray(allShipments)
+    // console.log(response)
 
 
 
@@ -317,15 +158,22 @@ export default function TableData() {
 
     const [columns, setColumns] = useState<Column[]>([]);
 
+    const [destinationIndex, setDestinationIndex] = useState(null)
+
+    function hoverEffect (index) {
+        setDestinationIndex(index)
+        console.log(index)
+    }
+
     useEffect(() => {
         const commonColumns: Column[] = [
             { id: 'fnr', label: 'FNR No.', class: 'fnr', innerClass: 'inner_fnr' },
             { id: 'destination', label: 'Destination', class: 'destination', innerClass: '' },
             { id: 'material', label: 'Material', class: 'material', innerClass: '' },
             { id: 'pickupdate', label: 'Pickup Date', class: 'pickupdate', innerClass: '' },
-            { id: 'ownedby', label: 'Owned By', class: 'ownedby', innerClass: '' },
+            // { id: 'ownedby', label: 'Owned By', class: 'ownedby', innerClass: '' },
             { id: 'status', label: 'Status', class: 'status', innerClass: 'inner_status' },
-            { id: 'initialETA', label: 'Initial ETA', class: 'initialETA', innerClass: '' },
+            // { id: 'initialETA', label: 'Initial ETA', class: 'initialETA', innerClass: '' },
             { id: 'currentEta', label: 'Current ETA', class: 'currentEta', innerClass: '' },
             { id: 'remarks', label: 'Remarks', class: 'remarks', innerClass: '' },
             { id: 'handlingAgent', label: 'Handling Agent', class: 'handlingAgent', innerClass: '' },
@@ -337,8 +185,10 @@ export default function TableData() {
             commonColumns.unshift({ id: 'edemand', label: 'E Demand', class: 'edamand', innerClass: '' });
         }
 
+        onSkipLimit(rowsPerPage, page * rowsPerPage)
+
         setColumns(commonColumns);
-    }, [edemand, showEdemand]);
+    }, [edemand, showEdemand, rowsPerPage, page]);
 
 
 
@@ -361,7 +211,7 @@ export default function TableData() {
                 <TablePagination
                     rowsPerPageOptions={[10, 25, 100]}
                     component="div"
-                    count={rows.length}
+                    count={response.length}
                     rowsPerPage={rowsPerPage}
                     page={page}
                     onPageChange={handleChangePage}
@@ -375,51 +225,45 @@ export default function TableData() {
                         }}>
                             <TableRow >
                                 {columns.map((column) => {
-                                    return(
+                                    return (
                                         <TableCell
                                             key={column.id}
                                             style={{ fontSize: 12, fontWeight: 'bold', color: '#7C7E8C', paddingLeft: '10px' }}
                                             className={column.class}
-    
+
                                         >
                                             <div className={column.innerClass}>
                                                 <div>
                                                     {column.label}
                                                     {
-                                                     column.id === 'edemand' && edemand ?   
-                                                     <div></div>
-                                                     :<></>
+                                                        column.id === 'edemand' && edemand ?
+                                                            <div></div>
+                                                            : <></>
                                                     }
                                                     {
-                                                    column.id === 'iconheader' && showEdemand ?
-                                                    <div className='inner_iconheader_before'>
-                                                        <Checkbox {...label} size='small'  checked={edemand}
-                                                            onClick={() => { setEdemand(edemand => !edemand) }}
-                                                        />
-                                                        <div style={{color:'black', fontWeight:'normal'}}>E Demand</div>
-                                                    </div>
-                                                    :<></>
+                                                        column.id === 'iconheader' && showEdemand ?
+                                                            <div className='inner_iconheader_before'>
+                                                                <Checkbox {...label} size='small' checked={edemand}
+                                                                    onClick={() => { setEdemand(edemand => !edemand) }}
+                                                                />
+                                                                <div style={{ color: 'black', fontWeight: 'normal' }}>E Demand</div>
+                                                            </div>
+                                                            : <></>
                                                     }
                                                 </div>
-                                                {column.id === 'status' ?
-                                                    <div className="fois">
-                                                        <div className='fois_label'>FOIS</div>
-                                                        <div className='inner_fois' ></div>
-                                                    </div>
-                                                    : <></>
-                                                }
+
                                             </div>
-    
+
                                         </TableCell>
                                     )
                                 })}
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
+                            {response.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row : object,firstindex: number) => {
                                 return (
                                     <TableRow hover key={row.edemand}>
-                                        {columns.map((item) => {
+                                        {columns.map((item,index) => {
                                             const value = row[item.id];
                                             const columnClassNames: any = {
                                                 edemand: 'body_edemand',
@@ -436,74 +280,41 @@ export default function TableData() {
                                                 action: 'body_action',
                                                 iconheader: 'body_iconheader'
                                             }
-                                            
+
+                                            if (item.id === 'pickupdate') console.log(typeof value)
+
                                             return (
-                                                <TableCell key={item.id} sx={{ p: 0, pl: '10px', pt: '16px', pb: '16px', fontSize: '12px', color: '#44475B' }}
+                                                <TableCell key={index} sx={{ p: 0, pl: '10px', pt: '16px', pb: '16px', fontSize: '12px', color: '#44475B' }}
                                                     className={columnClassNames[item.id]} >
                                                     <div>
-                                                        {
-                                                            (typeof value) === 'object' ? '' : value
-
-                                                        }
-                                                        {
-                                                            item.id === 'handlingAgent' ? 
-                                                            <div><DescriptionIcon/></div>
-                                                            :<></>
+                                                        {(typeof value) === 'object' ? '' : value}
+                                                        {item.id === 'action' ?
+                                                            <div className='action_icon'><MoreHorizIcon style={{ color: 'white' }} /></div>
+                                                            : <></>
                                                         }
                                                         {
                                                             item.id === 'fnr' ?
                                                                 <div className='fnr_container'>
-                                                                    <div className='fnr_inner_data'>{value.standard}</div>
-                                                                    <div className='fnr_inner_inner_data'>
-                                                                        <div className='fnr_inner_inner_num'>{value.num}</div>
-                                                                        <div className='fnr_inner_inner_count'>
-                                                                            <div style={{ fontSize: '9px', color: 'white' }}>+{value.count}</div></div>
-                                                                    </div>
-                                                                    <div className='fnr_inner_inner_nachoes'>{value.nachoes}</div>
+                                                                    <div className='fnr_inner_data'>{value.primary}</div>
+                                                                    
+                                                                    <div className='fnr_inner_inner_nachoes'>{value.allFNRs}</div>
                                                                 </div>
                                                                 : <></>
                                                         }
                                                         {
-                                                            item.id === 'pickupdate' ?
+                                                            item.id === 'destination'?
+                                                                <div>
+                                                                    <div className=''
+                                                                        onMouseOver={()=>{hoverEffect(firstindex)}}
+                                                                    >{value.code}</div>
+                                                                    <div style={{
+                                                                        display:  destinationIndex === firstindex  ? 'block' : 'none',
+                                                                    }}>{value.name}</div>
+                                                                </div>
+                                                                :<></>
+                                                        }
 
-                                                                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                                                    <div>{formatDateTime(row.pickupdate).formattedDate}</div>
-                                                                    <div>{formatDateTime(row.pickupdate).timeString}</div>
-                                                                </div>
-                                                                : <></>
-                                                        }
-                                                        {
-                                                            item.id === 'initialETA' ?
 
-                                                                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                                                    <div>{formatDateTime(row.pickupdate).formattedDate}</div>
-                                                                    <div>{formatDateTime(row.pickupdate).timeString}</div>
-                                                                </div>
-                                                                : <></>
-                                                        }
-                                                        {
-                                                            item.id === 'currentEta' ?
-
-                                                                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                                                    <div>{formatDateTime(row.pickupdate).formattedDate}</div>
-                                                                    <div>{formatDateTime(row.pickupdate).timeString}</div>
-                                                                </div>
-                                                                : <></>
-                                                        }
-                                                        {
-                                                            item.id === 'status' ?
-                                                            <div className='status_container'>
-                                                                <div className='status_title'>{value.status}</div>
-                                                                <div className='status_body'>{value.address}</div>
-                                                                <div className='time'>{formatDateTime(value.eta).timeString}</div>
-                                                            </div>
-                                                            :<></>
-                                                        }
-                                                        {
-                                                            item.id === 'action' ?
-                                                            <div className='action_icon'><MoreHorizIcon style={{color:'white'}}/></div>
-                                                            :<></>
-                                                        }
                                                     </div>
 
                                                 </TableCell>
@@ -516,11 +327,71 @@ export default function TableData() {
                     </Table>
                 </TableContainer>
             </Paper>
-           
+
         </div>
     );
 }
 
+
+// {   
+//     item.id === 'handlingAgent' ? 
+//         <div><DescriptionIcon/></div>
+//         :<></>
+//     }
+//     {
+//         item.id === 'fnr' ?
+//             <div className='fnr_container'>
+//                 <div className='fnr_inner_data'>{value.standard}</div>
+//                 <div className='fnr_inner_inner_data'>
+//                     <div className='fnr_inner_inner_num'>{value.num}</div>
+//                     <div className='fnr_inner_inner_count'>
+//                         <div style={{ fontSize: '9px', color: 'white' }}>+{value.count}</div></div>
+//                 </div>
+//                 <div className='fnr_inner_inner_nachoes'>{value.nachoes}</div>
+//             </div>
+//             : <></>
+//     }
+//     {
+//         item.id === 'pickupdate' ?
+
+//             <div style={{ display: 'flex', flexDirection: 'column' }}>
+//                 {/* <div>{formatDateTime(row.pickupdate).formattedDate}</div>
+//                 <div>{formatDateTime(row.pickupdate).timeString}</div> */}
+//             </div>
+//             : <></>
+//     }
+//     {
+//         item.id === 'initialETA' ?
+
+//             <div style={{ display: 'flex', flexDirection: 'column' }}>
+//                 {/* <div>{formatDateTime(row.pickupdate).formattedDate}</div>
+//                 <div>{formatDateTime(row.pickupdate).timeString}</div> */}
+//             </div>
+//             : <></>
+//     }
+//     {
+//         item.id === 'currentEta' ?
+
+//             <div style={{ display: 'flex', flexDirection: 'column' }}>
+//                 <div>{formatDateTime(row.pickupdate).formattedDate}</div>
+//                 <div>{formatDateTime(row.pickupdate).timeString}</div>
+//             </div>
+//             : <></>
+//     }
+//     {
+//         item.id === 'status' ?
+//         <div className='status_container'>
+//             <div className='status_title'>{value.status}</div>
+//             <div className='status_body'>{value.address}</div>
+//             <div className='time'>{formatDateTime(value.eta).timeString}</div>
+//         </div>
+//         :<></>
+//     }
+//     {
+//         item.id === 'action' ?
+//         <div className='action_icon'><MoreHorizIcon style={{color:'white'}}/></div>
+//         :<></>
+//     }
 
 
 
