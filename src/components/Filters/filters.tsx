@@ -7,11 +7,10 @@ import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import DateRangeIcon from '@mui/icons-material/DateRange';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 
-// import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-// import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { DateRangePicker } from '@mui/x-date-pickers-pro/DateRangePicker';
+
+// import { DateRangePicker } from '@mui/x-date-pickers-pro/DateRangePicker';
 import { SingleInputDateRangeField } from '@mui/x-date-pickers-pro/SingleInputDateRangeField';
-// import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
+
 import Calendar from '@mui/icons-material/Event';
 import { useState, useEffect } from 'react';
 
@@ -20,13 +19,16 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs from 'dayjs';
+// import { DateRangePicker } from "@nextui-org/date-picker";
+import {DateRangePicker} from "@nextui-org/react";
 
 
 
 
-function Filters({onToFromChange} : any) {
 
-   
+function Filters({ onToFromChange }: any) {
+
+
 
     const today = new Date();
     const twentyDaysBefore = new Date();
@@ -37,8 +39,8 @@ function Filters({onToFromChange} : any) {
     const [error, setError] = useState('');
 
 
-    const formatDate = (date :any) => {
-        
+    const formatDate = (date: any) => {
+
         const day = date.getDate();
         const month = date.toLocaleString('default', { month: 'short' });
         const year = date.getFullYear();
@@ -67,16 +69,14 @@ function Filters({onToFromChange} : any) {
 
     useEffect(() => {
         if (startDate && endDate && !error) {
-            // Add your form submission logic here
             onToFromChange(endDate, startDate);
-            // console.log("Form submitted with Start Date:", startDate, "End Date:", endDate);
         }
     }, [startDate, endDate, error]);
 
     return (
-        <div style={{ display: 'flex', gap: 20, overflowX: 'auto', position:'relative' }} >
+        <div style={{ display: 'flex', gap: 20, overflowX: 'auto', position: 'relative' }} >
 
-            <div style={{display:'flex', gap:20,  }} >
+            <div style={{display:'flex', gap:20,  }}>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                     <DemoContainer components={['DatePicker']}
                         sx={{ padding: 0, }}
@@ -132,9 +132,10 @@ function Filters({onToFromChange} : any) {
                         />
                     </DemoContainer>
                 </LocalizationProvider>
-                
             </div>
             {error && <div className='error'>{error}</div>}
+
+
 
             <div >
                 <div className="custom-container">

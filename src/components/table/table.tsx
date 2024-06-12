@@ -41,15 +41,22 @@ function formatDateTime(date: Date): object {
 
 
 const convertArrayToFilteredArray = (inputArray: any) => {
-    return inputArray.map((item: { is_fois_fetched?: any; edemand_no?: any; FNR?: any; delivery_location?: any; others?: any; remarks?: any; }) => {
-
+    return inputArray.map((
+        item: {
+            is_fois_fetched?: any;
+            edemand_no?: any;
+            FNR?: any;
+            delivery_location?: any;
+            others?: any;
+            remarks?: any;
+            allFNRs: any;
+        }) => {
         const { edemand_no, FNR, allFNRs, delivery_location, others, remarks } = item;
-
         return {
             edemand: edemand_no,
             fnr: {
                 primary: FNR,
-                allFNRs: allFNRs || 'NA',
+                others: allFNRs || 'NA',
             },
             destination: {
                 name: delivery_location.name || 'NA',
@@ -57,9 +64,7 @@ const convertArrayToFilteredArray = (inputArray: any) => {
             },
             material: others.demandedCommodity || 'NA',
             pickupdate: others.confirmationDate || 'NA',
-            // ownedby: 'NA',
             status: item.is_fois_fetched || 'NA',
-            // initialETA: 'NA',
             currentEta: 'NA',
             remarks: 'NA',
             handlingAgent: 'NA',
@@ -69,65 +74,15 @@ const convertArrayToFilteredArray = (inputArray: any) => {
     });
 };
 
-// Define the Column interface
+
 interface Column {
-    id: keyof Data;
+    id: string;
     label: string | React.ReactNode;
     class: string;
     innerClass: string;
 }
 
-// Define the Data interface
-// interface Data {
-//     edemand: string;
-//     fnr: object;
-//     destination: string;
-//     material: string;
-//     pickupdate: Date;
-//     ownedby: string;
-//     status: object;
-//     initialETA: Date;
-//     currentEta: Date;
-//     remarks: string;
-//     handlingAgent: string;
-//     action: any;
-//     iconheader: any;
-// }
 
-
-// // Function to create data
-// function createData(
-//     edemand: string,
-//     fnr: object,
-//     destination: string,
-//     material: string,
-//     pickupdate: Date,
-//     ownedby: string,
-//     status: object,
-//     initialETA: Date,
-//     currentEta: Date,
-//     remarks: string,
-//     handlingAgent: string,
-//     action: any,
-//     iconheader: any
-// ): Data {
-//     return {
-//         edemand,
-//         fnr,
-//         destination,
-//         material,
-//         pickupdate,
-//         ownedby,
-//         status,
-//         initialETA,
-//         currentEta,
-//         remarks,
-//         handlingAgent,
-//         action,
-//         iconheader: ''
-
-//     };
-// }
 
 
 // Main component
@@ -138,12 +93,16 @@ export default function TableData({ onSkipLimit, allShipments }: any) {
     const [edemand, setEdemand] = React.useState(true);
     const [showEdemand, setShowEdemad] = React.useState(false);
     const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
+    const [columns, setColumns] = useState<Column[]>([]);
 
-    // console.log(allShipments)
+    console.log(allShipments)
+
+
+
 
 
     const response = convertArrayToFilteredArray(allShipments)
-    // console.log(response)
+
 
 
 
@@ -156,11 +115,10 @@ export default function TableData({ onSkipLimit, allShipments }: any) {
         setPage(0);
     };
 
-    const [columns, setColumns] = useState<Column[]>([]);
 
-    const [destinationIndex, setDestinationIndex] = useState(null)
+    const [destinationIndex, setDestinationIndex] = useState(-1)
 
-    function hoverEffect (index) {
+    function hoverEffect(index: number) {
         setDestinationIndex(index)
         console.log(index)
     }
@@ -171,9 +129,7 @@ export default function TableData({ onSkipLimit, allShipments }: any) {
             { id: 'destination', label: 'Destination', class: 'destination', innerClass: '' },
             { id: 'material', label: 'Material', class: 'material', innerClass: '' },
             { id: 'pickupdate', label: 'Pickup Date', class: 'pickupdate', innerClass: '' },
-            // { id: 'ownedby', label: 'Owned By', class: 'ownedby', innerClass: '' },
             { id: 'status', label: 'Status', class: 'status', innerClass: 'inner_status' },
-            // { id: 'initialETA', label: 'Initial ETA', class: 'initialETA', innerClass: '' },
             { id: 'currentEta', label: 'Current ETA', class: 'currentEta', innerClass: '' },
             { id: 'remarks', label: 'Remarks', class: 'remarks', innerClass: '' },
             { id: 'handlingAgent', label: 'Handling Agent', class: 'handlingAgent', innerClass: '' },
@@ -217,7 +173,7 @@ export default function TableData({ onSkipLimit, allShipments }: any) {
                     onPageChange={handleChangePage}
                     onRowsPerPageChange={handleChangeRowsPerPage}
                 />
-                <TableContainer sx={{ minHeight: 440 }}>
+                <TableContainer sx={{ maxHeight: 550, border: '1px solid #E9E9EB', borderRadius: '8px' }}>
                     <Table stickyHeader aria-label="sticky table">
                         <TableHead sx={{
                             '.mui-y8ay40-MuiTableCell-root ': { padding: 0 },
@@ -260,10 +216,10 @@ export default function TableData({ onSkipLimit, allShipments }: any) {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {response.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row : object,firstindex: number) => {
+                            {response.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row: object, firstindex: number) => {
                                 return (
                                     <TableRow hover key={row.edemand}>
-                                        {columns.map((item,index) => {
+                                        {columns.map((item, index) => {
                                             const value = row[item.id];
                                             const columnClassNames: any = {
                                                 edemand: 'body_edemand',
@@ -284,7 +240,7 @@ export default function TableData({ onSkipLimit, allShipments }: any) {
                                             if (item.id === 'pickupdate') console.log(typeof value)
 
                                             return (
-                                                <TableCell key={index} sx={{ p: 0, pl: '10px', pt: '16px', pb: '16px', fontSize: '12px', color: '#44475B' }}
+                                                <TableCell key={index} sx={{ fontSize: '12px', color: '#44475B', p: '16px 10px 16px 10px' }}
                                                     className={columnClassNames[item.id]} >
                                                     <div>
                                                         {(typeof value) === 'object' ? '' : value}
@@ -296,27 +252,34 @@ export default function TableData({ onSkipLimit, allShipments }: any) {
                                                             item.id === 'fnr' ?
                                                                 <div className='fnr_container'>
                                                                     <div className='fnr_inner_data'>{value.primary}</div>
-                                                                    
+
                                                                     <div className='fnr_inner_inner_nachoes'>{value.allFNRs}</div>
                                                                 </div>
                                                                 : <></>
                                                         }
                                                         {
-                                                            item.id === 'destination'?
-                                                                <div>
+                                                            item.id === 'destination' ?
+                                                                <div style={{ position: 'relative' }} >
                                                                     <div className=''
-                                                                        onMouseOver={()=>{hoverEffect(firstindex)}}
+                                                                        onMouseOver={() => { hoverEffect(firstindex) }}
+                                                                        onMouseLeave={() => { setDestinationIndex(-1) }}
                                                                     >{value.code}</div>
-                                                                    <div style={{
-                                                                        display:  destinationIndex === firstindex  ? 'block' : 'none',
-                                                                    }}>{value.name}</div>
+                                                                    <div
+                                                                        style={{
+                                                                            opacity: destinationIndex === firstindex ? 1 : 0, position: 'absolute',
+                                                                            border: ' 1px solid #DFE3EB',
+                                                                            scale: 0.8,
+                                                                            padding: '2px 5px 2px 5px',
+                                                                            top: -22,
+                                                                            left: 15,
+                                                                            backgroundColor: 'white',
+                                                                            borderRadius: '8px'
+                                                                        }}
+                                                                    >{value.name}</div>
                                                                 </div>
-                                                                :<></>
+                                                                : <></>
                                                         }
-
-
                                                     </div>
-
                                                 </TableCell>
                                             );
                                         })}

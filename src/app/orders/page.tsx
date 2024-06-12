@@ -52,7 +52,8 @@ const OrdersPage = () => {
   // function which bring allshipment
   async function getAllShipment (){
     const response =await httpsPost(GET_SHIPMENTS,ShipmentsPayload);
-    setAllShipment(response.data.data)
+    // console.log(response)
+    setAllShipment(response.data)
 
   }
 
@@ -73,71 +74,23 @@ const OrdersPage = () => {
             mobile ? <Header></Header> : <MobileHeader />
           }
 
-          <div style={{ paddingInline: 24, paddingTop: 24, paddingBottom: 65 }}>
+          <div style={{ paddingInline: 24, paddingTop: 24, paddingBottom: 65,  position:'relative' }}>
 
             {/* ----search fnr---- */}
             <div className='input_fnr_reload'>
-              <div className='void'></div>
-              <div className='fnr_input'>
-                <Box
-                  sx={{
-                    maxWidth: '100%',
-
-                  }}
-                >
-                  <TextField
-                    fullWidth
-                    label=""
-                    id="fullWidth"
-                    placeholder="Search by FNR Number"
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <SearchIcon />
-                        </InputAdornment>
-                      ),
-                      sx: {
-                        height: 40,
-                        '& .MuiInputBase-input::placeholder': {
-                          fontSize: '12px',
-                          display: 'flex',
-                          alignItems: 'center',
-                        },
-                      },
-                    }}
-                    sx={{
-                      '& .MuiOutlinedInput-root': {
-                        '& fieldset': {
-                          borderColor: '#E9E9EB',
-                          borderWidth: 1
-                        },
-                        '&:hover fieldset': {
-                          borderColor: '#E9E9EB',
-                          borderWidth: 1
-                        },
-                        '&.Mui-focused fieldset': {
-                          borderColor: '#E9E9EB',
-                          borderWidth: 1
-                        },
-                      },
-                    }}
-                  />
-                </Box>
+              <div className='reload'>
+                <ReplayIcon style={{ color: '#707070' }} />
               </div>
-              <div className='reload'><ReplayIcon style={{ color: '#707070' }} /></div>
             </div>
 
-            {/* ----otbound and inbound---- */}
+            {/* ----otbound ---- */}
             {mobile ?
               <div className='outbound_inbound'>
-                <div style={{ width: 99, textAlign: 'center', alignContent: 'center', color: '#2962FF', borderBottomColor: '#2962FF', borderBottomWidth: 2, borderBottomStyle: 'solid' }}>{en.ORDERS.outbound}</div>
-
-                <div style={{ width: 87, textAlign: 'center', alignContent: 'center', color: '#7C7E8C' }}>{en.ORDERS.inbound}</div>
+                <div className="outbound_inner">{en.ORDERS.outbound}</div>
               </div>
               :
               <div className='mobile_outbound_inbound'>
                 <div className='mobile_outbound'>{en.ORDERS.outbound}</div>
-                <div className='mobile_inbound'>{en.ORDERS.inbound}</div>
               </div>
             }
 
