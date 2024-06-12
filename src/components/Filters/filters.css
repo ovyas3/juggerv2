@@ -80,3 +80,14 @@
 .filter-icon {
     color: #7C7E8C;
 }
+
+  .error {
+    color: red;
+    font-size: 12px;
+    margin-top: 5px;
+    position:absolute;
+    z-index: 1000000;
+    left:850px;
+    bottom: 0;
+    
+  }

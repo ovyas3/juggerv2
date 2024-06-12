@@ -160,9 +160,8 @@
 }
 .body_action{
     /* background-color: turquoise !important; */
-    padding-right: 10px !important;
-    text-align: center;
-    
+   padding-inline:auto !important;
+   
 
 }
 
@@ -219,5 +218,5 @@
     height: 30px;
     padding: 0;
     border-radius: 8px;
-
+    width:45px
 }
