@@ -18,22 +18,6 @@ const httpsPost = async (path: string, data: any, type = 0) => {
   return response.data;
 }
 
-// const callAPI = async (type: string, url: string, body: any) => {
-//   let response;
-//   switch (type) {
-//     case "get":
-//       response = await axios.get(url, { params: body });
-//       break;
-//     case "post":
-//       response = await axios.post(url, body);
-//       break;
-//     default:
-//       break;
-//   }
-//   // console.log("communication", url, " \n", response.data);
-//   return response ? response.data : null;
-// };
-
 const apiCall = async (config: object) => await axios(config)
 
 export { httpsGet,  httpsPost, apiCall };

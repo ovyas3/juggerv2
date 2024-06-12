@@ -8,7 +8,7 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import React, { useEffect, useRef, useState } from "react";
 import './tripTracker.css'
-import { httpGet } from "../..//utils/Communication";
+import { httpsGet } from "../../utils/Communication";
 import pickupIcon from '../../assets/pickup_icon.svg'
 import dropIcon from '../../assets/drop_icon.svg'
 import wagonIcon from '../../assets/wagons_icon.svg'
@@ -367,7 +367,7 @@ const TripTracker = () => {
   });
   useEffect(() => {
     const fetchData = async () => {
-      const response = await httpGet(
+      const response = await httpsGet(
         `v1/tracker?unique_code=${unique_code}`
       );
       console.log(response.data);
