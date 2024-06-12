@@ -3,7 +3,7 @@ import LeftDrawer from "../Drawer/Drawer";
 import L from 'leaflet';
 import { Box, Grid, Button, ButtonBase, CardMedia, IconButton, useMediaQuery } from "@mui/material";
 import Footer from "../Footer/footer";
-import { MapContainer, TileLayer, Marker, Popup, Polyline, Polygon, LayersControl } from 'react-leaflet';
+import { MapContainer, Marker, Popup, Polyline } from 'react-leaflet';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import React, { useEffect, useRef, useState } from "react";
@@ -19,6 +19,7 @@ import mapViewIcon from '../../assets/map_view_icon.svg'
 import haltIcon from '../../assets/halt_icon.svg';
 import mapPlaceHolder from '../../assets/mapPlaceHolder.svg';
 import mapPathIcon from '../../assets/mapPath.svg';
+import MapLayers from "../../MapsHelper/MapLayers";
 
 const statusBuilder = (status: string) => {
   if (!status) return "In Plant"
@@ -405,19 +406,7 @@ const TripTracker = () => {
       > 
         {loadMap ?
           <MapContainer className="map" center={center} zoom={5} style={{ minHeight: '100%', width: '100%', padding: '0px', zIndex: 0, position: "fixed" }} attributionControl={false} ref={mapRef}>
-                <LayersControl >
-                  <LayersControl.BaseLayer checked name="Street View">
-                    <TileLayer
-                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                    />
-                  </LayersControl.BaseLayer>
-                  <LayersControl.BaseLayer name="Satellite View">
-                    <TileLayer
-                      attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-                      url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
-                    />
-                  </LayersControl.BaseLayer>
-                </LayersControl>
+                <MapLayers />
                 {/* <Polygon pathOptions={{ color: 'blue' }} positions={pickupgeofence_decoded} /> */}
                 {renderMarkers(tracking_data, customIcon)}
                 {trackingLine.length && <Polyline pathOptions={{ color:'red'}} positions={trackingLine} />}
