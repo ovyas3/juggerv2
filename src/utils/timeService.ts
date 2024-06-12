@@ -1,6 +1,6 @@
 import { DateTime } from 'luxon';
 
-const utcToist = (utc: string, format: string = 'dd-MM-yyy HH:mm') => {
+const utcToist = (utc: string, format: string = 'dd-MM-yyyy HH:mm') => {
   return DateTime.fromJSDate(new Date(utc)).plus({minutes: 330}).toFormat(format);
 }
 
@@ -13,6 +13,7 @@ const getToday = () => {
 }
 
 const diffrent = (start: string, end: string, type: string = 'days') => {
+  // @ts-ignore
   return DateTime.fromJSDate(new Date(start)).diff(DateTime.fromJSDate(new Date(end)), type).toObject()[type];
 }
 

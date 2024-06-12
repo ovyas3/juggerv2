@@ -17,6 +17,8 @@ import Checkbox from '@mui/material/Checkbox';
 import { useState, useEffect } from 'react'
 import './table.css'
 import { all } from 'axios';
+import service from '@/utils/timeService';
+import Link from 'next/link';
 
 function formatDateTime(date: Date): object {
     console.log(date)
@@ -39,6 +41,29 @@ function formatDateTime(date: Date): object {
     return { timeString, formattedDate };
 }
 
+interface row {
+    // [id]: any,
+    edemand: string,
+    fnr: {
+        primary: string,
+        others: string,
+        unique_code: string
+    },
+    destination: {
+        name: string,
+        code: string
+    },
+    material: string,
+    pickupdate: {
+        date: string
+    },
+    status: string,
+    currentEta: string,
+    remarks: string,
+    handlingAgent: string,
+    action: string,
+}
+
 
 const convertArrayToFilteredArray = (inputArray: any) => {
     return inputArray.map((
@@ -50,20 +75,24 @@ const convertArrayToFilteredArray = (inputArray: any) => {
             others?: any;
             remarks?: any;
             allFNRs: any;
+            unique_code: string,
         }) => {
-        const { edemand_no, FNR, allFNRs, delivery_location, others, remarks } = item;
+        const { edemand_no, FNR, allFNRs, delivery_location, others, remarks, unique_code } = item;
         return {
             edemand: edemand_no,
             fnr: {
                 primary: FNR,
                 others: allFNRs || 'NA',
+                unique_code,
             },
             destination: {
                 name: delivery_location.name || 'NA',
                 code: delivery_location.code || 'NA'
             },
             material: others.demandedCommodity || 'NA',
-            pickupdate: others.confirmationDate || 'NA',
+            pickupdate: {
+                date: others.confirmationDate || 'NA',
+            },
             status: item.is_fois_fetched || 'NA',
             currentEta: 'NA',
             remarks: 'NA',
@@ -173,7 +202,7 @@ export default function TableData({ onSkipLimit, allShipments }: any) {
                     onPageChange={handleChangePage}
                     onRowsPerPageChange={handleChangeRowsPerPage}
                 />
-                <TableContainer sx={{ maxHeight: 550, border: '1px solid #E9E9EB', borderRadius: '8px' }}>
+                <TableContainer sx={{ maxHeight: '100%', border: '1px solid #E9E9EB', borderRadius: '8px' }}>
                     <Table stickyHeader aria-label="sticky table">
                         <TableHead sx={{
                             '.mui-y8ay40-MuiTableCell-root ': { padding: 0 },
@@ -216,11 +245,13 @@ export default function TableData({ onSkipLimit, allShipments }: any) {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {response.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row: object, firstindex: number) => {
+                            {response.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row: row, firstindex: number) => {
                                 return (
                                     <TableRow hover key={row.edemand}>
+
                                         {columns.map((item, index) => {
-                                            const value = row[item.id];
+                                            // @ts-ignore
+                                            const value : any  = row[item.id];
                                             const columnClassNames: any = {
                                                 edemand: 'body_edemand',
                                                 fnr: 'body_fnr',
@@ -251,7 +282,13 @@ export default function TableData({ onSkipLimit, allShipments }: any) {
                                                         {
                                                             item.id === 'fnr' ?
                                                                 <div className='fnr_container'>
-                                                                    <div className='fnr_inner_data'>{value.primary}</div>
+                                                                    <div className='fnr_inner_data'>
+                                                                        <Link target="_blank"
+                                                                            href={"/tracker?" + value.unique_code}
+                                                                        >
+                                                                            {value.primary}
+                                                                        </Link>
+                                                                    </div>
 
                                                                     <div className='fnr_inner_inner_nachoes'>{value.allFNRs}</div>
                                                                 </div>
@@ -279,10 +316,19 @@ export default function TableData({ onSkipLimit, allShipments }: any) {
                                                                 </div>
                                                                 : <></>
                                                         }
+                                                        {
+                                                            item.id === 'pickupdate' ?
+
+                                                                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                                                  {service.utcToist(value.date)}
+                                                                </div>
+                                                                : <></>
+                                                        }
                                                     </div>
                                                 </TableCell>
                                             );
                                         })}
+
                                     </TableRow>
                                 );
                             })}
