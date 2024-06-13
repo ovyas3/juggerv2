@@ -1,0 +1,11 @@
+
+.appBar {
+    background-color: #5C39B7 !important; /* Primary blue color */
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+.toolbar {
+    position: sticky;
+    top: 0px;
+    height: 75px;
+}

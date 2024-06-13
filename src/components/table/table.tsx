@@ -324,6 +324,38 @@ export default function TableData({ onSkipLimit, allShipments }: any) {
                                                                 </div>
                                                                 : <></>
                                                         }
+                                                        {
+                                                            item.id === 'initialETA' ?
+
+                                                                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                                                    {/* <div>{formatDateTime(row.pickupdate).formattedDate}</div>
+                                                                    <div>{formatDateTime(row.pickupdate).timeString}</div> */}
+                                                                </div>
+                                                                : <></>
+                                                        }
+                                                        {
+                                                            item.id === 'currentEta' ?
+
+                                                                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                                                    {/* <div>{formatDateTime(row.pickupdate).formattedDate}</div>
+                                                                    <div>{formatDateTime(row.pickupdate).timeString}</div> */}
+                                                                </div>
+                                                                : <></>
+                                                        }
+                                                        {
+                                                            item.id === 'status' ?
+                                                            <div className='status_container'>
+                                                                <div className='status_title'>{value.status}</div>
+                                                                <div className='status_body'>{value.address}</div>
+                                                                {/* <div className='time'>{formatDateTime(value.eta).timeString}</div> */}
+                                                            </div>
+                                                            :<></>
+                                                        }
+                                                        {
+                                                            item.id === 'action' ?
+                                                            <div className='action_icon'><MoreHorizIcon style={{color:'white'}}/></div>
+                                                            :<></>
+                                                        }
                                                     </div>
                                                 </TableCell>
                                             );
