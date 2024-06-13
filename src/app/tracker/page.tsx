@@ -9,10 +9,10 @@ import React from "react";
 const MapViewPage: NextPage = () => {
 
     const searchParams = useSearchParams();
-    console.log(searchParams, "searchParams");
+    const unique_code =  searchParams.get('unique_code');
     
     return (
-        <TripTracker uniqueCode={searchParams} />
+        <TripTracker uniqueCode={unique_code} />
     );
 }
 

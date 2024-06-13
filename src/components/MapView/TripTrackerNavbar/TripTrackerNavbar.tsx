@@ -24,7 +24,7 @@ export const TripTrackerNavbar = () => {
                     src={ logoDefaultIcon }
                     alt="Map Path Icon"
                     width={60}
-                    height={60}
+                    height={60} 
                 />
                 TRIP TRACKER
             </Toolbar>

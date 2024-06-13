@@ -65,9 +65,9 @@ const TripTracker = (params: any) => {
   useEffect(() => {
     const fetchData = async () => {
       const response = await httpsGet(
-        `v1/tracker?unique_code=${unique_code}`
+        `tracker?unique_code=${unique_code}`
       );
-      console.log(response.data);
+      
       const {
         rakeData,
         tracks,
@@ -79,39 +79,6 @@ const TripTracker = (params: any) => {
     };
     fetchData();
   }, [unique_code]);
-
-useEffect(() => {
-  const fetchData = async () => {
-    try {
-     
-      const uni_code = String(unique_code).replace("=", "");
-  
-      const response = await httpsGet(
-        `v1/tracker?unique_code=${uni_code}`, 1
-      );
-
-      if (response.data) {
-        const { rakeData, tracks } = response.data;
-
-        if (rakeData && tracks) {
-          setFnrData(rakeData);
-          setTrackingData(tracks);
-          setFirstTrackingDetails(tracks[0] || {});
-          setLastTrackingDetails(tracks[tracks.length - 1] || {});
-        } else {
-          console.warn('Data fields are missing in the response');
-        }
-      } else {
-        console.warn('Empty data in response');
-      }
-    } catch (err) {
-      console.error('Fetch Error:', err);
-    }
-  };
-
-  fetchData();
-}, [unique_code]);
-
 
   useEffect(() => {
     setTrackingLine(tracking_data.map((e: {geo_point: {coordinates: [number, number]}}) => [e.geo_point.coordinates[1],e.geo_point.coordinates[0]]))
