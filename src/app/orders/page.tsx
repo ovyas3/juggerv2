@@ -1,5 +1,5 @@
 'use client'
-import en from "/Users/instavans/Desktop/lucy/lucy/messages/en.json"
+import {useTranslations} from 'next-intl';
 import SideDrawer from '@/components/Drawer/Drawer';
 import React, { useEffect, useState } from 'react';
 import Header from '@/components/Header/header';
@@ -8,7 +8,7 @@ import { Box, TextField, InputAdornment } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import ReplayIcon from '@mui/icons-material/Replay';
 import Filters from '@/components/Filters/filters';
-import TableData from '@/components/Table/table';
+import TableData from '@/components/table/table';
 import MobileDrawer from "@/components/Drawer/mobile_drawer";
 import MobileHeader from "@/components/Header/mobileHeader";
 import { useWindowSize } from "@/utils/hooks";
@@ -20,7 +20,7 @@ import { GET_SHIPMENTS } from "@/utils/helper";
 
 
 const OrdersPage = () => {
-
+  const t = useTranslations('ORDERS');
   const mobile = useWindowSize(600);
   const [allShipment, setAllShipment] = useState([]);
 
@@ -86,11 +86,11 @@ const OrdersPage = () => {
             {/* ----otbound ---- */}
             {mobile ?
               <div className='outbound_inbound'>
-                <div className="outbound_inner">{en.ORDERS.outbound}</div>
+                <div className="outbound_inner">{t('outbound')}</div>
               </div>
               :
               <div className='mobile_outbound_inbound'>
-                <div className='mobile_outbound'>{en.ORDERS.outbound}</div>
+                <div className='mobile_outbound'>{t('outbound')}</div>
               </div>
             }
 

@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "dev_build": "node --max_old_space_size=8048 node_modules/next/dist/bin/next build",
     "start": "next start",
     "lint": "next lint"
   },

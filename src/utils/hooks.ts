@@ -1,9 +1,11 @@
+'use client'
 import {useState, useEffect} from 'react'
 
 export const useWindowSize = (width: number): Boolean => {
-    const [isWide, setIsWide] = useState(window.innerWidth >= width);
+    const [isWide, setIsWide] = useState(true);
   
-    useEffect(() => {
+  useEffect(() => {
+    if (window) {
       const handleResize = () => {
         setIsWide(window.innerWidth >= width);
       };
@@ -12,7 +14,8 @@ export const useWindowSize = (width: number): Boolean => {
       return () => {
         window.removeEventListener('resize', handleResize);
       };
-    }, [width]);
-  
-    return isWide;
-  };
+    }
+  }, [width]);
+
+  return isWide;
+};
