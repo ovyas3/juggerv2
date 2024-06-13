@@ -4,28 +4,29 @@ import LeftDrawer from "../Drawer/Drawer";
 import L from 'leaflet';
 import { Box, Grid, Button, ButtonBase, CardMedia, IconButton, useMediaQuery } from "@mui/material";
 import Footer from "../Footer/footer";
-import { MapContainer, TileLayer, Marker, Popup, Polyline, Polygon, LayersControl } from 'react-leaflet';
+import { MapContainer, Marker, Popup, Polyline } from 'react-leaflet';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import React, { useEffect, useRef, useState } from "react";
 import './tripTracker.css'
-import { httpGet } from "../../utils/Communication";
-// import pickupIcon from '../../assets/pickup_icon.svg';
-import dropIcon from '../../assets/drop_icon.svg'
-import wagonIcon from '../../assets/wagons_icon.svg'
-import currentTrainLocationIcon from '../../assets/current_train_location_icon.svg'
-import arrowUpIcon from '../../assets/arrowUp.svg'
-import arrowDownIcon from '../../assets/arrowDown.svg'
-import mapViewIcon from '../../assets/map_view_icon.svg'
-import haltIcon from '../../assets/halt_icon.svg';
-import mapPlaceHolder from '../../assets/mapPlaceHolder.svg';
-import mapPathIcon from '../../assets/mapPath.svg';
+import { httpsGet } from "../../utils/Communication";
+import pickupIcon from '@/assets/pickup_icon.svg'
+import dropIcon from '@/assets/drop_icon.svg'
+import wagonIcon from '@/assets/wagons_icon.svg'
+import currentTrainLocationIcon from '@/assets/current_train_location_icon.svg'
+import arrowUpIcon from '@/assets/arrowUp.svg'
+import arrowDownIcon from '@/assets/arrowDown.svg'
+import mapViewIcon from '@/assets/map_view_icon.svg'
+import haltIcon from '@/assets/halt_icon.svg';
+import mapPlaceHolder from '@/assets/mapPlaceHolder.svg';
+import mapPathIcon from '@/assets/mapPath.svg';
 import { statusBuilder } from '../MapView/StatusBuilder/StatusBuilder';
 // import { RenderMarkers } from '../MapView/RenderMarkers/RenderMarkers';
 import { FNRDetailsCard } from '../MapView/FnrDetailsCard/FnrDetailsCard';
 import { ActivityTimeLineChart } from '../MapView/ActivityTimeLineChart/ActivityTimeLineChart';
 import { TripTrackerNavbar } from '../MapView/TripTrackerNavbar/TripTrackerNavbar';
 import Image from 'next/image';
+import MapLayers from "../../MapsHelper/MapLayers";
 
 
 const renderMarkers = (tracking_data: any[], customIcon: L.Icon): JSX.Element[] => {
@@ -61,6 +62,23 @@ const TripTracker = (params: any) => {
     iconAnchor: [7, 14], // Anchor point of the icon, usually half of the size
     popupAnchor: [0, -32], // Point from which the popup should open relative to the iconAnchor
   });
+  useEffect(() => {
+    const fetchData = async () => {
+      const response = await httpsGet(
+        `v1/tracker?unique_code=${unique_code}`
+      );
+      console.log(response.data);
+      const {
+        rakeData,
+        tracks,
+      } = response.data;
+      setFnrData(rakeData);
+      setTrackingData(tracks);
+      setFirstTrackingDetails(tracks[0]);
+      setLastTrackingDetails(tracks[tracks.length - 1]);
+    };
+    fetchData();
+  }, [unique_code]);
 
 useEffect(() => {
   const fetchData = async () => {
@@ -68,7 +86,7 @@ useEffect(() => {
      
       const uni_code = String(unique_code).replace("=", "");
   
-      const response = await httpGet(
+      const response = await httpsGet(
         `v1/tracker?unique_code=${uni_code}`, 1
       );
 
@@ -115,19 +133,7 @@ useEffect(() => {
       > 
         {loadMap ?
           <MapContainer className="map" center={center} zoom={5} style={{ minHeight: '100%', width: '100%', padding: '0px', zIndex: 0, position: "fixed" }} attributionControl={false} ref={mapRef}>
-                <LayersControl >
-                  <LayersControl.BaseLayer checked name="Street View">
-                    <TileLayer
-                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                    />
-                  </LayersControl.BaseLayer>
-                  <LayersControl.BaseLayer name="Satellite View">
-                    <TileLayer
-                      attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-                      url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
-                    />
-                  </LayersControl.BaseLayer>
-                </LayersControl>
+                <MapLayers />
                 {/* <Polygon pathOptions={{ color: 'blue' }} positions={pickupgeofence_decoded} /> */}
                 {renderMarkers(tracking_data, customIcon)}
                 {trackingLine.length && <Polyline pathOptions={{ color:'red'}} positions={trackingLine} />}

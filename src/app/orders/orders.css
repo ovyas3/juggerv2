@@ -1,9 +1,18 @@
 .input_fnr_reload{
-    display: flex;
-    justify-content: space-between;
+   display: flex;
    /* background-color:darksalmon; */
-   margin-bottom: 24px;
+   position:absolute;
+   justify-content: right;
+   right: 24px;
+   top:10px
+}
 
+.reload{
+    /* background-color: wheat; */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
 }
 
 .fnr_input{
@@ -68,4 +77,12 @@ margin-top: 20px;
     border-top-right-radius: 8px;
     color: white;
     
+}
+
+.outbound_inner{
+    width: 99px;
+    text-align: center;
+    align-content: center;
+    color: #2962FF;
+    border-bottom: 2px solid #2962FF;
 }
