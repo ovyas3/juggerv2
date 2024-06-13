@@ -1,7 +1,8 @@
 import { Box, Button, ButtonBase, CardContent, CardMedia, Grid } from "@mui/material";
 import React from "react";
 import { useEffect, useState } from "react";
-import pickupIcon from '../../assets/pickup_icon.svg'
+import pickupIcon from '../../../assets/pickup_icon.svg';
+import Image from 'next/image';
 
 export const ActivityTimeLineChart = (props: any) => {
     // const dateConvertor = (date) => DateTime.fromISO(date).plus({minutes: 330}).toFormat("dd-MM-yyyy HH:mm");
@@ -83,7 +84,7 @@ export const ActivityTimeLineChart = (props: any) => {
                   {dateConvertor(details.created_at)}
                 </Grid> */}
                 <Grid item display={"flex"} justifyContent={"center"} alignItems={"center"} xs={2}>
-                  <CardMedia
+                  {/* <CardMedia
                     component={"img"}
                     src={pickupIcon}
                     sx={{
@@ -91,7 +92,13 @@ export const ActivityTimeLineChart = (props: any) => {
                       width: '10px',
                       justifyContent: "center",
                     }}
-                  />
+                  /> */}
+                  <Image
+                    src={ pickupIcon }
+                    alt="Map Path Icon"
+                    width={10}
+                    height={10}
+                  />        
                 </Grid>
                 <Grid justifyContent={"flex-start"} item xs={10} fontSize={"10px"} >
                   {details.currentStatus}
@@ -106,7 +113,7 @@ export const ActivityTimeLineChart = (props: any) => {
                   {dateConvertor(details.created_at)}
                 </Grid> */}
                 <Grid item display={"flex"} justifyContent={"center"} alignItems={"center"} xs={2}>
-                  <CardMedia
+                  {/* <CardMedia
                     component={"img"}
                     src={pickupIcon}
                     sx={{
@@ -114,6 +121,12 @@ export const ActivityTimeLineChart = (props: any) => {
                       width: '10px',
                       justifyContent: "center",
                     }}
+                  /> */}
+                  <Image
+                    src={ pickupIcon }
+                    alt="Map Path Icon"
+                    width={10}
+                    height={10}
                   />
                 </Grid>
                 <Grid justifyContent={"flex-start"} item xs={10} fontSize={"10px"} >
@@ -125,7 +138,7 @@ export const ActivityTimeLineChart = (props: any) => {
           {!showPings && startingPings.length && endingPings.length ?
             <Grid item container spacing={2} display={"block"} xs={12} >
               <Grid item display={"flex"} margin-left={"20px"} justifyContent={"center"} height={'10px'}  alignItems={"center"} xs={10}>
-                  <CardMedia
+                  {/* <CardMedia
                     component={"img"}
                     src={pickupIcon}
                     sx={{
@@ -133,6 +146,12 @@ export const ActivityTimeLineChart = (props: any) => {
                       width: '8px',
                       justifyContent: "center",
                     }}
+                  /> */}
+                  <Image
+                    src={ pickupIcon }
+                    alt="Map Path Icon"
+                    width={10}
+                    height={10}
                   />
               </Grid>
               <Grid item display={"flex"} justifyContent={"center"} height={'10px'}  alignItems={"center"} xs={10}>
@@ -148,7 +167,7 @@ export const ActivityTimeLineChart = (props: any) => {
                   <ButtonBase style={{fontSize:'10px'}} onClick={handleLoadMore} >Load More</ButtonBase>
               </Grid>
               <Grid item display={"flex"} margin-left={"20px"} justifyContent={"center"} height={'10px'}  alignItems={"center"} xs={10}>
-                  <CardMedia
+                  {/* <CardMedia
                     component={"img"}
                     src={pickupIcon}
                     sx={{
@@ -156,6 +175,12 @@ export const ActivityTimeLineChart = (props: any) => {
                       width: '8px',
                       justifyContent: "center",
                     }}
+                  /> */}
+                  <Image
+                    src={ pickupIcon }
+                    alt="Map Path Icon"
+                    width={10}
+                    height={10}
                   />
               </Grid>
             </Grid>
@@ -167,7 +192,7 @@ export const ActivityTimeLineChart = (props: any) => {
                   {dateConvertor(details.created_at)}
                 </Grid> */}
                 <Grid item display={"flex"} justifyContent={"center"} alignItems={"center"} xs={2}>
-                  <CardMedia
+                  {/* <CardMedia
                     component={"img"}
                     src={pickupIcon}
                     sx={{
@@ -175,6 +200,12 @@ export const ActivityTimeLineChart = (props: any) => {
                       width: '10px',
                       justifyContent: "center",
                     }}
+                  /> */}
+                  <Image
+                    src={ pickupIcon }
+                    alt="Map Path Icon"
+                    width={10}
+                    height={10}
                   />
                 </Grid>
                 <Grid justifyContent={"flex-start"} item xs={10} fontSize={"10px"} >

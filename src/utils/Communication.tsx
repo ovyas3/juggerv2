@@ -1,6 +1,7 @@
 import axios from 'axios';
 const prefix = [
-    'https://prod-api.instavans.com/api/fois/'
+    'https://prod-api.instavans.com/api/fois/',
+    'https://dev-rms-api.instavans.com/api/mysterio/'
 ]
 
 const httpGet = async (path: string, type: number = 0) => {

@@ -1,3 +1,4 @@
+'use client'
 
 import LeftDrawer from "../Drawer/Drawer";
 import L from 'leaflet';
@@ -8,8 +9,8 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import React, { useEffect, useRef, useState } from "react";
 import './tripTracker.css'
-import { httpGet } from "../..//utils/Communication";
-import pickupIcon from '../../assets/pickup_icon.svg'
+import { httpGet } from "../../utils/Communication";
+// import pickupIcon from '../../assets/pickup_icon.svg';
 import dropIcon from '../../assets/drop_icon.svg'
 import wagonIcon from '../../assets/wagons_icon.svg'
 import currentTrainLocationIcon from '../../assets/current_train_location_icon.svg'
@@ -23,6 +24,9 @@ import { statusBuilder } from '../MapView/StatusBuilder/StatusBuilder';
 // import { RenderMarkers } from '../MapView/RenderMarkers/RenderMarkers';
 import { FNRDetailsCard } from '../MapView/FnrDetailsCard/FnrDetailsCard';
 import { ActivityTimeLineChart } from '../MapView/ActivityTimeLineChart/ActivityTimeLineChart';
+import { TripTrackerNavbar } from '../MapView/TripTrackerNavbar/TripTrackerNavbar';
+import Image from 'next/image';
+
 
 const renderMarkers = (tracking_data: any[], customIcon: L.Icon): JSX.Element[] => {
   return tracking_data.map((point, index) => (
@@ -34,12 +38,16 @@ const renderMarkers = (tracking_data: any[], customIcon: L.Icon): JSX.Element[] 
   ));
 };
 
-const TripTracker = () => {
+const TripTracker = (params: any) => {
   const center: [number, number] = [24.2654256,78.9145218];
   const mapRef = useRef<any>()
   // get unique code from route params
-  const queryParameters = new URLSearchParams(window.location.search)
-  const unique_code = queryParameters.get("unique_code");
+  // const queryParameters = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+  // const unique_code = queryParameters ? queryParameters.get("unique_code") : null;
+  // console.log("uniqueCode", params);
+  const unique_code = params.uniqueCode;
+  // console.log("unique_code", `${unique_code}`);
+  // console.log(unique_code);
   const [loadMap, setLoadMap] = useState(false);
   const [fnr_data, setFnrData] = useState({});
   const [firstTrackingDetails, setFirstTrackingDetails] = useState({});
@@ -53,27 +61,39 @@ const TripTracker = () => {
     iconAnchor: [7, 14], // Anchor point of the icon, usually half of the size
     popupAnchor: [0, -32], // Point from which the popup should open relative to the iconAnchor
   });
-  useEffect(() => {
-    const fetchData = async () => {
-      const response = await httpGet(
-        `v1/tracker?unique_code=${unique_code}`
-      );
-      console.log(response.data);
-      const {
-        rakeData,
-        tracks,
-      } = response.data;
-      setFnrData(rakeData);
-      setTrackingData(tracks);
-      setFirstTrackingDetails(tracks[0]);
-      setLastTrackingDetails(tracks[tracks.length - 1]);
-    };
-    fetchData();
-  }, [unique_code]);
 
-  useEffect(() => {
-    if(loadMap) setShowDetails(false);
-  }, [loadMap])
+useEffect(() => {
+  const fetchData = async () => {
+    try {
+     
+      const uni_code = String(unique_code).replace("=", "");
+  
+      const response = await httpGet(
+        `v1/tracker?unique_code=${uni_code}`, 1
+      );
+
+      if (response.data) {
+        const { rakeData, tracks } = response.data;
+
+        if (rakeData && tracks) {
+          setFnrData(rakeData);
+          setTrackingData(tracks);
+          setFirstTrackingDetails(tracks[0] || {});
+          setLastTrackingDetails(tracks[tracks.length - 1] || {});
+        } else {
+          console.warn('Data fields are missing in the response');
+        }
+      } else {
+        console.warn('Empty data in response');
+      }
+    } catch (err) {
+      console.error('Fetch Error:', err);
+    }
+  };
+
+  fetchData();
+}, [unique_code]);
+
 
   useEffect(() => {
     setTrackingLine(tracking_data.map((e: {geo_point: {coordinates: [number, number]}}) => [e.geo_point.coordinates[1],e.geo_point.coordinates[0]]))
@@ -87,6 +107,7 @@ const TripTracker = () => {
   const mobile = !useMediaQuery("(min-width:800px)");
   return (
     <>
+      <TripTrackerNavbar />
       <Box
         sx={{
             height: mobile ? "90vh" : "100vh",
@@ -144,14 +165,20 @@ const TripTracker = () => {
                 alignItems: 'center',
                 justifyContent: 'center',
               }} item xs={12}>
-                <CardMedia
+                {/* <CardMedia
                   component={"img"}
                   src={mapPathIcon}
                   style={{
                     height: mobile ? '32px' : '64px',
                     width: mobile ? '32px' : '64px',
                   }}
-                ></CardMedia>
+                ></CardMedia> */}
+                <Image
+                    src={ mapPathIcon }
+                    alt="Map Path Icon"
+                    width={30}
+                    height={30}
+                  />
               </Grid>
               <Grid style={{
                 textAlign: 'center',
@@ -173,14 +200,20 @@ const TripTracker = () => {
               alignContent: "center",
               alignItems: "center",
             }} variant="contained" onClick={() => setLoadMap(true)}>
-              <CardMedia
+              {/* <CardMedia
               component={"img"}
               src={mapViewIcon}
               style={{
                 height: mobile ? '24px' : '30px',
                 width: mobile ? '24px' : '30px',
               }}
-              ></CardMedia>
+              ></CardMedia> */}
+              <Image
+                    src={ mapViewIcon }
+                    alt="Map Path Icon"
+                    width={30}
+                    height={30}
+                />
               Map View
             </Button>
           </Box>
@@ -204,31 +237,39 @@ const TripTracker = () => {
           }}
           onClick={() => setShowDetails(!showDetails)}
           >
-            <CardMedia
+            {/* <CardMedia
               component={"img"}
               src={showDetails ? arrowDownIcon : arrowUpIcon}
               sx={{
                 justifyContent: "center",
               }}
-            />
+            /> */}
+            <Image
+                    src={ showDetails ? arrowDownIcon : arrowUpIcon }
+                    alt="Map Path Icon"
+                    width={10}
+                    height={10}
+                  />
           </IconButton>
         </Box>}
         {(!mobile || showDetails) && (<Box
           sx={{
             top: mobile ? "50%" : "4%",
-            minHeight: mobile ? "70%" : "40%",
+            minHeight: mobile ? "70%" : "92%",
             marginBottom: '10vh',
-            width: mobile ? "100%" : "33%",
+            width: mobile ? "100%" : "25%",
             display: "flex",
             alignItems: "center",
             background: "#F0F3F9",
+            backgroundColor: "#F8F8F8",
             p: 0,
             flexDirection: "column",
             zIndex: 10,
-            position: mobile ? "absolute" : 'relative',
-            borderRadius: "10px 10px 0px 0px",
-            marginLeft: mobile ? '0px' : '70px',
-            marginTop: mobile ? '0px' : '-40px',
+            position: mobile ? "absolute" : 'fixed',
+            // borderRadius: "10px 10px 0px 0px",
+            marginLeft: mobile ? '0px' : '0px',
+            marginTop: mobile ? '0px' : '41px',
+        
           }}
 
           className="tracking_details"
@@ -237,7 +278,7 @@ const TripTracker = () => {
         <ActivityTimeLineChart className="tracking_details_mobile" trackingDetails={tracking_data} />
         </Box>)}
       </Box>
-      {mobile ? <Footer /> : <LeftDrawer />}
+      {/* {mobile ? <Footer /> : <LeftDrawer />} */}
     </>
   );
 };
