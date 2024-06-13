@@ -16,7 +16,7 @@ function SideDrawer (){
 
     return(
         
-        <div className='containerDrawer' onMouseEnter={()=>{setOpen(true)}} onMouseLeave={()=>{setOpen(false)}} style={{alignItems:'start', width:open ?'218px':'70px', transition:'width 0.2s ease-in'}}>
+        <div className='containerDrawer' onMouseEnter={()=>{setOpen(true)}} onMouseLeave={()=>{setOpen(false)}} style={{alignItems:'start', width:open ?'218px':'70px', transition:'width 0.2s ease-in', zIndex: '20'}}>
 
             <div className='img'><Image src={defaultLogo} alt=''/></div>
 

@@ -9,6 +9,7 @@ import CardContent from '@mui/material/CardContent';
 import React, { useEffect, useRef, useState } from "react";
 import './tripTracker.css'
 import { httpGet } from "../..//utils/Communication";
+import MapLayers from "@/app/MapsHelper/MapLayers";
 import pickupIcon from '../../assets/pickup_icon.svg'
 import dropIcon from '../../assets/drop_icon.svg'
 import wagonIcon from '../../assets/wagons_icon.svg'
@@ -19,7 +20,6 @@ import mapViewIcon from '../../assets/map_view_icon.svg'
 import haltIcon from '../../assets/halt_icon.svg';
 import mapPlaceHolder from '../../assets/mapPlaceHolder.svg';
 import mapPathIcon from '../../assets/mapPath.svg';
-import MapLayers from "../../MapsHelper/MapLayers";
 
 const statusBuilder = (status: string) => {
   if (!status) return "In Plant"
