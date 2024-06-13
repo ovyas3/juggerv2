@@ -4,10 +4,7 @@ import React, { useState, useEffect } from "react";
 import { MapContainer, TileLayer, Marker, LayersControl, Popup, GeoJSON, Polyline } from 'react-leaflet';
 import MarkerClusterGroup from "react-leaflet-cluster";
 import './MapLayers.css';
-import { httpGet } from "../..//utils/Communication";
-
-import deliveryIcon from '../../assets/deliveryIcon.svg';
-
+import { httpsGet } from "@/utils/Communication";
 import getBoundary from "./IndianClaimed";
 import coordsOfTracks from "./IndianTracks";
 
@@ -124,8 +121,10 @@ const MapLayers = () => {
 
     const getRakeShipmentDatas = async () => {
       try {
-        setLoading(true);
-        const res = await httpGet('v1/all_captive_shipment_details', 1);
+        // setLoading(true);
+        console.log('Fetching data');
+        const res = await httpsGet('/all_captive_shipment_details', 0);
+        console.log('Data fetched', res);
         res.map((data: any) => {
           if (data && data.rake_updates) {
             if (!coords[data.name]) {
@@ -140,6 +139,7 @@ const MapLayers = () => {
                 }
               }
             );
+
           }
           if (!allRakes.some((item: any) => item.rake_id === data.rake_id)) {
             allRakes.push({
@@ -152,6 +152,7 @@ const MapLayers = () => {
         setCoords(coords);
       } catch (error) {
         console.error("An error occurred:", error);
+        setLoading(false);
       } finally {
         setLoading(false);
       }
@@ -248,7 +249,7 @@ const MapLayers = () => {
       <div>
         <div className="map-container">
           {isMobile ? <SideDrawer /> : null}
-          <div style={{ width: '100%', overflowX: 'auto' }}>
+          <div style={{ width: '100%', overflow: 'hidden' }}>
             {isMobile ? <Header></Header> : <MobileHeader />}
             <div style={{ paddingInline: 24, paddingTop: 24, paddingBottom: 65,  position:'relative' }}>
               <Box
