@@ -1,10 +1,9 @@
-import { AppBar, Box, CardMedia, Toolbar, Typography } from '@mui/material'
+'use client'
+import { AppBar, Box, Toolbar } from '@mui/material'
 import React from 'react';
 import './TripTrackerNavbar.css';
 import Image from 'next/image'
 import logoDefaultIcon from '../../../assets/logo_default_icon.svg';
-import smartruck_lite_logo from '../../../assets/smartruck_lite_logo.svg'
-import { green } from '@mui/material/colors';
 
 export const TripTrackerNavbar = () => {
   return (

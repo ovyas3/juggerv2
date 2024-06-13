@@ -1,27 +1,17 @@
 'use client'
 
-import LeftDrawer from "../Drawer/Drawer";
 import L from 'leaflet';
-import { Box, Grid, Button, ButtonBase, CardMedia, IconButton, useMediaQuery } from "@mui/material";
-import Footer from "../Footer/footer";
+import { Box, Grid, Button, IconButton, useMediaQuery } from "@mui/material";
 import { MapContainer, Marker, Popup, Polyline } from 'react-leaflet';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
 import React, { useEffect, useRef, useState } from "react";
 import './tripTracker.css'
 import { httpsGet } from "../../utils/Communication";
-import pickupIcon from '@/assets/pickup_icon.svg'
-import dropIcon from '@/assets/drop_icon.svg'
-import wagonIcon from '@/assets/wagons_icon.svg'
-import currentTrainLocationIcon from '@/assets/current_train_location_icon.svg'
 import arrowUpIcon from '@/assets/arrowUp.svg'
 import arrowDownIcon from '@/assets/arrowDown.svg'
 import mapViewIcon from '@/assets/map_view_icon.svg'
 import haltIcon from '@/assets/halt_icon.svg';
 import mapPlaceHolder from '@/assets/mapPlaceHolder.svg';
 import mapPathIcon from '@/assets/mapPath.svg';
-import { statusBuilder } from '../MapView/StatusBuilder/StatusBuilder';
-// import { RenderMarkers } from '../MapView/RenderMarkers/RenderMarkers';
 import { FNRDetailsCard } from '../MapView/FnrDetailsCard/FnrDetailsCard';
 import { ActivityTimeLineChart } from '../MapView/ActivityTimeLineChart/ActivityTimeLineChart';
 import { TripTrackerNavbar } from '../MapView/TripTrackerNavbar/TripTrackerNavbar';
@@ -42,13 +32,7 @@ const renderMarkers = (tracking_data: any[], customIcon: L.Icon): JSX.Element[] 
 const TripTracker = (params: any) => {
   const center: [number, number] = [24.2654256,78.9145218];
   const mapRef = useRef<any>()
-  // get unique code from route params
-  // const queryParameters = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
-  // const unique_code = queryParameters ? queryParameters.get("unique_code") : null;
-  // console.log("uniqueCode", params);
   const unique_code = params.uniqueCode;
-  // console.log("unique_code", `${unique_code}`);
-  // console.log(unique_code);
   const [loadMap, setLoadMap] = useState(false);
   const [fnr_data, setFnrData] = useState({});
   const [firstTrackingDetails, setFirstTrackingDetails] = useState({});
