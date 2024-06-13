@@ -1,3 +1,4 @@
+'use client'
 import { TileLayer, LayersControl } from 'react-leaflet';
 
 const MapLayers = () => {

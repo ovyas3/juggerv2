@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { Select, MenuItem, FormControl, SelectChangeEvent } from "@mui/material";
-import dropdownIcon from "@/assets/dropdown_small_icon.svg";
+import dropdownIcon from "../../assets/dropdown_small_icon.svg";
 import "./dropdown.css";
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 

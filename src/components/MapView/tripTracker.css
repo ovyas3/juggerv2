@@ -56,7 +56,7 @@ body {
     box-shadow: 0 0 0px 10px #48e08a61;
 }
 
-cluster-icon-delivery {
+.cluster-icon-delivery {
     background-color: #cd0030;
     height: 2em;
     width: 2em;

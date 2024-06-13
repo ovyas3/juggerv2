@@ -1,11 +1,11 @@
 'use client'
 
-import L from 'leaflet';
+import { Icon, latLngBounds } from 'leaflet';
 import { Box, Grid, Button, IconButton, useMediaQuery } from "@mui/material";
-import { MapContainer, Marker, Popup, Polyline } from 'react-leaflet';
+import { MapContainer, Marker, Popup, Polyline, LayersControl, TileLayer } from 'react-leaflet';
 import React, { useEffect, useRef, useState } from "react";
 import './tripTracker.css'
-import { httpsGet } from "../../utils/Communication";
+
 import arrowUpIcon from '@/assets/arrowUp.svg'
 import arrowDownIcon from '@/assets/arrowDown.svg'
 import mapViewIcon from '@/assets/map_view_icon.svg'
@@ -16,10 +16,10 @@ import { FNRDetailsCard } from '../MapView/FnrDetailsCard/FnrDetailsCard';
 import { ActivityTimeLineChart } from '../MapView/ActivityTimeLineChart/ActivityTimeLineChart';
 import { TripTrackerNavbar } from '../MapView/TripTrackerNavbar/TripTrackerNavbar';
 import Image from 'next/image';
-import MapLayers from "../../MapsHelper/MapLayers";
+// import MapLayers from "../../MapsHelper/MapLayers";
 
 
-const renderMarkers = (tracking_data: any[], customIcon: L.Icon): JSX.Element[] => {
+const renderMarkers = (tracking_data: any[], customIcon: Icon): JSX.Element[] => {
   return tracking_data.map((point, index) => (
     <Marker key={index} position={[point.geo_point.coordinates[1], point.geo_point.coordinates[0]]} icon={customIcon}>
       <Popup>
@@ -32,7 +32,7 @@ const renderMarkers = (tracking_data: any[], customIcon: L.Icon): JSX.Element[] 
 const TripTracker = (params: any) => {
   const center: [number, number] = [24.2654256,78.9145218];
   const mapRef = useRef<any>()
-  const unique_code = params.uniqueCode;
+  const trip_tracker_data = params.trip_tracker_data;
   const [loadMap, setLoadMap] = useState(false);
   const [fnr_data, setFnrData] = useState({});
   const [firstTrackingDetails, setFirstTrackingDetails] = useState({});
@@ -40,34 +40,30 @@ const TripTracker = (params: any) => {
   const [tracking_data, setTrackingData] = useState<any>([]);
   const [trackingLine, setTrackingLine] = useState<[number, number][]>([]);
   const [showDetails, setShowDetails] = useState(true);
-  const customIcon = new L.Icon({
+  const customIcon = new Icon({
     iconUrl: haltIcon,
     iconSize: [14, 14], // Size of the icon
     iconAnchor: [7, 14], // Anchor point of the icon, usually half of the size
     popupAnchor: [0, -32], // Point from which the popup should open relative to the iconAnchor
   });
+  const fetchData = () => {  
+    const {
+      rakeData,
+      tracks,
+    } = trip_tracker_data;
+    setFnrData(rakeData);
+    setTrackingData(tracks);
+    setFirstTrackingDetails(tracks[0]);
+    setLastTrackingDetails(tracks[tracks.length - 1]);
+  };
   useEffect(() => {
-    const fetchData = async () => {
-      const response = await httpsGet(
-        `tracker?unique_code=${unique_code}`
-      );
-      
-      const {
-        rakeData,
-        tracks,
-      } = response.data;
-      setFnrData(rakeData);
-      setTrackingData(tracks);
-      setFirstTrackingDetails(tracks[0]);
-      setLastTrackingDetails(tracks[tracks.length - 1]);
-    };
     fetchData();
-  }, [unique_code]);
+  }, [trip_tracker_data]);
 
   useEffect(() => {
     setTrackingLine(tracking_data.map((e: {geo_point: {coordinates: [number, number]}}) => [e.geo_point.coordinates[1],e.geo_point.coordinates[0]]))
     if (mapRef.current && trackingLine.length > 0) {
-      const bounds = L.latLngBounds(trackingLine);
+      const bounds = latLngBounds(trackingLine);
       mapRef.current.fitBounds(bounds);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -84,7 +80,19 @@ const TripTracker = (params: any) => {
       > 
         {loadMap ?
           <MapContainer className="map" center={center} zoom={5} style={{ minHeight: '100%', width: '100%', padding: '0px', zIndex: 0, position: "fixed" }} attributionControl={false} ref={mapRef}>
-                <MapLayers />
+                <LayersControl >
+                <LayersControl.BaseLayer checked name="Street View">
+                  <TileLayer
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                  />
+                </LayersControl.BaseLayer>
+                <LayersControl.BaseLayer name="Satellite View">
+                  <TileLayer
+                    attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+                    url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+                  />
+                </LayersControl.BaseLayer>
+              </LayersControl>
                 {/* <Polygon pathOptions={{ color: 'blue' }} positions={pickupgeofence_decoded} /> */}
                 {renderMarkers(tracking_data, customIcon)}
                 {trackingLine.length && <Polyline pathOptions={{ color:'red'}} positions={trackingLine} />}

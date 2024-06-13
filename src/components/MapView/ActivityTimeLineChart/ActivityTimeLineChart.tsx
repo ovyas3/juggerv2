@@ -1,3 +1,4 @@
+'use client'
 import { Box, Button, ButtonBase, CardContent, CardMedia, Grid } from "@mui/material";
 import React from "react";
 import { useEffect, useState } from "react";

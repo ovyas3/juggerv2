@@ -284,7 +284,7 @@ export default function TableData({ onSkipLimit, allShipments }: any) {
                                                                 <div className='fnr_container'>
                                                                     <div className='fnr_inner_data'>
                                                                         <Link target="_blank"
-                                                                            href={"/tracker?unique_code" + value.unique_code}
+                                                                            href={"/tracker?unique_code=" + value.unique_code}
                                                                         >
                                                                             {value.primary}
                                                                         </Link>

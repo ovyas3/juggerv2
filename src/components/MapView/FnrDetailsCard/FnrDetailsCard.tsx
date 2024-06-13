@@ -1,4 +1,5 @@
-import { Box, CardContent, CardMedia, Grid } from "@mui/material";
+'use client'
+import { Box, CardContent, Grid } from "@mui/material";
 import React from "react";
 import pickupIcon from '../../../assets/pickup_icon.svg';
 import wagonIcon from '../../../assets/wagons_icon.svg';
