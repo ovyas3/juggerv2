@@ -21,6 +21,7 @@ import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import { Box } from "@mui/material";
+import { httpsGet } from "@/utils/Communication";
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialogContent-root": {
@@ -91,54 +92,144 @@ const data = [
   },
 ];
 
-const childData = [
-  {
-    title: "Rake ID",
-    number: "18013109984",
-  },
-  {
-    title: "No. of Wagons",
-    number: "44",
-  },
-  {
-    title: "Scheme Type",
-    number: "GPWIS",
-  },
-];
+// const dummyChildData = [
+//   {
+//     title: "Rake ID",
+//     number: "18013109984",
+//   },
+//   {
+//     title: "No. of Wagons",
+//     number: "44",
+//   },
+//   {
+//     title: "Scheme Type",
+//     number: "GPWIS",
+//   },
+// ];
 
 export const Popup = () => {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
   const [childOpen, setChildOpen] = useState(false);
-  const [schemeType, setSchemeType] = useState("");
-  const [wagonType, setWagonType] = useState("");
+  const [parentTableData, setParentTableData] = useState<any>([]);
+  const [filteredData, setFilteredData] = useState<any>([]);
+  const [schemeType, setSchemeType] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [wagonType, setWagonType] = useState('');
+  const [searchChildTerm, setSearchChildTerm] = useState('');
+  const [childData, setChildData] = useState<any>({});
+  const [childTableData, setChildTableData] = useState<any>([]);
+  const [childFilteredData, setChildFilteredData] = useState<any>([]);
 
-  const handleSchemeTypeChange = (event: SelectChangeEvent) => {
-    setSchemeType(event.target.value);
-  };
-
-  const handleWagonTypeChange = (event: SelectChangeEvent) => {
-    setWagonType(event.target.value);
-  };
+  // Get data for parent dialog component
+  const getDataParentTabele = async () => {
+    const res = await httpsGet('/all_captive_rakes_details', 0);
+    // Create a new array
+    const newData = res.map((item : any) => ({
+      rake_id: item.rake_id,
+      scheme_type: item.scheme,
+      no_of_wagons: item.wagons ? item.wagons.length : 0,
+      date_of_commissioning: item.commissioned ? new Date(item.commissioned).toLocaleDateString('en-GB') : 'N/A',
+      roh_done: item.roh ? new Date(item.roh).toLocaleDateString('en-GB') : 'N/A',
+      roh_due: item.roh_due ? new Date(item.roh_due).toLocaleDateString('en-GB') : 'N/A',
+      poh_done: item.poh ? new Date(item.poh).toLocaleDateString('en-GB') : 'N/A',
+      poh_due: item.poh_due ? new Date(item.poh_due).toLocaleDateString('en-GB') : 'N/A',
+      wagons: item.wagons,
+    }));
+    setParentTableData(newData);
+    setFilteredData(newData);
+  }
 
   useEffect(() => {
-    console.log(schemeType);
-    console.log(wagonType);
-  }, [schemeType, wagonType]);
+    getDataParentTabele();
+  }, []);
 
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
-  const handleClose = () => {
-    setOpen(false);
+  const handleFilterChange = (newSearchTerm = searchTerm, newSchemeType = schemeType) => {
+    const filteredBySearchTerm = newSearchTerm
+      ? parentTableData.filter((item: any) =>
+          item.rake_id.toLowerCase().includes(newSearchTerm.toLowerCase())
+        )
+      : parentTableData;
+
+    const finalFilteredData = (newSchemeType === 'ALL' || !newSchemeType)
+      ? filteredBySearchTerm
+      : filteredBySearchTerm.filter((item: any) => item.scheme_type === newSchemeType);
+
+    console.log(finalFilteredData);
+    setFilteredData(finalFilteredData);
   };
 
-  const handleChildClickOpen = () => {
-    console.log("child clicked");
+  const handleSearchChange = (event: any) => {
+    const newSearchTerm = event.target.value;
+    setSearchTerm(newSearchTerm);
+    console.log(newSearchTerm);
+    handleFilterChange(newSearchTerm, schemeType);
+  };
+
+  const handleSchemeTypeChange = (event: any) => {
+    const selectedSchemeType = event.target.value;
+    setSchemeType(selectedSchemeType);
+    console.log(selectedSchemeType);
+    handleFilterChange(searchTerm, selectedSchemeType);
+  };
+
+  // Open and close state for parent dialog
+  // const handleClickOpen = () => {
+  //   setOpen(true);
+  // };
+  // const handleClose = () => {
+  //   setOpen(false);
+  // };
+
+  // Child Data handling
+
+  // Open and close state for child dialog
+  const handleChildClickOpen = (item: any) => {
+    const newChildUpperData = {
+      rake_id: item.rake_id,
+      scheme_type: item.scheme_type,
+      no_of_wagons: item.no_of_wagons
+    };
+    const newChildLowerData = item.wagons.map((wagon: any, index: number) => (
+      {
+        wagon_no: wagon.wg_no,
+        wagon_type: wagon.wagon_type,
+        remark: wagon.remark
+      }
+    ));
+    setChildData(newChildUpperData);
+    setChildTableData(newChildLowerData);
+    setChildFilteredData(newChildLowerData);
     setChildOpen(true);
-  };
+  }
 
   const handleChildClose = () => {
     setChildOpen(false);
+  }
+
+  const handleChildFilterChange = (newSearchChildTerm = searchChildTerm, newWagonType = wagonType) => {
+    const filteredBySearchTerm = newSearchChildTerm
+      ? childTableData.filter((item: any) =>
+          item.wagon_no.toLowerCase().includes(newSearchChildTerm.toLowerCase())
+        )
+      : childTableData;
+
+    const finalFilteredData = (newWagonType === "ALL" || !newWagonType)
+      ? filteredBySearchTerm.filter((item: any) => item.wagon_type === newWagonType)
+      : filteredBySearchTerm;
+
+    setChildFilteredData(finalFilteredData);
+  };
+
+  const handleChildSearchChange = (event: any) => {
+    const newSearchTerm = event.target.value;
+    setSearchChildTerm(newSearchTerm);
+    handleChildFilterChange(newSearchTerm, wagonType);
+  };
+
+  const handleWagonTypeChange = (event: any) => {
+    const selectedWagonType = event.target.value;
+    setWagonType(selectedWagonType);
+    handleChildFilterChange(searchChildTerm, selectedWagonType);
   };
 
   const DialogComponent = () =>
@@ -173,21 +264,6 @@ export const Popup = () => {
         <TableHeadComponent />
         <TableBody>
           <TableRowComponent />
-          <TableRowComponent />
-          <TableRowComponent />
-          <TableRowComponent />
-          <TableRowComponent />
-          <TableRowComponent />
-          <TableRowComponent />
-          <TableRowComponent />
-          <TableRowComponent />
-          <TableRowComponent />
-          <TableRowComponent />
-          <TableRowComponent />
-          <TableRowComponent />
-          <TableRowComponent />
-          <TableRowComponent />
-          <TableRowComponent />
         </TableBody>
       </Table>
     </TableContainer>
@@ -201,6 +277,8 @@ export const Popup = () => {
             id="outlined-basic"
             label="Rake ID"
             variant="outlined"
+            value={searchTerm}
+            onChange={handleSearchChange} 
             InputLabelProps={{
               classes: {
                 root: "my-label-class",
@@ -219,6 +297,7 @@ export const Popup = () => {
                 label="Scheme Type"
                 onChange={handleSchemeTypeChange}
               >
+                <MenuItem value={"ALL"}>ALL</MenuItem>
                 <MenuItem value={"SFTO"}>SFTO</MenuItem>
                 <MenuItem value={"GPWIS"}>GPWIS</MenuItem>
                 <MenuItem value={"BFNV"}>BFNV</MenuItem>
@@ -249,48 +328,42 @@ export const Popup = () => {
   );
 
   const TableRowComponent = () => (
-    <TableRow
-      key={1}
-      sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-      className="table-rows-container"
-      onClick={handleChildClickOpen}
-    >
-      <TableCell align="center" className="table-rows">
-        18013109984
-      </TableCell>
-      <TableCell align="center" className="table-rows">
-        GPWIS
-      </TableCell>
-      <TableCell align="center" className="table-rows">
-        44
-      </TableCell>
-      <TableCell align="left" className="table-rows">
-        31/12/2022
-      </TableCell>
-      <TableCell align="left" className="table-rows">
-        31/12/2022
-      </TableCell>
-      <TableCell align="left" className="table-rows">
-        Dec 24
-      </TableCell>
-      <TableCell align="left" className="table-rows">
-        N/A
-      </TableCell>
-      <TableCell align="left" className="table-rows">
-        Dec 24
-      </TableCell>
-    </TableRow>
+    filteredData.map((item: any) => (
+      <TableRow
+        key={item.rake_id}
+        sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+        className='table-rows-container'
+        onClick={() => handleChildClickOpen(item)}>
+         <TableCell align="left" className='table-rows'>{item.rake_id}</TableCell>
+         <TableCell align="center" className='table-rows'>{item.scheme_type}</TableCell>
+         <TableCell align="center" className='table-rows'>{item.no_of_wagons}</TableCell>
+         <TableCell align="left" className='table-rows'>{item.date_of_commissioning}</TableCell>
+         <TableCell align="left" className='table-rows'>{item.roh_done}</TableCell>
+         <TableCell align="left" className='table-rows'>{item.roh_due}</TableCell>
+         <TableCell align="left" className='table-rows'>{item.poh_done}</TableCell>
+         <TableCell align="left" className='table-rows'>{item.poh_due}</TableCell>
+      </TableRow>
+      ))
   );
 
-  const ChildDialogComponent = () =>
-    childData.map((item, index) => (
-      <div className="child-upper-containers" key={index}>
-        <DialogContent>
-          <p className="title">{item.title}</p>
-          <p className="number">{item.number}</p>
-        </DialogContent>
-      </div>
-    ));
+  const ChildDialogComponent = () => (
+    childData && (
+      <div className="child-upper-containers" key={childData.rake_id}>
+      <DialogContent>
+        <p className="title">Rake ID</p>
+        <p className="number">{childData.rake_id}</p>
+      </DialogContent>
+      <DialogContent>
+        <p className="title">No. of Wagons</p>
+        <p className="number">{childData.no_of_wagons}</p>
+      </DialogContent>
+      <DialogContent>
+        <p className="title">Scheme Type</p>
+        <p className="number">{childData.scheme_type}</p>
+      </DialogContent>
+    </div>
+    )
+  );
 
   const ChildTableHeadComponent = () => (
     <TableHead>
@@ -300,7 +373,8 @@ export const Popup = () => {
             id="outlined-basic"
             label="Wagon No."
             variant="outlined"
-            className="rake-search"
+            value={searchChildTerm}
+            onChange={handleChildSearchChange}
             InputLabelProps={{
               classes: {
                 root: "my-label-class",
@@ -319,6 +393,7 @@ export const Popup = () => {
                 label="Wagon Type"
                 onChange={handleWagonTypeChange}
               >
+                <MenuItem value={"ALL"}>ALL</MenuItem>
                 <MenuItem value={"BRN"}>BRN</MenuItem>
                 <MenuItem value={"BFNV"}>BFNV</MenuItem>
               </Select>
@@ -333,22 +408,19 @@ export const Popup = () => {
   );
 
   const ChildTableRowComponent = () => (
-    <TableRow
-      key={1}
-      sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-      className="table-rows-container"
-    >
-      <TableCell align="left" className="table-rows">
-        18013109984
-      </TableCell>
-      <TableCell align="left" className="table-rows">
-        BRN
-      </TableCell>
-      <TableCell align="left" className="table-rows">
-        N/A
-      </TableCell>
-    </TableRow>
+    childFilteredData.map((item: any) => (
+      <TableRow
+        key={item.wagon_no}
+        sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+        className='table-rows-container'
+      >
+        <TableCell align="left" className='table-rows'>{item.wagon_no}</TableCell>
+        <TableCell align="left" className='table-rows'>BRN</TableCell>
+        <TableCell align="left" className='table-rows'>{item.remark}</TableCell>
+      </TableRow>
+    ))
   );
+
 
   const ChildTableComponent = () => (
     <TableContainer
@@ -356,33 +428,12 @@ export const Popup = () => {
       sx={{
         border: "1px solid #DFE3EB",
         borderRadius: "12px",
-        height: "540px",
+        height: "500px",
       }}
     >
       <Table sx={{ minWidth: 650 }} aria-label="simple table" stickyHeader>
         <ChildTableHeadComponent />
         <TableBody>
-          <ChildTableRowComponent />
-          <ChildTableRowComponent />
-          <ChildTableRowComponent />
-          <ChildTableRowComponent />
-          <ChildTableRowComponent />
-          <ChildTableRowComponent />
-          <ChildTableRowComponent />
-          <ChildTableRowComponent />
-          <ChildTableRowComponent />
-          <ChildTableRowComponent />
-          <ChildTableRowComponent />
-          <ChildTableRowComponent />
-          <ChildTableRowComponent />
-          <ChildTableRowComponent />
-          <ChildTableRowComponent />
-          <ChildTableRowComponent />
-          <ChildTableRowComponent />
-          <ChildTableRowComponent />
-          <ChildTableRowComponent />
-          <ChildTableRowComponent />
-          <ChildTableRowComponent />
           <ChildTableRowComponent />
         </TableBody>
       </Table>
@@ -430,9 +481,9 @@ export const Popup = () => {
       > */}
       <Box sx={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
         <div className="dialog-container">
-          <div aria-label="close" onClick={handleClose} className="close-icon">
-            {/* <Image src={CloseButtonIcon} alt="close" /> */}
-          </div>
+          {/* <div aria-label="close" onClick={handleClose} className="close-icon">
+            <Image src={CloseButtonIcon} alt="close" /> 
+          </div> */}
           <div className="upper-container">
             <DialogComponent />
           </div>

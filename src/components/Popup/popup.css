@@ -357,8 +357,8 @@
 
 .child-dialog-styles .MuiDialog-container .MuiDialog-paper{
   border-radius: 12px !important;
-  max-width: 689px !important;
-  min-height: 670px !important;
+  max-width: 750px !important;
+  min-height: 620px !important;
   overflow-y: unset;
 }
 
@@ -371,14 +371,11 @@
   z-index: 1000;
 }
 
-.child-dialog-styles .child-upper-container{
-  display: flex;
-  flex-direction: row;
-  gap: 28px;
-}
-
 .child-dialog-styles .child-upper-containers {
   padding: 24px 32px 24px 24px;
+  display: flex;
+  flex-direction: row;
+  gap: 24px;
 
   .title {
     font-size: 16px;
