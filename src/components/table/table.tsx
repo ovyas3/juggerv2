@@ -11,12 +11,10 @@ import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import IconButton from '@mui/material/IconButton';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import DescriptionIcon from '@mui/icons-material/Description';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import Checkbox from '@mui/material/Checkbox';
 import { useState, useEffect } from 'react'
 import './table.css'
-import { all } from 'axios';
 import service from '@/utils/timeService';
 import Link from 'next/link';
 
@@ -115,7 +113,7 @@ interface Column {
 
 
 // Main component
-export default function TableData({ onSkipLimit, allShipments }: any) {
+export default function TableData({ onSkipLimit, allShipments, count }: any) {
 
     const [page, setPage] = React.useState(0);
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
@@ -125,15 +123,7 @@ export default function TableData({ onSkipLimit, allShipments }: any) {
     const [columns, setColumns] = useState<Column[]>([]);
 
     console.log(allShipments)
-
-
-
-
-
-    const response = convertArrayToFilteredArray(allShipments)
-
-
-
+    const response = convertArrayToFilteredArray(allShipments && allShipments.length ? allShipments : [])
 
     const handleChangePage = (event: unknown, newPage: number) => {
         setPage(newPage);
@@ -196,7 +186,7 @@ export default function TableData({ onSkipLimit, allShipments }: any) {
                 <TablePagination
                     rowsPerPageOptions={[10, 25, 100]}
                     component="div"
-                    count={response.length}
+                    count={count}
                     rowsPerPage={rowsPerPage}
                     page={page}
                     onPageChange={handleChangePage}

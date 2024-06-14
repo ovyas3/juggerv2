@@ -1,26 +1,44 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Select, MenuItem, FormControl, SelectChangeEvent } from "@mui/material";
 import dropdownIcon from "../../assets/dropdown_small_icon.svg";
 import "./dropdown.css";
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 
-const options = [
-  { value: "raigarh", label: "Raigarh" },
-  { value: "angul", label: "Angul" },
-];
+
+interface shipper {
+  _id: string,
+  name: string
+}
+interface option {
+  value: string,
+  label: string
+}
 interface event {
   target: {
     value: string;
   };
 }
 
-const Dropdown = () => {
-  const [selectedValue, setSelectedValue] = useState("raigarh");
-
+const Dropdown = ({ shippers }:{shippers: shipper[]}) => {
+  const [selectedValue, setSelectedValue] = useState<string>('');
+  const [options, setOptions] = useState<option[]>([{
+    value: '',
+    label: ''
+  }]);
   const handleChange = (event: event) => {
     setSelectedValue(event.target.value as string);
   };
+
+  useEffect(() => {
+    const selected_shipper = localStorage.getItem('selected_shipper') as string;
+    const optionsData = shippers.map((shipper) => {
+      return { value: shipper._id, label: shipper.name };
+    });
+    setOptions(optionsData);
+    setSelectedValue(selected_shipper);
+    console.log({options, selectedValue})
+  }, []);
 
   return (
     <FormControl sx={{ minWidth: 166 }}>

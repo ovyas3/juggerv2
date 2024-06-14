@@ -13,20 +13,40 @@ import HelpIcon from '@mui/icons-material/Help';
 import LogoutIcon from '@mui/icons-material/Logout';
 
 import './proFileDrop.css'
+import { deleteAllCache } from '@/utils/storageService';
+import { useRouter } from 'next/navigation';
 
 export default function AccountMenu() {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
+  const router = useRouter();
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
+
+  const handleLogout = () => {
+    console.log('logout');
+    deleteAllCache();
+    router.push('/');
+  }
+
+  const createProfileName = (name: string) => {
+    let nameArray = name.split(' ');
+    let profileName = '';
+    nameArray.forEach((name, index) => {
+      if (index < 2) {
+        profileName += name[0].toUpperCase();
+      }
+    });
+    return profileName;
+  }
+
   const handleClose = () => {
     setAnchorEl(null);
   };
   return (
     <React.Fragment>
       <Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'center' }}>
-        
         <Tooltip title="Account settings">
           <IconButton
             onClick={handleClick}
@@ -36,7 +56,7 @@ export default function AccountMenu() {
             aria-haspopup="true"
             aria-expanded={open ? 'true' : undefined}
           >
-            <Avatar sx={{ width: 40, height: 40,}}>M</Avatar>
+            <Avatar sx={{ width: 40, height: 40,}}>OP</Avatar>
           </IconButton>
         </Tooltip>
       </Box>
@@ -111,7 +131,7 @@ export default function AccountMenu() {
             Help
         </MenuItem>
 
-        <MenuItem onClick={handleClose} className="menuItem" sx={{fontSize:14, fontWeight:500}}>
+        <MenuItem onClick={() => handleLogout()} className="menuItem" sx={{fontSize:14, fontWeight:500}}>
             <div className="iconContainer">
                 <LogoutIcon className="translateIcon" sx={{height:14, width:14}} />
             </div>

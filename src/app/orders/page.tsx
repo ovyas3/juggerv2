@@ -23,6 +23,7 @@ const OrdersPage = () => {
   const t = useTranslations('ORDERS');
   const mobile = useWindowSize(600);
   const [allShipment, setAllShipment] = useState([]);
+  const [count, setCount] = useState(0);
 
   //shipment payload
   const [ShipmentsPayload, setShipmentsPayload] = useState({
@@ -53,8 +54,8 @@ const OrdersPage = () => {
   async function getAllShipment (){
     const response =await httpsPost(GET_SHIPMENTS,ShipmentsPayload);
     // console.log(response)
-    setAllShipment(response.data)
-
+    setAllShipment(response.data.data);
+    setCount(response.data.count);
   }
 
   useEffect(()=>{
@@ -102,7 +103,7 @@ const OrdersPage = () => {
 
             {/* ----table---- */}
             <div>
-              <TableData onSkipLimit={handleSkipLimitChange} allShipments={allShipment} />
+              <TableData onSkipLimit={handleSkipLimitChange} allShipments={allShipment} count={count} />
             </div>
 
           </div>
