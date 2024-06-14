@@ -1,0 +1,244 @@
+.edamand{
+    /* background-color:blueviolet !important; */
+    min-width:120px !important;
+}
+
+.fnr{
+    /* background-color: cadetblue !important; */
+    min-width: 116px !important; 
+    
+}
+.inner_fnr{
+    border: 1px solid #DFE3EB;
+    border-radius: 4px;
+    width:84px !important;
+    text-align: center;
+
+}
+.destination{
+    /* background-color: antiquewhite!important; */
+    min-width: 87px !important;
+}
+.material{
+    /* background-color: cornflowerblue!important; */
+    min-width: 88px !important;
+}
+
+.pickupdate{
+    /* background-color: chocolate!important; */
+    min-width: 90px !important;
+}
+.ownedby{
+    /* background-color: darkslateblue!important; */
+    min-width: 60px !important;
+}
+
+.status{
+    /* background-color: darksalmon!important; */
+    min-width: 154px !important;
+}
+.inner_status{
+    /* background-color: aqua !important; */
+    display: flex;
+    gap:24px;
+    align-items: center;
+
+}
+.fois{
+    background-color: #E24D65;
+    width: 42px;
+    height:20px;
+    border-radius: 10px;
+    padding: 3px;
+    display: flex;
+    justify-content:space-between;
+    align-items: center;
+}
+.inner_fois{
+    width: 14px;
+    height: 14px;
+    background-color: white;
+    border-radius: 50%;
+}
+
+.fois_label{
+    color: white;
+    font-size:8px;
+}
+
+.initialETA{
+    /* background-color: darkseagreen!important; */
+    min-width: 90px !important;
+}
+.currentEta{
+    /* background-color: yellow!important; */
+    min-width: 90px !important;
+
+}
+.remarks{
+    /* background-color: darkslategray!important; */
+    min-width: 86px !important;
+
+}
+.handlingAgent{
+    /* background-color: wheat!important; */
+    min-width: 120px !important;
+
+}
+
+.action{
+    /* background-color: turquoise!important; */
+    min-width: 60px !important;
+
+}
+.iconheader{
+    /* background-color: tomato!important; */
+   /* padding-left: 50px !important; */
+/* width: 60px !important; */
+}
+.inner_iconheader{
+    /* background-color: #E24D65 !important; */
+    position: relative;
+}
+.inner_iconheader_before{
+    background-color:white;
+    position: absolute;
+    right: 0;
+    height: 35px;
+    width: 120px;
+    border : 1px solid #E9E9EB;
+    display: flex;
+    justify-content
+    :start;
+    align-items: center;
+}
+
+
+
+/* -------------------------------- */
+
+.body_edemand{
+    /* background-color: #E24D65 !important; */
+}
+
+.body_fnr{
+    /* background-color:yellow !important; */
+    padding-right: 10px !important;
+
+}
+.body_destination{
+    /* background-color:violet !important; */
+    padding-right: 10px !important;
+}
+.body_material{
+    /* background-color:darkcyan !important; */
+}
+.body_pickupdate{
+    /* background-color: burlywood !important; */
+}
+.body_ownedby{
+    /* background-color: aquamarine !important; */
+    padding-right:10px !important;
+    text-align: center !important;
+}
+.body_status{
+    /* background-color:cadetblue !important; */
+    padding-right: 10px !important;
+}
+.body_initialETA{
+    /* background-color:#334FFC !important; */
+}
+.body_currentEta{
+    /* background-color: brown !important; */
+}
+.body_remarks{
+    /* background-color: burlywood !important; */
+    padding-right: 10px !important;
+}
+.body_handlingAgent{
+    /* background-color: wheat !important; */
+}
+.body_action{
+    /* background-color: turquoise !important; */
+   padding-inline:auto !important;
+   
+
+}
+
+
+
+.fnr_inner_inner_num{
+    color: #334FFC;
+    font-weight: 500;
+    text-decoration: underline;
+    font-size: 14px;
+}
+
+.fnr_inner_inner_count{
+    height: 16px;
+    width: 16px;
+    background-color: #334FFC;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center
+}
+.fnr_inner_inner_data{
+    display: flex !important;
+    flex-direction: row !important;
+    gap:6px !important;
+    align-items: center;
+    margin-top: 4px;
+    margin-bottom: 12px;
+}
+.fnr_inner_inner_nachoes{
+    color: #44475B;
+
+}
+
+
+.status_title{
+    height: 20px;
+    width: 72px;
+    background-color: #FF98001F;
+    color: #FF9800;
+    text-align: center;
+    
+}
+
+.status_body{
+    font-size: 13px;
+}
+
+.action_icon{
+    background-color: #0168FF !important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 30px;
+    padding: 0;
+    border-radius: 4px;
+    width:45px;
+    position: relative;
+}
+
+.action_button_target {
+    position: absolute;
+    /* background-color: rgb(110, 208, 115); */
+   
+    right: 50px;
+    top: -5px;
+    z-index: 1;
+   
+    opacity: 0;
+    transform: scale(0.95);
+    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+    display: none; /* Hide by default */
+    background-color: white;
+}
+
+.action_button_target.show {
+    opacity: 1;
+    transform: scale(1);
+    display: block; /* Show when the 'show' class is added */
+}
