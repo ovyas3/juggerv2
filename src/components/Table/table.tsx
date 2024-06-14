@@ -21,7 +21,6 @@ import { Column, row } from '@/utils/interface';
 import { useTranslations } from 'next-intl';
 
 
-import { Theme, useTheme } from '@mui/material/styles';
 
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
@@ -31,9 +30,7 @@ import { Popper, } from '@mui/material';
 import Button from '@mui/material/Button';
 
 import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
-import Backdrop from '@mui/material';
 import { httpsPost } from '@/utils/Communication';
 import {UPDATE_RAKE_CAPTIVE_ID} from '@/utils/helper'
 
@@ -60,26 +57,21 @@ async function rake_update_id(payload : Object) {
     console.log(response)
 }
 
-function Tags({ rakeCaptiveList, shipmentId, setOpen , setShowActionBox }) {
+function Tags({ rakeCaptiveList , shipmentId, setOpen , setShowActionBox }:any) {
 
-    const [selectedItems, setSelectedItems] = useState<item>({});
-    // const [updateObject, setUpdateObject] = useState({})
+    const t = useTranslations('ORDERS');
 
-    //    console.log(shipmentId, 'dfhgwdhwhdjkhk')
-
+    const [selectedItems, setSelectedItems] = useState<item>({
+        _id: '',
+    });
     const handleSubmit = () => {
-        console.log('Selected Items:', selectedItems);
 
-        // Update the updateObject with the desired values
         const updatedObject = {
             shipmentId: shipmentId,
             captiveId: selectedItems._id
         };
-
-
         console.log(updatedObject)
-        // Set the updateObject state
-
+    
         if(selectedItems._id){
             rake_update_id(updatedObject)
         }
@@ -89,11 +81,11 @@ function Tags({ rakeCaptiveList, shipmentId, setOpen , setShowActionBox }) {
         setSelectedItems({_id: ''});
     };
 
-    const CustomPopper = (props) => {
+    const CustomPopper = (props : any) => {
         return <Popper {...props} style={{ fontSize: '10px' }} placement="bottom-start" />;
     };
 
-    const CustomPaper = (props) => {
+    const CustomPaper = (props:any) => {
         return <Paper {...props} style={{ fontSize: '10px' }} />;
     };
 
@@ -110,18 +102,14 @@ function Tags({ rakeCaptiveList, shipmentId, setOpen , setShowActionBox }) {
                     value={selectedItems}
 
 
-                    getOptionLabel={(option) => option.rake_id || "Select one"}
-                    isOptionEqualToValue={(option, value) => option.rake_id === value.rake_id}
+                    getOptionLabel={(option : any) => option.rake_id || "Select one"}
+                    isOptionEqualToValue={(option :any, value) => option.rake_id === value.rake_id}
                     renderOption={(props, option) => (
                         <li {...props} key={`Unnamed-Option-${Math.random()}`}>
                             {option.rake_id || "Unnamed Option"} - {option.name || "Unnamed Option"}
                         </li>
                     )}
                     onChange={(event, newValue) => {
-                        // setSelectedItems({
-                        //     shipmentId: shipmentId,
-                        //     captiveId: newValue ? newValue._id : null
-                        // });
                         setSelectedItems(newValue)
                     }}
                     renderInput={(params) => (
@@ -160,7 +148,7 @@ function Tags({ rakeCaptiveList, shipmentId, setOpen , setShowActionBox }) {
                 />
             </Stack>
             <div style={{ textAlign: 'end', paddingTop: '8px' }}>
-                <Button variant="contained" size='small' color="secondary" style={{ textTransform: 'none' }} onClick={handleSubmit}>Submit</Button>
+                <Button variant="contained" size='small' color="secondary" style={{ textTransform: 'none' }} onClick={handleSubmit}>{t('submit')}</Button>
             </div>
         </div>
     );
@@ -257,7 +245,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList }
         setPage(0);
     };
 
-    function clickActionBox(index: number, id: String) {
+    function clickActionBox(index: number, id: string) {
         setRowID(id)
         setShowActionBox(prevIndex => (prevIndex === index ? -1 : index));
     }
@@ -362,7 +350,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList }
                                                                 <Checkbox {...label} size='small' checked={edemand}
                                                                     onClick={() => { setEdemand(edemand => !edemand) }}
                                                                 />
-                                                                <div style={{ color: 'black', fontWeight: 'normal' }}>E Demand</div>
+                                                                <div style={{ color: 'black', fontWeight: 'normal' }}>{t('edemand')}</div>
                                                             </div>
                                                             : <></>
                                                     }
@@ -413,7 +401,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList }
                                                                 <div
                                                                     className={`action_button_target ${showActionBox === firstindex ? 'show' : ''}`}
                                                                 >
-                                                                    <Button variant="contained" size='small' color="secondary" style={{ textTransform: 'none' }} onClick={() => handleOpen()} >Attach</Button>
+                                                                    <Button variant="contained" size='small' color="secondary" style={{ textTransform: 'none' }} onClick={() => handleOpen()} >{t('attach')}</Button>
 
                                                                     <Modal
                                                                         open={open}

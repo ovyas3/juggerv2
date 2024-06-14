@@ -18,6 +18,7 @@ export  interface Column {
 
 export interface row {
   // [id]: any,
+  _id:string
   edemand: string,
   fnr: {
       primary: string,
