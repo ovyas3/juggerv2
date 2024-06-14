@@ -11,58 +11,164 @@ import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import IconButton from '@mui/material/IconButton';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import DescriptionIcon from '@mui/icons-material/Description';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import Checkbox from '@mui/material/Checkbox';
 import { useState, useEffect } from 'react'
 import './table.css'
-import { all } from 'axios';
+
 import service from '@/utils/timeService';
 import Link from 'next/link';
+import { Column, row } from '@/utils/interface';
+import { useTranslations } from 'next-intl';
 
-function formatDateTime(date: Date): object {
-    console.log(date)
-    let hours = date.getHours();
-    const minutes = date.getMinutes().toString().padStart(2, '0');
-    const seconds = date.getSeconds().toString().padStart(2, '0');
-    const ampm = hours >= 12 ? 'PM' : 'AM';
-    hours = hours % 12;
-    hours = hours ? hours : 12; // the hour '0' should be '12'
-    const timeString = `${hours}:${minutes} ${ampm}`;
-    const day = date.getDate();
-    const shortMonthNames = [
-        'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-    ];
-    const month = shortMonthNames[date.getMonth()];
-    const year = date.getFullYear();
-    const formattedDate = `${day} ${month} ${year}`;
 
-    return { timeString, formattedDate };
+import { Theme, useTheme } from '@mui/material/styles';
+
+import Autocomplete from '@mui/material/Autocomplete';
+import TextField from '@mui/material/TextField';
+import Stack from '@mui/material/Stack';
+
+import { Popper, } from '@mui/material';
+import Button from '@mui/material/Button';
+
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import Modal from '@mui/material/Modal';
+import Backdrop from '@mui/material';
+import { httpsPost } from '@/utils/Communication';
+import {UPDATE_RAKE_CAPTIVE_ID} from '@/utils/helper'
+
+const style = {
+    position: 'absolute' as 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 500,
+    bgcolor: 'white',
+    border: '1px solid #E9E9EB',
+    boxShadow: 2,
+    borderRadius: '4px',
+    p: 2,
+};
+
+interface item {
+    _id: string,
 }
 
-interface row {
-    // [id]: any,
-    edemand: string,
-    fnr: {
-        primary: string,
-        others: string,
-        unique_code: string
-    },
-    destination: {
-        name: string,
-        code: string
-    },
-    material: string,
-    pickupdate: {
-        date: string
-    },
-    status: string,
-    currentEta: string,
-    remarks: string,
-    handlingAgent: string,
-    action: string,
+async function rake_update_id(payload : Object) {
+    const response = await httpsPost(UPDATE_RAKE_CAPTIVE_ID, payload) 
+    console.log("updating")
+    console.log(response)
 }
+
+function Tags({ rakeCaptiveList, shipmentId }) {
+
+    const [selectedItems, setSelectedItems] = useState<item>({});
+    // const [updateObject, setUpdateObject] = useState({})
+
+    //    console.log(shipmentId, 'dfhgwdhwhdjkhk')
+
+    const handleSubmit = () => {
+        console.log('Selected Items:', selectedItems);
+
+        // Update the updateObject with the desired values
+        const updatedObject = {
+            shipmentId: shipmentId,
+            captiveId: selectedItems._id
+        };
+
+
+        console.log(updatedObject)
+        // Set the updateObject state
+
+        if(selectedItems._id){
+            rake_update_id(updatedObject)
+        }
+
+
+        // setUpdateObject({})
+        setSelectedItems({_id: ''});
+    };
+
+    const CustomPopper = (props) => {
+        return <Popper {...props} style={{ fontSize: '10px' }} placement="bottom-start" />;
+    };
+
+    const CustomPaper = (props) => {
+        return <Paper {...props} style={{ fontSize: '10px' }} />;
+    };
+
+    // console.log(updateObject)
+
+    return (
+        <div >
+            <Stack spacing={1} sx={{ border: 'none', paddingInline: '2px' }}>
+                <Autocomplete
+                    id="tags-standard"
+                    options={rakeCaptiveList}
+                    PopperComponent={CustomPopper}
+                    PaperComponent={CustomPaper}
+                    value={selectedItems}
+
+
+                    getOptionLabel={(option) => option.rake_id || "Select one"}
+                    isOptionEqualToValue={(option, value) => option.rake_id === value.rake_id}
+                    renderOption={(props, option) => (
+                        <li {...props} key={`Unnamed-Option-${Math.random()}`}>
+                            {option.rake_id || "Unnamed Option"} - {option.name || "Unnamed Option"}
+                        </li>
+                    )}
+                    onChange={(event, newValue) => {
+                        // setSelectedItems({
+                        //     shipmentId: shipmentId,
+                        //     captiveId: newValue ? newValue._id : null
+                        // });
+                        setSelectedItems(newValue)
+                    }}
+                    renderInput={(params) => (
+                        <TextField
+                            {...params}
+                            variant="standard"
+                            label="Shipments"
+
+                            InputProps={{
+                                ...params.InputProps,
+                                style: { fontSize: '10px', border: 'none' }
+                            }}
+                            InputLabelProps={{
+                                style: { fontSize: '10px', paddingLeft: '5px', border: 'none' }
+                            }}
+                            sx={{
+                                '.mui-38raov-MuiButtonBase-root-MuiChip-root': {
+                                    // fontSize:'10px',
+                                    m: 0,
+                                    p: 0,
+                                    height: '22px',
+                                    backgroundColor: 'transparent',
+                                    mb: '0.5px',
+                                    border: 'none'
+                                },
+                                '.mui-p1olib-MuiAutocomplete-endAdornment': {
+                                    top: '-5%',
+                                    border: 'none'
+                                },
+                                '.mui-953pxc-MuiInputBase-root-MuiInput-root::after': {
+                                    border: 'none'
+                                }
+                            }}
+                        />
+                    )}
+                />
+            </Stack>
+            <div style={{ textAlign: 'end', paddingTop: '8px' }}>
+                <Button variant="contained" size='small' color="secondary" onClick={handleSubmit}>Submit</Button>
+            </div>
+        </div>
+    );
+}
+
+
+
 
 
 const convertArrayToFilteredArray = (inputArray: any) => {
@@ -76,9 +182,11 @@ const convertArrayToFilteredArray = (inputArray: any) => {
             remarks?: any;
             allFNRs: any;
             unique_code: string,
+            _id: string
         }) => {
         const { edemand_no, FNR, allFNRs, delivery_location, others, remarks, unique_code } = item;
         return {
+            _id: item._id,
             edemand: edemand_no,
             fnr: {
                 primary: FNR,
@@ -104,18 +212,10 @@ const convertArrayToFilteredArray = (inputArray: any) => {
 };
 
 
-interface Column {
-    id: string;
-    label: string | React.ReactNode;
-    class: string;
-    innerClass: string;
-}
-
-
-
-
 // Main component
-export default function TableData({ onSkipLimit, allShipments }: any) {
+export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList }: any) {
+
+    const t = useTranslations("ORDERS")
 
     const [page, setPage] = React.useState(0);
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
@@ -123,17 +223,21 @@ export default function TableData({ onSkipLimit, allShipments }: any) {
     const [showEdemand, setShowEdemad] = React.useState(false);
     const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
     const [columns, setColumns] = useState<Column[]>([]);
+    const [destinationIndex, setDestinationIndex] = useState(-1)
+    const [showActionBox, setShowActionBox] = useState(-1)
 
-    console.log(allShipments)
+    const [open, setOpen] = React.useState(false);
+    const handleOpen = () => setOpen(true);
+    const handleClose = () => setOpen(false);
 
+    const [rowId, setRowID] = useState('')
 
+    // console.log(allShipments)
 
 
 
     const response = convertArrayToFilteredArray(allShipments)
-
-
-
+    // console.log("resopse:=> ", response)
 
     const handleChangePage = (event: unknown, newPage: number) => {
         setPage(newPage);
@@ -144,12 +248,10 @@ export default function TableData({ onSkipLimit, allShipments }: any) {
         setPage(0);
     };
 
+    function clickActionBox(index: number, id: String) {
+        setRowID(id)
 
-    const [destinationIndex, setDestinationIndex] = useState(-1)
-
-    function hoverEffect(index: number) {
-        setDestinationIndex(index)
-        console.log(index)
+        setShowActionBox(prevIndex => (prevIndex === index ? -1 : index));
     }
 
     useEffect(() => {
@@ -175,7 +277,7 @@ export default function TableData({ onSkipLimit, allShipments }: any) {
         setColumns(commonColumns);
     }, [edemand, showEdemand, rowsPerPage, page]);
 
-
+    console.log(rowId)
 
     return (
         <div className='target'>
@@ -202,7 +304,7 @@ export default function TableData({ onSkipLimit, allShipments }: any) {
                     onPageChange={handleChangePage}
                     onRowsPerPageChange={handleChangeRowsPerPage}
                 />
-                <TableContainer sx={{ maxHeight: '100%', border: '1px solid #E9E9EB', borderRadius: '8px' }}>
+                <TableContainer sx={{ maxHeight: '530px', border: '1px solid #E9E9EB', borderRadius: '8px' }}>
                     <Table stickyHeader aria-label="sticky table">
                         <TableHead sx={{
                             '.mui-y8ay40-MuiTableCell-root ': { padding: 0 },
@@ -251,7 +353,7 @@ export default function TableData({ onSkipLimit, allShipments }: any) {
 
                                         {columns.map((item, index) => {
                                             // @ts-ignore
-                                            const value : any  = row[item.id];
+                                            const value: any = row[item.id];
                                             const columnClassNames: any = {
                                                 edemand: 'body_edemand',
                                                 fnr: 'body_fnr',
@@ -267,18 +369,47 @@ export default function TableData({ onSkipLimit, allShipments }: any) {
                                                 action: 'body_action',
                                                 iconheader: 'body_iconheader'
                                             }
-
-                                            if (item.id === 'pickupdate') console.log(typeof value)
+                                            // console.log(row._id)
 
                                             return (
                                                 <TableCell key={index} sx={{ fontSize: '12px', color: '#44475B', p: '16px 10px 16px 10px' }}
                                                     className={columnClassNames[item.id]} >
                                                     <div>
                                                         {(typeof value) === 'object' ? '' : value}
-                                                        {item.id === 'action' ?
-                                                            <div className='action_icon'><MoreHorizIcon style={{ color: 'white' }} /></div>
-                                                            : <></>
-                                                        }
+                                                        {item.id === 'action' ? (
+                                                            <div className='action_icon'>
+                                                                <MoreHorizIcon
+                                                                    style={{ color: 'white', cursor: 'pointer' }}
+                                                                    onClick={() => { clickActionBox(firstindex, row._id); }}
+                                                                />
+                                                                <div
+                                                                    className={`action_button_target ${showActionBox === firstindex ? 'show' : ''}`}
+                                                                >
+                                                                    <Button variant="contained" size='small' color="secondary" onClick={() => handleOpen()} >Attach</Button>
+
+                                                                    <Modal
+                                                                        open={open}
+                                                                        onClose={handleClose}
+                                                                        aria-labelledby="modal-modal-title"
+                                                                        aria-describedby="modal-modal-description"
+                                                                        BackdropProps={{
+                                                                            sx: {
+                                                                                opacity: 0.7,
+                                                                                backgroundColor: 'rgba(0, 0, 0, 0.1)',
+                                                                            },
+                                                                        }}
+                                                                    >
+                                                                        <Box sx={style}>
+
+                                                                            <Tags rakeCaptiveList={rakeCaptiveList}
+                                                                                shipmentId={rowId}
+                                                                            />
+                                                                        </Box>
+                                                                    </Modal>
+
+                                                                </div>
+                                                            </div>
+                                                        ) : null}
                                                         {
                                                             item.id === 'fnr' ?
                                                                 <div className='fnr_container'>
@@ -298,7 +429,7 @@ export default function TableData({ onSkipLimit, allShipments }: any) {
                                                             item.id === 'destination' ?
                                                                 <div style={{ position: 'relative' }} >
                                                                     <div className=''
-                                                                        onMouseOver={() => { hoverEffect(firstindex) }}
+                                                                        onMouseOver={() => { setDestinationIndex(firstindex) }}
                                                                         onMouseLeave={() => { setDestinationIndex(-1) }}
                                                                     >{value.code}</div>
                                                                     <div
@@ -320,7 +451,7 @@ export default function TableData({ onSkipLimit, allShipments }: any) {
                                                             item.id === 'pickupdate' ?
 
                                                                 <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                                                  {service.utcToist(value.date)}
+                                                                    {service.utcToist(value.date)}
                                                                 </div>
                                                                 : <></>
                                                         }

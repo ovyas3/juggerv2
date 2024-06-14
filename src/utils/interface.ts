@@ -8,3 +8,33 @@ export interface ShipmentsObjectPayload  {
     limit:number,
     skip:number
   }
+
+export  interface Column {
+    id: string;
+    label: string | React.ReactNode;
+    class: string;
+    innerClass: string;
+}
+
+export interface row {
+  // [id]: any,
+  edemand: string,
+  fnr: {
+      primary: string,
+      others: string,
+      unique_code: string
+  },
+  destination: {
+      name: string,
+      code: string
+  },
+  material: string,
+  pickupdate: {
+      date: string
+  },
+  status: string,
+  currentEta: string,
+  remarks: string,
+  handlingAgent: string,
+  action: string,
+}
