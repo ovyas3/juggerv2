@@ -15,7 +15,6 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import Checkbox from '@mui/material/Checkbox';
 import { useState, useEffect } from 'react'
 import './table.css'
-
 import service from '@/utils/timeService';
 import Link from 'next/link';
 import { Column, row } from '@/utils/interface';
@@ -415,7 +414,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList }
                                                                 <div className='fnr_container'>
                                                                     <div className='fnr_inner_data'>
                                                                         <Link target="_blank"
-                                                                            href={"/tracker?" + value.unique_code}
+                                                                            href={"/tracker?unique_code=" + value.unique_code}
                                                                         >
                                                                             {value.primary}
                                                                         </Link>
@@ -454,6 +453,38 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList }
                                                                     {service.utcToist(value.date)}
                                                                 </div>
                                                                 : <></>
+                                                        }
+                                                        {
+                                                            item.id === 'initialETA' ?
+
+                                                                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                                                    {/* <div>{formatDateTime(row.pickupdate).formattedDate}</div>
+                                                                    <div>{formatDateTime(row.pickupdate).timeString}</div> */}
+                                                                </div>
+                                                                : <></>
+                                                        }
+                                                        {
+                                                            item.id === 'currentEta' ?
+
+                                                                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                                                    {/* <div>{formatDateTime(row.pickupdate).formattedDate}</div>
+                                                                    <div>{formatDateTime(row.pickupdate).timeString}</div> */}
+                                                                </div>
+                                                                : <></>
+                                                        }
+                                                        {
+                                                            item.id === 'status' ?
+                                                            <div className='status_container'>
+                                                                <div className='status_title'>{value.status}</div>
+                                                                <div className='status_body'>{value.address}</div>
+                                                                {/* <div className='time'>{formatDateTime(value.eta).timeString}</div> */}
+                                                            </div>
+                                                            :<></>
+                                                        }
+                                                        {
+                                                            item.id === 'action' ?
+                                                            <div className='action_icon'><MoreHorizIcon style={{color:'white'}}/></div>
+                                                            :<></>
                                                         }
                                                     </div>
                                                 </TableCell>

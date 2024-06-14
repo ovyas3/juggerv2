@@ -1,0 +1,29 @@
+image: tk120404/node:22.2.0      
+
+variables:
+  GIT_STRATEGY: fetch
+  GIT_SUBMODULE_STRATEGY: recursive
+
+dev_build:
+  tags:
+    - lucy-dev
+  stage: build
+  environment:
+    name: dev
+  script:
+    - npm install
+    - npm run dev_build
+    - echo $devEnvKey | base64 -d > devEnvKey.pem
+    - echo $devFingerPrint > ~/.ssh/known_hosts
+    - chmod 400 devEnvKey.pem
+    - zip -qq -r $CI_JOB_ID.zip ./ -x devEnvKey.pem
+    - scp -i devEnvKey.pem $CI_JOB_ID.zip ubuntu@dev-api.instavans.com:/home/ubuntu/milkyway/packages/lucy-$CI_JOB_ID.zip
+    - ssh -t -t -i devEnvKey.pem  ubuntu@dev-api.instavans.com << EOF
+    - rm -rf /home/ubuntu/milkyway/lucy/*
+    - cd /home/ubuntu/milkyway/lucy
+    - cp /home/ubuntu/milkyway/packages/lucy-$CI_JOB_ID.zip .
+    - unzip -qq -o lucy-$CI_JOB_ID.zip
+    - rm -rf lucy-$CI_JOB_ID.zip
+    - rm /home/ubuntu/milkyway/packages/lucy-$CI_JOB_ID.zip
+    - pm2 restart lucy
+    - exit

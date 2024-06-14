@@ -1,8 +1,8 @@
 import { Grid, IconButton, Tab, CardMedia } from "@mui/material";
 import { useState } from "react";
 import Link from "next/link";
-import active_control_room from "./../../assets/active_control_room.svg";
-import inactive_contact_dashboard from "./../../assets/inactive_contact_dashboard+icon.svg";
+import active_control_room from "../../assets/active_control_room.svg";
+import inactive_contact_dashboard from "../../assets/inactive_contact_dashboard+icon.svg";
 
 function Footer() {
   const [value, setValue] = useState("fnr");
