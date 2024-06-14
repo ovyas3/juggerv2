@@ -6,7 +6,6 @@ import Header from '@/components/Header/header';
 import './orders.css'
 import ReplayIcon from '@mui/icons-material/Replay';
 import Filters from '@/components/Filters/filters';
-<<<<<<< HEAD
 import TableData from '@/components/Table/table';
 import MobileDrawer from "@/components/Drawer/mobile_drawer";
 import MobileHeader from "@/components/Header/mobileHeader";
@@ -14,14 +13,6 @@ import { useWindowSize } from "@/utils/hooks";
 import { ShipmentsObjectPayload } from "@/utils/interface";
 import { httpsGet, httpsPost } from "@/utils/Communication";
 import { GET_SHIPMENTS, CAPTIVE_RAKE } from "@/utils/helper";
-=======
-import TableData from '@/components/table/table';
-import MobileDrawer from "../../components/Drawer/mobile_drawer";
-import MobileHeader from "@/components/Header/mobileHeader";
-import { useWindowSize } from "@/utils/hooks";
-import { httpsPost } from "@/utils/Communication";
-import { GET_SHIPMENTS } from "@/utils/helper";
->>>>>>> 6a5263c12fdb3faa637db757c80265c17f15e3a3
 
 const OrdersPage = () => {
   const t = useTranslations('ORDERS');
