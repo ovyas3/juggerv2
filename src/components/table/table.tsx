@@ -60,7 +60,7 @@ async function rake_update_id(payload : Object) {
     console.log(response)
 }
 
-function Tags({ rakeCaptiveList, shipmentId }) {
+function Tags({ rakeCaptiveList, shipmentId, setOpen , setShowActionBox }) {
 
     const [selectedItems, setSelectedItems] = useState<item>({});
     // const [updateObject, setUpdateObject] = useState({})
@@ -84,8 +84,8 @@ function Tags({ rakeCaptiveList, shipmentId }) {
             rake_update_id(updatedObject)
         }
 
-
-        // setUpdateObject({})
+        setOpen(false)
+        setShowActionBox(-1)
         setSelectedItems({_id: ''});
     };
 
@@ -160,7 +160,7 @@ function Tags({ rakeCaptiveList, shipmentId }) {
                 />
             </Stack>
             <div style={{ textAlign: 'end', paddingTop: '8px' }}>
-                <Button variant="contained" size='small' color="secondary" onClick={handleSubmit}>Submit</Button>
+                <Button variant="contained" size='small' color="secondary" style={{ textTransform: 'none' }} onClick={handleSubmit}>Submit</Button>
             </div>
         </div>
     );
@@ -200,11 +200,14 @@ const convertArrayToFilteredArray = (inputArray: any) => {
             pickupdate: {
                 date: others.confirmationDate || 'NA',
             },
-            status: item.is_fois_fetched || 'NA',
+            status: {
+                name:  'booked',
+                code: item.is_fois_fetched || 'NA'
+            },
             currentEta: 'NA',
             remarks: 'NA',
             handlingAgent: 'NA',
-            action: '',
+            action: null,
             iconheader: ''
         }
     });
@@ -214,29 +217,36 @@ const convertArrayToFilteredArray = (inputArray: any) => {
 // Main component
 export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList }: any) {
 
+    //language controller
     const t = useTranslations("ORDERS")
 
+    //pagination
     const [page, setPage] = React.useState(0);
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
+
+    //making edemand column toggle
     const [edemand, setEdemand] = React.useState(true);
     const [showEdemand, setShowEdemad] = React.useState(false);
+    
     const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
-    const [columns, setColumns] = useState<Column[]>([]);
-    const [destinationIndex, setDestinationIndex] = useState(-1)
-    const [showActionBox, setShowActionBox] = useState(-1)
 
+    //table header variable
+    const [columns, setColumns] = useState<Column[]>([]);
+
+    //destination animation
+    const [destinationIndex, setDestinationIndex] = useState(-1)
+
+    // action box toggle
+    const [showActionBox, setShowActionBox] = useState(-1)
     const [open, setOpen] = React.useState(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
 
+    //getting row id to pass it to tag element
     const [rowId, setRowID] = useState('')
 
-    // console.log(allShipments)
-
-
-
     const response = convertArrayToFilteredArray(allShipments)
-    // console.log("resopse:=> ", response)
+  
 
     const handleChangePage = (event: unknown, newPage: number) => {
         setPage(newPage);
@@ -249,9 +259,29 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList }
 
     function clickActionBox(index: number, id: String) {
         setRowID(id)
-
         setShowActionBox(prevIndex => (prevIndex === index ? -1 : index));
     }
+
+    useEffect(() => {
+        function handleClickOutside(event: MouseEvent) {
+            const target = event.target as HTMLElement;
+            const actionButton = target.closest('.action_icon'); // Check if clicked inside action button
+    
+            if (!actionButton) {
+                setShowActionBox(-1); // Close action box if clicked outside
+            }
+        }
+    
+        if (showActionBox !== -1) {
+            document.addEventListener('mousedown', handleClickOutside);
+        } else {
+            document.removeEventListener('mousedown', handleClickOutside);
+        }
+    
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside); // Clean up event listener on component unmount
+        };
+    }, [showActionBox]);
 
     useEffect(() => {
         const commonColumns: Column[] = [
@@ -276,7 +306,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList }
         setColumns(commonColumns);
     }, [edemand, showEdemand, rowsPerPage, page]);
 
-    console.log(rowId)
+  
 
     return (
         <div className='target'>
@@ -368,7 +398,6 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList }
                                                 action: 'body_action',
                                                 iconheader: 'body_iconheader'
                                             }
-                                            // console.log(row._id)
 
                                             return (
                                                 <TableCell key={index} sx={{ fontSize: '12px', color: '#44475B', p: '16px 10px 16px 10px' }}
@@ -384,7 +413,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList }
                                                                 <div
                                                                     className={`action_button_target ${showActionBox === firstindex ? 'show' : ''}`}
                                                                 >
-                                                                    <Button variant="contained" size='small' color="secondary" onClick={() => handleOpen()} >Attach</Button>
+                                                                    <Button variant="contained" size='small' color="secondary" style={{ textTransform: 'none' }} onClick={() => handleOpen()} >Attach</Button>
 
                                                                     <Modal
                                                                         open={open}
@@ -402,6 +431,8 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList }
 
                                                                             <Tags rakeCaptiveList={rakeCaptiveList}
                                                                                 shipmentId={rowId}
+                                                                                setOpen={setOpen}
+                                                                                setShowActionBox={setShowActionBox}
                                                                             />
                                                                         </Box>
                                                                     </Modal>
@@ -454,36 +485,21 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList }
                                                                 </div>
                                                                 : <></>
                                                         }
-                                                        {
-                                                            item.id === 'initialETA' ?
-
-                                                                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                                                    {/* <div>{formatDateTime(row.pickupdate).formattedDate}</div>
-                                                                    <div>{formatDateTime(row.pickupdate).timeString}</div> */}
-                                                                </div>
-                                                                : <></>
-                                                        }
-                                                        {
+                                                        {/* {
                                                             item.id === 'currentEta' ?
 
                                                                 <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                                                    {/* <div>{formatDateTime(row.pickupdate).formattedDate}</div>
-                                                                    <div>{formatDateTime(row.pickupdate).timeString}</div> */}
+                                                                    <div>{formatDateTime(row.pickupdate).formattedDate}</div>
+                                                                    <div>{formatDateTime(row.pickupdate).timeString}</div>
                                                                 </div>
                                                                 : <></>
-                                                        }
+                                                        } */}
                                                         {
                                                             item.id === 'status' ?
                                                             <div className='status_container'>
-                                                                <div className='status_title'>{value.status}</div>
-                                                                <div className='status_body'>{value.address}</div>
-                                                                {/* <div className='time'>{formatDateTime(value.eta).timeString}</div> */}
+                                                                <div className='status_title'>{value.name}</div>
+                                                                <div className='status_body'>{value.code}</div>
                                                             </div>
-                                                            :<></>
-                                                        }
-                                                        {
-                                                            item.id === 'action' ?
-                                                            <div className='action_icon'><MoreHorizIcon style={{color:'white'}}/></div>
                                                             :<></>
                                                         }
                                                     </div>
@@ -504,65 +520,6 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList }
 }
 
 
-// {   
-//     item.id === 'handlingAgent' ? 
-//         <div><DescriptionIcon/></div>
-//         :<></>
-//     }
-//     {
-//         item.id === 'fnr' ?
-//             <div className='fnr_container'>
-//                 <div className='fnr_inner_data'>{value.standard}</div>
-//                 <div className='fnr_inner_inner_data'>
-//                     <div className='fnr_inner_inner_num'>{value.num}</div>
-//                     <div className='fnr_inner_inner_count'>
-//                         <div style={{ fontSize: '9px', color: 'white' }}>+{value.count}</div></div>
-//                 </div>
-//                 <div className='fnr_inner_inner_nachoes'>{value.nachoes}</div>
-//             </div>
-//             : <></>
-//     }
-//     {
-//         item.id === 'pickupdate' ?
-
-//             <div style={{ display: 'flex', flexDirection: 'column' }}>
-//                 {/* <div>{formatDateTime(row.pickupdate).formattedDate}</div>
-//                 <div>{formatDateTime(row.pickupdate).timeString}</div> */}
-//             </div>
-//             : <></>
-//     }
-//     {
-//         item.id === 'initialETA' ?
-
-//             <div style={{ display: 'flex', flexDirection: 'column' }}>
-//                 {/* <div>{formatDateTime(row.pickupdate).formattedDate}</div>
-//                 <div>{formatDateTime(row.pickupdate).timeString}</div> */}
-//             </div>
-//             : <></>
-//     }
-//     {
-//         item.id === 'currentEta' ?
-
-//             <div style={{ display: 'flex', flexDirection: 'column' }}>
-//                 <div>{formatDateTime(row.pickupdate).formattedDate}</div>
-//                 <div>{formatDateTime(row.pickupdate).timeString}</div>
-//             </div>
-//             : <></>
-//     }
-//     {
-//         item.id === 'status' ?
-//         <div className='status_container'>
-//             <div className='status_title'>{value.status}</div>
-//             <div className='status_body'>{value.address}</div>
-//             <div className='time'>{formatDateTime(value.eta).timeString}</div>
-//         </div>
-//         :<></>
-//     }
-//     {
-//         item.id === 'action' ?
-//         <div className='action_icon'><MoreHorizIcon style={{color:'white'}}/></div>
-//         :<></>
-//     }
 
 
 

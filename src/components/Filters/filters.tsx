@@ -144,12 +144,12 @@ function Filters({ onToFromChange }: any) {
                 </div>
             </div>
 
-            <div>
+            {/* <div>
                 <div className="upload-container">
                     <CloudUploadIcon className="upload-icon" />
                     <div className="upload-text">Upload File</div>
                 </div>
-            </div>
+            </div> */}
 
             <div>
                 <div className="filter-container">
