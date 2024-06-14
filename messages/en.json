@@ -16,7 +16,10 @@
   "ORDERS":{
     "inbound":"Inbound",
     "outbound":"Outbound",
-    "attach": "Attach"
+    "submit":"Submit",
+    "attach":"Attach",
+    "edemand":"E demand"
+
 
   },
   "DRAWER":{

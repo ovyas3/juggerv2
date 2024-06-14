@@ -20,10 +20,14 @@ const OrdersPage = () => {
   const [allShipment, setAllShipment] = useState([]);
   const [rakeCaptiveList, setRakeCaptiveList] = useState([]);
 
+  const [reload, setReload] = useState(false)
+
 
   //shipment payload
   const [ShipmentsPayload, setShipmentsPayload] = useState({
     is_outbound: true,
+    to:'',
+    from:''
   })
 
   //adding to and from to shipmentpayload
@@ -36,7 +40,7 @@ const OrdersPage = () => {
   };
 
   //adding limit and skip to shipmentpayload
-  const handleSkipLimitChange = (limit : number, skip: number) => {
+  const handleSkipLimitChange = (limit : number, skip: number,) => {
     setShipmentsPayload(prevState => ({
       ...prevState,
       limit: limit,
@@ -69,7 +73,9 @@ const OrdersPage = () => {
 
 
   // console.log(ShipmentsPayload)
-  console.log('how many times it runing',allShipment)
+  // console.log('how many times it runing',allShipment)
+  console.log(reload)
+
 
   return (
     <div  >
@@ -84,7 +90,11 @@ const OrdersPage = () => {
 
             {/* ----search fnr---- */}
             <div className='input_fnr_reload'>
-              <div className='reload'>
+              <div className={`reload ${reload ? 'loading' : ''}`} onClick={()=>{
+                getAllShipment();
+                setReload(true)
+                setTimeout(()=>{setReload(false)}, 3000)
+              }}>
                 <ReplayIcon style={{ color: '#707070' }} />
               </div>
             </div>
