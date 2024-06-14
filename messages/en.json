@@ -15,7 +15,8 @@
   },
   "ORDERS":{
     "inbound":"Inbound",
-    "outbound":"Outbound"
+    "outbound":"Outbound",
+    "attach": "Attach"
 
   },
   "DRAWER":{

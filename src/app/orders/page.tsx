@@ -1,34 +1,29 @@
 'use client'
 import {useTranslations} from 'next-intl';
-import SideDrawer from '@/components/Drawer/Drawer';
+import SideDrawer from '../../components/Drawer/Drawer';
 import React, { useEffect, useState } from 'react';
 import Header from '@/components/Header/header';
 import './orders.css'
-import { Box, TextField, InputAdornment } from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
 import ReplayIcon from '@mui/icons-material/Replay';
 import Filters from '@/components/Filters/filters';
-import TableData from '@/components/table/table';
+import TableData from '@/components/Table/table';
 import MobileDrawer from "@/components/Drawer/mobile_drawer";
 import MobileHeader from "@/components/Header/mobileHeader";
 import { useWindowSize } from "@/utils/hooks";
 import { ShipmentsObjectPayload } from "@/utils/interface";
-import { httpsPost } from "@/utils/Communication";
-import { GET_SHIPMENTS } from "@/utils/helper";
-
-
-
+import { httpsGet, httpsPost } from "@/utils/Communication";
+import { GET_SHIPMENTS, CAPTIVE_RAKE } from "@/utils/helper";
 
 const OrdersPage = () => {
   const t = useTranslations('ORDERS');
   const mobile = useWindowSize(600);
   const [allShipment, setAllShipment] = useState([]);
+  const [rakeCaptiveList, setRakeCaptiveList] = useState([]);
+
 
   //shipment payload
   const [ShipmentsPayload, setShipmentsPayload] = useState({
     is_outbound: true,
-    from: '',
-    to: '',
   })
 
   //adding to and from to shipmentpayload
@@ -52,10 +47,21 @@ const OrdersPage = () => {
   // function which bring allshipment
   async function getAllShipment (){
     const response =await httpsPost(GET_SHIPMENTS,ShipmentsPayload);
-    // console.log(response)
-    setAllShipment(response.data)
+    console.log(response)
+    setAllShipment(response.data.data)
 
   }
+
+  async function getCaptiveRake (){
+    const list_captive_rake = await httpsGet(CAPTIVE_RAKE);
+    console.log(list_captive_rake)
+    setRakeCaptiveList(list_captive_rake.data)
+
+  }
+
+  useEffect(()=>{
+    getCaptiveRake();
+  },[])
 
   useEffect(()=>{
     if(ShipmentsPayload.from && ShipmentsPayload.to) getAllShipment();
@@ -63,7 +69,7 @@ const OrdersPage = () => {
 
 
   // console.log(ShipmentsPayload)
-  console.log(allShipment)
+  console.log('how many times it runing',allShipment)
 
   return (
     <div  >
@@ -102,7 +108,7 @@ const OrdersPage = () => {
 
             {/* ----table---- */}
             <div>
-              <TableData onSkipLimit={handleSkipLimitChange} allShipments={allShipment} />
+              <TableData onSkipLimit={handleSkipLimitChange} allShipments={allShipment} rakeCaptiveList={rakeCaptiveList} />
             </div>
 
           </div>
