@@ -2,11 +2,11 @@
 import checkAuth from "@/services/Authenticator/Auth";
 import { Box, CircularProgress } from "@mui/material";
 import { useSearchParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import './Auth.css'
 
 
-const Auth = () => {
+const AuthController = () => {
     const searchParams = useSearchParams ();
     const router = useRouter();
     const [checkCalled, setCheckCalled] = useState(false);
@@ -36,4 +36,11 @@ const Auth = () => {
     )
 }
 
+const Auth = () => {
+    return (
+        <Suspense fallback={<div>Loading...</div>} >
+            <AuthController />
+        </Suspense>
+    )
+}
 export default Auth;
