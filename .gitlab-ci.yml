@@ -12,6 +12,7 @@ dev_build:
     name: dev
   script:
     - npm install
+    - npm run dev_build
     - echo $devEnvKey | base64 -d > devEnvKey.pem
     - echo $devFingerPrint > ~/.ssh/known_hosts
     - chmod 400 devEnvKey.pem
