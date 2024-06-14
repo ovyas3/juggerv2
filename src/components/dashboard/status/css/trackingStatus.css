@@ -41,6 +41,10 @@
   position: relative;
 }
 
+.scheme-container:last-child {
+  border-right: none;
+}
+
 .scheme-container:first-child {
   margin-left: 20px;
 }

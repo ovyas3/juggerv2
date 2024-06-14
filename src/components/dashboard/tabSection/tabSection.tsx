@@ -17,6 +17,7 @@ import { DemoContainer, DemoItem } from "@mui/x-date-pickers/internals/demo";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { Popup } from "@/components/Popup/popup";
 
 const Tabsection = () => {
   const [value, setValue] = useState("1");
@@ -157,7 +158,7 @@ const Tabsection = () => {
                 </div>
               </div> */}
               <TabPanel value="1" sx={{ paddingLeft: 0 }}>
-                <div style={{ display: "flex", gridAutoColumns: 2 }}>
+                <div style={{ display: "flex" }}>
                   {/* <div
                     style={{ borderRight: "1px solid #DFE3EB", width: "60vw" }}
                   >
@@ -166,6 +167,9 @@ const Tabsection = () => {
                   </div> */}
                   <div style={{ width: "32vw" }}>
                     <TrackingStatus />
+                  </div>
+                  <div style={{ width: "60vw" }}>
+                    <Popup />
                   </div>
                 </div>
               </TabPanel>

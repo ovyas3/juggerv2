@@ -9,9 +9,6 @@ import { httpsGet } from "@/utils/Communication";
 
 const TrackingStatus = () => {
   const [isHovered, setIsHovered] = useState(false);
-  const [sftoHovered, setSFTOHovered] = useState(false);
-  const [gpwisHovered, setGPWISHovered] = useState(false);
-  const [bfnvHovered, setBFNVHovered] = useState(false);
   const [nonTrackingEmptyHovered, setNonTrackingEmptyHovered] = useState(false);
   const [nonTrackingWithLoadHovered, setNonTrackingWithLoadHovered] =
     useState(false);
@@ -195,7 +192,7 @@ const TrackingStatus = () => {
                 With Load
               </span>
               {nonTrackingWithLoadHovered ? (
-                <div className="hover-infobox breakdown" >
+                <div className="hover-infobox breakdown">
                   {Object.entries(nonTrackingData.withLoad).map(
                     ([key, value]) => (
                       <div className="non-tracking-breakdown-wrapper">
@@ -223,7 +220,10 @@ const TrackingStatus = () => {
               </span>
               <span style={{ color: "#71747A", fontSize: "10px" }}>Empty</span>
               {nonTrackingEmptyHovered ? (
-                <div className="hover-infobox breakdown" style={{display:"flex"}}>
+                <div
+                  className="hover-infobox breakdown"
+                  style={{ display: "flex" }}
+                >
                   {Object.entries(nonTrackingData.withoutLoad).map(
                     ([key, value]) => (
                       <div className="non-tracking-breakdown-wrapper">
