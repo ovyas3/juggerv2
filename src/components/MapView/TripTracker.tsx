@@ -1,11 +1,10 @@
 'use client'
 
 import { Icon, latLngBounds } from 'leaflet';
-import { Box, Grid, Button, IconButton, useMediaQuery } from "@mui/material";
+import { Box, Grid, Button, IconButton, useMediaQuery, CardContent, CardMedia, ButtonBase } from "@mui/material";
 import { MapContainer, Marker, Popup, Polyline, LayersControl, TileLayer } from 'react-leaflet';
 import React, { useEffect, useRef, useState } from "react";
 import './tripTracker.css'
-import { httpsGet } from "../../utils/Communication";
 import pickupIcon from '../../assets/pickup_icon.svg'
 import dropIcon from '../../assets/drop_icon.svg'
 import wagonIcon from '../../assets/wagons_icon.svg'
@@ -16,7 +15,8 @@ import mapViewIcon from '../../assets/map_view_icon.svg'
 import haltIcon from '../../assets/halt_icon.svg';
 import mapPlaceHolder from '../../assets/mapPlaceHolder.svg';
 import mapPathIcon from '../../assets/mapPath.svg';
-import MapLayers from "../../MapsHelper/MapLayers";
+import TripTrackerNavbar from './TripTrackerNavbar/TripTrackerNavbar';
+import Image from 'next/image';
 
 const statusBuilder = (status: string) => {
   if (!status) return "In Plant"
@@ -488,11 +488,11 @@ const TripTracker = (params: any) => {
               }}
               ></CardMedia> */}
               <Image
-                    src={ mapViewIcon }
-                    alt="Map Path Icon"
-                    width={30}
-                    height={30}
-                />
+                  src={ mapViewIcon }
+                  alt="Map Path Icon"
+                  width={30}
+                  height={30}
+              />
               Map View
             </Button>
           </Box>
@@ -524,11 +524,11 @@ const TripTracker = (params: any) => {
               }}
             /> */}
             <Image
-                    src={ showDetails ? arrowDownIcon : arrowUpIcon }
-                    alt="Map Path Icon"
-                    width={10}
-                    height={10}
-                  />
+              src={ showDetails ? arrowDownIcon : arrowUpIcon }
+              alt="Map Path Icon"
+              width={10}
+              height={10}
+            />
           </IconButton>
         </Box>}
         {(!mobile || showDetails) && (<Box
