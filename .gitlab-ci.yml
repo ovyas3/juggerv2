@@ -28,3 +28,4 @@ dev_build:
     - rm /home/ubuntu/milkyway/packages/lucy-$CI_JOB_ID.zip
     - pm2 restart lucy
     - exit
+  when: manual
