@@ -10,7 +10,7 @@ import arrowUpIcon from '@/assets/arrowUp.svg'
 import arrowDownIcon from '@/assets/arrowDown.svg'
 import mapViewIcon from '@/assets/map_view_icon.svg'
 import haltIcon from '@/assets/halt_icon.svg';
-import mapPlaceHolder from '@/assets/mapPlaceHolder.svg';
+import mapPlaceHolder from '@/assets/mapPlaceholder.svg';
 import mapPathIcon from '@/assets/mapPath.svg';
 import { FNRDetailsCard } from '../MapView/FnrDetailsCard/FnrDetailsCard';
 import { ActivityTimeLineChart } from '../MapView/ActivityTimeLineChart/ActivityTimeLineChart';

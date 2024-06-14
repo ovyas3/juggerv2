@@ -4,15 +4,12 @@ import SideDrawer from '@/components/Drawer/Drawer';
 import React, { useEffect, useState } from 'react';
 import Header from '@/components/Header/header';
 import './orders.css'
-import { Box, TextField, InputAdornment } from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
 import ReplayIcon from '@mui/icons-material/Replay';
 import Filters from '@/components/Filters/filters';
 import TableData from '@/components/table/table';
 import MobileDrawer from "@/components/Drawer/mobile_drawer";
 import MobileHeader from "@/components/Header/mobileHeader";
 import { useWindowSize } from "@/utils/hooks";
-import { ShipmentsObjectPayload } from "@/utils/interface";
 import { httpsPost } from "@/utils/Communication";
 import { GET_SHIPMENTS } from "@/utils/helper";
 
