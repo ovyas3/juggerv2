@@ -1,0 +1,127 @@
+.status-wrapper {
+  padding: 8px 0 20px 0;
+  margin-bottom: 12px;
+}
+
+.status-wrapper:hover:first-child {
+  background: #334ffc0d;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.hover-infobox {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  position: absolute;
+  height: 40px;
+  width: 58px;
+  border-radius: 6px;
+  background: black;
+  font-size: 10px;
+  top: 110%;
+  padding-bottom: 4px;
+  justify-content: space-evenly;
+  height: 42px;
+}
+
+.breakdown {
+  display: flex;
+  flex-direction: row;
+  width: auto;
+  background: #ee4d37;
+}
+
+.scheme-container {
+  display: flex;
+  flex-direction: column;
+  margin-right: 40px;
+  padding-right: 40px;
+  border-right: 1px solid #dfe3eb;
+  position: relative;
+}
+
+.scheme-container:first-child {
+  margin-left: 20px;
+}
+
+.scheme-container:hover .hover-infobox {
+  display: flex;
+}
+
+.scheme-container:hover:first-child .hover-infobox {
+  background: #18be8a;
+}
+
+.scheme-container:hover:nth-child(2) .hover-infobox {
+  background: #334ffc;
+}
+
+.scheme-container:hover:nth-child(3) .hover-infobox {
+  background: #bc4a28;
+}
+
+.total-rakes-split-count {
+  color: #42454e;
+}
+
+.scheme-container:hover:first-child .total-rakes-split-count {
+  color: #18be8a;
+}
+
+.scheme-container:hover:nth-child(2) .total-rakes-split-count {
+  color: #334ffc;
+}
+.scheme-container:hover:nth-child(3) .total-rakes-split-count {
+  color: #bc4a28;
+}
+
+.no-of-wagons {
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
+  width: 40px;
+  justify-content: left;
+}
+
+.wagons-text {
+  color: white;
+  font-size: 10px;
+}
+
+.non-tracking-data-with-load {
+  display: flex;
+  flex-direction: column;
+  margin-right: 40px;
+  margin-left: 20px;
+  padding-right: 40px;
+  border-right: 1px solid #dfe3eb;
+  position: relative;
+  cursor: pointer;
+}
+
+.non-tracking-data-without-load {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  cursor: pointer;
+}
+
+.non-tracking-breakdown-wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-left: 16px;
+}
+
+.non-tracking-breakdown-val {
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.non-tracking-breakdown-hours {
+  color: white;
+  font-size: 10px;
+  width: 60px;
+}

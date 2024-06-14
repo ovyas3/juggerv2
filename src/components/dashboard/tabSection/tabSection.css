@@ -1,0 +1,45 @@
+.wrapper {
+    margin: 56px 0 0 98px;
+}
+
+.tabs {
+    font-size: 20px;
+}
+
+.filter-bar{
+ display: flex;
+ justify-content: space-between;
+ margin-top: 26px;
+}
+.filterdrop-wrapper {
+ display: flex;
+}
+
+.dropdown {
+    margin-right: 16px;
+}
+
+.help-btn {
+    background: #F8F8F8;
+    color: #42454E;
+    height: 36px;
+    width:130px;
+    margin-right:24px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    padding:0 8px;
+    cursor: pointer;
+}
+
+.help-btn:hover {
+    background:#2E2D32;
+    color:#FFFFFF;
+}
+
+.date-picker-dashboard {
+  height: 36px;
+  width: 128px;
+}

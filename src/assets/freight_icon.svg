@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48">
+  <g id="freight_icon" transform="translate(-626 -342)">
+    <path id="Path_16982" data-name="Path 16982" d="M0,0H48V48H0Z" transform="translate(626 342)" fill="none"/>
+    <g id="Group_21105" data-name="Group 21105" transform="translate(-17.513 -32.008)">
+      <g id="Group_21104" data-name="Group 21104" transform="translate(648.243 380)">
+        <g id="Rectangle_4972" data-name="Rectangle 4972" transform="translate(0 8.937) rotate(-20)" fill="#fff" stroke="#131722" stroke-width="2.75">
+          <rect width="21.613" height="28.804" rx="2" stroke="none"/>
+          <rect x="1.375" y="1.375" width="18.863" height="26.054" rx="0.625" fill="none"/>
+        </g>
+        <g id="Rectangle_4970" data-name="Rectangle 4970" transform="translate(9.686)" fill="#fff" stroke="#131722" stroke-width="2.75">
+          <rect width="28.813" height="36" rx="2" stroke="none"/>
+          <rect x="1.375" y="1.375" width="26.063" height="33.25" rx="0.625" fill="none"/>
+        </g>
+        <g id="Group_21103" data-name="Group 21103" transform="translate(18.682 9.885)">
+          <path id="Path_16984" data-name="Path 16984" d="M19.821,7H10.8a5.41,5.41,0,1,1,0,10.821H9l5.41,5.41" transform="translate(-9 -7)" fill="none" stroke="#19be8a" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.75"/>
+          <path id="Path_16985" data-name="Path 16985" d="M9,10H19.821" transform="translate(-9 -4.587)" fill="none" stroke="#19be8a" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.75"/>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>
