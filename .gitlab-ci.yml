@@ -24,6 +24,7 @@ dev_build:
     - cp /home/ubuntu/milkyway/packages/lucy-$CI_JOB_ID.zip .
     - unzip -qq -o lucy-$CI_JOB_ID.zip
     - rm -rf lucy-$CI_JOB_ID.zip
+    - ls
     - rm /home/ubuntu/milkyway/packages/lucy-$CI_JOB_ID.zip
     - pm2 restart lucy
     - exit
