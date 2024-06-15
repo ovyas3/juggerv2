@@ -10,6 +10,20 @@
     "rememberMe": "Remember Me",
     "passWord": "Password"
   },
+  "DASHBOARD":{
+   "totalRakes":"Total Rakes",
+   "trackingWithGPS": "Tracking with GPS",
+   "nonTracking":"Non Tracking",
+   "rakesLoaded": "Rakes loaded",
+   "wagonsLoaded":"Wagons loaded",
+   "totalLoad":"Total load (MT)",
+   "freight":"Freight (Cr)",
+   "rakesUnloaded":"Rakes unloaded",
+   "wagonsUnloaded":"Wagons unloaded",
+   "railOverview":"RAIL OVERVIEW",
+   "handlingAgentsOverview": "HANDLING AGENT'S OVERVIEW",
+   "customerOverview":"CUSTOMER OVERVIEW"
+  },
   "HEADER":{
     "shipments":"Shipments"
   },

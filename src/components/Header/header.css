@@ -12,10 +12,20 @@
     background-color: white;
 }
 
+.header-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 998;
+    width: 100%;
+    background: white;
+}
+
 .shipment_text{
     font-size: 20px;
     font-weight: bold;
     color: #42454E;
+    margin-left:70px
 }
 .header_name{
     font-size: 14px;
