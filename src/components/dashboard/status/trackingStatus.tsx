@@ -46,7 +46,7 @@ const TrackingStatus = () => {
   }
 
   useEffect(() => {
-    httpsGet("/all_tracking_rakes").then((response: any) => {
+    httpsGet("all_tracking_rakes").then((response: any) => {
       if (response) {
         if (response.totalRakeCount) setTotalRakes(response.totalRakeCount);
         if (response.scheme) {
@@ -116,7 +116,7 @@ const TrackingStatus = () => {
           />
           <div style={{ display: "flex" }}>
             {schemeData.map((scheme) => (
-              <div className="scheme-container">
+              <div className="scheme-container" key={scheme.scheme}>
                 <span className="total-rakes-split-count">
                   {scheme.count || 0}
                 </span>
@@ -195,7 +195,7 @@ const TrackingStatus = () => {
                 <div className="hover-infobox breakdown">
                   {Object.entries(nonTrackingData.withLoad).map(
                     ([key, value]) => (
-                      <div className="non-tracking-breakdown-wrapper">
+                      <div className="non-tracking-breakdown-wrapper" key={key}>
                         <span className="non-tracking-breakdown-val">
                           {Number(value)}
                         </span>
@@ -226,7 +226,7 @@ const TrackingStatus = () => {
                 >
                   {Object.entries(nonTrackingData.withoutLoad).map(
                     ([key, value]) => (
-                      <div className="non-tracking-breakdown-wrapper">
+                      <div className="non-tracking-breakdown-wrapper" key={key}>
                         <span className="non-tracking-breakdown-val">
                           {Number(value)}
                         </span>

@@ -203,7 +203,7 @@ const convertArrayToFilteredArray = (inputArray: any) => {
 
 
 // Main component
-export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList }: any) {
+export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, count }: any) {
 
     //language controller
     const t = useTranslations("ORDERS")
@@ -315,13 +315,13 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList }
                 <TablePagination
                     rowsPerPageOptions={[10, 25, 100]}
                     component="div"
-                    count={response.length}
+                    count={count}
                     rowsPerPage={rowsPerPage}
                     page={page}
                     onPageChange={handleChangePage}
                     onRowsPerPageChange={handleChangeRowsPerPage}
                 />
-                <TableContainer sx={{ maxHeight: '530px', border: '1px solid #E9E9EB', borderRadius: '8px' }}>
+                <TableContainer sx={{ maxHeight: '650px', border: '1px solid #E9E9EB', borderRadius: '8px' }}>
                     <Table stickyHeader aria-label="sticky table">
                         <TableHead sx={{
                             '.mui-y8ay40-MuiTableCell-root ': { padding: 0 },
@@ -502,7 +502,6 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList }
                     </Table>
                 </TableContainer>
             </Paper>
-
         </div>
     );
 }
