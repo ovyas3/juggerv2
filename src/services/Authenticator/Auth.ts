@@ -9,10 +9,12 @@ const authenticate = async (rms_auth: string) => {
       access_token_web,
       default_unit,
       shippers,
+      name,
     } = res;
     setCookies('access_token', access_token_web);
     setCookies('default_unit', default_unit);
     localStorage.setItem('shippers', JSON.stringify(shippers));
+    localStorage.setItem('user_name', name);
     let selectedShipper = shippers.find((shipper: any) => shipper._id === default_unit);
     if (!selectedShipper) selectedShipper = shippers[0] as any;
     setCookies('selected_shipper', selectedShipper._id);

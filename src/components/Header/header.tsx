@@ -24,10 +24,10 @@ const Header = (props: any) => {
 
   useEffect(() => {
     const parent_name = getCookie("parent_name")?.toString() || "";
-    const shippers = JSON.parse(localStorage.getItem("shippers") || "[]");
+    const shippersData = JSON.parse(localStorage.getItem("shippers") || "[]");
     const selected_shipper = localStorage.getItem("selected_shipper");
     setParentName(parent_name);
-    setShippers(shippers);
+    setShippers(shippersData);
     // setSelectedShipper(selected_shipper);
   }, []);
 
@@ -44,7 +44,7 @@ const Header = (props: any) => {
         >
           <div className="header_name">{parent_name}</div>
           <div className="drop_down">
-            <Dropdown shippers={shippers} />
+            {shippers.length && <Dropdown shippers={shippers} />}
           </div>
           <div className="divder"></div>
           <div className="bell_icon">

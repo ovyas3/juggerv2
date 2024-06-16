@@ -38,7 +38,7 @@ const Dropdown = ({ shippers }:{shippers: shipper[]}) => {
     });
     setOptions(optionsData);
     setSelectedValue(selected_shipper);
-    console.log({options, selectedValue})
+    console.log({options, selectedValue, shippers})
   }, []);
 
   return (
