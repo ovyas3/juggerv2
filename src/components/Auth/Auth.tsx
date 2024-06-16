@@ -20,7 +20,7 @@ const AuthController = () => {
         }
     }
     useEffect(() => {
-        const rms_auth = searchParams.get('rms_auth') as string;
+        const rms_auth = searchParams.get('token') as string;
         console.log('top level', rms_auth)
         if (!checkCalled) {
             setCheckCalled(true);
