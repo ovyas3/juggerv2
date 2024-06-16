@@ -33,29 +33,29 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
 }));
 
 const data = [
-  {
-    title: "No. of Rakes",
-    number: "32",
-    description: "No.of captive rakes in each scheme",
-    subData: [
-      {
-        subTitle: "SFTO",
-        subNumber: "14",
-      },
-      {
-        subTitle: "GPWIS",
-        subNumber: "12",
-      },
-      {
-        subTitle: "BFNV",
-        subNumber: "06",
-      },
-    ],
-  },
+  // {
+  //   title: "No. of Rakes",
+  //   number: "32",
+  //   description: "No.of captive rakes in each scheme",
+  //   subData: [
+  //     {
+  //       subTitle: "SFTO",
+  //       subNumber: "14",
+  //     },
+  //     {
+  //       subTitle: "GPWIS",
+  //       subNumber: "12",
+  //     },
+  //     {
+  //       subTitle: "BFNV",
+  //       subNumber: "06",
+  //     },
+  //   ],
+  // },
   {
     title: "No. of Wagons",
     number: "1720",
-    description: "No.of wagons in each scheme",
+    description: "No.of wagons",
     subData: [
       {
         subTitle: "SFTO",
@@ -74,7 +74,7 @@ const data = [
   {
     title: "No. of Wagons with Remarks",
     number: "79",
-    description: "No.of wagon with remarks in each scheme",
+    description: "No.of wagon with remarks",
     subData: [
       {
         subTitle: "SFTO",
