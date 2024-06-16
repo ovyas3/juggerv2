@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 6050",
+    "prod_dev": "NODE_ENV=production next dev -p 6050",
     "build": "next build",
     "dev_build": "node --max_old_space_size=8048 node_modules/next/dist/bin/next build",
     "start": "next start -p 6060",
