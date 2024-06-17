@@ -100,6 +100,8 @@
   color: #42454E;
   font-size: 12px;
   font-weight: 600;
+  background-color: #E9E9EB ;
+  padding: 10px 12px;
 }
 
 .MuiTable-root .MuiTableBody-root .MuiTableRow-root:hover{
@@ -128,4 +130,18 @@
   font-size: 12px;
   color: #42454E;
   margin-top: 4px;
+}
+
+.tracking-heading{
+  font-size: 16px;
+  font-weight: 600;
+  color: #42454E;
+  padding: 20px 16px;
+  font-family: "Inter", sans-serif;
+}
+
+.captive-rake-rows{
+  font-size: 12px;
+  color: #42454E;
+  font-family: "Inter", sans-serif;
 }
