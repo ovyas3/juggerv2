@@ -8,9 +8,10 @@ import nonTracking from "../../../assets/non_tracking_icon_status.svg";
 import "./css/trackingStatus.css";
 import forwardArrow from "../../../assets/forward_arrow_icon.svg";
 import { httpsGet } from "@/utils/Communication";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 const TrackingStatus = () => {
+  const router = useRouter();
   const [isHovered, setIsHovered] = useState(false);
   const [nonTrackingEmptyHovered, setNonTrackingEmptyHovered] = useState(false);
   const [nonTrackingWithLoadHovered, setNonTrackingWithLoadHovered] =
@@ -121,40 +122,39 @@ const TrackingStatus = () => {
         TRACKING STATUS
       </div>
       <div style={{ marginTop: "20px" }}>
-        <div className="link-wrapper">
-          <Link href="/MapsHelper">
-            <div
-              className="status-wrapper"
-              onMouseOver={() => setIsHovered(true)}
-              onMouseLeave={() => setIsHovered(false)}
-            >
-              <ProgressBar
-                color={"#334FFC"}
-                percent={100}
-                count={totalRakes}
-                name="Total Rakes"
-                icon={totalRakesIcon}
-                hoverIcon={forwardArrow}
-                isHovered={isHovered}
-              />
-              <div style={{ display: "flex" }}>
-                {schemeData.map((scheme) => (
-                  <div className="scheme-container" key={scheme.scheme}>
-                    <span className="total-rakes-split-count">
-                      {scheme.count || 0}
-                    </span>
-                    <span style={{ color: "#71747A", fontSize: "10px" }}>
-                      {scheme.scheme || ""}
-                    </span>
-                    <div className="hover-infobox">
-                      <span className="no-of-wagons">{scheme.wagons || 0}</span>
-                      <span className="wagons-text">Wagons</span>
-                    </div>
-                  </div>
-                ))}
+        <div
+          className="status-wrapper"
+          onMouseOver={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+          onClick={() => {
+            router.push('/MapsHelper');
+          }}
+        >
+          <ProgressBar
+            color={"#334FFC"}
+            percent={100}
+            count={totalRakes}
+            name="Total Rakes"
+            icon={totalRakesIcon}
+            hoverIcon={forwardArrow}
+            isHovered={isHovered}
+          />
+          <div style={{ display: "flex" }}>
+            {schemeData.map((scheme) => (
+              <div className="scheme-container" key={scheme.scheme}>
+                <span className="total-rakes-split-count">
+                  {scheme.count || 0}
+                </span>
+                <span style={{ color: "#71747A", fontSize: "10px" }}>
+                  {scheme.scheme || ""}
+                </span>
+                <div className="hover-infobox">
+                  <span className="no-of-wagons">{scheme.wagons || 0}</span>
+                  <span className="wagons-text">Wagons</span>
+                </div>
               </div>
-            </div>
-          </Link>
+            ))}
+          </div>
         </div>
         <div className="status-wrapper">
           <ProgressBar
