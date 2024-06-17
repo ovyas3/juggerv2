@@ -9,6 +9,14 @@ import coordsOfTracks from "./IndianTracks";
 import { useWindowSize } from "@/utils/hooks";
 import {MagnifyingGlass} from 'react-loader-spinner';
 
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import Paper from "@mui/material/Paper";
+
 import { Icon, divIcon, point } from "leaflet";
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -103,10 +111,11 @@ const MapLayers = () => {
       try {
         // setLoading(true);
         console.log('Fetching data');
-        const res = await httpsGet('all_captive_shipment_details', 0);
+        const res = await httpsGet('rake_shipment/get/maps/captive_rakes', 0);
         console.log('Data fetched', res);
-        res.map((data: any) => {
-          if (data && data.rake_updates) {
+        const data = res.data;
+        data.map((data: any) => {
+          if (data && data.rake_updates && data.rake_id) {
             if (!coords[data.name]) {
               coords[data.name] = [];
             }
@@ -119,7 +128,6 @@ const MapLayers = () => {
                 }
               }
             );
-
           }
           if (!allRakes.some((item: any) => item.rake_id === data.rake_id)) {
             allRakes.push({
@@ -128,6 +136,8 @@ const MapLayers = () => {
             });
           }
         });
+        console.log('All Rakes:', allRakes);
+        console.log('Coords:', coords);
         setAllRakes(allRakes);
         setCoords(coords);
       } catch (error) {
@@ -258,6 +268,103 @@ const MapLayers = () => {
                     labelPlacement="start"
                   />
                 </FormGroup>
+                <Grid style={{
+                    position: 'absolute',
+                    height:'100%',
+                    width: '386px',
+                    background: 'white',
+                    left: '70px',
+                    top: '5%',
+                    overflowX: 'auto',
+                    backgroundColor:'#F8F8F8',
+                    zIndex:10
+                  }}  >
+                    <Grid>
+                       <div style={{
+                        width: '354px',
+                        height: '75%',
+                        marginTop: '24px',
+                        marginLeft: '16px',
+                        borderRadius: '12px',
+                        backgroundColor: '#ffffff',
+                       }}>
+                        <div style={{
+                          fontSize: '16px',
+                          color: '#42454E',
+                          padding: '20px 16px',
+                          fontWeight: 600,
+                        }}>
+                          Shipments
+                        </div>
+                        <TableContainer
+                          component={Paper}
+                          sx={{
+                          height: "450px",
+                        }}
+                      >
+                        <Table sx={{ minWidth: '100%' }} aria-label="simple table" stickyHeader>
+                          <TableHead>
+                            <TableRow sx={{backgroundColor: '#F2F2F4'}}>
+                              <TableCell align="left" className="table-heads">Rake ID</TableCell>
+                              <TableCell align="left" className="table-heads">Scheme Type</TableCell>
+                            </TableRow>
+                          </TableHead>
+                          <TableBody>
+                          {allRakes && allRakes.map((rake: any, index: number) => (
+                            <TableRow
+                            key={index}
+                            sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                            className='table-rows-container'
+                            >
+                              <TableCell align="left" className="table-rows">{rake.rake_id}</TableCell>
+                              <TableCell align="left" className="table-rows">{rake.name}</TableCell>
+                            </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </TableContainer>
+                       </div>
+                      
+                       {/* {
+                          list.length && list.map((item: any, index: number)=>{
+                             return (
+                               <div
+                                 key={index}
+                                 style={{
+                                   backgroundColor: item.tracking ? "#F1F1F1" : "lightgray",
+                                   marginInline: "5px",
+                                   marginBlock: "7px",
+                                   padding: "3px 13px",
+                                   borderRadius: "5px",
+                                   display: "flex",
+                                   justifyContent: "space-between",
+                                   alignItems: "center",
+                                   fontSize: "15px",
+                                   overflowX: "auto",
+                                 }}
+                               >
+                                 <div className="details">
+                                   <div>
+                                     <b>Rake ID:</b> {item.title}
+                                   </div>
+                                 </div>
+                                 <FormControlLabel
+                                   disabled={!item.tracking}
+                                   control={
+                                     <Switch
+                                       checked={showRouteFor === item.title}
+                                       onChange={() => handleApiByWagonNo(item.title)}
+                                     />
+                                   }
+                                   label="Show Route"
+                                   labelPlacement="start"
+                                 />
+                               </div>
+                             );
+                           })
+                         } */}
+                  </Grid> 
+                </Grid>
                 <MapContainer className="map" center={center} zoom={5} style={{ minHeight: '105%',width: '101%', padding: '0px', zIndex: '0', position: 'fixed' }} attributionControl={false} ref={setMap} >
                   <div className={"layersControl"} style={{marginTop:'60px'}} >
                     <LayersControl>

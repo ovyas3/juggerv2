@@ -5,6 +5,10 @@ import { styled } from "@mui/material/styles";
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import CloseButtonIcon from "@/assets/close_icon.svg";
+import TrackingIcon from "@/assets/tracking_icon.svg";
+import NonTrackingIcon from "@/assets/non_tracking_icon.svg";
+import LinkIcon from "@/assets/link.svg";
+import ReturnIcon from "@/assets/return_icon.svg";
 import Image from "next/image";
 import "./popup.css";
 import Table from "@mui/material/Table";
@@ -120,13 +124,12 @@ export const Popup = () => {
 
   // Get data for parent dialog component
   const getDataParentTabele = async () => {
-    const res = await httpsGet('/all_captive_rakes_details', 0);
+    const res = await httpsGet('all_captive_rakes_details', 0);
     const currentTime = new Date();
     // Create a new array
     const newData = res.map((item : any) => {
       const updatedAt = new Date(item.updated_at);
       const diffInHours = Math.abs(currentTime.getTime() - updatedAt.getTime()) / 36e5; // 36e5 is the number of milliseconds in one hour
-
       return {
         rake_id: item.rake_id,
         scheme_type: item.scheme,
@@ -137,13 +140,57 @@ export const Popup = () => {
         poh_done: item.poh ? new Date(item.poh).toLocaleDateString('en-GB') : 'N/A',
         poh_due: item.poh_due ? new Date(item.poh_due).toLocaleDateString('en-GB') : 'N/A',
         wagons: item.wagons,
+        isTracking: diffInHours < 2 ? true : false,
+        diffInHours: diffInHours
       }
     });
     const filteredNewData = newData.filter((item: any, index: number, array: any[]) => {
       return array.findIndex((el) => el.rake_id === item.rake_id) === index && item.rake_id !== undefined;
     });
+    console.log(filteredNewData);
     setParentTableData(filteredNewData);
     setFilteredData(filteredNewData);
+
+    const dialogData = [
+      {
+       title: "No. of Rakes",
+       number: filteredNewData ? filteredNewData.length : 0,
+       description: "No.of captive rakes in each scheme",
+       subData: [
+        {
+          subTitle: "SFTO",
+          subNumber: filteredNewData ? filteredNewData.filter((item: any) => item.scheme_type === 'SFTO').length : 0,
+        },
+        {
+          subTitle: "GPWIS",
+          subNumber: filteredNewData ? filteredNewData.filter((item: any) => item.scheme_type === 'GPWIS').length : 0,
+        },
+        {
+          subTitle: "BFNV",
+          subNumber: filteredNewData ? filteredNewData.filter((item: any) => item.scheme_type === 'BFNV').length : 0,
+        },
+      ],
+      },
+      {
+        title: "No. of Wagons",
+        number: filteredNewData ? filteredNewData.reduce((acc: number, item: any) => acc + item.no_of_wagons, 0) : 0,
+        description: "No.of wagons",
+        subData: [
+          {
+            subTitle: "SFTO",
+            subNumber: filteredNewData ? filteredNewData.filter((item: any) => item.scheme_type === 'SFTO').reduce((acc: number, item: any) => acc + item.no_of_wagons, 0) : 0,
+          },
+          {
+            subTitle: "GPWIS",
+            subNumber: filteredNewData ? filteredNewData.filter((item: any) => item.scheme_type === 'GPWIS').reduce((acc: number, item: any) => acc + item.no_of_wagons, 0) : 0,
+          },
+          {
+            subTitle: "BFNV",
+            subNumber: filteredNewData ? filteredNewData.filter((item: any) => item.scheme_type === 'BFNV').reduce((acc: number, item: any) => acc + item.no_of_wagons, 0) : 0,
+          },
+        ],
+      },
+    ];
   }
 
   useEffect(() => {
@@ -196,8 +243,8 @@ export const Popup = () => {
     const newChildLowerData = item.wagons.map((wagon: any, index: number) => (
       {
         wagon_no: wagon.wg_no,
-        wagon_type: wagon.wagon_type,
-        remark: wagon.remark
+        wagon_type: wagon.wagon_type ? wagon.wagon_type.name : 'N/A',
+        remark: wagon.remark ? wagon.remark : 'N/A'
       }
     ));
     setChildData(newChildUpperData);
@@ -211,6 +258,7 @@ export const Popup = () => {
   }
 
   const handleChildFilterChange = (newSearchChildTerm = searchChildTerm, newWagonType = wagonType) => {
+    console.log(newSearchChildTerm, newWagonType, childTableData, childFilteredData);
     const filteredBySearchTerm = newSearchChildTerm
       ? childTableData.filter((item: any) =>
           item.wagon_no.toLowerCase().includes(newSearchChildTerm.toLowerCase())
@@ -218,10 +266,11 @@ export const Popup = () => {
       : childTableData;
 
     const finalFilteredData = (newWagonType === "ALL" || !newWagonType)
-      ? filteredBySearchTerm.filter((item: any) => item.wagon_type === newWagonType)
-      : filteredBySearchTerm;
+      ? filteredBySearchTerm
+      : filteredBySearchTerm.filter((item: any) => item.wagon_type === newWagonType);
 
     setChildFilteredData(finalFilteredData);
+    console.log(finalFilteredData);
   };
 
   const handleChildSearchChange = (event: any) => {
@@ -350,7 +399,10 @@ export const Popup = () => {
         sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
         className='table-rows-container'
         onClick={() => handleChildClickOpen(item)}>
-         <TableCell align="left" className='table-rows'>{item.rake_id}</TableCell>
+         <TableCell align="left" className='table-rows'>
+          <p className="rake-id">{item.rake_id}</p>
+          {item.isTracking ? <Image src={TrackingIcon} alt="tracking"/>: <Image src={NonTrackingIcon} alt="tracking"/>}
+        </TableCell>
          <TableCell align="center" className='table-rows'>{item.scheme_type}</TableCell>
          <TableCell align="center" className='table-rows'>{item.no_of_wagons}</TableCell>
          <TableCell align="left" className='table-rows'>{item.date_of_commissioning}</TableCell>
@@ -381,47 +433,58 @@ export const Popup = () => {
     )
   );
 
-  const ChildTableHeadComponent = () => (
-    <TableHead>
-      <TableRow>
-        <TableCell align="left" className="table-columns">
-          <TextField
-            id="outlined-basic"
-            label="Wagon No."
-            variant="outlined"
-            value={searchChildTerm}
-            onChange={handleChildSearchChange}
-            InputLabelProps={{
-              classes: {
-                root: "my-label-class",
-              },
-            }}
-          />
-        </TableCell>
-        <TableCell align="left" className="table-columns">
-          <div className="select-container">
-            <FormControl>
-              <InputLabel id="demo-simple-select-label">Wagon Type</InputLabel>
-              <Select
-                labelId="demo-simple-select-label"
-                id="demo-simple-select"
-                value={wagonType}
-                label="Wagon Type"
-                onChange={handleWagonTypeChange}
-              >
-                <MenuItem value={"ALL"}>ALL</MenuItem>
-                <MenuItem value={"BRN"}>BRN</MenuItem>
-                <MenuItem value={"BFNV"}>BFNV</MenuItem>
-              </Select>
-            </FormControl>
-          </div>
-        </TableCell>
-        <TableCell align="left" className="table-columns">
-          Remarks
-        </TableCell>
-      </TableRow>
-    </TableHead>
-  );
+  const ChildTableHeadComponent = () => {
+    const inputRef = useRef<any>(null);
+
+    useEffect(() => {
+      if (inputRef.current) {
+        inputRef.current.focus();
+      }
+    }, []);
+
+    return (
+      <TableHead>
+        <TableRow>
+          <TableCell align="left" className="table-columns">
+            <TextField
+              inputRef={inputRef}
+              id="outlined-basic"
+              label="Wagon No."
+              variant="outlined"
+              value={searchChildTerm}
+              onChange={handleChildSearchChange}
+              InputLabelProps={{
+                classes: {
+                  root: "my-label-class",
+                },
+              }}
+            />
+          </TableCell>
+          <TableCell align="left" className="table-columns">
+            <div className="select-container">
+              <FormControl>
+                <InputLabel id="demo-simple-select-label">Wagon Type</InputLabel>
+                <Select
+                  labelId="demo-simple-select-label"
+                  id="demo-simple-select"
+                  value={wagonType}
+                  label="Wagon Type"
+                  onChange={handleWagonTypeChange}
+                >
+                  <MenuItem value={"ALL"}>ALL</MenuItem>
+                  <MenuItem value={"BRN"}>BRN</MenuItem>
+                  <MenuItem value={"BFNV"}>BFNV</MenuItem>
+                </Select>
+              </FormControl>
+            </div>
+          </TableCell>
+          <TableCell align="left" className="table-columns">
+            Remarks
+          </TableCell>
+        </TableRow>
+      </TableHead>
+    );
+  }
 
   const ChildTableRowComponent = () => (
     childFilteredData.map((item: any) => (
@@ -430,7 +493,10 @@ export const Popup = () => {
         sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
         className='table-rows-container'
       >
-        <TableCell align="left" className='table-rows'>{item.wagon_no}</TableCell>
+        <TableCell align="left" className='table-rows'>
+          <p>{item.wagon_no}</p>
+          <Image src={LinkIcon} alt="link"/>
+        </TableCell>
         <TableCell align="left" className='table-rows'>BRN</TableCell>
         <TableCell align="left" className='table-rows'>{item.remark}</TableCell>
       </TableRow>
@@ -469,7 +535,7 @@ export const Popup = () => {
           onClick={handleChildClose}
           className="child-close-icon"
         >
-          <Image src={CloseButtonIcon} alt="close" />
+          <Image src={ReturnIcon} alt="close" />
         </div>
 
         <div className="child-upper-container">
