@@ -165,11 +165,17 @@ const Tabsection = () => {
                     <Status />
                     <BarsDataset/>
                   </div> */}
-                  <div style={{ width: "32vw" }}>
+                  <div style={{ width: "28vw" }}>
                     <TrackingStatus />
                   </div>
-                  <div style={{ width: "60vw" }}>
-                    <Popup />
+                  <div
+                    style={{
+                      width: "70vw",
+                    }}
+                  >
+                    <div style={{ display: "flex", justifyContent: "center" }}>
+                      <Popup />
+                    </div>
                   </div>
                 </div>
               </TabPanel>

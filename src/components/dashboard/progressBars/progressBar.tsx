@@ -1,6 +1,6 @@
 import * as React from "react";
 import Image from "next/image";
-import "./css/progressBar.css"
+import "./css/progressBar.css";
 
 export default function ProgressBar(props: any) {
   return (
@@ -14,8 +14,10 @@ export default function ProgressBar(props: any) {
           alignItems: "center",
         }}
       >
-        <div style={{position:"relative",height:"42px"}}>
-          <span style={{ fontSize: "24px", fontWeight: "bold" }}>
+        <div style={{ position: "relative", height: "42px" }}>
+          <span
+            style={{ fontSize: "24px", fontWeight: "bold", color: "black" }}
+          >
             {props.count}
           </span>
           <span
@@ -26,11 +28,30 @@ export default function ProgressBar(props: any) {
         </div>
         <div
           style={{ marginRight: "24px", display: "flex", alignItems: "center" }}
-          className={props.isHovered ? "icon-container icon-container-hovered":"icon-container"}
+          className={
+            props.isHovered
+              ? "icon-container icon-container-hovered"
+              : "icon-container"
+          }
         >
-          <Image src={props.icon} alt="" className={props.isHovered ? "icon-before icon-before-hovered":"icon-before"} />
+          <Image
+            src={props.icon}
+            alt=""
+            className={
+              props.isHovered
+                ? "icon-before icon-before-hovered"
+                : "icon-before"
+            }
+          />
           {props.isHovered ? (
-            <Image src={props.hoverIcon} alt="" style={{ marginLeft: "4px" }} className={props.isHovered ? "icon-after icon-after-hovered":"icon-after"}/>
+            <Image
+              src={props.hoverIcon}
+              alt=""
+              style={{ marginLeft: "4px" }}
+              className={
+                props.isHovered ? "icon-after icon-after-hovered" : "icon-after"
+              }
+            />
           ) : (
             <></>
           )}
