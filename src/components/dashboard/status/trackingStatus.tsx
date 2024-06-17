@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import ProgressBar from "../progressBars/progressBar";
 import totalRakesIcon from "../../../assets/total_rakes.svg";
-import trackingWithGPS from "../../../assets/tracking_icon.svg";
-import nonTracking from "../../../assets/non_tracking_icon.svg";
+import trackingWithGPS from "../../../assets/tracking_icon_status.svg";
+import nonTracking from "../../../assets/non_tracking_icon_status.svg";
 import "./css/trackingStatus.css";
 import forwardArrow from "../../../assets/forward_arrow_icon.svg";
 import { httpsGet } from "@/utils/Communication";
@@ -121,7 +121,7 @@ const TrackingStatus = () => {
                   {scheme.count || 0}
                 </span>
                 <span style={{ color: "#71747A", fontSize: "10px" }}>
-                  {scheme.scheme}
+                  {scheme.scheme || ''}
                 </span>
                 <div className="hover-infobox">
                   <span className="no-of-wagons">{scheme.wagons || 0}</span>
