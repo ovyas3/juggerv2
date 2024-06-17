@@ -38,11 +38,11 @@ function SideDrawer (){
         
         <div className='containerDrawer' onMouseEnter={()=>{setOpen(true)}} onMouseLeave={()=>{setOpen(false)}} style={{alignItems:'start', width:open ?'218px':'70px', transition:'width 0.2s ease-in'}}>
             <div className='img'><Image src={defaultLogo} alt=''/></div>
-            <div className='fnr-icon' onClick={() => handleRouting('orders')} style={{width:open?'190px':'42px',transition:'width 0.2s ease-in',backgroundColor: (active == 'orders')? 'white':''}}>
+            <div className='fnr-icon' onClick={() => handleRouting('orders')} style={{width:open?'190px':'42px',transition:'width 0.2s ease-in',backgroundColor: (active == 'orders')? 'white':'', cursor: 'pointer'}}>
                 <TrainIcon style={{marginLeft:'9px', color: (active == 'orders') ? 'black' : 'white'}} /><div className={`${open?'fnr_text':'fnr_text_none'}`} style={{color: (active == 'orders')? 'black':'white'}} >Shipments</div>
             </div>
 
-            <div onMouseEnter={()=>{setActiveContact(true)}} onMouseLeave={()=>{setActiveContact(false)}} onClick={() => handleRouting('dashboard')} className='contact-icon' style={{width:open?'190px':'42px',justifyContent:open?'start':'center', backgroundColor: ((active == 'dashboard') || activeContact)?'white':''}}>
+            <div onMouseEnter={()=>{setActiveContact(true)}} onMouseLeave={()=>{setActiveContact(false)}} onClick={() => handleRouting('dashboard')} className='contact-icon' style={{width:open?'190px':'42px',justifyContent:open?'start':'center', backgroundColor: ((active == 'dashboard') || activeContact)?'white':'', cursor: 'pointer'}}>
                 <DashboardIcon style={{marginLeft:open?'9px':'', color: ((active == 'dashboard') || activeContact) ?'black':'white'}}  /><div className={`${open?'fnr_text':'fnr_text_none'}`} style={{color:((active == 'dashboard') || activeContact)?'black':'white'}} >Dashboard</div>
             </div>
         </div>

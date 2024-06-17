@@ -72,3 +72,23 @@
   border-top-right-radius: 8px;
   color: white;
 }
+
+.mapButtons {
+  position: absolute;
+  top: 10%;
+  right: 4%;
+  z-index: 10000;
+  width: 30%;
+  justify-content: space-around;
+  display: flex !important;
+  flex-direction: row !important;
+}
+
+.mapButtons label {
+  background-color: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 10px;
+  padding-left: 15px;
+  box-shadow: 0px 2px 10px #0000001A;
+}

@@ -1,7 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import Button from "@mui/material/Button";
+import React, { useRef, useState, useEffect } from "react";
 import { styled } from "@mui/material/styles";
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
@@ -19,7 +18,7 @@ import TextField from "@mui/material/TextField";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
-import Select, { SelectChangeEvent } from "@mui/material/Select";
+import Select from "@mui/material/Select";
 import { Box } from "@mui/material";
 import { httpsGet } from "@/utils/Communication";
 
@@ -108,7 +107,6 @@ const data = [
 // ];
 
 export const Popup = () => {
-  const [open, setOpen] = useState(false);
   const [childOpen, setChildOpen] = useState(false);
   const [parentTableData, setParentTableData] = useState<any>([]);
   const [filteredData, setFilteredData] = useState<any>([]);
@@ -123,20 +121,29 @@ export const Popup = () => {
   // Get data for parent dialog component
   const getDataParentTabele = async () => {
     const res = await httpsGet('/all_captive_rakes_details', 0);
+    const currentTime = new Date();
     // Create a new array
-    const newData = res.map((item : any) => ({
-      rake_id: item.rake_id,
-      scheme_type: item.scheme,
-      no_of_wagons: item.wagons ? item.wagons.length : 0,
-      date_of_commissioning: item.commissioned ? new Date(item.commissioned).toLocaleDateString('en-GB') : 'N/A',
-      roh_done: item.roh ? new Date(item.roh).toLocaleDateString('en-GB') : 'N/A',
-      roh_due: item.roh_due ? new Date(item.roh_due).toLocaleDateString('en-GB') : 'N/A',
-      poh_done: item.poh ? new Date(item.poh).toLocaleDateString('en-GB') : 'N/A',
-      poh_due: item.poh_due ? new Date(item.poh_due).toLocaleDateString('en-GB') : 'N/A',
-      wagons: item.wagons,
-    }));
-    setParentTableData(newData);
-    setFilteredData(newData);
+    const newData = res.map((item : any) => {
+      const updatedAt = new Date(item.updated_at);
+      const diffInHours = Math.abs(currentTime.getTime() - updatedAt.getTime()) / 36e5; // 36e5 is the number of milliseconds in one hour
+
+      return {
+        rake_id: item.rake_id,
+        scheme_type: item.scheme,
+        no_of_wagons: item.wagons ? item.wagons.length : 0,
+        date_of_commissioning: item.commissioned ? new Date(item.commissioned).toLocaleDateString('en-GB') : 'N/A',
+        roh_done: item.roh ? new Date(item.roh).toLocaleDateString('en-GB') : 'N/A',
+        roh_due: item.roh_due ? new Date(item.roh_due).toLocaleDateString('en-GB') : 'N/A',
+        poh_done: item.poh ? new Date(item.poh).toLocaleDateString('en-GB') : 'N/A',
+        poh_due: item.poh_due ? new Date(item.poh_due).toLocaleDateString('en-GB') : 'N/A',
+        wagons: item.wagons,
+      }
+    });
+    const filteredNewData = newData.filter((item: any, index: number, array: any[]) => {
+      return array.findIndex((el) => el.rake_id === item.rake_id) === index && item.rake_id !== undefined;
+    });
+    setParentTableData(filteredNewData);
+    setFilteredData(filteredNewData);
   }
 
   useEffect(() => {
@@ -154,21 +161,18 @@ export const Popup = () => {
       ? filteredBySearchTerm
       : filteredBySearchTerm.filter((item: any) => item.scheme_type === newSchemeType);
 
-    console.log(finalFilteredData);
     setFilteredData(finalFilteredData);
   };
 
   const handleSearchChange = (event: any) => {
     const newSearchTerm = event.target.value;
     setSearchTerm(newSearchTerm);
-    console.log(newSearchTerm);
     handleFilterChange(newSearchTerm, schemeType);
   };
 
   const handleSchemeTypeChange = (event: any) => {
     const selectedSchemeType = event.target.value;
     setSchemeType(selectedSchemeType);
-    console.log(selectedSchemeType);
     handleFilterChange(searchTerm, selectedSchemeType);
   };
 
@@ -269,63 +273,75 @@ export const Popup = () => {
     </TableContainer>
   );
 
-  const TableHeadComponent = () => (
-    <TableHead>
-      <TableRow>
-        <TableCell align="left" className="table-columns">
-          <TextField
-            id="outlined-basic"
-            label="Rake ID"
-            variant="outlined"
-            value={searchTerm}
-            onChange={handleSearchChange} 
-            InputLabelProps={{
-              classes: {
-                root: "my-label-class",
-              },
-            }}
-          />
-        </TableCell>
-        <TableCell align="left" className="table-columns">
-          <div className="select-container">
-            <FormControl>
-              <InputLabel id="demo-simple-select-label">Scheme Type</InputLabel>
-              <Select
-                labelId="demo-simple-select-label"
-                id="demo-simple-select"
-                value={schemeType}
-                label="Scheme Type"
-                onChange={handleSchemeTypeChange}
-              >
-                <MenuItem value={"ALL"}>ALL</MenuItem>
-                <MenuItem value={"SFTO"}>SFTO</MenuItem>
-                <MenuItem value={"GPWIS"}>GPWIS</MenuItem>
-                <MenuItem value={"BFNV"}>BFNV</MenuItem>
-              </Select>
-            </FormControl>
-          </div>
-        </TableCell>
-        <TableCell align="left" className="table-columns">
-          No.of Wagons
-        </TableCell>
-        <TableCell align="left" className="table-columns">
-          Date Of Commissioning
-        </TableCell>
-        <TableCell align="left" className="table-columns">
-          ROH Done
-        </TableCell>
-        <TableCell align="left" className="table-columns">
-          ROH Due
-        </TableCell>
-        <TableCell align="left" className="table-columns">
-          POH Done
-        </TableCell>
-        <TableCell align="left" className="table-columns">
-          POH Due
-        </TableCell>
-      </TableRow>
-    </TableHead>
-  );
+  const TableHeadComponent = () => {
+
+    const inputRef = useRef<any>(null);
+
+    useEffect(() => {
+      if (inputRef.current) {
+        inputRef.current.focus();
+      }
+    }, []);
+  
+     return (
+      <TableHead>
+        <TableRow>
+          <TableCell align="left" className="table-columns">
+            <TextField
+              inputRef={inputRef}
+              id="outlined-basic"
+              label="Rake ID"
+              variant="outlined"
+              value={searchTerm}
+              onChange={handleSearchChange} 
+              InputLabelProps={{
+                classes: {
+                  root: "my-label-class",
+                },
+              }}
+            />
+          </TableCell>
+          <TableCell align="left" className="table-columns">
+            <div className="select-container">
+              <FormControl>
+                <InputLabel id="demo-simple-select-label">Scheme Type</InputLabel>
+                <Select
+                  labelId="demo-simple-select-label"
+                  id="demo-simple-select"
+                  value={schemeType}
+                  label="Scheme Type"
+                  onChange={handleSchemeTypeChange}
+                >
+                  <MenuItem value={"ALL"}>ALL</MenuItem>
+                  <MenuItem value={"SFTO"}>SFTO</MenuItem>
+                  <MenuItem value={"GPWIS"}>GPWIS</MenuItem>
+                  <MenuItem value={"BFNV"}>BFNV</MenuItem>
+                </Select>
+              </FormControl>
+            </div>
+          </TableCell>
+          <TableCell align="left" className="table-columns">
+            No.of Wagons
+          </TableCell>
+          <TableCell align="left" className="table-columns">
+            Date Of Commissioning
+          </TableCell>
+          <TableCell align="left" className="table-columns">
+            ROH Done
+          </TableCell>
+          <TableCell align="left" className="table-columns">
+            ROH Due
+          </TableCell>
+          <TableCell align="left" className="table-columns">
+            POH Done
+          </TableCell>
+          <TableCell align="left" className="table-columns">
+            POH Due
+          </TableCell>
+        </TableRow>
+      </TableHead>
+    );
+  }
 
   const TableRowComponent = () => (
     filteredData.map((item: any) => (

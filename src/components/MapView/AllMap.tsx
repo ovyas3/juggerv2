@@ -103,7 +103,7 @@ const MapLayers = () => {
       try {
         // setLoading(true);
         console.log('Fetching data');
-        const res = await httpsGet('/all_captive_shipment_details', 0);
+        const res = await httpsGet('all_captive_shipment_details', 0);
         console.log('Data fetched', res);
         res.map((data: any) => {
           if (data && data.rake_updates) {
@@ -233,20 +233,80 @@ const MapLayers = () => {
             {isMobile ? <Header></Header> : <MobileHeader />}
             <div style={{ paddingInline: 24, paddingTop: 24, paddingBottom: 65,  position:'relative' }}>
               <Box
-      sx={{
-          marginTop: mobile ? "150px" : "",
-          height: "90vh",
-          width: "100%",
-          p: 0,
-          display: "flex",
-          flexDirection: "column",
-          zIndex: 0,
-          justifyContent: 'center',
-          alignItems: "center",
-          alignContent: 'space-around',
-      }}
-    >
-      <Grid style={{
+                sx={{
+                    marginTop: mobile ? "150px" : "",
+                    height: "90vh",
+                    width: "100%",
+                    p: 0,
+                    display: "flex",
+                    flexDirection: "column",
+                    zIndex: 0,
+                    justifyContent: 'center',
+                    alignItems: "center",
+                    alignContent: 'space-around',
+                }}
+              >
+                <FormGroup className='mapButtons'>
+                  <FormControlLabel
+                    control={<Switch checked={showTracks} onChange={() => setShowTracks(!showTracks)} />}
+                    label="Show All Tracks"
+                    labelPlacement="start"
+                  />
+                  <FormControlLabel
+                    control={<Switch checked={showAllRakes} onChange={() => setShowAllRakes(!showAllRakes)} />}
+                    label="Show All Rakes"
+                    labelPlacement="start"
+                  />
+                </FormGroup>
+                <MapContainer className="map" center={center} zoom={5} style={{ minHeight: '105%',width: '101%', padding: '0px', zIndex: '0', position: 'fixed' }} attributionControl={false} ref={setMap} >
+                  <div className={"layersControl"} style={{marginTop:'60px'}} >
+                    <LayersControl>
+                    <LayersControl.BaseLayer checked name="Street View">
+                      <TileLayer
+                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                      />
+                    </LayersControl.BaseLayer>
+                    <LayersControl.BaseLayer name="Satellite View">
+                      <TileLayer
+                        attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+                        url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+                      />
+                    </LayersControl.BaseLayer>
+                    </LayersControl>
+                  </div>
+                  {showTracks && <GeoJSON data={coordsOfTracks} style={geoJSONStyle} />}
+                  {showRoute && route.length && <Polyline pathOptions={{ color:'blue' }} positions={route} />}
+                  {currentLocation.length && currentLocation.map((cr:any, index: number) => <Marker key={index} position={cr.coords} icon={customIcon}>
+                    <Popup>
+                      <h3 style={{marginTop: '1em', marginBottom: "1em"}}>Rake ID: {cr.data.title}</h3>
+                      <h4 style={{marginTop: '1em', marginBottom: "1em"}}>Last Updated At: {cr.data.ts}</h4>
+                    </Popup>
+                  </Marker>)}
+                  {showAllRakes && <MarkerClusterGroup
+                    chunkedLoading
+                    iconCreateFunction={createClusterCustomIconInTransit}
+                  >
+                  {/* Mapping through the markers */}
+                    {showAllRakes && allRakesPositions.map((rake:any, index: number) => <Marker key={index} position={rake.coords} icon={customIcon}>
+                      <Popup>
+                        <h3 style={{marginTop: '1em', marginBottom: "1em"}}>Rake ID: {rake.data.title}</h3>
+                        <hr></hr>
+                        <h4 style={{marginTop: '1em', marginBottom: "1em"}}>Last Updated At: {rake.data.ts}</h4>
+                      </Popup>
+                    </Marker>)}
+                  </MarkerClusterGroup>}
+          
+                </MapContainer>
+              </Box>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+}
+
+{/* 
+<Grid style={{
       position: 'absolute',
       height:'80%',
       width: '350px',
@@ -256,11 +316,9 @@ const MapLayers = () => {
       overflowX: 'auto',
       zIndex:10
     }}  >
-      <Grid>
+      
+    </Grid><Grid>
         <h3 style={{marginLeft:'10px', marginTop: '1em', marginBottom: '1em'}}>Filters</h3>
-        {/* //add a slider for toggle */}
-    
-        {/* show all tracks------------- */}
         <div style={{ borderBottom: '0.1px solid lightgrey',margin:'5px'}}>
           <FormControl component="fieldset">
             <FormGroup>
@@ -279,7 +337,6 @@ const MapLayers = () => {
               </FormGroup>
           </FormControl>
         </div>
-        {/* list----------- */} 
         <div style={{ borderBottom: '0.1px solid lightgrey',margin:'5px'}}>
             <div style={{margin:'5px'}}>Total Rakes: {list.length}</div>
             <div style={{margin:'5px'}}>Currently Tracking: {allRakesPositions.length}</div>
@@ -322,54 +379,6 @@ const MapLayers = () => {
               );
             })
           }
-      </Grid>
-    </Grid>
-    <MapContainer className="map" center={center} zoom={5} style={{ minHeight: '96%',width: '95.5%', padding: '0px', zIndex: '0', position: 'fixed' }} attributionControl={false} ref={setMap} >
-        <div className={"layersControl"} style={{marginTop:'60px'}} >
-          <LayersControl>
-          <LayersControl.BaseLayer checked name="Street View">
-            <TileLayer
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
-          </LayersControl.BaseLayer>
-          <LayersControl.BaseLayer name="Satellite View">
-            <TileLayer
-              attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-              url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
-            />
-          </LayersControl.BaseLayer>
-          </LayersControl>
-        </div>
-        {showTracks && <GeoJSON data={coordsOfTracks} style={geoJSONStyle} />}
-        {showRoute && route.length && <Polyline pathOptions={{ color:'blue' }} positions={route} />}
-        {currentLocation.length && currentLocation.map((cr:any, index: number) => <Marker key={index} position={cr.coords} icon={customIcon}>
-              <Popup>
-                <h3 style={{marginTop: '1em', marginBottom: "1em"}}>Rake ID: {cr.data.title}</h3>
-                <h4 style={{marginTop: '1em', marginBottom: "1em"}}>Last Updated At: {cr.data.ts}</h4>
-              </Popup>
-            </Marker>)}
-        {showAllRakes && <MarkerClusterGroup
-          chunkedLoading
-          iconCreateFunction={createClusterCustomIconInTransit}
-        >
-          {/* Mapping through the markers */}
-          {showAllRakes && allRakesPositions.map((rake:any, index: number) => <Marker key={index} position={rake.coords} icon={customIcon}>
-          <Popup>
-            <h3 style={{marginTop: '1em', marginBottom: "1em"}}>Rake ID: {rake.data.title}</h3>
-            <hr></hr>
-            <h4 style={{marginTop: '1em', marginBottom: "1em"}}>Last Updated At: {rake.data.ts}</h4>
-          </Popup>
-        </Marker>)}
-          
-        </MarkerClusterGroup>}
-          
-    </MapContainer>
-</Box>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-}
+</Grid> */}
 
 export default MapLayers;
