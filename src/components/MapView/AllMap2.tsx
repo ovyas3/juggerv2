@@ -196,7 +196,7 @@ const MapLayers = () => {
         allRakesData.push({ 
           id: rake.rake_id,
           ts: lastTimeStamp && lastTimeStamp.data ? lastTimeStamp.data.ts : '',
-          title: rake.rake_id,
+          title: rake.name,
           value: '16',
           color: '#334FFC',
           accent_color: '#334FFC1F',
@@ -284,10 +284,9 @@ const MapLayers = () => {
                     zIndex:10
                   }}  >
                     <Grid>
-                       <div style={{
-                        display: 'block',
+                    <div style={{
                         width: '354px',
-                        height: '100%',
+                        height: '25%',
                         marginTop: '24px',
                         marginLeft: '16px',
                         borderRadius: '12px',
@@ -299,7 +298,63 @@ const MapLayers = () => {
                           padding: '20px 16px',
                           fontWeight: 600,
                         }}>
-                          Captive Rakes
+                        Tracking Status
+                        </div>
+                        <hr style={{
+                          backgroundColor: '#E9E9EB',
+                          color: '#E9E9EB',
+                          height: '1px',
+                          borderRadius: '12px',
+                          width: '90%',
+                          margin: '0 auto',
+                        }}/>
+                        <div style={{
+                          display: 'flex',
+                          flexDirection: 'row',
+                          justifyContent: 'space-between',
+
+                        }}>
+                          <div className="tracking-status">
+                            <div className="tracking-number">
+                              {list.length - 1}
+                            </div>
+                            <div className="tracking-text" style={{color: '#334FFC'}}>
+                              Total
+                            </div>
+                          </div>
+                          <div className="tracking-status">
+                            <div className="tracking-number">
+                              {allRakesPositions.length}
+                            </div>
+                            <div className="tracking-text" style={{color: '#18BE8A'}}>
+                              Tracking
+                            </div>
+                          </div>
+                          <div className="tracking-status">
+                            <div className="tracking-number">
+                              {list.length - allRakesPositions.length - 1}
+                            </div>
+                            <div className="tracking-text" style={{color: '#E6667B'}}>
+                              Non Tracking
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                       <div style={{
+                        width: '354px',
+                        height: '75%',
+                        marginTop: '24px',
+                        marginLeft: '16px',
+                        borderRadius: '12px',
+                        backgroundColor: '#ffffff',
+                       }}>
+                        <div style={{
+                          fontSize: '16px',
+                          color: '#42454E',
+                          padding: '20px 16px',
+                          fontWeight: 600,
+                        }}>
+                          Shipments
                         </div>
                         <TableContainer
                           component={Paper}
