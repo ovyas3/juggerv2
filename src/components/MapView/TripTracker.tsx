@@ -1,6 +1,6 @@
 'use client'
 import './tripTracker.css'
-import L from 'leaflet';
+import { Icon, latLngBounds } from 'leaflet';
 import { Box, Grid, Button, IconButton, useMediaQuery, CardContent, CardMedia, ButtonBase, FormControlLabel, FormGroup, Switch } from "@mui/material";
 import { MapContainer, Marker, Popup, Polyline, LayersControl, TileLayer } from 'react-leaflet';
 import React, { useEffect, useRef, useState } from "react";
@@ -251,7 +251,7 @@ const ActivityTimeLineChart = (props: any) => {
               borderRadius: '5px',
               fontSize: '10px',
             }
-          } onClick={handleLoadMore} >Show Less</Button>}
+          } onClick={() => handleLoadMore} >Show Less</Button>}
         </Grid>
       </Grid>
       <Grid container spacing={2} direction={"row"} color={"#42454E"} maxHeight={"70%"} justifyContent={"flex-start"} >
@@ -324,7 +324,7 @@ const ActivityTimeLineChart = (props: any) => {
                     justifyContent: "center",
                   }}
                 /> */}
-                <ButtonBase style={{fontSize:'10px'}} onClick={handleLoadMore} >Load More</ButtonBase>
+                <ButtonBase style={{fontSize:'10px'}} onClick={(e) => handleLoadMore(e)} >Load More</ButtonBase>
             </Grid>
             <Grid item display={"flex"} margin-left={"20px"} justifyContent={"center"} height={'10px'}  alignItems={"center"} xs={10}>
                 <CardMedia
@@ -367,7 +367,7 @@ const ActivityTimeLineChart = (props: any) => {
   </React.Fragment>)
 }
 
-const renderMarkers = (tracking_data: any[], customIcon: L.Icon): JSX.Element[] => {
+const renderMarkers = (tracking_data: any[], customIcon: Icon): JSX.Element[] => {
   return tracking_data.map((point, index) => (
     <Marker key={index} position={[point.geo_point.coordinates[1], point.geo_point.coordinates[0]]} icon={customIcon}>
       <Popup>
@@ -379,8 +379,7 @@ const renderMarkers = (tracking_data: any[], customIcon: L.Icon): JSX.Element[] 
 
 const TripTracker = (params: any) => {
   const center: [number, number] = [24.2654256,78.9145218];
-  // const mapRef = useRef<any>()
-  const [mapRef, setMapRef] = useState<L.Map | null>(null);
+  const mapRef = useRef<any>()
   const trip_tracker_data = params.trip_tracker_data;
   const [loadMap, setLoadMap] = useState(false);
   const [fnr_data, setFnrData] = useState({});
@@ -397,7 +396,7 @@ const TripTracker = (params: any) => {
   const handleGPSCheck = (e: any) => {
     setShowGPSTracks(e.target.checked);
   }
-  const customIcon = new L.Icon({
+  const customIcon = new Icon({
     iconUrl: haltIcon,
     iconSize: [14, 14], // Size of the icon
     iconAnchor: [7, 14], // Anchor point of the icon, usually half of the size
@@ -425,16 +424,14 @@ const TripTracker = (params: any) => {
     fetchData();
   }, [trip_tracker_data]);
 
-  // useEffect(() => {
-  //   setTrackingLine(tracking_data.map((e: {geo_point: {coordinates: [number, number]}}) => [e.geo_point.coordinates[1],e.geo_point.coordinates[0]]))
-  //   //@ts-ignore
-  //   if (mapRef && mapRef.current && trackingLine.length > 0) {
-  //     const bounds = L.latLngBounds(trackingLine);
-  //     //@ts-ignore
-  //     mapRef.current.fitBounds(bounds);
-  //   }
-  // // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [loadMap])
+  useEffect(() => {
+    setTrackingLine(tracking_data.map((e: {geo_point: {coordinates: [number, number]}}) => [e.geo_point.coordinates[1],e.geo_point.coordinates[0]]))
+    if (mapRef.current && trackingLine.length > 0) {
+      const bounds = latLngBounds(trackingLine);
+      mapRef.current.fitBounds(bounds);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loadMap])
 
   const mobile = !useMediaQuery("(min-width:800px)");
   return (
@@ -445,23 +442,111 @@ const TripTracker = (params: any) => {
             height: mobile ? "90vh" : "100vh",
         }}
       > 
-      <MapContainer className="map" center={center} zoom={5} style={{ minHeight: '105%',width: '101%', padding: '0px', zIndex: '0', position: 'fixed' }} attributionControl={false} ref={setMapRef} >
-        <div className={"layersControl"} style={{marginTop:'60px'}} >
-          <LayersControl>
-          <LayersControl.BaseLayer checked name="Street View">
-            <TileLayer
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
-          </LayersControl.BaseLayer>
-          <LayersControl.BaseLayer name="Satellite View">
-            <TileLayer
-              attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-              url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
-            />
-          </LayersControl.BaseLayer>
-          </LayersControl>
-        </div>
-        </MapContainer>
+        {loadMap ?
+          <MapContainer className="map" center={center} zoom={5} style={{ minHeight: '100%', width: '100%', padding: '0px', zIndex: 0, position: "fixed" }} attributionControl={false} ref={mapRef}>
+                <LayersControl >
+                  <LayersControl.BaseLayer checked name="Street View">
+                    <TileLayer
+                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    />
+                  </LayersControl.BaseLayer>
+                  <LayersControl.BaseLayer name="Satellite View">
+                    <TileLayer
+                      attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+                      url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+                    />
+                  </LayersControl.BaseLayer>
+                </LayersControl>
+                {/* <Polygon pathOptions={{ color: 'blue' }} positions={pickupgeofence_decoded} /> */}
+                {renderMarkers(tracking_data, customIcon)}
+                {trackingLine.length && <Polyline pathOptions={{ color:'red'}} positions={trackingLine} />}
+          </MapContainer>
+          :
+          <Box
+            sx={{
+              height: mobile ? "90vh" : "100vh",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",    
+              alignItems: "center",
+              background: "#F0F3F9",
+              p: 1,
+              width: '100%',
+              zIndex: 0,
+              position: mobile ? "relative" : "fixed",
+            }}
+            style={{
+              backgroundImage: `url(${mapPlaceHolder})`,
+            }}
+          >
+            <Grid style={{
+              height: mobile ? '26px' : '70px',
+              fontSize: '14px',
+              display: "flex",
+              marginBottom: mobile ? "30px" : "23px",
+              justifyContent: "center",
+              alignContent: "center",
+              alignItems: "center",
+            }} container spacing={1} justifyContent={"center"}>
+              <Grid style={{
+                display: 'flex',
+                marginLeft: '300px',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }} item xs={12}>
+                {/* <CardMedia
+                  component={"img"}
+                  src={mapPathIcon}
+                  style={{
+                    height: mobile ? '32px' : '64px',
+                    width: mobile ? '32px' : '64px',
+                  }}
+                ></CardMedia> */}
+                <Image
+                    src={ mapPathIcon }
+                    alt="Map Path Icon"
+                    width={30}
+                    height={30}
+                  />
+              </Grid>
+              <Grid style={{
+                textAlign: 'center',
+                marginLeft: mobile ? "0px" : "300px",
+                fontSize: mobile ? '1em' : '1.5em',
+                color: '#42454E',
+              }} item xs={8}>
+                Click the button to see the vehicle on the map.
+              </Grid>
+            </Grid>
+            <Button style={{
+              height: mobile ? '26px' : '50px',
+              width: mobile ? '130px': '150px',
+              fontSize: '14px',
+              display: "flex",
+              marginLeft: mobile ? "0px" : "300px",
+              marginBottom: mobile ? "200px" : "0px",
+              justifyContent: "space-between",
+              alignContent: "center",
+              alignItems: "center",
+            }} variant="contained" onClick={() => setLoadMap(true)}>
+              {/* <CardMedia
+              component={"img"}
+              src={mapViewIcon}
+              style={{
+                height: mobile ? '24px' : '30px',
+                width: mobile ? '24px' : '30px',
+              }}
+              ></CardMedia> */}
+              <Image
+                  src={ mapViewIcon }
+                  alt="Map Path Icon"
+                  width={30}
+                  height={30}
+              />
+              Map View
+            </Button>
+          </Box>
+        }
         {loadMap && <FormGroup className='mapButtons'>
           <FormControlLabel
             disabled={!buttonEnabledGPS}
