@@ -188,7 +188,7 @@ const convertArrayToFilteredArray = (inputArray: any) => {
             },
             status: {
                 name:  statusBuilder(status),
-                code: status || 'NA'
+                code: status || ''
             },
             currentEta: 'NA',
             remarks: 'NA',
@@ -339,7 +339,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                     onRowsPerPageChange={handleChangeRowsPerPage}
                     labelRowsPerPage="Shipments per page:"
                 />
-                <TableContainer sx={{ maxHeight: '530px', border: '1px solid #E9E9EB', borderRadius: '8px' }}>
+                <TableContainer sx={{ maxHeight: '680px', border: '1px solid #E9E9EB', borderRadius: '8px' }}>
                     <Table stickyHeader aria-label="sticky table">
                         <TableHead sx={{
                             '.mui-y8ay40-MuiTableCell-root ': { padding: 0 },

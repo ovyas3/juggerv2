@@ -41,8 +41,8 @@
     /* background-color: aqua !important; */
     display: flex;
     gap:24px;
+    width: 150px;
     align-items: center;
-
 }
 .fois{
     background-color: #E24D65;
@@ -245,4 +245,8 @@
     opacity: 1;
     transform: scale(1);
     display: block; /* Show when the 'show' class is added */
+}
+
+.status_container {
+    max-width: 150px;
 }
