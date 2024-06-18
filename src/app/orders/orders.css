@@ -49,6 +49,7 @@ margin-top: 20px;
     flex-direction: row;
     height: 100vh;
     width: 100%;
+    font-family: "Inter", sans-serif !important;
 }
 
 .mobile_outbound_inbound{

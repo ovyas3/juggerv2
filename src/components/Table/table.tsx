@@ -117,14 +117,14 @@ function Tags({ rakeCaptiveList , shipmentId, setOpen , setShowActionBox }:any) 
                         <TextField
                             {...params}
                             variant="standard"
-                            label="Shipments"
+                            label="Captive Rakes"
 
                             InputProps={{
                                 ...params.InputProps,
-                                style: { fontSize: '10px', border: 'none' }
+                                style: { fontSize: '12px', border: 'none' }
                             }}
                             InputLabelProps={{
-                                style: { fontSize: '10px', paddingLeft: '5px', border: 'none' }
+                                style: { fontSize: '12px', paddingLeft: '5px', border: 'none' }
                             }}
                             sx={{
                                 '.mui-38raov-MuiButtonBase-root-MuiChip-root': {
@@ -242,7 +242,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
         } else {
             console.log(changeFnr)
             const resData = convertArrayToFilteredArray(allShipments)
-            const filteredData = resData.filter(item => item.fnr.primary.includes(changeFnr));
+            const filteredData = resData.filter((item: { fnr: { primary: string | string[]; }; }) => item.fnr.primary.includes(changeFnr));
             setResponse(filteredData)
         }        
     }
@@ -325,6 +325,9 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                         border: ' 1px solid #E9E9EB',
                         borderRadius: '8px'
                     },
+                    '.mui-1briqcb-MuiTableCell-root':{
+                        fontFamily:'inherit'
+                    }
                 }}>
                 <TablePagination
                     rowsPerPageOptions={[5,10, 25, 100]}
@@ -384,7 +387,9 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                     textAlign:'center',
                                                                     fontSize:'12px',
                                                                     color:'#7C7E8C',
-                                                                    fontWeight:'bold'
+                                                                    fontWeight:'bold',
+                                                                    outline:'none',
+                                                                    
                                                                 }}
                                                             />
                                                         </div>
@@ -424,14 +429,16 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                             }
 
                                             return (
-                                                <TableCell key={index} sx={{ fontSize: '12px', color: '#44475B', p: '16px 10px 16px 10px', }}
+                                                <TableCell key={index} sx={{ fontSize: '12px', color: '#44475B', p: '16px 10px 16px 10px' }}
                                                     className={columnClassNames[item.id]} >
                                                     <div>
                                                         {(typeof value) === 'object' ? '' : value}
+
                                                         {item.id === 'action' ? (
+                                                            <div style={{display:'flex', justifyContent:'center'}}>
                                                             <div className='action_icon'>
                                                                 <MoreHorizIcon
-                                                                    style={{ color: 'white', cursor: 'pointer' }}
+                                                                    style={{ color: 'white', cursor: 'pointer', scale:'0.9' }}
                                                                     onClick={() => { clickActionBox(firstindex, row._id); }}
                                                                 />
                                                                 <div
@@ -462,6 +469,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                     </Modal>
 
                                                                 </div>
+                                                            </div>
                                                             </div>
                                                         ) : null}
                                                         {
@@ -513,7 +521,9 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                         {
                                                             item.id === 'status' ?
                                                             <div className='status_container'>
-                                                                <div className='status_title'>{value.name}</div>
+                                                                <div className='status_title'>
+                                                                    <div>{value.name}</div>
+                                                                </div>
                                                                 <div className='status_body'>{value.code}</div>
                                                             </div>
                                                             :<></>
