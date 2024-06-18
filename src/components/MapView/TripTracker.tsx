@@ -439,6 +439,7 @@ const TripTracker = (params: any) => {
       <TripTrackerNavbar />
       <Box
         sx={{
+            marginTop: mobile ? "150px" : "120px",
             height: mobile ? "90vh" : "100vh",
         }}
       > 
