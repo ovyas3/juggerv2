@@ -95,3 +95,10 @@ margin-top: 20px;
     color: #2962FF;
     border-bottom: 2px solid #2962FF;
 }
+
+.tableContainer {
+    margin-left: 70px;
+}
+/* .tableData {
+    margin-top: 100px;
+} */

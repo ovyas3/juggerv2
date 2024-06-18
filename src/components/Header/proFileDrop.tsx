@@ -1,3 +1,4 @@
+'use client'
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import Avatar from '@mui/material/Avatar';
@@ -19,6 +20,7 @@ import { useRouter } from 'next/navigation';
 export default function AccountMenu() {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
+  const [profileName, setProfileName] = React.useState<string>('OP' as string);
   const router = useRouter();
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -44,6 +46,17 @@ export default function AccountMenu() {
   const handleClose = () => {
     setAnchorEl(null);
   };
+
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const name = localStorage.getItem('user_name') as string;
+      if (name) {
+        const profileInitials = createProfileName(name);
+        setProfileName(profileInitials);
+      }
+    }
+  }, []);
+
   return (
     <React.Fragment>
       <Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'center' }}>
@@ -56,7 +69,9 @@ export default function AccountMenu() {
             aria-haspopup="true"
             aria-expanded={open ? 'true' : undefined}
           >
-            <Avatar sx={{ width: 40, height: 40,}}>OP</Avatar>
+            <Avatar sx={{ width: 40, height: 40,}}>
+            {profileName}
+            </Avatar>
           </IconButton>
         </Tooltip>
       </Box>

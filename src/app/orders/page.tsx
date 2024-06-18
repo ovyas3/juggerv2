@@ -18,6 +18,7 @@ const OrdersPage = () => {
   const t = useTranslations('ORDERS');
   const mobile = useWindowSize(600);
   const [allShipment, setAllShipment] = useState([]);
+  const [count, setCount] = useState(0);
   const [rakeCaptiveList, setRakeCaptiveList] = useState([]);
 
   const [reload, setReload] = useState(false)
@@ -52,8 +53,8 @@ const OrdersPage = () => {
   async function getAllShipment (){
     const response =await httpsPost(GET_SHIPMENTS,ShipmentsPayload);
     console.log(response)
-    setAllShipment(response.data.data)
-
+    setAllShipment( response.data.data)
+    setCount(response.data.count)
   }
 
   async function getCaptiveRake (){
@@ -72,21 +73,17 @@ const OrdersPage = () => {
   },[ShipmentsPayload])
 
 
-  // console.log(ShipmentsPayload)
-  // console.log('how many times it runing',allShipment)
-  console.log(reload)
 
 
   return (
     <div  >
       <div className='orderContainer'>
-        {mobile ? <SideDrawer /> : null}
         <div style={{ width: '100%', overflowX: 'auto' }}>
           {
-            mobile ? <Header></Header> : <MobileHeader />
+            mobile ? <Header title={'Shipments'} /> : <MobileHeader />
           }
 
-          <div style={{ paddingInline: 24, paddingTop: 24, paddingBottom: 65,  position:'relative' }}>
+          <div className='tableContainer' style={{ paddingInline: 24, paddingTop: 24,  paddingBottom: 65,  position:'relative', marginTop:'56px' }}>
 
             {/* ----search fnr---- */}
             <div className='input_fnr_reload'>
@@ -117,15 +114,14 @@ const OrdersPage = () => {
             </div>
 
             {/* ----table---- */}
-            <div>
-              <TableData onSkipLimit={handleSkipLimitChange} allShipments={allShipment} rakeCaptiveList={rakeCaptiveList} />
+            <div className='tableData'>
+              <TableData onSkipLimit={handleSkipLimitChange} allShipments={allShipment} count={count} rakeCaptiveList={rakeCaptiveList} />
             </div>
 
           </div>
         </div>
       </div>
-      {mobile ? null :
-        <div className="bottom_bar">
+      {mobile ? <SideDrawer /> : <div className="bottom_bar">
           <MobileDrawer />
         </div>}
     </div>

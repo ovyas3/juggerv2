@@ -1,11 +1,9 @@
 'use client'
-
+import './tripTracker.css'
 import { Icon, latLngBounds } from 'leaflet';
-import { Box, Grid, Button, IconButton, useMediaQuery } from "@mui/material";
+import { Box, Grid, Button, IconButton, useMediaQuery, CardContent, CardMedia, ButtonBase, FormControlLabel, FormGroup, Switch } from "@mui/material";
 import { MapContainer, Marker, Popup, Polyline, LayersControl, TileLayer } from 'react-leaflet';
 import React, { useEffect, useRef, useState } from "react";
-import './tripTracker.css'
-import { httpsGet } from "../../utils/Communication";
 import pickupIcon from '../../assets/pickup_icon.svg'
 import dropIcon from '../../assets/drop_icon.svg'
 import wagonIcon from '../../assets/wagons_icon.svg'
@@ -14,9 +12,10 @@ import arrowUpIcon from '../../assets/arrowUp.svg'
 import arrowDownIcon from '../../assets/arrowDown.svg'
 import mapViewIcon from '../../assets/map_view_icon.svg'
 import haltIcon from '../../assets/halt_icon.svg';
-import mapPlaceHolder from '../../assets/mapPlaceHolder.svg';
+import mapPlaceHolder from '../../assets/mapPlaceholder.svg';
 import mapPathIcon from '../../assets/mapPath.svg';
-import MapLayers from "../../MapsHelper/MapLayers";
+import TripTrackerNavbar from './TripTrackerNavbar/TripTrackerNavbar';
+import Image from 'next/image';
 
 const statusBuilder = (status: string) => {
   if (!status) return "In Plant"
@@ -26,127 +25,162 @@ const statusBuilder = (status: string) => {
   return "In Transit"
 }
 
-const FNRDetailsCard = (props: any) => ( 
-  <React.Fragment>
-    <CardContent className={props.className} >
-      <Grid style={
-        {
-              display: 'flex',
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              height: '100%',
-              padding: '0px'
+const FNRDetailsCard = (props: any) => {
+  const [fnrDetails, setFnrDetails] = useState<any>({
+    FNR: "",
+    status: "",
+    no_of_wagons: 0,
+    pickup: '',
+    drop: '',
+    trip_tracker: {},
+  });
 
-        }
-      } container spacing={2}>
-        <Grid item xs={6} >
-          <Box style={
+  useEffect(() => {
+    const {
+      FNR,
+      status,
+      no_of_wagons,
+      pickup_location,
+      delivery_location,
+      trip_tracker,
+    } = props.fnr_data;
+    const pickup = pickup_location ? pickup_location.code +' - '+ pickup_location.name : '';
+    const drop = delivery_location ? delivery_location.code +' - '+ delivery_location.name : '';
+    setFnrDetails({
+      FNR,
+      status,
+      no_of_wagons,
+      pickup,
+      drop,
+      trip_tracker,
+    });
+  }, [props.fnr_data]);
+  return (
+    <React.Fragment>
+      <CardContent className={props.className} >
+        <Grid style={
+          {
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                height: '100%',
+                padding: '0px'
+
+          }
+        } container spacing={2}>
+          <Grid item xs={6} >
+            <Box style={
+              {
+                display: "flex",
+                height: '24px',
+                width: '100%',
+                padding: '4px',
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: '5px',
+                fontSize: '14px',
+              }
+            }>
+              FNR No: #{fnrDetails.FNR}
+            </Box>
+          </Grid>
+          <Grid item xs={6}>
+            <Box style={
             {
               display: "flex",
+              backgroundColor: '#53F6AA',
+              color: '#008E27',
               height: '24px',
-              width: '100%',
-              padding: '4px',
+              width: '85px',
+              maxWidth: '100px',
+              padding: '2px',
+              float: "right",
               alignItems: 'center',
               justifyContent: 'center',
               borderRadius: '5px',
               fontSize: '14px',
             }
           }>
-            FNR No: #{props.fnr_data.FNR}
+          {statusBuilder(fnrDetails.status)}
           </Box>
-        </Grid>
-        <Grid item xs={6}>
-          <Box style={
-          {
-            display: "flex",
-            backgroundColor: '#53F6AA',
-            color: '#008E27',
-            height: '24px',
-            width: '85px',
-            maxWidth: '100px',
-            padding: '2px',
-            float: "right",
-            alignItems: 'center',
-            justifyContent: 'center',
-            borderRadius: '5px',
-            fontSize: '14px',
-          }
-        }>
-         {statusBuilder(props.fnr_data.status)}
-        </Box>
-        </Grid>
-      </Grid>
-      <hr></hr>
-      <Grid container spacing={2} direction={"row"} color={"#42454E"} >
-        <Grid container spacing={2} item xs={12} >
-          <Grid item display={"flex"} justifyContent={"center"} alignItems={"center"} xs={2}>
-            <CardMedia
-              component={"img"}
-              src={pickupIcon}
-              sx={{
-                height: '10px',
-                width: '10px',
-                justifyContent: "center",
-              }}
-            />
-          </Grid>
-          <Grid item xs={10} fontSize={"10px"} >
-              {props.firstTrackingDetails.stationFrom}
           </Grid>
         </Grid>
-        <Grid container spacing={2} item xs={12} >
-          <Grid item display={"flex"} justifyContent={"center"} alignItems={"center"} xs={2}>
-            <CardMedia
-              component={"img"}
-              src={dropIcon}
-              sx={{
-                height: '10px',
-                width: '10px',
-                justifyContent: "center",
-              }}
-            />
+        <hr></hr>
+        <Grid container spacing={2} direction={"row"} color={"#42454E"} >
+          <Grid container spacing={2} item xs={12} >
+            <Grid item display={"flex"} justifyContent={"center"} alignItems={"center"} xs={2}>
+              <CardMedia
+                component={"img"}
+                src={pickupIcon}
+                sx={{
+                  height: '10px',
+                  width: '10px',
+                  justifyContent: "center",
+                }}
+              />
+            </Grid>
+            <Grid item xs={10} fontSize={"10px"} >
+                {fnrDetails.pickup}
+            </Grid>
           </Grid>
-          <Grid item xs={10} fontSize={"10px"} >
-              {props.firstTrackingDetails.stationTo}
+          <Grid container spacing={2} item xs={12} >
+            <Grid item display={"flex"} justifyContent={"center"} alignItems={"center"} xs={2}>
+              <CardMedia
+                component={"img"}
+                src={dropIcon}
+                sx={{
+                  height: '10px',
+                  width: '10px',
+                  justifyContent: "center",
+                }}
+              />
+            </Grid>
+            <Grid item xs={10} fontSize={"10px"} >
+                {fnrDetails.drop}
+            </Grid>
+          </Grid>
+          <Grid container spacing={2} item xs={12} >
+            <Grid item display={"flex"} justifyContent={"center"} alignItems={"center"} xs={2}>
+              <CardMedia
+                component={"img"}
+                src={wagonIcon}
+                sx={{
+                  height: '10px',
+                  width: '10px',
+                  justifyContent: "center",
+                }}
+              />
+            </Grid>
+            <Grid item xs={10} fontSize={"10px"} >
+                No of Wagons: <b>{fnrDetails.no_of_wagons}</b>
+            </Grid>
+          </Grid>
+          <Grid container spacing={2} item xs={12} >
+            <Grid item display={"flex"} justifyContent={"center"} alignItems={"center"} xs={2}>
+              <CardMedia
+                component={"img"}
+                src={currentTrainLocationIcon}
+                sx={{
+                  height: '10px',
+                  width: '10px',
+                  justifyContent: "center",
+                }}
+              />
+            </Grid>
+            <Grid item xs={10} fontSize={"10px"} >
+                <b>Current Location: </b>
+                  <br></br>
+                  FOIS: <b> {fnrDetails.trip_tracker ? fnrDetails.trip_tracker.fois_last_location : 'N/A'} </b>
+                  <br></br>
+                  GPS: <b> {fnrDetails.trip_tracker ? fnrDetails.trip_tracker.gps_last_location : 'N/A'} </b>
+            </Grid>
           </Grid>
         </Grid>
-        <Grid container spacing={2} item xs={12} >
-          <Grid item display={"flex"} justifyContent={"center"} alignItems={"center"} xs={2}>
-            <CardMedia
-              component={"img"}
-              src={wagonIcon}
-              sx={{
-                height: '10px',
-                width: '10px',
-                justifyContent: "center",
-              }}
-            />
-          </Grid>
-          <Grid item xs={10} fontSize={"10px"} >
-              No of Wagons: <b>{props.fnr_data.no_of_wagons}</b>
-          </Grid>
-        </Grid>
-        <Grid container spacing={2} item xs={12} >
-          <Grid item display={"flex"} justifyContent={"center"} alignItems={"center"} xs={2}>
-            <CardMedia
-              component={"img"}
-              src={currentTrainLocationIcon}
-              sx={{
-                height: '10px',
-                width: '10px',
-                justifyContent: "center",
-              }}
-            />
-          </Grid>
-          <Grid item xs={10} fontSize={"10px"} >
-              Current Location: <b>{props.lastTrackingDetails.lastReportedLocn}</b>
-          </Grid>
-        </Grid>
-      </Grid>
-    </CardContent>
-  </React.Fragment>
-);
+      </CardContent>
+    </React.Fragment>
+  )
+};
 
 const ActivityTimeLineChart = (props: any) => {
   // const dateConvertor = (date) => DateTime.fromISO(date).plus({minutes: 330}).toFormat("dd-MM-yyyy HH:mm");
@@ -349,11 +383,19 @@ const TripTracker = (params: any) => {
   const trip_tracker_data = params.trip_tracker_data;
   const [loadMap, setLoadMap] = useState(false);
   const [fnr_data, setFnrData] = useState({});
-  const [firstTrackingDetails, setFirstTrackingDetails] = useState({});
-  const [lastTrackingDetails, setLastTrackingDetails] = useState({});
   const [tracking_data, setTrackingData] = useState<any>([]);
   const [trackingLine, setTrackingLine] = useState<[number, number][]>([]);
   const [showDetails, setShowDetails] = useState(true);
+  const [showFoisTracks, setShowFoisTracks] = useState(false);
+  const [showGPSTracks, setShowGPSTracks] = useState(false);
+  const [buttonEnabledFois, setButtonEnabledFois] = useState(false);
+  const [buttonEnabledGPS, setButtonEnabledGPS] = useState(false);
+  const handleFoisCheck = (e: any) => {
+    setShowFoisTracks(e.target.checked);
+  }
+  const handleGPSCheck = (e: any) => {
+    setShowGPSTracks(e.target.checked);
+  }
   const customIcon = new Icon({
     iconUrl: haltIcon,
     iconSize: [14, 14], // Size of the icon
@@ -367,8 +409,16 @@ const TripTracker = (params: any) => {
     } = trip_tracker_data;
     setFnrData(rakeData);
     setTrackingData(tracks);
-    setFirstTrackingDetails(tracks[0]);
-    setLastTrackingDetails(tracks[tracks.length - 1]);
+    if (tracks.length > 0) {
+      setButtonEnabledFois(true);
+    }
+
+    const trip_tracker_gps = rakeData.trip_tracker ? rakeData.trip_tracker.gps_updated_at : false;
+    if (trip_tracker_gps) {
+      setButtonEnabledGPS(true);
+    }
+    // setFirstTrackingDetails(tracks[0]);
+    // setLastTrackingDetails(tracks[tracks.length - 1]);
   };
   useEffect(() => {
     fetchData();
@@ -395,18 +445,18 @@ const TripTracker = (params: any) => {
         {loadMap ?
           <MapContainer className="map" center={center} zoom={5} style={{ minHeight: '100%', width: '100%', padding: '0px', zIndex: 0, position: "fixed" }} attributionControl={false} ref={mapRef}>
                 <LayersControl >
-                <LayersControl.BaseLayer checked name="Street View">
-                  <TileLayer
-                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                  />
-                </LayersControl.BaseLayer>
-                <LayersControl.BaseLayer name="Satellite View">
-                  <TileLayer
-                    attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-                    url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
-                  />
-                </LayersControl.BaseLayer>
-              </LayersControl>
+                  <LayersControl.BaseLayer checked name="Street View">
+                    <TileLayer
+                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    />
+                  </LayersControl.BaseLayer>
+                  <LayersControl.BaseLayer name="Satellite View">
+                    <TileLayer
+                      attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+                      url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+                    />
+                  </LayersControl.BaseLayer>
+                </LayersControl>
                 {/* <Polygon pathOptions={{ color: 'blue' }} positions={pickupgeofence_decoded} /> */}
                 {renderMarkers(tracking_data, customIcon)}
                 {trackingLine.length && <Polyline pathOptions={{ color:'red'}} positions={trackingLine} />}
@@ -488,15 +538,29 @@ const TripTracker = (params: any) => {
               }}
               ></CardMedia> */}
               <Image
-                    src={ mapViewIcon }
-                    alt="Map Path Icon"
-                    width={30}
-                    height={30}
-                />
+                  src={ mapViewIcon }
+                  alt="Map Path Icon"
+                  width={30}
+                  height={30}
+              />
               Map View
             </Button>
           </Box>
         }
+        {loadMap && <FormGroup className='mapButtons'>
+          <FormControlLabel
+            disabled={!buttonEnabledGPS}
+            control={<Switch checked={showGPSTracks} onChange={handleGPSCheck} />}
+            label="Show GPS Tracks"
+            labelPlacement="start"
+          />
+          <FormControlLabel
+            disabled={!buttonEnabledFois}
+            control={<Switch checked={showFoisTracks} onChange={handleFoisCheck} />}
+            label="Show Fois Tracks"
+            labelPlacement="start"
+          />
+        </FormGroup>}
         {mobile && <Box
         sx={{
           zIndex: 10,
@@ -524,11 +588,11 @@ const TripTracker = (params: any) => {
               }}
             /> */}
             <Image
-                    src={ showDetails ? arrowDownIcon : arrowUpIcon }
-                    alt="Map Path Icon"
-                    width={10}
-                    height={10}
-                  />
+              src={ showDetails ? arrowDownIcon : arrowUpIcon }
+              alt="Map Path Icon"
+              width={10}
+              height={10}
+            />
           </IconButton>
         </Box>}
         {(!mobile || showDetails) && (<Box
@@ -553,7 +617,7 @@ const TripTracker = (params: any) => {
 
           className="tracking_details"
         >
-        <FNRDetailsCard className="fnr_details_mobile"  fnr_data={fnr_data} firstTrackingDetails={firstTrackingDetails} lastTrackingDetails={lastTrackingDetails} />
+        <FNRDetailsCard className="fnr_details_mobile"  fnr_data={fnr_data} />
         <ActivityTimeLineChart className="tracking_details_mobile" trackingDetails={tracking_data} />
         </Box>)}
       </Box>

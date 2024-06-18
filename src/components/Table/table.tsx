@@ -189,7 +189,7 @@ const convertArrayToFilteredArray = (inputArray: any) => {
                 date: others.confirmationDate || 'NA',
             },
             status: {
-                name:  'booked',
+                name:  'In transit',
                 code: item.is_fois_fetched || 'NA'
             },
             currentEta: 'NA',
@@ -203,7 +203,7 @@ const convertArrayToFilteredArray = (inputArray: any) => {
 
 
 // Main component
-export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList }: any) {
+export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, count }: any) {
 
     //language controller
     const t = useTranslations("ORDERS")
@@ -234,8 +234,6 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList }
     const [rowId, setRowID] = useState('')
 
     const response = convertArrayToFilteredArray(allShipments)
-  
-
     const handleChangePage = (event: unknown, newPage: number) => {
         setPage(newPage);
     };
@@ -286,15 +284,13 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList }
         ];
 
         if (edemand) {
-            commonColumns.unshift({ id: 'edemand', label: 'E Demand', class: 'edamand', innerClass: '' });
+            commonColumns.unshift({ id: 'edemand', label: 'e-Demand', class: 'edamand', innerClass: '' });
         }
 
         onSkipLimit(rowsPerPage, page * rowsPerPage)
 
         setColumns(commonColumns);
     }, [edemand, showEdemand, rowsPerPage, page]);
-
-  
 
     return (
         <div className='target'>
@@ -313,13 +309,14 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList }
                     },
                 }}>
                 <TablePagination
-                    rowsPerPageOptions={[10, 25, 100]}
+                    rowsPerPageOptions={[5,10, 25, 100]}
                     component="div"
-                    count={response.length}
+                    count={count}
                     rowsPerPage={rowsPerPage}
                     page={page}
                     onPageChange={handleChangePage}
                     onRowsPerPageChange={handleChangeRowsPerPage}
+                    labelRowsPerPage="Shipments per page:"
                 />
                 <TableContainer sx={{ maxHeight: '530px', border: '1px solid #E9E9EB', borderRadius: '8px' }}>
                     <Table stickyHeader aria-label="sticky table">
@@ -364,7 +361,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList }
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {response.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row: row, firstindex: number) => {
+                            {response.map((row: row, firstindex: number) => {
                                 return (
                                     <TableRow hover key={row.edemand}>
 
@@ -469,19 +466,11 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList }
                                                             item.id === 'pickupdate' ?
 
                                                                 <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                                                    {service.utcToist(value.date)}
+                                                                    <div>{service.utcToist(value.date)}</div>
+                                                                    <div>{service.utcToistTime(value.date)}</div>
                                                                 </div>
                                                                 : <></>
                                                         }
-                                                        {/* {
-                                                            item.id === 'currentEta' ?
-
-                                                                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                                                    <div>{formatDateTime(row.pickupdate).formattedDate}</div>
-                                                                    <div>{formatDateTime(row.pickupdate).timeString}</div>
-                                                                </div>
-                                                                : <></>
-                                                        } */}
                                                         {
                                                             item.id === 'status' ?
                                                             <div className='status_container'>
@@ -502,7 +491,6 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList }
                     </Table>
                 </TableContainer>
             </Paper>
-
         </div>
     );
 }
