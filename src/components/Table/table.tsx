@@ -33,6 +33,7 @@ import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import { httpsPost } from '@/utils/Communication';
 import {UPDATE_RAKE_CAPTIVE_ID} from '@/utils/helper'
+import { statusBuilder } from '../MapView/StatusBuilder/StatusBuilder';
 
 const style = {
     position: 'absolute' as 'absolute',
@@ -154,10 +155,6 @@ function Tags({ rakeCaptiveList , shipmentId, setOpen , setShowActionBox }:any) 
     );
 }
 
-
-
-
-
 const convertArrayToFilteredArray = (inputArray: any) => {
     return inputArray.map((
         item: {
@@ -171,7 +168,7 @@ const convertArrayToFilteredArray = (inputArray: any) => {
             unique_code: string,
             _id: string
         }) => {
-        const { edemand_no, FNR, allFNRs, delivery_location, others, remarks, unique_code } = item;
+        const { edemand_no, FNR, allFNRs, delivery_location, others, remarks, unique_code, status } = item;
         return {
             _id: item._id,
             edemand: edemand_no,
@@ -189,8 +186,8 @@ const convertArrayToFilteredArray = (inputArray: any) => {
                 date: others.confirmationDate || 'NA',
             },
             status: {
-                name:  'booked',
-                code: item.is_fois_fetched || 'NA'
+                name:  statusBuilder(status),
+                code: status || 'NA'
             },
             currentEta: 'NA',
             remarks: 'NA',
@@ -200,7 +197,6 @@ const convertArrayToFilteredArray = (inputArray: any) => {
         }
     });
 };
-
 
 // Main component
 export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, count }: any) {
@@ -232,9 +228,12 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
 
     //getting row id to pass it to tag element
     const [rowId, setRowID] = useState('')
-
-    const response = convertArrayToFilteredArray(allShipments)
-  
+    const [response, setResponse] = useState([])
+    
+    useEffect(() => {
+        const resData = convertArrayToFilteredArray(allShipments)
+        setResponse(resData)
+    }, [allShipments, page])
 
     const handleChangePage = (event: unknown, newPage: number) => {
         setPage(newPage);
@@ -290,7 +289,6 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
         }
 
         onSkipLimit(rowsPerPage, page * rowsPerPage)
-
         setColumns(commonColumns);
     }, [edemand, showEdemand, rowsPerPage, page]);
 
@@ -364,7 +362,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {response.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row: row, firstindex: number) => {
+                            {response.map((row: row, firstindex: number) => {
                                 return (
                                     <TableRow hover key={row.edemand}>
 

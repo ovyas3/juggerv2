@@ -39,7 +39,7 @@ const data = [
   // {
   //   title: "No. of Rakes",
   //   number: "32",
-  //   description: "No.of captive rakes in each scheme",
+  //   description: "No.of captive rakes",
   //   subData: [
   //     {
   //       subTitle: "SFTO",

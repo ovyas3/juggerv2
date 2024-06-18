@@ -14,7 +14,7 @@ const page = () => {
         <Tabsection/>
      </div>
      <SideDrawer/>
-     </div>
+   </div>
   );
 };
 
