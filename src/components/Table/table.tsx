@@ -167,7 +167,6 @@ const convertArrayToFilteredArray = (inputArray: any) => {
             allFNRs: any;
             unique_code: string,
             _id: string
-            status: string
         }) => {
         const { edemand_no, FNR, allFNRs, delivery_location, others, remarks, unique_code, status } = item;
         return {

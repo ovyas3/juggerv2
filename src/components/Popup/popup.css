@@ -11,6 +11,7 @@
   display: inline-block;
   border-radius: 12px !important;
   overflow-y: unset;
+  height: 100%;
 }
 
 .dialog-container {
@@ -36,7 +37,7 @@
 .upper-container{
   display: flex;
   flex-direction: row;
-  gap: 32px;
+  justify-content: space-between;
 }
 
 .dialog-styles .close-icon{
@@ -241,7 +242,7 @@
 .lower-conatiner{
   background-color: #F8F8F8;
   padding: 24px;
-  border-radius: 0 0 12px 12px;
+  /* border-radius: 0 0 12px 12px; */
 
   .table-container{
     border: 1px solid #DFE3EB;
@@ -380,7 +381,7 @@
   padding: 24px 32px 24px 24px;
   display: flex;
   flex-direction: row;
-  gap: 24px;
+  justify-content: space-between;
 
   .title {
     font-size: 16px;

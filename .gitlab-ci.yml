@@ -2,7 +2,6 @@ image: tk120404/node:22.2.0
 
 variables:
   GIT_STRATEGY: fetch
-  GIT_SUBMODULE_STRATEGY: recursive
 
 dev_build:
   tags:
@@ -11,8 +10,8 @@ dev_build:
   environment:
     name: dev
   script:
-    # - npm install
-    # - npm run dev_build
+    - npm install
+    - npm run dev_build
     - echo $devEnvKey | base64 -d > devEnvKey.pem
     - echo $devFingerPrint > ~/.ssh/known_hosts
     - chmod 400 devEnvKey.pem
@@ -26,8 +25,8 @@ dev_build:
     - rm -rf lucy-$CI_JOB_ID.zip
     - ls
     - rm /home/ubuntu/milkyway/packages/lucy-$CI_JOB_ID.zip
-    - rm -rf node_modules
-    - npm install
+    # - rm -rf node_modules
+    - npm ci
     - pm2 reload lucy
     - exit
   when: manual
