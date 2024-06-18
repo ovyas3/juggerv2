@@ -25,6 +25,7 @@ import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import { Box } from "@mui/material";
 import { httpsGet } from "@/utils/Communication";
+import { title } from "process";
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialogContent-root": {
@@ -35,78 +36,63 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   },
 }));
 
-const data = [
-  // {
-  //   title: "No. of Rakes",
-  //   number: "32",
-  //   description: "No.of captive rakes",
-  //   subData: [
-  //     {
-  //       subTitle: "SFTO",
-  //       subNumber: "14",
-  //     },
-  //     {
-  //       subTitle: "GPWIS",
-  //       subNumber: "12",
-  //     },
-  //     {
-  //       subTitle: "BFNV",
-  //       subNumber: "06",
-  //     },
-  //   ],
-  // },
-  {
-    title: "No. of Wagons",
-    number: "1720",
-    description: "No.of wagons",
-    subData: [
-      {
-        subTitle: "SFTO",
-        subNumber: "627",
-      },
-      {
-        subTitle: "GPWIS",
-        subNumber: "729",
-      },
-      {
-        subTitle: "BFNV",
-        subNumber: "364",
-      },
-    ],
-  },
-  {
-    title: "No. of Wagons with Remarks",
-    number: "79",
-    description: "No.of wagon with remarks",
-    subData: [
-      {
-        subTitle: "SFTO",
-        subNumber: "29",
-      },
-      {
-        subTitle: "GPWIS",
-        subNumber: "30",
-      },
-      {
-        subTitle: "BFNV",
-        subNumber: "20",
-      },
-    ],
-  },
-];
-
-// const dummyChildData = [
+// const data = [
 //   {
-//     title: "Rake ID",
-//     number: "18013109984",
+//     title: "No. of Rakes",
+//     number: "32",
+//     description: "No.of captive rakes",
+//     subData: [
+//       {
+//         subTitle: "SFTO",
+//         subNumber: "14",
+//       },
+//       {
+//         subTitle: "GPWIS",
+//         subNumber: "12",
+//       },
+//       {
+//         subTitle: "BFNV",
+//         subNumber: "06",
+//       },
+//     ],
 //   },
 //   {
 //     title: "No. of Wagons",
-//     number: "44",
+//     number: "1720",
+//     description: "No.of wagons",
+//     subData: [
+//       {
+//         subTitle: "SFTO",
+//         subNumber: "627",
+//       },
+//       {
+//         subTitle: "GPWIS",
+//         subNumber: "729",
+//       },
+//       {
+//         subTitle: "BFNV",
+//         subNumber: "364",
+//       },
+//     ],
 //   },
 //   {
-//     title: "Scheme Type",
-//     number: "GPWIS",
+//     title: "No. of Wagons with Remarks",
+//     number: "79",
+//     description: "No.of wagon with remarks",
+//     subData: [
+//       {
+//         subTitle: "SFTO",
+//         subNumber: "29",
+//       },
+//       {
+//         subTitle: "GPWIS",
+//         subNumber: "30",
+//       },
+//       {
+//         subTitle: "BFNV",
+//         subNumber: "20",
+//       },
+//     ],
 //   },
 // ];
 
@@ -116,11 +102,13 @@ export const Popup = () => {
   const [filteredData, setFilteredData] = useState<any>([]);
   const [schemeType, setSchemeType] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
-  const [wagonType, setWagonType] = useState('');
+  const [wagonType, setWagonType] = useState<any>('');
+  const [showWagonTypes, setShowWagonTypes] = useState(false);
   const [searchChildTerm, setSearchChildTerm] = useState('');
   const [childData, setChildData] = useState<any>({});
   const [childTableData, setChildTableData] = useState<any>([]);
   const [childFilteredData, setChildFilteredData] = useState<any>([]);
+  const [dialogDatas, setDialogDatas] = useState<any>([]);
 
   // Get data for parent dialog component
   const getDataParentTabele = async () => {
@@ -147,7 +135,6 @@ export const Popup = () => {
     const filteredNewData = newData.filter((item: any, index: number, array: any[]) => {
       return array.findIndex((el) => el.rake_id === item.rake_id) === index && item.rake_id !== undefined;
     });
-    console.log(filteredNewData);
     setParentTableData(filteredNewData);
     setFilteredData(filteredNewData);
 
@@ -190,11 +177,40 @@ export const Popup = () => {
           },
         ],
       },
+      {
+        title: "No. of Wagons with Remarks",
+        number: filteredNewData ? filteredNewData.reduce((acc: number, item: any) => acc + item.wagons.filter((wagon: any) => wagon.remark).length, 0) : 0,
+        description: "No.of wagons with remarks", 
+        subData: [
+          {
+            subTitle: "SFTO",
+            subNumber: filteredNewData ? filteredNewData.filter((item: any) => item.scheme_type === 'SFTO').reduce((acc: number, item: any) => acc + item.wagons.filter((wagon: any) => wagon.remark).length, 0) : 0,
+          },
+          {
+            subTitle: "GPWIS",
+            subNumber: filteredNewData ? filteredNewData.filter((item: any) => item.scheme_type === 'GPWIS').reduce((acc: number, item: any) => acc + item.wagons.filter((wagon: any) => wagon.remark).length, 0) : 0,
+          },
+          {
+            subTitle: "BFNV",
+            subNumber: filteredNewData ? filteredNewData.filter((item: any) => item.scheme_type === 'BFNV').reduce((acc: number, item: any) => acc + item.wagons.filter((wagon: any) => wagon.remark).length, 0) : 0,
+          },
+        ],
+      }
     ];
+
+    setDialogDatas(dialogData);
+    console.log('dialogData', dialogDatas);
+  }
+
+  const getWagonTypes = async () => {
+    const res = await httpsGet('wagon_type/get/all_wagon_type', 0);
+    const wagonType = res && res.data && res.data.map((item: any) => item.name);
+    setShowWagonTypes(wagonType);
   }
 
   useEffect(() => {
     getDataParentTabele();
+    getWagonTypes();
   }, []);
 
   const handleFilterChange = (newSearchTerm = searchTerm, newSchemeType = schemeType) => {
@@ -255,10 +271,12 @@ export const Popup = () => {
 
   const handleChildClose = () => {
     setChildOpen(false);
+    setChildFilteredData([]);
+    setSearchChildTerm('');
+    setWagonType('');
   }
 
   const handleChildFilterChange = (newSearchChildTerm = searchChildTerm, newWagonType = wagonType) => {
-    console.log(newSearchChildTerm, newWagonType, childTableData, childFilteredData);
     const filteredBySearchTerm = newSearchChildTerm
       ? childTableData.filter((item: any) =>
           item.wagon_no.toLowerCase().includes(newSearchChildTerm.toLowerCase())
@@ -270,7 +288,6 @@ export const Popup = () => {
       : filteredBySearchTerm.filter((item: any) => item.wagon_type === newWagonType);
 
     setChildFilteredData(finalFilteredData);
-    console.log(finalFilteredData);
   };
 
   const handleChildSearchChange = (event: any) => {
@@ -286,7 +303,7 @@ export const Popup = () => {
   };
 
   const DialogComponent = () =>
-    data.map((item, index) => (
+    dialogDatas && dialogDatas.map((item: any, index: number) => (
       <div className="upper-containers" key={index}>
         <DialogContent>
           <p className="title">{item.title}</p>
@@ -294,7 +311,7 @@ export const Popup = () => {
         </DialogContent>
         {item.description && <p className="description">{item.description}</p>}
         <div className="row">
-          {item.subData.map((subItem, subIndex) => (
+          {item.subData.map((subItem:any, subIndex: number) => (
             <DialogContent key={subIndex}>
               <p className="sub-title">{subItem.subTitle}</p>
               <p className="sub-number-top">{subItem.subNumber}</p>
@@ -472,8 +489,11 @@ export const Popup = () => {
                   onChange={handleWagonTypeChange}
                 >
                   <MenuItem value={"ALL"}>ALL</MenuItem>
-                  <MenuItem value={"BRN"}>BRN</MenuItem>
-                  <MenuItem value={"BFNV"}>BFNV</MenuItem>
+                  {
+                    Array.isArray(showWagonTypes) && showWagonTypes.map((item: any, index: number) => (
+                      <MenuItem key={index} value={item}>{item}</MenuItem>
+                    ))
+                  }
                 </Select>
               </FormControl>
             </div>
@@ -497,7 +517,7 @@ export const Popup = () => {
           <p>{item.wagon_no}</p>
           <Image src={LinkIcon} alt="link"/>
         </TableCell>
-        <TableCell align="left" className='table-rows'>BRN</TableCell>
+        <TableCell align="left" className='table-rows'>{item.wagon_type}</TableCell>
         <TableCell align="left" className='table-rows'>{item.remark}</TableCell>
       </TableRow>
     ))
