@@ -2,7 +2,6 @@ image: tk120404/node:22.2.0
 
 variables:
   GIT_STRATEGY: fetch
-  GIT_SUBMODULE_STRATEGY: recursive
 
 dev_build:
   tags:

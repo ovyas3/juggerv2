@@ -251,7 +251,7 @@ const ActivityTimeLineChart = (props: any) => {
               borderRadius: '5px',
               fontSize: '10px',
             }
-          } onClick={handleLoadMore} >Show Less</Button>}
+          } onClick={() => handleLoadMore} >Show Less</Button>}
         </Grid>
       </Grid>
       <Grid container spacing={2} direction={"row"} color={"#42454E"} maxHeight={"70%"} justifyContent={"flex-start"} >
@@ -324,7 +324,7 @@ const ActivityTimeLineChart = (props: any) => {
                     justifyContent: "center",
                   }}
                 /> */}
-                <ButtonBase style={{fontSize:'10px'}} onClick={handleLoadMore} >Load More</ButtonBase>
+                <ButtonBase style={{fontSize:'10px'}} onClick={(e) => handleLoadMore(e)} >Load More</ButtonBase>
             </Grid>
             <Grid item display={"flex"} margin-left={"20px"} justifyContent={"center"} height={'10px'}  alignItems={"center"} xs={10}>
                 <CardMedia
