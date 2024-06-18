@@ -290,7 +290,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
 
     useEffect(() => {
         const commonColumns: Column[] = [
-            { id: 'fnr', label: 'FNR No.', class: 'fnr', innerClass: 'inner_fnr' },
+            { id: 'fnr', label: '', class: 'fnr', innerClass: 'inner_fnr' },
             { id: 'destination', label: 'Destination', class: 'destination', innerClass: '' },
             { id: 'material', label: 'Material', class: 'material', innerClass: '' },
             { id: 'pickupdate', label: 'Pickup Date', class: 'pickupdate', innerClass: '' },
