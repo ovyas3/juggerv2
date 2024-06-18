@@ -3,7 +3,8 @@ import axios from 'axios';
 import { environment } from '@/environments/env.api';
 
 const prefix = [
-  (process.env.NODE_ENV == 'production' ? environment.PROD_API_URL : environment.DEV_API_URL),
+  environment.PROD_API_URL
+  // (process.env.NODE_ENV == 'production' ? environment.PROD_API_URL : environment.DEV_API_URL),
 ]
 
 const httpsGet = async (path: string, type: number = 0) => {
