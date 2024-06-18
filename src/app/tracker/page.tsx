@@ -7,7 +7,7 @@ import { useEffect, useState, Suspense } from "react";
 import { httpsGet } from "../../utils/Communication";
 import dynamic from 'next/dynamic'
 
-const TripTrackerDynamic = dynamic(() => import('../../components/MapView/TripTrackerNew'), {
+const TripTrackerDynamic = dynamic(() => import('../../components/MapView/TripTracker'), {
   loading: () => <p>Loading...</p>,
   ssr: false
 })
