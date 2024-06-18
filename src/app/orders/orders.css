@@ -49,6 +49,7 @@ margin-top: 20px;
     flex-direction: row;
     height: 100vh;
     width: 100%;
+    font-family: "Inter", sans-serif !important;
 }
 
 .mobile_outbound_inbound{
@@ -93,11 +94,12 @@ margin-top: 20px;
     text-align: center;
     align-content: center;
     color: #2962FF;
+    font-weight: 600;
     border-bottom: 2px solid #2962FF;
 }
 
 .tableContainer {
-    margin-left: 55px;
+    margin-left: 70px;
 }
 /* .tableData {
     margin-top: 100px;

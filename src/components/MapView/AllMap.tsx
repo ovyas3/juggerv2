@@ -7,7 +7,7 @@ import { httpsGet } from "@/utils/Communication";
 import getBoundary from "./IndianClaimed";
 import coordsOfTracks from "./IndianTracks";
 import { useWindowSize } from "@/utils/hooks";
-import {MagnifyingGlass} from 'react-loader-spinner';
+import { MagnifyingGlass } from 'react-loader-spinner';
 
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";

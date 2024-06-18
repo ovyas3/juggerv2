@@ -28,7 +28,7 @@
     border-radius: 4px;
     border: 1px solid #E9E9EB;
     display: flex;
-    padding-inline: 12px; /* Note: 'padding-inline' is used for inline padding */
+    padding-inline: 12px;
     justify-content: space-between;
     align-items: center;
     gap: 8px;

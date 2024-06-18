@@ -1,7 +1,11 @@
 import { DateTime } from 'luxon';
 
-const utcToist = (utc: string, format: string = 'dd-MM-yyyy HH:mm') => {
+const utcToist = (utc: string, format: string = 'dd-MM-yyyy') => {
   return DateTime.fromJSDate(new Date(utc)).plus({minutes: 330}).toFormat(format);
+}
+
+const utcToistTime = (utc:string, format = 'hh:mm a') => {
+  return DateTime.fromJSDate(new Date(utc)).plus({ minutes: 330 }).toFormat(format);
 }
 
 const millies = (utc: string) => {
@@ -26,7 +30,8 @@ const service = {
   millies,
   getToday,
   diffrent,
-  getTimeWithAMPM
+  getTimeWithAMPM,
+  utcToistTime
 }
 
 export default service;

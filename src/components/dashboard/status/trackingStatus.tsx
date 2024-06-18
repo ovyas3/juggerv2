@@ -97,7 +97,7 @@ const TrackingStatus = () => {
   }, []);
 
   return (
-    <div style={{ paddingLeft: "48px" }}>
+    <div style={{ paddingLeft: "30px" }}>
       <div style={{ fontSize: "16px", fontWeight: "bold" }}>
         TRACKING STATUS
       </div>
