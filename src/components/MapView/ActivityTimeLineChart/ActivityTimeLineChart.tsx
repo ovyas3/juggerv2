@@ -33,7 +33,8 @@ export const ActivityTimeLineChart = (props: any) => {
         <Grid style={
           {
                 display: 'flex',
-                marginTop: '-40px',
+                marginTop: '-8px',
+                marginBottom: '5px',
                 flexDirection: 'row',
                 justifyContent: 'space-between',
                 alignItems: 'center',
@@ -54,7 +55,7 @@ export const ActivityTimeLineChart = (props: any) => {
                 display: "flex",
                 height: '24px',
                 width: showPings ? '80%' :'100%',
-                padding: '4px',
+                padding: '16px',
                 alignItems: 'center',
                 justifyContent: 'center',
                 borderRadius: '5px',
@@ -77,7 +78,7 @@ export const ActivityTimeLineChart = (props: any) => {
             } onClick={handleLoadMore} >Show Less</Button>}
           </Grid>
         </Grid>
-        <Grid container spacing={2} direction={"row"} color={"#42454E"} maxHeight={"70%"} justifyContent={"flex-start"} >
+        <Grid container spacing={2} direction={"row"} color={"#42454E"} maxHeight={"100%"} justifyContent={"flex-start"} overflow={"scroll"} marginTop={"5px"}>
         {
             (lowPings || showPings) && props.trackingDetails.map((details: {currentStatus: string}, index: number) => {
               return (<Grid container spacing={2} item xs={12} key={index} >
