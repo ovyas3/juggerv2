@@ -1,36 +1,18 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Build Documentation
 
-## Getting Started
+This project uses GitLab CI/CD for building and deploying the application. The configuration for this process is defined in the [`.gitlab-ci.yml`](.gitlab-ci.yml) file.
 
-First, run the development server:
+## Build Process
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+1. The build process is initiated with the `dev_build` job defined in the `.gitlab-ci.yml` file.
+2. The `npm install` command is run to install all the project dependencies.
+3. The `npm run dev_build` command is run to build the project. This command is defined in the [`package.json`](package.json) file and it uses the `next build` command to build the Next.js application.
+4. A zip file is created with the built project and it is securely copied to the server using the `scp` command.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Deployment Process
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. The deployment process is initiated after the build process.
+2. The old files in the `/home/ubuntu/milkyway/lucy` directory on the server are removed.
+3. The new build zip file is copied to the `/home/ubuntu/milkyway/lucy` directory on the server.
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+Please refer to the [`.gitlab-ci.yml`](.gitlab-ci.yml) file for more details.
