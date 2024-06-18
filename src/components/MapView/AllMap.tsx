@@ -9,6 +9,14 @@ import coordsOfTracks from "./IndianTracks";
 import { useWindowSize } from "@/utils/hooks";
 import {MagnifyingGlass} from 'react-loader-spinner';
 
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import Paper from "@mui/material/Paper";
+
 import { Icon, divIcon, point } from "leaflet";
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -103,10 +111,11 @@ const MapLayers = () => {
       try {
         // setLoading(true);
         console.log('Fetching data');
-        const res = await httpsGet('/all_captive_shipment_details', 0);
+        const res = await httpsGet('get/maps/captive_rakes', 0);
         console.log('Data fetched', res);
-        res.map((data: any) => {
-          if (data && data.rake_updates) {
+        const data = res.data;
+        data.map((data: any) => {
+          if (data && data.rake_updates && data.rake_id) {
             if (!coords[data.name]) {
               coords[data.name] = [];
             }
@@ -119,16 +128,21 @@ const MapLayers = () => {
                 }
               }
             );
-
           }
           if (!allRakes.some((item: any) => item.rake_id === data.rake_id)) {
             allRakes.push({
               "rake_id": data.rake_id,
               "name": data.name,
+              "fnr_no": data.shipment ? data.shipment.fnr_no : 'N/A',
             });
           }
+
         });
-        setAllRakes(allRakes);
+        console.log('All Rakes:', allRakes);
+        console.log('Coords:', coords);
+        const allRakesFiltered = allRakes.filter((rake: any) => rake.rake_id !== undefined);
+        console.log('All Rakes Filtered:', allRakesFiltered);
+        setAllRakes(allRakesFiltered);
         setCoords(coords);
       } catch (error) {
         console.error("An error occurred:", error);
@@ -169,6 +183,7 @@ const MapLayers = () => {
       for (let key in coords) {
         const sortedData = coords[key].sort((a:any, b:any) => a.time_stamp - b.time_stamp);
         const lastCords = sortedData[0];
+       if(lastCords.geo_point && lastCords.geo_point.coordinates && lastCords.geo_point.coordinates[0] && lastCords.geo_point.coordinates[1] && lastCords.time_stamp && lastCords.time_stamp.$date) {
         allLocations.push({
           data: {
             title: key,
@@ -176,6 +191,7 @@ const MapLayers = () => {
           },
           coords: [lastCords.geo_point.coordinates[1], lastCords.geo_point.coordinates[0]]
         });
+       }
       }
       const allRakesData = [];
       for (const rake of allRakes) {
@@ -184,7 +200,7 @@ const MapLayers = () => {
         allRakesData.push({ 
           id: rake.rake_id,
           ts: lastTimeStamp && lastTimeStamp.data ? lastTimeStamp.data.ts : '',
-          title: rake.name,
+          title: rake.rake_id,
           value: '16',
           color: '#334FFC',
           accent_color: '#334FFC1F',
@@ -192,6 +208,8 @@ const MapLayers = () => {
           tracking: tracking,
         });
       }
+      console.log('All Rakes Data:', allRakesData);
+      console.log('All Locations:', allLocations);
       setAllRakesPositions(allLocations);
       setShowAllRakes(true);
       setList(allRakesData);
@@ -230,23 +248,231 @@ const MapLayers = () => {
         <div className="map-container">
           {isMobile ? <SideDrawer /> : null}
           <div style={{ width: '100%', overflow: 'hidden' }}>
-            {isMobile ? <Header></Header> : <MobileHeader />}
+            {isMobile ? <Header title="Captive Rakes Map View" ></Header> : <MobileHeader />}
             <div style={{ paddingInline: 24, paddingTop: 24, paddingBottom: 65,  position:'relative' }}>
               <Box
-      sx={{
-          marginTop: mobile ? "150px" : "",
-          height: "90vh",
-          width: "100%",
-          p: 0,
-          display: "flex",
-          flexDirection: "column",
-          zIndex: 0,
-          justifyContent: 'center',
-          alignItems: "center",
-          alignContent: 'space-around',
-      }}
-    >
-      <Grid style={{
+                sx={{
+                    marginTop: mobile ? "150px" : "",
+                    height: "90vh",
+                    width: "100%",
+                    p: 0,
+                    display: "flex",
+                    flexDirection: "column",
+                    zIndex: 0,
+                    justifyContent: 'center',
+                    alignItems: "center",
+                    alignContent: 'space-around',
+                }}
+              >
+                <FormGroup className='mapButtons'>
+                  <FormControlLabel
+                    control={<Switch checked={showTracks} onChange={() => setShowTracks(!showTracks)} />}
+                    label="Show All Tracks"
+                    labelPlacement="start"
+                  />
+                  <FormControlLabel
+                    control={<Switch checked={showAllRakes} onChange={() => setShowAllRakes(!showAllRakes)} />}
+                    label="Show All Rakes"
+                    labelPlacement="start"
+                  />
+                </FormGroup>
+                <Grid style={{
+                    position: 'absolute',
+                    height:'100%',
+                    width: '424px',
+                    background: 'white',
+                    left: '70px',
+                    top: '5%',
+                    overflowX: 'auto',
+                    backgroundColor:'#F8F8F8',
+                    zIndex:10
+                  }}  >
+                    <Grid>
+                    <div style={{
+                        width: '394px',
+                        height: '25%',
+                        marginTop: '24px',
+                        marginLeft: '16px',
+                        borderRadius: '12px',
+                        backgroundColor: '#ffffff',
+                        padding: '20px 16px',
+                       }}>
+                        <div className="tracking-heading">
+                        Tracking Status
+                        </div>
+                        <hr style={{
+                          backgroundColor: '#E9E9EB',
+                          color: '#E9E9EB',
+                          height: '1px',
+                          borderRadius: '12px',
+                          width: '90%',
+                          margin: '0 auto',
+                        }}/>
+                        <div style={{
+                          display: 'flex',
+                          flexDirection: 'row',
+                          justifyContent: 'space-between',
+
+                        }}>
+                          <div className="tracking-status">
+                            <div className="tracking-number">
+                              {list.length}
+                            </div>
+                            <div className="tracking-text" style={{color: '#334FFC'}}>
+                              Total
+                            </div>
+                          </div>
+                          <div className="tracking-status">
+                            <div className="tracking-number">
+                              {allRakesPositions.length}
+                            </div>
+                            <div className="tracking-text" style={{color: '#18BE8A'}}>
+                              Tracking
+                            </div>
+                          </div>
+                          <div className="tracking-status">
+                            <div className="tracking-number">
+                              {list.length - allRakesPositions.length}
+                            </div>
+                            <div className="tracking-text" style={{color: '#E6667B'}}>
+                              Non Tracking
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                       <div style={{
+                        display: 'block',
+                        width: '394px',
+                        height: '100%',
+                        marginTop: '24px',
+                        marginLeft: '16px',
+                        borderRadius: '12px',
+                        backgroundColor: '#ffffff',
+                       }}>
+                        <div className="tracking-heading">
+                          Captive Rakes
+                        </div>
+                        <TableContainer
+                          component={Paper}
+                          sx={{
+                          height: "450px",
+                          borderRadius: '0px 0px 12px 12px'
+                        }}
+                      >
+                        <Table sx={{ minWidth: '100%', borderRadius: '0px 0px 12px 12px' }} aria-label="simple table" stickyHeader>
+                          <TableHead>
+                            <TableRow>
+                              <TableCell align="left" className="table-heads">Rake ID</TableCell>
+                              <TableCell align="left" className="table-heads">Scheme ID</TableCell>
+                              <TableCell align="left" className="table-heads">FNR No.</TableCell>
+                            </TableRow>
+                          </TableHead>
+                          <TableBody>
+                          {allRakes && allRakes.map((rake: any, index: number) => (
+                            <TableRow
+                            key={index}
+                            sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                            className='table-rows-container'
+                            >
+                              <TableCell align="left" className="captive-rake-rows">{rake.rake_id}</TableCell>
+                              <TableCell align="left" className="captive-rake-rows">{rake.name}</TableCell>
+                              <TableCell align="left" className="captive-rake-rows">{rake.fnr_no}</TableCell>
+                            </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </TableContainer>
+                       </div>
+                      
+                       {/* {
+                          list.length && list.map((item: any, index: number)=>{
+                             return (
+                               <div
+                                 key={index}
+                                 style={{
+                                   backgroundColor: item.tracking ? "#F1F1F1" : "lightgray",
+                                   marginInline: "5px",
+                                   marginBlock: "7px",
+                                   padding: "3px 13px",
+                                   borderRadius: "5px",
+                                   display: "flex",
+                                   justifyContent: "space-between",
+                                   alignItems: "center",
+                                   fontSize: "15px",
+                                   overflowX: "auto",
+                                 }}
+                               >
+                                 <div className="details">
+                                   <div>
+                                     <b>Rake ID:</b> {item.title}
+                                   </div>
+                                 </div>
+                                 <FormControlLabel
+                                   disabled={!item.tracking}
+                                   control={
+                                     <Switch
+                                       checked={showRouteFor === item.title}
+                                       onChange={() => handleApiByWagonNo(item.title)}
+                                     />
+                                   }
+                                   label="Show Route"
+                                   labelPlacement="start"
+                                 />
+                               </div>
+                             );
+                           })
+                         } */}
+                  </Grid> 
+                </Grid>
+                <MapContainer className="map" center={center} zoom={5} style={{ minHeight: '105%',width: '101%', padding: '0px', zIndex: '0', position: 'fixed' }} attributionControl={false} ref={setMap} >
+                  <div className={"layersControl"} style={{marginTop:'60px'}} >
+                    <LayersControl>
+                    <LayersControl.BaseLayer checked name="Street View">
+                      <TileLayer
+                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                      />
+                    </LayersControl.BaseLayer>
+                    <LayersControl.BaseLayer name="Satellite View">
+                      <TileLayer
+                        attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+                        url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+                      />
+                    </LayersControl.BaseLayer>
+                    </LayersControl>
+                  </div>
+                  {showTracks && <GeoJSON data={coordsOfTracks} style={geoJSONStyle} />}
+                  {showRoute && route.length && <Polyline pathOptions={{ color:'blue' }} positions={route} />}
+                  {currentLocation.length && currentLocation.map((cr:any, index: number) => <Marker key={index} position={cr.coords} icon={customIcon}>
+                    <Popup>
+                      <h3 style={{marginTop: '1em', marginBottom: "1em"}}>Rake Scheme ID: {cr.data.title}</h3>
+                      <h4 style={{marginTop: '1em', marginBottom: "1em"}}>Last Updated At: {cr.data.ts}</h4>
+                    </Popup>
+                  </Marker>)}
+                  {showAllRakes && <MarkerClusterGroup
+                    chunkedLoading
+                    iconCreateFunction={createClusterCustomIconInTransit}
+                  >
+                  {/* Mapping through the markers */}
+                    {showAllRakes && allRakesPositions.map((rake:any, index: number) => <Marker key={index} position={rake.coords} icon={customIcon}>
+                      <Popup>
+                        <h3 style={{marginTop: '1em', marginBottom: "1em"}}>Rake Scheme ID: {rake.data.title}</h3>
+                        <hr></hr>
+                        <h4 style={{marginTop: '1em', marginBottom: "1em"}}>Last Updated At: {rake.data.ts}</h4>
+                      </Popup>
+                    </Marker>)}
+                  </MarkerClusterGroup>}
+          
+                </MapContainer>
+              </Box>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+}
+
+{/* 
+<Grid style={{
       position: 'absolute',
       height:'80%',
       width: '350px',
@@ -256,11 +482,9 @@ const MapLayers = () => {
       overflowX: 'auto',
       zIndex:10
     }}  >
-      <Grid>
+      
+    </Grid><Grid>
         <h3 style={{marginLeft:'10px', marginTop: '1em', marginBottom: '1em'}}>Filters</h3>
-        {/* //add a slider for toggle */}
-    
-        {/* show all tracks------------- */}
         <div style={{ borderBottom: '0.1px solid lightgrey',margin:'5px'}}>
           <FormControl component="fieldset">
             <FormGroup>
@@ -279,7 +503,6 @@ const MapLayers = () => {
               </FormGroup>
           </FormControl>
         </div>
-        {/* list----------- */} 
         <div style={{ borderBottom: '0.1px solid lightgrey',margin:'5px'}}>
             <div style={{margin:'5px'}}>Total Rakes: {list.length}</div>
             <div style={{margin:'5px'}}>Currently Tracking: {allRakesPositions.length}</div>
@@ -322,54 +545,6 @@ const MapLayers = () => {
               );
             })
           }
-      </Grid>
-    </Grid>
-    <MapContainer className="map" center={center} zoom={5} style={{ minHeight: '96%',width: '95.5%', padding: '0px', zIndex: '0', position: 'fixed' }} attributionControl={false} ref={setMap} >
-        <div className={"layersControl"} style={{marginTop:'60px'}} >
-          <LayersControl>
-          <LayersControl.BaseLayer checked name="Street View">
-            <TileLayer
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
-          </LayersControl.BaseLayer>
-          <LayersControl.BaseLayer name="Satellite View">
-            <TileLayer
-              attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-              url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
-            />
-          </LayersControl.BaseLayer>
-          </LayersControl>
-        </div>
-        {showTracks && <GeoJSON data={coordsOfTracks} style={geoJSONStyle} />}
-        {showRoute && route.length && <Polyline pathOptions={{ color:'blue' }} positions={route} />}
-        {currentLocation.length && currentLocation.map((cr:any, index: number) => <Marker key={index} position={cr.coords} icon={customIcon}>
-              <Popup>
-                <h3 style={{marginTop: '1em', marginBottom: "1em"}}>Rake ID: {cr.data.title}</h3>
-                <h4 style={{marginTop: '1em', marginBottom: "1em"}}>Last Updated At: {cr.data.ts}</h4>
-              </Popup>
-            </Marker>)}
-        {showAllRakes && <MarkerClusterGroup
-          chunkedLoading
-          iconCreateFunction={createClusterCustomIconInTransit}
-        >
-          {/* Mapping through the markers */}
-          {showAllRakes && allRakesPositions.map((rake:any, index: number) => <Marker key={index} position={rake.coords} icon={customIcon}>
-          <Popup>
-            <h3 style={{marginTop: '1em', marginBottom: "1em"}}>Rake ID: {rake.data.title}</h3>
-            <hr></hr>
-            <h4 style={{marginTop: '1em', marginBottom: "1em"}}>Last Updated At: {rake.data.ts}</h4>
-          </Popup>
-        </Marker>)}
-          
-        </MarkerClusterGroup>}
-          
-    </MapContainer>
-</Box>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-}
+</Grid> */}
 
 export default MapLayers;

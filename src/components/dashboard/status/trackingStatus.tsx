@@ -1,3 +1,4 @@
+'use client'
 import React, { useEffect, useState } from "react";
 import ProgressBar from "../progressBars/progressBar";
 import totalRakesIcon from "../../../assets/total_rakes.svg";
@@ -6,12 +7,13 @@ import nonTracking from "../../../assets/non_tracking_icon.svg";
 import "./css/trackingStatus.css";
 import forwardArrow from "../../../assets/forward_arrow_icon.svg";
 import { httpsGet } from "@/utils/Communication";
+import { useRouter } from "next/navigation";
 
 const TrackingStatus = () => {
+  const router = useRouter();
   const [isHovered, setIsHovered] = useState(false);
   const [nonTrackingEmptyHovered, setNonTrackingEmptyHovered] = useState(false);
-  const [nonTrackingWithLoadHovered, setNonTrackingWithLoadHovered] =
-    useState(false);
+  const [nonTrackingWithLoadHovered, setNonTrackingWithLoadHovered] = useState(false);
   const [totalRakes, setTotalRakes] = useState(0);
   const [trackingPercent, setTrackingPercent] = useState(0);
   const [nonTrackingPercent, setNonTrackingPercent] = useState(0);
@@ -104,6 +106,9 @@ const TrackingStatus = () => {
           className="status-wrapper"
           onMouseOver={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
+          onClick={() => {
+            router.push('/MapsHelper');
+          }}
         >
           <ProgressBar
             color={"#334FFC"}

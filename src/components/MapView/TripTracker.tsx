@@ -557,7 +557,7 @@ const TripTracker = (params: any) => {
           <FormControlLabel
             disabled={!buttonEnabledFois}
             control={<Switch checked={showFoisTracks} onChange={handleFoisCheck} />}
-            label="Show Fois Tracks"
+            label="Show FOIS Tracks"
             labelPlacement="start"
           />
         </FormGroup>}
