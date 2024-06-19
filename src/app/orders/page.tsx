@@ -53,7 +53,7 @@ const OrdersPage = () => {
   async function getAllShipment (){
     const response =await httpsPost(GET_SHIPMENTS,ShipmentsPayload);
     console.log(response)
-    setAllShipment(response.data.data)
+    setAllShipment( response.data.data)
     setCount(response.data.count)
   }
 
@@ -73,9 +73,6 @@ const OrdersPage = () => {
   },[ShipmentsPayload])
 
 
-  // console.log(ShipmentsPayload)
-  // console.log('how many times it runing',allShipment)
-  console.log(reload)
 
 
   return (
@@ -83,10 +80,10 @@ const OrdersPage = () => {
       <div className='orderContainer'>
         <div style={{ width: '100%', overflowX: 'auto' }}>
           {
-            mobile ? <Header title={'Shipment'} /> : <MobileHeader />
+            mobile ? <Header title={'Shipments'} /> : <MobileHeader />
           }
 
-          <div className='tableContainer' style={{ paddingInline: 24, paddingTop: 24, marginTop: 54, paddingBottom: 65,  position:'relative' }}>
+          <div className='tableContainer' style={{ paddingInline: 24, paddingTop: 24,  paddingBottom: 65,  position:'relative', marginTop:'56px' }}>
 
             {/* ----search fnr---- */}
             <div className='input_fnr_reload'>

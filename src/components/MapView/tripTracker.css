@@ -11,12 +11,12 @@ body {
     display: flex;
     flex-direction: column;
     /* align-items: center; */
-    padding: 5px;
+    padding-left: 22px;
     background-color: white;
     margin-top: 17px;
     border-radius: 20px;
     width: 92%;
-    height: 218px;
+    max-height: 300px;
 }
 
 .tracking_details {
@@ -70,15 +70,14 @@ body {
 
 .mapButtons {
     position: absolute;
-    top: 9%;
-    right: 0%;
+    top: 10%;
+    right: 4%;
     z-index: 10000;
-    width: 30%;
+    width: 32%;
     justify-content: space-around;
     display: flex !important;
     flex-direction: row !important;
-}
-
+} 
 .mapButtons label {
     background-color: #fff;
     border: 1px solid #e0e0e0;

@@ -1,5 +1,4 @@
-"use client";
-
+'use client'
 import React, { useEffect, useState } from "react";
 import ProgressBar from "../progressBars/progressBar";
 import totalRakesIcon from "../../../assets/total_rakes.svg";
@@ -14,8 +13,7 @@ const TrackingStatus = () => {
   const router = useRouter();
   const [isHovered, setIsHovered] = useState(false);
   const [nonTrackingEmptyHovered, setNonTrackingEmptyHovered] = useState(false);
-  const [nonTrackingWithLoadHovered, setNonTrackingWithLoadHovered] =
-    useState(false);
+  const [nonTrackingWithLoadHovered, setNonTrackingWithLoadHovered] = useState(false);
   const [totalRakes, setTotalRakes] = useState(0);
   const [trackingPercent, setTrackingPercent] = useState(0);
   const [nonTrackingPercent, setNonTrackingPercent] = useState(0);
@@ -117,7 +115,7 @@ const TrackingStatus = () => {
   }, []);
 
   return (
-    <div className="tracking-status-container">
+    <div style={{ paddingLeft: "30px" }}>
       <div style={{ fontSize: "16px", fontWeight: "bold" }}>
         TRACKING STATUS
       </div>

@@ -33,6 +33,7 @@ import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import { httpsPost } from '@/utils/Communication';
 import {UPDATE_RAKE_CAPTIVE_ID} from '@/utils/helper'
+import { statusBuilder } from '../MapView/StatusBuilder/StatusBuilder';
 
 const style = {
     position: 'absolute' as 'absolute',
@@ -116,14 +117,14 @@ function Tags({ rakeCaptiveList , shipmentId, setOpen , setShowActionBox }:any) 
                         <TextField
                             {...params}
                             variant="standard"
-                            label="Shipments"
+                            label="Captive Rakes"
 
                             InputProps={{
                                 ...params.InputProps,
-                                style: { fontSize: '10px', border: 'none' }
+                                style: { fontSize: '12px', border: 'none' }
                             }}
                             InputLabelProps={{
-                                style: { fontSize: '10px', paddingLeft: '5px', border: 'none' }
+                                style: { fontSize: '12px', paddingLeft: '5px', border: 'none' }
                             }}
                             sx={{
                                 '.mui-38raov-MuiButtonBase-root-MuiChip-root': {
@@ -154,10 +155,6 @@ function Tags({ rakeCaptiveList , shipmentId, setOpen , setShowActionBox }:any) 
     );
 }
 
-
-
-
-
 const convertArrayToFilteredArray = (inputArray: any) => {
     return inputArray.map((
         item: {
@@ -169,9 +166,10 @@ const convertArrayToFilteredArray = (inputArray: any) => {
             remarks?: any;
             allFNRs: any;
             unique_code: string,
-            _id: string
+            _id: string,
+            status: string,
         }) => {
-        const { edemand_no, FNR, allFNRs, delivery_location, others, remarks, unique_code } = item;
+        const { edemand_no, FNR, allFNRs, delivery_location, others, remarks, unique_code, status } = item;
         return {
             _id: item._id,
             edemand: edemand_no,
@@ -189,8 +187,8 @@ const convertArrayToFilteredArray = (inputArray: any) => {
                 date: others.confirmationDate || 'NA',
             },
             status: {
-                name:  'booked',
-                code: item.is_fois_fetched || 'NA'
+                name:  statusBuilder(status),
+                code: status || ''
             },
             currentEta: 'NA',
             remarks: 'NA',
@@ -200,6 +198,8 @@ const convertArrayToFilteredArray = (inputArray: any) => {
         }
     });
 };
+
+
 
 
 // Main component
@@ -229,12 +229,24 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
     const [open, setOpen] = React.useState(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
+    const [fnr, setFnr] = useState('')
 
     //getting row id to pass it to tag element
     const [rowId, setRowID] = useState('')
-
-    const response = convertArrayToFilteredArray(allShipments)
-  
+    const [response, setResponse] = useState([])
+    
+    const handleChangeByFnr = (changeFnr :  string) =>{
+        if (changeFnr === '') {
+            const resData = convertArrayToFilteredArray(allShipments)
+            setResponse(resData)
+        } else {
+            console.log(changeFnr)
+            const resData = convertArrayToFilteredArray(allShipments)
+            const filteredData = resData.filter((item: { fnr: { primary: string | string[]; }; }) => item.fnr.primary.includes(changeFnr));
+            setResponse(filteredData)
+        }        
+    }
+    
 
     const handleChangePage = (event: unknown, newPage: number) => {
         setPage(newPage);
@@ -249,6 +261,11 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
         setRowID(id)
         setShowActionBox(prevIndex => (prevIndex === index ? -1 : index));
     }
+
+    useEffect(() => {
+        const resData = convertArrayToFilteredArray(allShipments)
+        setResponse(resData)
+    }, [allShipments, page])
 
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
@@ -273,7 +290,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
 
     useEffect(() => {
         const commonColumns: Column[] = [
-            { id: 'fnr', label: 'FNR No.', class: 'fnr', innerClass: 'inner_fnr' },
+            { id: 'fnr', label: '', class: 'fnr', innerClass: 'inner_fnr' },
             { id: 'destination', label: 'Destination', class: 'destination', innerClass: '' },
             { id: 'material', label: 'Material', class: 'material', innerClass: '' },
             { id: 'pickupdate', label: 'Pickup Date', class: 'pickupdate', innerClass: '' },
@@ -286,15 +303,12 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
         ];
 
         if (edemand) {
-            commonColumns.unshift({ id: 'edemand', label: 'E Demand', class: 'edamand', innerClass: '' });
+            commonColumns.unshift({ id: 'edemand', label: 'e-Demand', class: 'edamand', innerClass: '' });
         }
 
         onSkipLimit(rowsPerPage, page * rowsPerPage)
-
         setColumns(commonColumns);
     }, [edemand, showEdemand, rowsPerPage, page]);
-
-  
 
     return (
         <div className='target'>
@@ -311,17 +325,21 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                         border: ' 1px solid #E9E9EB',
                         borderRadius: '8px'
                     },
+                    '.mui-1briqcb-MuiTableCell-root':{
+                        fontFamily:'inherit'
+                    }
                 }}>
                 <TablePagination
-                    rowsPerPageOptions={[10, 25, 100]}
+                    rowsPerPageOptions={[5,10, 25, 100]}
                     component="div"
                     count={count}
                     rowsPerPage={rowsPerPage}
                     page={page}
                     onPageChange={handleChangePage}
                     onRowsPerPageChange={handleChangeRowsPerPage}
+                    labelRowsPerPage="Shipments per page:"
                 />
-                <TableContainer sx={{ maxHeight: '650px', border: '1px solid #E9E9EB', borderRadius: '8px' }}>
+                <TableContainer sx={{ maxHeight: '680px', border: '1px solid #E9E9EB', borderRadius: '8px' }}>
                     <Table stickyHeader aria-label="sticky table">
                         <TableHead sx={{
                             '.mui-y8ay40-MuiTableCell-root ': { padding: 0 },
@@ -354,6 +372,29 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                             </div>
                                                             : <></>
                                                     }
+                                                    {
+                                                        column.id === 'fnr' ?
+                                                        <div>
+                                                            <input type='text' 
+                                                                onChange={(e) => {
+                                                                    handleChangeByFnr(e.target.value)
+                                                                }}
+                                                                placeholder='FNR No.'
+                                                                style={{
+                                                                    width: '82px',
+                                                                    height:'22px',
+                                                                    border:'none',
+                                                                    textAlign:'center',
+                                                                    fontSize:'12px',
+                                                                    color:'#7C7E8C',
+                                                                    fontWeight:'bold',
+                                                                    outline:'none',
+                                                                    
+                                                                }}
+                                                            />
+                                                        </div>
+                                                        :<></>
+                                                    }
                                                 </div>
 
                                             </div>
@@ -364,7 +405,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {response.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row: row, firstindex: number) => {
+                            {response.map((row: row, firstindex: number) => {
                                 return (
                                     <TableRow hover key={row.edemand}>
 
@@ -392,10 +433,12 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                     className={columnClassNames[item.id]} >
                                                     <div>
                                                         {(typeof value) === 'object' ? '' : value}
+
                                                         {item.id === 'action' ? (
+                                                            <div style={{display:'flex', justifyContent:'center'}}>
                                                             <div className='action_icon'>
                                                                 <MoreHorizIcon
-                                                                    style={{ color: 'white', cursor: 'pointer' }}
+                                                                    style={{ color: 'white', cursor: 'pointer', scale:'0.9' }}
                                                                     onClick={() => { clickActionBox(firstindex, row._id); }}
                                                                 />
                                                                 <div
@@ -426,6 +469,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                     </Modal>
 
                                                                 </div>
+                                                            </div>
                                                             </div>
                                                         ) : null}
                                                         {
@@ -469,23 +513,17 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                             item.id === 'pickupdate' ?
 
                                                                 <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                                                    {service.utcToist(value.date)}
+                                                                    <div>{service.utcToist(value.date)}</div>
+                                                                    <div>{service.utcToistTime(value.date)}</div>
                                                                 </div>
                                                                 : <></>
                                                         }
-                                                        {/* {
-                                                            item.id === 'currentEta' ?
-
-                                                                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                                                    <div>{formatDateTime(row.pickupdate).formattedDate}</div>
-                                                                    <div>{formatDateTime(row.pickupdate).timeString}</div>
-                                                                </div>
-                                                                : <></>
-                                                        } */}
                                                         {
                                                             item.id === 'status' ?
                                                             <div className='status_container'>
-                                                                <div className='status_title'>{value.name}</div>
+                                                                <div className='status_title'>
+                                                                    <div>{value.name}</div>
+                                                                </div>
                                                                 <div className='status_body'>{value.code}</div>
                                                             </div>
                                                             :<></>

@@ -397,7 +397,7 @@ const TripTracker = (params: any) => {
     setShowGPSTracks(e.target.checked);
   }
   const customIcon = new Icon({
-    iconUrl: haltIcon,
+    iconUrl: '/assets/halt_icon.svg',
     iconSize: [14, 14], // Size of the icon
     iconAnchor: [7, 14], // Anchor point of the icon, usually half of the size
     popupAnchor: [0, -32], // Point from which the popup should open relative to the iconAnchor
@@ -439,6 +439,7 @@ const TripTracker = (params: any) => {
       <TripTrackerNavbar />
       <Box
         sx={{
+            marginTop: mobile ? "150px" : "120px",
             height: mobile ? "90vh" : "100vh",
         }}
       > 
@@ -557,7 +558,7 @@ const TripTracker = (params: any) => {
           <FormControlLabel
             disabled={!buttonEnabledFois}
             control={<Switch checked={showFoisTracks} onChange={handleFoisCheck} />}
-            label="Show Fois Tracks"
+            label="Show FOIS Tracks"
             labelPlacement="start"
           />
         </FormGroup>}

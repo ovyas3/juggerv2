@@ -41,8 +41,8 @@
     /* background-color: aqua !important; */
     display: flex;
     gap:24px;
+    width: 150px;
     align-items: center;
-
 }
 .fois{
     background-color: #E24D65;
@@ -89,6 +89,8 @@
 .action{
     /* background-color: turquoise!important; */
     min-width: 60px !important;
+    text-align: center !important;  
+    padding-right: 10px !important; 
 
 }
 .iconheader{
@@ -161,6 +163,7 @@
 .body_action{
     /* background-color: turquoise !important; */
    padding-inline:auto !important;
+  
    
 
 }
@@ -202,12 +205,13 @@
     width: 72px;
     background-color: #FF98001F;
     color: #FF9800;
-    text-align: center;
-    
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .status_body{
-    font-size: 13px;
+    font-size: 12px;
 }
 
 .action_icon{
@@ -215,10 +219,10 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 30px;
+    height: 24px;
     padding: 0;
     border-radius: 4px;
-    width:45px;
+    width:24px;
     position: relative;
 }
 
@@ -241,4 +245,8 @@
     opacity: 1;
     transform: scale(1);
     display: block; /* Show when the 'show' class is added */
+}
+
+.status_container {
+    max-width: 150px;
 }
