@@ -280,10 +280,7 @@ const TripTracker = (params: any) => {
             flexDirection: "column",
             zIndex: 10,
             position: mobile ? "absolute" : 'fixed',
-            // borderRadius: "10px 10px 0px 0px",
-            marginLeft: mobile ? '0px' : '0px',
-            marginTop: mobile ? '0px' : '100px',
-        
+            marginTop: mobile ? '0px' : '20px',
           }}
 
           className="tracking_details"
