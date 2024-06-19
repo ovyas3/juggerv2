@@ -22,10 +22,15 @@
    "wagonsUnloaded":"Wagons unloaded",
    "railOverview":"RAIL OVERVIEW",
    "handlingAgentsOverview": "HANDLING AGENT'S OVERVIEW",
-   "customerOverview":"CUSTOMER OVERVIEW"
+   "customerOverview":"CUSTOMER OVERVIEW",
+   "trackingStatus":"TRACKING STATUS",
+   "wagons":"Wagons",
+   "withLoad":"With Load",
+   "withoutLoad":"Empty"
   },
   "HEADER":{
-    "shipments":"Shipments"
+    "shipments":"Shipments",
+    "dashboard":"Dashboard"
   },
   "ORDERS":{
     "inbound":"Inbound",
@@ -33,8 +38,6 @@
     "submit":"Submit",
     "attach":"Attach",
     "edemand":"E demand"
-
-
   },
   "DRAWER":{
     "shipments":"shipments",

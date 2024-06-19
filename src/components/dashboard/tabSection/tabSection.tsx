@@ -18,13 +18,14 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { Popup } from "@/components/Popup/popup";
+import { useTranslations } from "next-intl";
 
 const Tabsection = () => {
   const [value, setValue] = useState("1");
   const [helpCenterBtnHovered, setHelpCenterBtnHovered] = useState(false);
+  const t = useTranslations("DASHBOARD");
 
   const handleChange = (val: any) => {
-    console.log(val);
     setValue(val);
   };
 
@@ -35,11 +36,8 @@ const Tabsection = () => {
           <Box sx={{ width: "100%", typography: "body1" }}>
             <TabContext value={value}>
               <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-                <TabList
-                  onChange={handleChange}
-                  aria-label="lab API tabs example"
-                >
-                  <Tab label="Captive Rake Overview" value="1" />
+                <TabList onChange={handleChange}>
+                  <Tab label={t("railOverview")} value="1" />
                   {/* <Tab label="Handling Agent's Overview" value="2" />
                   <Tab label="Customer Overview" value="3" /> */}
                 </TabList>
@@ -158,22 +156,18 @@ const Tabsection = () => {
                 </div>
               </div> */}
               <TabPanel value="1" sx={{ paddingLeft: 0 }}>
-                <div style={{ display: "flex" }}>
+                <div className="rail-overview-container">
                   {/* <div
                     style={{ borderRight: "1px solid #DFE3EB", width: "60vw" }}
                   >
                     <Status />
                     <BarsDataset/>
                   </div> */}
-                  <div style={{ width: "28vw" }}>
+                  <div className="rail-leftsection">
                     <TrackingStatus />
                   </div>
-                  <div
-                    style={{
-                      width: "70vw",
-                    }}
-                  >
-                    <div style={{ display: "flex", justifyContent: "center" }}>
+                  <div className="rail-rightsection">
+                    <div className="rail-right-popup">
                       <Popup />
                     </div>
                   </div>

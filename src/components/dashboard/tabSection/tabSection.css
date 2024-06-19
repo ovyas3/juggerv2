@@ -6,6 +6,23 @@
   font-size: 20px;
 }
 
+.rail-overview-container {
+  display: flex;
+}
+
+.rail-leftsection {
+  width: 28vw;
+}
+
+.rail-rightsection {
+  width: 70vw;
+}
+
+.rail-right-popup {
+  display: flex;
+  justify-content: center;
+}
+
 .filter-bar {
   display: flex;
   justify-content: space-between;

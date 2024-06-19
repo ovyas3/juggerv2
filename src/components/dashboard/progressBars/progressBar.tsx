@@ -5,29 +5,24 @@ import "./css/progressBar.css";
 export default function ProgressBar(props: any) {
   return (
     <div
-      style={{ minWidth: "200px", marginLeft: "20px", marginBottom: "36px" }}
+      className="progress-bar-wrapper"
     >
       <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
+        className="progress-bar-container"
       >
-        <div style={{ position: "relative", height: "42px" }}>
+        <div className="progress-info-container">
           <span
-            style={{ fontSize: "24px", fontWeight: "bold", color: "black" }}
+            className="progress-info-count"
           >
             {props.count}
           </span>
           <span
-            style={{ fontSize: "12px", color: "#71747A", marginLeft: "8px" }}
+            className="progress-info-name"
           >
             {props.name}
           </span>
         </div>
         <div
-          style={{ marginRight: "24px", display: "flex", alignItems: "center" }}
           className={
             props.isHovered
               ? "icon-container icon-container-hovered"
@@ -47,7 +42,6 @@ export default function ProgressBar(props: any) {
             <Image
               src={props.hoverIcon}
               alt=""
-              style={{ marginLeft: "4px" }}
               className={
                 props.isHovered ? "icon-after icon-after-hovered" : "icon-after"
               }
