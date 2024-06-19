@@ -35,7 +35,7 @@ export const ActivityTimeLineChart = (props: any) => {
       setShowPings(!showPings);
     }
     return (<React.Fragment>
-      <CardContent className={props.className} style={{height: '70%'}} >
+      <CardContent className={props.className} style={{height: '63%'}} >
         <Grid style={
           {
                 display: 'flex',
