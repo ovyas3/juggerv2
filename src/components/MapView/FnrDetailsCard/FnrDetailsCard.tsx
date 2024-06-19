@@ -9,6 +9,7 @@ import { statusBuilder } from "../StatusBuilder/StatusBuilder";
 import Image from 'next/image';
 
 export const FNRDetailsCard = (props: any) => ( 
+
     <React.Fragment>
       <CardContent className={props.className} >
         <Grid style={
@@ -84,6 +85,7 @@ export const FNRDetailsCard = (props: any) => (
               />
             </Grid>
             <Grid item xs={10} fontSize={"12px"} marginTop={"10px"}>
+                {props.fnr_data?.pickup_location?.code}-
                 {props.fnr_data?.pickup_location?.name}
             </Grid>
           </Grid>
@@ -106,6 +108,7 @@ export const FNRDetailsCard = (props: any) => (
               />
             </Grid>
             <Grid item xs={10} fontSize={"12px"}>
+                {props.fnr_data?.delivery_location?.code}-
                 {props.fnr_data?.delivery_location?.name}
             </Grid>
           </Grid>

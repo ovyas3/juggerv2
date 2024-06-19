@@ -37,6 +37,7 @@ const TripTracker = (params: any) => {
   const trip_tracker_data = params.trip_tracker_data;
   const [loadMap, setLoadMap] = useState(false);
   const [fnr_data, setFnrData] = useState({});
+  console.log(fnr_data)
   const [tracking_data, setTrackingData] = useState<any>([]);
   const [trackingLine, setTrackingLine] = useState<[number, number][]>([]);
   const [showDetails, setShowDetails] = useState(true);
@@ -129,8 +130,8 @@ const TripTracker = (params: any) => {
                   </LayersControl.BaseLayer>
                 </LayersControl>
                 {/* <Polygon pathOptions={{ color: 'blue' }} positions={pickupgeofence_decoded} /> */}
-                {showFoisTracks && renderMarkers(tracking_data, customIcon)}
-                {showFoisTracks && trackingLine.length && <Polyline pathOptions={{ color:'red'}} positions={trackingLine} />}
+                {renderMarkers(tracking_data, customIcon)}
+                {trackingLine.length && <Polyline pathOptions={{ color:'red'}} positions={trackingLine} />}
           </MapContainer>
           :
           <Box
@@ -283,6 +284,7 @@ const TripTracker = (params: any) => {
             // borderRadius: "10px 10px 0px 0px",
             marginLeft: mobile ? '0px' : '0px',
             marginTop: mobile ? '0px' : '30px',
+        
           }}
 
           className="tracking_details"
