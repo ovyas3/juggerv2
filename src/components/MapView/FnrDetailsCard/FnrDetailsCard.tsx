@@ -28,7 +28,7 @@ export const FNRDetailsCard = (props: any) => (
                 display: "flex",
                 height: '20px',
                 width: '200px',
-                padding: '0px',
+                paddingLeft: '20px',
                 alignItems: 'center',
                 justifyContent: 'start',
                 borderRadius: '5px',
@@ -64,7 +64,7 @@ export const FNRDetailsCard = (props: any) => (
           </Grid>
         </Grid>
         <hr style={{ marginTop: "-3px", width:"100%", height: "1px",backgroundColor: "#DFE3EB" }} />
-        <Grid container spacing={2} direction={"row"} color={"#42454E"} >
+        <Grid container spacing={2} direction={"row"} color={"#42454E"} paddingLeft={"15px"}>
           <Grid container spacing={2} item xs={12} >
             <Grid item display={"flex"} justifyContent={"center"} alignItems={"center"} xs={1} marginTop={2} >
               {/* <CardMedia
@@ -149,14 +149,13 @@ export const FNRDetailsCard = (props: any) => (
                 height={12}
               />
             </Grid>
-            <Grid item xs={10} fontSize={"12px"} >
+            <Grid item xs={10} fontSize={"12px"}>
                  <b>Current Location:</b>
+                 <br></br>       
+                 GPS: <b>{props.fnr_data?.trip_tracker?.gps_last_location || 'N/A'}</b>
                  <br></br>
-                 <pre style={{marginLeft: '10px'}}>
-                     GPS: <b>{props.fnr_data?.trip_tracker?.gps_last_location || 'N/A'}</b>
-                   <br></br>
-                     FOIS: <b>{props.fnr_data?.trip_tracker?.fois_last_location || 'N/A'}</b>
-                 </pre>
+                 FOIS: <b>{props.fnr_data?.trip_tracker?.fois_last_location || 'N/A'}</b>
+                
             </Grid>
           </Grid>
         </Grid>

@@ -283,7 +283,6 @@ const TripTracker = (params: any) => {
             // borderRadius: "10px 10px 0px 0px",
             marginLeft: mobile ? '0px' : '0px',
             marginTop: mobile ? '0px' : '30px',
-        
           }}
 
           className="tracking_details"
