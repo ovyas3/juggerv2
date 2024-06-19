@@ -271,7 +271,7 @@ const TripTracker = (params: any) => {
             top: mobile ? "50%" : "4%",
             minHeight: mobile ? "70%" : "92%",
             marginBottom: '10vh',
-            width: mobile ? "100%" : "25%",
+            width: mobile ? "100%" : "28%",
             display: "flex",
             alignItems: "center",
             background: "#F0F3F9",
