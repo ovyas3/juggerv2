@@ -68,12 +68,13 @@ export const ActivityTimeLineChart = (props: any) => {
               {
                 display: "flex",
                 height: '24px',
-                width: '20%',
+                width: '24%',
                 padding: '4px',
                 alignItems: 'center',
                 justifyContent: 'center',
                 borderRadius: '5px',
                 fontSize: '10px',
+                marginRight: '10px'
               }
             } onClick={handleLoadMore} >Show Less</Button>}
           </Grid>
