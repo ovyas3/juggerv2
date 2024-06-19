@@ -129,8 +129,8 @@ const TripTracker = (params: any) => {
                   </LayersControl.BaseLayer>
                 </LayersControl>
                 {/* <Polygon pathOptions={{ color: 'blue' }} positions={pickupgeofence_decoded} /> */}
-                {showFoisTracks && renderMarkers(tracking_data, customIcon)}
-                {showFoisTracks && trackingLine.length && <Polyline pathOptions={{ color:'red'}} positions={trackingLine} />}
+                {renderMarkers(tracking_data, customIcon)}
+                {trackingLine.length && <Polyline pathOptions={{ color:'red'}} positions={trackingLine} />}
           </MapContainer>
           :
           <Box
