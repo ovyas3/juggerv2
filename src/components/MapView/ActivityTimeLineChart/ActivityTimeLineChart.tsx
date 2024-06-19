@@ -11,8 +11,8 @@ export const ActivityTimeLineChart = (props: any) => {
     const numberOfStops = props.trackingDetails.length;
     const [startingPings, setStartingPings] = useState([]);
     const [endingPings, setEndingPings] = useState([]);
-    const [showPings, setShowPings] = useState(false);
-    const [lowPings, setLowPings] = useState(false);
+    const [showPings, setShowPings] = useState(true);
+    const [lowPings, setLowPings] = useState(true);
   
     useEffect(() => {
       const data = props.trackingDetails;

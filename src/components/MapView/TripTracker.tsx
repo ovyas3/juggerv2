@@ -44,6 +44,7 @@ const TripTracker = (params: any) => {
   const [showGPSTracks, setShowGPSTracks] = useState(false);
   const [buttonEnabledFois, setButtonEnabledFois] = useState(false);
   const [buttonEnabledGPS, setButtonEnabledGPS] = useState(false);
+  const [activityData, setActivityData] = useState([]);
   const handleFoisCheck = (e: any) => {
     setShowFoisTracks(e.target.checked);
   }
@@ -62,8 +63,23 @@ const TripTracker = (params: any) => {
       tracks,
     } = trip_tracker_data;
     setFnrData(rakeData);
-    setTrackingData(tracks);
-    if (tracks.length > 0) {
+    // remove tracks if currentStatus is empty or its misisng geo_point ir if geo_point.coordinates is empty or if its length is less than 2 or if geo_point.coordinates ==[0, 0]
+    const tracksWithStatus = tracks.filter((track: any) => {
+      if (!track.currentStatus || track.currentStatus === '') {
+        return false;
+      }
+      return true;
+    });
+    const filteredTracks = tracksWithStatus.filter((track: any) => {
+      if (!track.geo_point || !track.geo_point.coordinates || track.geo_point.coordinates.length < 2 || track.geo_point.coordinates[0] === 0 || track.geo_point.coordinates[1] === 0) {
+        return false;
+      }
+      return true;
+    });
+    console.log({tracksWithStatus, filteredTracks})
+    setTrackingData(filteredTracks);
+    setActivityData(tracksWithStatus);
+    if (filteredTracks.length > 0) {
       setButtonEnabledFois(true);
     }
 
@@ -93,7 +109,7 @@ const TripTracker = (params: any) => {
       <TripTrackerNavbar />
       <Box
         sx={{
-            marginTop: mobile ? "150px" : "120px",
+            marginTop: mobile ? "150px" : "75px",
             height: mobile ? "90vh" : "100vh",
         }}
       > 
@@ -266,14 +282,14 @@ const TripTracker = (params: any) => {
             position: mobile ? "absolute" : 'fixed',
             // borderRadius: "10px 10px 0px 0px",
             marginLeft: mobile ? '0px' : '0px',
-            marginTop: mobile ? '0px' : '41px',
+            marginTop: mobile ? '0px' : '30px',
         
           }}
 
           className="tracking_details"
         >
         <FNRDetailsCard className="fnr_details_mobile"  fnr_data={fnr_data} />
-        <ActivityTimeLineChart className="tracking_details_mobile" trackingDetails={tracking_data} />
+        <ActivityTimeLineChart className="tracking_details_mobile" trackingDetails={activityData} />
         </Box>)}
       </Box>
       {/* {mobile ? <Footer /> : <LeftDrawer />} */}
