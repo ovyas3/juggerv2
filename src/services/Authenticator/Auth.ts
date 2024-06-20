@@ -1,6 +1,6 @@
 'use client'
 import { httpsPost } from "@/utils/Communication";
-import { setCookies, hasCookie } from "@/utils/storageService";
+import { setCookies, getCookie, hasCookie } from "@/utils/storageService";
 
 const authenticate = async (rms_auth: string) => {
   const authenticated = httpsPost('tms_rms/verify', { rms_auth }).then((res) => {
@@ -36,6 +36,14 @@ const checkAuth = async (rms_auth: string)=> {
   }
   const isAuth = await authenticate(rms_auth);
   return isAuth;
+}
+
+export const getAuth = () => {
+  const token = getCookie('access_token');
+  const shipper =  localStorage.getItem('selected_shipper');
+
+  return `bearer ${token} shipper ${shipper}`
+
 }
 
 export default checkAuth;
