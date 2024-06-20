@@ -16,356 +16,11 @@ import mapPlaceHolder from '../../assets/mapPlaceholder.svg';
 import mapPathIcon from '../../assets/mapPath.svg';
 import TripTrackerNavbar from './TripTrackerNavbar/TripTrackerNavbar';
 import Image from 'next/image';
-
-const statusBuilder = (status: string) => {
-  if (!status) return "In Plant"
-  if(status.toLowerCase() === "delivered") {
-    return "Delivered";
-  }
-  return "In Transit"
-}
-
-const FNRDetailsCard = (props: any) => {
-  const [fnrDetails, setFnrDetails] = useState<any>({
-    FNR: "",
-    status: "",
-    no_of_wagons: 0,
-    pickup: '',
-    drop: '',
-    trip_tracker: {},
-  });
-
-  useEffect(() => {
-    const {
-      FNR,
-      status,
-      no_of_wagons,
-      pickup_location,
-      delivery_location,
-      trip_tracker,
-    } = props.fnr_data;
-    const pickup = pickup_location ? pickup_location.code +' - '+ pickup_location.name : '';
-    const drop = delivery_location ? delivery_location.code +' - '+ delivery_location.name : '';
-    setFnrDetails({
-      FNR,
-      status,
-      no_of_wagons,
-      pickup,
-      drop,
-      trip_tracker,
-    });
-  }, [props.fnr_data]);
-  return (
-    <React.Fragment>
-      <CardContent className={props.className} >
-        <Grid style={
-          {
-                display: 'flex',
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                height: '100%',
-                padding: '0px'
-
-          }
-        } container spacing={2}>
-          <Grid item xs={6} >
-            <Box style={
-              {
-                display: "flex",
-                height: '24px',
-                width: '100%',
-                padding: '4px',
-                alignItems: 'center',
-                justifyContent: 'center',
-                borderRadius: '5px',
-                fontSize: '14px',
-              }
-            }>
-              FNR No: #{fnrDetails.FNR}
-            </Box>
-          </Grid>
-          <Grid item xs={6}>
-            <Box style={
-            {
-              display: "flex",
-              backgroundColor: '#53F6AA',
-              color: '#008E27',
-              height: '24px',
-              width: '85px',
-              maxWidth: '100px',
-              padding: '2px',
-              float: "right",
-              alignItems: 'center',
-              justifyContent: 'center',
-              borderRadius: '5px',
-              fontSize: '14px',
-            }
-          }>
-          {statusBuilder(fnrDetails.status)}
-          </Box>
-          </Grid>
-        </Grid>
-        <hr></hr>
-        <Grid container spacing={2} direction={"row"} color={"#42454E"} >
-          <Grid container spacing={2} item xs={12} >
-            <Grid item display={"flex"} justifyContent={"center"} alignItems={"center"} xs={2}>
-              <CardMedia
-                component={"img"}
-                src={pickupIcon}
-                sx={{
-                  height: '10px',
-                  width: '10px',
-                  justifyContent: "center",
-                }}
-              />
-            </Grid>
-            <Grid item xs={10} fontSize={"10px"} >
-                {fnrDetails.pickup}
-            </Grid>
-          </Grid>
-          <Grid container spacing={2} item xs={12} >
-            <Grid item display={"flex"} justifyContent={"center"} alignItems={"center"} xs={2}>
-              <CardMedia
-                component={"img"}
-                src={dropIcon}
-                sx={{
-                  height: '10px',
-                  width: '10px',
-                  justifyContent: "center",
-                }}
-              />
-            </Grid>
-            <Grid item xs={10} fontSize={"10px"} >
-                {fnrDetails.drop}
-            </Grid>
-          </Grid>
-          <Grid container spacing={2} item xs={12} >
-            <Grid item display={"flex"} justifyContent={"center"} alignItems={"center"} xs={2}>
-              <CardMedia
-                component={"img"}
-                src={wagonIcon}
-                sx={{
-                  height: '10px',
-                  width: '10px',
-                  justifyContent: "center",
-                }}
-              />
-            </Grid>
-            <Grid item xs={10} fontSize={"10px"} >
-                No of Wagons: <b>{fnrDetails.no_of_wagons}</b>
-            </Grid>
-          </Grid>
-          <Grid container spacing={2} item xs={12} >
-            <Grid item display={"flex"} justifyContent={"center"} alignItems={"center"} xs={2}>
-              <CardMedia
-                component={"img"}
-                src={currentTrainLocationIcon}
-                sx={{
-                  height: '10px',
-                  width: '10px',
-                  justifyContent: "center",
-                }}
-              />
-            </Grid>
-            <Grid item xs={10} fontSize={"10px"} >
-                <b>Current Location: </b>
-                  <br></br>
-                  FOIS: <b> {fnrDetails.trip_tracker ? fnrDetails.trip_tracker.fois_last_location : 'N/A'} </b>
-                  <br></br>
-                  GPS: <b> {fnrDetails.trip_tracker ? fnrDetails.trip_tracker.gps_last_location : 'N/A'} </b>
-            </Grid>
-          </Grid>
-        </Grid>
-      </CardContent>
-    </React.Fragment>
-  )
-};
-
-const ActivityTimeLineChart = (props: any) => {
-  // const dateConvertor = (date) => DateTime.fromISO(date).plus({minutes: 330}).toFormat("dd-MM-yyyy HH:mm");
-  // const isMobile = props.mobile ? true : false;
-  const numberOfStops = props.trackingDetails.length;
-  const [startingPings, setStartingPings] = useState([]);
-  const [endingPings, setEndingPings] = useState([]);
-  const [showPings, setShowPings] = useState(false);
-  const [lowPings, setLowPings] = useState(false);
-
-  useEffect(() => {
-    const data = props.trackingDetails;
-    if (numberOfStops > 8) {
-      setStartingPings(data.slice(0, 4))
-      setEndingPings(data.slice(numberOfStops - 3, numberOfStops))
-    } else {
-      setLowPings(true)
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [numberOfStops])
-  const handleLoadMore = (e: any) => {
-    e.preventDefault();
-    setShowPings(!showPings);
-  }
-  return (<React.Fragment>
-    <CardContent className={props.className} >
-      <Grid style={
-        {
-              display: 'flex',
-              marginTop: '-40px',
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              height: '80px',
-              padding: '0px'
-        }
-      } container spacing={2}>
-        <Grid item xs={12} style={
-            {
-              display: 'flex',
-              flexDirection: 'row',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }
-          } >
-          <Box style={
-            {
-              display: "flex",
-              height: '24px',
-              width: showPings ? '80%' :'100%',
-              padding: '4px',
-              alignItems: 'center',
-              justifyContent: 'center',
-              borderRadius: '5px',
-              fontSize: '14px',
-            }
-          }>
-            List of stations it has stopped at
-          </Box>
-          {showPings && <Button variant="outlined" style={
-            {
-              display: "flex",
-              height: '24px',
-              width: '20%',
-              padding: '4px',
-              alignItems: 'center',
-              justifyContent: 'center',
-              borderRadius: '5px',
-              fontSize: '10px',
-            }
-          } onClick={handleLoadMore} >Show Less</Button>}
-        </Grid>
-      </Grid>
-      <Grid container spacing={2} direction={"row"} color={"#42454E"} maxHeight={"70%"} justifyContent={"flex-start"} >
-      {
-          (lowPings || showPings) && props.trackingDetails.map((details: {currentStatus: string}, index: number) => {
-            return (<Grid container spacing={2} item xs={12} key={index} >
-              {/* <Grid justifyContent={"flex-end"} item xs={4} fontSize={"10px"} >
-                {dateConvertor(details.created_at)}
-              </Grid> */}
-              <Grid item display={"flex"} justifyContent={"center"} alignItems={"center"} xs={2}>
-                <CardMedia
-                  component={"img"}
-                  src={pickupIcon}
-                  sx={{
-                    height: '10px',
-                    width: '10px',
-                    justifyContent: "center",
-                  }}
-                />
-              </Grid>
-              <Grid justifyContent={"flex-start"} item xs={10} fontSize={"10px"} >
-                {details.currentStatus}
-              </Grid>
-            </Grid>)
-          })
-        }
-        {
-          (!showPings && startingPings.length) ? startingPings.map((details: { currentStatus: string } , index: number) => {
-            return (<Grid container spacing={2} item xs={12} key={index} >
-              {/* <Grid justifyContent={"flex-end"} item xs={4} fontSize={"10px"} >
-                {dateConvertor(details.created_at)}
-              </Grid> */}
-              <Grid item display={"flex"} justifyContent={"center"} alignItems={"center"} xs={2}>
-                <CardMedia
-                  component={"img"}
-                  src={pickupIcon}
-                  sx={{
-                    height: '10px',
-                    width: '10px',
-                    justifyContent: "center",
-                  }}
-                />
-              </Grid>
-              <Grid justifyContent={"flex-start"} item xs={10} fontSize={"10px"} >
-                {details.currentStatus}
-              </Grid>
-            </Grid>)
-          }) : null
-        }
-        {!showPings && startingPings.length && endingPings.length ?
-          <Grid item container spacing={2} display={"block"} xs={12} >
-            <Grid item display={"flex"} margin-left={"20px"} justifyContent={"center"} height={'10px'}  alignItems={"center"} xs={10}>
-                <CardMedia
-                  component={"img"}
-                  src={pickupIcon}
-                  sx={{
-                    height: '8px',
-                    width: '8px',
-                    justifyContent: "center",
-                  }}
-                />
-            </Grid>
-            <Grid item display={"flex"} justifyContent={"center"} height={'10px'}  alignItems={"center"} xs={10}>
-                {/* <CardMedia
-                  component={"img"}
-                  src={pickupIcon}
-                  sx={{
-                    height: '8px',
-                    width: '8px',
-                    justifyContent: "center",
-                  }}
-                /> */}
-                <ButtonBase style={{fontSize:'10px'}} onClick={handleLoadMore} >Load More</ButtonBase>
-            </Grid>
-            <Grid item display={"flex"} margin-left={"20px"} justifyContent={"center"} height={'10px'}  alignItems={"center"} xs={10}>
-                <CardMedia
-                  component={"img"}
-                  src={pickupIcon}
-                  sx={{
-                    height: '8px',
-                    width: '8px',
-                    justifyContent: "center",
-                  }}
-                />
-            </Grid>
-          </Grid>
-          :null}
-        {
-          (!showPings && endingPings.length) ? endingPings.map(( details: {currentStatus: string}, index: number) => {
-            return (<Grid container spacing={2} item xs={12} key={index} >
-              {/* <Grid justifyContent={"flex-end"} item xs={4} fontSize={"10px"} >
-                {dateConvertor(details.created_at)}
-              </Grid> */}
-              <Grid item display={"flex"} justifyContent={"center"} alignItems={"center"} xs={2}>
-                <CardMedia
-                  component={"img"}
-                  src={pickupIcon}
-                  sx={{
-                    height: '10px',
-                    width: '10px',
-                    justifyContent: "center",
-                  }}
-                />
-              </Grid>
-              <Grid justifyContent={"flex-start"} item xs={10} fontSize={"10px"} >
-                {details.currentStatus}
-              </Grid>
-            </Grid>)
-          }) : null
-        }
-      </Grid>
-    </CardContent>
-  </React.Fragment>)
-}
+import { FNRDetailsCard } from './FnrDetailsCard/FnrDetailsCard';
+import { ActivityTimeLineChart } from './ActivityTimeLineChart/ActivityTimeLineChart';
+import { statusBuilder } from './StatusBuilder/StatusBuilder';
+import 'leaflet/dist/leaflet.css';
+import service from '@/utils/timeService';
 
 const renderMarkers = (tracking_data: any[], customIcon: Icon): JSX.Element[] => {
   return tracking_data.map((point, index) => (
@@ -390,6 +45,8 @@ const TripTracker = (params: any) => {
   const [showGPSTracks, setShowGPSTracks] = useState(false);
   const [buttonEnabledFois, setButtonEnabledFois] = useState(false);
   const [buttonEnabledGPS, setButtonEnabledGPS] = useState(false);
+  const [activityData, setActivityData] = useState([]);
+  const [currentLocation, setCurrentLocation] = useState<any>({});
   const handleFoisCheck = (e: any) => {
     setShowFoisTracks(e.target.checked);
   }
@@ -402,14 +59,37 @@ const TripTracker = (params: any) => {
     iconAnchor: [7, 14], // Anchor point of the icon, usually half of the size
     popupAnchor: [0, -32], // Point from which the popup should open relative to the iconAnchor
   });
+  const currentTrainLocation = new Icon({
+    iconUrl: '/assets/current_train_location_icon.svg',
+    iconSize: [30, 30], // Size of the icon
+    iconAnchor: [15, 30], // Anchor point of the icon, usually half of the size
+    popupAnchor: [0, -32], // Point from which the popup should open relative to the iconAnchor
+  });
   const fetchData = () => {  
     const {
       rakeData,
       tracks,
     } = trip_tracker_data;
     setFnrData(rakeData);
-    setTrackingData(tracks);
-    if (tracks.length > 0) {
+    // remove tracks if currentStatus is empty or its misisng geo_point ir if geo_point.coordinates is empty or if its length is less than 2 or if geo_point.coordinates ==[0, 0]
+    const tracksWithStatus = tracks.filter((track: any) => {
+      if (!track.currentStatus || track.currentStatus === '') {
+        return false;
+      }
+      return true;
+    });
+    const filteredTracks = tracksWithStatus.filter((track: any) => {
+      if (!track.geo_point || !track.geo_point.coordinates || track.geo_point.coordinates.length < 2 || track.geo_point.coordinates[0] === 0 || track.geo_point.coordinates[1] === 0) {
+        return false;
+      }
+      return true;
+    });
+    console.log({tracksWithStatus, filteredTracks})
+    setTrackingData(filteredTracks);
+    setActivityData(tracksWithStatus);
+    const lastLocation = filteredTracks[0];
+    setCurrentLocation(lastLocation);
+    if (filteredTracks.length > 0) {
       setButtonEnabledFois(true);
     }
 
@@ -439,7 +119,7 @@ const TripTracker = (params: any) => {
       <TripTrackerNavbar />
       <Box
         sx={{
-            marginTop: mobile ? "150px" : "120px",
+            marginTop: mobile ? "150px" : "75px",
             height: mobile ? "90vh" : "100vh",
         }}
       > 
@@ -459,8 +139,16 @@ const TripTracker = (params: any) => {
                   </LayersControl.BaseLayer>
                 </LayersControl>
                 {/* <Polygon pathOptions={{ color: 'blue' }} positions={pickupgeofence_decoded} /> */}
-                {renderMarkers(tracking_data, customIcon)}
-                {trackingLine.length && <Polyline pathOptions={{ color:'red'}} positions={trackingLine} />}
+                { showFoisTracks &&  renderMarkers(tracking_data, customIcon)}
+                { showFoisTracks &&  trackingLine.length && <Polyline pathOptions={{ color:'red'}} positions={trackingLine} />}
+                { showFoisTracks && <Marker position={[currentLocation.geo_point.coordinates[1], currentLocation.geo_point.coordinates[0]]} icon={currentTrainLocation}>
+                  <Popup>
+                      Current Status: {currentLocation.currentStatus.split(/ on /i)[0]}
+                      <br />
+                      <hr />
+                      Arrived At: { service.utcToist(currentLocation.time_stamp, 'dd-MM-yyyy hh:mm a') }
+                  </Popup>
+                </Marker>}
           </MapContainer>
           :
           <Box
@@ -601,7 +289,7 @@ const TripTracker = (params: any) => {
             top: mobile ? "50%" : "4%",
             minHeight: mobile ? "70%" : "92%",
             marginBottom: '10vh',
-            width: mobile ? "100%" : "25%",
+            width: mobile ? "100%" : "28%",
             display: "flex",
             alignItems: "center",
             background: "#F0F3F9",
@@ -610,16 +298,12 @@ const TripTracker = (params: any) => {
             flexDirection: "column",
             zIndex: 10,
             position: mobile ? "absolute" : 'fixed',
-            // borderRadius: "10px 10px 0px 0px",
-            marginLeft: mobile ? '0px' : '0px',
-            marginTop: mobile ? '0px' : '41px',
-        
+            marginTop: mobile ? '0px' : '20px',
           }}
-
           className="tracking_details"
         >
         <FNRDetailsCard className="fnr_details_mobile"  fnr_data={fnr_data} />
-        <ActivityTimeLineChart className="tracking_details_mobile" trackingDetails={tracking_data} />
+        <ActivityTimeLineChart className="tracking_details_mobile" trackingDetails={activityData} />
         </Box>)}
       </Box>
       {/* {mobile ? <Footer /> : <LeftDrawer />} */}

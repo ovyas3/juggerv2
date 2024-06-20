@@ -5,6 +5,7 @@ import { Select, MenuItem, FormControl, SelectChangeEvent } from "@mui/material"
 import dropdownIcon from "../../assets/dropdown_small_icon.svg";
 import "./dropdown.css";
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import {setCookies} from '@/utils/storageService'
 
 
 interface shipper {
@@ -21,14 +22,20 @@ interface event {
   };
 }
 
-const Dropdown = ({ shippers }:{shippers: shipper[]}) => {
+const Dropdown = ({ shippers, reload }:{shippers: shipper[], reload: any}) => {
+
   const [selectedValue, setSelectedValue] = useState<string>('');
   const [options, setOptions] = useState<option[]>([{
     value: '',
     label: ''
   }]);
   const handleChange = (event: event) => {
-    setSelectedValue(event.target.value as string);
+    const newValue = event.target.value as string;
+    setSelectedValue(newValue);
+    localStorage.setItem('selected_shipper', newValue);
+    setCookies("selected_shipper", newValue);
+    reload(true)
+    setTimeout(()=>{reload(false)}, 1)
   };
 
   useEffect(() => {

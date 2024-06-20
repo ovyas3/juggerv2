@@ -164,12 +164,13 @@ const convertArrayToFilteredArray = (inputArray: any) => {
             delivery_location?: any;
             others?: any;
             remarks?: any;
+            eta: string,
             allFNRs: any;
             unique_code: string,
             _id: string,
             status: string,
         }) => {
-        const { edemand_no, FNR, allFNRs, delivery_location, others, remarks, unique_code, status } = item;
+        const { edemand_no, FNR, allFNRs, delivery_location, others, remarks, unique_code, status, eta, } = item;
         return {
             _id: item._id,
             edemand: edemand_no,
@@ -190,7 +191,7 @@ const convertArrayToFilteredArray = (inputArray: any) => {
                 name:  statusBuilder(status),
                 code: status || ''
             },
-            currentEta: 'NA',
+            currentEta: service.utcToist(eta),
             remarks: 'NA',
             handlingAgent: 'NA',
             action: null,
