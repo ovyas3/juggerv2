@@ -16,7 +16,7 @@ const AuthController = () => {
             router.push('/orders');
         } else {
             // redirect to etms.instavans.com/login
-            router.push('https://etms.instavans.com/login');
+            // router.push('https://etms.instavans.com/login');
         }
     }
     useEffect(() => {

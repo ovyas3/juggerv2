@@ -1,7 +1,11 @@
 import { DateTime } from 'luxon';
 
 const utcToist = (utc: string, format: string = 'dd-MM-yyyy') => {
-  return DateTime.fromJSDate(new Date(utc)).plus({minutes: 330}).toFormat(format);
+  const date = DateTime.fromJSDate(new Date(utc)).plus({minutes: 330}).toFormat(format);
+  if (date === 'Invalid DateTime') {
+    return 'N/A';
+  }
+  return date;
 }
 
 const utcToistTime = (utc:string, format = 'hh:mm a') => {
