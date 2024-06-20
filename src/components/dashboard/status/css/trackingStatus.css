@@ -1,3 +1,20 @@
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap");
+
+.tracking-status-container {
+  padding-left: 30px;
+  font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+.tracking-status-header {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.status-container {
+  margin-top: 20px;
+}
+
 .status-wrapper {
   padding: 8px 0 20px 0;
   margin-bottom: 12px;
@@ -30,6 +47,49 @@
   flex-direction: row;
   width: auto;
   background: #ee4d37;
+  z-index: 900;
+}
+
+.scheme {
+  display: flex;
+}
+
+.load-analysis-wrapper {
+  display: flex;
+}
+
+.load-analysis-with-load-tracking {
+  display: flex;
+  flex-direction: column;
+  margin-right: 40px;
+  margin-left: 20px;
+  padding-right: 40px;
+  border-right: 1px solid #dfe3eb;
+}
+
+.load-analysis-without-load-tracking {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.load-count {
+  color: #42454e;
+}
+
+.with-load-label {
+  color: #71747a;
+  font-size: 10px;
+}
+
+.without-load-label {
+  color: #71747a;
+  font-size: 10px;
+}
+
+.scheme-name {
+  color: #71747a;
+  font-size: 10px;
 }
 
 .scheme-container {
@@ -127,5 +187,10 @@
 .non-tracking-breakdown-hours {
   color: white;
   font-size: 10px;
-  width: 60px;
+  width: 38px;
+  opacity: 0.87;
+}
+
+.link-wrapper a {
+  text-decoration: none;
 }

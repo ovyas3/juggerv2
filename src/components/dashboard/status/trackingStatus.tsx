@@ -2,15 +2,17 @@
 import React, { useEffect, useState } from "react";
 import ProgressBar from "../progressBars/progressBar";
 import totalRakesIcon from "../../../assets/total_rakes.svg";
-import trackingWithGPS from "../../../assets/tracking_icon.svg";
-import nonTracking from "../../../assets/non_tracking_icon.svg";
+import trackingWithGPS from "../../../assets/tracking_icon_status.svg";
+import nonTracking from "../../../assets/non_tracking_icon_status.svg";
 import "./css/trackingStatus.css";
 import forwardArrow from "../../../assets/forward_arrow_icon.svg";
 import { httpsGet } from "@/utils/Communication";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 const TrackingStatus = () => {
   const router = useRouter();
+  const t = useTranslations("DASHBOARD");
   const [isHovered, setIsHovered] = useState(false);
   const [nonTrackingEmptyHovered, setNonTrackingEmptyHovered] = useState(false);
   const [nonTrackingWithLoadHovered, setNonTrackingWithLoadHovered] = useState(false);
@@ -43,8 +45,26 @@ const TrackingStatus = () => {
   const [nonTrackingData, setNonTrackingData] = useState(nonTrackingStructure);
 
   function percentage(val: any, total: any) {
-    console.log(val, total);
     return (val / total) * 100;
+  }
+
+  function breakdownLabelFormatter(val: any) {
+    let formattedLabel = "";
+    switch (val) {
+      case "1-2 hours": {
+        formattedLabel = "2hrs";
+        break;
+      }
+      case "2-4 hours": {
+        formattedLabel = "4hrs";
+        break;
+      }
+      case "8+ hours": {
+        formattedLabel = "8hrs";
+        break;
+      }
+    }
+    return formattedLabel;
   }
 
   useEffect(() => {
@@ -97,40 +117,38 @@ const TrackingStatus = () => {
   }, []);
 
   return (
-    <div style={{ paddingLeft: "30px" }}>
-      <div style={{ fontSize: "16px", fontWeight: "bold" }}>
-        TRACKING STATUS
-      </div>
-      <div style={{ marginTop: "20px" }}>
+    <div className="tracking-status-container">
+      <div className="tracking-status-header">{t("trackingStatus")}</div>
+      <div className="status-container">
         <div
           className="status-wrapper"
           onMouseOver={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
           onClick={() => {
-            router.push('/MapsHelper');
+            router.push("/MapsHelper");
           }}
         >
           <ProgressBar
             color={"#334FFC"}
             percent={100}
             count={totalRakes}
-            name="Total Rakes"
+            name={t("totalRakes")}
             icon={totalRakesIcon}
             hoverIcon={forwardArrow}
             isHovered={isHovered}
           />
-          <div style={{ display: "flex" }}>
+          <div className="scheme">
             {schemeData.map((scheme) => (
               <div className="scheme-container" key={scheme.scheme}>
                 <span className="total-rakes-split-count">
                   {scheme.count || 0}
                 </span>
-                <span style={{ color: "#71747A", fontSize: "10px" }}>
-                  {scheme.scheme}
+                <span className="scheme-name">
+                  {scheme.scheme || ""}
                 </span>
                 <div className="hover-infobox">
                   <span className="no-of-wagons">{scheme.wagons || 0}</span>
-                  <span className="wagons-text">Wagons</span>
+                  <span className="wagons-text">{t("wagons")}</span>
                 </div>
               </div>
             ))}
@@ -141,38 +159,29 @@ const TrackingStatus = () => {
             color={"#18BE8A"}
             percent={trackingPercent}
             count={trackingData.totalTracking}
-            name="Tracking with GPS"
+            name={t("trackingWithGPS")}
             icon={trackingWithGPS}
           />
-          <div style={{ display: "flex" }}>
+          <div className="load-analysis-wrapper">
             <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                marginRight: "40px",
-                marginLeft: "20px",
-                paddingRight: "40px",
-                borderRight: "1px solid #DFE3EB",
-              }}
+              className="load-analysis-with-load-tracking"
             >
-              <span style={{ color: "#42454E" }}>
+              <span className="load-count">
                 {trackingData.withLoad || 0}
               </span>
-              <span style={{ color: "#71747A", fontSize: "10px" }}>
-                With Load
+              <span className="with-load-label">
+                {t("withLoad")}
               </span>
             </div>
             <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                position: "relative",
-              }}
+             className="load-analysis-without-load-tracking"
             >
-              <span style={{ color: "#42454E" }}>
+              <span className="load-count">
                 {trackingData.withoutLoad || 0}
               </span>
-              <span style={{ color: "#71747A", fontSize: "10px" }}>Empty</span>
+              <span className="without-load-label">
+                {t("withoutLoad")}
+              </span>
             </div>
           </div>
         </div>
@@ -181,34 +190,40 @@ const TrackingStatus = () => {
             color={"#EA5950"}
             percent={nonTrackingPercent}
             count={nonTrackingData.totalTracking}
-            name="Non Tracking"
+            name={t("nonTracking")}
             icon={nonTracking}
           />
-          <div style={{ display: "flex" }}>
+          <div className="load-analysis-wrapper">
             <div
               className="non-tracking-data-with-load"
               onMouseOver={() => setNonTrackingWithLoadHovered(true)}
               onMouseLeave={() => setNonTrackingWithLoadHovered(false)}
             >
-              <span style={{ color: "#42454E" }}>
+              <span className="load-count">
                 {nonTrackingData.totalWithLoad || 0}
               </span>
-              <span style={{ color: "#71747A", fontSize: "10px" }}>
-                With Load
+              <span className="with-load-label">
+                {t("withLoad")}
               </span>
               {nonTrackingWithLoadHovered ? (
                 <div className="hover-infobox breakdown">
                   {Object.entries(nonTrackingData.withLoad).map(
-                    ([key, value]) => (
-                      <div className="non-tracking-breakdown-wrapper" key={key}>
-                        <span className="non-tracking-breakdown-val">
-                          {Number(value)}
-                        </span>
-                        <span className="non-tracking-breakdown-hours">
-                          {key}
-                        </span>
-                      </div>
-                    )
+                    ([key, value], index) =>
+                      index > 0 ? (
+                        <div
+                          className="non-tracking-breakdown-wrapper"
+                          key={key}
+                        >
+                          <span className="non-tracking-breakdown-val">
+                            {Number(value)}
+                          </span>
+                          <span className="non-tracking-breakdown-hours">
+                            {breakdownLabelFormatter(key)}
+                          </span>
+                        </div>
+                      ) : (
+                        <></>
+                      )
                   )}
                 </div>
               ) : (
@@ -220,26 +235,34 @@ const TrackingStatus = () => {
               onMouseOver={() => setNonTrackingEmptyHovered(true)}
               onMouseLeave={() => setNonTrackingEmptyHovered(false)}
             >
-              <span style={{ color: "#42454E" }}>
+              <span className="load-count">
                 {nonTrackingData.totalWithoutLoad}
               </span>
-              <span style={{ color: "#71747A", fontSize: "10px" }}>Empty</span>
+              <span className="without-load-label">
+                {t("withoutLoad")}
+              </span>
               {nonTrackingEmptyHovered ? (
                 <div
                   className="hover-infobox breakdown"
                   style={{ display: "flex" }}
                 >
                   {Object.entries(nonTrackingData.withoutLoad).map(
-                    ([key, value]) => (
-                      <div className="non-tracking-breakdown-wrapper" key={key}>
-                        <span className="non-tracking-breakdown-val">
-                          {Number(value)}
-                        </span>
-                        <span className="non-tracking-breakdown-hours">
-                          {key}
-                        </span>
-                      </div>
-                    )
+                    ([key, value], index) =>
+                      index > 0 ? (
+                        <div
+                          className="non-tracking-breakdown-wrapper"
+                          key={key}
+                        >
+                          <span className="non-tracking-breakdown-val">
+                            {Number(value)}
+                          </span>
+                          <span className="non-tracking-breakdown-hours">
+                            {breakdownLabelFormatter(key)}
+                          </span>
+                        </div>
+                      ) : (
+                        <></>
+                      )
                   )}
                 </div>
               ) : (
