@@ -20,6 +20,7 @@ import { FNRDetailsCard } from './FnrDetailsCard/FnrDetailsCard';
 import { ActivityTimeLineChart } from './ActivityTimeLineChart/ActivityTimeLineChart';
 import { statusBuilder } from './StatusBuilder/StatusBuilder';
 import 'leaflet/dist/leaflet.css';
+import service from '@/utils/timeService';
 
 const renderMarkers = (tracking_data: any[], customIcon: Icon): JSX.Element[] => {
   return tracking_data.map((point, index) => (
@@ -45,6 +46,7 @@ const TripTracker = (params: any) => {
   const [buttonEnabledFois, setButtonEnabledFois] = useState(false);
   const [buttonEnabledGPS, setButtonEnabledGPS] = useState(false);
   const [activityData, setActivityData] = useState([]);
+  const [currentLocation, setCurrentLocation] = useState<any>({});
   const handleFoisCheck = (e: any) => {
     setShowFoisTracks(e.target.checked);
   }
@@ -55,6 +57,12 @@ const TripTracker = (params: any) => {
     iconUrl: '/assets/halt_icon.svg',
     iconSize: [14, 14], // Size of the icon
     iconAnchor: [7, 14], // Anchor point of the icon, usually half of the size
+    popupAnchor: [0, -32], // Point from which the popup should open relative to the iconAnchor
+  });
+  const currentTrainLocation = new Icon({
+    iconUrl: '/assets/current_train_location_icon.svg',
+    iconSize: [30, 30], // Size of the icon
+    iconAnchor: [15, 30], // Anchor point of the icon, usually half of the size
     popupAnchor: [0, -32], // Point from which the popup should open relative to the iconAnchor
   });
   const fetchData = () => {  
@@ -79,6 +87,8 @@ const TripTracker = (params: any) => {
     console.log({tracksWithStatus, filteredTracks})
     setTrackingData(filteredTracks);
     setActivityData(tracksWithStatus);
+    const lastLocation = filteredTracks[0];
+    setCurrentLocation(lastLocation);
     if (filteredTracks.length > 0) {
       setButtonEnabledFois(true);
     }
@@ -131,6 +141,14 @@ const TripTracker = (params: any) => {
                 {/* <Polygon pathOptions={{ color: 'blue' }} positions={pickupgeofence_decoded} /> */}
                 { showFoisTracks &&  renderMarkers(tracking_data, customIcon)}
                 { showFoisTracks &&  trackingLine.length && <Polyline pathOptions={{ color:'red'}} positions={trackingLine} />}
+                { showFoisTracks && <Marker position={[currentLocation.geo_point.coordinates[1], currentLocation.geo_point.coordinates[0]]} icon={currentTrainLocation}>
+                  <Popup>
+                      Current Status: {currentLocation.currentStatus.split(/ on /i)[0]}
+                      <br />
+                      <hr />
+                      Arrived At: { service.utcToist(currentLocation.time_stamp, 'dd-MM-yyyy hh:mm a') }
+                  </Popup>
+                </Marker>}
           </MapContainer>
           :
           <Box
@@ -282,7 +300,6 @@ const TripTracker = (params: any) => {
             position: mobile ? "absolute" : 'fixed',
             marginTop: mobile ? '0px' : '20px',
           }}
-
           className="tracking_details"
         >
         <FNRDetailsCard className="fnr_details_mobile"  fnr_data={fnr_data} />
