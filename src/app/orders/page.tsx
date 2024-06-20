@@ -22,6 +22,7 @@ const OrdersPage = () => {
   const [rakeCaptiveList, setRakeCaptiveList] = useState([]);
 
   const [reload, setReload] = useState(false)
+  const [reloadOnHeaderChange, setReloadOnHeaderChange] = useState(false);
 
 
   //shipment payload
@@ -72,15 +73,14 @@ const OrdersPage = () => {
     if(ShipmentsPayload.from && ShipmentsPayload.to) getAllShipment();
   },[ShipmentsPayload])
 
-
-
+  if(reloadOnHeaderChange) getAllShipment();
 
   return (
     <div  >
       <div className='orderContainer'>
         <div style={{ width: '100%', overflowX: 'auto' }}>
           {
-            mobile ? <Header title={'Shipments'} /> : <MobileHeader />
+            mobile ? <Header title={'Shipments'} setReloadOnHeaderChange={setReloadOnHeaderChange} /> : <MobileHeader />
           }
 
           <div className='tableContainer' style={{ paddingInline: 24, paddingTop: 24,  paddingBottom: 65,  position:'relative', marginTop:'56px' }}>
