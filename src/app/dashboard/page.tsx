@@ -1,4 +1,5 @@
 'use client'
+'use client'
 import React from "react";
 import Tabsection from "../../components/dashboard/tabSection/tabSection";
 import SideDrawer from "@/components/Drawer/Drawer";
