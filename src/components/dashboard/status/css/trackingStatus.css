@@ -13,6 +13,8 @@
 
 .status-container {
   margin-top: 20px;
+  display: flex;
+  flex-direction: column;
 }
 
 .status-wrapper {
@@ -95,8 +97,8 @@
 .scheme-container {
   display: flex;
   flex-direction: column;
-  margin-right: 40px;
-  padding-right: 40px;
+  margin-right: 20px;
+  padding-right: 28px;
   border-right: 1px solid #dfe3eb;
   position: relative;
 }
@@ -106,7 +108,7 @@
 }
 
 .scheme-container:first-child {
-  margin-left: 20px;
+  margin-left: 16px;
 }
 
 .scheme-container:hover .hover-infobox {
@@ -193,4 +195,116 @@
 
 .link-wrapper a {
   text-decoration: none;
+}
+
+.tracking-status-head{
+  display: flex;
+  justify-content: space-between;
+}
+
+.map-view-btn{
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  background-color: #F8F8F8;
+  border-radius: 4px;
+  padding: 6px 6px 6px 10px;
+  color: #131722;
+  transition: all ease 0.3s;
+  margin-right: 8px;
+}
+
+.map-view-btn:hover{
+  background-color: #2E2D32;
+  color: #FFFFFF;
+  cursor: pointer;
+}
+
+.map-view-btn-header{
+  font-size: 10px;
+  margin-left: 4px;
+}
+
+
+@media screen and (max-width: 1240px) {
+  .tracking-status-container {
+    padding-left: 16px;
+    font-family: "Plus Jakarta Sans", sans-serif;
+  }
+
+  .status-container {
+    margin-top: 16px;
+  }  
+
+}
+
+@media screen and (max-width: 1160px) {
+  .tracking-status-container {
+    padding-left: 12px;
+    font-family: "Plus Jakarta Sans", sans-serif;
+  }
+
+  .status-container {
+    margin-top: 16px;
+    flex-direction: row;
+    justify-content: space-between;
+  }  
+
+  .tracking-status-head{
+    justify-content: flex-start;
+  }
+
+  .map-view-btn{
+    margin-right: 0px;
+    margin-left: 16px;
+  }
+}
+
+@media screen and (max-width: 950px){
+  .tracking-status-container {
+    padding-left: 0px;
+  }
+
+  .status-container {
+    margin-top: 16px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }  
+}
+
+@media screen and (max-width: 850px){
+  .tracking-status-container {
+    padding-left: 12px;
+  }
+
+  .status-container {
+    margin-top: 16px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }  
+}
+
+@media screen and (max-width: 768px){
+  .tracking-status-container {
+    padding-left: 12px;
+  }
+
+  .status-container {
+    margin-top: 16px;
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+}
+
+@media screen and (max-width: 600px){
+  .tracking-status-head{
+    justify-content: space-between;
+  }
+
+  .map-view-btn{
+    margin-right: 16px;
+    margin-left: 0px;
+  }
 }

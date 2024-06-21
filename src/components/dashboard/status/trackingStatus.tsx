@@ -2,21 +2,31 @@
 import React, { useEffect, useState } from "react";
 import ProgressBar from "../progressBars/progressBar";
 import totalRakesIcon from "../../../assets/total_rakes.svg";
-import trackingWithGPS from "../../../assets/tracking_icon_status.svg";
-import nonTracking from "../../../assets/non_tracking_icon_status.svg";
+import trackingWithGPS from "../../../assets/tracking_icon.svg";
+import nonTracking from "../../../assets/non_tracking_icon.svg";
+import MapViewIcon from "@/assets/map_view.svg";
+import MapViewHoverIcon from "@/assets/map_view_onhover_icon.svg";
 import "./css/trackingStatus.css";
+import Image from "next/image";
 import forwardArrow from "../../../assets/forward_arrow_icon.svg";
 import { httpsGet } from "@/utils/Communication";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 
-const TrackingStatus = () => {
+interface TrackingStatusProps {
+  handleAllRakesAndTable: (props: any) => void;
+  handleSchemeTypeAndTable: (props: any) => void;
+}
+
+const TrackingStatus: React.FC<TrackingStatusProps> = ({ handleAllRakesAndTable, handleSchemeTypeAndTable }) => {
   const router = useRouter();
   const t = useTranslations("DASHBOARD");
   const [isHovered, setIsHovered] = useState(false);
+  const [isMapHover, setIsMapHover] = useState(false);
   const [nonTrackingEmptyHovered, setNonTrackingEmptyHovered] = useState(false);
   const [nonTrackingWithLoadHovered, setNonTrackingWithLoadHovered] = useState(false);
   const [totalRakes, setTotalRakes] = useState(0);
+  const [totalWagons, setTotalWagons] = useState(0);
   const [trackingPercent, setTrackingPercent] = useState(0);
   const [nonTrackingPercent, setNonTrackingPercent] = useState(0);
   const [schemeData, setSchemeData] = useState([
@@ -73,6 +83,9 @@ const TrackingStatus = () => {
         if (response.totalRakeCount) setTotalRakes(response.totalRakeCount);
         if (response.scheme) {
           setSchemeData(response.scheme);
+          response.scheme.map((scheme: any) => {
+            setTotalWagons((prev) => prev + scheme.wagons);
+          });
         }
         if (response.trackingDetails) {
           if (response.trackingDetails.tracking) {
@@ -118,15 +131,23 @@ const TrackingStatus = () => {
 
   return (
     <div className="tracking-status-container">
-      <div className="tracking-status-header">{t("trackingStatus")}</div>
+      <div className="tracking-status-head">
+        <div className="tracking-status-header">
+          TRACKING STATUS
+        </div>
+        <div className="map-view-btn" 
+             onMouseEnter={() => setIsMapHover(true)} 
+             onMouseLeave={() => setIsMapHover(false)}
+             onClick={() => router.push('/MapsHelper')}>
+          <Image src={isMapHover ? MapViewHoverIcon : MapViewIcon} alt="map view" width={16} height={16}/>
+          <span className="map-view-btn-header">Map View</span>
+        </div>
+      </div>
       <div className="status-container">
         <div
           className="status-wrapper"
           onMouseOver={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
-          onClick={() => {
-            router.push("/MapsHelper");
-          }}
         >
           <ProgressBar
             color={"#334FFC"}
@@ -136,10 +157,11 @@ const TrackingStatus = () => {
             icon={totalRakesIcon}
             hoverIcon={forwardArrow}
             isHovered={isHovered}
+            handleAllRakesAndTable={handleAllRakesAndTable}
           />
           <div className="scheme">
             {schemeData.map((scheme) => (
-              <div className="scheme-container" key={scheme.scheme}>
+              <div className="scheme-container" key={scheme.scheme} onClick={() => handleSchemeTypeAndTable(scheme.scheme)}>
                 <span className="total-rakes-split-count">
                   {scheme.count || 0}
                 </span>
@@ -152,6 +174,15 @@ const TrackingStatus = () => {
                 </div>
               </div>
             ))}
+              <div className="scheme-container" >
+                <span className="total-rakes-split-count">
+                  {totalWagons || 0}
+                </span>
+                <span style={{ color: "#71747A", fontSize: "10px" }}>
+                  No. of Wagons
+                </span>
+                
+              </div>
           </div>
         </div>
         <div className="status-wrapper">

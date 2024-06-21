@@ -2,7 +2,7 @@ import * as React from "react";
 import Image from "next/image";
 import "./css/progressBar.css";
 
-export default function ProgressBar(props: any) {
+const ProgressBar = (props: any) => {
   return (
     <div
       className="progress-bar-wrapper"
@@ -10,7 +10,7 @@ export default function ProgressBar(props: any) {
       <div
         className="progress-bar-container"
       >
-        <div className="progress-info-container">
+        <div className="progress-info-container" onClick={() => props.handleAllRakesAndTable(props.name)}>
           <span
             className="progress-info-count"
           >
@@ -74,3 +74,5 @@ export default function ProgressBar(props: any) {
     </div>
   );
 }
+
+export default ProgressBar;
