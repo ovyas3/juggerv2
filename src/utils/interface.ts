@@ -38,4 +38,10 @@ export interface row {
   remarks: string,
   handlingAgent: string,
   action: string,
+  validationForAttachRake: Boolean,
+  fois:{
+    is_gps: Boolean,
+    is_fois:Boolean
+  },
+
 }

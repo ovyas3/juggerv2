@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+  <g id="calender_icon" transform="translate(-113 -120)">
+    <g id="icon_calendar" data-name="icon/calendar" transform="translate(113 120.167)">
+      <path id="Vector" d="M12.667,2.667H3.333A1.333,1.333,0,0,0,2,4v9.333a1.333,1.333,0,0,0,1.333,1.333h9.333A1.333,1.333,0,0,0,14,13.333V4A1.333,1.333,0,0,0,12.667,2.667Z" fill="none" stroke="#7c7e8c" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      <path id="Vector_2" d="M10.667,1.333V4" fill="none" stroke="#7c7e8c" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      <path id="Vector_3" d="M5.333,1.333V4" fill="none" stroke="#7c7e8c" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      <path id="Vector_4" d="M2,6.667H14" fill="none" stroke="#7c7e8c" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+    </g>
+    <rect id="Rectangle_4784" data-name="Rectangle 4784" width="16" height="16" transform="translate(113 120)" fill="none"/>
+  </g>
+</svg>

@@ -32,7 +32,12 @@
     "outbound":"Outbound",
     "submit":"Submit",
     "attach":"Attach",
-    "edemand":"E demand"
+    "edemand":"E demand",
+    "contact":"Contact",
+    "share":"Share",
+    "intransit":"In Transit",
+    "delivered":"Delivered",
+    "inplant":"In Plant"
 
 
   },

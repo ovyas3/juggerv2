@@ -1,5 +1,5 @@
 'use client'
-import {useTranslations} from 'next-intl';
+import { useTranslations } from 'next-intl';
 import SideDrawer from '../../components/Drawer/Drawer';
 import React, { useEffect, useState } from 'react';
 import Header from '@/components/Header/header';
@@ -16,23 +16,24 @@ import { GET_SHIPMENTS, CAPTIVE_RAKE } from "@/utils/helper";
 
 const OrdersPage = () => {
   const t = useTranslations('ORDERS');
-  const mobile = useWindowSize(600);
+  const mobile = useWindowSize(500);
   const [allShipment, setAllShipment] = useState([]);
   const [count, setCount] = useState(0);
   const [rakeCaptiveList, setRakeCaptiveList] = useState([]);
 
   const [reload, setReload] = useState(false)
+  const [statusForShipment, setStatusForShipment] = useState('All')
 
 
   //shipment payload
   const [ShipmentsPayload, setShipmentsPayload] = useState({
     is_outbound: true,
-    to:'',
-    from:''
+    to: '',
+    from: ''
   })
 
   //adding to and from to shipmentpayload
-  const handleToFromChange = (to : string, from: string) => {
+  const handleToFromChange = (to: string, from: string) => {
     setShipmentsPayload(prevState => ({
       ...prevState,
       to: to,
@@ -41,7 +42,7 @@ const OrdersPage = () => {
   };
 
   //adding limit and skip to shipmentpayload
-  const handleSkipLimitChange = (limit : number, skip: number,) => {
+  const handleSkipLimitChange = (limit: number, skip: number,) => {
     setShipmentsPayload(prevState => ({
       ...prevState,
       limit: limit,
@@ -50,30 +51,30 @@ const OrdersPage = () => {
   }
 
   // function which bring allshipment
-  async function getAllShipment (){
-    const response =await httpsPost(GET_SHIPMENTS,ShipmentsPayload);
+  async function getAllShipment() {
+    const response = await httpsPost(GET_SHIPMENTS, ShipmentsPayload);
     console.log(response)
-    setAllShipment( response.data.data)
+    setAllShipment(response.data.data)
     setCount(response.data.count)
   }
 
-  async function getCaptiveRake (){
+  async function getCaptiveRake() {
     const list_captive_rake = await httpsGet(CAPTIVE_RAKE);
     console.log(list_captive_rake)
     setRakeCaptiveList(list_captive_rake.data)
 
   }
 
-  useEffect(()=>{
+  useEffect(() => {
     getCaptiveRake();
-  },[])
+  }, [])
 
-  useEffect(()=>{
-    if(ShipmentsPayload.from && ShipmentsPayload.to) getAllShipment();
-  },[ShipmentsPayload])
+  useEffect(() => {
+    if (ShipmentsPayload.from && ShipmentsPayload.to) getAllShipment();
+  }, [ShipmentsPayload])
 
 
-
+  // console.log(statusForShipment)
 
   return (
     <div  >
@@ -83,14 +84,14 @@ const OrdersPage = () => {
             mobile ? <Header title={'Shipments'} /> : <MobileHeader />
           }
 
-          <div className='tableContainer' style={{ paddingInline: 24, paddingTop: 24,  paddingBottom: 65,  position:'relative', marginTop:'56px' }}>
+          <div className='tableContainer' style={{ paddingInline: 24, paddingTop: 10, paddingBottom: mobile ? 24 : 65, position: 'relative', marginTop: mobile ? '56px' : '0px', marginLeft: mobile ? '70px' : '0px' }}>
 
             {/* ----search fnr---- */}
             <div className='input_fnr_reload'>
-              <div className={`reload ${reload ? 'loading' : ''}`} onClick={()=>{
+              <div className={`reload ${reload ? 'loading' : ''}`} onClick={() => {
                 getAllShipment();
                 setReload(true)
-                setTimeout(()=>{setReload(false)}, 3000)
+                setTimeout(() => { setReload(false) }, 3000)
               }}>
                 <ReplayIcon style={{ color: '#707070' }} />
               </div>
@@ -109,21 +110,22 @@ const OrdersPage = () => {
 
 
             {/* ----filter---- */}
-            <div className='filters'>
-              <Filters onToFromChange={handleToFromChange} />
+            <div className='filters' >
+              <Filters onToFromChange={handleToFromChange} setStatusForShipment={setStatusForShipment} />
+
             </div>
 
             {/* ----table---- */}
             <div className='tableData'>
-              <TableData onSkipLimit={handleSkipLimitChange} allShipments={allShipment} count={count} rakeCaptiveList={rakeCaptiveList} />
+              <TableData onSkipLimit={handleSkipLimitChange} allShipments={allShipment} count={count} rakeCaptiveList={rakeCaptiveList} statusForShipment={statusForShipment}  />
             </div>
 
           </div>
         </div>
       </div>
       {mobile ? <SideDrawer /> : <div className="bottom_bar">
-          <MobileDrawer />
-        </div>}
+        <MobileDrawer />
+      </div>}
     </div>
   );
 };

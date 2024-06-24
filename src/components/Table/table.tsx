@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 'use client'
 
 import * as React from 'react';
@@ -32,8 +33,14 @@ import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import { httpsPost } from '@/utils/Communication';
-import {UPDATE_RAKE_CAPTIVE_ID} from '@/utils/helper'
+import { UPDATE_RAKE_CAPTIVE_ID } from '@/utils/helper'
 import { statusBuilder } from '../MapView/StatusBuilder/StatusBuilder';
+
+import FOIS from '@/assets/fois_icon.png'
+import GPIS from '@/assets/gps_icon.svg'
+import attach_icon from '@/assets/attach_icon.svg'
+import ShareIcon from '@mui/icons-material/Share';
+import contactIcon from '@/assets/inactive_contact_dashboard+icon.svg'
 
 const style = {
     position: 'absolute' as 'absolute',
@@ -52,41 +59,42 @@ interface item {
     _id: string,
 }
 
-async function rake_update_id(payload : Object) {
-    const response = await httpsPost(UPDATE_RAKE_CAPTIVE_ID, payload) 
+async function rake_update_id(payload: Object) {
+    const response = await httpsPost(UPDATE_RAKE_CAPTIVE_ID, payload)
     console.log("updating")
     console.log(response)
 }
 
-function Tags({ rakeCaptiveList , shipmentId, setOpen , setShowActionBox }:any) {
+function Tags({ rakeCaptiveList, shipmentId, setOpen, setShowActionBox }: any) {
 
     const t = useTranslations('ORDERS');
 
     const [selectedItems, setSelectedItems] = useState<item>({
         _id: '',
     });
-    const handleSubmit = () => {
+    const handleSubmit = (e: any) => {
+        e.stopPropagation();
 
         const updatedObject = {
             shipmentId: shipmentId,
             captiveId: selectedItems._id
         };
         console.log(updatedObject)
-    
-        if(selectedItems._id){
+
+        if (selectedItems._id) {
             rake_update_id(updatedObject)
         }
 
         setOpen(false)
         setShowActionBox(-1)
-        setSelectedItems({_id: ''});
+        setSelectedItems({ _id: '' });
     };
 
-    const CustomPopper = (props : any) => {
+    const CustomPopper = (props: any) => {
         return <Popper {...props} style={{ fontSize: '10px' }} placement="bottom-start" />;
     };
 
-    const CustomPaper = (props:any) => {
+    const CustomPaper = (props: any) => {
         return <Paper {...props} style={{ fontSize: '10px' }} />;
     };
 
@@ -103,14 +111,16 @@ function Tags({ rakeCaptiveList , shipmentId, setOpen , setShowActionBox }:any) 
                     value={selectedItems}
 
 
-                    getOptionLabel={(option : any) => option.rake_id || "Select one"}
-                    isOptionEqualToValue={(option :any, value) => option.rake_id === value.rake_id}
+                    getOptionLabel={(option: any) => option.rake_id || "Select one"}
+                    isOptionEqualToValue={(option: any, value) => option.rake_id === value.rake_id}
                     renderOption={(props, option) => (
                         <li {...props} key={`Unnamed-Option-${Math.random()}`}>
                             {option.rake_id || "Unnamed Option"} - {option.name || "Unnamed Option"}
                         </li>
                     )}
                     onChange={(event, newValue) => {
+                        event.stopPropagation();
+                        console.log('this is triggering')
                         setSelectedItems(newValue)
                     }}
                     renderInput={(params) => (
@@ -149,7 +159,7 @@ function Tags({ rakeCaptiveList , shipmentId, setOpen , setShowActionBox }:any) 
                 />
             </Stack>
             <div style={{ textAlign: 'end', paddingTop: '8px' }}>
-                <Button variant="contained" size='small' color="secondary" style={{ textTransform: 'none' }} onClick={handleSubmit}>{t('submit')}</Button>
+                <Button variant="contained" size='small' color="secondary" style={{ textTransform: 'none' }} onClick={(e) => { handleSubmit(e) }}>{t('submit')}</Button>
             </div>
         </div>
     );
@@ -168,8 +178,14 @@ const convertArrayToFilteredArray = (inputArray: any) => {
             unique_code: string,
             _id: string,
             status: string,
+            pickup_date: any,
+            fois: any,
+            // validationForAttachRake:Boolean,
+            captive_id: string,
+            is_captive: Boolean,
+            trip_tracker: any,
         }) => {
-        const { edemand_no, FNR, allFNRs, delivery_location, others, remarks, unique_code, status } = item;
+        const { edemand_no, FNR, allFNRs, delivery_location, trip_tracker, others, remarks, unique_code, status, pickup_date, captive_id, is_captive } = item;
         return {
             _id: item._id,
             edemand: edemand_no,
@@ -184,17 +200,25 @@ const convertArrayToFilteredArray = (inputArray: any) => {
             },
             material: others.demandedCommodity || 'NA',
             pickupdate: {
-                date: others.confirmationDate || 'NA',
+                date: pickup_date || 'NA',
             },
             status: {
-                name:  statusBuilder(status),
+                name: statusBuilder(status),
                 code: status || ''
             },
             currentEta: 'NA',
             remarks: 'NA',
             handlingAgent: 'NA',
             action: null,
-            iconheader: ''
+            iconheader: '',
+            fois: {
+                is_fois: trip_tracker && trip_tracker.fois_last_location ? true : false,
+                is_gps: trip_tracker && trip_tracker.gps_last_location ? true : false,
+            },
+
+
+            validationForAttachRake: !captive_id && is_captive
+
         }
     });
 };
@@ -203,7 +227,7 @@ const convertArrayToFilteredArray = (inputArray: any) => {
 
 
 // Main component
-export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, count }: any) {
+export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, count, statusForShipment }: any) {
 
     //language controller
     const t = useTranslations("ORDERS")
@@ -215,7 +239,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
     //making edemand column toggle
     const [edemand, setEdemand] = React.useState(true);
     const [showEdemand, setShowEdemad] = React.useState(false);
-    
+
     const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
 
     //table header variable
@@ -227,29 +251,36 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
     // action box toggle
     const [showActionBox, setShowActionBox] = useState(-1)
     const [open, setOpen] = React.useState(false);
-    const handleOpen = () => setOpen(true);
-    const handleClose = () => setOpen(false);
+    const handleOpen = (e: any) => { e.stopPropagation(); setOpen(true); };
+    const handleClose = (e: any) => { e.stopPropagation(); setOpen(false); }
     const [fnr, setFnr] = useState('')
 
     //getting row id to pass it to tag element
     const [rowId, setRowID] = useState('')
     const [response, setResponse] = useState([])
-    
-    const handleChangeByFnr = (changeFnr :  string) =>{
+
+    //search fnr 
+    const [settingFnrChange, setSettingFnrChange] = useState('');
+
+
+    const handleRRDoc = (id: string) => {  // for rr documents
+        console.log('working:', id)
+    }
+
+    const handleChangeByFnr = (changeFnr: string) => {
+        setSettingFnrChange(changeFnr)
         if (changeFnr === '') {
             const resData = convertArrayToFilteredArray(allShipments)
             setResponse(resData)
         } else {
-            console.log(changeFnr)
             const resData = convertArrayToFilteredArray(allShipments)
             const filteredData = resData.filter((item: { fnr: { primary: string | string[]; }; }) => item.fnr.primary.includes(changeFnr));
             setResponse(filteredData)
-        }        
+        }
     }
-    
-
     const handleChangePage = (event: unknown, newPage: number) => {
         setPage(newPage);
+        setSettingFnrChange('')
     };
 
     const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -257,36 +288,62 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
         setPage(0);
     };
 
-    function clickActionBox(index: number, id: string) {
-        setRowID(id)
+    function clickActionBox(e: React.MouseEvent<SVGSVGElement, MouseEvent>, index: number, id: string) {
+        e.stopPropagation();
+        setRowID(id);
         setShowActionBox(prevIndex => (prevIndex === index ? -1 : index));
     }
 
     useEffect(() => {
         const resData = convertArrayToFilteredArray(allShipments)
-        setResponse(resData)
-    }, [allShipments, page])
+        console.log(statusForShipment)
+        if (statusForShipment === 'All') {
+            setResponse(resData)
+        } else {
+            const filteredData = resData.filter(shipment => shipment.status.name === statusForShipment);
+            console.log(filteredData)
+            setResponse(filteredData)
+        }
+
+        setSettingFnrChange('')
+    }, [allShipments, page, statusForShipment])
 
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
+            // if (showActionBox !== -1) {
+            //     event.stopPropagation();
+            // }
+            event.stopPropagation();
             const target = event.target as HTMLElement;
             const actionButton = target.closest('.action_icon'); // Check if clicked inside action button
-    
-            if (!actionButton) {
+
+            if (!actionButton && showActionBox !== -1) {
+                event.stopPropagation();
+                console.log('this is triggering ')
+                console.log(event)
                 setShowActionBox(-1); // Close action box if clicked outside
             }
+            event.stopPropagation();
         }
-    
+
+        console.log('this is hrfhefgvhfghd')
+
         if (showActionBox !== -1) {
             document.addEventListener('mousedown', handleClickOutside);
+
         } else {
             document.removeEventListener('mousedown', handleClickOutside);
         }
-    
+
         return () => {
+            console.log('this is triggerdfhghfssdsd');
             document.removeEventListener('mousedown', handleClickOutside); // Clean up event listener on component unmount
         };
     }, [showActionBox]);
+
+    useEffect(() => {
+        onSkipLimit(rowsPerPage, page * rowsPerPage)
+    }, [rowsPerPage, page]);
 
     useEffect(() => {
         const commonColumns: Column[] = [
@@ -305,10 +362,8 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
         if (edemand) {
             commonColumns.unshift({ id: 'edemand', label: 'e-Demand', class: 'edamand', innerClass: '' });
         }
-
-        onSkipLimit(rowsPerPage, page * rowsPerPage)
         setColumns(commonColumns);
-    }, [edemand, showEdemand, rowsPerPage, page]);
+    }, [edemand, showEdemand,])
 
     return (
         <div className='target'>
@@ -325,12 +380,12 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                         border: ' 1px solid #E9E9EB',
                         borderRadius: '8px'
                     },
-                    '.mui-1briqcb-MuiTableCell-root':{
-                        fontFamily:'inherit'
+                    '.mui-1briqcb-MuiTableCell-root': {
+                        fontFamily: 'inherit'
                     }
                 }}>
                 <TablePagination
-                    rowsPerPageOptions={[5,10, 25, 100]}
+                    rowsPerPageOptions={[5, 10, 25, 100]}
                     component="div"
                     count={count}
                     rowsPerPage={rowsPerPage}
@@ -339,18 +394,19 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                     onRowsPerPageChange={handleChangeRowsPerPage}
                     labelRowsPerPage="Shipments per page:"
                 />
-                <TableContainer sx={{ maxHeight: '680px', border: '1px solid #E9E9EB', borderRadius: '8px' }}>
+                <TableContainer sx={{ maxHeight: '594px', border: '1px solid #E9E9EB', borderRadius: '8px' }}>
                     <Table stickyHeader aria-label="sticky table">
                         <TableHead sx={{
                             '.mui-y8ay40-MuiTableCell-root ': { padding: 0 },
-                            '.mui-78trlr-MuiButtonBase-root-MuiIconButton-root ': { width: '5px' }
+                            '.mui-78trlr-MuiButtonBase-root-MuiIconButton-root ': { width: '5px' },
+                            '.mui-y8ay40-MuiTableCell-root': { fontFamily: 'inherit' }
                         }}>
                             <TableRow >
                                 {columns.map((column) => {
                                     return (
                                         <TableCell
                                             key={column.id}
-                                            style={{ fontSize: 12, fontWeight: 'bold', color: '#7C7E8C', paddingLeft: '10px' }}
+                                            style={{ fontSize: 12, fontWeight: 'bold', color: '#484A57', paddingLeft: '10px' }}
                                             className={column.class}
 
                                         >
@@ -374,26 +430,28 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                     }
                                                     {
                                                         column.id === 'fnr' ?
-                                                        <div>
-                                                            <input type='text' 
-                                                                onChange={(e) => {
-                                                                    handleChangeByFnr(e.target.value)
-                                                                }}
-                                                                placeholder='FNR No.'
-                                                                style={{
-                                                                    width: '82px',
-                                                                    height:'22px',
-                                                                    border:'none',
-                                                                    textAlign:'center',
-                                                                    fontSize:'12px',
-                                                                    color:'#7C7E8C',
-                                                                    fontWeight:'bold',
-                                                                    outline:'none',
-                                                                    
-                                                                }}
-                                                            />
-                                                        </div>
-                                                        :<></>
+                                                            <div>
+                                                                <input type='text'
+                                                                    onChange={(e) => {
+                                                                        handleChangeByFnr(e.target.value)
+                                                                    }}
+                                                                    value={settingFnrChange}
+                                                                    placeholder='FNR No.'
+                                                                    style={{
+                                                                        width: '82px',
+                                                                        height: '22px',
+                                                                        border: 'none',
+                                                                        textAlign: 'center',
+                                                                        fontSize: '12px',
+                                                                        color: '#484A57',
+                                                                        fontWeight: 'bold',
+                                                                        outline: 'none',
+                                                                    }}
+                                                                    className="custom-placeholder"
+                                                                />
+
+                                                            </div>
+                                                            : <></>
                                                     }
                                                 </div>
 
@@ -407,7 +465,9 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                         <TableBody>
                             {response.map((row: row, firstindex: number) => {
                                 return (
-                                    <TableRow hover key={row.edemand}>
+                                    <TableRow hover key={row.edemand}
+                                        onClick={() => { handleRRDoc(row._id) }}
+                                    >
 
                                         {columns.map((item, index) => {
                                             // @ts-ignore
@@ -435,41 +495,62 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                         {(typeof value) === 'object' ? '' : value}
 
                                                         {item.id === 'action' ? (
-                                                            <div style={{display:'flex', justifyContent:'center'}}>
-                                                            <div className='action_icon'>
-                                                                <MoreHorizIcon
-                                                                    style={{ color: 'white', cursor: 'pointer', scale:'0.9' }}
-                                                                    onClick={() => { clickActionBox(firstindex, row._id); }}
-                                                                />
-                                                                <div
-                                                                    className={`action_button_target ${showActionBox === firstindex ? 'show' : ''}`}
-                                                                >
-                                                                    <Button variant="contained" size='small' color="secondary" style={{ textTransform: 'none' }} onClick={() => handleOpen()} >{t('attach')}</Button>
-
-                                                                    <Modal
-                                                                        open={open}
-                                                                        onClose={handleClose}
-                                                                        aria-labelledby="modal-modal-title"
-                                                                        aria-describedby="modal-modal-description"
-                                                                        BackdropProps={{
-                                                                            sx: {
-                                                                                opacity: 0.7,
-                                                                                backgroundColor: 'rgba(0, 0, 0, 0.1)',
-                                                                            },
-                                                                        }}
+                                                            <div style={{ display: 'flex', justifyContent: 'center' }}>
+                                                                <div className='action_icon'>
+                                                                    <MoreHorizIcon
+                                                                        style={{ color: 'white', cursor: 'pointer', scale: '0.9' }}
+                                                                        onClick={(e) => { clickActionBox(e, firstindex, row._id); }}
+                                                                    />
+                                                                    <div
+                                                                        className={`action_button_target ${showActionBox === firstindex ? 'show' : ''}`}
                                                                     >
-                                                                        <Box sx={style}>
+                                                                        <div className='action_button_options'>
+                                                                            <div className='action_items' onClick={(e) => handleOpen(e)}
 
-                                                                            <Tags rakeCaptiveList={rakeCaptiveList}
-                                                                                shipmentId={rowId}
-                                                                                setOpen={setOpen}
-                                                                                setShowActionBox={setShowActionBox}
-                                                                            />
-                                                                        </Box>
-                                                                    </Modal>
+                                                                                style={{ display: row.validationForAttachRake ? '' : 'none' }}
+                                                                            >
+                                                                                <div >
+                                                                                    <img src={attach_icon.src} alt=''
+                                                                                        style={{ display: 'block' }} />
+                                                                                </div>
+                                                                                <div style={{ paddingTop: '3px' }}>{t('attach')}</div>
+                                                                            </div>
+                                                                            <div className='action_items' style={{ gap: '10px' }}>
+                                                                                <div>
+                                                                                    <ShareIcon style={{ fontSize: '15px', color: '#3352FF' }} />
+                                                                                </div>
+                                                                                <div>{t('share')}</div>
+                                                                            </div>
+                                                                            <div className='action_items'>
+                                                                                <div style={{ width: '20px', height: '20px' }}><img src={contactIcon.src} alt='' style={{ objectFit: 'contain', height: '100%', width: '100%' }} /></div>
+                                                                                <div>{t('contact')}</div>
+                                                                            </div>
+                                                                        </div>
 
+                                                                        <Modal
+                                                                            open={open}
+                                                                            onClose={(e) => { handleClose(e) }}
+                                                                            aria-labelledby="modal-modal-title"
+                                                                            aria-describedby="modal-modal-description"
+                                                                            BackdropProps={{
+                                                                                sx: {
+                                                                                    opacity: 0.7,
+                                                                                    backgroundColor: 'rgba(0, 0, 0, 0.1)',
+                                                                                },
+                                                                            }}
+                                                                        >
+                                                                            <Box sx={style}>
+
+                                                                                <Tags rakeCaptiveList={rakeCaptiveList}
+                                                                                    shipmentId={rowId}
+                                                                                    setOpen={setOpen}
+                                                                                    setShowActionBox={setShowActionBox}
+                                                                                />
+                                                                            </Box>
+                                                                        </Modal>
+
+                                                                    </div>
                                                                 </div>
-                                                            </div>
                                                             </div>
                                                         ) : null}
                                                         {
@@ -496,14 +577,18 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                     >{value.code}</div>
                                                                     <div
                                                                         style={{
-                                                                            opacity: destinationIndex === firstindex ? 1 : 0, position: 'absolute',
+                                                                            opacity: destinationIndex === firstindex ? 1 : 0,
+                                                                            position: 'absolute',
                                                                             border: ' 1px solid #DFE3EB',
                                                                             scale: 0.8,
                                                                             padding: '2px 5px 2px 5px',
                                                                             top: -22,
                                                                             left: 15,
                                                                             backgroundColor: 'white',
-                                                                            borderRadius: '8px'
+                                                                            borderRadius: '4px',
+                                                                            transition: 'all 0.2s ease-in-out',
+                                                                            boxShadow: ' 0px 4px 8px grey',
+                                                                            fontWeight: '600'
                                                                         }}
                                                                     >{value.name}</div>
                                                                 </div>
@@ -520,13 +605,27 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                         }
                                                         {
                                                             item.id === 'status' ?
-                                                            <div className='status_container'>
-                                                                <div className='status_title'>
-                                                                    <div>{value.name}</div>
+                                                                <div className='status_container'>
+                                                                    <div className={` ${value.name === t('intransit') ? 'status_title_In_Transit' : value.name === t('delivered') ? 'status_title_Delivered' : 'status_title_In_Plant'}`}>
+                                                                        <div>{value.name}</div>
+                                                                    </div>
+                                                                    <div className='status_body'>{value.code}</div>
                                                                 </div>
-                                                                <div className='status_body'>{value.code}</div>
-                                                            </div>
-                                                            :<></>
+                                                                : <></>
+                                                        }
+                                                        {
+                                                            item.id === 'edemand' ?
+                                                                <div className='edemand_fois_gpis' style={{ marginBottom: '5px' }}>
+                                                                    <img
+                                                                        src={row.fois.is_gps && GPIS.src} style={{ display: 'block' }}
+                                                                        alt=''
+                                                                    /><img
+                                                                        src={row.fois.is_fois && FOIS.src}
+                                                                        style={{ display: 'block' }}
+                                                                        alt=''
+                                                                    />
+                                                                </div>
+                                                                : <></>
                                                         }
                                                     </div>
                                                 </TableCell>
@@ -534,6 +633,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                         })}
 
                                     </TableRow>
+
                                 );
                             })}
                         </TableBody>
