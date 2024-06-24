@@ -126,24 +126,27 @@ const MapLayers = () => {
     const getRakeShipmentDatas = async () => {
       try {
         // setLoading(true);
-        console.log('Fetching data');
         const res = await httpsGet('get/maps/captive_rakes', 0);
-        console.log('Data fetched', res);
         const data = res.data;
         data.map((data: any) => {
           if (data && data.rake_updates && data.rake_id) {
-            if (!coords[data.name]) {
-              coords[data.name] = [];
-            }
-            coords[data.name].push(
-              {
-                "rake_id": data.rake_id,
-                "geo_point": data.rake_updates.geo_point,
-                "time_stamp": {
-                  "$date": data.rake_updates.gps_updated_at
-                }
+            const isDuplicate = Object.values(coords).flat().some((item: any) => item.rake_id === data.rake_id);
+
+            if (!isDuplicate) {
+              if (!coords[data.name]) {
+                coords[data.name] = [];
               }
-            );
+            
+              coords[data.name].push(
+                {
+                  "rake_id": data.rake_id,
+                  "geo_point": data.rake_updates.geo_point,
+                  "time_stamp": {
+                    "$date": data.rake_updates.gps_updated_at
+                  }
+                }
+              );
+            }
           }
           if (!allRakes.some((item: any) => item.rake_id === data.rake_id)) {
             allRakes.push({
@@ -154,14 +157,13 @@ const MapLayers = () => {
           }
 
         });
-        console.log('All Rakes:', allRakes);
-        console.log('Coords:', coords);
         const allRakesFiltered = allRakes.filter((rake: any) => rake.rake_id !== undefined);
-        console.log('All Rakes Filtered:', allRakesFiltered);
         setAllRakes(allRakesFiltered);
         setCoords(coords);
+        console.log("res", res.data);
+        console.log('coords', coords);
+        console.log('allRakes', allRakesFiltered);
       } catch (error) {
-        console.error("An error occurred:", error);
         setLoading(false);
       } finally {
         setLoading(false);
@@ -235,12 +237,13 @@ const MapLayers = () => {
           tracking: tracking,
         });
       }
-      console.log('All Rakes Data:', allRakesData);
-      console.log('All Locations:', allLocations);
       setAllRakesPositions(allLocations);
       setAllIdleRakes(allIdleRakes);
       setShowAllRakes(true);
       setList(allRakesData);
+      console.log('allLocations', allLocations);
+      console.log('allIdleRakes', allIdleRakes);
+      console.log('allRakesData', allRakesData);
     }
 
     useEffect(() => {
@@ -398,9 +401,9 @@ const MapLayers = () => {
                         <Table sx={{ minWidth: '100%', borderRadius: '0px 0px 12px 12px' }} aria-label="simple table" stickyHeader>
                           <TableHead>
                             <TableRow>
-                              <TableCell align="left" className="table-heads">Rake ID</TableCell>
-                              <TableCell align="left" className="table-heads">Scheme ID</TableCell>
-                              <TableCell align="left" className="table-heads">FNR No.</TableCell>
+                              <TableCell align="left" className="table-heads" style={{paddingLeft: '32px'}}>Rake ID</TableCell>
+                              {/* <TableCell align="left" className="table-heads">Scheme ID</TableCell> */}
+                              <TableCell align="left" className="table-heads" style={{paddingRight: '32px'}}>FNR No.</TableCell>
                             </TableRow>
                           </TableHead>
                           <TableBody>
@@ -410,9 +413,9 @@ const MapLayers = () => {
                             sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                             className='table-rows-container'
                             >
-                              <TableCell align="left" className="captive-rake-rows">{rake.rake_id}</TableCell>
-                              <TableCell align="left" className="captive-rake-rows">{rake.name}</TableCell>
-                              <TableCell align="left" className="captive-rake-rows">{rake.fnr_no}</TableCell>
+                              <TableCell align="left" className="captive-rake-rows" style={{paddingLeft: '32px'}}>{rake.rake_id}</TableCell>
+                              {/* <TableCell align="left" className="captive-rake-rows">{rake.name}</TableCell> */}
+                              <TableCell align="left" className="captive-rake-rows" style={{paddingRight: '32px'}}>{rake.fnr_no}</TableCell>
                             </TableRow>
                             ))}
                           </TableBody>
