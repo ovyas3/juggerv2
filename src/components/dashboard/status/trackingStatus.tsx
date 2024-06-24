@@ -96,7 +96,6 @@ const TrackingStatus: React.FC<TrackingStatusProps> = ({ handleAllRakesAndTable,
             setTrackingPercent(
               percentage(data.totalTracking, response.totalRakeCount)
             );
-            console.log(trackingPercent);
             setTrackingData({
               totalTracking: data.totalTracking,
               withLoad: data.withLoad,
@@ -108,7 +107,6 @@ const TrackingStatus: React.FC<TrackingStatusProps> = ({ handleAllRakesAndTable,
             setNonTrackingPercent(
               percentage(data.totalTracking, response.totalRakeCount)
             );
-            console.log(nonTrackingPercent);
             const withLoadTotal = Object.values(data.withLoad).reduce(
               (accumulator: any, currentValue: any) => {
                 return accumulator + currentValue;

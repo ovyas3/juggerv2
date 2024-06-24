@@ -1,5 +1,5 @@
 'use client'
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { MapContainer, TileLayer, Marker, LayersControl, Popup, GeoJSON, Polyline } from 'react-leaflet';
 import MarkerClusterGroup from "react-leaflet-cluster";
 import './MapLayers.css';
@@ -89,6 +89,8 @@ const MapLayers = () => {
     const [allRakesPositions, setAllRakesPositions] = useState<any>([]);
     const [list, setList] = useState<any>([]);
     const [loading, setLoading] = useState(true);
+    const [selectedRake, setSelectedRake] = useState<any>(null);
+    const selectedMarkerRef = useRef<L.Marker | null>(null);
 
     const geoJSONStyle: L.PathOptions = {
       color: 'black', // Set the color of train tracks
@@ -136,7 +138,7 @@ const MapLayers = () => {
               if (!coords[data.name]) {
                 coords[data.name] = [];
               }
-            
+
               coords[data.name].push(
                 {
                   "rake_id": data.rake_id,
@@ -149,9 +151,19 @@ const MapLayers = () => {
             }
           }
           if (!allRakes.some((item: any) => item.rake_id === data.rake_id)) {
+            const gpsUpdateTime = DateTime.fromJSDate(new Date(data.rake_updates.gps_updated_at));
+            const currentTime = DateTime.local();
+            const diff = currentTime.diff(gpsUpdateTime, ['hours', 'minutes']);
+            const diffInHours = Math.floor(diff.hours);
+            const diffInMinutes = Math.floor(diff.minutes) % 60;
+            const hours = isNaN(diffInHours) ? 'N/A' : `${diffInHours}hr`;
+            const minutes = isNaN(diffInMinutes) ? '' : `${diffInMinutes}min`;
+            const timeSinceUpdate = `${hours} ${minutes}`;
+
             allRakes.push({
               "rake_id": data.rake_id,
               "name": data.name,
+              "hours": timeSinceUpdate,
               "fnr_no": data.shipment ? data.shipment.fnr_no : 'N/A',
             });
           }
@@ -172,18 +184,24 @@ const MapLayers = () => {
         const coordsData = coords[name];
         if (coordsData.length) {
           const sortedData = coordsData.sort((a: any, b: any) => new Date(b.time_stamp.$date).getTime() - new Date(a.time_stamp.$date).getTime());
-          const lastCords = sortedData[0]
+          const lastCords = sortedData[0];
+          const date = service.utcToist(lastCords.time_stamp.$date, 'dd/MM/yyyy');
+          const time = service.utcToistTime(lastCords.time_stamp.$date, 'HH:mm');
+
+          const formattedDateTime = `${date} ${time}`;
           setRoute(sortedData.map((item: any) => [item.geo_point.coordinates[1], item.geo_point.coordinates[0]]))
           setCurrentLocation([{
             data: {
               title: name,
-              ts: DateTime.fromJSDate(new Date(lastCords.time_stamp.$date)).toFormat('dd/MM/yyyy HH:mm')
+              // ts: DateTime.fromJSDate(new Date(lastCords.time_stamp.$date)).toFormat('dd/MM/yyyy HH:mm')
+              ts: formattedDateTime
             },
             coords: [lastCords.geo_point.coordinates[1], lastCords.geo_point.coordinates[0]]
           }]);
           setShowRouteFor(name);
         }
       }
+
       else {
         setRoute([]);
         setCurrentLocation([]);
@@ -199,12 +217,17 @@ const MapLayers = () => {
       for (let key in coords) {
         const sortedData = coords[key].sort((a:any, b:any) => a.time_stamp - b.time_stamp);
         const lastCords = sortedData[0];
+        const date = service.utcToist(lastCords.time_stamp.$date, 'dd/MM/yyyy');
+        const time = service.utcToistTime(lastCords.time_stamp.$date, 'HH:mm');
+
+        const formattedDateTime = `${date} ${time}`;
        if(lastCords.geo_point && lastCords.geo_point.coordinates && lastCords.geo_point.coordinates[0] && lastCords.geo_point.coordinates[1] && lastCords.time_stamp && lastCords.time_stamp.$date) {
         if (service.differenceToday(lastCords.time_stamp.$date, 3, 'hours') < 1) {
           allIdleRakes.push({
             data: {
               title: key,
-              ts: DateTime.fromJSDate(new Date(lastCords.time_stamp.$date)).toFormat('dd/MM/yyyy HH:mm')
+              // ts: DateTime.fromJSDate(new Date(lastCords.time_stamp.$date)).toFormat('dd/MM/yyyy HH:mm')
+              ts: formattedDateTime
             },
             coords: [lastCords.geo_point.coordinates[1], lastCords.geo_point.coordinates[0]]
           });
@@ -212,7 +235,8 @@ const MapLayers = () => {
           allLocations.push({
             data: {
               title: key,
-              ts: DateTime.fromJSDate(new Date(lastCords.time_stamp.$date)).toFormat('dd/MM/yyyy HH:mm')
+              // ts: DateTime.fromJSDate(new Date(lastCords.time_stamp.$date)).toFormat('dd/MM/yyyy HH:mm')
+              ts: formattedDateTime
             },
             coords: [lastCords.geo_point.coordinates[1], lastCords.geo_point.coordinates[0]]
           });
@@ -250,6 +274,60 @@ const MapLayers = () => {
         allLastLocationForAll();
       } , 300);
     }, [map]);
+
+    useEffect(() => {
+      const handleClickOutside = (event: MouseEvent) => {
+        const target = event.target as Node;
+        if (target && target.nodeType === Node.ELEMENT_NODE) {
+          if (!(target as Element).closest('.table-rows-container')) {
+            setSelectedRake(null);
+            if (selectedMarkerRef.current) {
+              selectedMarkerRef.current.closePopup();
+            }
+          }
+        }
+      };
+    
+      document.addEventListener('mousedown', handleClickOutside);
+    
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+      };
+    }, []);
+
+    const handleRakeSelection = (rake: any) => {
+      if (selectedRake && selectedRake.rake_id === rake.rake_id) {
+        // Deselecting the current rake
+        setSelectedRake(null);
+        if (selectedMarkerRef.current) {
+          selectedMarkerRef.current.closePopup();
+        }
+      } else {
+        // Selecting a new rake
+        setSelectedRake(rake);
+        focusOnRake(rake);
+      }
+    };
+    
+    const focusOnRake = (rake: any) => {
+      if (rake && map) {
+        const rakeData = coords[rake.name];
+        if (rakeData && rakeData.length > 0) {
+          const bounds = L.latLngBounds(rakeData.map((item: any) => [
+            item.geo_point.coordinates[1],
+            item.geo_point.coordinates[0]
+          ]));
+          map.fitBounds(bounds, { padding: [50, 50] });
+          
+          // Open the popup after a short delay to ensure the map has finished moving
+          setTimeout(() => {
+            if (selectedMarkerRef.current) {
+              selectedMarkerRef.current.openPopup();
+            }
+          }, 250);
+        }
+      }
+    };
 
     if (loading) {
       return (
@@ -289,6 +367,7 @@ const MapLayers = () => {
                     alignContent: 'space-around',
                 }}
               >
+
                 <FormGroup className='mapButtons'>
                   <FormControlLabel
                     control={<Switch checked={showTracks} onChange={() => setShowTracks(!showTracks)} />}
@@ -337,7 +416,6 @@ const MapLayers = () => {
                           display: 'flex',
                           flexDirection: 'row',
                           justifyContent: 'space-between',
-
                         }}>
                           <div className="tracking-status">
                             <div className="tracking-number">
@@ -395,21 +473,27 @@ const MapLayers = () => {
                         <Table sx={{ minWidth: '100%', borderRadius: '0px 0px 12px 12px' }} aria-label="simple table" stickyHeader>
                           <TableHead>
                             <TableRow>
-                              <TableCell align="left" className="table-heads" style={{paddingLeft: '32px'}}>Rake ID</TableCell>
-                              {/* <TableCell align="left" className="table-heads">Scheme ID</TableCell> */}
-                              <TableCell align="left" className="table-heads" style={{paddingRight: '32px'}}>FNR No.</TableCell>
+                              <TableCell align="left" className="table-heads" style={{paddingLeft: '14px'}}>Rake ID</TableCell>
+                              <TableCell align="center" className="table-heads" style={{paddingRight: '32px', lineHeight: '16px'}}>Last Updated <br/> <span style={{fontSize: '10px', color:'#7C7E8C', fontWeight: '500' }}>(hr & min)</span></TableCell>
+                              <TableCell align="left" className="table-heads">FNR No.</TableCell>
                             </TableRow>
                           </TableHead>
                           <TableBody>
                           {allRakes && allRakes.map((rake: any, index: number) => (
                             <TableRow
                             key={index}
-                            sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                            sx={{ '&:last-child td, &:last-child th': { border: 0 }, backgroundColor: selectedRake && selectedRake.rake_id === rake.rake_id ? '#F0F3F9' : 'inherit' }}
                             className='table-rows-container'
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleRakeSelection(rake);
+                            }}
                             >
-                              <TableCell align="left" className="captive-rake-rows" style={{paddingLeft: '32px'}}>{rake.rake_id}</TableCell>
-                              {/* <TableCell align="left" className="captive-rake-rows">{rake.name}</TableCell> */}
-                              <TableCell align="left" className="captive-rake-rows" style={{paddingRight: '32px'}}>{rake.fnr_no}</TableCell>
+                              <TableCell align="left" className="captive-rake-rows" style={{fontWeight: selectedRake && selectedRake.rake_id === rake.rake_id ? "bold" : 'inherit'}}>{rake.rake_id}</TableCell>
+                              <TableCell align="center" className="captive-rake-rows" style={{paddingRight: '24px'}}>
+                                {rake.hours ? rake.hours : 'N/A'}
+                              </TableCell>
+                              <TableCell align="left" className="captive-rake-rows" style={{fontWeight: selectedRake && selectedRake.rake_id === rake.rake_id ? "bold" : 'inherit'}}>{rake.fnr_no}</TableCell>
                             </TableRow>
                             ))}
                           </TableBody>
@@ -485,7 +569,11 @@ const MapLayers = () => {
                   <>
                   <MarkerClusterGroup chunkedLoading iconCreateFunction={createClusterCustomIconInTransit}>
                   {/* Mapping through the markers */}
-                    {showAllRakes && allRakesPositions.map((rake:any, index: number) => <Marker key={index} position={rake.coords} icon={customIcon}>
+                    {showAllRakes && allRakesPositions.map((rake:any, index: number) => <Marker key={index} position={rake.coords} icon={customIcon} ref={(el) => {
+                      if (selectedRake && selectedRake.name === rake.data.title) {
+                        selectedMarkerRef.current = el;
+                      }
+                      }}>
                       <Popup>
                         <h3 style={{marginTop: '1em', marginBottom: "1em"}}>Rake Scheme ID: {rake.data.title}</h3>
                         <hr></hr>
@@ -495,7 +583,11 @@ const MapLayers = () => {
                   </MarkerClusterGroup>
                   <MarkerClusterGroup chunkedLoading iconCreateFunction={createClusterCustomIconIdle}>
                   {/* Mapping through the markers */}
-                    {showAllRakes && allIdleRakes.map((rake:any, index: number) => <Marker key={index} position={rake.coords} icon={customIconIdle}>
+                    {showAllRakes && allIdleRakes.map((rake:any, index: number) => <Marker key={index} position={rake.coords} icon={customIconIdle} ref={(el) => {
+                      if (selectedRake && selectedRake.name === rake.data.title) {
+                        selectedMarkerRef.current = el;
+                      }
+                      }}>
                       <Popup>
                         <h3 style={{marginTop: '1em', marginBottom: "1em"}}>Rake Scheme ID: {rake.data.title}</h3>
                         <hr></hr>
