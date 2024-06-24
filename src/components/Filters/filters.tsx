@@ -103,7 +103,6 @@ function Filters({ onToFromChange, setStatusForShipment }: any) {
         }
     }, [startDate, endDate, error]);
 
-    console.log(status)
 
     return (
         <div style={{ display: 'flex', gap: 20, overflowX: 'auto', position: 'relative' , overflowY:'visible'}} >

@@ -301,7 +301,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
         if (statusForShipment === 'All') {
             setResponse(resData)
         } else {
-            const filteredData = resData.filter(shipment => shipment.status.name === statusForShipment);
+            const filteredData = resData.filter((shipment: any) => shipment.status.name === statusForShipment);
             console.log(filteredData)
             setResponse(filteredData)
         }
