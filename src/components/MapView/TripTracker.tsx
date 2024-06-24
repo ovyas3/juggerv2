@@ -1,6 +1,6 @@
 'use client'
 import './tripTracker.css'
-import { Icon, latLngBounds } from 'leaflet';
+import { Icon, icon, latLngBounds } from 'leaflet';
 import { Box, Grid, Button, IconButton, useMediaQuery, CardContent, CardMedia, ButtonBase, FormControlLabel, FormGroup, Switch } from "@mui/material";
 import { MapContainer, Marker, Popup, Polyline, LayersControl, TileLayer } from 'react-leaflet';
 import React, { useEffect, useRef, useState } from "react";
@@ -52,7 +52,7 @@ const TripTracker = (params: any) => {
   const [activityData, setActivityData] = useState([]);
   const [currentLocation, setCurrentLocation] = useState<any>({});
   const [track, setTrack] = useState<any>([])
-  const [newGPSTrack, setNewGPSTrack] = useState<any>([]);
+  const [estimatedTrack, setEstimatedTrack] = useState<any>([]);
   const handleFoisCheck = (e: any) => {
     setShowFoisTracks(e.target.checked);
   }
@@ -72,6 +72,18 @@ const TripTracker = (params: any) => {
     iconAnchor: [15, 30], // Anchor point of the icon, usually half of the size
     popupAnchor: [0, -32], // Point from which the popup should open relative to the iconAnchor
   });
+  const pickup = new Icon({
+    iconUrl: '/assets/pickup_icon.svg',
+    iconSize: [14, 14], 
+    iconAnchor: [7, 14], 
+    popupAnchor: [0, -32], 
+  })
+  const drop = new Icon({
+    iconUrl: '/assets/drop_icon.svg',
+    iconSize: [14, 14], 
+    iconAnchor: [7, 14], 
+    popupAnchor: [0, -32],
+  })
   const fetchData = () => {  
     const {
       rakeData,
@@ -85,7 +97,7 @@ const TripTracker = (params: any) => {
 
     const tripTrackerLine1 = rakeData ? rakeData.polyline || '' : '';
     const decodeline = polyline.decode(tripTrackerLine1) || [];
-    setNewGPSTrack(decodeline);
+    setEstimatedTrack(decodeline);
     // remove tracks if currentStatus is empty or its misisng geo_point ir if geo_point.coordinates is empty or if its length is less than 2 or if geo_point.coordinates ==[0, 0]
     const tracksWithStatus = tracks.filter((track: any) => {
       if (!track.currentStatus || track.currentStatus === '') {
@@ -156,6 +168,12 @@ const TripTracker = (params: any) => {
                 {/* <Polygon pathOptions={{ color: 'blue' }} positions={pickupgeofence_decoded} /> */}
                 { showFoisTracks &&  renderMarkers(tracking_data, customIcon)}
                 { showGPSTracks &&  track.length && <Polyline pathOptions={{ color:'red'}} positions={track} />}
+                { estimatedTrack.length && <Polyline pathOptions={{ color:'black'}}  positions={estimatedTrack}/> }
+                { estimatedTrack.length &&
+                <>
+                  <Marker position={estimatedTrack[0]} icon={drop}></Marker>
+                  <Marker position={estimatedTrack[estimatedTrack.length - 1]} icon={pickup}></Marker>
+                </>}
                 { showFoisTracks &&  trackingLine.length && <Polyline pathOptions={{ color:'red'}} positions={trackingLine} />}
                 { showFoisTracks && <Marker position={[currentLocation.geo_point.coordinates[1], currentLocation.geo_point.coordinates[0]]} icon={currentTrainLocation}>
                   <Popup>
