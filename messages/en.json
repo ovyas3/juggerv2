@@ -37,7 +37,6 @@
     "outbound":"Outbound",
     "submit":"Submit",
     "attach":"Attach",
-<<<<<<< HEAD
     "edemand":"E demand",
     "contact":"Contact",
     "share":"Share",
@@ -46,9 +45,6 @@
     "inplant":"In Plant"
 
 
-=======
-    "edemand":"E demand"
->>>>>>> f421230ea229d1d03ae7ad221ed1a724dde00886
   },
   "DRAWER":{
     "shipments":"shipments",
