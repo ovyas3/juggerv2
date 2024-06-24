@@ -69,7 +69,7 @@ const TripTracker = (params: any) => {
     const {
       rakeData,
       tracks,
-    } = trip_tracker_data;
+    } = trip_tracker_data || {};
     setFnrData(rakeData);
     // remove tracks if currentStatus is empty or its misisng geo_point ir if geo_point.coordinates is empty or if its length is less than 2 or if geo_point.coordinates ==[0, 0]
     const tracksWithStatus = tracks.filter((track: any) => {
