@@ -37,10 +37,18 @@ import SideDrawer from "@/components/Drawer/Drawer";
 import Header from "@/components/Header/header";
 
 import { DateTime } from "luxon";
+import service from "@/utils/timeService";
 
 // Custom Icons
 const customIcon = L.icon({
-  iconUrl: "/assets/train_on_map_icon.svg",
+  iconUrl: "/assets/train_on_map_icon_in_transit.svg",
+  iconSize: [38, 38], // adjust icon size as needed
+  iconAnchor: [19, 38], // adjust anchor point as needed
+  popupAnchor: [0, -38] // adjust popup anchor as needed
+});
+
+const customIconIdle = L.icon({
+  iconUrl: "/assets/train_on_map_icon_idle.svg",
   iconSize: [38, 38], // adjust icon size as needed
   iconAnchor: [19, 38], // adjust anchor point as needed
   popupAnchor: [0, -38] // adjust popup anchor as needed
@@ -49,6 +57,13 @@ const customIcon = L.icon({
 const createClusterCustomIconInTransit = function (cluster: any) {
   return divIcon({
     html: `<span class="cluster-icon-in-transit">${cluster.getChildCount()}</span>`,
+    className: "custom-marker-cluster",
+    iconSize: point(33, 33, true)
+  });
+};
+const createClusterCustomIconIdle = function (cluster: any) {
+  return divIcon({
+    html: `<span class="cluster-icon-idle">${cluster.getChildCount()}</span>`,
     className: "custom-marker-cluster",
     iconSize: point(33, 33, true)
   });
@@ -69,6 +84,7 @@ const MapLayers = () => {
     const [showStations, setShowStations] = useState(false);
     const [showRouteFor, setShowRouteFor] = useState<any>(null);
     const [allStations, setAllStations] = useState([]);
+    const [allIdleRakes, setAllIdleRakes] = useState<any>([]);
     const [showAllRakes, setShowAllRakes] = useState(false);
     const [allRakesPositions, setAllRakesPositions] = useState<any>([]);
     const [list, setList] = useState<any>([]);
@@ -124,7 +140,7 @@ const MapLayers = () => {
                 "rake_id": data.rake_id,
                 "geo_point": data.rake_updates.geo_point,
                 "time_stamp": {
-                  "$date": data.rake_updates.updated_at
+                  "$date": data.rake_updates.gps_updated_at
                 }
               }
             );
@@ -180,17 +196,28 @@ const MapLayers = () => {
 
     const allLastLocationForAll = () => {
       let allLocations = [];
+      let allIdleRakes = []; 
       for (let key in coords) {
         const sortedData = coords[key].sort((a:any, b:any) => a.time_stamp - b.time_stamp);
         const lastCords = sortedData[0];
        if(lastCords.geo_point && lastCords.geo_point.coordinates && lastCords.geo_point.coordinates[0] && lastCords.geo_point.coordinates[1] && lastCords.time_stamp && lastCords.time_stamp.$date) {
-        allLocations.push({
-          data: {
-            title: key,
-            ts: DateTime.fromJSDate(new Date(lastCords.time_stamp.$date)).toFormat('dd/MM/yyyy HH:mm')
-          },
-          coords: [lastCords.geo_point.coordinates[1], lastCords.geo_point.coordinates[0]]
-        });
+        if (service.differenceToday(lastCords.time_stamp.$date, 3, 'hours') < 1) {
+          allIdleRakes.push({
+            data: {
+              title: key,
+              ts: DateTime.fromJSDate(new Date(lastCords.time_stamp.$date)).toFormat('dd/MM/yyyy HH:mm')
+            },
+            coords: [lastCords.geo_point.coordinates[1], lastCords.geo_point.coordinates[0]]
+          });
+        } else {
+          allLocations.push({
+            data: {
+              title: key,
+              ts: DateTime.fromJSDate(new Date(lastCords.time_stamp.$date)).toFormat('dd/MM/yyyy HH:mm')
+            },
+            coords: [lastCords.geo_point.coordinates[1], lastCords.geo_point.coordinates[0]]
+          });
+        }
        }
       }
       const allRakesData = [];
@@ -211,6 +238,7 @@ const MapLayers = () => {
       console.log('All Rakes Data:', allRakesData);
       console.log('All Locations:', allLocations);
       setAllRakesPositions(allLocations);
+      setAllIdleRakes(allIdleRakes);
       setShowAllRakes(true);
       setList(allRakesData);
     }
@@ -332,7 +360,15 @@ const MapLayers = () => {
                           </div>
                           <div className="tracking-status">
                             <div className="tracking-number">
-                              {list.length - allRakesPositions.length}
+                              {allIdleRakes.length}
+                            </div>
+                            <div className="tracking-text" style={{color: '#FF981A'}}>
+                              Idle
+                            </div>
+                          </div>
+                          <div className="tracking-status">
+                            <div className="tracking-number">
+                              {list.length - allRakesPositions.length - allIdleRakes.length}
                             </div>
                             <div className="tracking-text" style={{color: '#E6667B'}}>
                               Non Tracking
@@ -448,10 +484,9 @@ const MapLayers = () => {
                       <h4 style={{marginTop: '1em', marginBottom: "1em"}}>Last Updated At: {cr.data.ts}</h4>
                     </Popup>
                   </Marker>)}
-                  {showAllRakes && <MarkerClusterGroup
-                    chunkedLoading
-                    iconCreateFunction={createClusterCustomIconInTransit}
-                  >
+                  {showAllRakes &&
+                  <>
+                  <MarkerClusterGroup chunkedLoading iconCreateFunction={createClusterCustomIconInTransit}>
                   {/* Mapping through the markers */}
                     {showAllRakes && allRakesPositions.map((rake:any, index: number) => <Marker key={index} position={rake.coords} icon={customIcon}>
                       <Popup>
@@ -460,7 +495,19 @@ const MapLayers = () => {
                         <h4 style={{marginTop: '1em', marginBottom: "1em"}}>Last Updated At: {rake.data.ts}</h4>
                       </Popup>
                     </Marker>)}
-                  </MarkerClusterGroup>}
+                  </MarkerClusterGroup>
+                  <MarkerClusterGroup chunkedLoading iconCreateFunction={createClusterCustomIconIdle}>
+                  {/* Mapping through the markers */}
+                    {showAllRakes && allIdleRakes.map((rake:any, index: number) => <Marker key={index} position={rake.coords} icon={customIconIdle}>
+                      <Popup>
+                        <h3 style={{marginTop: '1em', marginBottom: "1em"}}>Rake Scheme ID: {rake.data.title}</h3>
+                        <hr></hr>
+                        <h4 style={{marginTop: '1em', marginBottom: "1em"}}>Last Updated At: {rake.data.ts}</h4>
+                      </Popup>
+                    </Marker>)}
+                  </MarkerClusterGroup>
+                  </>
+                  }
           
                 </MapContainer>
               </Box>
@@ -470,81 +517,5 @@ const MapLayers = () => {
       </div>
     );
 }
-
-{/* 
-<Grid style={{
-      position: 'absolute',
-      height:'80%',
-      width: '350px',
-      background: 'white',
-      left: '70px',
-      top: '8%',
-      overflowX: 'auto',
-      zIndex:10
-    }}  >
-      
-    </Grid><Grid>
-        <h3 style={{marginLeft:'10px', marginTop: '1em', marginBottom: '1em'}}>Filters</h3>
-        <div style={{ borderBottom: '0.1px solid lightgrey',margin:'5px'}}>
-          <FormControl component="fieldset">
-            <FormGroup>
-              <FormControlLabel
-                control={<Switch checked={showTracks} onChange={() => setShowTracks(!showTracks)} />}
-                label="Show All Tracks"
-                labelPlacement="start"
-              />
-            </FormGroup>
-            <FormGroup>
-                <FormControlLabel
-                  control={<Switch checked={showAllRakes} onChange={() => setShowAllRakes(!showAllRakes)} />}
-                  label="Show All Rakes"
-                  labelPlacement="start"
-                />
-              </FormGroup>
-          </FormControl>
-        </div>
-        <div style={{ borderBottom: '0.1px solid lightgrey',margin:'5px'}}>
-            <div style={{margin:'5px'}}>Total Rakes: {list.length}</div>
-            <div style={{margin:'5px'}}>Currently Tracking: {allRakesPositions.length}</div>
-        </div>
-        {
-           list.length && list.map((item: any, index: number)=>{
-              return (
-                <div
-                  key={index}
-                  style={{
-                    backgroundColor: item.tracking ? "#F1F1F1" : "lightgray",
-                    marginInline: "5px",
-                    marginBlock: "7px",
-                    padding: "3px 13px",
-                    borderRadius: "5px",
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    fontSize: "15px",
-                    overflowX: "auto",
-                  }}
-                >
-                  <div className="details">
-                    <div>
-                      <b>Rake ID:</b> {item.title}
-                    </div>
-                  </div>
-                  <FormControlLabel
-                    disabled={!item.tracking}
-                    control={
-                      <Switch
-                        checked={showRouteFor === item.title}
-                        onChange={() => handleApiByWagonNo(item.title)}
-                      />
-                    }
-                    label="Show Route"
-                    labelPlacement="start"
-                  />
-                </div>
-              );
-            })
-          }
-</Grid> */}
 
 export default MapLayers;

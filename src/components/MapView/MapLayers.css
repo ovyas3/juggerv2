@@ -41,7 +41,7 @@
   box-shadow: 0 0 0px 10px #334FFC61;
 }
 
-.cluster-icon-in-transit {
+.cluster-icon-idle {
   background-color: #FF981A;
   height: 2em;
   width: 2em;
@@ -52,6 +52,19 @@
   border-radius: 50%;
   font-size: 1.2rem;
   box-shadow: 0 0 0px 10px #FF981A61;
+}
+
+.cluster-icon-in-transit {
+  background-color: #18BE8A;
+  height: 2em;
+  width: 2em;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 1.2rem;
+  box-shadow: 0 0 0px 10px #18be8980;
 }
 
 .removePadding {
