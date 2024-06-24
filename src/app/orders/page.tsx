@@ -22,11 +22,8 @@ const OrdersPage = () => {
   const [rakeCaptiveList, setRakeCaptiveList] = useState([]);
 
   const [reload, setReload] = useState(false)
-<<<<<<< HEAD
   const [statusForShipment, setStatusForShipment] = useState('All')
-=======
   const [reloadOnHeaderChange, setReloadOnHeaderChange] = useState(false);
->>>>>>> f421230ea229d1d03ae7ad221ed1a724dde00886
 
 
   //shipment payload
@@ -73,16 +70,13 @@ const OrdersPage = () => {
     getCaptiveRake();
   }, [])
 
-<<<<<<< HEAD
   useEffect(() => {
     if (ShipmentsPayload.from && ShipmentsPayload.to) getAllShipment();
   }, [ShipmentsPayload])
 
 
   // console.log(statusForShipment)
-=======
   if(reloadOnHeaderChange) getAllShipment();
->>>>>>> f421230ea229d1d03ae7ad221ed1a724dde00886
 
   return (
     <div  >
