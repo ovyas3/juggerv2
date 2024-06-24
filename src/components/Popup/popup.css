@@ -2,251 +2,30 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
 
 /* Parent Modal Styles */
-.dialog-styles{
-  font-family: 'Plus Jakarta Sans', sans-serif;
-}
-
-.dialog-styles .dialog-container {
-  position: relative;
-  display: inline-block;
-  border-radius: 12px !important;
-  overflow-y: unset;
-  height: 100%;
-}
-
 .dialog-container {
   position: relative;
   display: inline-block;
   border-radius: 12px !important;
   overflow-y: unset;
-}
-
-.dialog-styles .MuiDialog-container .MuiDialog-paper{
-  border-radius: 12px !important;
-  max-width: 1019px !important;
-  min-height: 600px !important;
-  overflow-y: unset;
-}
-
-.dialog-styles .upper-container{
-  display: flex;
-  flex-direction: row;
-  gap: 32px;
-}
-
-.upper-container{
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-}
-
-.dialog-styles .close-icon{
-  position: absolute;
-  top: -40px;
-  right: -2px;
-  cursor: pointer;
-  z-index: 1000;
-}
-
-.dialog-styles .upper-containers {
-  padding: 24px 32px 24px 24px;
-
-  .title {
-    font-size: 16px;
-    color: #42454E;
-  }
-  .number {
-    font-size: 28px;
-    color: #131722;
-    font-weight: bold;
-    padding-top: 6px;
-  }
-  .description {
-    font-size: 14px;
-    color: #71747A;
-    padding-left: 14px;
-    padding-top: 28px;
-  }
-  .row {
-    display: flex;
-    flex-direction: row;
-
-    .sub-title {
-      font-size: 12px;
-      color: #42454E;
-    }
-
-    .sub-number {
-      font-size: 16px;
-      color: #131722;
-      font-weight: bold;
-    }
-    
-    .sub-number-top {
-      font-size: 16px;
-      color: #131722;
-      font-weight: bold;
-      padding-top: 4px;
-    }
-  }
-}
-
-.upper-containers {
-  padding: 24px 8px 24px 4px;
-
-  .title {
-    font-size: 16px;
-    color: #42454E;
-  }
-  .number {
-    font-size: 28px;
-    color: #131722;
-    font-weight: bold;
-    padding-top: 6px;
-  }
-  .description {
-    font-size: 14px;
-    color: #71747A;
-    padding-left: 14px;
-    padding-top: 28px;
-  }
-  .row {
-    display: flex;
-    flex-direction: row;
-
-    .sub-title {
-      font-size: 12px;
-      color: #42454E;
-    }
-
-    .sub-number {
-      font-size: 16px;
-      color: #131722;
-      font-weight: bold;
-    }
-    
-    .sub-number-top {
-      font-size: 16px;
-      color: #131722;
-      font-weight: bold;
-      padding-top: 4px;
-    }
-  }
-}
-
-.dialog-styles .lower-conatiner{
-  background-color: #F8F8F8;
-  padding: 24px;
-  border-radius: 0 0 12px 12px;
-
-  .table-container{
-    border: 1px solid #DFE3EB;
-    border-radius: 12px;
-  }
-
-  .MuiTable-root .MuiTableBody-root .MuiTableRow-root:hover{
-    cursor: pointer;
-    background-color: #F0F3F9;
-  }
-
-  .MuiTableHead-root .table-columns{
-    color: #42454E;
-    font-size: 12px;
-    font-weight: 600;
-    padding-top: 12.5px;
-    padding-bottom: 12.5px;
-  }
-
-  .MuiTableBody-root  .table-rows{
-    color: #42454E;
-    font-size: 12px;
-    font-weight: normal;
-    padding-top: 26px;
-    padding-bottom: 26px;
-    padding-left: 18px;
-    border-bottom: 1px solid #DFE3EB;
-  }
-
-  .MuiTableBody-root .table-rows:first-child{
-    text-align: center;
-    text-decoration: underline;
-    font-family: "Inter", sans-serif;
-    font-size: 14px;
-    font-weight: 600;
-    letter-spacing: 0px;
-    color: #334FFC;
-  }
-
-  .MuiFormControl-root input{
-    width: 106px;
-    height: 24px;
-    border: 1px solid #DFE3EB;
-    border-radius: 4px;
-    padding: 0 4px 0 6px;
-    font-size: 12px;
-    color: #42454E;
-    font-weight: 600;
-    font-family: "Inter", sans-serif;
-  }
-
-  .my-label-class.my-label-class {
-    transition: transform 0.2s ease-out, color 0.2s ease-out;
-  }
-  
-  .MuiFormControl-root label.my-label-class.my-label-class {
-    font-size: 12px;
-    color: #42454E;
-    font-weight: 600;
-    font-family: "Inter", sans-serif;
-    position: absolute;
-    left: 6px;
-    top: 2px;
-  }
-  
-  .MuiFormControl-root .mui-14s5rfu-MuiFormLabel-root-MuiInputLabel-root {
-    transform: translateY(5px);
-    font-size: 10px;
-    color: #888;
-    line-height: 1em; 
-    letter-spacing: 0.00938em;
-  }
-
-  .select-container .MuiFormControl-root .MuiInputBase-root .MuiSelect-select{
-    width: 111px;
-    height: 24px;
-    border: 1px solid #DFE3EB;
-    border-radius: 4px;
-    padding: 0 4px 0 6px;
-    font-size: 12px;
-    color: #42454E;
-    font-weight: 600;
-    font-family: "Inter", sans-serif;
-  }
-
-  .select-container .MuiFormControl-root label {
-    font-size: 12px;
-    color: #42454E;
-    font-weight: 600;
-    font-family: "Inter", sans-serif;
-    position: absolute;
-    left: 6px;
-    top: 2px;
-  }
-
-  .select-container .MuiFormControl-root .MuiInputBase-root .mui-hfutr2-MuiSvgIcon-root-MuiSelect-icon {
-    color: rgba(0, 0, 0);
-    font-size: 1.3em;
-  }
+  margin-top: 48px;
+  width: 100%;
+  padding-right: 24px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
 }
 
 .lower-conatiner{
-  background-color: #F8F8F8;
-  padding: 24px;
+  padding: 12px;
   /* border-radius: 0 0 12px 12px; */
 
-  .table-container{
+  .MuiPaper-root{
+    box-shadow: none;
+    height: 500px;
     border: 1px solid #DFE3EB;
-    border-radius: 12px;
+    border-radius: 6px;
+  }
+
+  .MuiTable-root{
+    min-width: 650px !important;
   }
 
   .MuiTable-root .MuiTableBody-root .MuiTableRow-root:hover{
@@ -258,32 +37,31 @@
     color: #42454E;
     font-size: 12px;
     font-weight: 600;
-    padding-top: 12.5px;
-    padding-bottom: 12.5px;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    line-height: 16px;
   }
 
   .MuiTableBody-root  .table-rows{
     color: #42454E;
     font-size: 12px;
     font-weight: normal;
-    padding-top: 26px;
-    padding-bottom: 26px;
-    padding-left: 18px;
+    padding: 24px 12px 24px 12px;
     border-bottom: 1px solid #DFE3EB;
   }
 
-  .MuiTableBody-root .table-rows:first-child{
-    padding-left: 20px;
-    .rake-id{
+  .MuiTableBody-root .table-rows:first-child {
+    padding-left: 14px;
+  .rake-id{
       text-decoration: underline;
       font-family: "Inter", sans-serif;
-      font-size: 14px;
+      font-size: 12px;
       font-weight: 600;
       letter-spacing: 0px;
       color: #334FFC ;
       padding-bottom: 2px;
-    }
   }
+}
 
   .MuiFormControl-root input{
     width: 106px;
@@ -311,7 +89,7 @@
     top: 2px;
   }
   
-  .MuiFormControl-root .mui-14s5rfu-MuiFormLabel-root-MuiInputLabel-root {
+  .MuiFormControl-root label.my-label-class.my-label-class {
     transform: translateY(5px);
     font-size: 10px;
     color: #888;
@@ -320,7 +98,7 @@
   }
 
   .select-container .MuiFormControl-root .MuiInputBase-root .MuiSelect-select{
-    width: 111px;
+    width: 108px;
     height: 24px;
     border: 1px solid #DFE3EB;
     border-radius: 4px;
@@ -331,17 +109,7 @@
     font-family: "Inter", sans-serif;
   }
 
-  .select-container .MuiFormControl-root label {
-    font-size: 12px;
-    color: #42454E;
-    font-weight: 600;
-    font-family: "Inter", sans-serif;
-    position: absolute;
-    left: 6px;
-    top: 2px;
-  }
-
-  .select-container .MuiFormControl-root .MuiInputBase-root .mui-hfutr2-MuiSvgIcon-root-MuiSelect-icon {
+  .select-container .MuiFormControl-root .MuiInputBase-root .MuiSvgIcon-root {
     color: rgba(0, 0, 0);
     font-size: 1.3em;
   }
@@ -363,8 +131,8 @@
 
 .child-dialog-styles .MuiDialog-container .MuiDialog-paper{
   border-radius: 12px !important;
-  max-width: 750px !important;
-  min-height: 620px !important;
+  width: 100% !important;
+  min-height: 40%;
   overflow-y: unset;
 }
 
@@ -401,9 +169,15 @@
   padding: 24px;
   border-radius: 0 0 12px 12px;
 
-  .table-container{
+  .MuiPaper-root{
+    box-shadow: none;
+    height: 450px;
     border: 1px solid #DFE3EB;
     border-radius: 12px;
+  }
+
+  .MuiTable-root{
+    min-width: 650px !important;
   }
 
   .MuiTable-root .MuiTableBody-root .MuiTableRow-root:hover{
@@ -415,9 +189,7 @@
     color: #42454E;
     font-size: 12px;
     font-weight: 600;
-    padding-top: 12.5px;
-    padding-bottom: 12.5px;
-    padding-left: 26px;
+    padding: 12.5px 0px 12.5px 26px;
   }
 
   .MuiTableHead-root .table-columns:first-child{
@@ -487,7 +259,7 @@
     top: 2px;
   }
   
-  .MuiFormControl-root .mui-14s5rfu-MuiFormLabel-root-MuiInputLabel-root {
+  .MuiFormControl-root label.my-label-class.my-label-class {
     transform: translateY(5px);
     font-size: 10px;
     color: #888;
@@ -507,19 +279,291 @@
     font-family: "Inter", sans-serif;
   }
 
-  .select-container .MuiFormControl-root label {
-    font-size: 12px;
-    color: #42454E;
-    font-weight: 600;
-    font-family: "Inter", sans-serif;
-    position: absolute;
-    left: 6px;
-    top: 2px;
-  }
-
-  .select-container .MuiFormControl-root .MuiInputBase-root .mui-hfutr2-MuiSvgIcon-root-MuiSelect-icon {
+  .MuiSelect-icon  {
     color: rgba(0, 0, 0);
     font-size: 1.3em;
+  }
+}
+
+
+@media screen and (max-width: 1240px) {
+  .dialog-container {
+    padding-right: 16px;
+  }
+
+  .lower-conatiner{
+    padding: 16px;
+  }
+}
+
+
+@media screen and (max-width: 1160px) {
+  .dialog-container {
+    padding-right: 12px;
+    margin-top: 12px;
+
+  }
+
+  .lower-conatiner{
+    padding: 12px;
+
+    .MuiTable-root{
+      min-width: 500px !important;
+    }
+
+    .MuiTableHead-root .table-columns{
+      padding-top: 10px;
+      padding-bottom: 10px;
+    }
+
+    .MuiTableBody-root  .table-rows{
+      padding: 20px 16px 20px 16px;
+    }
+
+    .MuiFormControl-root input{
+      width: 100px;
+      height: 24px;
+    }
+
+    .select-container .MuiFormControl-root .MuiInputBase-root .MuiSelect-select{
+      width: 100px;
+      height: 24px;
+    }
+
+    .MuiTableBody-root .table-rows:first-child {
+      padding-left: 10px;
+      .rake-id{
+      font-size: 12px;
+    }
+  }
+
+    .MuiFormControl-root label.my-label-class.my-label-class {
+      font-size: 10px;
+    }
+  }
+
+  .child-dialog-styles .child-lower-container {
+    .MuiPaper-root{
+      height: 350px;
+    }
+  }
+}
+
+@media screen and (max-width: 950px){
+  .dialog-container {
+    padding-right: 0px;
+    margin-top: 12px;
+  }
+
+  .lower-conatiner{
+    padding: 8px;
+
+    .MuiTable-root{
+      min-width: 400px !important;
+    }
+
+    .MuiTableHead-root .table-columns{
+      padding-top: 8px;
+      padding-bottom: 8px;
+    }
+
+    .MuiTableBody-root  .table-rows{
+      padding: 16px 12px 16px 12px;
+    }
+
+    .MuiFormControl-root input{
+      width: 90px;
+      height: 24px;
+    }
+
+    .select-container .MuiFormControl-root .MuiInputBase-root .MuiSelect-select{
+      width: 90px;
+      height: 24px;
+    }
+
+    .MuiTableBody-root .table-rows:first-child {
+      padding-left: 6px;
+      .rake-id{
+      font-size: 10px;
+    }
+  }
+
+    .MuiFormControl-root label.my-label-class.my-label-class {
+      font-size: 8px;
+    }
+  }
+
+  .child-dialog-styles .child-upper-containers {
+    padding: 20px 28px 20px 20px;
+
+    .title {
+      font-size: 14px;
+    }
+  
+    .number {
+      font-size: 22px;
+    }
+  }
+
+  .child-dialog-styles .child-lower-container {
+    padding: 22px;
+
+    .MuiTableHead-root .table-columns{
+      padding: 12px 0px 12px 24px;
+    }
+
+    .MuiTableHead-root .table-columns:last-child{
+      padding-right: 48px;
+    }
+
+    .MuiTableBody-root .table-rows:first-child{
+      font-size: 13px;
+      padding-left: 24px;
+    }
+
+    .MuiTableBody-root .table-rows:nth-child(2){
+      padding-left: 36px;
+      padding-right: 0px;
+    }
+  
+    .MuiTableBody-root .table-rows:last-child{
+      padding-left: 38px;
+    }
+
+    .MuiFormControl-root input{
+      width: 100px;
+    }
+
+    .select-container .MuiFormControl-root .MuiInputBase-root .MuiSelect-select{
+      width: 106px;
+    }
+  }
+}
+
+@media screen and (max-width: 810px){
+  .dialog-container {
+    padding-right: 0px;
+  }
+
+  .lower-conatiner{
+    padding: 8px;
+
+    .MuiTable-root{
+      min-width: 300px !important;
+    }
+
+    .MuiTableHead-root .table-columns{
+      padding-top: 8px;
+      padding-bottom: 8px;
+    }
+
+    .MuiTableBody-root  .table-rows{
+      padding: 14px 8px 14px 8px;
+    }
+
+    .MuiFormControl-root input{
+      width: 80px;
+      height: 24px;
+    }
+
+    .select-container .MuiFormControl-root .MuiInputBase-root .MuiSelect-select{
+      width: 80px;
+      height: 24px;
+    }
+
+    .MuiTableBody-root .table-rows:first-child .rake-id{
+      font-size: 10px;
+    }
+
+    .MuiFormControl-root label.my-label-class.my-label-class {
+      font-size: 8px;
+    }
+  }
+
+  .child-dialog-styles .MuiDialog-container .MuiDialog-paper{
+    width: 70% !important;
+    min-height: 30%;
+  }
+
+  .child-dialog-styles .child-upper-containers {
+    flex-direction: column;
+  }
+
+  .child-dialog-styles .child-upper-containers {
+    padding: 18px 24px 18px 18px;
+
+    .title {
+      font-size: 13px;
+    }
+  
+    .number {
+      font-size: 20px;
+    }
+  }
+
+  .child-dialog-styles .child-lower-container {
+    padding: 20px;
+
+    .MuiTableHead-root .table-columns{
+      padding: 10px 0px 10px 20px;
+    }
+
+    .MuiTableHead-root .table-columns:last-child{
+      padding-right: 42px;
+    }
+
+    .MuiTableBody-root .table-rows:first-child{
+      font-size: 12px;
+      padding-left: 20px;
+    }
+
+    .MuiTableBody-root .table-rows:nth-child(2){
+      padding-left: 32px;
+      padding-right: 0px;
+    }
+  
+    .MuiTableBody-root .table-rows:last-child{
+      padding-left: 34px;
+    }
+  }
+}
+
+@media screen and (max-width: 768px){
+  .child-dialog-styles .child-upper-containers {
+    padding: 16px 20px 16px 16px;
+
+    .title {
+      font-size: 12px;
+    }
+  
+    .number {
+      font-size: 16px;
+    }
+  }
+
+  .child-dialog-styles .child-lower-container {
+    padding: 16px;
+
+    .MuiTableHead-root .table-columns{
+      padding: 8px 0px 8px 16px;
+    }
+
+    .MuiTableHead-root .table-columns:last-child{
+      padding-right: 36px;
+    }
+
+    .MuiTableBody-root .table-rows:first-child{
+      padding-left: 16px;
+    }
+
+    .MuiTableBody-root .table-rows:nth-child(2){
+      padding-left: 26px;
+      padding-right: 0px;
+    }
+  
+    .MuiTableBody-root .table-rows:last-child{
+      padding-left: 28px;
+    }
   }
 }
 

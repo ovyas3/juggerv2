@@ -1,0 +1,8 @@
+<svg id="map_view_icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+  <path id="Path_17109" data-name="Path 17109" d="M0,0H16V16H0Z" fill="none"/>
+  <path id="Path_17110" data-name="Path 17110" d="M8.994,13.652l-2-1-4,2V6L7,4l4,2,4-2V8.66" transform="translate(-0.994 -1.325)" fill="none" stroke="#131722" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.25"/>
+  <path id="Path_17111" data-name="Path 17111" d="M9,4v8.693" transform="translate(-3 -1.343)" fill="none" stroke="#131722" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.25"/>
+  <path id="Path_17112" data-name="Path 17112" d="M15,7v3.344" transform="translate(-5 -2.337)" fill="none" stroke="#131722" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.25"/>
+  <path id="Path_17113" data-name="Path 17113" d="M19.424,18.424a2.006,2.006,0,1,0-2.837,0q.419.42,1.418,1.256Q19.06,18.788,19.424,18.424Z" transform="translate(-5.35 -5.018)" fill="none" stroke="#18be8a" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.25"/>
+  <path id="Path_17114" data-name="Path 17114" d="M19,18v.007" transform="translate(-6.333 -6)" fill="none" stroke="#131722" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.25"/>
+</svg>
