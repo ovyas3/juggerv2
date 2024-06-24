@@ -132,6 +132,7 @@
 .body_destination{
     /* background-color:violet !important; */
     padding-right: 10px !important;
+    max-width: 150px;
 }
 .body_material{
     /* background-color:darkcyan !important; */

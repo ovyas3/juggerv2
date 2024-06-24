@@ -186,7 +186,7 @@ const convertArrayToFilteredArray = (inputArray: any) => {
             is_captive: Boolean,
             trip_tracker: any,
         }) => {
-        const { edemand_no, FNR, allFNRs, delivery_location, trip_tracker, others, remarks, eta, unique_code, status, pickup_date, captive_id, is_captive } = item;
+        const { edemand_no, FNR, allFNRs, delivery_location, trip_tracker, others, remarks, unique_code, status, pickup_date, captive_id, is_captive, eta } = item;
         return {
             _id: item._id,
             edemand: edemand_no,
@@ -207,7 +207,7 @@ const convertArrayToFilteredArray = (inputArray: any) => {
                 name: statusBuilder(status),
                 code: status || ''
             },
-            currentEta: service.utcToist(eta),
+            currentEta: service.utcToist(eta) || 'NA',
             remarks: 'NA',
             handlingAgent: 'NA',
             action: null,
@@ -301,7 +301,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
         if (statusForShipment === 'All') {
             setResponse(resData)
         } else {
-            const filteredData = resData.filter(shipment => shipment.status.name === statusForShipment);
+            const filteredData = resData.filter((shipment: any) => shipment.status.name === statusForShipment);
             console.log(filteredData)
             setResponse(filteredData)
         }
@@ -575,8 +575,8 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                     <div className=''
                                                                         onMouseOver={() => { setDestinationIndex(firstindex) }}
                                                                         onMouseLeave={() => { setDestinationIndex(-1) }}
-                                                                    >{value.code}</div>
-                                                                    <div
+                                                                    >{value.name != 'NA' ? value.name : value.code} ({value.code})</div>
+                                                                    {/* <div
                                                                         style={{
                                                                             opacity: destinationIndex === firstindex ? 1 : 0,
                                                                             position: 'absolute',
@@ -591,7 +591,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                             boxShadow: ' 0px 4px 8px grey',
                                                                             fontWeight: '600'
                                                                         }}
-                                                                    >{value.name}</div>
+                                                                    >{value.c</div> */}
                                                                 </div>
                                                                 : <></>
                                                         }
