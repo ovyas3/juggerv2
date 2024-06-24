@@ -1,185 +1,298 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import Button from '@mui/material/Button';
-import { styled } from '@mui/material/styles';
-import Dialog from '@mui/material/Dialog';
-import DialogContent from '@mui/material/DialogContent';
+import React, { useRef, useState, useEffect } from "react";
+import { styled } from "@mui/material/styles";
+import Dialog from "@mui/material/Dialog";
+import DialogContent from "@mui/material/DialogContent";
 import CloseButtonIcon from "@/assets/close_icon.svg";
-import Image from 'next/image';
+import TrackingIcon from "@/assets/tracking_icon.svg";
+import NonTrackingIcon from "@/assets/non_tracking_icon.svg";
+import LinkIcon from "@/assets/link.svg";
+import ReturnIcon from "@/assets/return_icon.svg";
+import Image from "next/image";
 import "./popup.css";
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
-import TextField from '@mui/material/TextField';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import Select from '@mui/material/Select';
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import Paper from "@mui/material/Paper";
+import TextField from "@mui/material/TextField";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
+import Select from "@mui/material/Select";
+import { Box } from "@mui/material";
 import { httpsGet } from "@/utils/Communication";
+import { styled as muiStyled } from '@mui/material/styles';
+import { title } from "process";
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
-  '& .MuiDialogContent-root': {
+  "& .MuiDialogContent-root": {
     padding: theme.spacing(2),
   },
-  '& .MuiDialogActions-root': {
+  "& .MuiDialogActions-root": {
     padding: theme.spacing(1),
   },
 }));
 
-const data = [
+// const dialogData = [
+//   {
+//    title: "No. of Rakes",
+//    number: filteredNewData ? filteredNewData.length : 0,
+//    description: "No.of captive rakes in each scheme",
+//    subData: [
+//     {
+//       subTitle: "SFTO",
+//       subNumber: filteredNewData ? filteredNewData.filter((item: any) => item.scheme_type === 'SFTO').length : 0,
+//     },
+//     {
+//       subTitle: "GPWIS",
+//       subNumber: filteredNewData ? filteredNewData.filter((item: any) => item.scheme_type === 'GPWIS').length : 0,
+//     },
+//     {
+//       subTitle: "BFNV",
+//       subNumber: filteredNewData ? filteredNewData.filter((item: any) => item.scheme_type === 'BFNV').length : 0,
+//     },
+//   ],
+//   },
   // {
-  //   title: 'No. of Rakes',
-  //   number: '32',
-  //   description: 'No.of captive rakes',
+  //   title: "No. of Wagons",
+  //   number: filteredNewData ? filteredNewData.reduce((acc: number, item: any) => acc + item.no_of_wagons, 0) : 0,
+  //   description: "No.of wagons",
   //   subData: [
   //     {
-  //       subTitle: 'SFTO',
-  //       subNumber: '14'
+  //       subTitle: "SFTO",
+  //       subNumber: filteredNewData ? filteredNewData.filter((item: any) => item.scheme_type === 'SFTO').reduce((acc: number, item: any) => acc + item.no_of_wagons, 0) : 0,
   //     },
   //     {
-  //       subTitle: 'GPWIS',
-  //       subNumber: '12'
+  //       subTitle: "GPWIS",
+  //       subNumber: filteredNewData ? filteredNewData.filter((item: any) => item.scheme_type === 'GPWIS').reduce((acc: number, item: any) => acc + item.no_of_wagons, 0) : 0,
   //     },
   //     {
-  //       subTitle: 'BFNV',
-  //       subNumber: '06'
-  //     }
-  //   ]
-  // }, 
+  //       subTitle: "BFNV",
+  //       subNumber: filteredNewData ? filteredNewData.filter((item: any) => item.scheme_type === 'BFNV').reduce((acc: number, item: any) => acc + item.no_of_wagons, 0) : 0,
+  //     },
+  //   ],
+  // },
+  // {
+  //   title: "No. of Wagons with Remarks",
+  //   number: filteredNewData ? filteredNewData.reduce((acc: number, item: any) => acc + item.wagons.filter((wagon: any) => wagon.remark).length, 0) : 0,
+  //   description: "No.of wagons with remarks", 
+  //   subData: [
+  //     {
+  //       subTitle: "SFTO",
+  //       subNumber: filteredNewData ? filteredNewData.filter((item: any) => item.scheme_type === 'SFTO').reduce((acc: number, item: any) => acc + item.wagons.filter((wagon: any) => wagon.remark).length, 0) : 0,
+  //     },
+  //     {
+  //       subTitle: "GPWIS",
+  //       subNumber: filteredNewData ? filteredNewData.filter((item: any) => item.scheme_type === 'GPWIS').reduce((acc: number, item: any) => acc + item.wagons.filter((wagon: any) => wagon.remark).length, 0) : 0,
+  //     },
+  //     {
+  //       subTitle: "BFNV",
+  //       subNumber: filteredNewData ? filteredNewData.filter((item: any) => item.scheme_type === 'BFNV').reduce((acc: number, item: any) => acc + item.wagons.filter((wagon: any) => wagon.remark).length, 0) : 0,
+  //     },
+  //   ],
+  // }
+// ];
+
+const dialogData = [
   {
-    title: 'No. of Wagons',
-    number: '1720',
-    description: 'No.of wagons',
+    title: "No. of Rakes",
+    number: "32",
+    description: "No.of captive rakes",
     subData: [
       {
-        subTitle: 'SFTO',
-        subNumber: '627'
+        subTitle: "SFTO",
+        subNumber: "14",
       },
       {
-        subTitle: 'GPWIS',
-        subNumber: '729'
+        subTitle: "GPWIS",
+        subNumber: "12",
       },
       {
-        subTitle: 'BFNV',
-        subNumber: '364'
-      }
-    ]
-  }, 
-  {
-    title: 'No. of Wagons with Remarks',
-    number: '79',
-    description: 'No.of wagon with remarks',
-    subData: [
-      {
-        subTitle: 'SFTO',
-        subNumber: '29'
+        subTitle: "BFNV",
+        subNumber: "06",
       },
-      {
-        subTitle: 'GPWIS',
-        subNumber: '30'
-      },
-      {
-        subTitle: 'BFNV',
-        subNumber: '20'
-      }
-    ]
-  }, 
-
-];
-
-const childData = [
-  {
-    title: "Rake ID",
-    number: "18013109984"
+    ],
   },
   {
     title: "No. of Wagons",
-    number: "44"
+    number: "1720",
+    description: "No.of wagons",
+    subData: [
+      {
+        subTitle: "SFTO",
+        subNumber: "627",
+      },
+      {
+        subTitle: "GPWIS",
+        subNumber: "729",
+      },
+      {
+        subTitle: "BFNV",
+        subNumber: "364",
+      },
+    ],
   },
   {
-    title: "Scheme Type",
-    number: "GPWIS"
-  }
+    title: "No. of Wagons with Remarks",
+    number: "79",
+    description: "No.of wagon with remarks",
+    subData: [
+      {
+        subTitle: "SFTO",
+        subNumber: "29",
+      },
+      {
+        subTitle: "GPWIS",
+        subNumber: "30",
+      },
+      {
+        subTitle: "BFNV",
+        subNumber: "20",
+      },
+    ],
+  },
 ];
 
-export const Popup = () => {
-  const [open, setOpen] = useState(false);
+interface PopupProps {
+  data: any;
+}
+
+export const Popup: React.FC<PopupProps> = ({ data }) => {
   const [childOpen, setChildOpen] = useState(false);
   const [parentTableData, setParentTableData] = useState<any>([]);
   const [filteredData, setFilteredData] = useState<any>([]);
   const [schemeType, setSchemeType] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
-  const [wagonType, setWagonType] = useState('');
+  const [wagonType, setWagonType] = useState<any>('');
+  const [showWagonTypes, setShowWagonTypes] = useState(false);
   const [searchChildTerm, setSearchChildTerm] = useState('');
   const [childData, setChildData] = useState<any>({});
   const [childTableData, setChildTableData] = useState<any>([]);
   const [childFilteredData, setChildFilteredData] = useState<any>([]);
+  // const [dialogDatas, setDialogDatas] = useState<any>([]);
 
-  useEffect(() => {
-    console.log(schemeType);
-    console.log(wagonType);
-  }, [schemeType, wagonType]);
+  console.log('data @ popup', data);
 
-  // Open and close state for parent dialog
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
-  const handleClose = () => {
-    setOpen(false);
-  };
+  const CustomTextField = muiStyled(TextField)(({ theme }) => ({
+    '& .MuiInputLabel-root': {
+      transition: 'transform 0.2s ease-out, color 0.2s ease-out',
+      fontSize: '12px !important',
+      color: '#42454E !important',
+      fontWeight: '600 !important',
+      fontFamily: '"Inter", sans-serif !important',
+      position: 'absolute !important',
+      left: '0px !important',
+      top: '-11px !important',
+    },
+    '& .MuiInputLabel-root.Mui-focused': {
+      transform: 'translateY(5px) !important',
+      fontSize: '10px !important',
+      color: '#454545 !important',
+      position: 'absolute !important',
+      left: '14px !important',
+      lineHeight: '1em !important',
+      letterSpacing: '0.00938em !important',
+    },
+    '& .MuiInputLabel-root.MuiInputLabel-shrink':{
+      transform: 'translateY(5px) !important',
+      fontSize: '10px !important',
+      color: '#454545 !important',
+      position: 'absolute !important',
+      left: '14px !important',
+      lineHeight: '1em !im portant',
+      letterSpacing: '0.00938em !important',
+    }
+  }));
 
-  // Open and close state for child dialog
-
+  
   // Get data for parent dialog component
   const getDataParentTabele = async () => {
-    console.log('get data for parent table');
-    const res = await httpsGet('/all_captive_rakes_details', 0);
-    console.log(res);
-
+    const currentTime = new Date();
     // Create a new array
-    const newData = res.map((item : any) => ({
-      rake_id: item.rake_id,
-      scheme_type: item.scheme,
-      no_of_wagons: item.wagons ? item.wagons.length : 0,
-      date_of_commissioning: item.commissioned ? new Date(item.commissioned).toLocaleDateString('en-GB') : 'N/A',
-      roh_done: item.roh ? new Date(item.roh).toLocaleDateString('en-GB') : 'N/A',
-      roh_due: item.roh_due ? new Date(item.roh_due).toLocaleDateString('en-GB') : 'N/A',
-      poh_done: item.poh ? new Date(item.poh).toLocaleDateString('en-GB') : 'N/A',
-      poh_due: item.poh_due ? new Date(item.poh_due).toLocaleDateString('en-GB') : 'N/A',
-      wagons: item.wagons,
-    }));
-    setParentTableData(newData);
-    setFilteredData(newData);
-    console.log(newData);
+    const newData = data && data.map((item : any) => {
+      const updatedAt = new Date(item.updated_at);
+      const diffInHours = Math.abs(currentTime.getTime() - updatedAt.getTime()) / 36e5; // 36e5 is the number of milliseconds in one hour
+      return {
+        rake_id: item.rake_id,
+        scheme_type: item.scheme,
+        no_of_wagons: item.wagons ? item.wagons.length : 0,
+        date_of_commissioning: item.commissioned ? new Date(item.commissioned).toLocaleDateString('en-GB') : 'N/A',
+        roh_done: item.roh ? new Date(item.roh).toLocaleDateString('en-GB') : 'N/A',
+        roh_due: item.roh_due ? new Date(item.roh_due).toLocaleDateString('en-GB') : 'N/A',
+        poh_done: item.poh ? new Date(item.poh).toLocaleDateString('en-GB') : 'N/A',
+        poh_due: item.poh_due ? new Date(item.poh_due).toLocaleDateString('en-GB') : 'N/A',
+        isTracking: diffInHours < 2 ? true : false,
+        diffInHours: diffInHours
+      }
+    });
+    const filteredNewData = newData.filter((item: any, index: number, array: any[]) => {
+      return array.findIndex((el) => el.rake_id === item.rake_id) === index && item.rake_id !== undefined;
+    });
+    console.log('filteredNewData', filteredNewData);
+    setParentTableData(filteredNewData);
+    setFilteredData(filteredNewData);
+
+   
+
+    // setDialogDatas(dialogData);
   }
+
+  const getWagonTypes = async () => {
+    const res = await httpsGet('wagon_type/get/all_wagon_type', 0);
+    const wagonType = res && res.data && res.data.map((item: any) => item.name);
+    setShowWagonTypes(wagonType);
+  }
+
+  useEffect(() => {
+    getWagonTypes();
+  }, []);
+
+  useEffect(() => {
+    getDataParentTabele();
+  }, [data]);
+
+  const handleFilterChange = (newSearchTerm = searchTerm, newSchemeType = schemeType) => {
+    const filteredBySearchTerm = newSearchTerm
+      ? parentTableData.filter((item: any) =>
+          item.rake_id.toLowerCase().includes(newSearchTerm.toLowerCase())
+        )
+      : parentTableData;
+
+    const finalFilteredData = (newSchemeType === 'ALL' || !newSchemeType)
+      ? filteredBySearchTerm
+      : filteredBySearchTerm.filter((item: any) => item.scheme_type === newSchemeType);
+
+    setFilteredData(finalFilteredData);
+  };
 
   const handleSearchChange = (event: any) => {
     const newSearchTerm = event.target.value;
     setSearchTerm(newSearchTerm);
-  
-    const newFilteredData = newSearchTerm
-      ? filteredData.filter((item: any) => item.rake_id.includes(newSearchTerm))
-      : parentTableData;
-    setFilteredData(newFilteredData);
+    handleFilterChange(newSearchTerm, schemeType);
   };
-  
+
   const handleSchemeTypeChange = (event: any) => {
     const selectedSchemeType = event.target.value;
     setSchemeType(selectedSchemeType);
-  
-    const newFilteredData = selectedSchemeType
-      ? filteredData.filter((item: any) => item.scheme_type === selectedSchemeType)
-      : parentTableData;
-    setFilteredData(newFilteredData);
+    handleFilterChange(searchTerm, selectedSchemeType);
   };
 
+  // Open and close state for parent dialog
+  // const handleClickOpen = () => {
+  //   setOpen(true);
+  // };
+  // const handleClose = () => {
+  //   setOpen(false);
+  // };
+
+  // Child Data handling
+
+  // Open and close state for child dialog
   const handleChildClickOpen = (item: any) => {
-    console.log(item, "item");
     const newChildUpperData = {
       rake_id: item.rake_id,
       scheme_type: item.scheme_type,
@@ -188,8 +301,8 @@ export const Popup = () => {
     const newChildLowerData = item.wagons.map((wagon: any, index: number) => (
       {
         wagon_no: wagon.wg_no,
-        wagon_type: wagon.wagon_type,
-        remark: wagon.remark
+        wagon_type: wagon.wagon_type ? wagon.wagon_type.name : 'N/A',
+        remark: wagon.remark ? wagon.remark : 'N/A'
       }
     ));
     setChildData(newChildUpperData);
@@ -200,39 +313,39 @@ export const Popup = () => {
 
   const handleChildClose = () => {
     setChildOpen(false);
+    setChildFilteredData([]);
+    setSearchChildTerm('');
+    setWagonType('');
   }
+
+  const handleChildFilterChange = (newSearchChildTerm = searchChildTerm, newWagonType = wagonType) => {
+    const filteredBySearchTerm = newSearchChildTerm
+      ? childTableData.filter((item: any) =>
+          item.wagon_no.toLowerCase().includes(newSearchChildTerm.toLowerCase())
+        )
+      : childTableData;
+
+    const finalFilteredData = (newWagonType === "ALL" || !newWagonType)
+      ? filteredBySearchTerm
+      : filteredBySearchTerm.filter((item: any) => item.wagon_type === newWagonType);
+
+    setChildFilteredData(finalFilteredData);
+  };
 
   const handleChildSearchChange = (event: any) => {
     const newSearchTerm = event.target.value;
     setSearchChildTerm(newSearchTerm);
-  
-    const newFilteredData = newSearchTerm
-      ? childFilteredData.filter((item: any) => item.wagon_no.includes(newSearchTerm))
-      : childTableData;
-    setFilteredData(newFilteredData);
-    console.log(newFilteredData);
-    console.log(filteredData);
+    handleChildFilterChange(newSearchTerm, wagonType);
   };
-  
+
   const handleWagonTypeChange = (event: any) => {
     const selectedWagonType = event.target.value;
     setWagonType(selectedWagonType);
-  
-    const newFilteredData = selectedWagonType
-      ? childFilteredData.filter((item: any) => item.wagon_type === selectedWagonType)
-      : childTableData;
-    setChildFilteredData(newFilteredData);
-    console.log(newFilteredData);
-    console.log(filteredData);
+    handleChildFilterChange(searchChildTerm, selectedWagonType);
   };
 
-  useEffect(() => {
-    console.log('use effect');
-    getDataParentTabele();
-  }, []);
-
-  const DialogComponent = () => (
-    data.map((item, index) => (
+  const DialogComponent = () =>
+    dialogData && dialogData.map((item: any, index: number) => (
       <div className="upper-containers" key={index}>
         <DialogContent>
           <p className="title">{item.title}</p>
@@ -240,7 +353,7 @@ export const Popup = () => {
         </DialogContent>
         {item.description && <p className="description">{item.description}</p>}
         <div className="row">
-          {item.subData.map((subItem, subIndex) => (
+          {item.subData.map((subItem:any, subIndex: number) => (
             <DialogContent key={subIndex}>
               <p className="sub-title">{subItem.subTitle}</p>
               <p className="sub-number-top">{subItem.subNumber}</p>
@@ -248,73 +361,128 @@ export const Popup = () => {
           ))}
         </div>
       </div>
-    ))
-  );
+    ));
 
   const TableComponent = () => (
-    <TableContainer component={Paper} sx={{border: '1px solid #DFE3EB', borderRadius: '12px', height: '350px'}}>
-    <Table sx={{ minWidth: 650  }} aria-label="simple table" stickyHeader>
-     <TableHeadComponent />
-     <TableBody>
-       <TableRowComponent />
-     </TableBody>
-   </Table>
+    <TableContainer
+      component={Paper}
+      sx={{
+        border: "1px solid #DFE3EB",
+        borderRadius: "12px",
+        height: "350px",
+      }}
+    >
+      <Table sx={{ minWidth: 650 }} aria-label="simple table" stickyHeader>
+        <TableHeadComponent />
+        <TableBody>
+          <TableRowComponent />
+        </TableBody>
+      </Table>
     </TableContainer>
   );
 
-  const TableHeadComponent = () => (
-    <TableHead>
-      <TableRow>
-        <TableCell align="left" className='table-columns'>
-          <TextField 
-              id="outlined-basic" 
-              label="Rake ID" 
-              variant="outlined"
-              value={searchTerm}
-              onChange={handleSearchChange} 
-              InputLabelProps={{
-              classes: {
-                root: 'my-label-class',
-              },
-              }}/>
+  const TableHeadComponent = () => {
+
+    const inputRef = useRef<any>(null);
+
+    useEffect(() => {
+      if (inputRef.current) {
+        inputRef.current.focus();
+      }
+    }, []);
+  
+     return (
+      <TableHead>
+        <TableRow>
+          <TableCell align="left" className="table-columns">
+          <CustomTextField
+            inputRef={inputRef}
+            label="Rake ID"
+            value={searchTerm}
+            onChange={handleSearchChange}
+          />
           </TableCell>
-        <TableCell align="left" className='table-columns' >
-         <div className='select-container'>
-         <FormControl>
-            <InputLabel id="demo-simple-select-label">Scheme Type</InputLabel>
-            <Select
-              labelId="demo-simple-select-label"
-              id="demo-simple-select"
-              value={schemeType}
-              label="Scheme Type"
-              onChange={handleSchemeTypeChange}
-            >
-              <MenuItem value={'SFTO'}>SFTO</MenuItem>
-              <MenuItem value={'GPWIS'}>GPWIS</MenuItem>
-              <MenuItem value={'BFNV'}>BFNV</MenuItem>
-            </Select>
-          </FormControl>
-         </div>
-        </TableCell>
-        <TableCell align="left" className='table-columns'>No.of Wagons</TableCell>
-        <TableCell align="left" className='table-columns'>Date Of Commissioning</TableCell>
-        <TableCell align="left" className='table-columns'>ROH Done</TableCell>
-        <TableCell align="left" className='table-columns'>ROH Due</TableCell>
-        <TableCell align="left" className='table-columns'>POH Done</TableCell>
-        <TableCell align="left" className='table-columns'>POH Due</TableCell>
-      </TableRow>
-    </TableHead>
-  );
+          <TableCell align="left" className="table-columns">
+            <div className="select-container">
+              <FormControl>
+                <InputLabel id="demo-customized-select-label"
+                sx={{
+                  fontSize: '12px !important',
+                  color: '#42454E !important',
+                  fontWeight: '600 !important',
+                  fontFamily: '"Inter", sans-serif !important',
+                  position: 'absolute !important',
+                  left: '0px !important',
+                  top: '-11px !important',
+                  transition: 'transform 0.2s ease-out, color 0.2s ease-out !important',
+                  '&.Mui-focused': {
+                    transform: 'translateY(5px) !important',
+                    fontSize: '10px !important',
+                    color: '#454545 !important',
+                    lineHeight: '1em !important',
+                    letterSpacing: '0.00938em !important',
+                    position: 'absolute !important',
+                    left: '14px !important',
+                  },
+                  '&.MuiInputLabel-shrink': {
+                    transform: 'translateY(5px) !important',
+                    fontSize: '10px !important',
+                    color: '#454545 !important',
+                    lineHeight: '1em !important',
+                    letterSpacing: '0.00938em !important',
+                    position: 'absolute !important',
+                    left: '14px !important',
+                }
+                }}>Scheme Type</InputLabel>
+                <Select
+                  labelId="demo-customized-select-label"
+                  id="demo-customized-select"
+                  value={schemeType}
+                  label="Scheme Type"
+                  onChange={handleSchemeTypeChange}
+                >
+                  <MenuItem value={"ALL"}>ALL</MenuItem>
+                  <MenuItem value={"SFTO"}>SFTO</MenuItem>
+                  <MenuItem value={"GPWIS"}>GPWIS</MenuItem>
+                  <MenuItem value={"BFNV"}>BFNV</MenuItem>
+                </Select>
+              </FormControl>
+            </div>
+          </TableCell>
+          <TableCell align="left" className="table-columns">
+            No.of Wagons
+          </TableCell>
+          <TableCell align="left" className="table-columns">
+            Date Of Commissioning
+          </TableCell>
+          <TableCell align="left" className="table-columns">
+            ROH Done
+          </TableCell>
+          <TableCell align="left" className="table-columns">
+            ROH Due
+          </TableCell>
+          <TableCell align="left" className="table-columns">
+            POH Done
+          </TableCell>
+          <TableCell align="left" className="table-columns">
+            POH Due
+          </TableCell>
+        </TableRow>
+      </TableHead>
+    );
+  }
 
   const TableRowComponent = () => (
-
     filteredData.map((item: any) => (
       <TableRow
         key={item.rake_id}
         sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
         className='table-rows-container'
         onClick={() => handleChildClickOpen(item)}>
-         <TableCell align="left" className='table-rows'>{item.rake_id}</TableCell>
+         <TableCell align="left" className='table-rows'>
+          <p className="rake-id">{item.rake_id}</p>
+          {item.isTracking ? <Image src={TrackingIcon} alt="tracking"/>: <Image src={NonTrackingIcon} alt="tracking"/>}
+        </TableCell>
          <TableCell align="center" className='table-rows'>{item.scheme_type}</TableCell>
          <TableCell align="center" className='table-rows'>{item.no_of_wagons}</TableCell>
          <TableCell align="left" className='table-rows'>{item.date_of_commissioning}</TableCell>
@@ -345,43 +513,84 @@ export const Popup = () => {
     )
   );
 
-  const ChildTableHeadComponent = () => (
-    <TableHead>
-    <TableRow>
-      <TableCell align="left" className='table-columns'>
-        <TextField 
-        id="outlined-basic" 
-        label="Wagon No." 
-        variant="outlined" 
-        value={searchChildTerm}
-        onChange={handleChildSearchChange}
-        InputLabelProps={{
-        classes: {
-          root: 'child-label-class',
-        },
-        }}/>
-        </TableCell>
-      <TableCell align="left" className='table-columns'>
-       <div className='select-container'>
-       <FormControl>
-          <InputLabel id="demo-simple-select-label">Wagon Type</InputLabel>
-          <Select
-            labelId="demo-simple-select-label"
-            id="demo-simple-select"
-            value={wagonType}
-            label="Wagon Type"
-            onChange={handleWagonTypeChange}
-          >
-            <MenuItem value={'BRN'}>BRN</MenuItem>
-            <MenuItem value={'BFNV'}>BFNV</MenuItem>
-          </Select>
-        </FormControl>
-       </div>
-      </TableCell>
-      <TableCell align="left" className='table-columns'>Remarks</TableCell>
-    </TableRow>
-  </TableHead>
-  );
+  const ChildTableHeadComponent = () => {
+    const inputRef = useRef<any>(null);
+
+    useEffect(() => {
+      if (inputRef.current) {
+        inputRef.current.focus();
+      }
+    }, []);
+
+    return (
+      <TableHead>
+        <TableRow>
+          <TableCell align="left" className="table-columns">
+            <CustomTextField
+              inputRef={inputRef}
+              id="outlined-basic"
+              label="Wagon No."
+              variant="outlined"
+              value={searchChildTerm}
+              onChange={handleChildSearchChange}
+            />
+          </TableCell>
+          <TableCell align="left" className="table-columns">
+            <div className="select-container">
+              <FormControl>
+                <InputLabel id="demo-simple-select-label"
+                sx={{
+                  fontSize: '12px !important',
+                  color: '#42454E !important',
+                  fontWeight: '600 !important',
+                  fontFamily: '"Inter", sans-serif !important',
+                  position: 'absolute !important',
+                  left: '0px !important',
+                  top: '-11px !important',
+                  transition: 'transform 0.2s ease-out, color 0.2s ease-out !important',
+                  '&.Mui-focused': {
+                    transform: 'translateY(5px) !important',
+                    fontSize: '10px !important',
+                    color: '#454545 !important',
+                    lineHeight: '1em !important',
+                    letterSpacing: '0.00938em !important',
+                    position: 'absolute !important',
+                    left: '14px !important',
+                  },
+                  '&.MuiInputLabel-shrink': {
+                    transform: 'translateY(5px) !important',
+                    fontSize: '10px !important',
+                    color: '#454545 !important',
+                    lineHeight: '1em !important',
+                    letterSpacing: '0.00938em !important',
+                    position: 'absolute !important',
+                    left: '14px !important',
+                }
+                }}>Wagon Type</InputLabel>
+                <Select
+                  labelId="demo-simple-select-label"
+                  id="demo-simple-select"
+                  value={wagonType}
+                  label="Wagon Type"
+                  onChange={handleWagonTypeChange}
+                >
+                  <MenuItem value={"ALL"}>ALL</MenuItem>
+                  {
+                    Array.isArray(showWagonTypes) && showWagonTypes.map((item: any, index: number) => (
+                      <MenuItem key={index} value={item}>{item}</MenuItem>
+                    ))
+                  }
+                </Select>
+              </FormControl>
+            </div>
+          </TableCell>
+          <TableCell align="left" className="table-columns">
+            Remarks
+          </TableCell>
+        </TableRow>
+      </TableHead>
+    );
+  }
 
   const ChildTableRowComponent = () => (
     childFilteredData.map((item: any) => (
@@ -390,77 +599,89 @@ export const Popup = () => {
         sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
         className='table-rows-container'
       >
-        <TableCell align="left" className='table-rows'>{item.wagon_no}</TableCell>
-        <TableCell align="left" className='table-rows'>BRN</TableCell>
+        <TableCell align="left" className='table-rows'>
+          <p>{item.wagon_no}</p>
+          <Image src={LinkIcon} alt="link"/>
+        </TableCell>
+        <TableCell align="left" className='table-rows'>{item.wagon_type}</TableCell>
         <TableCell align="left" className='table-rows'>{item.remark}</TableCell>
       </TableRow>
     ))
   );
 
+
   const ChildTableComponent = () => (
-    <TableContainer component={Paper} sx={{border: '1px solid #DFE3EB', borderRadius: '12px', height: '540px'}}>
-                <Table sx={{ minWidth: 650  }} aria-label="simple table" stickyHeader>
-                  <ChildTableHeadComponent />
-                  <TableBody>
-                    <ChildTableRowComponent />
-                  </TableBody>
-                </Table>
-            </TableContainer>
+    <TableContainer
+      component={Paper}
+      sx={{
+        border: "1px solid #DFE3EB",
+        borderRadius: "12px",
+        height: "500px",
+      }}
+    >
+      <Table sx={{ minWidth: 650 }} aria-label="simple table" stickyHeader>
+        <ChildTableHeadComponent />
+        <TableBody>
+          <ChildTableRowComponent />
+        </TableBody>
+      </Table>
+    </TableContainer>
   );
 
   const childPopUp = () => (
     <BootstrapDialog
-        onClose={handleChildClose}
-        className='child-dialog-styles'
-        aria-labelledby="customized-dialog-title"
-        open={childOpen}
-      >
-        <div className='child-dialog-container'>
-            <div
-              aria-label="close"
-              onClick={handleChildClose}
-              className='child-close-icon'>
-              <Image src={CloseButtonIcon} alt="close" />
-           </div>  
-
-            <div className='child-upper-container'>
-              <ChildDialogComponent />
-            </div>
-
-            <div className='child-lower-container'>
-              <ChildTableComponent />
-            </div>
+      onClose={handleChildClose}
+      className="child-dialog-styles"
+      aria-labelledby="customized-dialog-title"
+      open={childOpen}
+    >
+      <div className="child-dialog-container">
+        <div
+          aria-label="close"
+          onClick={handleChildClose}
+          className="child-close-icon"
+        >
+          <Image src={ReturnIcon} alt="close" />
         </div>
+
+        <div className="child-upper-container">
+          <ChildDialogComponent />
+        </div>
+
+        <div className="child-lower-container">
+          <ChildTableComponent />
+        </div>
+      </div>
     </BootstrapDialog>
   );
 
   return (
     <React.Fragment>
-      <Button variant="outlined" onClick={handleClickOpen}>
+      {/* <Button variant="outlined" onClick={handleClickOpen}>
         Open dialog
-      </Button>
-      <BootstrapDialog
+      </Button> */}
+
+      {/* <BootstrapDialog
         onClose={handleClose}
         className='dialog-styles'
         aria-labelledby="customized-dialog-title"
         open={open}
-      >
-      <div className='dialog-container'>
-       <div
-          aria-label="close"
-          onClick={handleClose}
-          className='close-icon'>
-          <Image src={CloseButtonIcon} alt="close" />
-       </div>      
-       <div className='upper-container'>
-        <DialogComponent />
-       </div>
-       <div className='lower-conatiner'>
-        <TableComponent />
-       </div>
-      </div>
-      </BootstrapDialog>
+      > */}
+      <Box sx={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+        <div className="dialog-container">
+          {/* <div aria-label="close" onClick={handleClose} className="close-icon">
+            <Image src={CloseButtonIcon} alt="close" /> 
+          </div> */}
+          <div className="upper-container">
+            <DialogComponent />
+          </div>
+          <div className="lower-conatiner">
+            <TableComponent />
+          </div>
+        </div>
+      </Box>
+      {/* </BootstrapDialog> */}
       {childPopUp()}
     </React.Fragment>
   );
-}
+};

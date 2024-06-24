@@ -2,13 +2,17 @@ import * as React from "react";
 import Image from "next/image";
 import "./css/progressBar.css";
 
-export default function ProgressBar(props: any) {
+const ProgressBar = (props: any) => {
   return (
     <div
       className="progress-bar-wrapper"
     >
       <div
         className="progress-bar-container"
+        onClick={() => {
+            props.handleAllRakesAndTable(props.name);
+        }}
+        style={{ cursor: "pointer" }}
       >
         <div className="progress-info-container">
           <span
@@ -74,3 +78,5 @@ export default function ProgressBar(props: any) {
     </div>
   );
 }
+
+export default ProgressBar;

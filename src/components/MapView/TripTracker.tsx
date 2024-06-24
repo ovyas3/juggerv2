@@ -256,13 +256,13 @@ const TripTracker = (params: any) => {
           <FormControlLabel
             disabled={!buttonEnabledGPS}
             control={<Switch checked={showGPSTracks} onChange={handleGPSCheck} />}
-            label="Show GPS Tracks"
+            label="Show GPS Pings"
             labelPlacement="start"
           />
           <FormControlLabel
             disabled={!buttonEnabledFois}
             control={<Switch checked={showFoisTracks} onChange={handleFoisCheck} />}
-            label="Show FOIS Tracks"
+            label="Show FOIS Pings"
             labelPlacement="start"
           />
         </FormGroup>}

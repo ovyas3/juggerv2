@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-
+import { httpsGet } from "@/utils/Communication";
 import { Tab, Box, Select, MenuItem } from "@mui/material";
 import "./tabSection.css";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
@@ -22,11 +22,55 @@ import { useTranslations } from "next-intl";
 
 const Tabsection = () => {
   const [value, setValue] = useState("1");
+  const [data, setData] = useState<any>([]);
   const [helpCenterBtnHovered, setHelpCenterBtnHovered] = useState(false);
   const t = useTranslations("DASHBOARD");
 
   const handleChange = (val: any) => {
     setValue(val);
+  };
+
+  const handleAllRakesAndTable = async (props: any) => {
+    const getProps = props.toLowerCase().replace(/\s/g, ""); 
+    console.log(getProps);
+    if(getProps === "totalrakes"){
+      const res = await httpsGet("all_captive_rakes_details", 0);
+      setData(res);
+    } else if (getProps === "trackingwithgps"){
+      const res = await httpsGet("all_captive_rakes_details?tracking=true", 0);
+      setData(res);
+    } else if (getProps === "nontracking"){
+      const res = await httpsGet("all_captive_rakes_details?tracking=false", 0);
+      setData(res);
+    }
+  };
+
+  const handleSchemeTypeAndTable = async (props: any) => {
+    const getSchemeType = props;
+    const validSchemes = ["SFTO", "GPWIS", "BFNV"];
+  
+    if (validSchemes.includes(getSchemeType)) {
+      const res = await httpsGet(`all_captive_rakes_details?scheme=${getSchemeType}`, 0);
+      setData(res);
+    }
+  }
+
+  const handleTrackingAndNonTracking = async (props: any) => {
+    const getProps = props;
+    console.log(getProps);
+    if(getProps === "trackingWithLoad"){
+      const res = await httpsGet("all_captive_rakes_details?tracking=true&withLoad=true", 0);
+      setData(res);
+    } else if(getProps === "trackingWithoutLoad"){
+      const res = await httpsGet("all_captive_rakes_details?tracking=true&withLoad=false", 0);
+      setData(res);
+    } else if(getProps === "nonTrackingWithLoad"){
+      const res = await httpsGet("all_captive_rakes_details?tracking=false&withLoad=true", 0);
+      setData(res);
+    } else if(getProps === "nonTrackingWithoutLoad"){
+      const res = await httpsGet("all_captive_rakes_details?tracking=false&withLoad=false", 0);
+      setData(res);
+    }
   };
 
   return (
@@ -155,21 +199,23 @@ const Tabsection = () => {
                   <span style={{ marginLeft: "8px" }}>Help Center</span>
                 </div>
               </div> */}
-              <TabPanel value="1" sx={{ paddingLeft: 0 }}>
-                <div className="rail-overview-container">
+             <TabPanel value="1" className="tabpanel-container">
+                <div className="tabpanel-contents">
                   {/* <div
                     style={{ borderRight: "1px solid #DFE3EB", width: "60vw" }}
                   >
                     <Status />
                     <BarsDataset/>
                   </div> */}
-                  <div className="rail-leftsection">
-                    <TrackingStatus />
+                  <div className="tracking-status">
+                    <TrackingStatus 
+                          handleAllRakesAndTable={handleAllRakesAndTable}
+                          handleSchemeTypeAndTable={handleSchemeTypeAndTable}
+                          handleTrackingAndNonTracking={handleTrackingAndNonTracking}/>
                   </div>
-                  <div className="rail-rightsection">
-                    <div className="rail-right-popup">
-                      <Popup />
-                    </div>
+                  <div className="vertical-line"/>
+                  <div className="popup-container">
+                  {data && <Popup data={data} />}
                   </div>
                 </div>
               </TabPanel>
