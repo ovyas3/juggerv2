@@ -91,3 +91,18 @@
     bottom: 0;
     
   }
+
+  
+
+  .status_container .MuiFormControl-root .MuiInputBase-root .MuiSelect-select{
+   padding: 6.5px 10px;
+   font-size: 14px;
+  }
+
+  .status_container .MuiPaper-root .MuiList-root .MuiButtonBase-root{
+    padding: 0px 8px 6px 6px !important;
+  }
+
+  .status_container .mui-10hburv-MuiTypography-root{
+    font-size: 12px;
+  }

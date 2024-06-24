@@ -2,34 +2,61 @@
 
 import './filters.css'
 import * as React from 'react';
-import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
-import DateRangeIcon from '@mui/icons-material/DateRange';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 
-
-// import { DateRangePicker } from '@mui/x-date-pickers-pro/DateRangePicker';
-import { SingleInputDateRangeField } from '@mui/x-date-pickers-pro/SingleInputDateRangeField';
-
-import Calendar from '@mui/icons-material/Event';
 import { useState, useEffect } from 'react';
 
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import dayjs from 'dayjs';
-// import { DateRangePicker } from "@nextui-org/date-picker";
-import {DateRangePicker} from "@nextui-org/react";
+import { DateRangePicker } from '@mui/x-date-pickers-pro/DateRangePicker';
+import { SingleInputDateRangeField } from '@mui/x-date-pickers-pro/SingleInputDateRangeField';
+
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+
+import OutlinedInput from '@mui/material/OutlinedInput';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import ListItemText from '@mui/material/ListItemText';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
+import Checkbox from '@mui/material/Checkbox';
 
 
 
-
-
-function Filters({ onToFromChange }: any) {
+function Filters({ onToFromChange, setStatusForShipment }: any) {
 
 
 
+    const MenuProps = {
+        PaperProps: {
+            style: {
+                width: 128,
+                padding:0,
+                marginTop:'3px',
+                paddingTop:0,
+                fontSize:'12px'
+            },
+        },
+    };
+
+    const names = [
+        'All',
+        'In Transit',
+        'Delivered',
+        'In Plant'
+    ];
+
+
+
+    const [status, setStatus] = React.useState<string>('All');
+
+    const handleChange = (event: SelectChangeEvent<string>) => {
+        setStatus(event.target.value as string);
+        setStatusForShipment(event.target.value as string)
+      };
     const today = new Date();
     const twentyDaysBefore = new Date();
     twentyDaysBefore.setDate(today.getDate() - 20);
@@ -37,6 +64,9 @@ function Filters({ onToFromChange }: any) {
     const [startDate, setStartDate] = useState(twentyDaysBefore);
     const [endDate, setEndDate] = useState(today);
     const [error, setError] = useState('');
+
+
+
 
 
     const formatDate = (date: any) => {
@@ -73,17 +103,23 @@ function Filters({ onToFromChange }: any) {
         }
     }, [startDate, endDate, error]);
 
-    return (
-        <div style={{ display: 'flex', gap: 20, overflowX: 'auto', position: 'relative' }} >
 
-            <div style={{display:'flex', gap:20,  }}>
+    return (
+        <div style={{ display: 'flex', gap: 20, overflowX: 'auto', position: 'relative' , overflowY:'visible'}} >
+
+            <div style={{ display: 'flex', gap: 20, }}>
+
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                     <DemoContainer components={['DatePicker']}
-                        sx={{ padding: 0, }}
+                        sx={{
+                            padding: 0,
+                            height: 'auto',
+                            overflow: 'hidden',
+                        }}
                     >
                         <DatePicker
                             slotProps={{ textField: { placeholder: formatDate(startDate) } }}
-                           
+
                             onChange={(newDate) => { handleStartDateChange(newDate) }}
                             sx={{
                                 '& .MuiInputBase-input::placeholder': {
@@ -104,14 +140,18 @@ function Filters({ onToFromChange }: any) {
                         />
                     </DemoContainer>
                 </LocalizationProvider>
-            
+
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                     <DemoContainer components={['DatePicker']}
-                        sx={{ padding: 0, }}
+                        sx={{
+                            padding: 0,
+                            height: 'auto',
+                            overflow: 'hidden',
+                        }}
                     >
                         <DatePicker
                             slotProps={{ textField: { placeholder: formatDate(endDate) } }}
-                         
+
                             onChange={(newDate) => { handleEndDateChange(newDate) }}
                             sx={{
                                 '& .MuiInputBase-input::placeholder': {
@@ -134,17 +174,50 @@ function Filters({ onToFromChange }: any) {
                 </LocalizationProvider>
             </div>
             {error && <div className='error'>{error}</div>}
-           
 
-
-
-
-            <div >
-                <div className="custom-container">
-                    <div className="custom-text">Status</div>
-                    <ArrowDropDownIcon className="custom-icon" />
-                </div>
-            </div>
+            <div className='status_container'>
+                <FormControl sx={{  width: 128, margin:0,padding: 0 ,
+                    '.mui-kk1bwy-MuiButtonBase-root-MuiMenuItem-root':{
+                        padding:0,
+                    },
+                    '.mui-10hburv-MuiTypography-root ':{fontSize:'12px'}
+                }}>
+                    <InputLabel id="demo-multiple-checkbox-label" sx={{ padding: 0, fontSize: 14 ,marginTop:'-8px', 
+                    }}>Status</InputLabel>
+                    <Select
+                        
+                        labelId="demo-multiple-checkbox-label"
+                        id="demo-multiple-checkbox"
+                        value={status}
+                        onChange={handleChange}
+                        input={<OutlinedInput 
+                            sx={{
+                                width:'128px',
+                                '& .MuiOutlinedInput-notchedOutline': {
+                                  border:'1px solid #E9E9EB'
+                                },
+                                '&:hover .MuiOutlinedInput-notchedOutline': {
+                                    border:'1px solid #E9E9EB'
+                                },
+                                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                    border:'1px solid #E9E9EB'
+                                },
+                              }}
+                            />}
+                        // renderValue={(selected) => selected.join(', ')}
+                        renderValue={(selected) => selected}
+                        MenuProps={MenuProps}
+                       
+                    >
+                        {names.map((name) => (
+                            <MenuItem key={name} value={name} sx={{ padding: 0,fontSize:'12px',}} >
+                                <Checkbox checked={status.indexOf(name) > -1}  />
+                                <ListItemText primary={name} />
+                            </MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
+            </div> 
 
             {/* <div>
                 <div className="upload-container">
@@ -158,6 +231,8 @@ function Filters({ onToFromChange }: any) {
                     <FilterAltIcon className="filter-icon" />
                 </div>
             </div>
+
+            {/* <input type='date' placeholder='Dec 23, 3456' /> */}
         </div>
     );
 }

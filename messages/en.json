@@ -37,7 +37,12 @@
     "outbound":"Outbound",
     "submit":"Submit",
     "attach":"Attach",
-    "edemand":"E demand"
+    "edemand":"e-Demand",
+    "contact":"Contact",
+    "share":"Share",
+    "intransit":"In Transit",
+    "delivered":"Delivered",
+    "inplant":"In Plant"
   },
   "DRAWER":{
     "shipments":"shipments",

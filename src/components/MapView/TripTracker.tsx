@@ -57,7 +57,6 @@ const TripTracker = (params: any) => {
     setShowFoisTracks(e.target.checked);
   }
   const handleGPSCheck = (e: any) => {
-    console.log(e.target.checked)
     setShowGPSTracks(e.target.checked);
   }
   const customIcon = new Icon({
@@ -238,7 +237,7 @@ const TripTracker = (params: any) => {
                 fontSize: mobile ? '1em' : '1.5em',
                 color: '#42454E',
               }} item xs={8}>
-                Click the button to see the vehicle on the map.
+                Click the button to see the Train on the map.
               </Grid>
             </Grid>
             <Button style={{
