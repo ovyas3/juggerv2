@@ -32,7 +32,6 @@ const Tabsection = () => {
 
   const handleAllRakesAndTable = async (props: any) => {
     const getProps = props.toLowerCase().replace(/\s/g, ""); 
-    console.log(getProps);
     if(getProps === "totalrakes"){
       const res = await httpsGet("all_captive_rakes_details", 0);
       setData(res);
@@ -57,7 +56,6 @@ const Tabsection = () => {
 
   const handleTrackingAndNonTracking = async (props: any) => {
     const getProps = props;
-    console.log(getProps);
     if(getProps === "trackingWithLoad"){
       const res = await httpsGet("all_captive_rakes_details?tracking=true&withLoad=true", 0);
       setData(res);
