@@ -491,7 +491,7 @@ const MapLayers = () => {
                             >
                               <TableCell align="left" className="captive-rake-rows" style={{fontWeight: selectedRake && selectedRake.rake_id === rake.rake_id ? "bold" : 'inherit'}}>{rake.rake_id}</TableCell>
                               <TableCell align="center" className="captive-rake-rows" style={{paddingRight: '24px'}}>
-                                {rake.hours ? rake.hours : 'N/A'}
+                              {rake.hours && parseFloat(rake.hours.split('h')[0]) <= 720 ? rake.hours : 'N/A'}
                               </TableCell>
                               <TableCell align="left" className="captive-rake-rows" style={{fontWeight: selectedRake && selectedRake.rake_id === rake.rake_id ? "bold" : 'inherit'}}>{rake.fnr_no}</TableCell>
                             </TableRow>

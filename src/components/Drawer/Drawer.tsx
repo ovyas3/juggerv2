@@ -62,7 +62,7 @@ function SideDrawer() {
             </div>
 
             <div onMouseEnter={() => { setActiveContact(true) }} onMouseLeave={() => { setActiveContact(false) }} onClick={() => handleRouting('dashboard')} className='contact-icon' style={{ width: open ? '190px' : '42px', justifyContent: open ? 'start' : 'center', backgroundColor: ((active == 'dashboard') || activeContact) ? 'white' : '', cursor: 'pointer' }}>
-                <DashboardIcon style={{ marginLeft: open ? '9px' : '', color: ((active == 'dashboard') || activeContact) ? 'black' : 'white' }} /><div className={`${open ? 'fnr_text' : 'fnr_text_none'}`} style={{ color: ((active == 'dashboard') || activeContact) ? 'black' : 'white' }} >Dashboard</div>
+                <DashboardIcon style={{ marginLeft: open ? '9px' : '', color: ((active == 'dashboard') || activeContact) ? 'black' : 'white' }} /><div className={`${open ? 'fnr_text' : 'fnr_text_none'}`} style={{ color: ((active == 'dashboard') || activeContact) ? 'black' : 'white' }} >Captive Rakes</div>
             </div>
         </div>
 
