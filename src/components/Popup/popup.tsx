@@ -27,6 +27,7 @@ import { Box } from "@mui/material";
 import { httpsGet } from "@/utils/Communication";
 import { styled as muiStyled } from '@mui/material/styles';
 import { title } from "process";
+import service from "@/utils/timeService";
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialogContent-root": {
@@ -99,14 +100,13 @@ export const Popup: React.FC<PopupProps> = ({ data }) => {
         _id: item._id,  
         rake_id: item.rake_id,
         scheme_type: item.scheme,
-        no_of_wagons: item.wagonsLength ? item.wagonsLength : 0,
-        date_of_commissioning: item.commissioned ? new Date(item.commissioned).toLocaleDateString('en-GB') : 'N/A',
-        roh_done: item.roh ? new Date(item.roh).toLocaleDateString('en-GB') : 'N/A',
-        roh_due: item.roh_due ? new Date(item.roh_due).toLocaleDateString('en-GB') : 'N/A',
-        poh_done: item.poh ? new Date(item.poh).toLocaleDateString('en-GB') : 'N/A',
-        poh_due: item.poh_due ? new Date(item.poh_due).toLocaleDateString('en-GB') : 'N/A',
-        isTracking: diffInHours < 2 ? true : false,
-        diffInHours: diffInHours
+        no_of_wagons: item.no_of_wagons ? item.no_of_wagons : 0,
+        date_of_commissioning: item.commissioned ? service.utcToist(item.commissioned, 'dd/MM/yyyy') : 'N/A',
+        roh_done: item.roh ? service.utcToist(item.roh, 'dd/MM/yyyy') : 'N/A',
+        roh_due: item.roh_due ? service.utcToist(item.roh_due, 'dd/MM/yyyy') : 'N/A',
+        poh_done: item.poh ? service.utcToist(item.poh, 'dd/MM/yyyy') : 'N/A',
+        poh_due: item.poh_due ? service.utcToist(item.poh_due, 'dd/MM/yyyy') : 'N/A',
+        isTracking: item.is_tracking ? item.is_tracking : false
       }
     });
     const filteredNewData = newData.filter((item: any, index: number, array: any[]) => {
@@ -238,7 +238,7 @@ export const Popup: React.FC<PopupProps> = ({ data }) => {
     const inputRef = useRef<any>(null);
 
     useEffect(() => {
-      if (inputRef.current) {
+      if (inputRef.current && searchTerm !== '') {
         inputRef.current.focus();
       }
     }, [searchTerm]);
@@ -369,7 +369,7 @@ export const Popup: React.FC<PopupProps> = ({ data }) => {
     const inputRef = useRef<any>(null);
 
     useEffect(() => {
-      if (inputRef.current) {
+      if (inputRef.current && searchChildTerm !== '') {
         inputRef.current.focus();
       }
     }, [searchChildTerm]);

@@ -16,9 +16,10 @@ import { useTranslations } from "next-intl";
 interface TrackingStatusProps {
   handleAllRakesAndTable: (props: any) => void;
   handleSchemeTypeAndTable: (props: any) => void;
+  handleTrackingAndNonTracking: (props: any) => void;
 }
 
-const TrackingStatus: React.FC<TrackingStatusProps> = ({ handleAllRakesAndTable, handleSchemeTypeAndTable }) => {
+const TrackingStatus: React.FC<TrackingStatusProps> = ({ handleAllRakesAndTable, handleSchemeTypeAndTable, handleTrackingAndNonTracking }) => {
   const router = useRouter();
   const t = useTranslations("DASHBOARD");
   const [isHovered, setIsHovered] = useState(false);
@@ -83,9 +84,11 @@ const TrackingStatus: React.FC<TrackingStatusProps> = ({ handleAllRakesAndTable,
         if (response.totalRakeCount) setTotalRakes(response.totalRakeCount);
         if (response.scheme) {
           setSchemeData(response.scheme);
+          let totalWagons = 0;
           response.scheme.map((scheme: any) => {
-            setTotalWagons((prev) => prev + scheme.wagons);
+            totalWagons += scheme.wagons;
           });
+          setTotalWagons(totalWagons);
         }
         if (response.trackingDetails) {
           if (response.trackingDetails.tracking) {
@@ -138,7 +141,7 @@ const TrackingStatus: React.FC<TrackingStatusProps> = ({ handleAllRakesAndTable,
         <div className="map-view-btn" 
              onMouseEnter={() => setIsMapHover(true)} 
              onMouseLeave={() => setIsMapHover(false)}
-             onClick={() => router.push('/MapsHelper')}>
+             onClick={() => window.open('/MapsHelper', '_blank')}>
           <Image src={isMapHover ? MapViewHoverIcon : MapViewIcon} alt="map view" width={16} height={16}/>
           <span className="map-view-btn-header">Map View</span>
         </div>
@@ -179,7 +182,7 @@ const TrackingStatus: React.FC<TrackingStatusProps> = ({ handleAllRakesAndTable,
                   {totalWagons || 0}
                 </span>
                 <span style={{ color: "#71747A", fontSize: "10px" }}>
-                  No. of Wagons
+                  Total Wagons
                 </span>
                 
               </div>
@@ -192,10 +195,13 @@ const TrackingStatus: React.FC<TrackingStatusProps> = ({ handleAllRakesAndTable,
             count={trackingData.totalTracking}
             name={t("trackingWithGPS")}
             icon={trackingWithGPS}
+            handleAllRakesAndTable={handleAllRakesAndTable}
           />
           <div className="load-analysis-wrapper">
             <div
               className="load-analysis-with-load-tracking"
+              onClick={() => handleTrackingAndNonTracking("trackingWithLoad")}
+              style={{ cursor: "pointer" }}
             >
               <span className="load-count">
                 {trackingData.withLoad || 0}
@@ -206,6 +212,8 @@ const TrackingStatus: React.FC<TrackingStatusProps> = ({ handleAllRakesAndTable,
             </div>
             <div
              className="load-analysis-without-load-tracking"
+              onClick={() => handleTrackingAndNonTracking("trackingWithoutLoad")}
+              style={{ cursor: "pointer" }}
             >
               <span className="load-count">
                 {trackingData.withoutLoad || 0}
@@ -223,12 +231,15 @@ const TrackingStatus: React.FC<TrackingStatusProps> = ({ handleAllRakesAndTable,
             count={nonTrackingData.totalTracking}
             name={t("nonTracking")}
             icon={nonTracking}
+            handleAllRakesAndTable={handleAllRakesAndTable}
           />
           <div className="load-analysis-wrapper">
             <div
               className="non-tracking-data-with-load"
+              onClick={() => handleTrackingAndNonTracking("nonTrackingWithLoad")}
               onMouseOver={() => setNonTrackingWithLoadHovered(true)}
               onMouseLeave={() => setNonTrackingWithLoadHovered(false)}
+              style={{ cursor: "pointer" }}
             >
               <span className="load-count">
                 {nonTrackingData.totalWithLoad || 0}
@@ -263,8 +274,10 @@ const TrackingStatus: React.FC<TrackingStatusProps> = ({ handleAllRakesAndTable,
             </div>
             <div
               className="non-tracking-data-without-load"
+              onClick={() => handleTrackingAndNonTracking("nonTrackingWithoutLoad")}
               onMouseOver={() => setNonTrackingEmptyHovered(true)}
               onMouseLeave={() => setNonTrackingEmptyHovered(false)}
+              style={{ cursor: "pointer" }}
             >
               <span className="load-count">
                 {nonTrackingData.totalWithoutLoad}

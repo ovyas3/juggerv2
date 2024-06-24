@@ -9,8 +9,12 @@ const ProgressBar = (props: any) => {
     >
       <div
         className="progress-bar-container"
+        onClick={() => {
+            props.handleAllRakesAndTable(props.name);
+        }}
+        style={{ cursor: "pointer" }}
       >
-        <div className="progress-info-container" onClick={() => props.handleAllRakesAndTable(props.name)}>
+        <div className="progress-info-container">
           <span
             className="progress-info-count"
           >
