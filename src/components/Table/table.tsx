@@ -216,10 +216,7 @@ const convertArrayToFilteredArray = (inputArray: any) => {
                 is_fois: trip_tracker && trip_tracker.fois_last_location ? true : false,
                 is_gps: trip_tracker && trip_tracker.gps_last_location ? true : false,
             },
-
-
             validationForAttachRake: !captive_id && is_captive
-
         }
     });
 };
