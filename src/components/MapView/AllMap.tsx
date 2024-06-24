@@ -160,9 +160,6 @@ const MapLayers = () => {
         const allRakesFiltered = allRakes.filter((rake: any) => rake.rake_id !== undefined);
         setAllRakes(allRakesFiltered);
         setCoords(coords);
-        console.log("res", res.data);
-        console.log('coords', coords);
-        console.log('allRakes', allRakesFiltered);
       } catch (error) {
         setLoading(false);
       } finally {
@@ -241,9 +238,6 @@ const MapLayers = () => {
       setAllIdleRakes(allIdleRakes);
       setShowAllRakes(true);
       setList(allRakesData);
-      console.log('allLocations', allLocations);
-      console.log('allIdleRakes', allIdleRakes);
-      console.log('allRakesData', allRakesData);
     }
 
     useEffect(() => {
