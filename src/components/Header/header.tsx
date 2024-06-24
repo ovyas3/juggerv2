@@ -17,7 +17,7 @@ import ProfileDrop from "./proFileDrop";
 import { useEffect, useState } from "react";
 import { getCookie } from "@/utils/storageService";
 
-const Header = (props: any) => {
+const Header = ({title, setReloadOnHeaderChange}:any) => {
   const [parent_name, setParentName] = useState<string>("");
   const [shippers, setShippers] = useState([]);
   const [selected_shipper, setSelectedShipper] = useState("");
@@ -34,7 +34,7 @@ const Header = (props: any) => {
   return (
     <div className="header-wrapper">
       <Box className="container">
-        <div className="shipment_text">{props.title}</div>
+        <div className="shipment_text">{title}</div>
         <div
           style={{
             display: "flex",
@@ -44,7 +44,7 @@ const Header = (props: any) => {
         >
           <div className="header_name">{parent_name}</div>
           <div className="drop_down">
-            {shippers.length && <Dropdown shippers={shippers} />}
+            {shippers.length && <Dropdown reload={setReloadOnHeaderChange} shippers={shippers}  />}
           </div>
           <div className="divder"></div>
           <div className="bell_icon">

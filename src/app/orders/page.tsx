@@ -22,7 +22,11 @@ const OrdersPage = () => {
   const [rakeCaptiveList, setRakeCaptiveList] = useState([]);
 
   const [reload, setReload] = useState(false)
+<<<<<<< HEAD
   const [statusForShipment, setStatusForShipment] = useState('All')
+=======
+  const [reloadOnHeaderChange, setReloadOnHeaderChange] = useState(false);
+>>>>>>> f421230ea229d1d03ae7ad221ed1a724dde00886
 
 
   //shipment payload
@@ -69,19 +73,23 @@ const OrdersPage = () => {
     getCaptiveRake();
   }, [])
 
+<<<<<<< HEAD
   useEffect(() => {
     if (ShipmentsPayload.from && ShipmentsPayload.to) getAllShipment();
   }, [ShipmentsPayload])
 
 
   // console.log(statusForShipment)
+=======
+  if(reloadOnHeaderChange) getAllShipment();
+>>>>>>> f421230ea229d1d03ae7ad221ed1a724dde00886
 
   return (
     <div  >
       <div className='orderContainer'>
         <div style={{ width: '100%', overflowX: 'auto' }}>
           {
-            mobile ? <Header title={'Shipments'} /> : <MobileHeader />
+            mobile ? <Header title={'Shipments'} setReloadOnHeaderChange={setReloadOnHeaderChange} /> : <MobileHeader />
           }
 
           <div className='tableContainer' style={{ paddingInline: 24, paddingTop: 10, paddingBottom: mobile ? 24 : 65, position: 'relative', marginTop: mobile ? '56px' : '0px', marginLeft: mobile ? '70px' : '0px' }}>

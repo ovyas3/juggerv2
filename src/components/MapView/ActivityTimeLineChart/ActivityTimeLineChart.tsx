@@ -1,9 +1,14 @@
 'use client'
-import { Box, Button, ButtonBase, CardContent, CardMedia, Grid } from "@mui/material";
-import React from "react";
+import { Box, Button, CardContent, Grid } from "@mui/material";
+import React, { Children } from "react";
 import { useEffect, useState } from "react";
-import pickupIcon from '../../../assets/pickup_icon.svg';
-import Image from 'next/image';
+import { Timeline, TimelineConnector, TimelineContent, TimelineDot, TimelineItem, TimelineOppositeContent, TimelineSeparator } from "@mui/lab";
+import service from "@/utils/timeService";
+import ShareLocationOutlinedIcon from '@mui/icons-material/ShareLocationOutlined';
+import MyLocationOutlinedIcon from '@mui/icons-material/MyLocationOutlined';
+import {
+  timelineOppositeContentClasses,
+} from '@mui/lab/TimelineOppositeContent';
 
 export const ActivityTimeLineChart = (props: any) => {
     // const dateConvertor = (date) => DateTime.fromISO(date).plus({minutes: 330}).toFormat("dd-MM-yyyy HH:mm");
@@ -11,8 +16,10 @@ export const ActivityTimeLineChart = (props: any) => {
     const numberOfStops = props.trackingDetails.length;
     const [startingPings, setStartingPings] = useState([]);
     const [endingPings, setEndingPings] = useState([]);
-    const [showPings, setShowPings] = useState(false);
-    const [lowPings, setLowPings] = useState(false);
+    const [pings, setPings] = useState([]);
+    const [firstPing, setFirstPing] = useState<any>({});
+    const [showPings, setShowPings] = useState(true);
+    const [lowPings, setLowPings] = useState(true);
   
     useEffect(() => {
       const data = props.trackingDetails;
@@ -22,6 +29,10 @@ export const ActivityTimeLineChart = (props: any) => {
       } else {
         setLowPings(true)
       }
+      const latestPing = data[0]
+      const restPings = data.slice(1)
+      setFirstPing(latestPing)
+      setPings(restPings)
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [numberOfStops])
     const handleLoadMore = (e: any) => {
@@ -29,7 +40,7 @@ export const ActivityTimeLineChart = (props: any) => {
       setShowPings(!showPings);
     }
     return (<React.Fragment>
-      <CardContent className={props.className} >
+      <CardContent className={props.className} style={{height: '63%'}} >
         <Grid style={
           {
                 display: 'flex',
@@ -59,163 +70,64 @@ export const ActivityTimeLineChart = (props: any) => {
                 alignItems: 'center',
                 justifyContent: 'center',
                 borderRadius: '5px',
-                fontSize: '14px',
+                fontSize: '20px',
               }
             }>
-              List of stations it has stopped at
+              FOIS Timeline
             </Box>
-            {showPings && <Button variant="outlined" style={
-              {
-                display: "flex",
-                height: '24px',
-                width: '20%',
-                padding: '4px',
-                alignItems: 'center',
-                justifyContent: 'center',
-                borderRadius: '5px',
-                fontSize: '10px',
-              }
-            } onClick={handleLoadMore} >Show Less</Button>}
           </Grid>
         </Grid>
-        <Grid container spacing={2} direction={"row"} color={"#42454E"} maxHeight={"100%"} justifyContent={"flex-start"} overflow={"scroll"} marginTop={"5px"}>
-        {
-            (lowPings || showPings) && props.trackingDetails.map((details: {currentStatus: string}, index: number) => {
-              return (<Grid container spacing={2} item xs={12} key={index} >
-                {/* <Grid justifyContent={"flex-end"} item xs={4} fontSize={"10px"} >
-                  {dateConvertor(details.created_at)}
-                </Grid> */}
-                <Grid item display={"flex"} justifyContent={"center"} alignItems={"center"} xs={2}>
-                  {/* <CardMedia
-                    component={"img"}
-                    src={pickupIcon}
-                    sx={{
-                      height: '10px',
-                      width: '10px',
-                      justifyContent: "center",
-                    }}
-                  /> */}
-                  <Image
-                    src={ pickupIcon }
-                    alt="Map Path Icon"
-                    width={10}
-                    height={10}
-                  />        
-                </Grid>
-                <Grid justifyContent={"flex-start"} item xs={10} fontSize={"10px"} >
-                  {details.currentStatus}
-                </Grid>
-              </Grid>)
-            })
-          }
-          {
-            (!showPings && startingPings.length) ? startingPings.map((details: { currentStatus: string } , index: number) => {
-              return (<Grid container spacing={2} item xs={12} key={index} >
-                {/* <Grid justifyContent={"flex-end"} item xs={4} fontSize={"10px"} >
-                  {dateConvertor(details.created_at)}
-                </Grid> */}
-                <Grid item display={"flex"} justifyContent={"center"} alignItems={"center"} xs={2}>
-                  {/* <CardMedia
-                    component={"img"}
-                    src={pickupIcon}
-                    sx={{
-                      height: '10px',
-                      width: '10px',
-                      justifyContent: "center",
-                    }}
-                  /> */}
-                  <Image
-                    src={ pickupIcon }
-                    alt="Map Path Icon"
-                    width={10}
-                    height={10}
-                  />
-                </Grid>
-                <Grid justifyContent={"flex-start"} item xs={10} fontSize={"10px"} >
-                  {details.currentStatus}
-                </Grid>
-              </Grid>)
-            }) : null
-          }
-          {!showPings && startingPings.length && endingPings.length ?
-            <Grid item container spacing={2} display={"block"} xs={12} >
-              <Grid item display={"flex"} margin-left={"20px"} justifyContent={"center"} height={'10px'}  alignItems={"center"} xs={10}>
-                  {/* <CardMedia
-                    component={"img"}
-                    src={pickupIcon}
-                    sx={{
-                      height: '8px',
-                      width: '8px',
-                      justifyContent: "center",
-                    }}
-                  /> */}
-                  <Image
-                    src={ pickupIcon }
-                    alt="Map Path Icon"
-                    width={10}
-                    height={10}
-                  />
-              </Grid>
-              <Grid item display={"flex"} justifyContent={"center"} height={'10px'}  alignItems={"center"} xs={10}>
-                  {/* <CardMedia
-                    component={"img"}
-                    src={pickupIcon}
-                    sx={{
-                      height: '8px',
-                      width: '8px',
-                      justifyContent: "center",
-                    }}
-                  /> */}
-                  <ButtonBase style={{fontSize:'10px'}} onClick={handleLoadMore} >Load More</ButtonBase>
-              </Grid>
-              <Grid item display={"flex"} margin-left={"20px"} justifyContent={"center"} height={'10px'}  alignItems={"center"} xs={10}>
-                  {/* <CardMedia
-                    component={"img"}
-                    src={pickupIcon}
-                    sx={{
-                      height: '8px',
-                      width: '8px',
-                      justifyContent: "center",
-                    }}
-                  /> */}
-                  <Image
-                    src={ pickupIcon }
-                    alt="Map Path Icon"
-                    width={10}
-                    height={10}
-                  />
-              </Grid>
-            </Grid>
-            :null}
-          {
-            (!showPings && endingPings.length) ? endingPings.map(( details: {currentStatus: string}, index: number) => {
-              return (<Grid container spacing={2} item xs={12} key={index} >
-                {/* <Grid justifyContent={"flex-end"} item xs={4} fontSize={"10px"} >
-                  {dateConvertor(details.created_at)}
-                </Grid> */}
-                <Grid item display={"flex"} justifyContent={"center"} alignItems={"center"} xs={2}>
-                  {/* <CardMedia
-                    component={"img"}
-                    src={pickupIcon}
-                    sx={{
-                      height: '10px',
-                      width: '10px',
-                      justifyContent: "center",
-                    }}
-                  /> */}
-                  <Image
-                    src={ pickupIcon }
-                    alt="Map Path Icon"
-                    width={10}
-                    height={10}
-                  />
-                </Grid>
-                <Grid justifyContent={"flex-start"} item xs={10} fontSize={"10px"} >
-                  {details.currentStatus}
-                </Grid>
-              </Grid>)
-            }) : null
-          }
+        <Grid container spacing={2} direction={"row"} color={"#42454E"} maxHeight={"100%"} justifyContent={"flex-start"} overflow={"scroll"} marginTop={"5px"}> 
+          <Timeline
+           sx={{
+            [`& .${timelineOppositeContentClasses.root}`]: {
+              flex: 0.4,
+            },
+          }}
+          >
+            {firstPing && <TimelineItem sx={{
+              fontWeight: 900
+            }} key={firstPing._id} style={{fontSize: '17px'}}>
+                    <TimelineOppositeContent sx={{
+              fontWeight: 900
+            }}  color="text.secondary" fontSize={"small"} marginTop={"20px"}>
+                      { service.utcToistTime(firstPing.time_stamp, 'dd-MM-yyyy HH:mm') }
+                    </TimelineOppositeContent>
+                    <TimelineSeparator >
+                      <TimelineConnector />
+                        <TimelineDot sx={{
+                          backgroundColor: "white"
+                        }}>
+                          <MyLocationOutlinedIcon fontSize="small" color="success" />
+                        </TimelineDot>
+                      <TimelineConnector />
+                    </TimelineSeparator>
+                    <TimelineContent sx={{
+              fontWeight: 900
+            }} fontSize={"small"}  marginTop={"20px"}>{ firstPing.currentStatus?.split(/ on /i)[0] }</TimelineContent>
+                  </TimelineItem>}
+            {
+              pings && pings.length && pings.map((ping: any) => {
+                return (
+                  <TimelineItem key={ping._id} style={{fontSize: '17px'}}>
+                    <TimelineOppositeContent color="text.secondary" fontSize={"small"} marginTop={"20px"}>
+                      { service.utcToistTime(ping.time_stamp, 'dd-MM-yyyy HH:mm') }
+                    </TimelineOppositeContent>
+                    <TimelineSeparator >
+                      <TimelineConnector />
+                        <TimelineDot sx={{
+                          backgroundColor: "white"
+                        }}>
+                          <ShareLocationOutlinedIcon fontSize="small" color="info" />
+                        </TimelineDot>
+                      <TimelineConnector />
+                    </TimelineSeparator>
+                    <TimelineContent fontSize={"small"}  marginTop={"20px"}>{ ping.currentStatus.split(/ on /i)[0] }</TimelineContent>
+                  </TimelineItem>
+                )
+              })
+            }
+          </Timeline>
         </Grid>
       </CardContent>
     </React.Fragment>)

@@ -16,14 +16,16 @@ body {
     margin-top: 17px;
     border-radius: 20px;
     width: 92%;
-    max-height: 300px;
+    max-height: 230px;
 }
 
 .tracking_details {
     height: 10px;
-    margin-top: 43px;
+    margin-top: 41px;
     margin-left: 0px;
     transition: 0.5s ease-in-out;
+
+    /* background-color: #cd0030; */
 }
 
 .tracking_details_mobile {
@@ -69,9 +71,9 @@ body {
 }
 
 .mapButtons {
-    position: absolute;
+    position: fixed;
     top: 10%;
-    right: 4%;
+    right: 8%;
     z-index: 10000;
     width: 32%;
     justify-content: space-around;

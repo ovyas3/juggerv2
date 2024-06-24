@@ -1,37 +1,68 @@
+.progress-bar-wrapper {
+  min-width: 200px;
+  margin-left: 20px;
+  margin-bottom: 36px;
+}
+
+.progress-bar-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 .icon-container {
-    position: relative;
-    display: inline-block;
-    width: 30px; 
-    height: 50px; 
-  }
-  
-  .icon-before,
-  .icon-after {
-    position: absolute;
-    top: 50%;
-    left: 75%;
-    transform: translate(-50%, -50%);
-    transition: all 0.5s ease; 
-  }
-  
-  .icon-after {
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(0);
-  }
-  
-  
-  .icon-before-hovered {
-    left:20%;
-  }
+  position: relative;
+  width: 30px;
+  height: 50px;
+  margin-right: 24px;
+  display: flex;
+  align-items: center;
+}
 
- .icon-after-hovered {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
-  }
+.icon-before,
+.icon-after {
+  position: absolute;
+  top: 50%;
+  left: 75%;
+  transform: translate(-50%, -50%);
+  transition: all 0.5s ease;
+}
 
-  .icon-container-hovered {
-    width:48px;
-  }
+.icon-after {
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0);
+  margin-left: 4px;
+}
+
+.icon-before-hovered {
+  left: 20%;
+}
+
+.icon-after-hovered {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.icon-container-hovered {
+  width: 48px;
+}
+
+.progress-info-container {
+  position: relative;
+  height: 42px;
+}
+
+.progress-info-count {
+  font-size: 24px;
+  font-weight: bold;
+  color: black;
+}
+
+.progress-info-name {
+  font-size-adjust: 12px;
+  color: #71747A;
+  margin-left: 8px;
+}
 
 
-  
+

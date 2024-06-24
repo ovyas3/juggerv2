@@ -174,6 +174,7 @@ const convertArrayToFilteredArray = (inputArray: any) => {
             delivery_location?: any;
             others?: any;
             remarks?: any;
+            eta: string,
             allFNRs: any;
             unique_code: string,
             _id: string,
@@ -185,7 +186,11 @@ const convertArrayToFilteredArray = (inputArray: any) => {
             is_captive: Boolean,
             trip_tracker: any,
         }) => {
+<<<<<<< HEAD
         const { edemand_no, FNR, allFNRs, delivery_location, trip_tracker, others, remarks, unique_code, status, pickup_date, captive_id, is_captive } = item;
+=======
+        const { edemand_no, FNR, allFNRs, delivery_location, others, remarks, unique_code, status, eta, } = item;
+>>>>>>> f421230ea229d1d03ae7ad221ed1a724dde00886
         return {
             _id: item._id,
             edemand: edemand_no,
@@ -206,7 +211,7 @@ const convertArrayToFilteredArray = (inputArray: any) => {
                 name: statusBuilder(status),
                 code: status || ''
             },
-            currentEta: 'NA',
+            currentEta: service.utcToist(eta),
             remarks: 'NA',
             handlingAgent: 'NA',
             action: null,

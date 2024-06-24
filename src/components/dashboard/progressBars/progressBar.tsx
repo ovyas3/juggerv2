@@ -1,36 +1,55 @@
 import * as React from "react";
 import Image from "next/image";
-import "./css/progressBar.css"
+import "./css/progressBar.css";
 
-export default function ProgressBar(props: any) {
+const ProgressBar = (props: any) => {
   return (
     <div
-      style={{ minWidth: "200px", marginLeft: "20px", marginBottom: "36px" }}
+      className="progress-bar-wrapper"
     >
       <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
+        className="progress-bar-container"
+        onClick={() => {
+            props.handleAllRakesAndTable(props.name);
         }}
+        style={{ cursor: "pointer" }}
       >
-        <div style={{position:"relative",height:"42px"}}>
-          <span style={{ fontSize: "24px", fontWeight: "bold" }}>
+        <div className="progress-info-container">
+          <span
+            className="progress-info-count"
+          >
             {props.count}
           </span>
           <span
-            style={{ fontSize: "12px", color: "#71747A", marginLeft: "8px" }}
+            className="progress-info-name"
           >
             {props.name}
           </span>
         </div>
         <div
-          style={{ marginRight: "24px", display: "flex", alignItems: "center" }}
-          className={props.isHovered ? "icon-container icon-container-hovered":"icon-container"}
+          className={
+            props.isHovered
+              ? "icon-container icon-container-hovered"
+              : "icon-container"
+          }
         >
-          <Image src={props.icon} alt="" className={props.isHovered ? "icon-before icon-before-hovered":"icon-before"} />
+          <Image
+            src={props.icon}
+            alt=""
+            className={
+              props.isHovered
+                ? "icon-before icon-before-hovered"
+                : "icon-before"
+            }
+          />
           {props.isHovered ? (
-            <Image src={props.hoverIcon} alt="" style={{ marginLeft: "4px" }} className={props.isHovered ? "icon-after icon-after-hovered":"icon-after"}/>
+            <Image
+              src={props.hoverIcon}
+              alt=""
+              className={
+                props.isHovered ? "icon-after icon-after-hovered" : "icon-after"
+              }
+            />
           ) : (
             <></>
           )}
@@ -59,3 +78,5 @@ export default function ProgressBar(props: any) {
     </div>
   );
 }
+
+export default ProgressBar;
