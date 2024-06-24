@@ -71,7 +71,7 @@ body {
 }
 
 .mapButtons {
-    position: absolute;
+    position: fixed;
     top: 10%;
     right: 8%;
     z-index: 10000;
