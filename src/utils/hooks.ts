@@ -2,7 +2,7 @@
 import {useState, useEffect} from 'react'
 
 export const useWindowSize = (width: number): Boolean => {
-    const [isWide, setIsWide] = useState(true);
+  const [isWide, setIsWide] = useState(true);
   
   useEffect(() => {
     if (window) {

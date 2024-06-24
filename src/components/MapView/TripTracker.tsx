@@ -146,7 +146,7 @@ const TripTracker = (params: any) => {
                       Current Status: {currentLocation.currentStatus.split(/ on /i)[0]}
                       <br />
                       <hr />
-                      Arrived At: { service.utcToist(currentLocation.time_stamp, 'dd-MM-yyyy hh:mm a') }
+                      Updated At: { service.utcToist(currentLocation.time_stamp, 'dd-MM-yyyy hh:mm') }
                   </Popup>
                 </Marker>}
           </MapContainer>
