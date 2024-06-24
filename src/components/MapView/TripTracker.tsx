@@ -21,12 +21,16 @@ import { ActivityTimeLineChart } from './ActivityTimeLineChart/ActivityTimeLineC
 import { statusBuilder } from './StatusBuilder/StatusBuilder';
 import 'leaflet/dist/leaflet.css';
 import service from '@/utils/timeService';
+import polyline from '@mapbox/polyline';
 
 const renderMarkers = (tracking_data: any[], customIcon: Icon): JSX.Element[] => {
   return tracking_data.map((point, index) => (
     <Marker key={index} position={[point.geo_point.coordinates[1], point.geo_point.coordinates[0]]} icon={customIcon}>
       <Popup>
-          {point.currentStatus}
+          Current Status: {point.currentStatus.split(/ on /i)[0]}
+          <br />
+          <hr />
+          Updated At: { service.utcToist(point.time_stamp, 'dd-MM-yyyy HH:mm') }
       </Popup>
     </Marker>
   ));
@@ -47,10 +51,13 @@ const TripTracker = (params: any) => {
   const [buttonEnabledGPS, setButtonEnabledGPS] = useState(false);
   const [activityData, setActivityData] = useState([]);
   const [currentLocation, setCurrentLocation] = useState<any>({});
+  const [track, setTrack] = useState<any>([])
+  const [newGPSTrack, setNewGPSTrack] = useState<any>([]);
   const handleFoisCheck = (e: any) => {
     setShowFoisTracks(e.target.checked);
   }
   const handleGPSCheck = (e: any) => {
+    console.log(e.target.checked)
     setShowGPSTracks(e.target.checked);
   }
   const customIcon = new Icon({
@@ -69,8 +76,16 @@ const TripTracker = (params: any) => {
     const {
       rakeData,
       tracks,
-    } = trip_tracker_data;
+    } = trip_tracker_data || {};
     setFnrData(rakeData);
+    
+    const tripTrackerLine = rakeData && rakeData.trip_tracker ?  rakeData.trip_tracker.polyline || '' : '';
+    const decodedCoordinates = polyline.decode(tripTrackerLine) || [];
+    setTrack(decodedCoordinates);
+
+    const tripTrackerLine1 = rakeData ? rakeData.polyline || '' : '';
+    const decodeline = polyline.decode(tripTrackerLine1) || [];
+    setNewGPSTrack(decodeline);
     // remove tracks if currentStatus is empty or its misisng geo_point ir if geo_point.coordinates is empty or if its length is less than 2 or if geo_point.coordinates ==[0, 0]
     const tracksWithStatus = tracks.filter((track: any) => {
       if (!track.currentStatus || track.currentStatus === '') {
@@ -140,13 +155,14 @@ const TripTracker = (params: any) => {
                 </LayersControl>
                 {/* <Polygon pathOptions={{ color: 'blue' }} positions={pickupgeofence_decoded} /> */}
                 { showFoisTracks &&  renderMarkers(tracking_data, customIcon)}
+                { showGPSTracks &&  track.length && <Polyline pathOptions={{ color:'red'}} positions={track} />}
                 { showFoisTracks &&  trackingLine.length && <Polyline pathOptions={{ color:'red'}} positions={trackingLine} />}
                 { showFoisTracks && <Marker position={[currentLocation.geo_point.coordinates[1], currentLocation.geo_point.coordinates[0]]} icon={currentTrainLocation}>
                   <Popup>
                       Current Status: {currentLocation.currentStatus.split(/ on /i)[0]}
                       <br />
                       <hr />
-                      Updated At: { service.utcToist(currentLocation.time_stamp, 'dd-MM-yyyy hh:mm') }
+                      Updated At: { service.utcToist(currentLocation.time_stamp, 'dd-MM-yyyy HH:mm') }
                   </Popup>
                 </Marker>}
           </MapContainer>
