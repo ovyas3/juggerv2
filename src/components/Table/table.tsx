@@ -188,6 +188,8 @@ const convertArrayToFilteredArray = (inputArray: any) => {
             captive_id: string,
             is_captive: Boolean,
             trip_tracker: any,
+            etaTime: any,
+
         }) => {
         const { edemand_no, FNR, all_FNRs, delivery_location, trip_tracker, others, remarks, unique_code, status, pickup_date, captive_id, is_captive, eta } = item;
         return {
@@ -204,13 +206,17 @@ const convertArrayToFilteredArray = (inputArray: any) => {
             },
             material: others.demandedCommodity || 'NA',
             pickupdate: {
-                date: pickup_date || 'NA',
+                date: service.utcToist(pickup_date) || 'NA',
+                pickupTime: service.utcToistTime(pickup_date) || 'NA'
             },
             status: {
                 name: statusBuilder(status),
                 code: status || ''
             },
-            currentEta: service.utcToist(eta) || 'NA',
+            currentEta: {
+                date: service.utcToist(eta) || 'NA',
+                etaTime: service.utcToistTime(eta) || 'NA'
+            },
             remarks: 'NA',
             handlingAgent: 'NA',
             action: null,
@@ -219,7 +225,11 @@ const convertArrayToFilteredArray = (inputArray: any) => {
                 is_fois: trip_tracker && trip_tracker.fois_last_location ? true : false,
                 is_gps: trip_tracker && trip_tracker.gps_last_location ? true : false,
             },
-            validationForAttachRake: !captive_id && is_captive
+            validationForAttachRake: !captive_id && is_captive,
+            eta: eta,
+            pickup_date: pickup_date
+
+
         }
     });
 };
@@ -235,7 +245,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
 
     //pagination
     const [page, setPage] = React.useState(0);
-    const [rowsPerPage, setRowsPerPage] = React.useState(50);
+    const [rowsPerPage, setRowsPerPage] = React.useState(10);
 
     //making edemand column toggle
     const [edemand, setEdemand] = React.useState(true);
@@ -500,7 +510,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                 iconheader: 'body_iconheader'
                                             }
 
-                                            console.log(row.fnr.others)
+                                            console.log(row.eta)
                                             return (
                                                 <TableCell key={index} sx={{ fontSize: '12px', color: '#44475B', p: '16px 10px 16px 10px' }}
                                                     className={columnClassNames[item.id]} >
@@ -582,16 +592,16 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                         >
                                                                             <div style={{ cursor: 'pointer' }} >+{value.others.length}</div>
                                                                             <div className='show_Allfnr'
-                                                                                style={{display: showAllFnr === firstindex ? 'block' : 'none'}}
-                                                                                >
+                                                                                style={{ display: showAllFnr === firstindex ? 'block' : 'none' }}
+                                                                            >
                                                                                 <div className='contain_fnr'>
-                                                                                {
-                                                                                    value.others.map((item: string, index: number) => {
-                                                                                        return <div key={index} >{item}</div>
-                                                                                    })
-                                                                                }
-                                                                                </div> 
-                                                                                
+                                                                                    {
+                                                                                        value.others.map((item: string, index: number) => {
+                                                                                            return <div key={index} >{item}</div>
+                                                                                        })
+                                                                                    }
+                                                                                </div>
+
                                                                             </div>
                                                                         </div>
                                                                     </div>
@@ -610,10 +620,16 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                         }
                                                         {
                                                             item.id === 'pickupdate' ?
+                                                                <div>
+                                                                    {
+                                                                        row.pickup_date ?
+                                                                            <div>
+                                                                                <div>{value.date}</div>
+                                                                                <div>{value.pickupTime}</div>
+                                                                            </div>
+                                                                            : <>NA</>
+                                                                    }
 
-                                                                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                                                    <div>{service.utcToist(value.date)}</div>
-                                                                    <div>{service.utcToistTime(value.date)}</div>
                                                                 </div>
                                                                 : <></>
                                                         }
@@ -641,6 +657,21 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                         style={{ display: 'block' }}
                                                                         alt=''
                                                                     />
+                                                                </div>
+                                                                : <></>
+                                                        }
+                                                        {
+                                                            item.id === 'currentEta' ?
+                                                                <div>
+                                                                    {
+                                                                        row.eta ?
+                                                                            <div>
+                                                                                <div>{value.date}</div>
+                                                                                <div>{value.etaTime}</div>
+                                                                            </div>
+                                                                            : <>NA</>
+                                                                    }
+
                                                                 </div>
                                                                 : <></>
                                                         }

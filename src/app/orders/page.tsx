@@ -41,15 +41,15 @@ const OrdersPage = () => {
 
 
   //shipment payload
-  const [ShipmentsPayload, setShipmentsPayload] = useState({
+  const [ShipmentsPayload, setShipmentsPayload] = useState<any>({
     is_outbound: true,
     to: '',
-    from: ''
+    from: '',
   })
 
   //adding to and from to shipmentpayload
   const handleToFromChange = (to: string, from: string) => {
-    setShipmentsPayload(prevState => ({
+    setShipmentsPayload((prevState:any) => ({
       ...prevState,
       to: to,
       from: from
@@ -58,7 +58,7 @@ const OrdersPage = () => {
 
   //adding limit and skip to shipmentpayload
   const handleSkipLimitChange = (limit: number, skip: number,) => {
-    setShipmentsPayload(prevState => ({
+    setShipmentsPayload((prevState:any) => ({
       ...prevState,
       limit: limit,
       skip: skip
@@ -66,14 +66,14 @@ const OrdersPage = () => {
   }
 
   const handleChangeByFnr = (fnr: string)=>{
-    setShipmentsPayload(prevState => ({
+    setShipmentsPayload((prevState:any) => ({
       ...prevState,
       fnrNumber: fnr,
     }));
   }
 
   const handleChangeStatus = (status: string) =>{
-    setShipmentsPayload(prevState => {
+    setShipmentsPayload((prevState:any) => {
       if (status === "All") {
        
         // Create a new object without the status property
