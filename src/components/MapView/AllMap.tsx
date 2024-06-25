@@ -310,7 +310,6 @@ const MapLayers = () => {
     };
     
     const focusOnRake = (rake: any) => {
-      console.log(rake);
       if (rake && parseFloat(rake.hours.split('h')[0]) > 720) {
         if (selectedMarkerRef.current) {
           selectedMarkerRef.current.closePopup();
