@@ -6,9 +6,10 @@ import { useSearchParams } from 'next/navigation'
 import { useEffect, useState, Suspense } from "react";
 import { httpsGet } from "../../utils/Communication";
 import dynamic from 'next/dynamic'
+import Placeholder from "@/components/MapView/Skeleton/placeholder";
 
 const TripTrackerDynamic = dynamic(() => import('../../components/MapView/TripTracker'), {
-  loading: () => <p>Loading...</p>,
+  loading: () => <Placeholder />,
   ssr: false
 })
 

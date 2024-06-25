@@ -74,8 +74,6 @@ const OrdersPage = () => {
     if (ShipmentsPayload.from && ShipmentsPayload.to) getAllShipment();
   }, [ShipmentsPayload])
 
-
-  // console.log(statusForShipment)
   if(reloadOnHeaderChange) getAllShipment();
 
   return (
