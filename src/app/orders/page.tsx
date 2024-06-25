@@ -14,6 +14,20 @@ import { ShipmentsObjectPayload } from "@/utils/interface";
 import { httpsGet, httpsPost } from "@/utils/Communication";
 import { GET_SHIPMENTS, CAPTIVE_RAKE } from "@/utils/helper";
 
+
+const getStatusCode = (status: string): string => {
+  switch (status) {
+    case "In Transit":
+      return "ITNS"
+    case "Delivered":
+      return 'All' // todo:adding according to backend
+    case "In Plant":
+      return 'All'// todo:adding according to backend
+    default:
+      return 'All'
+  }
+}
+
 const OrdersPage = () => {
   const t = useTranslations('ORDERS');
   const mobile = useWindowSize(500);
@@ -27,15 +41,15 @@ const OrdersPage = () => {
 
 
   //shipment payload
-  const [ShipmentsPayload, setShipmentsPayload] = useState({
+  const [ShipmentsPayload, setShipmentsPayload] = useState<any>({
     is_outbound: true,
     to: '',
-    from: ''
+    from: '',
   })
 
   //adding to and from to shipmentpayload
   const handleToFromChange = (to: string, from: string) => {
-    setShipmentsPayload(prevState => ({
+    setShipmentsPayload((prevState:any) => ({
       ...prevState,
       to: to,
       from: from
@@ -44,15 +58,40 @@ const OrdersPage = () => {
 
   //adding limit and skip to shipmentpayload
   const handleSkipLimitChange = (limit: number, skip: number,) => {
-    setShipmentsPayload(prevState => ({
+    setShipmentsPayload((prevState:any) => ({
       ...prevState,
       limit: limit,
       skip: skip
     }));
   }
 
-  // function which bring allshipment
+  const handleChangeByFnr = (fnr: string)=>{
+    setShipmentsPayload((prevState:any) => ({
+      ...prevState,
+      fnrNumber: fnr,
+    }));
+  }
+
+  const handleChangeStatus = (status: string) =>{
+    setShipmentsPayload((prevState:any) => {
+      if (status === "All") {
+       
+        // Create a new object without the status property
+        const { status, ...newState } = prevState;
+        return newState;
+      } else {
+        return {
+          ...prevState,
+          status: getStatusCode(status)
+        };
+      }
+    });
+   
+  }
+
+  // function which bring allshipment   OB ITNS CPTD
   async function getAllShipment() {
+    console.log(ShipmentsPayload)
     const response = await httpsPost(GET_SHIPMENTS, ShipmentsPayload);
     console.log(response)
     setAllShipment(response.data.data)
@@ -89,6 +128,13 @@ const OrdersPage = () => {
             {/* ----search fnr---- */}
             <div className='input_fnr_reload'>
               <div className={`reload ${reload ? 'loading' : ''}`} onClick={() => {
+                const { fnrNumber, ...updatedShipmentsPayload } = ShipmentsPayload;
+    
+                // Update the state
+                setShipmentsPayload(updatedShipmentsPayload);
+                
+                // Log the updated payload
+                console.log(updatedShipmentsPayload);
                 getAllShipment();
                 setReload(true)
                 setTimeout(() => { setReload(false) }, 3000)
@@ -111,13 +157,13 @@ const OrdersPage = () => {
 
             {/* ----filter---- */}
             <div className='filters' >
-              <Filters onToFromChange={handleToFromChange} setStatusForShipment={setStatusForShipment} />
+              <Filters onToFromChange={handleToFromChange}   onChangeStatus={handleChangeStatus} />
 
             </div>
 
             {/* ----table---- */}
             <div className='tableData'>
-              <TableData onSkipLimit={handleSkipLimitChange} allShipments={allShipment} count={count} rakeCaptiveList={rakeCaptiveList} statusForShipment={statusForShipment}  />
+              <TableData onSkipLimit={handleSkipLimitChange} allShipments={allShipment} count={count} rakeCaptiveList={rakeCaptiveList} statusForShipment={statusForShipment} onFnrChange={handleChangeByFnr} reload={reload}/>
             </div>
 
           </div>

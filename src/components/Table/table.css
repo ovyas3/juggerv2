@@ -5,7 +5,7 @@
 
 .fnr{
     /* background-color: cadetblue !important; */
-    min-width: 116px !important; 
+    min-width: 130px !important; 
     color: #484A57 !important;
     
 }
@@ -199,6 +199,50 @@
 .fnr_inner_inner_nachoes{
     color: #44475B;
 
+}
+.all_Pnr_count{
+    background-color: #3350FC;
+    height: 16px;
+    width: 16px;
+    border-radius: 50%;
+    font-size: 9px;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.show_Allfnr{
+    background-color: transparent;
+    width: 80px;
+    position: absolute;
+    z-index: 1
+    ;
+    top: 0px;
+    left: 0px;
+    border-radius: 4px;
+    
+    font-size: 10px;
+    /* box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.3); */
+
+}
+
+.contain_fnr{
+    background-color: #3350FC;
+    margin-top: 20px;
+    padding: 8px;
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.fnr_inner_data{
+    display: flex !important;
+    gap:5px;
+    justify-content:flex-start !important;
+    
 }
 
 
