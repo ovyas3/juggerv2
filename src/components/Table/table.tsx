@@ -21,6 +21,12 @@ import Link from 'next/link';
 import { Column, row } from '@/utils/interface';
 import { useTranslations } from 'next-intl';
 
+// 24062024178
+
+// 24062024178
+
+// 24062013552
+
 
 
 import Autocomplete from '@mui/material/Autocomplete';
@@ -79,8 +85,6 @@ function Tags({ rakeCaptiveList, shipmentId, setOpen, setShowActionBox }: any) {
             shipmentId: shipmentId,
             captiveId: selectedItems._id
         };
-        console.log(updatedObject)
-
         if (selectedItems._id) {
             rake_update_id(updatedObject)
         }
@@ -120,7 +124,6 @@ function Tags({ rakeCaptiveList, shipmentId, setOpen, setShowActionBox }: any) {
                     )}
                     onChange={(event, newValue) => {
                         event.stopPropagation();
-                        console.log('this is triggering')
                         setSelectedItems(newValue)
                     }}
                     renderInput={(params) => (
@@ -175,7 +178,7 @@ const convertArrayToFilteredArray = (inputArray: any) => {
             others?: any;
             remarks?: any;
             eta: string,
-            allFNRs: any;
+            all_FNRs: any;
             unique_code: string,
             _id: string,
             status: string,
@@ -186,13 +189,13 @@ const convertArrayToFilteredArray = (inputArray: any) => {
             is_captive: Boolean,
             trip_tracker: any,
         }) => {
-        const { edemand_no, FNR, allFNRs, delivery_location, trip_tracker, others, remarks, unique_code, status, pickup_date, captive_id, is_captive, eta } = item;
+        const { edemand_no, FNR, all_FNRs, delivery_location, trip_tracker, others, remarks, unique_code, status, pickup_date, captive_id, is_captive, eta } = item;
         return {
             _id: item._id,
             edemand: edemand_no,
             fnr: {
                 primary: FNR,
-                others: allFNRs || 'NA',
+                others: all_FNRs || 'NA',
                 unique_code,
             },
             destination: {
@@ -228,14 +231,14 @@ const convertArrayToFilteredArray = (inputArray: any) => {
 
 
 // Main component
-export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, count, statusForShipment }: any) {
+export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, count, statusForShipment, onFnrChange, reload }: any) {
 
     //language controller
     const t = useTranslations("ORDERS")
 
     //pagination
     const [page, setPage] = React.useState(0);
-    const [rowsPerPage, setRowsPerPage] = React.useState(10);
+    const [rowsPerPage, setRowsPerPage] = React.useState(50);
 
     //making edemand column toggle
     const [edemand, setEdemand] = React.useState(true);
@@ -263,25 +266,34 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
     //search fnr 
     const [settingFnrChange, setSettingFnrChange] = useState('');
 
+    // all Fnr Show toggle
+    const [showAllFnr, setShowAllFnr] = useState(-1)
+
 
     const handleRRDoc = (id: string) => {  // for rr documents
         console.log('working:', id)
     }
 
     const handleChangeByFnr = (changeFnr: string) => {
-        setSettingFnrChange(changeFnr)
-        if (changeFnr === '') {
-            const resData = convertArrayToFilteredArray(allShipments)
-            setResponse(resData)
+        if (changeFnr.length === 11) {
+            setSettingFnrChange(changeFnr)
+            onFnrChange(changeFnr)
         } else {
-            const resData = convertArrayToFilteredArray(allShipments)
-            const filteredData = resData.filter((item: { fnr: { primary: string | string[]; }; }) => item.fnr.primary.includes(changeFnr));
-            setResponse(filteredData)
+            if (!changeFnr) onFnrChange(changeFnr);
+            setSettingFnrChange(changeFnr)
+            if (changeFnr === '') {
+                const resData = convertArrayToFilteredArray(allShipments)
+                setResponse(resData)
+            } else {
+                const resData = convertArrayToFilteredArray(allShipments)
+                const filteredData = resData.filter((item: { fnr: { primary: string | string[]; }; }) => item.fnr.primary.includes(changeFnr));
+                setResponse(filteredData)
+            }
         }
     }
     const handleChangePage = (event: unknown, newPage: number) => {
         setPage(newPage);
-        setSettingFnrChange('')
+        setSettingFnrChange(settingFnrChange);
     };
 
     const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -297,16 +309,16 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
 
     useEffect(() => {
         const resData = convertArrayToFilteredArray(allShipments)
-        console.log(statusForShipment)
         if (statusForShipment === 'All') {
             setResponse(resData)
         } else {
-            const filteredData = resData.filter(shipment => shipment.status.name === statusForShipment);
-            console.log(filteredData)
+            const filteredData = resData.filter((shipment: any) => shipment.status.name === statusForShipment);
             setResponse(filteredData)
         }
+        if (settingFnrChange.length) {
+            setSettingFnrChange(settingFnrChange)
+        } else { setSettingFnrChange('') }
 
-        setSettingFnrChange('')
     }, [allShipments, page, statusForShipment])
 
     useEffect(() => {
@@ -326,8 +338,6 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
             }
             event.stopPropagation();
         }
-
-        console.log('this is hrfhefgvhfghd')
 
         if (showActionBox !== -1) {
             document.addEventListener('mousedown', handleClickOutside);
@@ -366,6 +376,10 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
         setColumns(commonColumns);
     }, [edemand, showEdemand,])
 
+    useEffect(() => {
+        setSettingFnrChange('')
+    }, [reload])
+
     return (
         <div className='target'>
             <Paper
@@ -386,7 +400,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                     }
                 }}>
                 <TablePagination
-                    rowsPerPageOptions={[5, 10, 25, 100]}
+                    rowsPerPageOptions={[5, 10, 25, 50, 100]}
                     component="div"
                     count={count}
                     rowsPerPage={rowsPerPage}
@@ -489,6 +503,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                 iconheader: 'body_iconheader'
                                             }
 
+                                            console.log(row.fnr.others)
                                             return (
                                                 <TableCell key={index} sx={{ fontSize: '12px', color: '#44475B', p: '16px 10px 16px 10px' }}
                                                     className={columnClassNames[item.id]} >
@@ -557,15 +572,32 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                         {
                                                             item.id === 'fnr' ?
                                                                 <div className='fnr_container'>
+                                                                    <div>Primary</div>
                                                                     <div className='fnr_inner_data'>
                                                                         <Link target="_blank"
                                                                             href={"/tracker?unique_code=" + value.unique_code}
                                                                         >
                                                                             {value.primary}
                                                                         </Link>
+                                                                        <div className='all_Pnr_count'
+                                                                            onMouseOver={() => { setShowAllFnr(firstindex) }}
+                                                                            onMouseLeave={() => { setShowAllFnr(-1) }}
+                                                                        >
+                                                                            <div style={{ cursor: 'pointer' }} >+{value.others.length}</div>
+                                                                            <div className='show_Allfnr'
+                                                                                style={{display: showAllFnr === firstindex ? 'block' : 'none'}}
+                                                                                >
+                                                                                <div className='contain_fnr'>
+                                                                                {
+                                                                                    value.others.map((item: string, index: number) => {
+                                                                                        return <div key={index} >{item}</div>
+                                                                                    })
+                                                                                }
+                                                                                </div> 
+                                                                                
+                                                                            </div>
+                                                                        </div>
                                                                     </div>
-
-                                                                    <div className='fnr_inner_inner_nachoes'>{value.allFNRs}</div>
                                                                 </div>
                                                                 : <></>
                                                         }
@@ -576,22 +608,6 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                         onMouseOver={() => { setDestinationIndex(firstindex) }}
                                                                         onMouseLeave={() => { setDestinationIndex(-1) }}
                                                                     >{value.name != 'NA' ? value.name : value.code} ({value.code})</div>
-                                                                    {/* <div
-                                                                        style={{
-                                                                            opacity: destinationIndex === firstindex ? 1 : 0,
-                                                                            position: 'absolute',
-                                                                            border: ' 1px solid #DFE3EB',
-                                                                            scale: 0.8,
-                                                                            padding: '2px 5px 2px 5px',
-                                                                            top: -22,
-                                                                            left: 15,
-                                                                            backgroundColor: 'white',
-                                                                            borderRadius: '4px',
-                                                                            transition: 'all 0.2s ease-in-out',
-                                                                            boxShadow: ' 0px 4px 8px grey',
-                                                                            fontWeight: '600'
-                                                                        }}
-                                                                    >{value.c</div> */}
                                                                 </div>
                                                                 : <></>
                                                         }
@@ -616,11 +632,14 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                         }
                                                         {
                                                             item.id === 'edemand' ?
-                                                                <div className='edemand_fois_gpis' style={{ marginBottom: '5px' }}>
+                                                                <div className='edemand_fois_gpis' style={{ marginBottom: '5px', display: !row.fois.is_gps && !row.fois.is_fois ? 'none' : '' }}>
+
                                                                     <img
                                                                         src={row.fois.is_gps && GPIS.src} style={{ display: 'block' }}
                                                                         alt=''
-                                                                    /><img
+                                                                    />
+
+                                                                    <img
                                                                         src={row.fois.is_fois && FOIS.src}
                                                                         style={{ display: 'block' }}
                                                                         alt=''

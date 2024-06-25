@@ -26,7 +26,7 @@ import Checkbox from '@mui/material/Checkbox';
 
 
 
-function Filters({ onToFromChange, setStatusForShipment }: any) {
+function Filters({ onToFromChange,  onChangeStatus }: any) {
 
 
 
@@ -54,8 +54,9 @@ function Filters({ onToFromChange, setStatusForShipment }: any) {
     const [status, setStatus] = React.useState<string>('All');
 
     const handleChange = (event: SelectChangeEvent<string>) => {
+        onChangeStatus(event.target.value as string)
         setStatus(event.target.value as string);
-        setStatusForShipment(event.target.value as string)
+        // setStatusForShipment(event.target.value as string)
       };
     const today = new Date();
     const twentyDaysBefore = new Date();
@@ -103,7 +104,7 @@ function Filters({ onToFromChange, setStatusForShipment }: any) {
         }
     }, [startDate, endDate, error]);
 
-    console.log(status)
+    
 
     return (
         <div style={{ display: 'flex', gap: 20, overflowX: 'auto', position: 'relative' , overflowY:'visible'}} >
@@ -119,6 +120,7 @@ function Filters({ onToFromChange, setStatusForShipment }: any) {
                         }}
                     >
                         <DatePicker
+                            format="DD/MM/YYYY"
                             slotProps={{ textField: { placeholder: formatDate(startDate) } }}
 
                             onChange={(newDate) => { handleStartDateChange(newDate) }}
@@ -152,7 +154,7 @@ function Filters({ onToFromChange, setStatusForShipment }: any) {
                     >
                         <DatePicker
                             slotProps={{ textField: { placeholder: formatDate(endDate) } }}
-
+                            format="DD/MM/YYYY"
                             onChange={(newDate) => { handleEndDateChange(newDate) }}
                             sx={{
                                 '& .MuiInputBase-input::placeholder': {
