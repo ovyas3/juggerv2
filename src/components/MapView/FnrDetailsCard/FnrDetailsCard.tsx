@@ -9,7 +9,6 @@ import { statusBuilder } from "../StatusBuilder/StatusBuilder";
 import Image from 'next/image';
 
 export const FNRDetailsCard = (props: any) => ( 
-
     <React.Fragment>
       <CardContent className={props.className} >
         <Grid style={

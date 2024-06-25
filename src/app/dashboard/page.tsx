@@ -18,7 +18,7 @@ const Page = () => {
       <div className="dashboardContainer">
         <div style={{ width: '100%', overflowX: 'auto' }}>
             {
-              mobile ? <Header title={t('dashboard')} /> : <MobileHeader />
+              mobile ? <Header title={'Captive Rakes'} /> : <MobileHeader />
             }
         </div>
         <div>

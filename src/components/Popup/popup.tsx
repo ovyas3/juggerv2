@@ -56,8 +56,6 @@ export const Popup: React.FC<PopupProps> = ({ data }) => {
   const [childFilteredData, setChildFilteredData] = useState<any>([]);
   // const [dialogDatas, setDialogDatas] = useState<any>([]);
 
-  console.log('data @ popup', data);
-
   const CustomTextField = muiStyled(TextField)(({ theme }) => ({
     '& .MuiInputLabel-root': {
       transition: 'transform 0.2s ease-out, color 0.2s ease-out',
@@ -92,6 +90,8 @@ export const Popup: React.FC<PopupProps> = ({ data }) => {
   
   // Get data for parent dialog component
   const getDataParentTabele = async () => {
+    setSearchTerm('');
+    setSchemeType('');
     const currentTime = new Date();
     const newData = data && data.map((item : any) => {
       const updatedAt = new Date(item.updated_at);
@@ -112,7 +112,7 @@ export const Popup: React.FC<PopupProps> = ({ data }) => {
     const filteredNewData = newData.filter((item: any, index: number, array: any[]) => {
       return array.findIndex((el) => el.rake_id === item.rake_id) === index && item.rake_id !== undefined;
     });
-    console.log('filteredNewData', filteredNewData);
+
     setParentTableData(filteredNewData);
     setFilteredData(filteredNewData);
 
@@ -163,6 +163,8 @@ export const Popup: React.FC<PopupProps> = ({ data }) => {
 
   // Open and close state for child dialog
   const handleChildClickOpen = async (item: any) => {
+    setSearchChildTerm('');
+    setWagonType('');
     const newChildUpperData = {
       _id: item._id,
       rake_id: item.rake_id,
@@ -247,6 +249,9 @@ export const Popup: React.FC<PopupProps> = ({ data }) => {
       <TableHead>
         <TableRow>
           <TableCell align="left" className="table-columns">
+            S.No
+          </TableCell>
+          <TableCell align="left" className="table-columns">
           <CustomTextField
             inputRef={inputRef}
             label="Rake ID"
@@ -325,12 +330,13 @@ export const Popup: React.FC<PopupProps> = ({ data }) => {
   }
 
   const TableRowComponent = () => (
-    filteredData.map((item: any) => (
+    filteredData.map((item: any, index: number) => (
       <TableRow
         key={item.rake_id}
         sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
         className='table-rows-container'
         onClick={() => handleChildClickOpen(item)}>
+        <TableCell align="left" className='table-rows' style={{paddingLeft: '24px'}}>{index + 1}.</TableCell>
          <TableCell align="left" className='table-rows'>
           <p className="rake-id">{item.rake_id}</p>
           {item.isTracking ? <Image src={TrackingIcon} alt="tracking"/>: <Image src={NonTrackingIcon} alt="tracking"/>}

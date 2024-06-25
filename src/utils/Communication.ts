@@ -4,7 +4,7 @@ import { environment } from '@/environments/env.api';
 import { getAuth } from '@/services/Authenticator/Auth';
 
 const prefix = [
-  environment.DEV_API_URL
+  (process.env.NODE_ENV == 'production' ? environment.PROD_API_URL : environment.DEV_API_URL),
 ]
 
 const httpsGet = async (path: string, type: number = 0) => {
