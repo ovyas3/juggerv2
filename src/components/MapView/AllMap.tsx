@@ -222,7 +222,7 @@ const MapLayers = () => {
 
         const formattedDateTime = `${date} ${time}`;
        if(lastCords.geo_point && lastCords.geo_point.coordinates && lastCords.geo_point.coordinates[0] && lastCords.geo_point.coordinates[1] && lastCords.time_stamp && lastCords.time_stamp.$date) {
-        if (service.differenceToday(lastCords.time_stamp.$date, 3, 'hours') < 1) {
+        if (service.differenceToday(lastCords.time_stamp.$date, 0, 'hours') < -3) {
           allIdleRakes.push({
             data: {
               title: key,
