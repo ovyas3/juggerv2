@@ -1,6 +1,6 @@
 'use client'
 import './tripTracker.css'
-import { Icon, icon, latLngBounds } from 'leaflet';
+import { Icon, bounds, icon, latLngBounds } from 'leaflet';
 import { Box, Grid, Button, IconButton, useMediaQuery, CardContent, CardMedia, ButtonBase, FormControlLabel, FormGroup, Switch } from "@mui/material";
 import { MapContainer, Marker, Popup, Polyline, LayersControl, TileLayer } from 'react-leaflet';
 import React, { useEffect, useRef, useState } from "react";
@@ -36,10 +36,26 @@ const renderMarkers = (tracking_data: any[], customIcon: Icon): JSX.Element[] =>
   ));
 };
 
+const renderRouteStations = (stations: any[], trainIcon: Icon): JSX.Element[] => {
+  if (!Array.isArray(stations)) {
+    return [];
+  }
+  return stations.map((station, index) => (
+    <Marker key={index} position={[station.longLat[1], station.longLat[0]]} icon={trainIcon}>
+      <Popup>
+        Station Name: {station.name}
+      </Popup>
+    </Marker>
+  ));
+};
+
+
+
 const TripTracker = (params: any) => {
   const center: [number, number] = [24.2654256,78.9145218];
   const mapRef = useRef<any>()
   const trip_tracker_data = params.trip_tracker_data;
+  const routeStation = params.routeStation;
   const [loadMap, setLoadMap] = useState(false);
   const [fnr_data, setFnrData] = useState({});
   const [tracking_data, setTrackingData] = useState<any>([]);
@@ -55,6 +71,7 @@ const TripTracker = (params: any) => {
   const [currentLocation, setCurrentLocation] = useState<any>({});
   const [track, setTrack] = useState<any>([])
   const [estimatedTrack, setEstimatedTrack] = useState<any>([]);
+  const [stations, setStations] = useState<any>([]);
   const handleFoisCheck = (e: any) => {
     setShowFoisTracks(e.target.checked);
   }
@@ -67,6 +84,12 @@ const TripTracker = (params: any) => {
     iconAnchor: [7, 14], // Anchor point of the icon, usually half of the size
     popupAnchor: [0, -32], // Point from which the popup should open relative to the iconAnchor
   });
+  const trainIcon = new Icon({
+    iconUrl: '/assets/train_station_icon.svg',
+    iconSize: [14, 14], 
+    iconAnchor: [7, 14], 
+    popupAnchor: [0, -32], 
+  })
   const currentTrainLocation = new Icon({
     iconUrl: '/assets/current_train_location_icon.svg',
     iconSize: [30, 30], // Size of the icon
@@ -127,6 +150,7 @@ const TripTracker = (params: any) => {
     };
 
     setTrackingData(filteredTracks);
+    setStations(routeStation)
     setActivityData(tracksWithStatus);
     setPickupDetail(pickupDetails);
     setDropDetail(dropDetails);
@@ -145,7 +169,7 @@ const TripTracker = (params: any) => {
   };
   useEffect(() => {
     fetchData();
-  }, [trip_tracker_data]);
+  }, [trip_tracker_data,routeStation]);
 
   useEffect(() => {
     setTrackingLine(tracking_data.map((e: {geo_point: {coordinates: [number, number]}}) => [e.geo_point.coordinates[1],e.geo_point.coordinates[0]]))
@@ -182,8 +206,9 @@ const TripTracker = (params: any) => {
                   </LayersControl.BaseLayer>
                 </LayersControl>
                 {/* <Polygon pathOptions={{ color: 'blue' }} positions={pickupgeofence_decoded} /> */}
-                { showFoisTracks &&  renderMarkers(tracking_data, customIcon)}
                 { showGPSTracks &&  track.length && <Polyline pathOptions={{ color:'red'}} positions={track} />}
+
+                { renderRouteStations(stations, trainIcon) }
                 { estimatedTrack.length && <Polyline pathOptions={{ color:'black'}}  positions={estimatedTrack}/> }
                 { estimatedTrack.length &&
                 <>
@@ -207,6 +232,7 @@ const TripTracker = (params: any) => {
                     </Popup>
                   </Marker>
                 </>}
+                { showFoisTracks &&  renderMarkers(tracking_data, customIcon)}
                 { showFoisTracks &&  trackingLine.length && <Polyline pathOptions={{ color:'red'}} positions={trackingLine} />}
                 { showFoisTracks && <Marker position={[currentLocation.geo_point.coordinates[1], currentLocation.geo_point.coordinates[0]]} icon={currentTrainLocation}>
                   <Popup>
