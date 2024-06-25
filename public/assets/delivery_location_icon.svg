@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+  <g id="delivery_location_icon" transform="translate(3978 -5970)">
+    <rect id="Rectangle_5226" data-name="Rectangle 5226" width="24" height="24" rx="4" transform="translate(-3978 5970)" fill="none"/>
+    <path id="location_on_24dp_FILL1_wght400_GRAD0_opsz24" d="M168-870a1.927,1.927,0,0,0,1.413-.588A1.926,1.926,0,0,0,170-872a1.926,1.926,0,0,0-.588-1.413A1.927,1.927,0,0,0,168-874a1.927,1.927,0,0,0-1.413.587A1.926,1.926,0,0,0,166-872a1.926,1.926,0,0,0,.588,1.413A1.927,1.927,0,0,0,168-870Zm0,10a33.249,33.249,0,0,1-6.014-6.362A9.893,9.893,0,0,1,160-871.8a7.733,7.733,0,0,1,2.413-5.975A8,8,0,0,1,168-880a8,8,0,0,1,5.589,2.225A7.733,7.733,0,0,1,176-871.8a9.893,9.893,0,0,1-1.988,5.438A33.249,33.249,0,0,1,168-860Z" transform="translate(-4134.002 6852)" fill="#e84436"/>
+    <circle id="Ellipse_235" data-name="Ellipse 235" cx="3" cy="3" r="3" transform="translate(-3969 5977)" fill="#fff"/>
+  </g>
+</svg>
