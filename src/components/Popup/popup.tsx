@@ -343,7 +343,7 @@ export const Popup: React.FC<PopupProps> = ({ data }) => {
         </TableCell>
          <TableCell align="center" className='table-rows'>{item.scheme_type}</TableCell>
          <TableCell align="center" className='table-rows'>{item.no_of_wagons}</TableCell>
-         <TableCell align="left" className='table-rows'>{item.date_of_commissioning}</TableCell>
+         <TableCell align="left" className='table-rows' style={{paddingLeft: '18px'}}>{item.date_of_commissioning}</TableCell>
          <TableCell align="left" className='table-rows'>{item.roh_done}</TableCell>
          <TableCell align="left" className='table-rows'>{item.roh_due}</TableCell>
          <TableCell align="left" className='table-rows'>{item.poh_done}</TableCell>

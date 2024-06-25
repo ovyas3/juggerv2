@@ -29,8 +29,8 @@ export const ActivityTimeLineChart = (props: any) => {
       } else {
         setLowPings(true)
       }
-      const latestPing = data[0]
-      const restPings = data.slice(1)
+      const latestPing = data[0];
+      const restPings = data.slice(1);
       setFirstPing(latestPing)
       setPings(restPings)
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -78,6 +78,7 @@ export const ActivityTimeLineChart = (props: any) => {
           </Grid>
         </Grid>
         <Grid container spacing={2} direction={"row"} color={"#42454E"} maxHeight={"100%"} justifyContent={"flex-start"} overflow={"scroll"} marginTop={"5px"}> 
+         { firstPing ? <>
           <Timeline
            sx={{
             [`& .${timelineOppositeContentClasses.root}`]: {
@@ -127,7 +128,9 @@ export const ActivityTimeLineChart = (props: any) => {
                 )
               })
             }
-          </Timeline>
+          </Timeline></> : <div>
+          <p style={{paddingLeft: '190px', color:'#7C7E8C', fontSize: '14px', fontWeight: '600', paddingTop: '150px'}}>No Data Present</p>
+          </div> }
         </Grid>
       </CardContent>
     </React.Fragment>)

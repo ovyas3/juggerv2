@@ -47,6 +47,8 @@ const TripTracker = (params: any) => {
   const [showDetails, setShowDetails] = useState(true);
   const [showFoisTracks, setShowFoisTracks] = useState(false);
   const [showGPSTracks, setShowGPSTracks] = useState(false);
+  const [pickupDetail, setPickupDetail] = useState<any>({});
+  const [dropDetail, setDropDetail] = useState<any>({});
   const [buttonEnabledFois, setButtonEnabledFois] = useState(false);
   const [buttonEnabledGPS, setButtonEnabledGPS] = useState(false);
   const [activityData, setActivityData] = useState([]);
@@ -110,9 +112,24 @@ const TripTracker = (params: any) => {
       }
       return true;
     });
-    console.log({tracksWithStatus, filteredTracks})
+
+    const pickupDetails = {
+      code: rakeData && rakeData.pickup_location && rakeData.pickup_location.code ? rakeData.pickup_location.code : 'N/A',
+      name: rakeData && rakeData.pickup_location && rakeData.pickup_location.name ? rakeData.pickup_location.name : 'N/A',
+      dateTime: rakeData && rakeData.pickup_date ? `${service.utcToist(rakeData.pickup_date, 'dd-MM-yyyy')} ${service.utcToist(rakeData.pickup_date, 'HH:mm')}` : 'N/A',
+      distance: rakeData && rakeData.estimated && rakeData.estimated.distance ? `${rakeData.estimated.distance} km` : 'N/A',
+    };
+
+    const dropDetails = {
+      code: rakeData && rakeData.delivery_location && rakeData.delivery_location.code ? rakeData.delivery_location.code : 'N/A',
+      name: rakeData && rakeData.delivery_location && rakeData.delivery_location.name ? rakeData.delivery_location.name : 'N/A',
+      eta: rakeData && rakeData.eta ? `${service.utcToist(rakeData.eta, 'dd-MM-yyyy')} ${service.utcToist(rakeData.eta, 'HH:mm')}` : 'N/A',
+    };
+
     setTrackingData(filteredTracks);
     setActivityData(tracksWithStatus);
+    setPickupDetail(pickupDetails);
+    setDropDetail(dropDetails);
     const lastLocation = filteredTracks[0];
     setCurrentLocation(lastLocation);
     if (filteredTracks.length > 0) {
@@ -170,8 +187,25 @@ const TripTracker = (params: any) => {
                 { estimatedTrack.length && <Polyline pathOptions={{ color:'black'}}  positions={estimatedTrack}/> }
                 { estimatedTrack.length &&
                 <>
-                  <Marker position={estimatedTrack[0]} icon={drop}></Marker>
-                  <Marker position={estimatedTrack[estimatedTrack.length - 1]} icon={pickup}></Marker>
+                  <Marker position={estimatedTrack[0]} icon={pickup}>
+                    <Popup>
+                      {pickupDetail &&
+                       <>
+                          <p className='popup-details'>Pickup Station: {pickupDetail.code} - {pickupDetail.name}</p>
+                          <p className='popup-details'>Pickup Date: {pickupDetail.dateTime}</p>
+                          <p className='popup-details'>Total Distance: {pickupDetail.distance}</p>
+                       </>}
+                    </Popup>
+                  </Marker>
+                  <Marker position={estimatedTrack[estimatedTrack.length - 1]} icon={drop}>
+                    <Popup>
+                      {dropDetail &&
+                       <>
+                          <p className='popup-details'>Drop Station: {dropDetail.code} - {dropDetail.name}</p>
+                          <p className='popup-details'>ETA: {dropDetail.eta}</p>
+                       </>}
+                    </Popup>
+                  </Marker>
                 </>}
                 { showFoisTracks &&  trackingLine.length && <Polyline pathOptions={{ color:'red'}} positions={trackingLine} />}
                 { showFoisTracks && <Marker position={[currentLocation.geo_point.coordinates[1], currentLocation.geo_point.coordinates[0]]} icon={currentTrainLocation}>
