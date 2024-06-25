@@ -31,7 +31,7 @@ const diffrent = (start: string, end: string, type: string = 'days') => {
 
 const differenceToday = (end: string, difference: number = 0, type: string = 'days') => {
   // @ts-ignore
-  return DateTime.fromJSDate(new Date(end)).setZone('Asia/Calcutta').diff(DateTime.fromJSDate(new Date()).minus({hours: difference}), type).toObject()[type];
+  return DateTime.fromJSDate(new Date(end)).setZone('Asia/Calcutta').diff(DateTime.fromJSDate(new Date()), type).toObject()[type];
 }
 
 const getTimeWithAMPM = (utc: string) => {
