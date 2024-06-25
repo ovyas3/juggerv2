@@ -43,5 +43,7 @@ export interface row {
     is_gps: Boolean,
     is_fois:Boolean
   },
+  pickup_date:string,
+  eta:string
 
 }
