@@ -4,7 +4,7 @@ import { AppRouterCacheProvider } from '@mui/material-nextjs/v13-appRouter';
 import {NextIntlClientProvider} from 'next-intl';
 import {getLocale, getMessages} from 'next-intl/server';
 import "./globals.css";
-
+import { SnackbarProvider } from '../hooks/snackBar';
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -26,7 +26,9 @@ export default async function RootLayout({
           <NextIntlClientProvider
             messages={messages}
             locale={locale}>
-              {children}
+              <SnackbarProvider>  
+                {children}
+              </SnackbarProvider>
           </NextIntlClientProvider>
         </AppRouterCacheProvider>
       </body>
