@@ -201,7 +201,6 @@ const MapLayers = () => {
           setShowRouteFor(name);
         }
       }
-
       else {
         setRoute([]);
         setCurrentLocation([]);
