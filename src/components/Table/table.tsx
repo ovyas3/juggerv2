@@ -21,12 +21,6 @@ import Link from 'next/link';
 import { Column, row } from '@/utils/interface';
 import { useTranslations } from 'next-intl';
 
-// 24062024178
-
-// 24062024178
-
-// 24062013552
-
 
 
 import Autocomplete from '@mui/material/Autocomplete';

@@ -67,9 +67,6 @@ function Filters({ onToFromChange,  onChangeStatus }: any) {
     const [error, setError] = useState('');
 
 
-
-
-
     const formatDate = (date: any) => {
 
         const day = date.getDate();
