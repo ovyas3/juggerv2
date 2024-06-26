@@ -14,6 +14,7 @@ import mapViewIcon from '../../assets/map_view_icon.svg'
 import haltIcon from '../../assets/halt_icon.svg';
 import mapPlaceHolder from '../../assets/mapPlaceholder.svg';
 import mapPathIcon from '../../assets/mapPath.svg';
+import TrainIndicationIcon from '../../assets/train_station_icon.svg';
 import TripTrackerNavbar from './TripTrackerNavbar/TripTrackerNavbar';
 import Image from 'next/image';
 import { FNRDetailsCard } from './FnrDetailsCard/FnrDetailsCard';
@@ -206,7 +207,7 @@ const TripTracker = (params: any) => {
                   </LayersControl.BaseLayer>
                 </LayersControl>
                 {/* <Polygon pathOptions={{ color: 'blue' }} positions={pickupgeofence_decoded} /> */}
-                { showGPSTracks &&  track.length && <Polyline pathOptions={{ color:'red'}} positions={track} />}
+                { showGPSTracks &&  track.length && <Polyline pathOptions={{ color: '#334FFC'}} positions={track} />}
 
                 { renderRouteStations(stations, trainIcon) }
                 { estimatedTrack.length && <Polyline pathOptions={{ color:'black'}}  positions={estimatedTrack}/> }
@@ -329,20 +330,43 @@ const TripTracker = (params: any) => {
             </Button>
           </Box>
         }
-        {loadMap && <FormGroup className='mapButtons'>
-          <FormControlLabel
-            disabled={!buttonEnabledGPS}
-            control={<Switch checked={showGPSTracks} onChange={handleGPSCheck} />}
-            label="Show GPS Pings"
-            labelPlacement="start"
-          />
-          <FormControlLabel
-            disabled={!buttonEnabledFois}
-            control={<Switch checked={showFoisTracks} onChange={handleFoisCheck} />}
-            label="Show FOIS Pings"
-            labelPlacement="start"
-          />
-        </FormGroup>}
+        {loadMap && <>
+          <FormGroup className='mapButtons'>
+            <FormControlLabel
+              disabled={!buttonEnabledGPS}
+              control={<Switch checked={showGPSTracks} onChange={handleGPSCheck} />}
+              label="Show GPS Pings"
+              labelPlacement="start"
+            />
+            <FormControlLabel
+              disabled={!buttonEnabledFois}
+              control={<Switch checked={showFoisTracks} onChange={handleFoisCheck} />}
+              label="Show FOIS Pings"
+              labelPlacement="start"
+            />
+          </FormGroup>
+
+          <div className='map-indications'>
+            <div className='map-indications__item'>
+              <div className='map-indications__icon' style={{backgroundColor: '#000000', width: '25px', height: '5px'}}></div>
+              <p>Estimated Track</p>
+            </div>
+            <div className='map-indications__item'>
+              <div className='map-indications__icon' style={{backgroundColor: '#FF0000', width: '25px', height: '5px'}}></div>
+              <p>FOIS Track</p>
+            </div>
+            <div className='map-indications__item'>
+              <div className='map-indications__icon' style={{backgroundColor: '#334FFC', width: '25px', height: '5px'}}></div>
+              <p>GPS Track</p>
+            </div>
+            <div className='map-indications__item'>
+              <Image src={TrainIndicationIcon} alt="Train Indication Icon" width={20} height={18} />
+              <p style={{paddingLeft: '4px'}}>Railway Station</p>
+            </div>
+          </div>
+
+        </>}
+      
         {mobile && <Box
         sx={{
           zIndex: 10,
