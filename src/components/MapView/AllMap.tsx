@@ -310,6 +310,12 @@ const MapLayers = () => {
     };
     
     const focusOnRake = (rake: any) => {
+      if (rake && parseFloat(rake.hours.split('h')[0]) > 720) {
+        if (selectedMarkerRef.current) {
+          selectedMarkerRef.current.closePopup();
+        }
+        return;
+      }
       if (rake && map) {
         const rakeData = coords[rake.name];
         if (rakeData && rakeData.length > 0) {
