@@ -156,12 +156,13 @@ export const FNRDetailsCard = (props: any) => (
               />
             </Grid>
             <Grid item xs={10} fontSize={"12px"}>
-                 <b>Current Location:</b>
+                 <b>Current Status:</b>
                  <br></br>       
                  GPS: <b>{props.fnr_data?.trip_tracker?.gps_last_location || 'N/A'} </b>
                  <br></br>
                  FOIS: <b>{props.fnr_data?.trip_tracker?.fois_last_location || 'N/A'}</b>
-                
+                 <br></br>
+                 ETA: <b>{props.fnr_data?.eta || 'N/A'}</b>
             </Grid>
           </Grid>
         </Grid>
