@@ -30,7 +30,7 @@
 .header_name{
     font-size: 14px;
     font-weight: 500;
-    margin-right: 8px;
+    /* margin-right: 8px; */
 }
 .divder{
     border-color: #DFE3EB;

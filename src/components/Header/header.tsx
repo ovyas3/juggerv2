@@ -43,11 +43,11 @@ const Header = ({title, setReloadOnHeaderChange}:any) => {
           }}
         >
           <div className="header_name">{parent_name}</div>
-          <div className="drop_down">
+          {/* <div className="drop_down">
             {shippers.length && <Dropdown reload={setReloadOnHeaderChange} shippers={shippers}  />}
-          </div>
-          <div className="divder"></div>
-          <div className="bell_icon">
+          </div> */}
+          {/* <div className="divder"></div> */}
+          {/* <div className="bell_icon">
             <Badge
               badgeContent={0}
               color="error"
@@ -64,7 +64,7 @@ const Header = ({title, setReloadOnHeaderChange}:any) => {
                 sx={{ width: 20, height: 18 }}
               />
             </Badge>
-          </div>
+          </div> */}
           <div className="divder"></div>
           <div className="profile_pic">
             <ProfileDrop />

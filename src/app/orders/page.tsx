@@ -10,7 +10,6 @@ import TableData from '@/components/Table/table';
 import MobileDrawer from "@/components/Drawer/mobile_drawer";
 import MobileHeader from "@/components/Header/mobileHeader";
 import { useWindowSize } from "@/utils/hooks";
-import { ShipmentsObjectPayload } from "@/utils/interface";
 import { httpsGet, httpsPost } from "@/utils/Communication";
 import { GET_SHIPMENTS, CAPTIVE_RAKE } from "@/utils/helper";
 import { useSnackbar } from '@/hooks/snackBar';
@@ -21,9 +20,9 @@ const getStatusCode = (status: string): string => {
     case "In Transit":
       return "ITNS"
     case "Delivered":
-      return 'All' // todo:adding according to backend
+      return 'Delivered'
     case "In Plant":
-      return 'All'// todo:adding according to backend
+      return 'OB'
     default:
       return 'All'
   }

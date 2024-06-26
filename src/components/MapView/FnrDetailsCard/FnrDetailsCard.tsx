@@ -7,6 +7,7 @@ import dropIcon from '../../../assets/drop_icon.svg';
 import currentTrainLocationIcon from '../../../assets/current_train_location_icon.svg';
 import { statusBuilder } from "../StatusBuilder/StatusBuilder";
 import Image from 'next/image';
+import service from "@/utils/timeService";
 
 export const FNRDetailsCard = (props: any) => ( 
     <React.Fragment>
@@ -165,7 +166,7 @@ export const FNRDetailsCard = (props: any) => (
                   FOIS: <b>{props.fnr_data?.trip_tracker?.fois_last_location || 'N/A'}</b>
                  </div>
                  <div style={{marginLeft: "20px"}}>
-                  ETA: <b>{props.fnr_data?.eta || 'N/A'}</b>
+                  ETA: <b>{service.utcToist(props.fnr_data?.eta, 'dd-MM-yyyy HH:mm')}</b>
                  </div>
             </Grid>
           </Grid>
