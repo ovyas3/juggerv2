@@ -156,8 +156,8 @@ const MapLayers = () => {
             const diff = currentTime.diff(gpsUpdateTime, ['hours', 'minutes']);
             const diffInHours = Math.floor(diff.hours);
             const diffInMinutes = Math.floor(diff.minutes) % 60;
-            const hours = isNaN(diffInHours) ? 'N/A' : `${diffInHours}hr`;
-            const minutes = isNaN(diffInMinutes) ? '' : `${diffInMinutes}min`;
+            const hours = isNaN(diffInHours) ? 'N/A' : `${diffInHours} hr`;
+            const minutes = isNaN(diffInMinutes) ? '' : `${diffInMinutes} min`;
             const timeSinceUpdate = `${hours} ${minutes}`;
 
             allRakes.push({
@@ -170,6 +170,7 @@ const MapLayers = () => {
 
         });
         const allRakesFiltered = allRakes.filter((rake: any) => rake.rake_id !== undefined);
+        console.log(allRakesFiltered);
         setAllRakes(allRakesFiltered);
         setCoords(coords);
       } catch (error) {
@@ -325,6 +326,7 @@ const MapLayers = () => {
           ]));
           map.fitBounds(bounds, { padding: [50, 50] });
           
+          setShowAllRakes(true);
           // Open the popup after a short delay to ensure the map has finished moving
           setTimeout(() => {
             if (selectedMarkerRef.current) {
@@ -496,7 +498,7 @@ const MapLayers = () => {
                             }}
                             >
                               <TableCell align="left" className="captive-rake-rows" style={{fontWeight: selectedRake && selectedRake.rake_id === rake.rake_id ? "bold" : 'inherit'}}>{rake.rake_id}</TableCell>
-                              <TableCell align="center" className="captive-rake-rows" style={{paddingRight: '24px'}}>
+                              <TableCell align="center" className="captive-rake-rows" style={{paddingRight: '36px'}}>
                               {rake.hours && parseFloat(rake.hours.split('h')[0]) <= 720 ? rake.hours : 'N/A'}
                               </TableCell>
                               <TableCell align="left" className="captive-rake-rows" style={{fontWeight: selectedRake && selectedRake.rake_id === rake.rake_id ? "bold" : 'inherit'}}>{rake.fnr_no}</TableCell>
