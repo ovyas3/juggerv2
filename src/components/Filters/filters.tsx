@@ -26,7 +26,7 @@ import Checkbox from '@mui/material/Checkbox';
 
 
 
-function Filters({ onToFromChange,  onChangeStatus }: any) {
+function Filters({ onToFromChange, onChangeStatus }: any) {
 
 
 
@@ -34,10 +34,7 @@ function Filters({ onToFromChange,  onChangeStatus }: any) {
         PaperProps: {
             style: {
                 width: 128,
-                padding:0,
-                marginTop:'3px',
-                paddingTop:0,
-                fontSize:'12px'
+                marginTop: '3px',
             },
         },
     };
@@ -57,7 +54,7 @@ function Filters({ onToFromChange,  onChangeStatus }: any) {
         onChangeStatus(event.target.value as string)
         setStatus(event.target.value as string);
         // setStatusForShipment(event.target.value as string)
-      };
+    };
     const today = new Date();
     const twentyDaysBefore = new Date();
     twentyDaysBefore.setDate(today.getDate() - 20);
@@ -104,10 +101,10 @@ function Filters({ onToFromChange,  onChangeStatus }: any) {
         }
     }, [startDate, endDate, error]);
 
-    
+
 
     return (
-        <div style={{ display: 'flex', gap: 20, overflowX: 'auto', position: 'relative' , overflowY:'visible'}} >
+        <div style={{ display: 'flex', gap: 20, overflowX: 'auto', position: 'relative', overflowY: 'visible' }} >
 
             <div style={{ display: 'flex', gap: 20, }}>
 
@@ -179,48 +176,48 @@ function Filters({ onToFromChange,  onChangeStatus }: any) {
             {error && <div className='error'>{error}</div>}
 
             <div className='status_container'>
-                <FormControl sx={{  width: 128, margin:0,padding: 0 ,
-                    '.mui-kk1bwy-MuiButtonBase-root-MuiMenuItem-root':{
-                        padding:0,
+                <FormControl sx={{
+                    width: 128, margin: 0, padding: 0,
+                    '.mui-kk1bwy-MuiButtonBase-root-MuiMenuItem-root': {
+                        padding: 0,
                     },
-                    '.mui-10hburv-MuiTypography-root ':{fontSize:'12px'}
                 }}>
-                    <InputLabel id="demo-multiple-checkbox-label" sx={{ padding: 0, fontSize: 14 ,marginTop:'-8px', 
+                    <InputLabel id="demo-multiple-checkbox-label" sx={{
+                        padding: 0, fontSize: 14, marginTop: '-8px',
                     }}>Status</InputLabel>
                     <Select
-                        
+
                         labelId="demo-multiple-checkbox-label"
                         id="demo-multiple-checkbox"
                         value={status}
                         onChange={handleChange}
-                        input={<OutlinedInput 
+                        input={<OutlinedInput
                             sx={{
-                                width:'128px',
+                                width: '128px',
                                 '& .MuiOutlinedInput-notchedOutline': {
-                                  border:'1px solid #E9E9EB'
+                                    border: '1px solid #E9E9EB'
                                 },
                                 '&:hover .MuiOutlinedInput-notchedOutline': {
-                                    border:'1px solid #E9E9EB'
+                                    border: '1px solid #E9E9EB'
                                 },
                                 '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                                    border:'1px solid #E9E9EB'
+                                    border: '1px solid #E9E9EB'
                                 },
-                              }}
-                            />}
+                            }}
+                        />}
                         // renderValue={(selected) => selected.join(', ')}
                         renderValue={(selected) => selected}
                         MenuProps={MenuProps}
-                       
                     >
                         {names.map((name) => (
-                            <MenuItem key={name} value={name} sx={{ padding: 0,fontSize:'12px',}} >
-                                <Checkbox checked={status.indexOf(name) > -1}  />
-                                <ListItemText primary={name} />
+                            <MenuItem key={name} value={name} sx={{ padding: 0 }} >
+                                <Checkbox checked={status.indexOf(name) > -1} sx={{ paddingLeft: '8px', padding: '4px', '& .MuiSvgIcon-root': { fontSize: 15 } }} />
+                                <ListItemText primary={name} primaryTypographyProps={{ fontSize: '12px', fontFamily: 'Inter, sans-serif' }} />
                             </MenuItem>
                         ))}
                     </Select>
                 </FormControl>
-            </div> 
+            </div>
 
             {/* <div>
                 <div className="upload-container">
@@ -229,11 +226,11 @@ function Filters({ onToFromChange,  onChangeStatus }: any) {
                 </div>
             </div> */}
 
-            <div>
+            {/* <div>
                 <div className="filter-container">
                     <FilterAltIcon className="filter-icon" />
                 </div>
-            </div>
+            </div> */}
 
             {/* <input type='date' placeholder='Dec 23, 3456' /> */}
         </div>

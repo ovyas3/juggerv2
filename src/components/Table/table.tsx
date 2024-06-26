@@ -102,7 +102,6 @@ function Tags({ rakeCaptiveList, shipmentId, setOpen, setShowActionBox }: any) {
         return <Paper {...props} style={{ fontSize: '10px' }} />;
     };
 
-    // console.log(updateObject)
 
     return (
         <div >
@@ -184,7 +183,6 @@ const convertArrayToFilteredArray = (inputArray: any) => {
             status: string,
             pickup_date: any,
             fois: any,
-            // validationForAttachRake:Boolean,
             captive_id: string,
             is_captive: Boolean,
             trip_tracker: any,
@@ -211,7 +209,7 @@ const convertArrayToFilteredArray = (inputArray: any) => {
             },
             status: {
                 name: statusBuilder(status),
-                code: status || ''
+                code: status === "Delivered" ? null : status==='OB' ? null: status || ''
             },
             currentEta: {
                 date: service.utcToist(eta) || 'NA',
@@ -285,6 +283,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
         if (changeFnr.length === 11) {
             setSettingFnrChange(changeFnr)
             onFnrChange(changeFnr)
+            setPage(0);
         } else {
             if (!changeFnr) onFnrChange(changeFnr);
             setSettingFnrChange(changeFnr)
