@@ -14,6 +14,7 @@ import mapViewIcon from '../../assets/map_view_icon.svg'
 import haltIcon from '../../assets/halt_icon.svg';
 import mapPlaceHolder from '../../assets/mapPlaceholder.svg';
 import mapPathIcon from '../../assets/mapPath.svg';
+import TrainIndicationIcon from '../../assets/train_station_icon.svg';
 import TripTrackerNavbar from './TripTrackerNavbar/TripTrackerNavbar';
 import Image from 'next/image';
 import { FNRDetailsCard } from './FnrDetailsCard/FnrDetailsCard';
@@ -22,6 +23,8 @@ import { statusBuilder } from './StatusBuilder/StatusBuilder';
 import 'leaflet/dist/leaflet.css';
 import service from '@/utils/timeService';
 import polyline from '@mapbox/polyline';
+import getBoundary from "./IndianClaimed";
+import L from 'leaflet';
 
 const renderMarkers = (tracking_data: any[], customIcon: Icon): JSX.Element[] => {
   return tracking_data.map((point, index) => (
@@ -53,16 +56,20 @@ const renderRouteStations = (stations: any[], trainIcon: Icon): JSX.Element[] =>
 
 const TripTracker = (params: any) => {
   const center: [number, number] = [24.2654256,78.9145218];
-  const mapRef = useRef<any>()
+  // const mapRef = useRef<any>();
   const trip_tracker_data = params.trip_tracker_data;
   const routeStation = params.routeStation;
   const [loadMap, setLoadMap] = useState(false);
   const [fnr_data, setFnrData] = useState({});
   const [tracking_data, setTrackingData] = useState<any>([]);
   const [trackingLine, setTrackingLine] = useState<[number, number][]>([]);
+  const [showEstimtedTrack, setShowEstimtedTrack] = useState(false);
+  const [showRailwayStation, setShowRailwayStation] = useState(false);
   const [showDetails, setShowDetails] = useState(true);
   const [showFoisTracks, setShowFoisTracks] = useState(false);
   const [showGPSTracks, setShowGPSTracks] = useState(false);
+  const [pickupDetail, setPickupDetail] = useState<any>({});
+  const [dropDetail, setDropDetail] = useState<any>({});
   const [buttonEnabledFois, setButtonEnabledFois] = useState(false);
   const [buttonEnabledGPS, setButtonEnabledGPS] = useState(false);
   const [activityData, setActivityData] = useState([]);
@@ -70,11 +77,21 @@ const TripTracker = (params: any) => {
   const [track, setTrack] = useState<any>([])
   const [estimatedTrack, setEstimatedTrack] = useState<any>([]);
   const [stations, setStations] = useState<any>([]);
+  const [map, setMap] = useState<L.Map | null>(null);
+
   const handleFoisCheck = (e: any) => {
     setShowFoisTracks(e.target.checked);
   }
   const handleGPSCheck = (e: any) => {
     setShowGPSTracks(e.target.checked);
+  }
+
+  const handleTrackingLineCheck = (e: any) => {
+    setShowEstimtedTrack(e.target.checked);
+  }
+
+  const handleRailwayStationCheck = (e: any) => {
+    setShowRailwayStation(e.target.checked);
   }
   const customIcon = new Icon({
     iconUrl: '/assets/halt_icon.svg',
@@ -105,7 +122,32 @@ const TripTracker = (params: any) => {
     iconSize: [14, 14], 
     iconAnchor: [7, 14], 
     popupAnchor: [0, -32],
-  })
+  });
+
+  const boundaryStyle = (feature: any) => {
+    switch (feature.properties.boundary) {
+      case 'claimed':
+        return {
+          color: "#C2B3BF", weight: 2
+        };
+      default:
+        return {
+          color: "", weight: 0
+        };
+    }
+  }
+
+  const addIndiaBoundaries = () => {
+    const b = getBoundary();
+    if (map instanceof L.Map) {
+      L.geoJSON(b, {
+        style: boundaryStyle
+      }).addTo(map);
+    } else {
+      console.error('map is not a Leaflet map object');
+    }
+  }
+
   const fetchData = () => {  
     const {
       rakeData,
@@ -133,10 +175,25 @@ const TripTracker = (params: any) => {
       }
       return true;
     });
-    console.log({tracksWithStatus, filteredTracks})
+
+    const pickupDetails = {
+      code: rakeData && rakeData.pickup_location && rakeData.pickup_location.code ? rakeData.pickup_location.code : 'N/A',
+      name: rakeData && rakeData.pickup_location && rakeData.pickup_location.name ? rakeData.pickup_location.name : 'N/A',
+      dateTime: rakeData && rakeData.pickup_date ? `${service.utcToist(rakeData.pickup_date, 'dd-MM-yyyy')} ${service.utcToist(rakeData.pickup_date, 'HH:mm')}` : 'N/A',
+      distance: rakeData && rakeData.estimated && rakeData.estimated.distance ? `${rakeData.estimated.distance} km` : 'N/A',
+    };
+
+    const dropDetails = {
+      code: rakeData && rakeData.delivery_location && rakeData.delivery_location.code ? rakeData.delivery_location.code : 'N/A',
+      name: rakeData && rakeData.delivery_location && rakeData.delivery_location.name ? rakeData.delivery_location.name : 'N/A',
+      eta: rakeData && rakeData.eta ? `${service.utcToist(rakeData.eta, 'dd-MM-yyyy')} ${service.utcToist(rakeData.eta, 'HH:mm')}` : 'N/A',
+    };
+
     setTrackingData(filteredTracks);
     setStations(routeStation)
     setActivityData(tracksWithStatus);
+    setPickupDetail(pickupDetails);
+    setDropDetail(dropDetails);
     const lastLocation = filteredTracks[0];
     setCurrentLocation(lastLocation);
     if (filteredTracks.length > 0) {
@@ -156,12 +213,16 @@ const TripTracker = (params: any) => {
 
   useEffect(() => {
     setTrackingLine(tracking_data.map((e: {geo_point: {coordinates: [number, number]}}) => [e.geo_point.coordinates[1],e.geo_point.coordinates[0]]))
-    if (mapRef.current && trackingLine.length > 0) {
+    if (map && trackingLine.length > 0) {
       const bounds = latLngBounds(trackingLine);
-      mapRef.current.fitBounds(bounds);
+      map.fitBounds(bounds);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loadMap])
+
+  useEffect(() => {
+    addIndiaBoundaries();
+  }, [map]);
 
   const mobile = !useMediaQuery("(min-width:800px)");
   return (
@@ -174,7 +235,7 @@ const TripTracker = (params: any) => {
         }}
       > 
         {loadMap ?
-          <MapContainer className="map" center={center} zoom={5} style={{ minHeight: '100%', width: '100%', padding: '0px', zIndex: 0, position: "fixed" }} attributionControl={false} ref={mapRef}>
+          <MapContainer className="map" center={center} zoom={5} style={{ minHeight: '100%', width: '100%', padding: '0px', zIndex: 0, position: "fixed" }} attributionControl={false} ref={setMap}>
                 <LayersControl >
                   <LayersControl.BaseLayer checked name="Street View">
                     <TileLayer
@@ -189,18 +250,35 @@ const TripTracker = (params: any) => {
                   </LayersControl.BaseLayer>
                 </LayersControl>
                 {/* <Polygon pathOptions={{ color: 'blue' }} positions={pickupgeofence_decoded} /> */}
-                { showGPSTracks &&  track.length && <Polyline pathOptions={{ color:'red'}} positions={track} />}
+                { showGPSTracks &&  track.length && <Polyline pathOptions={{ color: '#334FFC'}} positions={track} />}
 
-                { renderRouteStations(stations, trainIcon) }
-                { estimatedTrack.length && <Polyline pathOptions={{ color:'black'}}  positions={estimatedTrack}/> }
-                { estimatedTrack.length &&
+                { showRailwayStation && renderRouteStations(stations, trainIcon) }
+                { showEstimtedTrack && estimatedTrack.length && <Polyline pathOptions={{ color:'black'}}  positions={estimatedTrack}/> }
+                { showEstimtedTrack && estimatedTrack.length &&
                 <>
-                  <Marker position={estimatedTrack[0]} icon={drop}></Marker>
-                  <Marker position={estimatedTrack[estimatedTrack.length - 1]} icon={pickup}></Marker>
+                  <Marker position={estimatedTrack[0]} icon={pickup}>
+                    <Popup>
+                      {pickupDetail &&
+                       <>
+                          <p className='popup-details'>Pickup Station: {pickupDetail.code} - {pickupDetail.name}</p>
+                          <p className='popup-details'>Pickup Date: {pickupDetail.dateTime}</p>
+                          <p className='popup-details'>Total Distance: {pickupDetail.distance}</p>
+                       </>}
+                    </Popup>
+                  </Marker>
+                  <Marker position={estimatedTrack[estimatedTrack.length - 1]} icon={drop}>
+                    <Popup>
+                      {dropDetail &&
+                       <>
+                          <p className='popup-details'>Drop Station: {dropDetail.code} - {dropDetail.name}</p>
+                          <p className='popup-details'>ETA: {dropDetail.eta}</p>
+                       </>}
+                    </Popup>
+                  </Marker>
                 </>}
                 { showFoisTracks &&  renderMarkers(tracking_data, customIcon)}
                 { showFoisTracks &&  trackingLine.length && <Polyline pathOptions={{ color:'red'}} positions={trackingLine} />}
-                { showFoisTracks && <Marker position={[currentLocation.geo_point.coordinates[1], currentLocation.geo_point.coordinates[0]]} icon={currentTrainLocation}>
+                { currentLocation && <Marker position={[currentLocation.geo_point.coordinates[1], currentLocation.geo_point.coordinates[0]]} icon={currentTrainLocation}>
                   <Popup>
                       Current Status: {currentLocation.currentStatus.split(/ on /i)[0]}
                       <br />
@@ -295,20 +373,50 @@ const TripTracker = (params: any) => {
             </Button>
           </Box>
         }
-        {loadMap && <FormGroup className='mapButtons'>
-          <FormControlLabel
-            disabled={!buttonEnabledGPS}
-            control={<Switch checked={showGPSTracks} onChange={handleGPSCheck} />}
-            label="Show GPS Pings"
-            labelPlacement="start"
-          />
-          <FormControlLabel
-            disabled={!buttonEnabledFois}
-            control={<Switch checked={showFoisTracks} onChange={handleFoisCheck} />}
-            label="Show FOIS Pings"
-            labelPlacement="start"
-          />
-        </FormGroup>}
+        {loadMap &&
+
+          <div className='map-indications'>
+            <div className='map-indications__item'>
+              <div className='map-indications__icon' style={{backgroundColor: '#000000', width: '25px', height: '5px'}}></div>
+              <FormControlLabel
+              // disabled={!buttonEnabledGPS}
+              control={<Switch checked={showEstimtedTrack} onChange={handleTrackingLineCheck} />}
+              label="Predicted Route"
+              labelPlacement="start"
+            />
+            </div>
+            <div className='map-indications__item'>
+              <div className='map-indications__icon' style={{backgroundColor: '#FF0000', width: '25px', height: '5px'}}></div>
+              <FormControlLabel
+              disabled={!buttonEnabledFois}
+              control={<Switch checked={showFoisTracks} onChange={handleFoisCheck} />}
+              label="FOIS Pings"
+              labelPlacement="start"
+            />
+            </div>
+            <div className='map-indications__item'>
+              <div className='map-indications__icon' style={{backgroundColor: '#334FFC', width: '25px', height: '5px'}}></div>
+              <FormControlLabel
+              disabled={!buttonEnabledGPS}
+              control={<Switch checked={showGPSTracks} onChange={handleGPSCheck} />}
+              label="GPS Pings"
+              labelPlacement="start"
+            />
+            </div>
+            <div className='map-indications__item'>
+              <Image src={TrainIndicationIcon} alt="Train Indication Icon" width={20} height={18} />
+              <FormControlLabel
+              sx={{paddingLeft: '4px'}}
+              // disabled={!buttonEnabledGPS}
+              control={<Switch checked={showRailwayStation} onChange={handleRailwayStationCheck} />}
+              label="Railway Station"
+              labelPlacement="start"
+            />
+            </div>
+          </div>
+
+        }
+      
         {mobile && <Box
         sx={{
           zIndex: 10,

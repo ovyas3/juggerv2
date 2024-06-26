@@ -12,6 +12,7 @@ import MobileHeader from "@/components/Header/mobileHeader";
 import { useWindowSize } from "@/utils/hooks";
 import { httpsGet, httpsPost } from "@/utils/Communication";
 import { GET_SHIPMENTS, CAPTIVE_RAKE } from "@/utils/helper";
+import { useSnackbar } from '@/hooks/snackBar';
 
 
 const getStatusCode = (status: string): string => {
@@ -37,6 +38,7 @@ const OrdersPage = () => {
   const [reload, setReload] = useState(false)
   const [statusForShipment, setStatusForShipment] = useState('All')
   const [reloadOnHeaderChange, setReloadOnHeaderChange] = useState(false);
+  const { showMessage } = useSnackbar();
 
 
   //shipment payload
@@ -127,6 +129,7 @@ const OrdersPage = () => {
             {/* ----search fnr---- */}
             <div className='input_fnr_reload'>
               <div className={`reload ${reload ? 'loading' : ''}`} onClick={() => {
+                showMessage('Refresh Successfully', 'success')
                 const { fnrNumber, ...updatedShipmentsPayload } = ShipmentsPayload;
     
                 // Update the state
