@@ -18,7 +18,7 @@ import { useState, useEffect } from 'react'
 import './table.css'
 import service from '@/utils/timeService';
 import Link from 'next/link';
-import { Column, row } from '@/utils/interface';
+import { Column, row, tagItem } from '@/utils/interface';
 import { useTranslations } from 'next-intl';
 
 
@@ -41,6 +41,7 @@ import GPIS from '@/assets/gps_icon.svg'
 import attach_icon from '@/assets/attach_icon.svg'
 import ShareIcon from '@mui/icons-material/Share';
 import contactIcon from '@/assets/inactive_contact_dashboard+icon.svg'
+import BookmarkAddOutlinedIcon from '@mui/icons-material/BookmarkAddOutlined';
 
 const style = {
     position: 'absolute' as 'absolute',
@@ -50,14 +51,10 @@ const style = {
     width: 500,
     bgcolor: 'white',
     border: '1px solid #E9E9EB',
-    boxShadow: 2,
-    borderRadius: '4px',
+    boxShadow: 0.01,
+    borderRadius: '2px',
     p: 2,
 };
-
-interface item {
-    _id: string,
-}
 
 async function rake_update_id(payload: Object) {
     const response = await httpsPost(UPDATE_RAKE_CAPTIVE_ID, payload)
@@ -66,10 +63,8 @@ async function rake_update_id(payload: Object) {
 }
 
 function Tags({ rakeCaptiveList, shipmentId, setOpen, setShowActionBox }: any) {
-
     const t = useTranslations('ORDERS');
-
-    const [selectedItems, setSelectedItems] = useState<item>({
+    const [selectedItems, setSelectedItems] = useState<tagItem>({
         _id: '',
     });
     const handleSubmit = (e: any) => {
@@ -161,6 +156,50 @@ function Tags({ rakeCaptiveList, shipmentId, setOpen, setShowActionBox }: any) {
     );
 }
 
+function Remarks({ shipmentId }: any) {
+    const t = useTranslations('ORDERS');
+    const [remarks, setRemarks] = useState('');
+
+
+    function handleSubmit(e: any) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (remarks.trim() === '') return; // Don't submit empty remarks
+
+        // const newRemark = {
+        //     date: new Date().toISOString(), // Current date in ISO format
+        //     remark: remark.trim(),
+        // };
+
+        // setRemarks([...remarks, newRemarks]);
+
+        // // Create the object structure you want
+        // const remarkObject = {
+        //     rakeId: shipmentId,
+        //     remarks: [...remarks, newRemarks],
+        // };
+
+        // console.log(remarkObject); // Log the object (you can send it to an API here)
+
+        // setRemarks(''); // Clear the input after submission
+    }
+
+    return (
+        <>
+            <input
+                type='text'
+                value={remarks}
+                onChange={(e) => setRemarks(e.target.value)}
+                placeholder="Enter your remark"
+                style={{ width: '100%', height: '32px', paddingLeft: '4px', border: '1px solid #E9E9EB', outline: 'none' }}
+            />
+            <div style={{ textAlign: 'end', paddingTop: '8px' }}>
+                <Button variant="contained" size='small' color="secondary" style={{ textTransform: 'none' }} onClick={(e) => { handleSubmit(e) }}>{t('submit')}</Button>
+            </div>
+        </>
+    )
+}
+
 const convertArrayToFilteredArray = (inputArray: any) => {
     return inputArray.map((
         item: {
@@ -203,7 +242,7 @@ const convertArrayToFilteredArray = (inputArray: any) => {
             },
             status: {
                 name: statusBuilder(status),
-                code: status === "Delivered" ? null : status==='OB' ? null: status || ''
+                code: (status === "Delivered" || status === "OB") ? null : (status || '')
             },
             currentEta: {
                 date: service.utcToist(eta) || 'NA',
@@ -230,7 +269,7 @@ const convertArrayToFilteredArray = (inputArray: any) => {
 
 
 // Main component
-export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, count, statusForShipment, onFnrChange, reload }: any) {
+export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, count, onFnrChange, reload }: any) {
 
     //language controller
     const t = useTranslations("ORDERS")
@@ -254,7 +293,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
     // action box toggle
     const [showActionBox, setShowActionBox] = useState(-1)
     const [open, setOpen] = React.useState(false);
-    const handleOpen = (e: any) => { e.stopPropagation(); setOpen(true); };
+    const handleOpen = (e: any) => { e.stopPropagation(); setOpen(true); setActionOptions(e.currentTarget.id) };
     const handleClose = (e: any) => { e.stopPropagation(); setOpen(false); }
     const [fnr, setFnr] = useState('')
 
@@ -267,6 +306,9 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
 
     // all Fnr Show toggle
     const [showAllFnr, setShowAllFnr] = useState(-1)
+
+    //trigger action options
+    const [actionOptions, setActionOptions] = useState('')
 
 
     const handleRRDoc = (id: string) => {  // for rr documents
@@ -309,32 +351,21 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
 
     useEffect(() => {
         const resData = convertArrayToFilteredArray(allShipments)
-        if (statusForShipment === 'All') {
-            setResponse(resData)
-        } else {
-            const filteredData = resData.filter((shipment: any) => shipment.status.name === statusForShipment);
-            setResponse(filteredData)
-        }
+        setResponse(resData)
         if (settingFnrChange.length) {
             setSettingFnrChange(settingFnrChange)
         } else { setSettingFnrChange('') }
-
-    }, [allShipments, page, statusForShipment])
+    }, [allShipments])
 
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
-            // if (showActionBox !== -1) {
-            //     event.stopPropagation();
-            // }
             event.stopPropagation();
             const target = event.target as HTMLElement;
-            const actionButton = target.closest('.action_icon'); // Check if clicked inside action button
+            const actionButton = target.closest('.action_icon');
 
             if (!actionButton && showActionBox !== -1) {
                 event.stopPropagation();
-                console.log('this is triggering ')
-                console.log(event)
-                setShowActionBox(-1); // Close action box if clicked outside
+                setShowActionBox(-1);
             }
             event.stopPropagation();
         }
@@ -503,7 +534,6 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                 iconheader: 'body_iconheader'
                                             }
 
-                                            console.log(row.eta)
                                             return (
                                                 <TableCell key={index} sx={{ fontSize: '12px', color: '#44475B', p: '16px 10px 16px 10px' }}
                                                     className={columnClassNames[item.id]} >
@@ -521,8 +551,9 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                         className={`action_button_target ${showActionBox === firstindex ? 'show' : ''}`}
                                                                     >
                                                                         <div className='action_button_options'>
-                                                                            <div className='action_items' onClick={(e) => handleOpen(e)}
 
+                                                                            <div className='action_items' onClick={(e) => handleOpen(e)}
+                                                                                id='attach'
                                                                                 style={{ display: row.validationForAttachRake ? '' : 'none' }}
                                                                             >
                                                                                 <div >
@@ -541,27 +572,48 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                                 <div style={{ width: '20px', height: '20px' }}><img src={contactIcon.src} alt='' style={{ objectFit: 'contain', height: '100%', width: '100%' }} /></div>
                                                                                 <div>{t('contact')}</div>
                                                                             </div>
+                                                                            <div className='action_items' style={{ gap: '10px' }}
+                                                                                id='remarks'
+                                                                                onClick={(e) => handleOpen(e)}>
+                                                                                <div>
+                                                                                    <BookmarkAddOutlinedIcon style={{ fontSize: '17px', color: '#658147' }} />
+                                                                                </div>
+                                                                                <div>{t('addremarks')}</div>
+                                                                            </div>
                                                                         </div>
 
                                                                         <Modal
                                                                             open={open}
                                                                             onClose={(e) => { handleClose(e) }}
-                                                                            aria-labelledby="modal-modal-title"
-                                                                            aria-describedby="modal-modal-description"
+                                                                            sx={{
+                                                                                display: 'flex',
+                                                                                alignItems: 'center',
+                                                                                justifyContent: 'center',
+                                                                                backgroundColor:'rgba(0, 0, 0, 0.01)'
+                                                                            }}
                                                                             BackdropProps={{
                                                                                 sx: {
-                                                                                    opacity: 0.7,
-                                                                                    backgroundColor: 'rgba(0, 0, 0, 0.1)',
+                                                                                  backgroundColor: 'rgba(0, 0, 0, 0.2)',
                                                                                 },
-                                                                            }}
+                                                                              }}
                                                                         >
-                                                                            <Box sx={style}>
-
-                                                                                <Tags rakeCaptiveList={rakeCaptiveList}
+                                                                            <Box sx={{
+                                                                                backgroundColor: 'background.paper',
+                                                                                borderRadius: 2,
+                                                                                boxShadow: 2,
+                                                                                p: 4,
+                                                                                width: '40vw',
+                                                                                maxHeight: '90vh',
+                                                                                
+                                                                            }}>
+                                                                                {actionOptions === 'attach' && <Tags rakeCaptiveList={rakeCaptiveList}
                                                                                     shipmentId={rowId}
                                                                                     setOpen={setOpen}
                                                                                     setShowActionBox={setShowActionBox}
-                                                                                />
+                                                                                />}
+                                                                                {actionOptions === 'remarks' && <Remarks
+                                                                                    shipmentId={rowId}
+                                                                                />}
                                                                             </Box>
                                                                         </Modal>
 
@@ -579,23 +631,30 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                         >
                                                                             {value.primary}
                                                                         </Link>
-                                                                        <div className='all_Pnr_count'
+                                                                        <div className={`${value.others.length > 1 && 'all_Pnr_count'}`}
                                                                             onMouseOver={() => { setShowAllFnr(firstindex) }}
                                                                             onMouseLeave={() => { setShowAllFnr(-1) }}
                                                                         >
-                                                                            <div style={{ cursor: 'pointer' }} >+{value.others.length}</div>
-                                                                            <div className='show_Allfnr'
-                                                                                style={{ display: showAllFnr === firstindex ? 'block' : 'none' }}
-                                                                            >
-                                                                                <div className='contain_fnr'>
-                                                                                    {
-                                                                                        value.others.map((item: string, index: number) => {
-                                                                                            return <div key={index} >{item}</div>
-                                                                                        })
-                                                                                    }
+                                                                            {value.others.length > 1 &&
+                                                                            <>
+                                                                                <div style={{ cursor: 'pointer' }} >+{value.others.length - 1}</div>
+                                                                                <div className='show_Allfnr'
+                                                                                    style={{ display: showAllFnr === firstindex ? 'block' : 'none' }}
+                                                                                >
+                                                                                    <div className='contain_fnr'>
+                                                                                        {
+                                                                                            value.others
+                                                                                            .filter((item: string) => item !== value.primary)
+                                                                                            .map((item: string, index: number) => {
+                                                                                              return <div key={index}>{item}</div>;
+                                                                                            })
+                                                                                        }
+                                                                                    </div>
+    
                                                                                 </div>
-
-                                                                            </div>
+                                                                            </>  
+                                                                            }
+                                                                            
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -653,21 +712,18 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                 </div>
                                                                 : <></>
                                                         }
-                                                        {
-                                                            item.id === 'currentEta' ?
-                                                                <div>
-                                                                    {
-                                                                        row.eta ?
-                                                                            <div>
-                                                                                <div>{value.date}</div>
-                                                                                <div>{value.etaTime}</div>
-                                                                            </div>
-                                                                            : <>NA</>
-                                                                    }
-
-                                                                </div>
-                                                                : <></>
-                                                        }
+                                                        {item.id === 'currentEta' && (
+                                                            <div>
+                                                                {row.eta ? (
+                                                                    <>
+                                                                        <div>{value.date}</div>
+                                                                        <div>{value.etaTime}</div>
+                                                                    </>
+                                                                ) : (
+                                                                    'NA'
+                                                                )}
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 </TableCell>
                                             );
