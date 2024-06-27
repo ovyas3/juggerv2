@@ -20,7 +20,7 @@ import service from '@/utils/timeService';
 import Link from 'next/link';
 import { Column, row } from '@/utils/interface';
 import { useTranslations } from 'next-intl';
-
+import RRModal from '../RR Modal/RRModal';
 
 
 import Autocomplete from '@mui/material/Autocomplete';
@@ -60,9 +60,7 @@ interface item {
 }
 
 async function rake_update_id(payload: Object) {
-    const response = await httpsPost(UPDATE_RAKE_CAPTIVE_ID, payload)
-    console.log("updating")
-    console.log(response)
+    const response = await httpsPost(UPDATE_RAKE_CAPTIVE_ID, payload);
 }
 
 function Tags({ rakeCaptiveList, shipmentId, setOpen, setShowActionBox }: any) {
@@ -256,6 +254,8 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
     const [open, setOpen] = React.useState(false);
     const handleOpen = (e: any) => { e.stopPropagation(); setOpen(true); };
     const handleClose = (e: any) => { e.stopPropagation(); setOpen(false); }
+    const [isRRModalOpen, setRRModalOpen] = useState(false);
+    const [rrNumbers, setRRNumbers] = useState([]); 
     const [fnr, setFnr] = useState('')
 
     //getting row id to pass it to tag element
@@ -269,8 +269,11 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
     const [showAllFnr, setShowAllFnr] = useState(-1)
 
 
-    const handleRRDoc = (id: string) => {  // for rr documents
-        console.log('working:', id)
+    const handleRRDoc = (id: any) => {  // for rr documents
+        setRRModalOpen(true);
+        const rrNums = allShipments.filter((shipment: any) => shipment._id === id)[0].all_FNRs;
+        setRRNumbers(rrNums);
+        console.log(rrNums);
     }
 
     const handleChangeByFnr = (changeFnr: string) => {
@@ -332,8 +335,6 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
 
             if (!actionButton && showActionBox !== -1) {
                 event.stopPropagation();
-                console.log('this is triggering ')
-                console.log(event)
                 setShowActionBox(-1); // Close action box if clicked outside
             }
             event.stopPropagation();
@@ -347,7 +348,6 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
         }
 
         return () => {
-            console.log('this is triggerdfhghfssdsd');
             document.removeEventListener('mousedown', handleClickOutside); // Clean up event listener on component unmount
         };
     }, [showActionBox]);
@@ -482,6 +482,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                 return (
                                     <TableRow hover key={row.edemand}
                                         onClick={() => { handleRRDoc(row._id) }}
+                                        sx={{cursor:'pointer'}}
                                     >
 
                                         {columns.map((item, index) => {
@@ -502,8 +503,6 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                 action: 'body_action',
                                                 iconheader: 'body_iconheader'
                                             }
-
-                                            console.log(row.eta)
                                             return (
                                                 <TableCell key={index} sx={{ fontSize: '12px', color: '#44475B', p: '16px 10px 16px 10px' }}
                                                     className={columnClassNames[item.id]} >
@@ -681,6 +680,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                     </Table>
                 </TableContainer>
             </Paper>
+            <RRModal isOpen={isRRModalOpen} isClose={() => setRRModalOpen(false)} rrNumbers={rrNumbers}/>
         </div>
     );
 }
