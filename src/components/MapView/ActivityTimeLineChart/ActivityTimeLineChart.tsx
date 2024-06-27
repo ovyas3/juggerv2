@@ -107,9 +107,9 @@ export const ActivityTimeLineChart = (props: any) => {
                     <TimelineContent sx={{
               fontWeight: 900
             }} fontSize={"small"}  marginTop={"20px"}>{ firstPing.currentStatus?.split(/ on /i)[0] }</TimelineContent>
-                  </TimelineItem>}
+            </TimelineItem>}
             {
-              pings && pings.length && pings.map((ping: any) => {
+              (pings && pings.length) ? pings.map((ping: any) => {
                 return (
                   <TimelineItem key={ping._id} style={{fontSize: '17px'}}>
                     <TimelineOppositeContent color="text.secondary" fontSize={"small"} marginTop={"20px"}>
@@ -127,9 +127,9 @@ export const ActivityTimeLineChart = (props: any) => {
                     <TimelineContent fontSize={"small"}  marginTop={"20px"}>{ ping.currentStatus.split(/ on /i)[0] }</TimelineContent>
                   </TimelineItem>
                 )
-              })
+              }) : <></>
             }
-          </Timeline></> : <></>
+          </Timeline></>
         </Grid>
         : <div style={{width: '100%', height: '100%', display: 'flex', alignItems:'center', justifyContent: 'center'}}>
         <p style={{color:'#7C7E8C', fontSize: '14px', fontWeight: '600'}}>No Data Present</p>

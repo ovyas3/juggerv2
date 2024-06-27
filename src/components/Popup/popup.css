@@ -140,7 +140,7 @@
 .child-dialog-styles .child-close-icon {
   position: absolute;
   top: -40px;
-  left: -2px;
+  right: -2px;
   cursor: pointer;
   z-index: 1000;
 }
