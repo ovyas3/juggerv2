@@ -44,43 +44,46 @@ const RRModal: React.FC<PopupProps> = ({ isOpen, isClose, rrNumbers }) => {
 
   const handleRRDetails = async (rrNumber: string, index: number) => {
     setActiveRR(index.toString());
-    const response = await httpsGet(`get/rr_document?fnr=${rrNumber}`);
-    console.log(response.data);
-    const data = response.data;
-    const rrDetail = {
-      fnr: data && data.fnr ? data.fnr : 'N/A',
-      rrDate: data && data.created_at ? service.utcToist(data.created_at, 'dd/MM/yyyy') : 'N/A',
-      // stationFrom: data && data.shipment && data.shipment.pickup_location ? data.shipment.pickup_location : 'N/A',
-      // stationTo: data && data.shipment && data.shipment.delivery_location ? data.shipment.delivery_location : 'N/A',
-      stationFrom: data && data.from_station ? data.from_station : 'N/A',
-      stationTo: data && data.to_station ? data.to_station : 'N/A',
-      totalWagons: data && data.no_of_wagons ? data.no_of_wagons : 0,
-      invoicedNo: data && data.invoice_number ?  data.invoice_number : 'N/A',
-      invoicedDate: data && data.invoice_date ? service.utcToist(data.invoice_date, 'dd/MM/yyyy') : 'N/A',
-      distance: data && data.distance ? data.distance : 'N/A',
-      totalWeight: data && data.chargeable_weight ? data.chargeable_weight : 'N/A',
-      totalFreight: data && data.total_freight ? data.total_freight.toLocaleString('en-IN') : 'N/A',
-    };
+    try{
+      const response = await httpsGet(`get/rr_document?fnr=${rrNumber}`);
+      console.log(response.data);
+      const data = response.data;
+      const rrDetail = {
+        fnr: data && data.fnr ? data.fnr : 'N/A',
+        rrDate: data && data.created_at ? service.utcToist(data.created_at, 'dd/MM/yyyy') : 'N/A',
+        stationFrom: data && data.shipment && data.shipment.pickup_location && data.shipment.pickup_location.code ? data.shipment.pickup_location.code : 'N/A',
+        stationTo: data && data.shipment && data.shipment.delivery_location && data.shipment.delivery_location.code ? data.shipment.delivery_location.code : 'N/A',
+        totalWagons: data && data.no_of_wagons ? data.no_of_wagons : 0,
+        invoicedNo: data && data.invoice_number ?  data.invoice_number : 'N/A',
+        invoicedDate: data && data.invoice_date ? service.utcToist(data.invoice_date, 'dd/MM/yyyy') : 'N/A',
+        distance: data && data.distance ? data.distance : 'N/A',
+        totalWeight: data && data.chargeable_weight ? data.chargeable_weight : 'N/A',
+        totalFreight: data && data.total_freight ? data.total_freight.toLocaleString('en-IN') : 'N/A',
+      };
+  
+      const tableData = data && data.wagon_details ? 
+          data.wagon_details.map((wagon: any) => {
+            return {
+              owningRly: wagon.owningRailway ? wagon.owningRailway : 'N/A',
+              type: wagon.type ? wagon.type : 'N/A',
+              wagonNo: wagon.wagonNumber ? wagon.wagonNumber : 'N/A',
+              cc: wagon.CCWeight ? wagon.CCWeight : 'N/A',
+              tare: wagon.tareWeight ? wagon.tareWeight : 'N/A',
+              noOfArticles: wagon.no_of_articles ? wagon.no_of_articles : 'N/A',
+              grossWeight: wagon.grossWeight ? wagon.grossWeight : 'N/A',
+              actualWt: wagon.actualWeight ? wagon.actualWeight : 'N/A',
+            };
+          } )
+          : [];
+  
+      setRRDetails(rrDetail);
+      setRRTableData(tableData);
+      console.log(rrDetail);
+      console.log(tableData);
 
-    const tableData = data && data.wagon_details ? 
-        data.wagon_details.map((wagon: any) => {
-          return {
-            owningRly: wagon.owningRailway ? wagon.owningRailway : 'N/A',
-            type: wagon.type ? wagon.type : 'N/A',
-            wagonNo: wagon.wagonNumber ? wagon.wagonNumber : 'N/A',
-            cc: wagon.CCWeight ? wagon.CCWeight : 'N/A',
-            tare: wagon.tareWeight ? wagon.tareWeight : 'N/A',
-            noOfArticles: wagon.no_of_articles ? wagon.no_of_articles : 'N/A',
-            grossWeight: wagon.grossWeight ? wagon.grossWeight : 'N/A',
-            actualWt: wagon.actualWeight ? wagon.actualWeight : 'N/A',
-          };
-        } )
-        : [];
-
-    setRRDetails(rrDetail);
-    setRRTableData(tableData);
-    console.log(rrDetail);
-    console.log(tableData);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   useEffect(() => { 
