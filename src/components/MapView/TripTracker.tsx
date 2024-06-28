@@ -163,13 +163,13 @@ const TripTracker = (params: any) => {
     const decodeline = polyline.decode(tripTrackerLine1) || [];
     setEstimatedTrack(decodeline);
     // remove tracks if currentStatus is empty or its misisng geo_point ir if geo_point.coordinates is empty or if its length is less than 2 or if geo_point.coordinates ==[0, 0]
-    const tracksWithStatus = tracks.filter((track: any) => {
+    const tracksWithStatus = tracks && tracks.filter((track: any) => {
       if (!track.currentStatus || track.currentStatus === '') {
         return false;
       }
       return true;
     });
-    const filteredTracks = tracksWithStatus.filter((track: any) => {
+    const filteredTracks =tracksWithStatus && tracksWithStatus.filter((track: any) => {
       if (!track.geo_point || !track.geo_point.coordinates || track.geo_point.coordinates.length < 2 || track.geo_point.coordinates[0] === 0 || track.geo_point.coordinates[1] === 0) {
         return false;
       }
@@ -194,13 +194,13 @@ const TripTracker = (params: any) => {
     setActivityData(tracksWithStatus);
     setPickupDetail(pickupDetails);
     setDropDetail(dropDetails);
-    const lastLocation = filteredTracks[0];
+    const lastLocation = filteredTracks && filteredTracks.length && filteredTracks[0];
     setCurrentLocation(lastLocation);
-    if (filteredTracks.length > 0) {
+    if (filteredTracks && filteredTracks.length > 0) {
       setButtonEnabledFois(true);
     }
 
-    const trip_tracker_gps = rakeData.trip_tracker ? rakeData.trip_tracker.gps_updated_at : false;
+    const trip_tracker_gps = rakeData && rakeData.trip_tracker ? rakeData.trip_tracker.gps_updated_at : false;
     if (trip_tracker_gps) {
       setButtonEnabledGPS(true);
     }
@@ -470,8 +470,8 @@ const TripTracker = (params: any) => {
           className="tracking_details"
         >
         <FNRDetailsCard className="fnr_details_mobile"  fnr_data={fnr_data} />
-        <ActivityTimeLineChart className="tracking_details_mobile" trackingDetails={activityData} />
-        </Box>)}                                                        
+        <ActivityTimeLineChart className="tracking_details_mobile" trackingDetails={activityData} fnr_data={fnr_data} />
+        </Box>)}          
       </Box>
       {/* {mobile ? <Footer /> : <LeftDrawer />} */}
     </>
