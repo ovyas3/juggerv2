@@ -42,7 +42,8 @@
     "share":"Share",
     "intransit":"In Transit",
     "delivered":"Delivered",
-    "inplant":"In Plant"
+    "inplant":"In Plant",
+    "addremarks":"Remarks"
   },
   "DRAWER":{
     "shipments":"shipments",

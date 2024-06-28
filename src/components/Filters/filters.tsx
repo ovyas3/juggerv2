@@ -23,10 +23,12 @@ import FormControl from '@mui/material/FormControl';
 import ListItemText from '@mui/material/ListItemText';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import Checkbox from '@mui/material/Checkbox';
+import dayjs from 'dayjs';
+import service from '@/utils/timeService';
 
 
 
-function Filters({ onToFromChange, onChangeStatus }: any) {
+function Filters({ onToFromChange, onChangeStatus, reload }: any) {
 
 
 
@@ -48,7 +50,7 @@ function Filters({ onToFromChange, onChangeStatus }: any) {
 
 
 
-    const [status, setStatus] = React.useState<string>('All');
+    const [status, setStatus] = React.useState<string>('In Transit');
 
     const handleChange = (event: SelectChangeEvent<string>) => {
         onChangeStatus(event.target.value as string)
@@ -65,15 +67,12 @@ function Filters({ onToFromChange, onChangeStatus }: any) {
 
 
     const formatDate = (date: any) => {
-
-        const day = date.getDate();
-        const month = date.toLocaleString('default', { month: 'short' });
-        const year = date.getFullYear();
-        return `${month} ${day}, ${year}`;
+        const t = service.getLocalTime(new Date(date));
+        return t;
     };
 
     const handleStartDateChange = (e: any) => {
-        const newStartDate = e.$d;
+        const newStartDate = e.$d
         if (new Date(newStartDate) > new Date(endDate)) {
             setError('Start date cannot be after end date');
         } else {
@@ -93,10 +92,24 @@ function Filters({ onToFromChange, onChangeStatus }: any) {
     };
 
     useEffect(() => {
-        if (startDate && endDate && !error) {
+        if (!reload)
+        if (startDate && endDate && !error ) {
             onToFromChange(endDate, startDate);
         }
+
     }, [startDate, endDate, error]);
+
+    useEffect(() => {
+        if (reload) {
+            const today = new Date();
+            const twentyDaysBefore = new Date(today);
+            twentyDaysBefore.setDate(today.getDate() - 20);
+            
+            setStartDate(twentyDaysBefore);
+            setEndDate(today);
+            onToFromChange(today, twentyDaysBefore);
+        }
+    }, [reload]);
 
 
 
@@ -115,8 +128,8 @@ function Filters({ onToFromChange, onChangeStatus }: any) {
                     >
                         <DatePicker
                             format="DD/MM/YYYY"
-                            slotProps={{ textField: { placeholder: formatDate(startDate) } }}
-
+                            slotProps={{ textField: { placeholder: formatDate(startDate) },  }}
+                            value={dayjs(startDate)}
                             onChange={(newDate) => { handleStartDateChange(newDate) }}
                             sx={{
                                 '& .MuiInputBase-input::placeholder': {
@@ -150,6 +163,7 @@ function Filters({ onToFromChange, onChangeStatus }: any) {
                             slotProps={{ textField: { placeholder: formatDate(endDate) } }}
                             format="DD/MM/YYYY"
                             onChange={(newDate) => { handleEndDateChange(newDate) }}
+                            value={dayjs(endDate)}
                             sx={{
                                 '& .MuiInputBase-input::placeholder': {
                                     fontSize: '14px',
@@ -229,7 +243,7 @@ function Filters({ onToFromChange, onChangeStatus }: any) {
                 </div>
             </div> */}
 
-            {/* <input type='date' placeholder='Dec 23, 3456' /> */}
+            
         </div>
     );
 }
