@@ -7,6 +7,7 @@ import { useEffect, useState, Suspense } from "react";
 import { httpsGet } from "../../utils/Communication";
 import dynamic from 'next/dynamic'
 import Placeholder from "@/components/MapView/Skeleton/placeholder";
+import Loader from "@/components/Loading/WithBackDrop";
 
 const TripTrackerDynamic = dynamic(() => import('../../components/MapView/TripTracker'), {
   loading: () => <Placeholder />,
@@ -45,13 +46,13 @@ const MapViewPageFunction: NextPage = () => {
       // @ts-ignore
       return <TripTrackerDynamic trip_tracker_data={data} routeStation={routeStation}/>
     } else {
-      return <div>Loading...</div>
+      return <Loader />
     }
 }
 
 const MapViewPage = () => {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<Loader />}>
       <MapViewPageFunction />
     </Suspense>
   )

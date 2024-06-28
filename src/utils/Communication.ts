@@ -4,32 +4,32 @@ import { environment } from '@/environments/env.api';
 import { getAuth } from '@/services/Authenticator/Auth';
 
 const prefix = [
-  environment.DEV_API_URL
+  environment.PROD_API_URL
 ]
 
 const httpsGet = async (path: string, type: number = 0) => {
-  const autherization = {
-    Autherization: getAuth(),
+  const authorization = {
+    Authorization: getAuth(),
   }
   const url = prefix[type] + path;
   const config = {
     method: 'GET',
     url,
-    headers: autherization,
+    headers: authorization,
   }
   const response = await axios(config);
   return response.data;
 }
 
 const httpsPost = async (path: string, data: any, type = 0) => {
-  const autherization = {
-    Autherization: getAuth(),
+  const authorization = {
+    Authorization: getAuth(),
   }
   const url = prefix[type] + path;
   const config = {
     method: 'POST',
     url,
-    headers: autherization,
+    headers: authorization,
     data,
   }
   const response = await axios(config);
