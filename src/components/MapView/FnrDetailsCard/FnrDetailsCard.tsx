@@ -9,7 +9,31 @@ import { statusBuilder } from "../StatusBuilder/StatusBuilder";
 import Image from 'next/image';
 import service from "@/utils/timeService";
 
-export const FNRDetailsCard = (props: any) => ( 
+const getStatusStyle = (status: string) => {
+  switch(status.toLowerCase()){
+    case "delivered":
+      return{
+        backgroundColor: '#90dcc4',
+        color: '#0e9167'
+      };
+    case "in transit":
+      return{
+        backgroundColor: '#ff98001f',
+        color: '#ff9800'
+      }
+    case "in plant": 
+      return{
+        backgroundColor: '#334ffc1f',
+        color: '#334ffc'
+      }  
+  }
+}
+
+export const FNRDetailsCard = (props: any) => {
+
+    const statusText = statusBuilder(props.fnr_data.status);
+    const statusStyle = getStatusStyle(statusText);
+    return(
     <React.Fragment>
       <CardContent className={props.className} >
         <Grid style={
@@ -45,7 +69,6 @@ export const FNRDetailsCard = (props: any) => (
             <Box style={
             {
               display: "flex",
-              backgroundColor: '#D6F6DD',
               color: '#008E27',
               height: '24px',
               width: '75px',
@@ -58,9 +81,11 @@ export const FNRDetailsCard = (props: any) => (
               fontSize: '12px',
               marginBottom: "22px",
               marginRight: "5px",
+              ...statusStyle
             }
           }>
-           {statusBuilder(props.fnr_data.status)}
+            
+           {statusBuilder(statusText)}
           </Box>
           </Grid>
         </Grid>
@@ -173,4 +198,5 @@ export const FNRDetailsCard = (props: any) => (
         </Grid>
       </CardContent>
     </React.Fragment>
-  );
+    );
+};

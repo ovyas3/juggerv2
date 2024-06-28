@@ -471,7 +471,7 @@ const TripTracker = (params: any) => {
         >
         <FNRDetailsCard className="fnr_details_mobile"  fnr_data={fnr_data} />
         <ActivityTimeLineChart className="tracking_details_mobile" trackingDetails={activityData} />
-        </Box>)}
+        </Box>)}                                                        
       </Box>
       {/* {mobile ? <Footer /> : <LeftDrawer />} */}
     </>
