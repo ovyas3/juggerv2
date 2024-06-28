@@ -48,7 +48,7 @@ const apiCall = async (config: any) => {
     }
   } else  {
     finalConf.headers = {
-      Autherization: getAuth(),
+      Authorization: getAuth(),
     }
   }
   await axios(finalConf)
