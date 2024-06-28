@@ -38,6 +38,14 @@ const getTimeWithAMPM = (utc: string) => {
   return DateTime.fromJSDate(new Date(utc)).setZone('Asia/Calcutta').toFormat('hh:mm a');
 }
 
+const getLocalTime = (date:any, format: string = 'dd MM yyyy') => {
+  return DateTime.fromJSDate(new Date(date)).setZone('Asia/Calcutta').toFormat('hh:mm a');
+}
+
+const getEpoch = (date:any) => {
+  return DateTime.fromJSDate(new Date(date)).toUTC();
+}
+
 const service = {
   utcToist,
   millies,
@@ -45,7 +53,9 @@ const service = {
   diffrent,
   getTimeWithAMPM,
   utcToistTime,
-  differenceToday
+  differenceToday,
+  getLocalTime,
+  getEpoch,
 }
 
 export default service;

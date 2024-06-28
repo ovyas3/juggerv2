@@ -4,7 +4,7 @@ import { environment } from '@/environments/env.api';
 import { getAuth } from '@/services/Authenticator/Auth';
 
 const prefix = [
-  environment.PROD_API_URL
+  environment.DEV_API_URL
 ]
 
 const httpsGet = async (path: string, type: number = 0) => {
@@ -32,6 +32,7 @@ const httpsPost = async (path: string, data: any, type = 0) => {
     headers: authorization,
     data,
   }
+  console.log(config);
   const response = await axios(config);
   return response.data;
 }
@@ -43,7 +44,7 @@ const apiCall = async (config: any) => {
   if(finalConf.headers) {
     finalConf.headers = {
       ...finalConf.headers,
-      Autherization: getAuth(),
+      Authorization: getAuth(),
     }
   } else  {
     finalConf.headers = {

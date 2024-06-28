@@ -381,9 +381,12 @@ export const Popup: React.FC<PopupProps> = ({ data }) => {
     }, [searchChildTerm]);
 
     return (
-      <TableHead>
+      <TableHead>       
         <TableRow>
           <TableCell align="left" className="table-columns">
+            S.No
+          </TableCell>
+          <TableCell align="center" className="table-columns">
             <CustomTextField
               inputRef={inputRef}
               id="outlined-basic"
@@ -393,7 +396,7 @@ export const Popup: React.FC<PopupProps> = ({ data }) => {
               onChange={handleChildSearchChange}
             />
           </TableCell>
-          <TableCell align="left" className="table-columns">
+          <TableCell align="left" className="table-columns" sx={{paddingLeft: '0px !important'}}>
             <div className="select-container">
               <FormControl>
                 <InputLabel id="demo-simple-select-label"
@@ -451,12 +454,13 @@ export const Popup: React.FC<PopupProps> = ({ data }) => {
   }
 
   const ChildTableRowComponent = () => (
-    childFilteredData && childFilteredData.map((item: any) => (
+    childFilteredData && childFilteredData.map((item: any, index: number) => (
       <TableRow
         key={item.wagon_no}
         sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
         className='table-rows-container'
       >
+        <TableCell align="left" className='table-rows' >{index + 1}.</TableCell>
         <TableCell align="left" className='table-rows'>
           <p>{item.wagon_no}</p>
           <Image src={LinkIcon} alt="link"/>
@@ -494,7 +498,7 @@ export const Popup: React.FC<PopupProps> = ({ data }) => {
           onClick={handleChildClose}
           className="child-close-icon"
         >
-          <Image src={ReturnIcon} alt="close" />
+          <Image src={CloseButtonIcon} alt="close" />
         </div>
 
         <div className="child-upper-container">

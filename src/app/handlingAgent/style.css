@@ -1,0 +1,27 @@
+.bottom_bar{
+    width: 100%;
+    background-color: #f0f3f9;
+    position: fixed;
+    bottom: 0;
+    height: 65px;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    color: white;
+}
+
+.content_container{
+    width: calc(100vw - 70px);
+    height: calc(100vh - 56px);
+    padding: 8px;
+    
+}
+
+.adjustMargin{
+    margin-top: 56px;
+    margin-left: 70px;
+   
+}
+.adjustMarginMobile {
+    width: 100vw;
+    height: calc(100vh - 56px - 54px);
+}

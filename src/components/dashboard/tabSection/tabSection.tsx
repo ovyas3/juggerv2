@@ -77,7 +77,7 @@ const Tabsection = () => {
         <div>
           <Box sx={{ width: "100%", typography: "body1" }}>
             <TabContext value={value}>
-              <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+              <Box sx={{ borderBottom: 1, borderColor: "divider"}}>
                 <TabList onChange={handleChange}>
                   <Tab label={t("railOverview")} value="1" />
                   {/* <Tab label="Handling Agent's Overview" value="2" />

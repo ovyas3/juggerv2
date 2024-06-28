@@ -1,0 +1,185 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+
+.rrmodal-styles{
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.rrmodal-styles .rrmodal-container {
+  position: relative;
+  display: inline-block;
+  border-radius: 12px !important;
+  overflow-y: unset;
+  height: 100%;
+}
+
+.rrmodal-container  .rrmodal-close{
+  position: absolute;
+  top: -40px;
+  right: -2px;
+  cursor: pointer;
+  z-index: 1000;
+}
+
+.rrmodal-styles .MuiDialog-container .MuiDialog-paper{
+  border-radius: 12px !important;
+  max-width: 1052px !important;
+  min-height: 696px !important;
+  overflow-y: unset;
+}
+
+.rrmodal-container .rrmodal-header .rrmodal-heading{
+  font-size: 20px;
+  font-weight: 600;
+  color: #131722;
+  opacity: 84%;
+  padding: 20px 24px;
+}
+
+.rrmodal-container .rrmodal-body{
+  padding: 16px 24px;
+  background-color: #F8F8F8;
+  border-radius: 0 0 12px 12px;
+  max-width: 1052px !important;
+  display: flex;
+}
+
+.rrmodal-container .rrmodal-body .rrmodal-sidebar{
+  width: 200px;
+  height: 600px;
+  border: 1px solid #E9E9EB;
+  background-color: #fff;
+  border-radius: 12px;
+  font-family: 'Inter', sans-serif !important;
+  flex: 1;
+
+  .rrmodal-sidebar-heading{
+    font-size: 12px;
+    font-weight: 600;
+    padding: 12px;
+    color: #42454E;
+    border-bottom: 1px solid #E9E9EB;
+  }
+
+  .rrmodal-sidebar-details-item-value{
+    font-size: 12px;
+    font-weight: normal;
+    padding: 16px;
+    color: #42454E;
+    border-bottom: 1px solid #E9E9EB;
+  }
+
+  .rrmodal-sidebar-details-item-value:last-child{
+    border-bottom: none;
+  }
+
+  .rrmodal-sidebar-details-item-value:hover{
+    cursor: pointer;
+    background-color: #F0F3F999;
+    border: 1px solid #3351FF;
+  }
+
+  .rrmodal-sidebar-details-item-value-active{
+    background-color: #334FFC;
+    border: 1px solid #3351FF;
+    color: #fff;
+    font-weight: 600;
+    font-size: 12px;
+    padding: 16px;
+  }
+}
+
+.rrmodal-container .rrmodal-body .rrmodal-content{
+  flex: 3;
+  margin-left: 24px;
+
+  .rrmodal-content-upper{
+    padding: 16px 24px;
+    height: 158px;
+    width: 780px;
+    background-color: #fff;
+    border-radius: 12px;
+    border: 1px solid #E9E9EB;
+    margin-bottom: 16px;
+    display: flex;
+    flex-direction: column;
+
+    .rrmodal-content-upper-body{
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      margin-bottom: 32px;
+      margin-top: 10px;
+    }
+
+    .rrmodal-content-lower-body{
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+
+    .rrmodal-content-upper-item {
+      flex: 1;
+    }
+
+    .rrmodal-content-upper-item:nth-child(2){
+      margin-left: 16px;
+    }
+
+    .rrmodal-content-upper-item:nth-child(7){
+      margin-left: 16px;
+    }
+
+    .rrmodal-content-upper-item-heading{
+      font-size: 12px;
+      color: #42454E;
+      font-weight: normal;
+    }
+
+    .rrmodal-content-upper-item-value{
+      font-size: 14px;
+      font-weight: bold;
+      color: #131722;
+      padding-top: 4px;
+    }
+  }
+
+  .rrmodal-content-lower{
+
+    .MuiTable-root{
+      min-width: 780px !important;
+    }
+
+    .MuiPaper-root{
+      box-shadow: none;
+      background-color: #fff;
+      border-radius: 12px;
+      overflow: auto;
+      height: 425px;
+      border: 1px solid #E9E9EB;
+    }
+  
+    .MuiTable-root .MuiTableBody-root .MuiTableRow-root:hover{
+      cursor: pointer;
+      background-color: #F0F3F9;
+    }
+
+    .MuiTableHead-root .rrmodal-table-headers{
+      font-size: 12px;
+      font-weight: 600;
+      color: #42454E;
+      padding: 24px 16px;
+      border-bottom: 1px solid #E9E9EB;
+      line-height: 14px;
+      font-family: 'Inter', sans-serif !important;
+    }
+
+    .MuiTableBody-root  .rrmodal-table-body-items{
+      font-size: 12px;
+      font-weight: normal;
+      color: #42454E;
+      font-family: 'Inter', sans-serif !important;
+      padding: 10px 16px 32px 16px;
+    }
+  }
+}
