@@ -368,11 +368,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
 
             if (!actionButton && showActionBox !== -1) {
                 event.stopPropagation();
-<<<<<<< HEAD
-                setShowActionBox(-1);
-=======
                 setShowActionBox(-1); // Close action box if clicked outside
->>>>>>> 0849dce833bf765825d9fd8185e56ded601e42f8
             }
             event.stopPropagation();
         }
@@ -540,10 +536,6 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                 action: 'body_action',
                                                 iconheader: 'body_iconheader'
                                             }
-<<<<<<< HEAD
-
-=======
->>>>>>> 0849dce833bf765825d9fd8185e56ded601e42f8
                                             return (
                                                 <TableCell key={index} sx={{ fontSize: '12px', color: '#44475B', p: '16px 10px 16px 10px' }}
                                                     className={columnClassNames[item.id]} >
