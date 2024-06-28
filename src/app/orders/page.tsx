@@ -13,6 +13,7 @@ import { useWindowSize } from "@/utils/hooks";
 import { httpsGet, httpsPost } from "@/utils/Communication";
 import { GET_SHIPMENTS, CAPTIVE_RAKE } from "@/utils/helper";
 import { useSnackbar } from '@/hooks/snackBar';
+import service from '@/utils/timeService';
 
 
 const getStatusCode = (status: string): string => {
@@ -36,7 +37,7 @@ const OrdersPage = () => {
   const [rakeCaptiveList, setRakeCaptiveList] = useState([]);
 
   const [reload, setReload] = useState(false)
-  const [statusForShipment, setStatusForShipment] = useState('All')
+  // const [statusForShipment, setStatusForShipment] = useState('All')
   const [reloadOnHeaderChange, setReloadOnHeaderChange] = useState(false);
   const { showMessage } = useSnackbar();
 
@@ -46,37 +47,38 @@ const OrdersPage = () => {
     is_outbound: true,
     to: '',
     from: '',
+    status: 'ITNS'
   })
 
   //adding to and from to shipmentpayload
   const handleToFromChange = (to: string, from: string) => {
-    setShipmentsPayload((prevState:any) => ({
+    setShipmentsPayload((prevState: any) => ({
       ...prevState,
-      to: to,
-      from: from
+      to: service.getEpoch(new Date(to)),
+      from: service.getEpoch(new Date(from)),
     }));
   };
 
   //adding limit and skip to shipmentpayload
   const handleSkipLimitChange = (limit: number, skip: number,) => {
-    setShipmentsPayload((prevState:any) => ({
+    setShipmentsPayload((prevState: any) => ({
       ...prevState,
       limit: limit,
       skip: skip
     }));
   }
 
-  const handleChangeByFnr = (fnr: string)=>{
-    setShipmentsPayload((prevState:any) => ({
+  const handleChangeByFnr = (fnr: string) => {
+    setShipmentsPayload((prevState: any) => ({
       ...prevState,
       fnrNumber: fnr,
     }));
   }
 
-  const handleChangeStatus = (status: string) =>{
-    setShipmentsPayload((prevState:any) => {
+  const handleChangeStatus = (status: string) => {
+    setShipmentsPayload((prevState: any) => {
       if (status === "All") {
-       
+
         // Create a new object without the status property
         const { status, ...newState } = prevState;
         return newState;
@@ -87,7 +89,7 @@ const OrdersPage = () => {
         };
       }
     });
-   
+
   }
 
   // function which bring allshipment   OB ITNS CPTD
@@ -114,7 +116,7 @@ const OrdersPage = () => {
     if (ShipmentsPayload.from && ShipmentsPayload.to) getAllShipment();
   }, [ShipmentsPayload])
 
-  if(reloadOnHeaderChange) getAllShipment();
+  if (reloadOnHeaderChange) getAllShipment();
 
   return (
     <div  >
@@ -131,11 +133,7 @@ const OrdersPage = () => {
               <div className={`reload ${reload ? 'loading' : ''}`} onClick={() => {
                 showMessage('Refresh Successfully', 'success')
                 const { fnrNumber, ...updatedShipmentsPayload } = ShipmentsPayload;
-    
-                // Update the state
                 setShipmentsPayload(updatedShipmentsPayload);
-                
-                // Log the updated payload
                 console.log(updatedShipmentsPayload);
                 getAllShipment();
                 setReload(true)
@@ -159,13 +157,13 @@ const OrdersPage = () => {
 
             {/* ----filter---- */}
             <div className='filters' >
-              <Filters onToFromChange={handleToFromChange}   onChangeStatus={handleChangeStatus} />
+              <Filters onToFromChange={handleToFromChange} onChangeStatus={handleChangeStatus} reload={reload} />
 
             </div>
 
             {/* ----table---- */}
             <div className='tableData'>
-              <TableData onSkipLimit={handleSkipLimitChange} allShipments={allShipment} count={count} rakeCaptiveList={rakeCaptiveList} statusForShipment={statusForShipment} onFnrChange={handleChangeByFnr} reload={reload}/>
+              <TableData onSkipLimit={handleSkipLimitChange} allShipments={allShipment} count={count} rakeCaptiveList={rakeCaptiveList} onFnrChange={handleChangeByFnr} reload={reload} />
             </div>
 
           </div>

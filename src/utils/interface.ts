@@ -47,3 +47,7 @@ export interface row {
   eta:string
 
 }
+
+export interface tagItem {
+  _id: string;
+}

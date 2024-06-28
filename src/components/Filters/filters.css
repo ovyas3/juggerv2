@@ -106,3 +106,15 @@
   .status_container .mui-10hburv-MuiTypography-root{
     font-size: 12px;
   }
+  .box {
+    height: 35px;
+    width: 91px;
+    font-size: 12px;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    padding: 0px 8px 0px 7px;
+    justify-content: space-between;
+    cursor: pointer;
+    background: rgb(233, 233, 233);
+  }

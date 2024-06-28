@@ -4,6 +4,7 @@ import { Box, CircularProgress } from "@mui/material";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import './Auth.css'
+import Loader from "../Loading/WithBackDrop";
 
 
 const AuthController = () => {
@@ -38,7 +39,7 @@ const AuthController = () => {
 
 const Auth = () => {
     return (
-        <Suspense fallback={<div>Loading...</div>} >
+        <Suspense fallback={<Loader />} >
             <AuthController />
         </Suspense>
     )
