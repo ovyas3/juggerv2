@@ -8,6 +8,7 @@ import currentTrainLocationIcon from '../../../assets/current_train_location_ico
 import { statusBuilder } from "../StatusBuilder/StatusBuilder";
 import Image from 'next/image';
 import service from "@/utils/timeService";
+import { Tooltip } from "@mui/material";
 
 const getStatusStyle = (status: string) => {
   switch(status.toLowerCase()){
@@ -190,8 +191,14 @@ export const FNRDetailsCard = (props: any) => {
                  <div style={{marginLeft: "20px"}}>
                   FOIS: <b>{props.fnr_data?.trip_tracker?.fois_last_location || 'N/A'}</b>
                  </div>
-                 <div style={{marginLeft: "20px"}}>
-                  ETA: <b>{service.utcToist(props.fnr_data?.eta, 'dd-MM-yyyy HH:mm')}</b>
+                 <div style={{marginLeft: "20px", cursor: "hover"}}>
+                 <Tooltip
+                    title={`ETA - Estimated Time of Arrival or Expected Time of Arrival`}
+                    arrow
+                    placement="bottom"
+                  >
+                    <p style={{cursor: 'pointer'}}>ETA : <b>{service.utcToist(props.fnr_data?.eta, 'dd-MM-yyyy HH:mm')}</b></p>
+                  </Tooltip>
                  </div>
             </Grid>
           </Grid>

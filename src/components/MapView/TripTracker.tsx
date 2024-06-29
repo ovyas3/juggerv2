@@ -381,7 +381,7 @@ const TripTracker = (params: any) => {
               <FormControlLabel
               // disabled={!buttonEnabledGPS}
               control={<Switch checked={showEstimtedTrack} onChange={handleTrackingLineCheck} />}
-              label="Predicted Route"
+              label="RR Route"
               labelPlacement="start"
             />
             </div>

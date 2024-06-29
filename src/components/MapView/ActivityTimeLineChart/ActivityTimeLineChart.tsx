@@ -21,7 +21,6 @@ export const ActivityTimeLineChart = (props: any) => {
     const [lastPing, setLastPing] = useState<any>({});
     const [showPings, setShowPings] = useState(true);
     const [lowPings, setLowPings] = useState(true);
-    console.log(props)
   
     useEffect(() => {
       const data = props.trackingDetails;
@@ -77,7 +76,7 @@ export const ActivityTimeLineChart = (props: any) => {
                 fontSize: '20px',
               }
             }>
-              FOIS Timeline
+              Timeline
             </Box>
           </Grid>
         </Grid>
@@ -140,8 +139,6 @@ export const ActivityTimeLineChart = (props: any) => {
               fontWeight: 900
             }}  color="text.secondary" fontSize={"small"} marginTop={"20px"}>
                       { props.fnr_data && props.fnr_data.pickup_date ? `${service.utcToist(props.fnr_data.pickup_date, 'dd-MM-yyyy')} ${service.utcToist(props.fnr_data.pickup_date, 'HH:mm')}` : 'N/A' }
-                      {/* { rakeData && rakeData.pickup_date ? `${service.utcToist(rakeData.pickup_date, 'dd-MM-yyyy')} ${service.utcToist(rakeData.pickup_date, 'HH:mm')}` : 'N/A'} */}
-                      {/* { service.utcToistTime(lastPing.time_stamp, 'dd-MM-yyyy HH:mm') } */}
                     </TimelineOppositeContent>
                     <TimelineSeparator >
                       <TimelineConnector />
