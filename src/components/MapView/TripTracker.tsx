@@ -25,7 +25,7 @@ import service from '@/utils/timeService';
 import polyline from '@mapbox/polyline';
 import getBoundary from "./IndianClaimed";
 import L from 'leaflet';
-import { distanceBetweenMultiplePointsInKm} from '@/utils/distance';
+import { distanceBetweenMultiplePointsInKm } from '@/utils/distance';
 
 const renderMarkers = (tracking_data: any[], customIcon: Icon): JSX.Element[] => {
   return tracking_data.map((point, index) => (
@@ -240,7 +240,7 @@ const TripTracker = (params: any) => {
   const mobile = !useMediaQuery("(min-width:800px)");
   return (
     <>
-      <TripTrackerNavbar />
+      <TripTrackerNavbar fnr_data={fnr_data}/>
       <Box
         sx={{
             marginTop: mobile ? "150px" : "75px",

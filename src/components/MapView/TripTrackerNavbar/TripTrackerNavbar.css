@@ -9,3 +9,10 @@
     top: 0px;
     height: 75px;
 }
+
+.head{
+    margin: auto;
+    font-weight: 400;
+    word-spacing: 0.2em;
+    font-size: 25px;
+}
