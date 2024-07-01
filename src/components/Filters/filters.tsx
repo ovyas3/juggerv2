@@ -23,6 +23,7 @@ import FormControl from '@mui/material/FormControl';
 import ListItemText from '@mui/material/ListItemText';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import Checkbox from '@mui/material/Checkbox';
+import closeIcon from '../../assets/close_icon.svg'
 import dayjs from 'dayjs';
 import service from '@/utils/timeService';
 import { motion } from 'framer-motion';
@@ -30,7 +31,7 @@ import Image from 'next/image';
 import MapViewIcon from "@/assets/map_view.svg";
 
 
-function Filters({ onToFromChange, onChangeStatus, reload }: any) {
+function Filters({ onToFromChange, onChangeStatus, reload, shipmentsPayloadSetter }: any) {
 
 
 
@@ -53,6 +54,8 @@ function Filters({ onToFromChange, onChangeStatus, reload }: any) {
 
 
     const [status, setStatus] = React.useState<string>('In Transit');
+    const [openStartDatePicker,setOpenStartDatePicker] = useState(false);
+    const [openEndDatePicker,setOpenEndDatePicker] = useState(false);
 
     const handleChange = (event: SelectChangeEvent<string>) => {
         onChangeStatus(event.target.value as string)
@@ -66,7 +69,9 @@ function Filters({ onToFromChange, onChangeStatus, reload }: any) {
     const [startDate, setStartDate] = useState(twentyDaysBefore);
     const [endDate, setEndDate] = useState(today);
     const [error, setError] = useState('');
-
+    const [openFilterModal,setOpenFilterModal] = useState(false)
+    const [filterEDemand, setFilterEDemand] = useState('');
+    const [filterDestination, setFilterDestination] = useState('');
 
     const formatDate = (date: any) => {
         const t = service.getLocalTime(new Date(date));
@@ -80,7 +85,7 @@ function Filters({ onToFromChange, onChangeStatus, reload }: any) {
         } else {
             setError('');
         }
-        setStartDate(newStartDate);
+        setStartDate(newStartDate.setHours(0, 0, 0, 0));
     };
 
     const handleEndDateChange = (e: any) => {
@@ -92,6 +97,34 @@ function Filters({ onToFromChange, onChangeStatus, reload }: any) {
         }
         setEndDate(newEndDate);
     };
+
+    function clearFilter() {
+        setFilterDestination('')
+        setFilterEDemand('')
+    }
+
+    function shouldDisableStartDate(date: Date) {
+        return date > new Date() || date > endDate
+    }
+
+    function shouldDisableEndDate(date: Date) {
+        
+        return date > new Date() ||  new Date(new Date(date).setHours(23, 59, 59, 999)) < startDate
+    }
+
+    function handleSubmit() {
+      shipmentsPayloadSetter((prevState: any) => {
+        const newState = { ...prevState };
+        if (!filterEDemand) delete newState["eDemand"];
+        else newState.eDemand = filterEDemand;
+        if (!filterDestination) delete newState["destination"];
+        else newState.destination = filterDestination;
+
+        return newState;
+      });
+      clearFilter();
+      setOpenFilterModal(false);
+    }
 
     useEffect(() => {
         if (!reload)
@@ -113,10 +146,15 @@ function Filters({ onToFromChange, onChangeStatus, reload }: any) {
         }
     }, [reload]);
 
+    function check(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
+        console.log(e)
+    }
+
 
 
     return (
-        <div style={{ display: 'flex', gap: 20, overflowX: 'auto', position: 'relative', overflowY: 'visible' }} >
+    <div>
+        <div style={{ display: 'flex', gap: 20, overflowX: 'auto', position: 'relative' , overflowY:'visible'}} >
 
             <div style={{ display: 'flex', gap: 20, }}>
 
@@ -130,9 +168,13 @@ function Filters({ onToFromChange, onChangeStatus, reload }: any) {
                     >
                         <DatePicker
                             format="DD/MM/YYYY"
-                            slotProps={{ textField: { placeholder: formatDate(startDate) },  }}
+                            open={openStartDatePicker}
+                            onOpen={() => setOpenStartDatePicker(true)}
+                            onClose={() => setOpenStartDatePicker(false)}
+                            slotProps={{ textField: { placeholder: formatDate(startDate),onClick: ()=> setOpenStartDatePicker(!openStartDatePicker) },  }}
                             value={dayjs(startDate)}
                             onChange={(newDate) => { handleStartDateChange(newDate) }}
+                            shouldDisableDate={shouldDisableStartDate}
                             sx={{
                                 '& .MuiInputBase-input::placeholder': {
                                     fontSize: '14px',
@@ -162,10 +204,14 @@ function Filters({ onToFromChange, onChangeStatus, reload }: any) {
                         }}
                     >
                         <DatePicker
-                            slotProps={{ textField: { placeholder: formatDate(endDate) } }}
+                            open={openEndDatePicker}
+                            onOpen={() => setOpenEndDatePicker(true)}
+                            onClose={() => setOpenEndDatePicker(false)}
+                            slotProps={{ textField: { placeholder: formatDate(endDate),onClick: ()=> setOpenEndDatePicker(!openEndDatePicker) } }}
                             format="DD/MM/YYYY"
                             onChange={(newDate) => { handleEndDateChange(newDate) }}
                             value={dayjs(endDate)}
+                            shouldDisableDate={shouldDisableEndDate}
                             sx={{
                                 '& .MuiInputBase-input::placeholder': {
                                     fontSize: '14px',
@@ -185,6 +231,7 @@ function Filters({ onToFromChange, onChangeStatus, reload }: any) {
                         />
                     </DemoContainer>
                 </LocalizationProvider>
+
             </div>
             {error && <div className='error'>{error}</div>}
 
@@ -250,14 +297,42 @@ function Filters({ onToFromChange, onChangeStatus, reload }: any) {
                 </div>
             </div> */}
 
-            {/* <div>
-                <div className="filter-container">
+            <div>
+                <div className="filter-container" onClick={()=>setOpenFilterModal(true)}>
                     <FilterAltIcon className="filter-icon" />
                 </div>
-            </div> */}
+            </div>
 
-            
+            {/* <input type='date' placeholder='Dec 23, 3456' /> */}
         </div>
+        {
+
+        openFilterModal ?    
+        <div>
+         <div className='modal-wrapper'>
+          <div className='modal-container'>
+            <div className='modal-header'><span className='modal-filter-header'>Advanced Search</span><Image src={closeIcon} alt='' className='close-icon' onClick={()=>setOpenFilterModal(false)}/></div>
+            <div className='filters-wrapper'>
+            <input placeholder='e-Demand Number' onChange={(e)=>setFilterEDemand(e.target.value)} value={filterEDemand}/>
+            <input placeholder='Destination' onChange={(e)=>setFilterDestination(e.target.value)} value={filterDestination}/>
+            </div>
+            <div className='filter-modal-footer'>
+                <button onClick={()=>clearFilter()}>
+                Clear Filter
+                </button>
+                <button onClick={handleSubmit}>
+                  Search
+                </button>
+
+            </div>
+           </div>
+        </div>
+
+        <div className='overlay-container'/>
+        </div> : <></>
+}
+    
+    </div>
     );
 }
 

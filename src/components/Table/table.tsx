@@ -38,11 +38,13 @@ import { statusBuilder } from '../MapView/StatusBuilder/StatusBuilder';
 
 import FOIS from '@/assets/fois_icon.png'
 import GPIS from '@/assets/gps_icon.svg'
+import RRDOC from '@/assets/Doc-icon.svg'
 import attach_icon from '@/assets/attach_icon.svg'
 import rrDocumentIcon from '@/assets/rr_document_icon.svg'
 import ShareIcon from '@mui/icons-material/Share';
 import contactIcon from '@/assets/inactive_contact_dashboard+icon.svg'
 import BookmarkAddOutlinedIcon from '@mui/icons-material/BookmarkAddOutlined';
+import Image from 'next/image';
 
 const style = {
     position: 'absolute' as 'absolute',
@@ -215,6 +217,7 @@ const convertArrayToFilteredArray = (inputArray: any) => {
             status: string,
             pickup_date: any,
             fois: any,
+            rr_document: any,
             captive_id: string,
             is_captive: Boolean,
             trip_tracker: any,
@@ -409,7 +412,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
         ];
 
         if (edemand) {
-            commonColumns.unshift({ id: 'edemand', label: 'e-Demand', class: 'edamand', innerClass: '' });
+            commonColumns.unshift({ id: 'edemand', label: 'e-Demand', class: 'edemand', innerClass: '' });
         }
         setColumns(commonColumns);
     }, [edemand, showEdemand,])
@@ -519,7 +522,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                             {response.map((row: row, firstindex: number) => {
                                 return (
                                     <TableRow hover key={row.edemand}
-                                        onClick={() => { handleRRDoc(row._id) }}
+                                    onDoubleClick={() => { handleRRDoc(row._id) }}
                                         sx={{cursor:'pointer'}}
                                     >
                                         {columns.map((item, index) => {
@@ -541,7 +544,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                 iconheader: 'body_iconheader'
                                             }
                                             return (
-                                                <TableCell key={index} sx={{ fontSize: '12px', color: '#44475B', p: '16px 10px 16px 10px' }}
+                                                <TableCell key={index} sx={{ fontSize: '12px', color: '#44475B', p: '16px 10px 24px 10px' }}
                                                     className={columnClassNames[item.id]} >
                                                     <div>
                                                         {(typeof value) === 'object' ? '' : value}
@@ -707,7 +710,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                 <div className='edemand_fois_gpis' style={{ marginBottom: '5px', display: !row.fois.is_gps && !row.fois.is_fois && !row.rrDoc ? 'none' : '' }}>
 
                                                                     <img
-                                                                        src={row.fois.is_gps && GPIS.src} style={{ display: 'block' }}
+                                                                        src={ GPIS.src} style={{ display: 'block' }}
                                                                         alt=''
                                                                     />
 

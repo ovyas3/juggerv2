@@ -1,4 +1,4 @@
-.edamand{
+.edemand{
     /* background-color:blueviolet !important; */
     min-width:120px !important;
 }
@@ -12,7 +12,8 @@
 .inner_fnr{
     border: 1px solid #DFE3EB;
     border-radius: 4px;
-    width:84px !important;
+    width:90px !important;
+    padding: 0 4px;
     text-align: center;
 
 }
@@ -314,6 +315,7 @@
     transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
     display: none; /* Hide by default */
     background-color: white;
+    width: max-content;
 }
 
 .action_button_target.show {
@@ -332,9 +334,11 @@
     height: 16px;
     width: 48px;
     margin-top: 8px;
+
     
-    display: flex;
-    
+    display: grid;
+    grid-template-columns: auto auto;
+    row-gap: 6px;
   }
   .action_button_options{
    display: flex;
