@@ -42,7 +42,7 @@ function Filters({ onToFromChange, onChangeStatus, reload }: any) {
     };
 
     const names = [
-        'All',
+       
         'In Transit',
         'Delivered',
         'In Plant'
@@ -50,13 +50,24 @@ function Filters({ onToFromChange, onChangeStatus, reload }: any) {
 
 
 
-    const [status, setStatus] = React.useState<string>('In Transit');
+    const [status, setStatus] = useState(['In Transit','Delivered',]);
 
-    const handleChange = (event: SelectChangeEvent<string>) => {
-        onChangeStatus(event.target.value as string)
-        setStatus(event.target.value as string);
-        // setStatusForShipment(event.target.value as string)
-    };
+    // const handleChange = (event: SelectChangeEvent<string>) => {
+    //     onChangeStatus(event.target.value as string)
+    //     setStatus(event.target.value as string);
+    //     // setStatusForShipment(event.target.value as string)
+    // };
+
+    const handleChange = (event : any) => {
+        const {
+          target: { value },
+        } = event;
+        setStatus(
+          typeof value === 'string' ? value.split(',') : value,
+        );
+        onChangeStatus(typeof value === 'string' ? value.split(',') : value,)
+      };
+
     const today = new Date();
     const twentyDaysBefore = new Date();
     twentyDaysBefore.setDate(today.getDate() - 20);
@@ -107,7 +118,11 @@ function Filters({ onToFromChange, onChangeStatus, reload }: any) {
             
             setStartDate(twentyDaysBefore);
             setEndDate(today);
-            onToFromChange(today, twentyDaysBefore);
+
+            if(startDate === twentyDaysBefore && endDate === today){
+                onToFromChange(today, twentyDaysBefore);
+            }
+            
         }
     }, [reload]);
 
@@ -201,10 +216,11 @@ function Filters({ onToFromChange, onChangeStatus, reload }: any) {
                         labelId="demo-multiple-checkbox-label"
                         id="demo-multiple-checkbox"
                         value={status}
+                        multiple
                         onChange={handleChange}
                         input={<OutlinedInput
                             sx={{
-                                width: '128px',
+                                width: '170px',
                                 '& .MuiOutlinedInput-notchedOutline': {
                                     border: '1px solid #E9E9EB'
                                 },
@@ -216,8 +232,8 @@ function Filters({ onToFromChange, onChangeStatus, reload }: any) {
                                 },
                             }}
                         />}
-                        // renderValue={(selected) => selected.join(', ')}
-                        renderValue={(selected) => selected}
+                        renderValue={(selected : any) => selected.join(', ')}
+                        // renderValue={(selected) => selected}
                         MenuProps={MenuProps}
                     >
                         {names.map((name) => (
