@@ -3,7 +3,8 @@ export const statusBuilder = (status: string) => {
   if(status.toLowerCase() === "delivered") {
     return "Delivered";
   }
-  if(status === 'OB')
+  if(status.toLowerCase() === 'in plant')
     return "In Plant"
+  
   return "In Transit"
 }

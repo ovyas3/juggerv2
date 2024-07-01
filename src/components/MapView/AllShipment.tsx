@@ -188,23 +188,40 @@ const MapLayers = () => {
       }
     }
 
+    const getTrackingShipment = (shipments: any[]) => {
+      const shipmentData = shipments.sort((a : any, b: any) => {
+        return a.created_at - b.created_at;
+      }).map((shipment: any) => {
+        return {
+          FNR: shipment.all_FNRs.join(', '),
+          pickup: shipment.pickup_location.name + ' (' + shipment.pickup_location.code + ')',
+          delivery: shipment.delivery_location.name + ' (' + shipment.delivery_location.code + ')',
+          status: shipment.status,
+          gps: shipment.trip_tracker?.last_location?.fois ||  shipment.pickup_location?.geo_point
+        }
+      });
+
+      return shipmentData;
+    }
+
     const getShipments = async () => {
       const shipments = await httpsPost('/shipment_map_view', {});
-      const inTransit = shipments.filter((shipment: any) => (shipment.status !== 'Delivered' && shipment.status !== '')).length;
-      const idle = shipments.filter((shipment: any) => (shipment.status === '')).length;
+      const inTransit = shipments.filter((shipment: any) => (shipment.status !== 'Delivered' && shipment.status !== ''));
+      const idle = shipments.filter((shipment: any) => (shipment.status === ''));
       const delivered = shipments.filter((shipment: any) => (shipment.status === 'Delivered')).length;
-      setInTransitCount(inTransit);
-      setIdleCount(idle);
+      setInTransitCount(inTransit.length);
+      setIdleCount(idle.length);
       setDeliveryCount(delivered);
       setAllShipments(shipments);
-      setShipments(shipments);
+      const ships = getTrackingShipment([...inTransit, ...idle]);
+      setShipments(ships);
     }
 
     useEffect(() => {
       if (map) {
         addIndiaBoundaries();
       }
-      getShipments();
+      // getShipments();
     }, [map]);
 
     return (
@@ -230,33 +247,33 @@ const MapLayers = () => {
                   </LayersControl.BaseLayer>
                   </LayersControl>
                 </div>
+                <MarkerClusterGroup chunkedLoading iconCreateFunction={createClusterCustomIconInTransit}>
                 {
                   shipments.length && shipments.map((shipment, index) => {
-                    if (shipment && shipment.trip_tracker && shipment.trip_tracker.last_location && shipment.trip_tracker.last_location.fois && shipment.trip_tracker.last_location.fois.coordinates && shipment.trip_tracker.last_location.fois.coordinates.length) {
-                      return <Marker key={index} position={[shipment.trip_tracker.last_location.fois.coordinates[1], shipment.trip_tracker.last_location.fois.coordinates[0]]} icon={shipment.status == '' ? customIconIdle : customIcon}>
+                      return <Marker key={index} position={[shipment.gps.coordinates[1], shipment.gps.coordinates[0]]} icon={shipment.status == '' ? customIconIdle : customIcon}>
                         <Popup>
                           <Typography variant="h6" component="div">
-                            # {shipment.all_FNRs ? shipment.all_FNRs.join(', ') : 'N/A'}
+                            # {shipment.FNR}
                           </Typography>
                           <Typography variant="body2" component="div">
                             <Grid container>
                               <Grid item xs={12}>
                                 <Typography variant="body2" component="div">
-                                  <Image height={10} alt="pickup" src={pickupIcon} /> - {shipment.pickup_location?.name} ({shipment.pickup_location?.code})
+                                  <Image height={10} alt="pickup" src={pickupIcon} /> - {shipment.pickup}
                                 </Typography>
                               </Grid>
                               <Grid item xs={12}>
                                 <Typography variant="body2" component="div">
-                                <Image height={10} alt="drop" src={dropIcon} /> - {shipment.delivery_location?.name} ({shipment.delivery_location?.code})
+                                <Image height={10} alt="drop" src={dropIcon} /> - {shipment.delivery}
                                 </Typography>
                               </Grid>
                             </Grid>
                           </Typography>
                         </Popup>
                       </Marker>
-                    }
                   })
                 }
+                </MarkerClusterGroup>
               </MapContainer>
               <Box sx={{
                 position: 'absolute',
@@ -285,7 +302,7 @@ const MapLayers = () => {
               }} >
                 <Box sx={{
                   display: 'flex',
-                  justifyContent: 'space-between',
+                  justifyContent: 'space-evenly',
                   alignItems: 'center',
                   padding: '5px',
                   borderRadius: '5px',
@@ -298,7 +315,8 @@ const MapLayers = () => {
                   <Paper sx={{
                     padding: '10px',
                     borderRadius: '5px',
-                    backgroundColor: '#f6f8f8',
+                    color: 'white',
+                    backgroundColor: '#3790cc',
                   }} elevation={3} color="info">
                     <Typography variant="h6" color="info" component="div">
                       In Plant
@@ -310,7 +328,8 @@ const MapLayers = () => {
                   <Paper sx={{
                     padding: '10px',
                     borderRadius: '5px',
-                    backgroundColor: '#f6f8f8',
+                    color: 'white',
+                    backgroundColor: '#FF981A',
                   }} elevation={3} color="info">
                     <Typography variant="h6" component="div">
                       In Transit
@@ -322,7 +341,8 @@ const MapLayers = () => {
                   <Paper sx={{
                     padding: '10px',
                     borderRadius: '5px',
-                    backgroundColor: '##2f7c3152',
+                    color: 'white',
+                    backgroundColor: '#18BE8A',
                   }} elevation={3} color="info">
                     <Typography variant="h6" component="div">
                       Delivered
@@ -332,7 +352,7 @@ const MapLayers = () => {
                     </Typography>
                   </Paper>
                 </Box>
-                {shipments.map((item, index) => {
+                {allShipments.map((item, index) => {
                   return <ShipmentCard key={index} index={index} shipment={item} />
                 })}
               </Box>
