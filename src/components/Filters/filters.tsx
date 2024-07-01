@@ -25,7 +25,9 @@ import Select, { SelectChangeEvent } from '@mui/material/Select';
 import Checkbox from '@mui/material/Checkbox';
 import dayjs from 'dayjs';
 import service from '@/utils/timeService';
-
+import { motion } from 'framer-motion';
+import Image from 'next/image';
+import MapViewIcon from "@/assets/map_view.svg";
 
 
 function Filters({ onToFromChange, onChangeStatus, reload }: any) {
@@ -245,6 +247,17 @@ function Filters({ onToFromChange, onChangeStatus, reload }: any) {
                     </Select>
                 </FormControl>
             </div>
+
+            <motion.div
+                className="box"
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                onClick={() => window.open('/shipment_map_view', '_blank')}
+            >
+                <Image src={MapViewIcon} alt="map view" width={16} height={16}/>
+                <span className="map-view-btn-header">Map View</span>
+            </motion.div>
 
             {/* <div>
                 <div className="upload-container">

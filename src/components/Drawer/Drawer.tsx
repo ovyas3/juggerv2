@@ -30,13 +30,6 @@ function SideDrawer() {
     }, []);
 
     return (
-
-        // <div className='containerDrawer' onMouseEnter={()=>{setOpen(true)}} onMouseLeave={()=>{setOpen(false)}} style={{alignItems:'start', width:open ?'218px':'70px', transition:'width 0.2s ease-in'}}>
-        //     <div className='img'><Image src={defaultLogo} alt=''/></div>
-        //     <div className='fnr-icon' style={{width:open?'190px':'42px',transition:'width 0.2s ease-in'}}><TrainIcon style={{marginLeft:'9px'}} /><div className={`${open?'fnr_text':'fnr_text_none'}`}>Shipments</div></div>
-        //     <div onMouseEnter={()=>{setActiveContact(true)}} onMouseLeave={()=>{setActiveContact(false)}} className='contact-icon' style={{width:open?'190px':'42px',justifyContent:open?'start':'center', backgroundColor:activeContact?'white':''}}><Image src={contactIcon} alt='' style={{marginLeft:open?'9px':'', color:activeContact?'black':'white'}}  /><div className={`${open?'fnr_text':'fnr_text_none'}`} style={{color:activeContact?'black':'white'}} >Dashboard</div></div>
-        // </div>
-
         <div 
             className='containerDrawer' 
             onMouseEnter={() => { setOpen(true) }} 

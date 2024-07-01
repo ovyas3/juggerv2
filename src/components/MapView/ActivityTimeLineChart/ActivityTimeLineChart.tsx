@@ -13,11 +13,12 @@ import {
 export const ActivityTimeLineChart = (props: any) => {
     // const dateConvertor = (date) => DateTime.fromISO(date).plus({minutes: 330}).toFormat("dd-MM-yyyy HH:mm");
     // const isMobile = props.mobile ? true : false;
-    const numberOfStops = props.trackingDetails.length;
+    const numberOfStops = props.trackingDetails && props.trackingDetails.length;
     const [startingPings, setStartingPings] = useState([]);
     const [endingPings, setEndingPings] = useState([]);
     const [pings, setPings] = useState([]);
     const [firstPing, setFirstPing] = useState<any>({});
+    const [lastPing, setLastPing] = useState<any>({});
     const [showPings, setShowPings] = useState(true);
     const [lowPings, setLowPings] = useState(true);
   
@@ -29,9 +30,11 @@ export const ActivityTimeLineChart = (props: any) => {
       } else {
         setLowPings(true)
       }
-      const latestPing = data[0];
-      const restPings = data.slice(1);
+      const latestPing =data && data.length && data[0];
+      const restPings =data && data.length && data.slice(1);
+      const lastPing = data && data.length && data[data.length-1];
       setFirstPing(latestPing)
+      setLastPing(lastPing)
       setPings(restPings)
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [numberOfStops])
@@ -73,7 +76,7 @@ export const ActivityTimeLineChart = (props: any) => {
                 fontSize: '20px',
               }
             }>
-              FOIS Timeline
+              Timeline
             </Box>
           </Grid>
         </Grid>
@@ -129,6 +132,27 @@ export const ActivityTimeLineChart = (props: any) => {
                 )
               }) : <></>
             }
+            {lastPing && <TimelineItem sx={{
+              fontWeight: 900
+            }} key={lastPing._id} style={{fontSize: '17px'}}>
+                    <TimelineOppositeContent sx={{
+              fontWeight: 900
+            }}  color="text.secondary" fontSize={"small"} marginTop={"20px"}>
+                      { props.fnr_data && props.fnr_data.pickup_date ? `${service.utcToist(props.fnr_data.pickup_date, 'dd-MM-yyyy')} ${service.utcToist(props.fnr_data.pickup_date, 'HH:mm')}` : 'N/A' }
+                    </TimelineOppositeContent>
+                    <TimelineSeparator >
+                      <TimelineConnector />
+                        <TimelineDot sx={{
+                          backgroundColor: "white"
+                        }}>
+                          <MyLocationOutlinedIcon fontSize="small" color="success" />
+                        </TimelineDot>
+                      <TimelineConnector />
+                    </TimelineSeparator>
+                    <TimelineContent sx={{
+              fontWeight: 900
+            }} fontSize={"small"}  marginTop={"20px"}>{ props.fnr_data?.pickup_location && props.fnr_data?.pickup_location?.name }</TimelineContent>
+            </TimelineItem>}
           </Timeline></>
         </Grid>
         : <div style={{width: '100%', height: '100%', display: 'flex', alignItems:'center', justifyContent: 'center'}}>

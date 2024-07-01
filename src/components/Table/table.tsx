@@ -39,6 +39,7 @@ import { statusBuilder } from '../MapView/StatusBuilder/StatusBuilder';
 import FOIS from '@/assets/fois_icon.png'
 import GPIS from '@/assets/gps_icon.svg'
 import attach_icon from '@/assets/attach_icon.svg'
+import rrDocumentIcon from '@/assets/rr_document_icon.svg'
 import ShareIcon from '@mui/icons-material/Share';
 import contactIcon from '@/assets/inactive_contact_dashboard+icon.svg'
 import BookmarkAddOutlinedIcon from '@mui/icons-material/BookmarkAddOutlined';
@@ -306,9 +307,10 @@ const convertArrayToFilteredArray = (inputArray: any) => {
             is_captive: Boolean,
             trip_tracker: any,
             etaTime: any,
+            rr_document: any
 
         }) => {
-        const { edemand_no, FNR, all_FNRs, delivery_location, trip_tracker, others, remarks, unique_code, status, pickup_date, captive_id, is_captive, eta } = item;
+        const { edemand_no, FNR, all_FNRs, delivery_location, trip_tracker, others, remarks, unique_code, status, pickup_date, captive_id, is_captive, eta, rr_document } = item;
         return {
             _id: item._id,
             edemand: edemand_no,
@@ -344,9 +346,8 @@ const convertArrayToFilteredArray = (inputArray: any) => {
             },
             validationForAttachRake: !captive_id && is_captive,
             eta: eta,
-            pickup_date: pickup_date
-
-
+            pickup_date: pickup_date,
+            rrDoc: rr_document && rr_document.length > 0 ? true : false
         }
     });
 };
@@ -381,8 +382,9 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
     const [open, setOpen] = React.useState(false);
     const handleOpen = (e: any) => { e.stopPropagation(); setOpen(true); setActionOptions(e.currentTarget.id) };
     const handleClose = (e: any) => { e.stopPropagation(); setOpen(false); }
-    const [isRRModalOpen, setRRModalOpen] = useState(false);
-    const [rrNumbers, setRRNumbers] = useState([]);
+    const [isRRModalOpen, setRRModalOpen] = useState<boolean>(false);
+    const [isRRDoc, setIsRRDoc] = useState<boolean>(false);
+    const [rrNumbers, setRRNumbers] = useState([]); 
     const [fnr, setFnr] = useState('')
 
     //getting row id to pass it to tag element
@@ -409,7 +411,9 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
         setRRModalOpen(true);
         const rrNums = allShipments.filter((shipment: any) => shipment._id === id)[0].all_FNRs;
         setRRNumbers(rrNums);
-        console.log(rrNums);
+        const rrDocumnets = allShipments.filter((shipment: any) => shipment._id === id)[0].rr_document;
+        const isRRDocument = rrDocumnets && rrDocumnets.length > 0;
+        setIsRRDoc(isRRDocument);
     }
 
     const handleChangeByFnr = (changeFnr: string) => {
@@ -473,7 +477,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
 
             if (!actionButton && showActionBox !== -1) {
                 event.stopPropagation();
-                setShowActionBox(-1);
+                setShowActionBox(-1); // Close action box if clicked outside
             }
             event.stopPropagation();
         }
@@ -657,7 +661,6 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                         onClick={() => { handleRRDoc(row._id) }}
                                         sx={{ cursor: 'pointer' }}
                                     >
-
                                         {columns.map((item, index) => {
                                             // @ts-ignore
                                             const value: any = row[item.id];
@@ -777,7 +780,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                     <div className='fnr_inner_data'>
                                                                         <Link target="_blank"
                                                                             href={"/tracker?unique_code=" + value.unique_code}
-                                                                            onClick={(e)=>{e.stopPropagation();}}
+                                                                            onClick={(e) => { e.stopPropagation() }}
                                                                         >
                                                                             {value.primary}
                                                                         </Link>
@@ -847,7 +850,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                         }
                                                         {
                                                             item.id === 'edemand' ?
-                                                                <div className='edemand_fois_gpis' style={{ marginBottom: '5px', display: !row.fois.is_gps && !row.fois.is_fois ? 'none' : '' }}>
+                                                                <div className='edemand_fois_gpis' style={{ marginBottom: '5px', display: !row.fois.is_gps && !row.fois.is_fois && !row.rrDoc ? 'none' : '' }}>
 
                                                                     <img
                                                                         src={row.fois.is_gps && GPIS.src} style={{ display: 'block' }}
@@ -859,6 +862,13 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                         style={{ display: 'block' }}
                                                                         alt=''
                                                                     />
+
+                                                                    <img
+                                                                        src={row.rrDoc && rrDocumentIcon.src}
+                                                                        style={{ display: 'block' }}
+                                                                        alt='' 
+                                                                    />
+
                                                                 </div>
                                                                 : <></>
                                                         }
@@ -887,7 +897,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                     </Table>
                 </TableContainer>
             </Paper>
-            <RRModal isOpen={isRRModalOpen} isClose={() => setRRModalOpen(false)} rrNumbers={rrNumbers} />
+            <RRModal isOpen={isRRModalOpen} isClose={() => setRRModalOpen(false)} rrNumbers={rrNumbers} isRRDoc={isRRDoc} />
         </div>
     );
 }

@@ -8,28 +8,28 @@ const prefix = [
 ]
 
 const httpsGet = async (path: string, type: number = 0) => {
-  const autherization = {
+  const authorization = {
     Authorization: getAuth(),
   }
   const url = prefix[type] + path;
   const config = {
     method: 'GET',
     url,
-    headers: autherization,
+    headers: authorization,
   }
   const response = await axios(config);
   return response.data;
 }
 
 const httpsPost = async (path: string, data: any, type = 0) => {
-  const autherization = {
+  const authorization = {
     Authorization: getAuth(),
   }
   const url = prefix[type] + path;
   const config = {
     method: 'POST',
     url,
-    headers: autherization,
+    headers: authorization,
     data,
   }
   console.log(config);
@@ -48,7 +48,7 @@ const apiCall = async (config: any) => {
     }
   } else  {
     finalConf.headers = {
-      Autherization: getAuth(),
+      Authorization: getAuth(),
     }
   }
   await axios(finalConf)

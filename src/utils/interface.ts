@@ -44,7 +44,8 @@ export interface row {
     is_fois:Boolean
   },
   pickup_date:string,
-  eta:string
+  eta:string,
+  rrDoc: Boolean
 
 }
 
