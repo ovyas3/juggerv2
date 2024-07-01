@@ -186,7 +186,7 @@ export const FNRDetailsCard = (props: any) => {
               />
             </Grid>
             <Grid item xs={10} fontSize={"12px"} >
-                Traveled Distance: <b>{props.traveledDistance}</b> km
+                Travelled Distance: <b>{props.travelledDistance}</b> km
             </Grid>
           </Grid>
           <Grid container spacing={2} item xs={12} >

@@ -34,7 +34,7 @@ body {
     margin-top: 10px;
     border-radius: 20px;
     width: 92%;
-    height: 398px;
+    max-height: 55%;
 }
 
 .leaflet-right {

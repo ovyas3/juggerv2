@@ -25,7 +25,7 @@ import service from '@/utils/timeService';
 import polyline from '@mapbox/polyline';
 import getBoundary from "./IndianClaimed";
 import L from 'leaflet';
-import { distanceBetweenMultiplePointsInKm } from '@/utils/distance';
+import { distanceBetweenMultiplePointsInKm} from '@/utils/distance';
 
 const renderMarkers = (tracking_data: any[], customIcon: Icon): JSX.Element[] => {
   return tracking_data.map((point, index) => (
@@ -71,7 +71,7 @@ const TripTracker = (params: any) => {
   const [showGPSTracks, setShowGPSTracks] = useState(false);
   const [pickupDetail, setPickupDetail] = useState<any>({});
   const [dropDetail, setDropDetail] = useState<any>({});
-  const [traveledDistance, setTraveledDistance] = useState(0);
+  const [travelledDistance, setTravelledDistance] = useState(0);
   const [buttonEnabledFois, setButtonEnabledFois] = useState(false);
   const [buttonEnabledGPS, setButtonEnabledGPS] = useState(false);
   const [activityData, setActivityData] = useState([]);
@@ -161,7 +161,7 @@ const TripTracker = (params: any) => {
     const decodedCoordinates = polyline.decode(tripTrackerLine) || [];
     setTrack(decodedCoordinates);
 
-    const tripTrackerLine1 = rakeData ? rakeData.polyline.polyline || '' : '';
+    const tripTrackerLine1 = rakeData ? rakeData.polyline || '' : '';
     const decodeline = polyline.decode(tripTrackerLine1) || [];
     setEstimatedTrack(decodeline);
     // remove tracks if currentStatus is empty or its misisng geo_point ir if geo_point.coordinates is empty or if its length is less than 2 or if geo_point.coordinates ==[0, 0]
@@ -201,8 +201,8 @@ const TripTracker = (params: any) => {
       setButtonEnabledFois(true);
     }
 
-    const traveledDistanceData = filteredTracks && filteredTracks.length > 0 ? distanceBetweenMultiplePointsInKm(filteredTracks.map((e: {geo_point: {coordinates: [number, number]}}) => e.geo_point.coordinates)) : 0;
-    setTraveledDistance(traveledDistanceData);
+    const travelledDistanceData = filteredTracks && filteredTracks.length > 0 ? distanceBetweenMultiplePointsInKm(filteredTracks.map((e: {geo_point: {coordinates: [number, number]}}) => e.geo_point.coordinates)) : 0;
+    setTravelledDistance(travelledDistanceData);
 
     const trip_tracker_gps = rakeData && rakeData.trip_tracker ? rakeData.trip_tracker.gps_updated_at : false;
     if (trip_tracker_gps) {
@@ -394,7 +394,7 @@ const TripTracker = (params: any) => {
               <FormControlLabel
               // disabled={!buttonEnabledGPS}
               control={<Switch checked={showEstimtedTrack} onChange={handleTrackingLineCheck} />}
-              label="RR Route"
+              label="Rail Route"
               labelPlacement="start"
             />
             </div>
@@ -482,7 +482,7 @@ const TripTracker = (params: any) => {
           }}
           className="tracking_details"
         >
-        <FNRDetailsCard className="fnr_details_mobile"  fnr_data={fnr_data} traveledDistance={traveledDistance} />
+        <FNRDetailsCard className="fnr_details_mobile"  fnr_data={fnr_data} travelledDistance={travelledDistance} />
         <ActivityTimeLineChart className="tracking_details_mobile" trackingDetails={activityData} fnr_data={fnr_data} />
         </Box>)}          
       </Box>
