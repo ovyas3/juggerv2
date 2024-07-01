@@ -73,7 +73,7 @@ export const ActivityTimeLineChart = (props: any) => {
                 fontSize: '20px',
               }
             }>
-              FOIS Timeline
+              Timeline
             </Box>
           </Grid>
         </Grid>
