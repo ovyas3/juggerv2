@@ -153,10 +153,21 @@
     .MuiPaper-root{
       box-shadow: none;
       background-color: #fff;
-      border-radius: 12px;
       overflow: auto;
-      height: 425px;
+    }
+
+    .table-body-container{
+      max-height: 350px;
+      overflow-y: auto;
+      border-radius: 0 0 12px 12px;
       border: 1px solid #E9E9EB;
+      border-top: none;
+    }
+
+    .table-head-container{
+      border-radius: 12px 12px 0 0;
+      border: 1px solid #E9E9EB;
+      border-bottom: none;
     }
   
     .MuiTable-root .MuiTableBody-root .MuiTableRow-root:hover{
@@ -168,18 +179,28 @@
       font-size: 12px;
       font-weight: 600;
       color: #42454E;
-      padding: 24px 16px;
+      padding: 12px 16px;
       border-bottom: 1px solid #E9E9EB;
       line-height: 14px;
       font-family: 'Inter', sans-serif !important;
+      width: 100px;
     }
 
+    .MuiTableHead-root .rrmodal-table-headers:first-child{
+      width: 25px;
+    }
+    
     .MuiTableBody-root  .rrmodal-table-body-items{
       font-size: 12px;
       font-weight: normal;
       color: #42454E;
       font-family: 'Inter', sans-serif !important;
       padding: 10px 16px 32px 16px;
+      width: 100px;
+    }
+
+    .MuiTableBody-root  .rrmodal-table-body-items:first-child{
+      width: 25px;
     }
   }
 }
