@@ -14,7 +14,7 @@ import IconButton from '@mui/material/IconButton';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import Checkbox from '@mui/material/Checkbox';
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import './table.css'
 import service from '@/utils/timeService';
 import Link from 'next/link';
@@ -33,7 +33,7 @@ import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import { httpsPost } from '@/utils/Communication';
-import { UPDATE_RAKE_CAPTIVE_ID } from '@/utils/helper'
+import { UPDATE_RAKE_CAPTIVE_ID, REMARKS_UPDATE_ID } from '@/utils/helper'
 import { statusBuilder } from '../MapView/StatusBuilder/StatusBuilder';
 
 import FOIS from '@/assets/fois_icon.png'
@@ -43,6 +43,16 @@ import rrDocumentIcon from '@/assets/rr_document_icon.svg'
 import ShareIcon from '@mui/icons-material/Share';
 import contactIcon from '@/assets/inactive_contact_dashboard+icon.svg'
 import BookmarkAddOutlinedIcon from '@mui/icons-material/BookmarkAddOutlined';
+import CloseIcon from '@mui/icons-material/Close';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import { Menu, MenuItem } from '@mui/material';
+import './style.css'
+import Backdrop from '@mui/material/Backdrop';
+import Fade from '@mui/material/Fade';
+import { sortArray } from '@/utils/hooks';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+
+
 
 const style = {
     position: 'absolute' as 'absolute',
@@ -58,7 +68,11 @@ const style = {
 };
 
 async function rake_update_id(payload: Object) {
-    const response = await httpsPost(UPDATE_RAKE_CAPTIVE_ID, payload);
+    return await httpsPost(UPDATE_RAKE_CAPTIVE_ID, payload);
+}
+
+async function remake_update_By_Id(payload: object) {
+    const response = await httpsPost(REMARKS_UPDATE_ID, payload);
 }
 
 function Tags({ rakeCaptiveList, shipmentId, setOpen, setShowActionBox }: any) {
@@ -155,47 +169,121 @@ function Tags({ rakeCaptiveList, shipmentId, setOpen, setShowActionBox }: any) {
     );
 }
 
-function Remarks({ shipmentId }: any) {
+function Remarks({ shipmentId, setOpen }: any) {
     const t = useTranslations('ORDERS');
     const [remarks, setRemarks] = useState('');
+    const inputRef = useRef<HTMLInputElement>(null);
+    const [openRemarks, setOpenRemarks] = useState(false);
+    const [inputEnabled, setInputEnabled] = useState(true);
+    const [isHovered, setIsHovered] = useState(false);
+    const predefinedRemarks = [
+        'Great job!',
+        'Needs improvement',
+        'Well done',
+        'Please revise',
+        'Excellent work'
+    ];
 
+    const handleMouseEnter = useCallback(() => setIsHovered(true), []);
+    const handleMouseLeave = useCallback(() => setIsHovered(false), []);
 
-    function handleSubmit(e: any) {
-        e.preventDefault();
-        e.stopPropagation();
-        if (remarks.trim() === '') return; // Don't submit empty remarks
-
-        // const newRemark = {
-        //     date: new Date().toISOString(), // Current date in ISO format
-        //     remark: remark.trim(),
-        // };
-
-        // setRemarks([...remarks, newRemarks]);
-
-        // // Create the object structure you want
-        // const remarkObject = {
-        //     rakeId: shipmentId,
-        //     remarks: [...remarks, newRemarks],
-        // };
-
-        // console.log(remarkObject); // Log the object (you can send it to an API here)
-
-        // setRemarks(''); // Clear the input after submission
+    const handleCustom = () => {
+        setOpenRemarks(false)
+        setRemarks('')
+        setInputEnabled(false)
+        setTimeout(() => {
+            if (inputRef.current) {
+                inputRef.current.focus();
+            }
+        }, 0);
     }
 
+    const handlePreDefineRemarks = (remark: string) => {
+        setRemarks(remark);
+        setOpenRemarks(false)
+    };
+
+
+    async function handleSubmit(e: any) {
+
+        setInputEnabled(true);
+        setOpenRemarks(false);
+        setRemarks('')
+        e.stopPropagation();
+        if (remarks.trim() === '') return;
+        const remarkObject = {
+            id: shipmentId,
+            remarks: [
+                {
+                    date: service.getEpoch(new Date()),
+                    remark: remarks
+                }
+            ]
+        }
+        console.log(remarkObject);
+        const response = await remake_update_By_Id(remarkObject);
+        console.log(response)
+        setRemarks('');
+    }
+
+    console.log(isHovered)
+
     return (
-        <>
+        <div onClick={(e) => { e.stopPropagation() }}>
             <input
+                ref={inputRef}
                 type='text'
                 value={remarks}
                 onChange={(e) => setRemarks(e.target.value)}
                 placeholder="Enter your remark"
-                style={{ width: '100%', height: '32px', paddingLeft: '4px', border: '1px solid #E9E9EB', outline: 'none' }}
+                style={{ width: '100%', height: '32px', paddingInline: '8px', border: '1px solid #E9E9EB', outline: 'none' }}
+                disabled={inputEnabled}
+                onClick={() => { setOpenRemarks(true) }}
             />
+            <ArrowDropDownIcon
+                onClick={() => { setOpenRemarks(!openRemarks) }}
+                className='arrow_down_icon'
+            />
+            <div className='remarks_dropDown_list' style={{ display: openRemarks ? 'block' : 'none' }}>
+                {predefinedRemarks.map((remark, index) => (
+                    <div
+                        key={index}
+                        onClick={() => handlePreDefineRemarks(remark)}
+                        className='remarks_dropDown_list_item'
+                    >{remark}</div>
+                ))}
+                <div className='remarks_dropDown_list_item' onClick={handleCustom}>Others</div>
+            </div>
             <div style={{ textAlign: 'end', paddingTop: '8px' }}>
                 <Button variant="contained" size='small' color="secondary" style={{ textTransform: 'none' }} onClick={(e) => { handleSubmit(e) }}>{t('submit')}</Button>
             </div>
-        </>
+            <div
+                style={{
+                    height: '32px',
+                    width: '32px',
+                    borderRadius: '50%',
+                    backgroundColor: '#E9E9EB',
+                    position: 'absolute',
+                    top: -40,
+                    right: 0,
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    cursor: 'pointer',
+                    zIndex: 999,
+                    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+                    transition: 'all 0.5s ease-in-out',
+                    transform: `rotate(${isHovered ? 90 : 0}deg)`
+                }}
+                onClick={(e) => { e.stopPropagation() }}
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
+            >
+                <CloseIcon
+                    onClick={(e) => { e.stopPropagation(); setOpen(false) }}
+                />
+            </div>
+        </div>
     )
 }
 
@@ -312,6 +400,12 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
     //trigger action options
     const [actionOptions, setActionOptions] = useState('')
 
+    // pickup sorting filter
+    const [pickupSorting, setPickupSorting] = useState(false)
+
+    //currentETA sorting filter
+    const [currentETAsorting, setCurrentETAsorting] = useState(false)
+
 
     const handleRRDoc = (id: any) => {  // for rr documents
         setRRModalOpen(true);
@@ -356,14 +450,24 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
         setShowActionBox(prevIndex => (prevIndex === index ? -1 : index));
     }
 
+    useEffect(()=>{
+        const etaResult = sortArray(allShipments, 'eta', currentETAsorting?'dec':'asc');
+        console.log(etaResult)
+        const resData = convertArrayToFilteredArray(etaResult)
+        setResponse(resData)
+    },[currentETAsorting])
+
+
+
     useEffect(() => {
-        const resData = convertArrayToFilteredArray(allShipments)
+        const pickupResult = sortArray(allShipments, 'pickup_date', pickupSorting?'dec':'asc');
+        const etaResult = sortArray(allShipments, 'eta', currentETAsorting?'dec':'asc');
+        const resData = convertArrayToFilteredArray(pickupResult)
         setResponse(resData)
         if (settingFnrChange.length) {
             setSettingFnrChange(settingFnrChange)
         } else { setSettingFnrChange('') }
-
-    }, [allShipments])
+    }, [allShipments, pickupSorting])
 
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
@@ -386,7 +490,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
         }
 
         return () => {
-            document.removeEventListener('mousedown', handleClickOutside); // Clean up event listener on component unmount
+            document.removeEventListener('mousedown', handleClickOutside);
         };
     }, [showActionBox]);
 
@@ -399,9 +503,9 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
             { id: 'fnr', label: '', class: 'fnr', innerClass: 'inner_fnr' },
             { id: 'destination', label: 'Destination', class: 'destination', innerClass: '' },
             { id: 'material', label: 'Material', class: 'material', innerClass: '' },
-            { id: 'pickupdate', label: 'Pickup Date', class: 'pickupdate', innerClass: '' },
+            { id: 'pickupdate', label: 'Pickup Date', class: 'pickupdate', innerClass: 'inner_pickup' },
             { id: 'status', label: 'Status', class: 'status', innerClass: 'inner_status' },
-            { id: 'currentEta', label: 'Current ETA', class: 'currentEta', innerClass: '' },
+            { id: 'currentEta', label: 'Current ETA', class: 'currentEta', innerClass: 'inner_eta' },
             { id: 'remarks', label: 'Remarks', class: 'remarks', innerClass: '' },
             { id: 'handlingAgent', label: 'Handling Agent', class: 'handlingAgent', innerClass: '' },
             { id: 'action', label: 'Action', class: 'action', innerClass: '' },
@@ -464,49 +568,84 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
 
                                         >
                                             <div className={column.innerClass}>
-                                                <div>
-                                                    {column.label}
-                                                    {
-                                                        column.id === 'edemand' && edemand ?
-                                                            <div></div>
-                                                            : <></>
-                                                    }
-                                                    {
-                                                        column.id === 'iconheader' && showEdemand ?
-                                                            <div className='inner_iconheader_before'>
-                                                                <Checkbox {...label} size='small' checked={edemand}
-                                                                    onClick={() => { setEdemand(edemand => !edemand) }}
-                                                                />
-                                                                <div style={{ color: 'black', fontWeight: 'normal' }}>{t('edemand')}</div>
-                                                            </div>
-                                                            : <></>
-                                                    }
-                                                    {
-                                                        column.id === 'fnr' ?
-                                                            <div>
-                                                                <input type='text'
-                                                                    onChange={(e) => {
-                                                                        handleChangeByFnr(e.target.value)
-                                                                    }}
-                                                                    value={settingFnrChange}
-                                                                    placeholder='FNR No.'
-                                                                    style={{
-                                                                        width: '82px',
-                                                                        height: '22px',
-                                                                        border: 'none',
-                                                                        textAlign: 'center',
-                                                                        fontSize: '12px',
-                                                                        color: '#484A57',
-                                                                        fontWeight: 'bold',
-                                                                        outline: 'none',
-                                                                    }}
-                                                                    className="custom-placeholder"
-                                                                />
 
-                                                            </div>
-                                                            : <></>
-                                                    }
-                                                </div>
+                                                {column.label}
+                                                {
+                                                    column.id === 'edemand' && edemand ?
+                                                        <div></div>
+                                                        : <></>
+                                                }
+                                                {
+                                                    column.id === 'iconheader' && showEdemand ?
+                                                        <div className='inner_iconheader_before'>
+                                                            <Checkbox {...label} size='small' checked={edemand}
+                                                                onClick={() => { setEdemand(edemand => !edemand) }}
+                                                            />
+                                                            <div style={{ color: 'black', fontWeight: 'normal' }}>{t('edemand')}</div>
+                                                        </div>
+                                                        : <></>
+                                                }
+                                                {
+                                                    column.id === 'fnr' ?
+                                                        <div>
+                                                            <input type='text'
+                                                                onChange={(e) => {
+                                                                    handleChangeByFnr(e.target.value)
+                                                                }}
+                                                                value={settingFnrChange}
+                                                                placeholder='FNR No.'
+                                                                style={{
+                                                                    width: '82px',
+                                                                    height: '22px',
+                                                                    border: 'none',
+                                                                    textAlign: 'center',
+                                                                    fontSize: '12px',
+                                                                    color: '#484A57',
+                                                                    fontWeight: 'bold',
+                                                                    outline: 'none',
+                                                                }}
+                                                                className="custom-placeholder"
+                                                            />
+
+                                                        </div>
+                                                        : <></>
+                                                }
+                                                {
+                                                    column.id === 'pickupdate' ?
+                                                        <div style={{
+                                                            transform: pickupSorting ? 'rotate(180deg)' : 'rotate(0deg)',
+                                                            transformOrigin: 'center center',
+                                                            transition: 'transform 0.3s ease-in-out',
+                                                            cursor: 'pointer',
+                                                            display: 'flex',
+                                                            justifyContent: 'center',
+                                                            alignItems: 'center',
+                                                        }}
+                                                        onClick={() => { setPickupSorting(!pickupSorting) }}
+                                                        ><ArrowDownwardIcon
+                                                                fontSize='small'
+                                                                style={{ color: 'darkgrey' }}
+                                                            /></div>
+                                                        : <></>
+                                                }
+                                                {
+                                                    column.id === 'currentEta' ?
+                                                    <div style={{
+                                                        transform: currentETAsorting ? 'rotate(180deg)' : 'rotate(0deg)',
+                                                        transformOrigin: 'center center',
+                                                        transition: 'transform 0.3s ease-in-out',
+                                                        cursor: 'pointer',
+                                                        display: 'flex',
+                                                        justifyContent: 'center',
+                                                        alignItems: 'center',
+                                                    }}
+                                                    onClick={() => { setCurrentETAsorting(!currentETAsorting) }}
+                                                    ><ArrowDownwardIcon
+                                                            fontSize='small'
+                                                            style={{ color: 'darkgrey' }}
+                                                        /></div>
+                                                    : <></>
+                                                }
 
                                             </div>
 
@@ -520,7 +659,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                 return (
                                     <TableRow hover key={row.edemand}
                                         onClick={() => { handleRRDoc(row._id) }}
-                                        sx={{cursor:'pointer'}}
+                                        sx={{ cursor: 'pointer' }}
                                     >
                                         {columns.map((item, index) => {
                                             // @ts-ignore
@@ -587,7 +726,6 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                                 <div>{t('addremarks')}</div>
                                                                             </div>
                                                                         </div>
-
                                                                         <Modal
                                                                             open={open}
                                                                             onClose={(e) => { handleClose(e) }}
@@ -595,23 +733,30 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                                 display: 'flex',
                                                                                 alignItems: 'center',
                                                                                 justifyContent: 'center',
-                                                                                backgroundColor:'rgba(0, 0, 0, 0.01)'
                                                                             }}
-                                                                            BackdropProps={{
-                                                                                sx: {
-                                                                                  backgroundColor: 'rgba(0, 0, 0, 0.2)',
+                                                                            // closeAfterTransition
+                                                                            slots={{ backdrop: Backdrop }}
+                                                                            slotProps={{
+                                                                                backdrop: {
+                                                                                    timeout: 500,
+                                                                                    sx: {
+                                                                                        backgroundColor: 'rgba(0, 0, 0, 0.09)',
+                                                                                    },
                                                                                 },
-                                                                              }}
+                                                                            }}
                                                                         >
-                                                                            <Box sx={{
-                                                                                backgroundColor: 'background.paper',
-                                                                                borderRadius: 2,
-                                                                                boxShadow: 2,
-                                                                                p: 4,
-                                                                                width: '40vw',
-                                                                                maxHeight: '90vh',
-                                                                                
-                                                                            }}>
+                                                                            <Box
+                                                                                onClick={(e) => { e.stopPropagation() }}
+                                                                                sx={{
+                                                                                    backgroundColor: 'background.paper',
+                                                                                    borderRadius: 2,
+                                                                                    boxShadow: 2,
+                                                                                    p: 4,
+                                                                                    width: '40vw',
+                                                                                    maxHeight: '90vh',
+                                                                                    position: 'relative',
+                                                                                    outline: 'none'
+                                                                                }}>
                                                                                 {actionOptions === 'attach' && <Tags rakeCaptiveList={rakeCaptiveList}
                                                                                     shipmentId={rowId}
                                                                                     setOpen={setOpen}
@@ -619,6 +764,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                                 />}
                                                                                 {actionOptions === 'remarks' && <Remarks
                                                                                     shipmentId={rowId}
+                                                                                    setOpen={setOpen}
                                                                                 />}
                                                                             </Box>
                                                                         </Modal>
@@ -643,25 +789,25 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                             onMouseLeave={() => { setShowAllFnr(-1) }}
                                                                         >
                                                                             {value.others.length > 1 &&
-                                                                            <>
-                                                                                <div style={{ cursor: 'pointer' }} >+{value.others.length - 1}</div>
-                                                                                <div className='show_Allfnr'
-                                                                                    style={{ display: showAllFnr === firstindex ? 'block' : 'none' }}
-                                                                                >
-                                                                                    <div className='contain_fnr'>
-                                                                                        {
-                                                                                            value.others
-                                                                                            .filter((item: string) => item !== value.primary)
-                                                                                            .map((item: string, index: number) => {
-                                                                                              return <div key={index}>{item}</div>;
-                                                                                            })
-                                                                                        }
+                                                                                <>
+                                                                                    <div style={{ cursor: 'pointer' }} >+{value.others.length - 1}</div>
+                                                                                    <div className='show_Allfnr'
+                                                                                        style={{ display: showAllFnr === firstindex ? 'block' : 'none' }}
+                                                                                    >
+                                                                                        <div className='contain_fnr'>
+                                                                                            {
+                                                                                                value.others
+                                                                                                    .filter((item: string) => item !== value.primary)
+                                                                                                    .map((item: string, index: number) => {
+                                                                                                        return <div key={index}>{item}</div>;
+                                                                                                    })
+                                                                                            }
+                                                                                        </div>
+
                                                                                     </div>
-    
-                                                                                </div>
-                                                                            </>  
+                                                                                </>
                                                                             }
-                                                                            
+
                                                                         </div>
                                                                     </div>
                                                                 </div>
