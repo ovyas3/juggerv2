@@ -161,7 +161,7 @@ const TripTracker = (params: any) => {
     const decodedCoordinates = polyline.decode(tripTrackerLine) || [];
     setTrack(decodedCoordinates);
 
-    const tripTrackerLine1 = rakeData ? rakeData.polyline || '' : '';
+    const tripTrackerLine1 = rakeData ? rakeData.polyline.polyline || '' : '';
     const decodeline = polyline.decode(tripTrackerLine1) || [];
     setEstimatedTrack(decodeline);
     // remove tracks if currentStatus is empty or its misisng geo_point ir if geo_point.coordinates is empty or if its length is less than 2 or if geo_point.coordinates ==[0, 0]
