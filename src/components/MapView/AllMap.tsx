@@ -16,6 +16,7 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
+import { Tooltip } from '@mui/material';
 
 import { Icon, divIcon, point } from "leaflet";
 import L from 'leaflet';
@@ -428,33 +429,41 @@ const MapLayers = () => {
                             <div className="tracking-number">
                               {list.length}
                             </div>
-                            <div className="tracking-text" style={{color: '#334FFC'}}>
-                              Total
-                            </div>
+                            <Tooltip title="Items being tracked or managed within the system" arrow placement="bottom">
+                              <div className="tracking-text" style={{ color: '#334FFC', cursor: 'pointer' }}>
+                                Total
+                              </div>
+                            </Tooltip>
                           </div>
                           <div className="tracking-status">
                             <div className="tracking-number">
                               {allRakesPositions.length}
                             </div>
-                            <div className="tracking-text" style={{color: '#18BE8A'}}>
+                            <Tooltip title="Items currently being actively tracked or monitored" arrow placement="bottom">
+                            <div className="tracking-text" style={{color: '#18BE8A', cursor: 'pointer' }}>
                               Tracking
                             </div>
+                            </Tooltip>
                           </div>
                           <div className="tracking-status">
                             <div className="tracking-number">
                               {allIdleRakes.length}
                             </div>
-                            <div className="tracking-text" style={{color: '#FF981A'}}>
-                              Idle
-                            </div>
+                            <Tooltip title="Items that are not moving or are stationary for a significant period" arrow placement="bottom">
+                              <div className="tracking-text" style={{ color: '#FF981A', cursor: 'pointer' }}>
+                                Idle
+                              </div>
+                            </Tooltip>
                           </div>
                           <div className="tracking-status">
                             <div className="tracking-number">
                               {list.length - allRakesPositions.length - allIdleRakes.length}
                             </div>
-                            <div className="tracking-text" style={{color: '#E6667B'}}>
-                              Non Tracking
-                            </div>
+                            <Tooltip title="Items that are not currently being tracked or monitored" arrow placement="bottom">
+                              <div className="tracking-text" style={{ color: '#E6667B', cursor: 'pointer' }}>
+                                Non Tracking
+                              </div>
+                            </Tooltip>
                           </div>
                         </div>
                       </div>

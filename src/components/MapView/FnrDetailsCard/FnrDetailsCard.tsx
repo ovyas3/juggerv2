@@ -8,8 +8,33 @@ import currentTrainLocationIcon from '../../../assets/current_train_location_ico
 import { statusBuilder } from "../StatusBuilder/StatusBuilder";
 import Image from 'next/image';
 import service from "@/utils/timeService";
+import { Tooltip } from "@mui/material";
 
-export const FNRDetailsCard = (props: any) => ( 
+const getStatusStyle = (status: string) => {
+  switch(status.toLowerCase()){
+    case "delivered":
+      return{
+        backgroundColor: '#90dcc4',
+        color: '#0e9167'
+      };
+    case "in transit":
+      return{
+        backgroundColor: '#ff98001f',
+        color: '#ff9800'
+      }
+    case "in plant": 
+      return{
+        backgroundColor: '#334ffc1f',
+        color: '#334ffc'
+      }  
+  }
+}
+
+export const FNRDetailsCard = (props: any) => {
+
+    const statusText = statusBuilder(props.fnr_data?.status);
+    const statusStyle = getStatusStyle(statusText);
+    return(
     <React.Fragment>
       <CardContent className={props.className} >
         <Grid style={
@@ -38,14 +63,13 @@ export const FNRDetailsCard = (props: any) => (
                 color: "#42454E"
               }
             }>
-              FNR No: #{props.fnr_data.FNR}
+              FNR No: #{props.fnr_data?.FNR}
             </Box>
           </Grid>
           <Grid item xs={6}>
             <Box style={
             {
               display: "flex",
-              backgroundColor: '#D6F6DD',
               color: '#008E27',
               height: '24px',
               width: '75px',
@@ -58,9 +82,11 @@ export const FNRDetailsCard = (props: any) => (
               fontSize: '12px',
               marginBottom: "22px",
               marginRight: "5px",
+              ...statusStyle
             }
           }>
-           {statusBuilder(props.fnr_data.status)}
+            
+           {statusBuilder(statusText)}
           </Box>
           </Grid>
         </Grid>
@@ -135,7 +161,7 @@ export const FNRDetailsCard = (props: any) => (
               />
             </Grid>
             <Grid item xs={10} fontSize={"12px"} >
-                No of Wagons: <b>{props.fnr_data.no_of_wagons}</b>
+                No of Wagons: <b>{props.fnr_data?.no_of_wagons}</b>
             </Grid>
           </Grid>
           <Grid container spacing={2} item xs={12} >
@@ -165,12 +191,19 @@ export const FNRDetailsCard = (props: any) => (
                  <div style={{marginLeft: "20px"}}>
                   FOIS: <b>{props.fnr_data?.trip_tracker?.fois_last_location || 'N/A'}</b>
                  </div>
-                 <div style={{marginLeft: "20px"}}>
-                  ETA: <b>{service.utcToist(props.fnr_data?.eta, 'dd-MM-yyyy HH:mm')}</b>
+                 <div style={{marginLeft: "20px", cursor: "hover"}}>
+                 <Tooltip
+                    title={`ETA - Estimated Time of Arrival or Expected Time of Arrival`}
+                    arrow
+                    placement="bottom"
+                  >
+                    <p style={{cursor: 'pointer'}}>ETA : <b>{service.utcToist(props.fnr_data?.eta, 'dd-MM-yyyy HH:mm')}</b></p>
+                  </Tooltip>
                  </div>
             </Grid>
           </Grid>
         </Grid>
       </CardContent>
     </React.Fragment>
-  );
+    );
+};
