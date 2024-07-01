@@ -85,7 +85,6 @@ export const FNRDetailsCard = (props: any) => {
               ...statusStyle
             }
           }>
-            
            {statusBuilder(statusText)}
           </Box>
           </Grid>
@@ -113,8 +112,8 @@ export const FNRDetailsCard = (props: any) => {
             <Grid item xs={10} fontSize={"12px"} marginTop={"10px"}>
                 {/* {props.fnr_data?.pickup_location?.code}-
                 {props.fnr_data?.pickup_location?.name} */}
-                { props.fnr_data?.pickup_location && props.fnr_data?.pickup_location?.code ? props.fnr_data?.pickup_location?.code: "" }
-                { props.fnr_data?.pickup_location && props.fnr_data?.pickup_location?.name ? " - " + props.fnr_data?.pickup_location?.name : "" }
+                { props.fnr_data?.pickup_location && props.fnr_data?.pickup_location?.code ? props.fnr_data?.pickup_location?.code: "" } 
+                { props.fnr_data?.pickup_location && props.fnr_data?.pickup_location?.shipper ? " - " + props.fnr_data?.pickup_location?.shipper?.parent_name: " - " +  props.fnr_data?.pickup_location?.name }
             </Grid>
           </Grid>
           <Grid container spacing={2} item xs={12} >
@@ -162,6 +161,32 @@ export const FNRDetailsCard = (props: any) => {
             </Grid>
             <Grid item xs={10} fontSize={"12px"} >
                 No of Wagons: <b>{props.fnr_data?.no_of_wagons}</b>
+            </Grid>
+          </Grid>
+          <Grid container spacing={2} item xs={12} >
+            <Grid item display={"flex"} justifyContent={"center"} alignItems={"center"} xs={1}>
+               <Image
+                src={ wagonIcon }
+                alt="Map Path Icon"
+                width={16}
+                height={16}
+              />
+            </Grid>
+            <Grid item xs={10} fontSize={"12px"} >
+                Total Distance: <b>{props.fnr_data?.estimated?.distance}</b> km
+            </Grid>
+          </Grid>
+          <Grid container spacing={2} item xs={12} >
+            <Grid item display={"flex"} justifyContent={"center"} alignItems={"center"} xs={1}>
+               <Image
+                src={ wagonIcon }
+                alt="Map Path Icon"
+                width={16}
+                height={16}
+              />
+            </Grid>
+            <Grid item xs={10} fontSize={"12px"} >
+                Traveled Distance: <b>{props.traveledDistance}</b> km
             </Grid>
           </Grid>
           <Grid container spacing={2} item xs={12} >

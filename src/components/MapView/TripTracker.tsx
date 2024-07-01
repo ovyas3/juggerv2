@@ -25,12 +25,13 @@ import service from '@/utils/timeService';
 import polyline from '@mapbox/polyline';
 import getBoundary from "./IndianClaimed";
 import L from 'leaflet';
+import { distanceBetweenMultiplePointsInKm } from '@/utils/distance';
 
 const renderMarkers = (tracking_data: any[], customIcon: Icon): JSX.Element[] => {
   return tracking_data.map((point, index) => (
     <Marker key={index} position={[point.geo_point.coordinates[1], point.geo_point.coordinates[0]]} icon={customIcon}>
       <Popup>
-          Current Status: {point.currentStatus.split(/ on /i)[0]}
+          Status: {point.currentStatus.split(/ on /i)[0]}
           <br />
           <hr />
           Updated At: { service.utcToist(point.time_stamp, 'dd-MM-yyyy HH:mm') }
@@ -60,7 +61,7 @@ const TripTracker = (params: any) => {
   const trip_tracker_data = params.trip_tracker_data;
   const routeStation = params.routeStation;
   const [loadMap, setLoadMap] = useState(false);
-  const [fnr_data, setFnrData] = useState({});
+  const [fnr_data, setFnrData] = useState<any>({});
   const [tracking_data, setTrackingData] = useState<any>([]);
   const [trackingLine, setTrackingLine] = useState<[number, number][]>([]);
   const [showEstimtedTrack, setShowEstimtedTrack] = useState(false);
@@ -70,6 +71,7 @@ const TripTracker = (params: any) => {
   const [showGPSTracks, setShowGPSTracks] = useState(false);
   const [pickupDetail, setPickupDetail] = useState<any>({});
   const [dropDetail, setDropDetail] = useState<any>({});
+  const [traveledDistance, setTraveledDistance] = useState(0);
   const [buttonEnabledFois, setButtonEnabledFois] = useState(false);
   const [buttonEnabledGPS, setButtonEnabledGPS] = useState(false);
   const [activityData, setActivityData] = useState([]);
@@ -178,7 +180,7 @@ const TripTracker = (params: any) => {
 
     const pickupDetails = {
       code: rakeData && rakeData.pickup_location && rakeData.pickup_location.code ? rakeData.pickup_location.code : 'N/A',
-      name: rakeData && rakeData.pickup_location && rakeData.pickup_location.name ? rakeData.pickup_location.name : 'N/A',
+      name: rakeData && rakeData.pickup_location && rakeData.pickup_location.shipper && rakeData.pickup_location.shipper.parent_name ? rakeData.pickup_location.shipper.parent_name : (rakeData.pickup_location.name || 'N/A'),
       dateTime: rakeData && rakeData.pickup_date ? `${service.utcToist(rakeData.pickup_date, 'dd-MM-yyyy')} ${service.utcToist(rakeData.pickup_date, 'HH:mm')}` : 'N/A',
       distance: rakeData && rakeData.estimated && rakeData.estimated.distance ? `${rakeData.estimated.distance} km` : 'N/A',
     };
@@ -188,7 +190,6 @@ const TripTracker = (params: any) => {
       name: rakeData && rakeData.delivery_location && rakeData.delivery_location.name ? rakeData.delivery_location.name : 'N/A',
       eta: rakeData && rakeData.eta ? `${service.utcToist(rakeData.eta, 'dd-MM-yyyy')} ${service.utcToist(rakeData.eta, 'HH:mm')}` : 'N/A',
     };
-
     setTrackingData(filteredTracks);
     setStations(routeStation)
     setActivityData(tracksWithStatus);
@@ -199,6 +200,9 @@ const TripTracker = (params: any) => {
     if (filteredTracks && filteredTracks.length > 0) {
       setButtonEnabledFois(true);
     }
+
+    const traveledDistanceData = filteredTracks && filteredTracks.length > 0 ? distanceBetweenMultiplePointsInKm(filteredTracks.map((e: {geo_point: {coordinates: [number, number]}}) => e.geo_point.coordinates)) : 0;
+    setTraveledDistance(traveledDistanceData);
 
     const trip_tracker_gps = rakeData && rakeData.trip_tracker ? rakeData.trip_tracker.gps_updated_at : false;
     if (trip_tracker_gps) {
@@ -212,7 +216,16 @@ const TripTracker = (params: any) => {
   }, [trip_tracker_data,routeStation]);
 
   useEffect(() => {
-    setTrackingLine(tracking_data.map((e: {geo_point: {coordinates: [number, number]}}) => [e.geo_point.coordinates[1],e.geo_point.coordinates[0]]))
+    const estimated_pickup = estimatedTrack[0];
+    const pickup_coords = fnr_data && fnr_data.pickup_location && fnr_data.pickup_location.geo_point && fnr_data.pickup_location.geo_point.coordinates;
+    let trackingLineData: [number, number][] = [];
+    trackingLineData.push(...tracking_data.map((e: {geo_point: {coordinates: [number, number]}}) => [e.geo_point.coordinates[1],e.geo_point.coordinates[0]]))
+    if (estimated_pickup) {
+      trackingLineData.push(estimated_pickup);
+    } else if (pickup_coords) {
+      trackingLineData.push([pickup_coords[1], pickup_coords[0]]);
+    }
+    setTrackingLine(trackingLineData);
     if (map && trackingLine.length > 0) {
       const bounds = latLngBounds(trackingLine);
       map.fitBounds(bounds);
@@ -469,7 +482,7 @@ const TripTracker = (params: any) => {
           }}
           className="tracking_details"
         >
-        <FNRDetailsCard className="fnr_details_mobile"  fnr_data={fnr_data} />
+        <FNRDetailsCard className="fnr_details_mobile"  fnr_data={fnr_data} traveledDistance={traveledDistance} />
         <ActivityTimeLineChart className="tracking_details_mobile" trackingDetails={activityData} fnr_data={fnr_data} />
         </Box>)}          
       </Box>
