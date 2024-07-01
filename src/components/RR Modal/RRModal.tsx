@@ -75,9 +75,6 @@ const RRModal: React.FC<PopupProps> = ({ isOpen, isClose, rrNumbers, isRRDoc }) 
             };
           } )
           : [];
-  
-      console.log('rrDetail', rrDetail);
-      console.log('tableData', tableData);
       setRRDetails(rrDetail);
       setRRTableData(tableData);
 
