@@ -140,7 +140,7 @@ export const FNRDetailsCard = (props: any) => {
                  <div style={{marginLeft: "20px"}}>
                   GPS: <b>{props.fnr_data?.trip_tracker?.gps_last_location || 'N/A'} </b>
                  </div>    
-                 <div style={{marginLeft: "20px"}}>
+                 <div style={{marginLeft: "20px"}}>                        
                   FOIS: <b>{props.fnr_data?.trip_tracker?.fois_last_location || 'N/A'}</b>
                  </div>
                  <div style={{marginLeft: "20px", cursor: "hover"}}>
