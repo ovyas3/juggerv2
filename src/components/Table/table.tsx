@@ -249,7 +249,7 @@ function Remarks({ shipmentId, setOpen }: any) {
         setRemarks('');
     }
     return (
-        <div onClick={(e) => { e.stopPropagation()}}>
+        <div onClick={(e) => { e.stopPropagation() }}>
 
             <div style={{
                 width: '100%',
@@ -352,8 +352,8 @@ const convertArrayToFilteredArray = (inputArray: any) => {
                 unique_code,
             },
             destination: {
-                name: delivery_location.name || 'NA',
-                code: delivery_location.code || 'NA'
+                name: delivery_location?.name ?? 'NA',
+                code: delivery_location?.code ?? 'NA'
             },
             material: others.demandedCommodity || 'NA',
             pickupdate: {
@@ -489,8 +489,6 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
         setResponse(resData)
     }, [currentETAsorting])
 
-
-
     useEffect(() => {
         const pickupResult = sortArray(allShipments, 'pickup_date', pickupSorting ? 'dec' : 'asc');
         const etaResult = sortArray(allShipments, 'eta', currentETAsorting ? 'dec' : 'asc');
@@ -506,21 +504,17 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
             event.stopPropagation();
             const target = event.target as HTMLElement;
             const actionButton = target.closest('.action_icon');
-
             if (!actionButton && showActionBox !== -1) {
                 event.stopPropagation();
                 setShowActionBox(-1); // Close action box if clicked outside
             }
             event.stopPropagation();
         }
-
         if (showActionBox !== -1) {
             document.addEventListener('mousedown', handleClickOutside);
-
         } else {
             document.removeEventListener('mousedown', handleClickOutside);
         }
-
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
@@ -555,7 +549,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
     }, [reload])
 
     return (
-        <div className='target'>
+        <div className='target' >
             <Paper
                 sx={{
                     width: '100%', overflow: 'hidden', boxShadow: 'none',
@@ -583,7 +577,15 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                     onRowsPerPageChange={handleChangeRowsPerPage}
                     labelRowsPerPage="Shipments per page:"
                 />
-                <TableContainer sx={{ maxHeight: '594px', border: '1px solid #E9E9EB', borderRadius: '8px' }}>
+                <TableContainer sx={{
+                    border: '1px solid #E9E9EB', borderRadius: '8px', maxHeight: 'calc(90vh - 110px)', minHeight: '200px',
+                    overflowY: 'scroll',
+                    '&::-webkit-scrollbar': {
+                        display: 'none',
+                    },
+                    scrollbarWidth: 'none',
+                    '-ms-overflow-style': 'none',
+                }}>
                     <Table stickyHeader aria-label="sticky table">
                         <TableHead sx={{
                             '.mui-y8ay40-MuiTableCell-root ': { padding: 0 },
@@ -597,10 +599,8 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                             key={column.id}
                                             style={{ fontSize: 12, fontWeight: 'bold', color: '#484A57', paddingLeft: '10px' }}
                                             className={column.class}
-
                                         >
                                             <div className={column.innerClass}>
-
                                                 {column.label}
                                                 {
                                                     column.id === 'edemand' && edemand ?
@@ -626,19 +626,8 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                 }}
                                                                 value={settingFnrChange}
                                                                 placeholder='FNR No.'
-                                                                style={{
-                                                                    width: '82px',
-                                                                    height: '22px',
-                                                                    border: 'none',
-                                                                    textAlign: 'center',
-                                                                    fontSize: '12px',
-                                                                    color: '#484A57',
-                                                                    fontWeight: 'bold',
-                                                                    outline: 'none',
-                                                                }}
                                                                 className="custom-placeholder"
                                                             />
-
                                                         </div>
                                                         : <></>
                                                 }
@@ -717,190 +706,121 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                     <div>
                                                         {(typeof value) === 'object' ? '' : value}
 
-                                                        {item.id === 'action' ? (
+                                                        {item.id === 'action' && (
                                                             <div style={{ display: 'flex', justifyContent: 'center' }}>
                                                                 <div className='action_icon'>
                                                                     <MoreHorizIcon
                                                                         style={{ color: 'white', cursor: 'pointer', scale: '0.9' }}
-                                                                        onClick={(e) => { clickActionBox(e, firstindex, row._id); }}
+                                                                        onClick={(e) => clickActionBox(e, firstindex, row._id)}
                                                                     />
-                                                                    <div
-                                                                        className={`action_button_target ${showActionBox === firstindex ? 'show' : ''}`}
-                                                                    >
-                                                                        <div className='action_button_options'>
-
-                                                                            <div className='action_items' onClick={(e) => handleOpen(e)}
-                                                                                id='attach'
-                                                                                style={{ display: row.validationForAttachRake ? '' : 'none' }}
-                                                                            >
-                                                                                <div >
-                                                                                    <img src={attach_icon.src} alt=''
-                                                                                        style={{ display: 'block' }} />
-                                                                                </div>
-                                                                                <div style={{ paddingTop: '3px' }}>{t('attach')}</div>
-                                                                            </div>
-                                                                            <div className='action_items' style={{ gap: '10px' }}>
-                                                                                <div>
-                                                                                    <ShareIcon style={{ fontSize: '15px', color: '#3352FF' }} />
-                                                                                </div>
-                                                                                <div>{t('share')}</div>
-                                                                            </div>
-                                                                            <div className='action_items'>
-                                                                                <div style={{ width: '20px', height: '20px' }}><img src={contactIcon.src} alt='' style={{ objectFit: 'contain', height: '100%', width: '100%' }} /></div>
-                                                                                <div>{t('contact')}</div>
-                                                                            </div>
-                                                                            <div className='action_items' style={{ gap: '10px' }}
+                                                                    <div className={`action_button_target ${showActionBox === firstindex ? 'show' : ''}`}>
+                                                                        <div className='action_button_options' onClick={(e) => e.stopPropagation()}>
+                                                                            {row.validationForAttachRake && (
+                                                                                <ActionItem
+                                                                                    icon={<img src={attach_icon.src} alt='' />}
+                                                                                    text={t('attach')}
+                                                                                    onClick={handleOpen}
+                                                                                    id='attach'
+                                                                                />
+                                                                            )}
+                                                                            <ActionItem
+                                                                                icon={<ShareIcon style={{ fontSize: '15px', color: '#3352FF' }} />}
+                                                                                text={t('share')}
+                                                                            />
+                                                                            <ActionItem
+                                                                                icon={<img src={contactIcon.src} alt='' style={{ objectFit: 'contain', height: '100%', width: '100%' }} />}
+                                                                                text={t('contact')}
+                                                                            />
+                                                                            <ActionItem
+                                                                                icon={<BookmarkAddOutlinedIcon style={{ fontSize: '17px', color: '#658147' }} />}
+                                                                                text={t('addremarks')}
+                                                                                onClick={handleOpen}
                                                                                 id='remarks'
-                                                                                onClick={(e) => handleOpen(e)}>
-                                                                                <div>
-                                                                                    <BookmarkAddOutlinedIcon style={{ fontSize: '17px', color: '#658147' }} />
-                                                                                </div>
-                                                                                <div>{t('addremarks')}</div>
-                                                                            </div>
+                                                                            />
                                                                         </div>
-                                                                        <Modal
-                                                                            open={open}
-                                                                            onClose={(e) => { handleClose(e) }}
-                                                                            sx={{
-                                                                                display: 'flex',
-                                                                                alignItems: 'center',
-                                                                                justifyContent: 'center',
-                                                                            }}
-                                                                            // closeAfterTransition
-                                                                            slots={{ backdrop: Backdrop }}
-                                                                            slotProps={{
-                                                                                backdrop: {
-                                                                                    timeout: 500,
-                                                                                    sx: {
-                                                                                        backgroundColor: 'rgba(0, 0, 0, 0.04)',
-                                                                                    },
-                                                                                },
-                                                                            }}
-                                                                        >
-                                                                            <Box
-                                                                                onClick={(e) => { e.stopPropagation() }}
-                                                                                sx={{
-                                                                                    backgroundColor: 'white',
-                                                                                    borderRadius: '12px',
-                                                                                    width: '30vw',
-                                                                                    maxHeight: '90vh',
-                                                                                    position: 'relative',
-                                                                                    outline: 'none'
-                                                                                }}>
-                                                                                {actionOptions === 'attach' && <Tags rakeCaptiveList={rakeCaptiveList}
-                                                                                    shipmentId={rowId}
-                                                                                    setOpen={setOpen}
-                                                                                    setShowActionBox={setShowActionBox}
-                                                                                />}
-                                                                                {actionOptions === 'remarks' && <Remarks
-                                                                                    shipmentId={rowId}
-                                                                                    setOpen={setOpen}
-                                                                                />}
-                                                                            </Box>
-                                                                        </Modal>
-
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                        ) : null}
-                                                        {
-                                                            item.id === 'fnr' ?
-                                                                <div className='fnr_container'>
-                                                                    <div>Primary</div>
-                                                                    <div className='fnr_inner_data'>
-                                                                        <Link target="_blank"
-                                                                            href={"/tracker?unique_code=" + value.unique_code}
-                                                                            onClick={(e) => { e.stopPropagation() }}
-                                                                        >
-                                                                            {value.primary}
-                                                                        </Link>
-                                                                        <div className={`${value.others.length > 1 && 'all_Pnr_count'}`}
-                                                                            onMouseOver={() => { setShowAllFnr(firstindex) }}
-                                                                            onMouseLeave={() => { setShowAllFnr(-1) }}
-                                                                        >
-                                                                            {value.others.length > 1 &&
-                                                                                <>
-                                                                                    <div style={{ cursor: 'pointer' }} >+{value.others.length - 1}</div>
-                                                                                    <div className='show_Allfnr'
-                                                                                        style={{ display: showAllFnr === firstindex ? 'block' : 'none' }}
-                                                                                    >
-                                                                                        <div className='contain_fnr'>
-                                                                                            {
-                                                                                                value.others
-                                                                                                    .filter((item: string) => item !== value.primary)
-                                                                                                    .map((item: string, index: number) => {
-                                                                                                        return <div key={index}>{item}</div>;
-                                                                                                    })
-                                                                                            }
-                                                                                        </div>
-
+                                                        )}
+                                                        {item.id === 'fnr' &&
+                                                            <div className='fnr_container'>
+                                                                <div>Primary</div>
+                                                                <div className='fnr_inner_data'>
+                                                                    <Link target="_blank"
+                                                                        href={"/tracker?unique_code=" + value.unique_code}
+                                                                        onClick={(e) => { e.stopPropagation() }}
+                                                                    >
+                                                                        {value.primary}
+                                                                    </Link>
+                                                                    <div className={`${value.others.length > 1 && 'all_Pnr_count'}`}
+                                                                        onMouseOver={() => { setShowAllFnr(firstindex) }}
+                                                                        onMouseLeave={() => { setShowAllFnr(-1) }}
+                                                                    >
+                                                                        {value.others.length > 1 &&
+                                                                            <>
+                                                                                <div style={{ cursor: 'pointer' }} >+{value.others.length - 1}</div>
+                                                                                <div className='show_Allfnr'
+                                                                                    style={{ display: showAllFnr === firstindex ? 'block' : 'none' }}
+                                                                                >
+                                                                                    <div className='contain_fnr'>
+                                                                                        {value.others
+                                                                                            .filter((item: string) => item !== value.primary)
+                                                                                            .map((item: string, index: number) => {
+                                                                                                return <div key={index}>{item}</div>;
+                                                                                            })
+                                                                                        }
                                                                                     </div>
-                                                                                </>
-                                                                            }
-
-                                                                        </div>
+                                                                                </div>
+                                                                            </>
+                                                                        }
                                                                     </div>
                                                                 </div>
-                                                                : <></>
+                                                            </div>
                                                         }
-                                                        {
-                                                            item.id === 'destination' ?
-                                                                <div style={{ position: 'relative' }} >
-                                                                    <div className=''
-                                                                        onMouseOver={() => { setDestinationIndex(firstindex) }}
-                                                                        onMouseLeave={() => { setDestinationIndex(-1) }}
-                                                                    >{value.name != 'NA' ? value.name : value.code} ({value.code})</div>
+                                                        {item.id === 'destination' && (
+                                                            <div style={{ position: 'relative' }}>
+                                                                <div>{value.name !== 'NA' ? value.name : value.code} ({value.code})</div>
+                                                            </div>
+                                                        )}
+                                                        {item.id === 'pickupdate' && (
+                                                            <div>
+                                                                {row.pickup_date ? (
+                                                                    <>
+                                                                        <div>{value.date}</div>
+                                                                        <div>{value.pickupTime}</div>
+                                                                    </>
+                                                                ) : 'NA'}
+                                                            </div>
+                                                        )}
+                                                        {item.id === 'status' &&
+                                                            <div className='status_container'>
+                                                                <div className={` ${value.name === t('intransit') ? 'status_title_In_Transit' : value.name === t('delivered') ? 'status_title_Delivered' : 'status_title_In_Plant'}`}>
+                                                                    <div>{value.name}</div>
                                                                 </div>
-                                                                : <></>
+                                                                <div className='status_body'>{value.code}</div>
+                                                            </div>
                                                         }
-                                                        {
-                                                            item.id === 'pickupdate' ?
-                                                                <div>
-                                                                    {
-                                                                        row.pickup_date ?
-                                                                            <div>
-                                                                                <div>{value.date}</div>
-                                                                                <div>{value.pickupTime}</div>
-                                                                            </div>
-                                                                            : <>NA</>
-                                                                    }
+                                                        {item.id === 'edemand' &&
+                                                            <div className='edemand_fois_gpis' style={{ marginBottom: '5px', display: !row.fois.is_gps && !row.fois.is_fois && !row.rrDoc ? 'none' : '' }}>
 
-                                                                </div>
-                                                                : <></>
-                                                        }
-                                                        {
-                                                            item.id === 'status' ?
-                                                                <div className='status_container'>
-                                                                    <div className={` ${value.name === t('intransit') ? 'status_title_In_Transit' : value.name === t('delivered') ? 'status_title_Delivered' : 'status_title_In_Plant'}`}>
-                                                                        <div>{value.name}</div>
-                                                                    </div>
-                                                                    <div className='status_body'>{value.code}</div>
-                                                                </div>
-                                                                : <></>
-                                                        }
-                                                        {
-                                                            item.id === 'edemand' ?
-                                                                <div className='edemand_fois_gpis' style={{ marginBottom: '5px', display: !row.fois.is_gps && !row.fois.is_fois && !row.rrDoc ? 'none' : '' }}>
+                                                                <img
+                                                                    src={row.fois.is_gps && GPIS.src} style={{ display: 'block' }}
+                                                                    alt=''
+                                                                />
 
-                                                                    <img
-                                                                        src={row.fois.is_gps && GPIS.src} style={{ display: 'block' }}
-                                                                        alt=''
-                                                                    />
+                                                                <img
+                                                                    src={row.fois.is_fois && FOIS.src}
+                                                                    style={{ display: 'block' }}
+                                                                    alt=''
+                                                                />
 
-                                                                    <img
-                                                                        src={row.fois.is_fois && FOIS.src}
-                                                                        style={{ display: 'block' }}
-                                                                        alt=''
-                                                                    />
+                                                                <img
+                                                                    src={row.rrDoc && rrDocumentIcon.src}
+                                                                    style={{ display: 'block' }}
+                                                                    alt=''
+                                                                />
 
-                                                                    <img
-                                                                        src={row.rrDoc && rrDocumentIcon.src}
-                                                                        style={{ display: 'block' }}
-                                                                        alt=''
-                                                                    />
-
-                                                                </div>
-                                                                : <></>
+                                                            </div>
                                                         }
                                                         {item.id === 'currentEta' && (
                                                             <div>
@@ -918,9 +838,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                 </TableCell>
                                             );
                                         })}
-
                                     </TableRow>
-
                                 );
                             })}
                         </TableBody>
@@ -928,9 +846,46 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                 </TableContainer>
             </Paper>
             <RRModal isOpen={isRRModalOpen} isClose={() => setRRModalOpen(false)} rrNumbers={rrNumbers} isRRDoc={isRRDoc} />
+            <Modal
+                open={open}
+                onClose={(e) => { handleClose(e) }}
+                sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                }}
+            >
+                <Box
+                    onClick={(e) => { e.stopPropagation() }}
+                    sx={{
+                        backgroundColor: 'white',
+                        borderRadius: '12px',
+                        width: '30vw',
+                        maxHeight: '90vh',
+                        position: 'relative',
+                        outline: 'none'
+                    }}>
+                    {actionOptions === 'attach' && <Tags rakeCaptiveList={rakeCaptiveList}
+                        shipmentId={rowId}
+                        setOpen={setOpen}
+                        setShowActionBox={setShowActionBox}
+                    />}
+                    {actionOptions === 'remarks' && <Remarks
+                        shipmentId={rowId}
+                        setOpen={setOpen}
+                    />}
+                </Box>
+            </Modal>
         </div>
     );
 }
+
+const ActionItem = ({ icon, text, onClick, id }: any) => (
+    <div className='action_items' onClick={onClick} id={id}>
+        <div>{icon}</div>
+        <div>{text}</div>
+    </div>
+);
 
 
 
