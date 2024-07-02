@@ -169,3 +169,7 @@
 .leaflet-left {
   left: 520px !important;
 }
+
+.cardHover :hover {
+  cursor: pointer;
+}
