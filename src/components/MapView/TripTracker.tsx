@@ -472,13 +472,12 @@ const TripTracker = (params: any) => {
             width: mobile ? "100%" : "28%",
             display: "flex",
             alignItems: "center",
-            background: "#F0F3F9",
-            backgroundColor: "#F8F8F8",
+            backdropFilter: "blur(10px)",
             p: 0,
             flexDirection: "column",
             zIndex: 10,
             position: mobile ? "absolute" : 'fixed',
-            marginTop: mobile ? '0px' : '20px',
+            marginTop: mobile ? '-10px' : '20px',
           }}
           className="tracking_details"
         >
