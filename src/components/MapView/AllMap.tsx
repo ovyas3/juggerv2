@@ -172,7 +172,6 @@ const MapLayers = () => {
 
         });
         const allRakesFiltered = allRakes.filter((rake: any) => rake.rake_id !== undefined);
-        console.log(allRakesFiltered);
         setAllRakes(allRakesFiltered);
         setCoords(coords);
       } catch (error) {
