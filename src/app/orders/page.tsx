@@ -47,7 +47,7 @@ const OrdersPage = () => {
     is_outbound: true,
     to: '',
     from: '',
-    status: 'ITNS'
+    status:['ITNS','Delivered']
   })
 
   //adding to and from to shipmentpayload
@@ -75,24 +75,19 @@ const OrdersPage = () => {
     }));
   }
 
-  const handleChangeStatus = (status: string) => {
+  const handleChangeStatus = (status: string[]) => {
     setShipmentsPayload((prevState: any) => {
-      if (status === "All") {
-
-        // Create a new object without the status property
-        const { status, ...newState } = prevState;
+      if (status.length === 0) {
+        const { status , ...newState } = prevState;
         return newState;
       } else {
-        return {
-          ...prevState,
-          status: getStatusCode(status)
-        };
+        const modifiedStatus = status.map(getStatusCode);
+        return { ...prevState, status: modifiedStatus };
       }
     });
-
   }
 
-  // function which bring allshipment   OB ITNS CPTD
+  // function which bring allshipment 
   async function getAllShipment() {
     console.log(ShipmentsPayload)
     const response = await httpsPost(GET_SHIPMENTS, ShipmentsPayload);
@@ -116,7 +111,7 @@ const OrdersPage = () => {
     if (ShipmentsPayload.from && ShipmentsPayload.to) getAllShipment();
   }, [ShipmentsPayload])
 
-  if (reloadOnHeaderChange) getAllShipment();
+  // if (reloadOnHeaderChange) getAllShipment();
 
   return (
     <div  >
@@ -134,8 +129,8 @@ const OrdersPage = () => {
                 showMessage('Refresh Successfully', 'success')
                 const { fnrNumber, ...updatedShipmentsPayload } = ShipmentsPayload;
                 setShipmentsPayload(updatedShipmentsPayload);
-                console.log(updatedShipmentsPayload);
-                getAllShipment();
+                // console.log(updatedShipmentsPayload);
+                // getAllShipment();
                 setReload(true)
                 setTimeout(() => { setReload(false) }, 3000)
               }}>

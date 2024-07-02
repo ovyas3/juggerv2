@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+  <g id="travelled_distance_icon" transform="translate(3849 -714)">
+    <g id="travelled_distance" transform="translate(-1.5 20.001)">
+      <g id="Group_21486" data-name="Group 21486" transform="translate(-3843.5 687)">
+        <path id="Path_17122" data-name="Path 17122" d="M16,15v.01" transform="translate(-8)" fill="none" stroke="#45475b" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+        <path id="Path_17121" data-name="Path 17121" d="M13.172,17.828a4,4,0,1,1,5.656,0L16,20.657Z" transform="translate(-8)" fill="none" stroke="#45475b" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+      </g>
+      <g id="Rectangle_5229" data-name="Rectangle 5229" transform="translate(-3844 710)" fill="#fff" stroke="#45475b" stroke-linecap="square" stroke-width="1">
+        <rect width="17" height="1.5" stroke="none"/>
+        <rect x="0.5" y="0.5" width="16" height="0.5" fill="none"/>
+      </g>
+      <g id="Rectangle_5230" data-name="Rectangle 5230" transform="translate(-3845.5 707.75)" fill="#fff" stroke="#45475b" stroke-linecap="round" stroke-linejoin="round" stroke-width="1">
+        <rect width="1.5" height="6" rx="0.75" stroke="none"/>
+        <rect x="0.5" y="0.5" width="0.5" height="5" rx="0.25" fill="none"/>
+      </g>
+      <g id="Rectangle_5231" data-name="Rectangle 5231" transform="translate(-3827 707.75)" fill="#fff" stroke="#45475b" stroke-linecap="round" stroke-linejoin="round" stroke-width="1">
+        <rect width="1.5" height="6" rx="0.75" stroke="none"/>
+        <rect x="0.5" y="0.5" width="0.5" height="5" rx="0.25" fill="none"/>
+      </g>
+    </g>
+    <rect id="Rectangle_5232" data-name="Rectangle 5232" width="24" height="24" transform="translate(-3849 714)" fill="none"/>
+  </g>
+</svg>

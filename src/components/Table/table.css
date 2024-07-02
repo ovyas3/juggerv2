@@ -27,8 +27,23 @@
 
 .pickupdate{
     /* background-color: chocolate!important; */
-    min-width: 90px !important;
+    min-width: 70px !important;
+    /* display: flex !important;
+    flex-direction: row !important; */
 }
+.inner_pickup{
+    /* background-color: chocolate!important; */
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 10px;
+}
+
+.inner_eta{
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 10px;
+}
+
 .ownedby{
     /* background-color: darkslateblue!important; */
     min-width: 60px !important;
