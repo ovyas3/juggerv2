@@ -18,3 +18,4 @@ export const GET_SHIPMENTS = 'rake_shipment/getShipment';
 export const CAPTIVE_RAKE = 'rake_shipment/get/captive_rakes';
 export const UPDATE_RAKE_CAPTIVE_ID = 'rake_shipment/update_rake_captive_id';
 export const REMARKS_UPDATE_ID = 'add/remark';
+export const REMARKS_LIST = 'get/remark/reasons';

@@ -93,8 +93,19 @@ margin-top: 20px;
     width: 99px;
     text-align: center;
     align-content: center;
+    cursor: pointer;
+    color: #7C7E8C;
+}
+
+.outbound_inner:hover{
+    background-color: #cedafc;
+    border-radius: 4px 4px 0 0;
+    transition: all 0.3s ease-in-out;
+}
+
+.selected_bound{
     color: #2962FF;
-    font-weight: 600;
     border-bottom: 2px solid #2962FF;
+    font-weight: 600;
 }
 
