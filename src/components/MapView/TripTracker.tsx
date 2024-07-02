@@ -387,7 +387,6 @@ const TripTracker = (params: any) => {
           </Box>
         }
         {loadMap &&
-
           <div className='map-indications'>
             <div className='map-indications__item'>
               <div className='map-indications__icon' style={{backgroundColor: '#000000', width: '25px', height: '5px'}}></div>
@@ -430,7 +429,7 @@ const TripTracker = (params: any) => {
 
         }
       
-        {mobile && <Box
+      {mobile && <Box
         sx={{
           zIndex: 10,
           height: '40px',
