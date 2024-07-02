@@ -71,7 +71,7 @@ const TripTracker = (params: any) => {
   const [showGPSTracks, setShowGPSTracks] = useState(false);
   const [pickupDetail, setPickupDetail] = useState<any>({});
   const [dropDetail, setDropDetail] = useState<any>({});
-  const [traveledDistance, setTraveledDistance] = useState(0);
+  const [travelledDistance, setTravelledDistance] = useState(0);
   const [buttonEnabledFois, setButtonEnabledFois] = useState(false);
   const [buttonEnabledGPS, setButtonEnabledGPS] = useState(false);
   const [activityData, setActivityData] = useState([]);
@@ -161,7 +161,7 @@ const TripTracker = (params: any) => {
     const decodedCoordinates = polyline.decode(tripTrackerLine) || [];
     setTrack(decodedCoordinates);
 
-    const tripTrackerLine1 = rakeData ? rakeData.polyline || '' : '';
+    const tripTrackerLine1 = rakeData ? rakeData.polyline && rakeData.polyline.polyline || '' : '';
     const decodeline = polyline.decode(tripTrackerLine1) || [];
     setEstimatedTrack(decodeline);
     // remove tracks if currentStatus is empty or its misisng geo_point ir if geo_point.coordinates is empty or if its length is less than 2 or if geo_point.coordinates ==[0, 0]
@@ -201,8 +201,8 @@ const TripTracker = (params: any) => {
       setButtonEnabledFois(true);
     }
 
-    const traveledDistanceData = filteredTracks && filteredTracks.length > 0 ? distanceBetweenMultiplePointsInKm(filteredTracks.map((e: {geo_point: {coordinates: [number, number]}}) => e.geo_point.coordinates)) : 0;
-    setTraveledDistance(traveledDistanceData);
+    const travelledDistanceData = filteredTracks && filteredTracks.length > 0 ? distanceBetweenMultiplePointsInKm(filteredTracks.map((e: {geo_point: {coordinates: [number, number]}}) => e.geo_point.coordinates)) : 0;
+    setTravelledDistance(travelledDistanceData);
 
     const trip_tracker_gps = rakeData && rakeData.trip_tracker ? rakeData.trip_tracker.gps_updated_at : false;
     if (trip_tracker_gps) {
@@ -240,7 +240,7 @@ const TripTracker = (params: any) => {
   const mobile = !useMediaQuery("(min-width:800px)");
   return (
     <>
-      <TripTrackerNavbar />
+      <TripTrackerNavbar fnr_data={fnr_data}/>
       <Box
         sx={{
             marginTop: mobile ? "150px" : "75px",
@@ -387,14 +387,13 @@ const TripTracker = (params: any) => {
           </Box>
         }
         {loadMap &&
-
           <div className='map-indications'>
             <div className='map-indications__item'>
               <div className='map-indications__icon' style={{backgroundColor: '#000000', width: '25px', height: '5px'}}></div>
               <FormControlLabel
               // disabled={!buttonEnabledGPS}
               control={<Switch checked={showEstimtedTrack} onChange={handleTrackingLineCheck} />}
-              label="RR Route"
+              label="Rail Route"
               labelPlacement="start"
             />
             </div>
@@ -430,7 +429,7 @@ const TripTracker = (params: any) => {
 
         }
       
-        {mobile && <Box
+      {mobile && <Box
         sx={{
           zIndex: 10,
           height: '40px',
@@ -472,17 +471,16 @@ const TripTracker = (params: any) => {
             width: mobile ? "100%" : "28%",
             display: "flex",
             alignItems: "center",
-            background: "#F0F3F9",
-            backgroundColor: "#F8F8F8",
+            backdropFilter: "blur(10px)",
             p: 0,
             flexDirection: "column",
             zIndex: 10,
             position: mobile ? "absolute" : 'fixed',
-            marginTop: mobile ? '0px' : '20px',
+            marginTop: mobile ? '-10px' : '20px',
           }}
           className="tracking_details"
         >
-        <FNRDetailsCard className="fnr_details_mobile"  fnr_data={fnr_data} traveledDistance={traveledDistance} />
+        <FNRDetailsCard className="fnr_details_mobile"  fnr_data={fnr_data} travelledDistance={travelledDistance} />
         <ActivityTimeLineChart className="tracking_details_mobile" trackingDetails={activityData} fnr_data={fnr_data} />
         </Box>)}          
       </Box>
