@@ -153,7 +153,7 @@ const RRModal: React.FC<PopupProps> = ({ isOpen, isClose, rrNumbers, isRRDoc }) 
                  </div>
                 <div className="rrmodal-content-lower-body">
                   <div className="rrmodal-content-upper-item">
-                    <h4 className="rrmodal-content-upper-item-heading">Invoiced No.</h4>
+                    <h4 className="rrmodal-content-upper-item-heading">Invoice No.</h4>
                     <p className="rrmodal-content-upper-item-value">{ rrDetails.invoicedNo }</p>
                   </div>
                   <div className="rrmodal-content-upper-item">
@@ -161,7 +161,7 @@ const RRModal: React.FC<PopupProps> = ({ isOpen, isClose, rrNumbers, isRRDoc }) 
                     <p className="rrmodal-content-upper-item-value">{ rrDetails.invoicedDate }</p>
                   </div>
                   <div className="rrmodal-content-upper-item">
-                    <h4 className="rrmodal-content-upper-item-heading">Distance (km)</h4>
+                    <h4 className="rrmodal-content-upper-item-heading">Total Distance (km)</h4>
                     <p className="rrmodal-content-upper-item-value">{ rrDetails.distance }</p>
                   </div>
                   <div className="rrmodal-content-upper-item">
@@ -176,8 +176,8 @@ const RRModal: React.FC<PopupProps> = ({ isOpen, isClose, rrNumbers, isRRDoc }) 
               </>}
                 </div>
                 <div className="rrmodal-content-lower">
-                  <TableContainer component={Paper} className="table-head-container">
-                    <Table>
+                  <TableContainer component={Paper} className="table-rrmodal">
+                    <Table aria-label="table" stickyHeader>
                       <TableHead>
                         <TableRow>
                           <TableCell align="left" className="rrmodal-table-headers">S.No</TableCell>
@@ -188,14 +188,10 @@ const RRModal: React.FC<PopupProps> = ({ isOpen, isClose, rrNumbers, isRRDoc }) 
                           <TableCell align="center" className="rrmodal-table-headers">Tare (MT)</TableCell>
                           <TableCell align="left" className="rrmodal-table-headers">No. Of Articles</TableCell>
                           <TableCell align="left" className="rrmodal-table-headers">Gross Weight (MT)</TableCell>
-                          <TableCell align="left" className="rrmodal-table-headers">Actual Wt (MT)</TableCell>
+                          <TableCell align="left" className="rrmodal-table-headers">Actual Weight (MT)</TableCell>
                         </TableRow>
                       </TableHead>
-                      </Table>
-                  </TableContainer>
 
-                      <TableContainer component={Paper} className="table-body-container">
-                        <Table>
                         <TableBody>
                         {rrTableData.map((row: any, index: number) => (
                           <TableRow key={index}>
