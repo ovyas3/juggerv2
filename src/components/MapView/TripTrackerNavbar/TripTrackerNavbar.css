@@ -8,11 +8,51 @@
     position: sticky;
     top: 0px;
     height: 75px;
+    padding-left: 0px;
 }
-
+.main{
+    display: flex;
+    margin-right: 30px !important;
+}
 .head{
     margin: auto;
     font-weight: 400;
-    word-spacing: 0.2em;
-    font-size: 25px;
+    word-spacing: 0.1em;
+    font-size: 18px;
+}
+.card{
+    display: flex;
+    margin-top: 0px;
+    width: 100%;
+    height: 100%;
+    padding-left: 0px;
+    justify-content: space-between;
+    align-items: center;
+}
+.img{
+    padding: 0px;
+    position: relative;
+}
+@media (max-width: 390px){
+    .card{
+        display: block;
+        padding-top: 0px;
+    }
+    .head1{
+        margin-top: 4px !important;
+        font-size: 12px !important;
+    }
+    .head2{
+        margin-top: 0px !important;
+        font-size: 12px !important;
+    }
+    
+    .box1{
+        margin-top: -4px !important;
+        font-size: 12px !important;
+    }
+    .box2{
+        height: 20px !important;
+        margin-top: -12px !important;
+    }
 }
