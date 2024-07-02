@@ -203,9 +203,9 @@ function Filters({ onToFromChange, onChangeStatus, reload }: any) {
             </div>
             {error && <div className='error'>{error}</div>}
 
-            <div className='status_container'>
+            <div className='status_container' style={{width:'170px'}}>
                 <FormControl sx={{
-                    width: 128, margin: 0, padding: 0,
+                    width:'170px', margin: 0, padding: 0,
                     '.mui-kk1bwy-MuiButtonBase-root-MuiMenuItem-root': {
                         padding: 0,
                     },
@@ -247,7 +247,7 @@ function Filters({ onToFromChange, onChangeStatus, reload }: any) {
                     </Select>
                 </FormControl>
             </div>
-
+            
             <motion.div
                 className="box"
                 whileHover={{ scale: 1.1 }}
@@ -258,6 +258,7 @@ function Filters({ onToFromChange, onChangeStatus, reload }: any) {
                 <Image src={MapViewIcon} alt="map view" width={16} height={16}/>
                 <span className="map-view-btn-header">Map View</span>
             </motion.div>
+
 
             {/* <div>
                 <div className="upload-container">

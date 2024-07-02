@@ -1,10 +1,11 @@
 .remarks_dropDown_list{
     width: 50%;
     position: absolute;
-    top: 70px;
-    border: 1px solid #E9E9EB ;
+    top: 85px;
+    border: 1px solid #bbbbbf ;
     border-radius: 4px;
     background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .remarks_dropDown_list_item{    cursor: pointer;
@@ -15,8 +16,8 @@
 
 .arrow_down_icon{
     position: absolute;
-    right: 40px;
-    top: 48px;
+    right: 23px;
+    top: 65px;
     transform: translateY(-50%);
     cursor: pointer;
 }

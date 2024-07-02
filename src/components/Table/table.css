@@ -306,7 +306,7 @@
 
 .action_icon{
     background-color: #0168FF !important;
-    display: flex;
+    display: flex ;
     justify-content: center;
     align-items: center;
     height: 24px;
@@ -373,6 +373,13 @@
     background-color:  #E9E9EB;
   }
 
-  .custom-placeholder::placeholder {
+  .custom-placeholder {
+    width: 82px;
+    height: 22px;
+    border: none;
+    text-align: center;
+    font-size: 12px;
     color: #484A57;
+    font-weight: bold;
+    outline: none;
   }
