@@ -22,6 +22,7 @@ import { Icon, divIcon, point } from "leaflet";
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
+import { makeStyles } from "@mui/material";
 import {
     Box,
     Grid,
@@ -165,7 +166,7 @@ const MapLayers = () => {
               "rake_id": data.rake_id,
               "name": data.name,
               "hours": timeSinceUpdate,
-              "fnr_no": data.shipment ? data.shipment.fnr_no : 'N/A',
+              "fnr_no": data.shipment ? data.shipment.FNR : 'N/A',
             });
           }
 
@@ -314,6 +315,7 @@ const MapLayers = () => {
       if (rake && parseFloat(rake.hours.split('h')[0]) > 720) {
         if (selectedMarkerRef.current) {
           selectedMarkerRef.current.closePopup();
+          map?.flyTo(center, 5, { duration: 1 });
         }
         return;
       }
@@ -324,15 +326,17 @@ const MapLayers = () => {
             item.geo_point.coordinates[1],
             item.geo_point.coordinates[0]
           ]));
-          map.fitBounds(bounds, { padding: [50, 50] });
+          map.flyToBounds(bounds, { padding: [50, 50], duration: 1 });
           
           setShowAllRakes(true);
-          // Open the popup after a short delay to ensure the map has finished moving
           setTimeout(() => {
             if (selectedMarkerRef.current) {
               selectedMarkerRef.current.openPopup();
             }
-          }, 250);
+          }, 1250);
+        }
+        else {
+          map?.flyTo(center, 5, { duration: 1 });
         }
       }
     };
@@ -360,7 +364,11 @@ const MapLayers = () => {
           {isMobile ? <SideDrawer /> : null}
           <div style={{ width: '100%', overflow: 'hidden' }}>
             {isMobile ? <Header title="Captive Rakes Map View" ></Header> : <MobileHeader />}
-            <div style={{ paddingInline: 24, paddingTop: 24, paddingBottom: 65,  position:'relative' }}>
+            <div style={{
+              paddingTop: isMobile ? 12 : 24, 
+              paddingBottom: isMobile ? 32 : 65,  
+              position:'relative',
+            }}>
               <Box
                 sx={{
                     marginTop: mobile ? "150px" : "",
@@ -375,7 +383,6 @@ const MapLayers = () => {
                     alignContent: 'space-around',
                 }}
               >
-
                 <FormGroup className='mapButtons'>
                   <FormControlLabel
                     control={<Switch checked={showTracks} onChange={() => setShowTracks(!showTracks)} />}
@@ -454,6 +461,7 @@ const MapLayers = () => {
                                 Idle
                               </div>
                             </Tooltip>
+
                           </div>
                           <div className="tracking-status">
                             <div className="tracking-number">
@@ -467,30 +475,20 @@ const MapLayers = () => {
                           </div>
                         </div>
                       </div>
-                       <div style={{
-                        display: 'block',
-                        width: '394px',
-                        height: '100%',
-                        marginTop: '24px',
-                        marginLeft: '16px',
-                        borderRadius: '12px',
-                        backgroundColor: '#ffffff',
-                       }}>
+                       <div className="tracking-container">
                         <div className="tracking-heading">
                           Captive Rakes
                         </div>
                         <TableContainer
                           component={Paper}
-                          sx={{
-                          height: "450px",
-                          borderRadius: '0px 0px 12px 12px'
-                        }}
+                          className="table-mapview-container"
                       >
                         <Table sx={{ minWidth: '100%', borderRadius: '0px 0px 12px 12px' }} aria-label="simple table" stickyHeader>
                           <TableHead>
                             <TableRow>
-                              <TableCell align="left" className="table-heads" style={{paddingLeft: '14px'}}>Rake ID</TableCell>
-                              <TableCell align="center" className="table-heads" style={{paddingRight: '32px', lineHeight: '16px'}}>Last Updated <br/> <span style={{fontSize: '10px', color:'#7C7E8C', fontWeight: '500' }}>(hr & min)</span></TableCell>
+                              <TableCell align="left" className="table-heads">S.No</TableCell>
+                              <TableCell align="left" className="table-heads">Rake ID</TableCell>
+                              <TableCell align="center" className="table-heads" style={{lineHeight: '16px'}}>Last Updated <br/> <span style={{fontSize: '10px', color:'#7C7E8C', fontWeight: '500', textAlign: 'center' }}>(hr & min)</span></TableCell>
                               <TableCell align="left" className="table-heads">FNR No.</TableCell>
                             </TableRow>
                           </TableHead>
@@ -505,8 +503,9 @@ const MapLayers = () => {
                               handleRakeSelection(rake);
                             }}
                             >
+                              <TableCell align="left" className="captive-rake-rows" style={{fontWeight: selectedRake && selectedRake.rake_id === rake.rake_id ? "bold" : 'inherit'}}>{index + 1}.</TableCell>
                               <TableCell align="left" className="captive-rake-rows" style={{fontWeight: selectedRake && selectedRake.rake_id === rake.rake_id ? "bold" : 'inherit'}}>{rake.rake_id}</TableCell>
-                              <TableCell align="center" className="captive-rake-rows" style={{paddingRight: '36px'}}>
+                              <TableCell align="center" className="captive-rake-rows" style={{fontWeight: selectedRake && selectedRake.rake_id === rake.rake_id ? "bold" : 'inherit'}}>
                               {rake.hours && parseFloat(rake.hours.split('h')[0]) <= 720 ? rake.hours : 'N/A'}
                               </TableCell>
                               <TableCell align="left" className="captive-rake-rows" style={{fontWeight: selectedRake && selectedRake.rake_id === rake.rake_id ? "bold" : 'inherit'}}>{rake.fnr_no}</TableCell>
