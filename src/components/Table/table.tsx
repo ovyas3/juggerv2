@@ -51,6 +51,7 @@ import Backdrop from '@mui/material/Backdrop';
 import Fade from '@mui/material/Fade';
 import { sortArray } from '@/utils/hooks';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
 
 async function rake_update_id(payload: Object) {
     return await httpsPost(UPDATE_RAKE_CAPTIVE_ID, payload);
@@ -192,9 +193,10 @@ function Tags({ rakeCaptiveList, shipmentId, setOpen, setShowActionBox }: any) {
     );
 }
 
-function Remarks({ shipmentId, setOpen }: any) {
+function Remarks({ shipmentId, setOpen,remarksList }: any) {
+    const [others, setOthers] = useState('')
     const t = useTranslations('ORDERS');
-    const [remarks, setRemarks] = useState('');
+    const [remarks, setRemarks] = useState('Enter Your Remarks');
     const inputRef = useRef<HTMLInputElement>(null);
     const [openRemarks, setOpenRemarks] = useState(false);
     const [inputEnabled, setInputEnabled] = useState(true);
@@ -204,8 +206,10 @@ function Remarks({ shipmentId, setOpen }: any) {
         'Needs improvement',
         'Well done',
         'Please revise',
-        'Excellent work'
+        'Excellent work',
+        'others',
     ];
+    console.log(remarksList)
 
     const handleMouseEnter = useCallback(() => setIsHovered(true), []);
     const handleMouseLeave = useCallback(() => setIsHovered(false), []);
@@ -226,6 +230,10 @@ function Remarks({ shipmentId, setOpen }: any) {
         setOpenRemarks(false)
     };
 
+    function handleothers(e:string){
+       setOthers(e)
+    }
+
 
     async function handleSubmit(e: any) {
         setOpen(false)
@@ -239,7 +247,7 @@ function Remarks({ shipmentId, setOpen }: any) {
             remarks: [
                 {
                     date: service.getEpoch(new Date()),
-                    remark: remarks
+                    remark: remarks === 'others' ? others : remarks,
                 }
             ]
         }
@@ -248,8 +256,9 @@ function Remarks({ shipmentId, setOpen }: any) {
         console.log(response)
         setRemarks('');
     }
+
     return (
-        <div onClick={(e) => { e.stopPropagation() }}>
+        <div onClick={(e) => { e.stopPropagation(); setOpenRemarks(false) }}>
 
             <div style={{
                 width: '100%',
@@ -261,29 +270,34 @@ function Remarks({ shipmentId, setOpen }: any) {
             }}>Remarks</div>
 
             <div style={{ padding: '12px' }}>
-                <input
-                    ref={inputRef}
-                    type='text'
-                    value={remarks}
-                    onChange={(e) => setRemarks(e.target.value)}
-                    placeholder="Enter your remark"
-                    style={{ width: '100%', height: '32px', paddingInline: '8px', border: '1px solid #E9E9EB', outline: 'none' }}
-                    disabled={inputEnabled}
-                    onClick={() => { setOpenRemarks(true) }}
-                />
+                <div
+                    className='remarks_update'
+                    onClick={(e) => { e.stopPropagation(); setOpenRemarks(!openRemarks); }}
+                >{remarks}{
+                        remarks === 'others' ?
+                            <input
+                                onClick={(e) => { e.stopPropagation(); }}
+                                onChange={(e) => { handleothers(e.target.value) }}
+                                style={{
+                                    outline: 'none',
+                                    marginInline: '5px',
+                                    backgroundColor: '#E9E9EB',
+                                    borderBottom: '2px solid black',
+                                }}
+                            /> : <></>
+                    }</div>
                 <ArrowDropDownIcon
                     onClick={() => { setOpenRemarks(!openRemarks) }}
                     className='arrow_down_icon'
                 />
                 <div className='remarks_dropDown_list' style={{ display: openRemarks ? 'block' : 'none' }}>
-                    {predefinedRemarks.map((remark, index) => (
+                    {predefinedRemarks.map((remark:string, index:number) => (
                         <div
                             key={index}
                             onClick={() => handlePreDefineRemarks(remark)}
                             className='remarks_dropDown_list_item'
                         >{remark}</div>
                     ))}
-                    <div className='remarks_dropDown_list_item' onClick={handleCustom}>Others</div>
                 </div>
                 <div style={{ textAlign: 'end', paddingTop: '8px' }}>
                     <Button variant="contained" size='small' color="secondary" style={{ textTransform: 'none', backgroundColor: '#3351FF' }} onClick={(e) => { handleSubmit(e) }}>{t('submit')}</Button>
@@ -388,7 +402,7 @@ const convertArrayToFilteredArray = (inputArray: any) => {
 
 
 // Main component
-export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, count, onFnrChange, reload }: any) {
+export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, count, onFnrChange, reload,remarksList }: any) {
 
     //language controller
     const t = useTranslations("ORDERS")
@@ -529,7 +543,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
             { id: 'fnr', label: '', class: 'fnr', innerClass: 'inner_fnr' },
             { id: 'destination', label: 'Destination', class: 'destination', innerClass: '' },
             { id: 'material', label: 'Material', class: 'material', innerClass: '' },
-            { id: 'pickupdate', label: 'Pickup Date', class: 'pickupdate', innerClass: 'inner_pickup' },
+            { id: 'pickupdate', label: 'Invoice Date', class: 'pickupdate', innerClass: 'inner_pickup' },
             { id: 'status', label: 'Status', class: 'status', innerClass: 'inner_status' },
             { id: 'currentEta', label: 'Current ETA', class: 'currentEta', innerClass: 'inner_eta' },
             { id: 'remarks', label: 'Remarks', class: 'remarks', innerClass: '' },
@@ -808,11 +822,11 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                     alt=''
                                                                 />
 
-                                                                <img
+                                                                {/* <img
                                                                     src={row.fois.is_fois && FOIS.src}
                                                                     style={{ display: 'block' }}
                                                                     alt=''
-                                                                />
+                                                                /> */}
 
                                                                 <img
                                                                     src={row.rrDoc && rrDocumentIcon.src}
@@ -873,6 +887,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                     {actionOptions === 'remarks' && <Remarks
                         shipmentId={rowId}
                         setOpen={setOpen}
+                        remarksList={remarksList}
                     />}
                 </Box>
             </Modal>

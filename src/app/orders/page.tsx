@@ -170,7 +170,7 @@ const OrdersPage = () => {
               {
                 selected_bound === 'outbound' ?
                   <div className='filters' >
-                    <Filters onToFromChange={handleToFromChange} onChangeStatus={handleChangeStatus} reload={reload} />
+                    <Filters onToFromChange={handleToFromChange} onChangeStatus={handleChangeStatus} reload={reload} remarksList={remarksList} />
                   </div>
                   : <></>
               }
@@ -183,6 +183,11 @@ const OrdersPage = () => {
                   <TableData onSkipLimit={handleSkipLimitChange} allShipments={allShipment} count={count} rakeCaptiveList={rakeCaptiveList} onFnrChange={handleChangeByFnr} reload={reload} />
                 </div>
                 : <></>
+            }
+            {
+              selected_bound === 'inbound' ?
+              <div>COMING SOON !!!!</div>
+              :<></>
             }
 
 
