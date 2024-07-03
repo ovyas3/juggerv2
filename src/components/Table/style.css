@@ -93,3 +93,10 @@
   .close-icon.hovered {
     transform: rotate(90deg);
   }
+
+  .remarks_update{
+    background-color: #E9E9EB;
+    font-size: 14px;
+    padding: 2px 4px ;
+    cursor: pointer;
+  }

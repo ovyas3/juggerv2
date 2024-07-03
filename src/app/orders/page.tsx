@@ -194,6 +194,11 @@ const OrdersPage = () => {
                 </div>
                 : <></>
             }
+            {
+              selected_bound === 'inbound' ?
+              <div>COMING SOON !!!!</div>
+              :<></>
+            }
 
 
           </div>
