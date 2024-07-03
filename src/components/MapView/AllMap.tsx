@@ -80,6 +80,7 @@ const MapLayers = () => {
     const [showTracks, setShowTracks] = useState<boolean>(false);
     const [coords, setCoords] = useState<any>({});
     const [allRakes, setAllRakes] = useState<any>([]);
+    const [allRakesBackUp, setAllRakesBackUp] = useState<any>([]);
     const [showRoute, setShowRoute] = useState(false);
     const [route, setRoute] = useState([]);
     const [currentLocation, setCurrentLocation] = useState<any>([]);
@@ -93,6 +94,7 @@ const MapLayers = () => {
     const [loading, setLoading] = useState(true);
     const [selectedRake, setSelectedRake] = useState<any>(null);
     const selectedMarkerRef = useRef<L.Marker | null>(null);
+    const [selectedType,setSelectedType] = useState('total')
 
     const geoJSONStyle: L.PathOptions = {
       color: 'black', // Set the color of train tracks
@@ -173,6 +175,7 @@ const MapLayers = () => {
         });
         const allRakesFiltered = allRakes.filter((rake: any) => rake.rake_id !== undefined);
         setAllRakes(allRakesFiltered);
+        setAllRakesBackUp(allRakesFiltered)
         setCoords(coords);
       } catch (error) {
         setLoading(false);
@@ -180,6 +183,44 @@ const MapLayers = () => {
         setLoading(false);
       }
   }
+
+    function handleFilter(type: string) {
+      if (type === 'total') {
+        setAllRakes(allRakesBackUp);
+        setSelectedType('total');
+      } else if (type === 'tracking') {
+        const filteredData = allRakesBackUp.filter((rake: { name: any }) => {
+          const lastTimeStamp = allRakesPositions.find(
+            (val: { data: { title: any } }) => val.data.title === rake.name
+          );
+          if (lastTimeStamp) {
+            return true;
+          }
+          return false;
+        });
+        setAllRakes(filteredData);
+        setSelectedType('tracking');
+      } else if (type === 'idle') {
+        const rakeIds = allIdleRakes.map(
+          (item: { rake_id: any }) => item.rake_id
+        );
+        const filteredData = allRakesBackUp.filter(
+          (item: { rake_id: unknown }) => {
+            return rakeIds.includes(item.rake_id);
+          }
+        );
+        setAllRakes(filteredData);
+        setSelectedType('idle');
+      } else if (type === 'non-tracking') {
+        const filteredData = allRakesBackUp.filter(
+          (rake: { hours: string }) => {
+            return rake.hours && parseFloat(rake.hours.split("h")[0]) > 720;
+          }
+        );
+        setAllRakes(filteredData);
+        setSelectedType('non-tracking');
+      }
+    }
 
     const handleApiByWagonNo = (name: string) => {
       if (!showRoute) {
@@ -225,6 +266,7 @@ const MapLayers = () => {
        if(lastCords.geo_point && lastCords.geo_point.coordinates && lastCords.geo_point.coordinates[0] && lastCords.geo_point.coordinates[1] && lastCords.time_stamp && lastCords.time_stamp.$date) {
         if (service.differenceToday(lastCords.time_stamp.$date, 0, 'hours') < -3) {
           allIdleRakes.push({
+            rake_id: coords[key][0].rake_id,
             data: {
               title: key,
               // ts: DateTime.fromJSDate(new Date(lastCords.time_stamp.$date)).toFormat('dd/MM/yyyy HH:mm')
@@ -430,8 +472,9 @@ const MapLayers = () => {
                           display: 'flex',
                           flexDirection: 'row',
                           justifyContent: 'space-between',
+                          marginTop:'12px'
                         }}>
-                          <div className="tracking-status">
+                          <div className="tracking-status" onClick={()=>handleFilter('total')} style={selectedType==='total'? {background:"rgba(51, 79, 252, 0.1)"}:{}}>
                             <div className="tracking-number">
                               {list.length}
                             </div>
@@ -441,7 +484,7 @@ const MapLayers = () => {
                               </div>
                             </Tooltip>
                           </div>
-                          <div className="tracking-status">
+                          <div className="tracking-status" onClick={()=>handleFilter('tracking')} style={selectedType==='tracking'? {background:"rgba(24, 190, 138, 0.1)"}:{}}>
                             <div className="tracking-number">
                               {allRakesPositions.length}
                             </div>
@@ -451,7 +494,8 @@ const MapLayers = () => {
                             </div>
                             </Tooltip>
                           </div>
-                          <div className="tracking-status">
+                          <div className="tracking-status" onClick={()=>handleFilter('idle')} style={selectedType==='idle'? {background:"rgba(255, 152, 26, 0.1)"}:{}}>
+                     
                             <div className="tracking-number">
                               {allIdleRakes.length}
                             </div>
@@ -462,7 +506,7 @@ const MapLayers = () => {
                             </Tooltip>
 
                           </div>
-                          <div className="tracking-status">
+                          <div className="tracking-status" onClick={()=>handleFilter('non-tracking')} style={selectedType==='non-tracking'? {background:"rgba(230, 102, 123, 0.1)"}:{}}>
                             <div className="tracking-number">
                               {list.length - allRakesPositions.length - allIdleRakes.length}
                             </div>
@@ -583,7 +627,7 @@ const MapLayers = () => {
                   <>
                   <MarkerClusterGroup chunkedLoading iconCreateFunction={createClusterCustomIconInTransit}>
                   {/* Mapping through the markers */}
-                    {showAllRakes && allRakesPositions.map((rake:any, index: number) => <Marker key={index} position={rake.coords} icon={customIcon} ref={(el) => {
+                    {showAllRakes && ['total','tracking'].includes(selectedType) && allRakesPositions.map((rake:any, index: number) => <Marker key={index} position={rake.coords} icon={customIcon} ref={(el) => {
                       if (selectedRake && selectedRake.name === rake.data.title) {
                         selectedMarkerRef.current = el;
                       }
@@ -597,7 +641,7 @@ const MapLayers = () => {
                   </MarkerClusterGroup>
                   <MarkerClusterGroup chunkedLoading iconCreateFunction={createClusterCustomIconIdle}>
                   {/* Mapping through the markers */}
-                    {showAllRakes && allIdleRakes.map((rake:any, index: number) => <Marker key={index} position={rake.coords} icon={customIconIdle} ref={(el) => {
+                    {showAllRakes && ['total','idle'].includes(selectedType) && allIdleRakes.map((rake:any, index: number) => <Marker key={index} position={rake.coords} icon={customIconIdle} ref={(el) => {
                       if (selectedRake && selectedRake.name === rake.data.title) {
                         selectedMarkerRef.current = el;
                       }
