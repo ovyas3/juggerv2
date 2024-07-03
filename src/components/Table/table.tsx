@@ -362,7 +362,7 @@ const convertArrayToFilteredArray = (inputArray: any) => {
             },
             status: {
                 name: statusBuilder(status),
-                code: (status === "Delivered" || status === "OB") ? null : (status || '')
+                code: (status === "Delivered" || status === "OB") ? null : ((trip_tracker && trip_tracker.fois_last_location) || '')
             },
             currentEta: {
                 date: service.utcToist(eta) || 'NA',
@@ -529,7 +529,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
             { id: 'fnr', label: '', class: 'fnr', innerClass: 'inner_fnr' },
             { id: 'destination', label: 'Destination', class: 'destination', innerClass: '' },
             { id: 'material', label: 'Material', class: 'material', innerClass: '' },
-            { id: 'pickupdate', label: 'Pickup Date', class: 'pickupdate', innerClass: 'inner_pickup' },
+            { id: 'pickupdate', label: 'Invoiced Date', class: 'pickupdate', innerClass: 'inner_pickup' },
             { id: 'status', label: 'Status', class: 'status', innerClass: 'inner_status' },
             { id: 'currentEta', label: 'Current ETA', class: 'currentEta', innerClass: 'inner_eta' },
             { id: 'remarks', label: 'Remarks', class: 'remarks', innerClass: '' },
@@ -808,11 +808,11 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                     alt=''
                                                                 />
 
-                                                                <img
+                                                                {/* <img
                                                                     src={row.fois.is_fois && FOIS.src}
                                                                     style={{ display: 'block' }}
                                                                     alt=''
-                                                                />
+                                                                /> */}
 
                                                                 <img
                                                                     src={row.rrDoc && rrDocumentIcon.src}
@@ -853,6 +853,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
+                    zIndex: 100000
                 }}
             >
                 <Box
