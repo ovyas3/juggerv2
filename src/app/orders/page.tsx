@@ -102,12 +102,21 @@ const OrdersPage = () => {
     console.log(list_captive_rake)
     setRakeCaptiveList(list_captive_rake.data)
   }
-
   async function getRemarksList (){
     const list_remarks = await httpsGet(REMARKS_LIST);
     console.log(list_remarks)
     setRemarksList(list_remarks.data)
   }
+
+  function clearFilter() { 
+    setShipmentsPayload((prevState: any) => {
+      const newState = {...prevState} 
+      delete newState["eDemand"]
+      delete newState["destination"]
+    
+      return newState
+  });
+}
 
   useEffect(() => {
     getCaptiveRake();
@@ -138,6 +147,7 @@ const OrdersPage = () => {
                   const { fnrNumber, ...updatedShipmentsPayload } = ShipmentsPayload;
                   setShipmentsPayload(updatedShipmentsPayload);
                   // console.log(updatedShipmentsPayload);
+                clearFilter()
                   // getAllShipment();
                   setReload(true)
                   setTimeout(() => { setReload(false) }, 3000)
@@ -170,10 +180,10 @@ const OrdersPage = () => {
               {
                 selected_bound === 'outbound' ?
                   <div className='filters' >
-                    <Filters onToFromChange={handleToFromChange} onChangeStatus={handleChangeStatus} reload={reload} remarksList={remarksList} />
+                    <Filters onToFromChange={handleToFromChange} onChangeStatus={handleChangeStatus} reload={reload} getShipments={getAllShipment} shipmentsPayloadSetter={setShipmentsPayload}/>
                   </div>
                   : <></>
-              }
+              }              
             </div>
 
             {/* ----table---- */}

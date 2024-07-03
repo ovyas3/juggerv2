@@ -43,6 +43,7 @@ export interface row {
     is_gps: Boolean,
     is_fois:Boolean
   },
+  rr_document: Array<any>
   pickup_date:string,
   eta:string,
   rrDoc: Boolean

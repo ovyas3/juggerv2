@@ -43,7 +43,8 @@
     "intransit":"In Transit",
     "delivered":"Delivered",
     "inplant":"In Plant",
-    "addremarks":"Remarks"
+    "addremarks":"Remarks",
+    "fetchtrackdetails":"Fetch Track Details"
   },
   "DRAWER":{
     "shipments":"shipments",

@@ -38,11 +38,13 @@ import { statusBuilder } from '../MapView/StatusBuilder/StatusBuilder';
 
 import FOIS from '@/assets/fois_icon.png'
 import GPIS from '@/assets/gps_icon.svg'
+import RRDOC from '@/assets/Doc-icon.svg'
 import attach_icon from '@/assets/attach_icon.svg'
 import rrDocumentIcon from '@/assets/rr_document_icon.svg'
 import ShareIcon from '@mui/icons-material/Share';
 import contactIcon from '@/assets/inactive_contact_dashboard+icon.svg'
 import BookmarkAddOutlinedIcon from '@mui/icons-material/BookmarkAddOutlined';
+import Image from 'next/image';
 import CloseIcon from '@mui/icons-material/Close';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import { Menu, MenuItem } from '@mui/material';
@@ -349,12 +351,11 @@ const convertArrayToFilteredArray = (inputArray: any) => {
             status: string,
             pickup_date: any,
             fois: any,
+            rr_document: any,
             captive_id: string,
             is_captive: Boolean,
             trip_tracker: any,
-            etaTime: any,
-            rr_document: any
-
+            etaTime: any
         }) => {
         const { edemand_no, FNR, all_FNRs, delivery_location, trip_tracker, others, remarks, unique_code, status, pickup_date, captive_id, is_captive, eta, rr_document } = item;
         return {
@@ -376,7 +377,7 @@ const convertArrayToFilteredArray = (inputArray: any) => {
             },
             status: {
                 name: statusBuilder(status),
-                code: (status === "Delivered" || status === "OB") ? null : (status || '')
+                code: (status === "Delivered" || status === "OB") ? null : ((trip_tracker && trip_tracker.fois_last_location) || '')
             },
             currentEta: {
                 date: service.utcToist(eta) || 'NA',
@@ -543,7 +544,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
             { id: 'fnr', label: '', class: 'fnr', innerClass: 'inner_fnr' },
             { id: 'destination', label: 'Destination', class: 'destination', innerClass: '' },
             { id: 'material', label: 'Material', class: 'material', innerClass: '' },
-            { id: 'pickupdate', label: 'Invoice Date', class: 'pickupdate', innerClass: 'inner_pickup' },
+            { id: 'pickupdate', label: 'Invoiced Date', class: 'pickupdate', innerClass: 'inner_pickup' },
             { id: 'status', label: 'Status', class: 'status', innerClass: 'inner_status' },
             { id: 'currentEta', label: 'Current ETA', class: 'currentEta', innerClass: 'inner_eta' },
             { id: 'remarks', label: 'Remarks', class: 'remarks', innerClass: '' },
@@ -553,7 +554,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
         ];
 
         if (edemand) {
-            commonColumns.unshift({ id: 'edemand', label: 'e-Demand', class: 'edamand', innerClass: '' });
+            commonColumns.unshift({ id: 'edemand', label: 'e-Demand', class: 'edemand', innerClass: '' });
         }
         setColumns(commonColumns);
     }, [edemand, showEdemand,])
@@ -715,7 +716,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                 iconheader: 'body_iconheader'
                                             }
                                             return (
-                                                <TableCell key={index} sx={{ fontSize: '12px', color: '#44475B', p: '16px 10px 16px 10px' }}
+                                                <TableCell key={index} sx={{ fontSize: '12px', color: '#44475B', p: '16px 10px 24px 10px' }}
                                                     className={columnClassNames[item.id]} >
                                                     <div>
                                                         {(typeof value) === 'object' ? '' : value}
@@ -867,6 +868,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
+                    zIndex: 100000
                 }}
             >
                 <Box

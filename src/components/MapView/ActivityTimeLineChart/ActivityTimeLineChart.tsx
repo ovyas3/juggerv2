@@ -90,48 +90,6 @@ export const ActivityTimeLineChart = (props: any) => {
             },
           }}
           >
-            {lastPing && <TimelineItem sx={{
-              fontWeight: 900
-            }} key={lastPing._id} style={{fontSize: '17px'}}>
-                    <TimelineOppositeContent sx={{
-              fontWeight: 900
-            }}  color="text.secondary" fontSize={"small"} marginTop={"20px"}>
-                      { props.fnr_data && props.fnr_data.pickup_date ? `${service.utcToist(props.fnr_data.pickup_date, 'dd-MM-yyyy')} ${service.utcToist(props.fnr_data.pickup_date, 'HH:mm')}` : 'N/A' }
-                    </TimelineOppositeContent>
-                    <TimelineSeparator >
-                      <TimelineConnector />
-                        <TimelineDot sx={{
-                          backgroundColor: "white"
-                        }}>
-                          <MyLocationOutlinedIcon fontSize="small" color="success" />
-                        </TimelineDot>
-                      <TimelineConnector />
-                    </TimelineSeparator>
-                    <TimelineContent sx={{
-              fontWeight: 900
-            }} fontSize={"small"}  marginTop={"20px"}>{ props.fnr_data?.pickup_location && props.fnr_data?.pickup_location?.name }</TimelineContent>
-            </TimelineItem>}
-            {
-              (pings && pings.length) ? pings.slice().reverse().map((ping: any) => {
-                return (
-                  <TimelineItem key={ping._id} style={{fontSize: '17px'}}>
-                    <TimelineOppositeContent color="text.secondary" fontSize={"small"} marginTop={"20px"}>
-                      { service.utcToistTime(ping.time_stamp, 'dd-MM-yyyy HH:mm') }
-                    </TimelineOppositeContent>
-                    <TimelineSeparator >
-                      <TimelineConnector />
-                        <TimelineDot sx={{
-                          backgroundColor: "white"
-                        }}>
-                          <ShareLocationOutlinedIcon fontSize="small" color="warning" />
-                        </TimelineDot>
-                      <TimelineConnector />
-                    </TimelineSeparator>
-                    <TimelineContent fontSize={"small"}  marginTop={"20px"}>{ ping.currentStatus.split(/ on /i)[0] }</TimelineContent>
-                  </TimelineItem>
-                )
-              }) : <></>
-            }
             {firstPing && <TimelineItem sx={{
               fontWeight: 900
             }} key={firstPing._id} style={{fontSize: '17px'}}>
@@ -152,6 +110,48 @@ export const ActivityTimeLineChart = (props: any) => {
                     <TimelineContent sx={{
               fontWeight: 900
             }} fontSize={"small"}  marginTop={"20px"}>{ firstPing.currentStatus?.split(/ on /i)[0] }</TimelineContent>
+            </TimelineItem>}
+            {
+              (pings && pings.length) ? pings.map((ping: any) => {
+                return (
+                  <TimelineItem key={ping._id} style={{fontSize: '17px'}}>
+                    <TimelineOppositeContent color="text.secondary" fontSize={"small"} marginTop={"20px"}>
+                      { service.utcToistTime(ping.time_stamp, 'dd-MM-yyyy HH:mm') }
+                    </TimelineOppositeContent>
+                    <TimelineSeparator >
+                      <TimelineConnector />
+                        <TimelineDot sx={{
+                          backgroundColor: "white"
+                        }}>
+                          <ShareLocationOutlinedIcon fontSize="small" color="warning" />
+                        </TimelineDot>
+                      <TimelineConnector />
+                    </TimelineSeparator>
+                    <TimelineContent fontSize={"small"}  marginTop={"20px"}>{ ping.currentStatus.split(/ on /i)[0] }</TimelineContent>
+                  </TimelineItem>
+                )
+              }) : <></>
+            }
+            {lastPing && <TimelineItem sx={{
+              fontWeight: 900
+            }} key={lastPing._id} style={{fontSize: '17px'}}>
+                    <TimelineOppositeContent sx={{
+              fontWeight: 900
+            }}  color="text.secondary" fontSize={"small"} marginTop={"20px"}>
+                      { props.fnr_data && props.fnr_data.pickup_date ? `${service.utcToist(props.fnr_data.pickup_date, 'dd-MM-yyyy')} ${service.utcToist(props.fnr_data.pickup_date, 'HH:mm')}` : 'N/A' }
+                    </TimelineOppositeContent>
+                    <TimelineSeparator >
+                      <TimelineConnector />
+                        <TimelineDot sx={{
+                          backgroundColor: "white"
+                        }}>
+                          <MyLocationOutlinedIcon fontSize="small" color="success" />
+                        </TimelineDot>
+                      <TimelineConnector />
+                    </TimelineSeparator>
+                    <TimelineContent sx={{
+              fontWeight: 900
+            }} fontSize={"small"}  marginTop={"20px"}>{ props.fnr_data?.pickup_location && props.fnr_data?.pickup_location?.name }</TimelineContent>
             </TimelineItem>}
           </Timeline></>
         </Grid>
