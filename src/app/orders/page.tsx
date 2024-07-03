@@ -11,7 +11,7 @@ import MobileDrawer from "@/components/Drawer/mobile_drawer";
 import MobileHeader from "@/components/Header/mobileHeader";
 import { useWindowSize } from "@/utils/hooks";
 import { httpsGet, httpsPost } from "@/utils/Communication";
-import { GET_SHIPMENTS, CAPTIVE_RAKE } from "@/utils/helper";
+import { GET_SHIPMENTS, CAPTIVE_RAKE, REMARKS_LIST } from "@/utils/helper";
 import { useSnackbar } from '@/hooks/snackBar';
 import service from '@/utils/timeService';
 
@@ -37,9 +37,10 @@ const OrdersPage = () => {
   const [rakeCaptiveList, setRakeCaptiveList] = useState([]);
 
   const [reload, setReload] = useState(false)
-  // const [statusForShipment, setStatusForShipment] = useState('All')
   const [reloadOnHeaderChange, setReloadOnHeaderChange] = useState(false);
   const { showMessage } = useSnackbar();
+  const [selected_bound, setSelected_bound] = useState('outbound')
+  const [remarksList, setRemarksList] = useState([])
 
 
   //shipment payload
@@ -47,7 +48,7 @@ const OrdersPage = () => {
     is_outbound: true,
     to: '',
     from: '',
-    status:['ITNS','Delivered']
+    status: ['ITNS', 'Delivered']
   })
 
   //adding to and from to shipmentpayload
@@ -78,7 +79,7 @@ const OrdersPage = () => {
   const handleChangeStatus = (status: string[]) => {
     setShipmentsPayload((prevState: any) => {
       if (status.length === 0) {
-        const { status , ...newState } = prevState;
+        const { status, ...newState } = prevState;
         return newState;
       } else {
         const modifiedStatus = status.map(getStatusCode);
@@ -100,18 +101,33 @@ const OrdersPage = () => {
     const list_captive_rake = await httpsGet(CAPTIVE_RAKE);
     console.log(list_captive_rake)
     setRakeCaptiveList(list_captive_rake.data)
-
   }
+  async function getRemarksList (){
+    const list_remarks = await httpsGet(REMARKS_LIST);
+    console.log(list_remarks)
+    setRemarksList(list_remarks.data)
+  }
+
+  function clearFilter() { 
+    setShipmentsPayload((prevState: any) => {
+      const newState = {...prevState} 
+      delete newState["eDemand"]
+      delete newState["destination"]
+    
+      return newState
+  });
+}
 
   useEffect(() => {
     getCaptiveRake();
+    getRemarksList();
   }, [])
 
   useEffect(() => {
     if (ShipmentsPayload.from && ShipmentsPayload.to) getAllShipment();
   }, [ShipmentsPayload])
 
-  // if (reloadOnHeaderChange) getAllShipment();
+  console.log(remarksList)
 
   return (
     <div  >
@@ -121,45 +137,69 @@ const OrdersPage = () => {
             mobile ? <Header title={'Shipments'} setReloadOnHeaderChange={setReloadOnHeaderChange} isMapHelper={false}/> : <MobileHeader />
           }
 
-          <div className='tableContainer' style={{ paddingInline: 24, paddingTop: 10, paddingBottom: mobile ? 24 : 65, position: 'relative', marginTop: mobile ? '56px' : '0px', marginLeft: mobile ? '70px' : '0px' }}>
+          <div className='tableContainer' style={{ paddingInline: 24, paddingTop: 10, paddingBottom: mobile ? 24 : 65, position: 'relative', marginTop: mobile ? '56px' : '0px', marginLeft: mobile ? '70px' : '0px', height: 'calc(100vh - 56px)' }}>
 
-            {/* ----search fnr---- */}
-            <div className='input_fnr_reload'>
-              <div className={`reload ${reload ? 'loading' : ''}`} onClick={() => {
-                showMessage('Refresh Successfully', 'success')
-                const { fnrNumber, ...updatedShipmentsPayload } = ShipmentsPayload;
-                setShipmentsPayload(updatedShipmentsPayload);
-                // console.log(updatedShipmentsPayload);
-                // getAllShipment();
-                setReload(true)
-                setTimeout(() => { setReload(false) }, 3000)
-              }}>
-                <ReplayIcon style={{ color: '#707070' }} />
+            <div style={{ height: '10%' }}>
+              {/* ----search fnr---- */}
+              <div className='input_fnr_reload'>
+                <div className={`reload ${reload ? 'loading' : ''}`} onClick={() => {
+                  showMessage('Refresh Successfully', 'success')
+                  const { fnrNumber, ...updatedShipmentsPayload } = ShipmentsPayload;
+                  setShipmentsPayload(updatedShipmentsPayload);
+                  // console.log(updatedShipmentsPayload);
+                clearFilter()
+                  // getAllShipment();
+                  setReload(true)
+                  setTimeout(() => { setReload(false) }, 3000)
+                }}>
+                  <ReplayIcon style={{ color: '#707070' }} />
+                </div>
               </div>
-            </div>
 
-            {/* ----otbound ---- */}
-            {mobile ?
-              <div className='outbound_inbound'>
-                <div className="outbound_inner">{t('outbound')}</div>
-              </div>
-              :
-              <div className='mobile_outbound_inbound'>
-                <div className='mobile_outbound'>{t('outbound')}</div>
-              </div>
-            }
+              {/* ----otbound ---- */}
+              {mobile ?
+                <div className='outbound_inbound'>
+                  {['outbound', 'inbound'].map(bound => (
+                    <div
+                      key={bound}
+                      onClick={() => setSelected_bound(bound)}
+                      className={`outbound_inner ${selected_bound === bound ? 'selected_bound' : ''}`}
+                    >
+                      {t(bound)}
+                    </div>
+                  ))}
+                </div>
+                :
+                <div className='mobile_outbound_inbound'>
+                  <div className='mobile_outbound'>{t('outbound')}</div>
+                </div>
+              }
 
 
-            {/* ----filter---- */}
-            <div className='filters' >
-              <Filters onToFromChange={handleToFromChange} onChangeStatus={handleChangeStatus} reload={reload} />
-
+              {/* ----filter---- */}
+              {
+                selected_bound === 'outbound' ?
+                  <div className='filters' >
+                    <Filters onToFromChange={handleToFromChange} onChangeStatus={handleChangeStatus} reload={reload} getShipments={getAllShipment} shipmentsPayloadSetter={setShipmentsPayload}/>
+                  </div>
+                  : <></>
+              }              
             </div>
 
             {/* ----table---- */}
-            <div className='tableData'>
-              <TableData onSkipLimit={handleSkipLimitChange} allShipments={allShipment} count={count} rakeCaptiveList={rakeCaptiveList} onFnrChange={handleChangeByFnr} reload={reload} />
-            </div>
+            {
+              selected_bound === 'outbound' ?
+                <div className='tableData' style={{ height: '90%' }}>
+                  <TableData onSkipLimit={handleSkipLimitChange} allShipments={allShipment} count={count} rakeCaptiveList={rakeCaptiveList} onFnrChange={handleChangeByFnr} reload={reload} />
+                </div>
+                : <></>
+            }
+            {
+              selected_bound === 'inbound' ?
+              <div>COMING SOON !!!!</div>
+              :<></>
+            }
+
 
           </div>
         </div>

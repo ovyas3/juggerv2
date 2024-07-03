@@ -103,8 +103,8 @@ const ShipmentCard = ({ index, shipment }: {index: number, shipment: any}) => {
     padding: '5px',
     borderRadius: '10px',
     marginTop: index == 0 ? '40px' :'15px',
-  }} variant="outlined" >
-    <CardContent>
+  }} className="cardHover" variant="outlined" >
+    <CardContent >
       <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
         <Grid container sx={{
           padding: '5px',
@@ -199,21 +199,38 @@ const MapLayers = () => {
           status: shipment.status,
           gps: shipment.trip_tracker?.last_location?.fois ||  shipment.pickup_location?.geo_point
         }
-      });
+      }).filter((shipment: any) => shipment.gps && shipment.gps.coordinates.length > 0);
 
       return shipmentData;
+    }
+
+    const filterShipments = (status: string) => {
+      const filtered = allShipments.filter((shipment: any) => {
+        switch (status) {
+          case 'OB':
+            return shipment.status == '' || shipment.status == 'OB';
+          case 'ITNS':
+            return shipment.status != 'Delivered' && shipment.status != '' && shipment.status != 'OB';
+          case 'Delivered':
+            return shipment.status == 'Delivered';
+          default:
+            return true;
+        }
+      });
+      const ships = getTrackingShipment(filtered);
+      setShipments(ships);
     }
 
     const getShipments = async () => {
       const shipments = await httpsPost('/shipment_map_view', {});
       const inTransit = shipments.filter((shipment: any) => (shipment.status !== 'Delivered' && shipment.status !== ''));
       const idle = shipments.filter((shipment: any) => (shipment.status === ''));
-      const delivered = shipments.filter((shipment: any) => (shipment.status === 'Delivered')).length;
+      const delivered = shipments.filter((shipment: any) => (shipment.status === 'Delivered'));
       setInTransitCount(inTransit.length);
       setIdleCount(idle.length);
-      setDeliveryCount(delivered);
-      setAllShipments(shipments);
-      const ships = getTrackingShipment([...inTransit, ...idle]);
+      setDeliveryCount(delivered.length);
+      setAllShipments([...inTransit, ...idle, ...delivered]);
+      const ships = getTrackingShipment(shipments);
       setShipments(ships);
     }
 
@@ -221,7 +238,7 @@ const MapLayers = () => {
       if (map) {
         addIndiaBoundaries();
       }
-      // getShipments();
+      getShipments();
     }, [map]);
 
     return (
@@ -317,7 +334,7 @@ const MapLayers = () => {
                     borderRadius: '5px',
                     color: 'white',
                     backgroundColor: '#3790cc',
-                  }} elevation={3} color="info">
+                  }} onClick={() => filterShipments('OB')}  elevation={3} color="info">
                     <Typography variant="h6" color="info" component="div">
                       In Plant
                     </Typography>
@@ -330,7 +347,7 @@ const MapLayers = () => {
                     borderRadius: '5px',
                     color: 'white',
                     backgroundColor: '#FF981A',
-                  }} elevation={3} color="info">
+                  }} onClick={() => filterShipments('ITNS')} elevation={3} color="info">
                     <Typography variant="h6" component="div">
                       In Transit
                     </Typography>
@@ -343,7 +360,7 @@ const MapLayers = () => {
                     borderRadius: '5px',
                     color: 'white',
                     backgroundColor: '#18BE8A',
-                  }} elevation={3} color="info">
+                  }} onClick={() => filterShipments('Delivered')}  elevation={3} color="info">
                     <Typography variant="h6" component="div">
                       Delivered
                     </Typography>
