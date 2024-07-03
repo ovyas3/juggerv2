@@ -38,11 +38,13 @@ import { statusBuilder } from '../MapView/StatusBuilder/StatusBuilder';
 
 import FOIS from '@/assets/fois_icon.png'
 import GPIS from '@/assets/gps_icon.svg'
+import RRDOC from '@/assets/Doc-icon.svg'
 import attach_icon from '@/assets/attach_icon.svg'
 import rrDocumentIcon from '@/assets/rr_document_icon.svg'
 import ShareIcon from '@mui/icons-material/Share';
 import contactIcon from '@/assets/inactive_contact_dashboard+icon.svg'
 import BookmarkAddOutlinedIcon from '@mui/icons-material/BookmarkAddOutlined';
+import Image from 'next/image';
 import CloseIcon from '@mui/icons-material/Close';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import { Menu, MenuItem } from '@mui/material';
@@ -335,6 +337,7 @@ const convertArrayToFilteredArray = (inputArray: any) => {
             status: string,
             pickup_date: any,
             fois: any,
+            rr_document: any,
             captive_id: string,
             is_captive: Boolean,
             trip_tracker: any,
@@ -539,7 +542,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
         ];
 
         if (edemand) {
-            commonColumns.unshift({ id: 'edemand', label: 'e-Demand', class: 'edamand', innerClass: '' });
+            commonColumns.unshift({ id: 'edemand', label: 'e-Demand', class: 'edemand', innerClass: '' });
         }
         setColumns(commonColumns);
     }, [edemand, showEdemand,])
@@ -701,7 +704,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                 iconheader: 'body_iconheader'
                                             }
                                             return (
-                                                <TableCell key={index} sx={{ fontSize: '12px', color: '#44475B', p: '16px 10px 16px 10px' }}
+                                                <TableCell key={index} sx={{ fontSize: '12px', color: '#44475B', p: '16px 10px 24px 10px' }}
                                                     className={columnClassNames[item.id]} >
                                                     <div>
                                                         {(typeof value) === 'object' ? '' : value}
