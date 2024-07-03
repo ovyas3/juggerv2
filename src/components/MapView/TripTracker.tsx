@@ -28,16 +28,39 @@ import L from 'leaflet';
 import { distanceBetweenMultiplePointsInKm } from '@/utils/distance';
 
 const renderMarkers = (tracking_data: any[], customIcon: Icon): JSX.Element[] => {
-  return tracking_data.map((point, index) => (
-    <Marker key={index} position={[point.geo_point.coordinates[1], point.geo_point.coordinates[0]]} icon={customIcon}>
+  return tracking_data.map((point, index) => {
+    let Status = point.currentStatus.trim();
+    let status = "";
+    let station = "";
+    if(Status.startsWith("DEPARTED FROM")){
+      status = "DEPARTED";
+      station = Status.substring("DEPARTED FROM".length, Status.indexOf("(")).trim();
+    }
+    else if(Status.startsWith("ARRIVED AT")){
+      status = "ARRIVED";
+      station =  Status.substring("ARRIVED AT".length, Status.indexOf("(")).trim();
+    }
+    else if(Status.startsWith("REACHED AT")){
+      status = "REACHED";
+      station =  "DESTINATION";
+    }
+    else if(Status.startsWith("STABLED AT")){
+      status = "STABLED";
+      station =  Status.substring("STABLED AT".length, Status.indexOf("(")).trim();
+    }
+    return(
+      <Marker key={index} position={[point.geo_point.coordinates[1], point.geo_point.coordinates[0]]} icon={customIcon}>
       <Popup>
-          Status: {point.currentStatus.split(/ on /i)[0]}
+          Status: {status}
           <br />
           <hr />
+          Station: {station}
+          <br />
           Updated At: { service.utcToist(point.time_stamp, 'dd-MM-yyyy HH:mm') }
       </Popup>
     </Marker>
-  ));
+    )
+  });
 };
 
 const renderRouteStations = (stations: any[], trainIcon: Icon): JSX.Element[] => {
@@ -71,7 +94,7 @@ const TripTracker = (params: any) => {
   const [showGPSTracks, setShowGPSTracks] = useState(false);
   const [pickupDetail, setPickupDetail] = useState<any>({});
   const [dropDetail, setDropDetail] = useState<any>({});
-  const [traveledDistance, setTraveledDistance] = useState(0);
+  const [travelledDistance, setTravelledDistance] = useState(0);
   const [buttonEnabledFois, setButtonEnabledFois] = useState(false);
   const [buttonEnabledGPS, setButtonEnabledGPS] = useState(false);
   const [activityData, setActivityData] = useState([]);
@@ -161,7 +184,7 @@ const TripTracker = (params: any) => {
     const decodedCoordinates = polyline.decode(tripTrackerLine) || [];
     setTrack(decodedCoordinates);
 
-    const tripTrackerLine1 = rakeData ? rakeData.polyline || '' : '';
+    const tripTrackerLine1 = rakeData ? rakeData.polyline && rakeData.polyline.polyline || '' : '';
     const decodeline = polyline.decode(tripTrackerLine1) || [];
     setEstimatedTrack(decodeline);
     // remove tracks if currentStatus is empty or its misisng geo_point ir if geo_point.coordinates is empty or if its length is less than 2 or if geo_point.coordinates ==[0, 0]
@@ -201,8 +224,8 @@ const TripTracker = (params: any) => {
       setButtonEnabledFois(true);
     }
 
-    const traveledDistanceData = filteredTracks && filteredTracks.length > 0 ? distanceBetweenMultiplePointsInKm(filteredTracks.map((e: {geo_point: {coordinates: [number, number]}}) => e.geo_point.coordinates)) : 0;
-    setTraveledDistance(traveledDistanceData);
+    const travelledDistanceData = filteredTracks && filteredTracks.length > 0 ? distanceBetweenMultiplePointsInKm(filteredTracks.map((e: {geo_point: {coordinates: [number, number]}}) => e.geo_point.coordinates)) : 0;
+    setTravelledDistance(travelledDistanceData);
 
     const trip_tracker_gps = rakeData && rakeData.trip_tracker ? rakeData.trip_tracker.gps_updated_at : false;
     if (trip_tracker_gps) {
@@ -240,7 +263,7 @@ const TripTracker = (params: any) => {
   const mobile = !useMediaQuery("(min-width:800px)");
   return (
     <>
-      <TripTrackerNavbar />
+      <TripTrackerNavbar fnr_data={fnr_data}/>
       <Box
         sx={{
             marginTop: mobile ? "150px" : "75px",
@@ -290,6 +313,17 @@ const TripTracker = (params: any) => {
                   </Marker>
                 </>}
                 { showFoisTracks &&  renderMarkers(tracking_data, customIcon)}
+                { showFoisTracks && estimatedTrack.length > 0 && <Marker position={estimatedTrack[0]} icon={customIcon}>
+                  <Popup>
+                    {pickupDetail &&
+                      <>
+                        Station: {pickupDetail.name}
+                        <br />
+                        Updated At: {pickupDetail.dateTime}
+                      </>
+                    }
+                  </Popup>
+                </Marker>}
                 { showFoisTracks &&  trackingLine.length && <Polyline pathOptions={{ color:'red'}} positions={trackingLine} />}
                 { currentLocation && <Marker position={[currentLocation.geo_point.coordinates[1], currentLocation.geo_point.coordinates[0]]} icon={currentTrainLocation}>
                   <Popup>
@@ -387,14 +421,13 @@ const TripTracker = (params: any) => {
           </Box>
         }
         {loadMap &&
-
           <div className='map-indications'>
             <div className='map-indications__item'>
               <div className='map-indications__icon' style={{backgroundColor: '#000000', width: '25px', height: '5px'}}></div>
               <FormControlLabel
               // disabled={!buttonEnabledGPS}
               control={<Switch checked={showEstimtedTrack} onChange={handleTrackingLineCheck} />}
-              label="RR Route"
+              label="Rail Route"
               labelPlacement="start"
             />
             </div>
@@ -430,7 +463,7 @@ const TripTracker = (params: any) => {
 
         }
       
-        {mobile && <Box
+      {mobile && <Box
         sx={{
           zIndex: 10,
           height: '40px',
@@ -472,17 +505,16 @@ const TripTracker = (params: any) => {
             width: mobile ? "100%" : "28%",
             display: "flex",
             alignItems: "center",
-            background: "#F0F3F9",
-            backgroundColor: "#F8F8F8",
+            backdropFilter: "blur(10px)",
             p: 0,
             flexDirection: "column",
             zIndex: 10,
             position: mobile ? "absolute" : 'fixed',
-            marginTop: mobile ? '0px' : '20px',
+            marginTop: mobile ? '-10px' : '20px',
           }}
           className="tracking_details"
         >
-        <FNRDetailsCard className="fnr_details_mobile"  fnr_data={fnr_data} traveledDistance={traveledDistance} />
+        <FNRDetailsCard className="fnr_details_mobile"  fnr_data={fnr_data} travelledDistance={travelledDistance} />
         <ActivityTimeLineChart className="tracking_details_mobile" trackingDetails={activityData} fnr_data={fnr_data} />
         </Box>)}          
       </Box>

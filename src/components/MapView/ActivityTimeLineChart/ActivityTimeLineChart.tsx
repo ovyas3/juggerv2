@@ -123,7 +123,7 @@ export const ActivityTimeLineChart = (props: any) => {
                         <TimelineDot sx={{
                           backgroundColor: "white"
                         }}>
-                          <ShareLocationOutlinedIcon fontSize="small" color="info" />
+                          <ShareLocationOutlinedIcon fontSize="small" color="warning" />
                         </TimelineDot>
                       <TimelineConnector />
                     </TimelineSeparator>

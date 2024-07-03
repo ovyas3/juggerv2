@@ -15,6 +15,7 @@ import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
+import TablePagination from "@mui/material/TablePagination";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
@@ -22,11 +23,12 @@ import TextField from "@mui/material/TextField";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
+import Tooltip from "@mui/material/Tooltip";
+import { TooltipProps } from "@mui/material/Tooltip";
 import Select from "@mui/material/Select";
-import { Box } from "@mui/material";
+import { Box, Tab } from "@mui/material";
 import { httpsGet } from "@/utils/Communication";
 import { styled as muiStyled } from '@mui/material/styles';
-import { title } from "process";
 import service from "@/utils/timeService";
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
@@ -38,11 +40,49 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   },
 }));
 
+interface StyledTooltipProps extends TooltipProps {
+  className?: string;
+}
+
+const CustomTooltip = styled(({ className, ...props }: StyledTooltipProps) => (
+  <Tooltip 
+    {...props} 
+    classes={{ popper: className }} 
+    PopperProps={{
+      popperOptions: {
+        modifiers: [
+          {
+            name: 'offset',
+            options: {
+              offset: [14, -10], // Adjust the second value to change the vertical offset
+            },
+          },
+        ],
+      },
+    }}
+  />
+))({
+  '& .MuiTooltip-tooltip': {
+    backgroundColor: '#000',
+    color: '#fff',
+    width: '80px',
+    height: '32px',
+    boxShadow: '0px 0px 2px rgba(0,0,0,0.1)',
+    fontSize: '8px',
+    fontFamily: '"Inter", sans-serif',
+  },
+  '& .MuiTooltip-arrow': {
+    color: '#000',
+  },
+});
+
 interface PopupProps {
   data: any;
 }
 
 export const Popup: React.FC<PopupProps> = ({ data }) => {
+  const rowsPerPageOptions = [5, 10, 25, 50];
+
   const [childOpen, setChildOpen] = useState(false);
   const [parentTableData, setParentTableData] = useState<any>([]);
   const [filteredData, setFilteredData] = useState<any>([]);
@@ -54,7 +94,11 @@ export const Popup: React.FC<PopupProps> = ({ data }) => {
   const [childData, setChildData] = useState<any>({});
   const [childTableData, setChildTableData] = useState<any>([]);
   const [childFilteredData, setChildFilteredData] = useState<any>([]);
+  const [count, setCount] = useState<number>(0);
+  const [childFilteredDataCount, setChildFilteredDataCount] = useState<number>(0);
   // const [dialogDatas, setDialogDatas] = useState<any>([]);
+  const [page, setPage] = useState<number>(0);
+  const [rowsPerPage, setRowsPerPage] = useState<number>(rowsPerPageOptions[0]);
 
   const CustomTextField = muiStyled(TextField)(({ theme }) => ({
     '& .MuiInputLabel-root': {
@@ -87,7 +131,15 @@ export const Popup: React.FC<PopupProps> = ({ data }) => {
     }
   }));
 
-  
+  const handleChangePage = (event:any, newPage:number) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event:any) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
   // Get data for parent dialog component
   const getDataParentTabele = async () => {
     setSearchTerm('');
@@ -115,9 +167,8 @@ export const Popup: React.FC<PopupProps> = ({ data }) => {
 
     setParentTableData(filteredNewData);
     setFilteredData(filteredNewData);
-
-   
-
+    const count_data = filteredNewData.length;
+    setCount(count_data);
     // setDialogDatas(dialogData);
   }
 
@@ -146,7 +197,9 @@ export const Popup: React.FC<PopupProps> = ({ data }) => {
       ? filteredBySearchTerm
       : filteredBySearchTerm.filter((item: any) => item.scheme_type === newSchemeType);
 
+    const count_data = finalFilteredData.length;
     setFilteredData(finalFilteredData);
+    setCount(count_data);
   };
 
   const handleSearchChange = (event: any) => {
@@ -165,6 +218,7 @@ export const Popup: React.FC<PopupProps> = ({ data }) => {
   const handleChildClickOpen = async (item: any) => {
     setSearchChildTerm('');
     setWagonType('');
+    setChildFilteredDataCount(0);
     const newChildUpperData = {
       _id: item._id,
       rake_id: item.rake_id,
@@ -176,16 +230,20 @@ export const Popup: React.FC<PopupProps> = ({ data }) => {
       return {
         wagon_no: item.wg_no,
         wagon_type: item.wagon_type ? item.wagon_type.name : '',
-        remark: item.remark ? item.remark : 'N/A'
+        remark: item.remark ? item.remark : 'N/A',
+        tare_weight: item.wagon_type && item.wagon_type.tare_weight ? item.wagon_type.tare_weight : 'N/A',
+        cc_weight: item.wagon_type && item.wagon_type.capacity ? item.wagon_type.capacity : 'N/A',
       }
     });
     const filteredNewChildData = newChildLowerData.filter((item: any, index: number, array: any[]) => {
       return array.findIndex((el) => el.wagon_no === item.wagon_no) === index && item.wagon_no !== undefined;
     }
     );
+    const count_data = filteredNewChildData.length;
     setChildData(newChildUpperData);
     setChildTableData(filteredNewChildData);
     setChildFilteredData(filteredNewChildData);
+    setChildFilteredDataCount(count_data);
     setChildOpen(true);
   }
 
@@ -206,8 +264,11 @@ export const Popup: React.FC<PopupProps> = ({ data }) => {
     const finalFilteredData = (newWagonType === "ALL" || !newWagonType)
       ? filteredBySearchTerm
       : filteredBySearchTerm.filter((item: any) => item.wagon_type === newWagonType);
+    
+    const count_data = finalFilteredData.length;
 
     setChildFilteredData(finalFilteredData);
+    setChildFilteredDataCount(count_data);
   };
 
   const handleChildSearchChange = (event: any) => {
@@ -223,16 +284,29 @@ export const Popup: React.FC<PopupProps> = ({ data }) => {
   };
 
   const TableComponent = () => (
+    <Paper sx={{border: 'none !important', overflowX: 'auto !important', boxShadow: 'none !important'}}>
+      <TablePagination
+      component="div"
+      count={count}
+      page={page}
+      onPageChange={handleChangePage}
+      rowsPerPage={rowsPerPage}
+      onRowsPerPageChange={handleChangeRowsPerPage}
+      rowsPerPageOptions={rowsPerPageOptions}
+      labelRowsPerPage="Rakes per page:"
+    />
     <TableContainer
       component={Paper}
-    >
+      className="table-parent-container"
+      >
       <Table aria-label="simple table" stickyHeader>
         <TableHeadComponent />
-        <TableBody>
+      <TableBody>
           <TableRowComponent />
         </TableBody>
       </Table>
     </TableContainer>
+    </Paper>
   );
 
   const TableHeadComponent = () => {
@@ -248,7 +322,7 @@ export const Popup: React.FC<PopupProps> = ({ data }) => {
      return (
       <TableHead>
         <TableRow>
-          <TableCell align="left" className="table-columns">
+          <TableCell align="center" className="table-columns">
             S.No
           </TableCell>
           <TableCell align="left" className="table-columns">
@@ -330,26 +404,29 @@ export const Popup: React.FC<PopupProps> = ({ data }) => {
   }
 
   const TableRowComponent = () => (
-    filteredData.map((item: any, index: number) => (
-      <TableRow
-        key={item.rake_id}
-        sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-        className='table-rows-container'
-        onClick={() => handleChildClickOpen(item)}>
-        <TableCell align="left" className='table-rows' style={{paddingLeft: '24px'}}>{index + 1}.</TableCell>
-         <TableCell align="left" className='table-rows'>
-          <p className="rake-id">{item.rake_id}</p>
-          {item.isTracking ? <Image src={TrackingIcon} alt="tracking"/>: <Image src={NonTrackingIcon} alt="tracking"/>}
-        </TableCell>
-         <TableCell align="center" className='table-rows'>{item.scheme_type}</TableCell>
-         <TableCell align="center" className='table-rows'>{item.no_of_wagons}</TableCell>
-         <TableCell align="left" className='table-rows' style={{paddingLeft: '18px'}}>{item.date_of_commissioning}</TableCell>
-         <TableCell align="left" className='table-rows'>{item.roh_done}</TableCell>
-         <TableCell align="left" className='table-rows'>{item.roh_due}</TableCell>
-         <TableCell align="left" className='table-rows'>{item.poh_done}</TableCell>
-         <TableCell align="left" className='table-rows'>{item.poh_due}</TableCell>
-      </TableRow>
-      ))
+    filteredData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((item: any, index: number) => {
+      const serialNumber = page * rowsPerPage + index + 1;
+      return  (
+        <TableRow
+          key={item.rake_id}
+          sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+          className='table-rows-container'
+          onClick={() => handleChildClickOpen(item)}>
+          <TableCell align="left" className='table-rows'>{serialNumber}.</TableCell>
+           <TableCell align="left" className='table-rows'>
+            <p className="rake-id">{item.rake_id}</p>
+            {item.isTracking ? <Image src={TrackingIcon} alt="tracking"/>: <Image src={NonTrackingIcon} alt="tracking"/>}
+          </TableCell>
+           <TableCell align="left" className='table-rows'>{item.scheme_type}</TableCell>
+           <TableCell align="left" className='table-rows'>{item.no_of_wagons}</TableCell>
+           <TableCell align="left" className='table-rows'>{item.date_of_commissioning}</TableCell>
+           <TableCell align="left" className='table-rows'>{item.roh_done}</TableCell>
+           <TableCell align="left" className='table-rows'>{item.roh_due}</TableCell>
+           <TableCell align="left" className='table-rows'>{item.poh_done}</TableCell>
+           <TableCell align="left" className='table-rows'>{item.poh_due}</TableCell>
+        </TableRow>
+        );
+    })
   );
 
   const ChildDialogComponent = () => (
@@ -361,7 +438,7 @@ export const Popup: React.FC<PopupProps> = ({ data }) => {
       </DialogContent>
       <DialogContent>
         <p className="title">No. of Wagons</p>
-        <p className="number">{childData.no_of_wagons}</p>
+        <p className="number">{childFilteredDataCount}</p>
       </DialogContent>
       <DialogContent>
         <p className="title">Scheme Type</p>
@@ -386,7 +463,7 @@ export const Popup: React.FC<PopupProps> = ({ data }) => {
           <TableCell align="left" className="table-columns">
             S.No
           </TableCell>
-          <TableCell align="center" className="table-columns">
+          <TableCell align="left" className="table-columns">
             <CustomTextField
               inputRef={inputRef}
               id="outlined-basic"
@@ -465,7 +542,18 @@ export const Popup: React.FC<PopupProps> = ({ data }) => {
           <p>{item.wagon_no}</p>
           <Image src={LinkIcon} alt="link"/>
         </TableCell>
-        <TableCell align="left" className='table-rows'>{item.wagon_type}</TableCell>
+        <TableCell align="left" className='table-rows' style={{cursor: 'pointer'}}>
+        <CustomTooltip arrow title={<div style={{display: 'flex', 
+                                          flexDirection: 'column', 
+                                          justifyContent: 'center',
+                                          gap: '2px'
+                                          }}>
+                                            <p style={{marginTop: '2px'}}>TARE WT: {item.tare_weight}</p>
+                                            <p>CC WT: {item.cc_weight}</p>
+                              </div>}>
+            {item.wagon_type}
+        </CustomTooltip>
+        </TableCell>
         <TableCell align="left" className='table-rows'>{item.remark}</TableCell>
       </TableRow>
     ))
@@ -473,8 +561,10 @@ export const Popup: React.FC<PopupProps> = ({ data }) => {
 
 
   const ChildTableComponent = () => (
+    <>
     <TableContainer
       component={Paper}
+      className="table-child-container"
     >
       <Table aria-label="simple table" stickyHeader>
         <ChildTableHeadComponent />
@@ -483,6 +573,7 @@ export const Popup: React.FC<PopupProps> = ({ data }) => {
         </TableBody>
       </Table>
     </TableContainer>
+    </>
   );
 
   const childPopUp = () => (

@@ -7,7 +7,7 @@
   display: inline-block;
   border-radius: 12px !important;
   overflow-y: unset;
-  margin-top: 48px;
+  margin-top: 6px;
   width: 100%;
   padding-right: 24px;
   font-family: 'Plus Jakarta Sans', sans-serif;
@@ -19,13 +19,21 @@
 
   .MuiPaper-root{
     box-shadow: none;
-    height: 500px;
-    border: 1px solid #DFE3EB;
-    border-radius: 6px;
+    background-color: #fff;
+    overflow: auto;
+    border-radius: 12px;
+    border: 1px solid #E9E9EB;
+    scrollbar-width: none; 
+    -ms-overflow-style: none; 
+  }
+  
+  .MuiPaper-root::-webkit-scrollbar {
+    width: 0px;
   }
 
-  .MuiTable-root{
+  .table-parent-container{
     min-width: 650px !important;
+    max-height: 500px;
   }
 
   .MuiTable-root .MuiTableBody-root .MuiTableRow-root:hover{
@@ -37,22 +45,41 @@
     color: #42454E;
     font-size: 12px;
     font-weight: 600;
-    padding-top: 12px;
-    padding-bottom: 12px;
+    padding: 12px;
     line-height: 16px;
   }
+
+  .MuiTableHead-root .table-columns:first-child{
+    width: 25px;
+  }
+
+  .MuiTableHead-root .table-columns:nth-child(2){
+    padding-right: 0px;
+    padding-left: 0px;
+  }
+
+  .MuiTableHead-root .table-columns:nth-child(3){
+    padding-left: 0px;
+  }
+
 
   .MuiTableBody-root  .table-rows{
     color: #42454E;
     font-size: 12px;
     font-weight: normal;
-    padding: 24px 12px 24px 12px;
+    padding: 24px 16px 24px 16px;
     border-bottom: 1px solid #DFE3EB;
   }
 
-  .MuiTableBody-root .table-rows:first-child {
-    padding-left: 14px;
-  .rake-id{
+  .MuiTableBody-root .table-rows:first-child{
+    width: 50px;
+    padding-left: 16px;
+    padding-right: 0px;
+  }
+
+  .MuiTableBody-root .table-rows:nth-child(2){
+    padding-left: 0px;
+    .rake-id{
       text-decoration: underline;
       font-family: "Inter", sans-serif;
       font-size: 12px;
@@ -60,8 +87,12 @@
       letter-spacing: 0px;
       color: #334FFC ;
       padding-bottom: 2px;
+    }
   }
-}
+
+  .MuiTableBody-root .table-rows:nth-child(3){
+    padding-left: 0px;
+  }
 
   .MuiFormControl-root input{
     width: 106px;
@@ -171,13 +202,21 @@
 
   .MuiPaper-root{
     box-shadow: none;
-    height: 450px;
-    border: 1px solid #DFE3EB;
+    background-color: #fff;
+    overflow: auto;
     border-radius: 12px;
+    border: 1px solid #E9E9EB;
+    scrollbar-width: none; 
+    -ms-overflow-style: none; 
+  }
+  
+  .MuiPaper-root::-webkit-scrollbar {
+    width: 0px;
   }
 
-  .MuiTable-root{
-    min-width: 650px !important;
+  .table-child-container{
+    min-width: 500px !important;
+    max-height: 450px;
   }
 
   .MuiTable-root .MuiTableBody-root .MuiTableRow-root:hover{
@@ -189,20 +228,12 @@
     color: #42454E;
     font-size: 12px;
     font-weight: 600;
-    padding: 12.5px 0px 12.5px 26px;
+    padding: 12.5px 0px 12.5px 12px;
   }
 
   .MuiTableHead-root .table-columns:first-child{
-    padding-right: 0px;
-  }
-
-  .MuiTableHead-root .table-columns:nth-child(2){
-    padding-right: 0px;
-    padding-left: 0px;
-  }
-
-  .MuiTableHead-root .table-columns:last-child{
-    padding-right: 60px;
+    width: 30px;
+    padding-left: 12px;
   }
 
   .MuiTableBody-root  .table-rows{
@@ -215,22 +246,23 @@
   }
 
   .MuiTableBody-root .table-rows:first-child{
+    width: 30px;
+    padding-right: 0px;
+    padding-left: 16px;
+  }
+
+  .MuiTableBody-root .table-rows:nth-child(2){
     font-family: "Inter", sans-serif;
     font-size: 14px;
     font-weight: 600;
-    padding-left: 28px;
+    padding-left: 12px;
     padding-right: 0px;
     letter-spacing: 0px;
     color: #44475B;
   }
 
-  .MuiTableBody-root .table-rows:nth-child(2){
-    padding-left: 40px;
-    padding-right: 0px;
-  }
-
-  .MuiTableBody-root .table-rows:last-child{
-    padding-left: 42px;
+  .MuiTableBody-root .table-rows:nth-child(3){
+    padding-left: 6px;
   }
 
   .MuiFormControl-root input{
@@ -307,7 +339,7 @@
   .lower-conatiner{
     padding: 12px;
 
-    .MuiTable-root{
+    .table-parent-container{
       min-width: 500px !important;
     }
 
@@ -341,12 +373,6 @@
       font-size: 10px;
     }
   }
-
-  .child-dialog-styles .child-lower-container {
-    .MuiPaper-root{
-      height: 350px;
-    }
-  }
 }
 
 @media screen and (max-width: 950px){
@@ -358,7 +384,7 @@
   .lower-conatiner{
     padding: 8px;
 
-    .MuiTable-root{
+    .table-parent-container{
       min-width: 400px !important;
     }
 
@@ -412,24 +438,6 @@
       padding: 12px 0px 12px 24px;
     }
 
-    .MuiTableHead-root .table-columns:last-child{
-      padding-right: 48px;
-    }
-
-    .MuiTableBody-root .table-rows:first-child{
-      font-size: 13px;
-      padding-left: 24px;
-    }
-
-    .MuiTableBody-root .table-rows:nth-child(2){
-      padding-left: 36px;
-      padding-right: 0px;
-    }
-  
-    .MuiTableBody-root .table-rows:last-child{
-      padding-left: 38px;
-    }
-
     .MuiFormControl-root input{
       width: 100px;
     }
@@ -448,7 +456,7 @@
   .lower-conatiner{
     padding: 8px;
 
-    .MuiTable-root{
+    .table-parent-container{
       min-width: 300px !important;
     }
 
@@ -507,24 +515,6 @@
     .MuiTableHead-root .table-columns{
       padding: 10px 0px 10px 20px;
     }
-
-    .MuiTableHead-root .table-columns:last-child{
-      padding-right: 42px;
-    }
-
-    .MuiTableBody-root .table-rows:first-child{
-      font-size: 12px;
-      padding-left: 20px;
-    }
-
-    .MuiTableBody-root .table-rows:nth-child(2){
-      padding-left: 32px;
-      padding-right: 0px;
-    }
-  
-    .MuiTableBody-root .table-rows:last-child{
-      padding-left: 34px;
-    }
   }
 }
 
@@ -545,25 +535,49 @@
     padding: 16px;
 
     .MuiTableHead-root .table-columns{
-      padding: 8px 0px 8px 16px;
+        padding: 8px 0px 8px 16px;
     }
 
-    .MuiTableHead-root .table-columns:last-child{
-      padding-right: 36px;
-    }
-
-    .MuiTableBody-root .table-rows:first-child{
-      padding-left: 16px;
-    }
-
-    .MuiTableBody-root .table-rows:nth-child(2){
-      padding-left: 26px;
-      padding-right: 0px;
-    }
-  
-    .MuiTableBody-root .table-rows:last-child{
-      padding-left: 28px;
+    .table-child-container{
+      min-width: 460px !important;
     }
   }
 }
+
+@media screen and (max-width: 680px){
+  .child-dialog-styles .child-lower-container {
+
+    .table-child-container{
+      min-width: 320px !important;
+    }
+  }
+}
+
+@media screen and (max-width: 500px){
+  .child-dialog-styles .child-lower-container {
+
+    .table-child-container{
+      min-width: 280px !important;
+    }
+  }
+}
+
+@media screen and (max-width: 418px){
+  .child-dialog-styles .child-lower-container {
+
+    .table-child-container{
+      min-width: 200px !important;
+    }
+  }
+}
+
+@media screen and (max-width: 280px){
+  .child-dialog-styles .child-lower-container {
+
+    .table-child-container{
+      min-width: 120px !important;
+    }
+  }
+}
+
 

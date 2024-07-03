@@ -5,94 +5,21 @@ import pickupIcon from '../../../assets/pickup_icon.svg';
 import wagonIcon from '../../../assets/wagons_icon.svg';
 import dropIcon from '../../../assets/drop_icon.svg';
 import currentTrainLocationIcon from '../../../assets/current_train_location_icon.svg';
+import travelledIcon from '../../../assets/travelled_distance_icon.svg';
+import totalDistanceIcon from '../../../assets/total_distance_icon.svg';
 import { statusBuilder } from "../StatusBuilder/StatusBuilder";
 import Image from 'next/image';
 import service from "@/utils/timeService";
 import { Tooltip } from "@mui/material";
 
-const getStatusStyle = (status: string) => {
-  switch(status.toLowerCase()){
-    case "delivered":
-      return{
-        backgroundColor: '#90dcc4',
-        color: '#0e9167'
-      };
-    case "in transit":
-      return{
-        backgroundColor: '#ff98001f',
-        color: '#ff9800'
-      }
-    case "in plant": 
-      return{
-        backgroundColor: '#334ffc1f',
-        color: '#334ffc'
-      }  
-  }
-}
-
 export const FNRDetailsCard = (props: any) => {
 
-    const statusText = statusBuilder(props.fnr_data?.status);
-    const statusStyle = getStatusStyle(statusText);
     return(
     <React.Fragment>
       <CardContent className={props.className} >
-        <Grid style={
-          {
-                display: 'flex',
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                height: '100%',
-                padding: '0px'
-  
-          }
-        } container spacing={2}>
-          <Grid item xs={6} >
-            <Box style={
-              {
-                display: "flex",
-                height: '20px',
-                width: '200px',
-                paddingLeft: '20px',
-                alignItems: 'center',
-                justifyContent: 'start',
-                borderRadius: '5px',
-                fontSize: '14px',
-                marginBottom: "22px",
-                color: "#42454E"
-              }
-            }>
-              FNR No: #{props.fnr_data?.FNR}
-            </Box>
-          </Grid>
-          <Grid item xs={6}>
-            <Box style={
-            {
-              display: "flex",
-              color: '#008E27',
-              height: '24px',
-              width: '75px',
-              maxWidth: '100px',
-              padding: '2px',
-              float: "right",
-              alignItems: 'center',
-              justifyContent: 'center',
-              borderRadius: '5px',
-              fontSize: '12px',
-              marginBottom: "22px",
-              marginRight: "5px",
-              ...statusStyle
-            }
-          }>
-           {statusBuilder(statusText)}
-          </Box>
-          </Grid>
-        </Grid>
-        <hr style={{ marginTop: "-3px", width:"100%", height: "1px",backgroundColor: "#DFE3EB" }} />
         <Grid container spacing={2} direction={"row"} color={"#42454E"} paddingLeft={"15px"}>
           <Grid container spacing={2} item xs={12} >
-            <Grid item display={"flex"} justifyContent={"center"} alignItems={"center"} xs={1} marginTop={2} >
+            <Grid item display={"flex"} justifyContent={"center"} alignItems={"center"} xs={1} marginTop={1.7} >
               {/* <CardMedia
                 component={"img"}
                 src={pickupIcon}
@@ -104,12 +31,12 @@ export const FNRDetailsCard = (props: any) => {
               /> */}
               <Image
                 src={ pickupIcon }
-                alt="Map Path Icon"
-                width={8}
-                height={8}
+                alt="PickUp Icon"
+                width={10}
+                height={10}
               />
             </Grid>
-            <Grid item xs={10} fontSize={"12px"} marginTop={"10px"}>
+            <Grid item xs={10} fontSize={"12px"} marginTop={"13px"}>
                 {/* {props.fnr_data?.pickup_location?.code}-
                 {props.fnr_data?.pickup_location?.name} */}
                 { props.fnr_data?.pickup_location && props.fnr_data?.pickup_location?.code ? props.fnr_data?.pickup_location?.code: "" } 
@@ -129,9 +56,9 @@ export const FNRDetailsCard = (props: any) => {
               /> */}
                <Image
                 src={ dropIcon }
-                alt="Map Path Icon"
-                width={10}
-                height={10}
+                alt="Drop Icon"
+                width={12}
+                height={12}
               />
             </Grid>
             <Grid item xs={10} fontSize={"12px"}>
@@ -166,10 +93,10 @@ export const FNRDetailsCard = (props: any) => {
           <Grid container spacing={2} item xs={12} >
             <Grid item display={"flex"} justifyContent={"center"} alignItems={"center"} xs={1}>
                <Image
-                src={ wagonIcon }
-                alt="Map Path Icon"
-                width={16}
-                height={16}
+                src={ totalDistanceIcon }
+                alt="Total Distance Icon"
+                width={18}
+                height={18}
               />
             </Grid>
             <Grid item xs={10} fontSize={"12px"} >
@@ -179,14 +106,14 @@ export const FNRDetailsCard = (props: any) => {
           <Grid container spacing={2} item xs={12} >
             <Grid item display={"flex"} justifyContent={"center"} alignItems={"center"} xs={1}>
                <Image
-                src={ wagonIcon }
-                alt="Map Path Icon"
-                width={16}
-                height={16}
+                src={ travelledIcon }
+                alt="Travelled Distance Icon"
+                width={18}
+                height={18}
               />
             </Grid>
             <Grid item xs={10} fontSize={"12px"} >
-                Traveled Distance: <b>{props.traveledDistance}</b> km
+                Travelled Distance: <b>{props.travelledDistance}</b> km
             </Grid>
           </Grid>
           <Grid container spacing={2} item xs={12} >
@@ -202,9 +129,9 @@ export const FNRDetailsCard = (props: any) => {
               /> */}
                <Image
                 src={ currentTrainLocationIcon }
-                alt="Map Path Icon"
-                width={12}
-                height={12}
+                alt="Current Train Location Icon"
+                width={14}
+                height={14}
               />
             </Grid>
             <Grid item xs={10} fontSize={"12px"}>
@@ -213,7 +140,7 @@ export const FNRDetailsCard = (props: any) => {
                  <div style={{marginLeft: "20px"}}>
                   GPS: <b>{props.fnr_data?.trip_tracker?.gps_last_location || 'N/A'} </b>
                  </div>    
-                 <div style={{marginLeft: "20px"}}>
+                 <div style={{marginLeft: "20px"}}>                        
                   FOIS: <b>{props.fnr_data?.trip_tracker?.fois_last_location || 'N/A'}</b>
                  </div>
                  <div style={{marginLeft: "20px", cursor: "hover"}}>
