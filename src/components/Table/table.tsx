@@ -341,9 +341,7 @@ const convertArrayToFilteredArray = (inputArray: any) => {
             captive_id: string,
             is_captive: Boolean,
             trip_tracker: any,
-            etaTime: any,
-            rr_document: any
-
+            etaTime: any
         }) => {
         const { edemand_no, FNR, all_FNRs, delivery_location, trip_tracker, others, remarks, unique_code, status, pickup_date, captive_id, is_captive, eta, rr_document } = item;
         return {
