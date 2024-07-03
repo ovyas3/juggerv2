@@ -118,7 +118,7 @@ const OrdersPage = () => {
       <div className='orderContainer'>
         <div style={{ width: '100%', overflowX: 'auto' }}>
           {
-            mobile ? <Header title={'Shipments'} setReloadOnHeaderChange={setReloadOnHeaderChange} /> : <MobileHeader />
+            mobile ? <Header title={'Shipments'} setReloadOnHeaderChange={setReloadOnHeaderChange} isMapHelper={false}/> : <MobileHeader />
           }
 
           <div className='tableContainer' style={{ paddingInline: 24, paddingTop: 10, paddingBottom: mobile ? 24 : 65, position: 'relative', marginTop: mobile ? '56px' : '0px', marginLeft: mobile ? '70px' : '0px' }}>

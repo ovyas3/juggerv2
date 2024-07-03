@@ -23,6 +23,8 @@ import { useTranslations } from "next-intl";
 const Tabsection = () => {
   const [value, setValue] = useState("1");
   const [data, setData] = useState<any>([]);
+  const [statusInfo, setStatusInfo] = useState<string>('');
+  const [statusNumber, setStatusNumber] = useState<number>(0);
   const [helpCenterBtnHovered, setHelpCenterBtnHovered] = useState(false);
   const t = useTranslations("DASHBOARD");
 
@@ -42,6 +44,8 @@ const Tabsection = () => {
       const res = await httpsGet("all_captive_rakes_details?tracking=false", 0);
       setData(res);
     }
+    setStatusInfo("all");
+    setStatusNumber(1);
   };
 
   const handleSchemeTypeAndTable = async (props: any) => {
@@ -51,6 +55,16 @@ const Tabsection = () => {
     if (validSchemes.includes(getSchemeType)) {
       const res = await httpsGet(`all_captive_rakes_details?scheme=${getSchemeType}`, 0);
       setData(res);
+      if(getSchemeType === "SFTO"){
+        setStatusInfo("sfto");
+        setStatusNumber(2);
+      } else if(getSchemeType === "GPWIS"){
+        setStatusInfo("gpwis");
+        setStatusNumber(3);
+      } else if(getSchemeType === "BFNV"){
+        setStatusInfo("bfnv");
+        setStatusNumber(4);
+      }
     }
   }
 
@@ -59,15 +73,23 @@ const Tabsection = () => {
     if(getProps === "trackingWithLoad"){
       const res = await httpsGet("all_captive_rakes_details?tracking=true&withLoad=true", 0);
       setData(res);
+      setStatusInfo("trackingWithLoad");
+      setStatusNumber(5);
     } else if(getProps === "trackingWithoutLoad"){
       const res = await httpsGet("all_captive_rakes_details?tracking=true&withLoad=false", 0);
       setData(res);
+      setStatusInfo("trackingWithoutLoad");
+      setStatusNumber(6);
     } else if(getProps === "nonTrackingWithLoad"){
       const res = await httpsGet("all_captive_rakes_details?tracking=false&withLoad=true", 0);
       setData(res);
+      setStatusInfo("nonTrackingWithLoad");
+      setStatusNumber(7);
     } else if(getProps === "nonTrackingWithoutLoad"){
       const res = await httpsGet("all_captive_rakes_details?tracking=false&withLoad=false", 0);
       setData(res);
+      setStatusInfo("nonTrackingWithoutLoad");
+      setStatusNumber(8);
     }
   };
 
@@ -209,7 +231,10 @@ const Tabsection = () => {
                     <TrackingStatus 
                           handleAllRakesAndTable={handleAllRakesAndTable}
                           handleSchemeTypeAndTable={handleSchemeTypeAndTable}
-                          handleTrackingAndNonTracking={handleTrackingAndNonTracking}/>
+                          handleTrackingAndNonTracking={handleTrackingAndNonTracking}
+                          statusInfo={statusInfo}
+                          statusNumber={statusNumber}
+                          />
                   </div>
                   <div className="vertical-line"/>
                   <div className="popup-container">

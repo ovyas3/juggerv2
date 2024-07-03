@@ -16,8 +16,12 @@ import Dropdown from "./dropdown";
 import ProfileDrop from "./proFileDrop";
 import { useEffect, useState } from "react";
 import { getCookie } from "@/utils/storageService";
+import BackIcon from "@/assets/back.svg";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
 
-const Header = ({title, setReloadOnHeaderChange}:any) => {
+const Header = ({title, setReloadOnHeaderChange, isMapHelper}:any) => {
+  const router = useRouter();
   const [parent_name, setParentName] = useState<string>("");
   const [shippers, setShippers] = useState([]);
   const [selected_shipper, setSelectedShipper] = useState("");
@@ -34,7 +38,10 @@ const Header = ({title, setReloadOnHeaderChange}:any) => {
   return (
     <div className="header-wrapper">
       <Box className="container">
-        <div className="shipment_text">{title}</div>
+        <div className="shipment_title">
+          {isMapHelper ? <Image src={BackIcon} alt="back" width={25} height={30} style={{cursor: 'pointer'}} onClick={() => router.push('/dashboard')}/> : <></>}
+           <p className="shipment_text">{title}</p>
+        </div>
         <div
           style={{
             display: "flex",

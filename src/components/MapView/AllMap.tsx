@@ -362,7 +362,7 @@ const MapLayers = () => {
         <div className="map-container">
           {isMobile ? <SideDrawer /> : null}
           <div style={{ width: '100%', overflow: 'hidden' }}>
-            {isMobile ? <Header title="Captive Rakes Map View" ></Header> : <MobileHeader />}
+            {isMobile ? <Header title="Captive Rakes Map View" isMapHelper={true}></Header> : <MobileHeader />}
             <div style={{
               paddingTop: isMobile ? 12 : 24, 
               paddingBottom: isMobile ? 32 : 65,  

@@ -229,7 +229,7 @@ const MapLayers = () => {
         <div className="map-container">
           {isMobile ? <SideDrawer /> : null}
           <div style={{ width: '100%', overflow: 'hidden' }}>
-            {isMobile ? <Header title="Shipments Map View" ></Header> : <MobileHeader />}
+            {isMobile ? <Header title="Shipments Map View" isMapHelper={false}></Header> : <MobileHeader />}
             <div style={{ paddingInline: 24, paddingTop: 24, paddingBottom: 65,  position:'relative' }}>
               <MapContainer className="map" center={center} zoom={5.4} style={{ minHeight: '105%',width: '101%', padding: '0px', zIndex: '0', position: 'fixed' }} attributionControl={false} ref={setMap} >
                 <div className={"layersControl"} style={{marginTop:'10px'}} >
