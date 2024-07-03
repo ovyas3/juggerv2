@@ -555,7 +555,7 @@ const MapLayers = () => {
                          } */}
                   </Grid> 
                 </Grid>
-                <MapContainer className="map" center={center} zoom={5} style={{ minHeight: '105%',width: '101%', padding: '0px', zIndex: '0', position: 'fixed' }} attributionControl={false} ref={setMap} >
+                <MapContainer className="map" id="map-helpers" center={center} zoom={5} style={{ minHeight: '105%',width: '101%', padding: '0px', zIndex: '0', position: 'fixed' }} attributionControl={false} ref={setMap} >
                   <div className={"layersControl"} style={{marginTop:'60px'}} >
                     <LayersControl>
                     <LayersControl.BaseLayer checked name="Street View">
