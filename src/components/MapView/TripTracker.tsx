@@ -38,21 +38,22 @@ const renderMarkers = (tracking_data: any[], customIcon: Icon): JSX.Element[] =>
     }
     else if(Status.startsWith("ARRIVED AT")){
       status = "ARRIVED";
-      station= Status.substring("ARRIVED AT".length, Status.indexOf("(")).trim();
+      station =  Status.substring("ARRIVED AT".length, Status.indexOf("(")).trim();
     }
     else if(Status.startsWith("REACHED AT")){
       status = "REACHED";
-      station= "DESTINATION";
+      station =  "DESTINATION";
     }
     else if(Status.startsWith("STABLED AT")){
       status = "STABLED";
-      station= Status.substring("STABLED AT".length, Status.indexOf("(")).trim();
+      station =  Status.substring("STABLED AT".length, Status.indexOf("(")).trim();
     }
     return(
       <Marker key={index} position={[point.geo_point.coordinates[1], point.geo_point.coordinates[0]]} icon={customIcon}>
       <Popup>
           Status: {status}
           <br />
+          <hr />
           Station: {station}
           <br />
           Updated At: { service.utcToist(point.time_stamp, 'dd-MM-yyyy HH:mm') }
@@ -312,6 +313,17 @@ const TripTracker = (params: any) => {
                   </Marker>
                 </>}
                 { showFoisTracks &&  renderMarkers(tracking_data, customIcon)}
+                { showFoisTracks && estimatedTrack.length > 0 && <Marker position={estimatedTrack[0]} icon={customIcon}>
+                  <Popup>
+                    {pickupDetail &&
+                      <>
+                        Station: {pickupDetail.name}
+                        <br />
+                        Updated At: {pickupDetail.dateTime}
+                      </>
+                    }
+                  </Popup>
+                </Marker>}
                 { showFoisTracks &&  trackingLine.length && <Polyline pathOptions={{ color:'red'}} positions={trackingLine} />}
                 { currentLocation && <Marker position={[currentLocation.geo_point.coordinates[1], currentLocation.geo_point.coordinates[0]]} icon={currentTrainLocation}>
                   <Popup>
