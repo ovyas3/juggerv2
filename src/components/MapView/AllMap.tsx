@@ -404,7 +404,7 @@ const MapLayers = () => {
         <div className="map-container">
           {isMobile ? <SideDrawer /> : null}
           <div style={{ width: '100%', overflow: 'hidden' }}>
-            {isMobile ? <Header title="Captive Rakes Map View" ></Header> : <MobileHeader />}
+            {isMobile ? <Header title="Captive Rakes Map View" isMapHelper={true}></Header> : <MobileHeader />}
             <div style={{
               paddingTop: isMobile ? 12 : 24, 
               paddingBottom: isMobile ? 32 : 65,  
@@ -599,7 +599,7 @@ const MapLayers = () => {
                          } */}
                   </Grid> 
                 </Grid>
-                <MapContainer className="map" center={center} zoom={5} style={{ minHeight: '105%',width: '101%', padding: '0px', zIndex: '0', position: 'fixed' }} attributionControl={false} ref={setMap} >
+                <MapContainer className="map" id="map-helpers" center={center} zoom={5} style={{ minHeight: '105%',width: '101%', padding: '0px', zIndex: '0', position: 'fixed' }} attributionControl={false} ref={setMap} >
                   <div className={"layersControl"} style={{marginTop:'60px'}} >
                     <LayersControl>
                     <LayersControl.BaseLayer checked name="Street View">

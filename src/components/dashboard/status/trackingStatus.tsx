@@ -12,14 +12,17 @@ import forwardArrow from "../../../assets/forward_arrow_icon.svg";
 import { httpsGet } from "@/utils/Communication";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { get } from "http";
 
 interface TrackingStatusProps {
   handleAllRakesAndTable: (props: any) => void;
   handleSchemeTypeAndTable: (props: any) => void;
   handleTrackingAndNonTracking: (props: any) => void;
+  statusInfo: string;
+  statusNumber: number;
 }
 
-const TrackingStatus: React.FC<TrackingStatusProps> = ({ handleAllRakesAndTable, handleSchemeTypeAndTable, handleTrackingAndNonTracking }) => {
+const TrackingStatus: React.FC<TrackingStatusProps> = ({ handleAllRakesAndTable, handleSchemeTypeAndTable, handleTrackingAndNonTracking, statusInfo, statusNumber }) => {
   const router = useRouter();
   const t = useTranslations("DASHBOARD");
   const [isHovered, setIsHovered] = useState(false);
@@ -37,6 +40,12 @@ const TrackingStatus: React.FC<TrackingStatusProps> = ({ handleAllRakesAndTable,
       wagons: "",
     },
   ]);
+
+  
+  useEffect(() => {
+    console.log("statusInfo", statusInfo);
+  console.log("statusNumber", statusNumber);
+  }, [statusInfo, statusNumber]);
 
   let trackingStructure = {
     totalTracking: 0,
@@ -130,6 +139,81 @@ const TrackingStatus: React.FC<TrackingStatusProps> = ({ handleAllRakesAndTable,
     });
   }, []);
 
+  const getClassName = (baseName: string, statusInfo: string) => {
+    switch(statusInfo) {
+      case 'all':
+        return baseName;
+      case 'sfto':
+        return `${baseName}-sfto`;
+      case 'gpwis':
+        return `${baseName}-gpwis`;
+      case 'bfnv':
+        return `${baseName}-bfnv`;
+      default:
+        return baseName;
+    };
+  };
+
+  const getClassNameTracking = (baseName: string, statusInfo: string) => {
+    switch(statusInfo) {
+      case 'all':
+        return baseName;
+      case 'trackingWithLoad':
+        return `${baseName}-trackingWithLoad`;
+      case 'trackingWithoutLoad':
+        return `${baseName}-trackingWithoutLoad`;
+      default:
+        return baseName;
+    };
+  };
+
+  const getClassNameNonTracking = (baseName: string, statusInfo: string) => {
+    switch(statusInfo) {
+      case 'all':
+        return baseName;
+      case 'nonTrackingWithLoad':
+        return `${baseName}-nonTrackingWithLoad`;
+      case 'nonTrackingWithoutLoad':
+        return `${baseName}-nonTrackingWithoutLoad`;
+      default:
+        return baseName;
+    };
+  };
+
+  function getStyle(statusInfo: string, index: number) {
+
+    if (statusInfo === 'sfto') {
+      if (index === 0) {
+        return { backgroundColor: '#18be8a1a', borderRadius: '8px', borderRight: '3px solid #334ffc0d'};
+      }
+    } else if (statusInfo === 'gpwis') {
+      if (index === 1) {
+        return { backgroundColor: '#334ffc1a', borderRadius: '8px', borderRight: '3px solid #334ffc0d'};
+      } 
+    } else if (statusInfo === 'bfnv') {
+      if (index === 2) {
+        return { backgroundColor: '#bc4a281a', borderRadius: '8px', borderRight: '3px solid #334ffc0d'};
+      }
+    } else if (statusInfo === 'trackingWithLoad') {
+      if (index === 3) {
+        return { backgroundColor: '#334ffc1a', borderRadius: '8px', borderRight: '3px solid #18be8a0d'};
+      }
+    } else if (statusInfo === 'trackingWithoutLoad') {
+      if (index === 4) {
+        return { backgroundColor: '#bc4a281a', borderRadius: '8px', borderRight: '3px solid #18be8a0d' };
+      }
+    } else if (statusInfo === 'nonTrackingWithLoad') {
+      if (index === 5) {
+        return { backgroundColor: '#18be8a1a', borderRadius: '8px', borderRight: '3px solid #ea59500d' };
+      }
+    } else if (statusInfo === 'nonTrackingWithoutLoad') {
+      if (index === 6) {
+        return { backgroundColor: '#334ffc1a', borderRadius: '8px', borderRight: '3px solid #ea59500d' };
+      }
+    }
+  }
+
+
   return (
     <div className="tracking-status-container">
       <div className="tracking-status-head">
@@ -139,7 +223,7 @@ const TrackingStatus: React.FC<TrackingStatusProps> = ({ handleAllRakesAndTable,
         <div className="map-view-btn" 
              onMouseEnter={() => setIsMapHover(true)} 
              onMouseLeave={() => setIsMapHover(false)}
-             onClick={() => window.open('/MapsHelper', '_blank')}>
+             onClick={() => router.push('/MapsHelper')}>
           <Image src={isMapHover ? MapViewHoverIcon : MapViewIcon} alt="map view" width={16} height={16}/>
           <span className="map-view-btn-header">Map View</span>
         </div>
@@ -159,14 +243,20 @@ const TrackingStatus: React.FC<TrackingStatusProps> = ({ handleAllRakesAndTable,
             hoverIcon={forwardArrow}
             isHovered={isHovered}
             handleAllRakesAndTable={handleAllRakesAndTable}
+            onClick={() => getClassName('total-rakes-split-count', statusInfo)}
           />
           <div className="scheme">
-            {schemeData.map((scheme) => (
-              <div className="scheme-container" key={scheme.scheme} onClick={() => handleSchemeTypeAndTable(scheme.scheme)}>
-                <span className="total-rakes-split-count">
+            {schemeData
+              .sort((a, b) => {
+                const order = ['SFTO', 'GPWIS', 'BFNV'];
+                return order.indexOf(a.scheme) - order.indexOf(b.scheme);
+              }).map((scheme, index) => (
+              <div className="scheme-container"  key={scheme.scheme} onClick={() => handleSchemeTypeAndTable(scheme.scheme)}
+              style={getStyle(statusInfo, index)}>
+                <span className={getClassName('total-rakes-split-count', statusInfo)}>
                   {scheme.count || 0}
                 </span>
-                <span className="scheme-name">
+                <span className={getClassName('scheme-name', statusInfo)}>
                   {scheme.scheme || ""}
                 </span>
                 <div className="hover-infobox">
@@ -194,29 +284,30 @@ const TrackingStatus: React.FC<TrackingStatusProps> = ({ handleAllRakesAndTable,
             name={t("trackingWithGPS")}
             icon={trackingWithGPS}
             handleAllRakesAndTable={handleAllRakesAndTable}
+            onClick={() => getClassNameTracking('all', statusInfo)}
           />
           <div className="load-analysis-wrapper">
             <div
               className="load-analysis-with-load-tracking"
               onClick={() => handleTrackingAndNonTracking("trackingWithLoad")}
-              style={{ cursor: "pointer" }}
+              style={getStyle(statusInfo, 3)}
             >
-              <span className="load-count">
+              <span className={getClassNameTracking('load-count', statusInfo)}>
                 {trackingData.withLoad || 0}
               </span>
-              <span className="with-load-label">
+              <span className={getClassNameTracking("load-label", statusInfo)}>
                 {t("withLoad")}
               </span>
             </div>
             <div
              className="load-analysis-without-load-tracking"
               onClick={() => handleTrackingAndNonTracking("trackingWithoutLoad")}
-              style={{ cursor: "pointer" }}
+              style={getStyle(statusInfo, 4)}
             >
-              <span className="load-count">
+              <span className={getClassNameTracking('load-count', statusInfo)}>
                 {trackingData.withoutLoad || 0}
               </span>
-              <span className="without-load-label">
+              <span className={getClassNameTracking("load-label", statusInfo)}>
                 {t("withoutLoad")}
               </span>
             </div>
@@ -230,6 +321,7 @@ const TrackingStatus: React.FC<TrackingStatusProps> = ({ handleAllRakesAndTable,
             name={t("nonTracking")}
             icon={nonTracking}
             handleAllRakesAndTable={handleAllRakesAndTable}
+            onClick={() => getClassNameNonTracking('all', statusInfo)}  
           />
           <div className="load-analysis-wrapper">
             <div
@@ -237,12 +329,12 @@ const TrackingStatus: React.FC<TrackingStatusProps> = ({ handleAllRakesAndTable,
               onClick={() => handleTrackingAndNonTracking("nonTrackingWithLoad")}
               onMouseOver={() => setNonTrackingWithLoadHovered(true)}
               onMouseLeave={() => setNonTrackingWithLoadHovered(false)}
-              style={{ cursor: "pointer" }}
+              style={getStyle(statusInfo, 5)}
             >
-              <span className="load-count">
+              <span className={getClassNameNonTracking('load-count', statusInfo)}>
                 {nonTrackingData.totalWithLoad || 0}
               </span>
-              <span className="with-load-label">
+              <span className={getClassNameNonTracking('load-label', statusInfo)}>
                 {t("withLoad")}
               </span>
               {nonTrackingWithLoadHovered ? (
@@ -275,12 +367,12 @@ const TrackingStatus: React.FC<TrackingStatusProps> = ({ handleAllRakesAndTable,
               onClick={() => handleTrackingAndNonTracking("nonTrackingWithoutLoad")}
               onMouseOver={() => setNonTrackingEmptyHovered(true)}
               onMouseLeave={() => setNonTrackingEmptyHovered(false)}
-              style={{ cursor: "pointer" }}
+              style={getStyle(statusInfo, 6)}
             >
-              <span className="load-count">
+              <span className={getClassNameNonTracking('load-count', statusInfo)}>
                 {nonTrackingData.totalWithoutLoad}
               </span>
-              <span className="without-load-label">
+              <span className={getClassNameNonTracking('load-label', statusInfo)}>
                 {t("withoutLoad")}
               </span>
               {nonTrackingEmptyHovered ? (
