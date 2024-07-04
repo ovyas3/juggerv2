@@ -18,7 +18,7 @@ function HandlingAgent() {
     return (
         <div className='handlingAgent_Container'>
             {/* -----header ------- */}
-            { mobile ? <Header title={'Handling Agent'} /> : <MobileHeader/> }
+            { mobile ? <Header title={'Handling Agent'} isMapHelper={false}/> : <MobileHeader/> }
 
 
             {/* -------- pageContent--------- */}
