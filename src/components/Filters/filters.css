@@ -150,8 +150,8 @@
     display: flex;
     position: relative;
     align-items: center;
-    justify-content: center;
     top: calc(50vh - 160px);
+    left: calc(50vw - 240px);
 }
 
 .modal-header {

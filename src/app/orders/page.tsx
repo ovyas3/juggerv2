@@ -32,6 +32,7 @@ const getStatusCode = (status: string): string => {
 const OrdersPage = () => {
   const t = useTranslations('ORDERS');
   const mobile = useWindowSize(500);
+  const tablePagination = useWindowSize(1300);
   const [allShipment, setAllShipment] = useState([]);
   const [count, setCount] = useState(0);
   const [rakeCaptiveList, setRakeCaptiveList] = useState([]);
@@ -102,21 +103,21 @@ const OrdersPage = () => {
     console.log(list_captive_rake)
     setRakeCaptiveList(list_captive_rake.data)
   }
-  async function getRemarksList (){
+  async function getRemarksList() {
     const list_remarks = await httpsGet(REMARKS_LIST);
     console.log(list_remarks)
     setRemarksList(list_remarks.data)
   }
 
-  function clearFilter() { 
+  function clearFilter() {
     setShipmentsPayload((prevState: any) => {
-      const newState = {...prevState} 
+      const newState = { ...prevState }
       delete newState["eDemand"]
       delete newState["destination"]
-    
+
       return newState
-  });
-}
+    });
+  }
 
   useEffect(() => {
     getCaptiveRake();
@@ -127,7 +128,6 @@ const OrdersPage = () => {
     if (ShipmentsPayload.from && ShipmentsPayload.to) getAllShipment();
   }, [ShipmentsPayload])
 
-  console.log(remarksList)
 
   return (
     <div  >
@@ -139,16 +139,15 @@ const OrdersPage = () => {
 
           <div className='tableContainer' style={{ paddingInline: 24, paddingTop: 10, paddingBottom: mobile ? 24 : 65, position: 'relative', marginTop: mobile ? '56px' : '0px', marginLeft: mobile ? '70px' : '0px', height: 'calc(100vh - 56px)' }}>
 
-            <div style={{ height: '10%' }}>
-              {/* ----search fnr---- */}
+            <div>
+
+              {/* ---- reloader---- */}
               <div className='input_fnr_reload'>
                 <div className={`reload ${reload ? 'loading' : ''}`} onClick={() => {
                   showMessage('Refresh Successfully', 'success')
                   const { fnrNumber, ...updatedShipmentsPayload } = ShipmentsPayload;
                   setShipmentsPayload(updatedShipmentsPayload);
-                  // console.log(updatedShipmentsPayload);
-                clearFilter()
-                  // getAllShipment();
+                  clearFilter()
                   setReload(true)
                   setTimeout(() => { setReload(false) }, 3000)
                 }}>
@@ -174,33 +173,38 @@ const OrdersPage = () => {
                   <div className='mobile_outbound'>{t('outbound')}</div>
                 </div>
               }
-
-
-              {/* ----filter---- */}
-              {
-                selected_bound === 'outbound' ?
-                  <div className='filters' >
-                    <Filters onToFromChange={handleToFromChange} onChangeStatus={handleChangeStatus} reload={reload} getShipments={getAllShipment} shipmentsPayloadSetter={setShipmentsPayload}/>
-                  </div>
-                  : <></>
-              }              
             </div>
 
-            {/* ----table---- */}
+
+            {/* ----table and filters---- */}
             {
               selected_bound === 'outbound' ?
-                <div className='tableData' style={{ height: '90%' }}>
-                  <TableData onSkipLimit={handleSkipLimitChange} allShipments={allShipment} count={count} rakeCaptiveList={rakeCaptiveList} onFnrChange={handleChangeByFnr} reload={reload} />
+                <div className='tableData' style={{ position: 'relative', height: '95%' }}
+                >
+                  {
+                    selected_bound === 'outbound' ?
+                      <div className='filters' style={{
+                        position: 'absolute', top: 0, overflowX: 'auto',
+                        maxWidth: '100%', zIndex: 100,
+                        whiteSpace: 'nowrap'
+                      }} >
+                        <Filters onToFromChange={handleToFromChange} onChangeStatus={handleChangeStatus} reload={reload} getShipments={getAllShipment} shipmentsPayloadSetter={setShipmentsPayload} />
+                      </div>
+                      : <></>
+                  }
+                  <div style={{ paddingTop: tablePagination ? '25px' : '60px' }}>
+                    <TableData onSkipLimit={handleSkipLimitChange} allShipments={allShipment} count={count} rakeCaptiveList={rakeCaptiveList} onFnrChange={handleChangeByFnr} reload={reload} />
+                  </div>
                 </div>
                 : <></>
             }
+
+
             {
               selected_bound === 'inbound' ?
-              <div>COMING SOON !!!!</div>
-              :<></>
+                <div>COMING SOON !!!!</div>
+                : <></>
             }
-
-
           </div>
         </div>
       </div>

@@ -31,6 +31,7 @@
     min-width: 70px !important;
     /* display: flex !important;
     flex-direction: row !important; */
+    text-wrap: nowrap;
 }
 .inner_pickup{
     /* background-color: chocolate!important; */
@@ -90,12 +91,11 @@
 .currentEta{
     /* background-color: yellow!important; */
     min-width: 90px !important;
-
+    text-wrap:nowrap;
 }
 .remarks{
     /* background-color: darkslategray!important; */
     min-width: 86px !important;
-
 }
 .handlingAgent{
     /* background-color: wheat!important; */
@@ -321,9 +321,9 @@
     position: absolute;
     /* background-color: rgb(110, 208, 115); */
    
-    right: 30px;
-    top: 7px;
-    z-index: 1;
+    right: 33px;
+    top: -52px;
+    z-index: 100 !important;
    
     opacity: 0;
     transform: scale(0.95);
@@ -367,9 +367,10 @@
   .action_items{
     display: flex;
     align-items: center;
-    gap: 6px;
+    /* gap: 6px; */
     cursor: pointer;
-    padding: 6px 8px;
+    padding-inline: 8px;
+    padding-block: 2px;
   
   }
 
