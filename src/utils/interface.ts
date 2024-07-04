@@ -35,7 +35,10 @@ export interface row {
   },
   status: string,
   currentEta: string,
-  remarks: string,
+  remarks: {
+    latest:string,
+    rest : Array<Object>,
+  },
   handlingAgent: string,
   action: string,
   validationForAttachRake: Boolean,
@@ -52,4 +55,16 @@ export interface row {
 
 export interface tagItem {
   _id: string;
+}
+
+export interface Remarks {
+  latest: {
+    remark: string;
+  };
+  rest: any[];
+}
+
+export interface SeparatedRemarks {
+ latest:Object,
+ rest:Array<Object>
 }

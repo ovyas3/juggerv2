@@ -1,5 +1,6 @@
 'use client'
 import {useState, useEffect} from 'react'
+import {SeparatedRemarks} from '@/utils/interface'
 
 export const useWindowSize = (width: number): Boolean => {
   const [isWide, setIsWide] = useState(true);
@@ -47,4 +48,23 @@ export const sortArray = (inputArray: Array<Object>, parameter: string = 'pickup
   });
 
   return sortedArray;
+}
+
+export const  separateLatestObject = (dataArray: Array<Object>) : any => {
+  if (!dataArray || dataArray.length === 0) {
+    return { latest: null, rest: [] };
+  }
+
+  // Sort the array by date in descending order
+  const sortedArray = dataArray.sort((a:any, b:any) => 
+    new Date(b.date).getTime() - new Date(a.date).getTime()
+  );
+
+  // The first element is the latest
+  const latest = sortedArray[0];
+
+  // The rest of the elements
+  const rest = sortedArray.slice(1);
+
+  return { latest, rest };
 }
