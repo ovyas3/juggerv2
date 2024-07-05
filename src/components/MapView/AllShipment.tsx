@@ -485,7 +485,7 @@ const MapLayers = () => {
                 height: '100vh',
                 padding: '10px',
                 boxShadow: '0px 00px 10px 0px rgba(0,0,0,0.3)',
-                overflowY: 'scroll',
+                overflowY: 'unset',
               }} 
               >
                 <Box className="shipment-heads">
@@ -529,12 +529,14 @@ const MapLayers = () => {
                     </Typography>
                   </Paper>
                 </Box>
+                <div className="card-container">
                 {showAll && allShipments.map((item, index) => {
-                  return <ShipmentCard key={index} index={index} shipment={item} handleShipmentSelection={handleShipmentSelection}/>
+                   return  <ShipmentCard key={index} index={index} shipment={item} handleShipmentSelection={handleShipmentSelection}/>
                 })}
                 {showFiltered && filteredShipments.map((item, index) => {
                   return <ShipmentCard key={index} index={index} shipment={item} handleShipmentSelection={handleShipmentSelection}/>
                 })}
+                </div>
               </Box>
             </div>
           </div>

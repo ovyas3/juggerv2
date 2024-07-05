@@ -340,6 +340,18 @@
   background-color: #18be8a80;
 }
 
+.card-container{
+  padding: 0px;
+  max-height: 65%;
+  overflow-y: scroll;
+  scrollbar-width: none; 
+  -ms-overflow-style: none; 
+}
+
+.card-container::-webkit-scrollbar {
+  width: 0px;
+}
+
 @media screen and (max-width: 1140px){
   .shipment-heads{
     grid-template-columns: repeat(1, 1fr);
