@@ -21,6 +21,7 @@ import Link from 'next/link';
 import { Column, row, tagItem } from '@/utils/interface';
 import { useTranslations } from 'next-intl';
 import RRModal from '../RR Modal/RRModal';
+import { useSnackbar } from '@/hooks/snackBar';
 
 
 import Autocomplete from '@mui/material/Autocomplete';
@@ -33,7 +34,7 @@ import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import { httpsPost } from '@/utils/Communication';
-import { UPDATE_RAKE_CAPTIVE_ID, REMARKS_UPDATE_ID } from '@/utils/helper'
+import { UPDATE_RAKE_CAPTIVE_ID, REMARKS_UPDATE_ID,FETCH_TRACK_DETAILS } from '@/utils/helper'
 import { statusBuilder } from '../MapView/StatusBuilder/StatusBuilder';
 
 import FOIS from '@/assets/fois_icon.png'
@@ -42,6 +43,7 @@ import RRDOC from '@/assets/Doc-icon.svg'
 import attach_icon from '@/assets/attach_icon.svg'
 import rrDocumentIcon from '@/assets/rr_document_icon.svg'
 import ShareIcon from '@mui/icons-material/Share';
+import fetchTrackDetailsIcon from '@/assets/polylines_icon.svg'
 import contactIcon from '@/assets/inactive_contact_dashboard+icon.svg'
 import BookmarkAddOutlinedIcon from '@mui/icons-material/BookmarkAddOutlined';
 import Image from 'next/image';
@@ -88,8 +90,9 @@ const convertArrayToFilteredArray = (inputArray: any) => {
             is_captive: Boolean,
             trip_tracker: any,
             etaTime: any
+            polyline: any
         }) => {
-        const { edemand_no, FNR, all_FNRs, delivery_location, trip_tracker, others, remarks, unique_code, status, pickup_date, captive_id, is_captive, eta, rr_document } = item;
+        const { edemand_no, FNR, all_FNRs, delivery_location, trip_tracker, others, remarks, unique_code, status, pickup_date, captive_id, is_captive, eta, rr_document,polyline } = item;
         return {
             _id: item._id,
             edemand: edemand_no,
@@ -127,6 +130,7 @@ const convertArrayToFilteredArray = (inputArray: any) => {
                 is_gps: trip_tracker && trip_tracker.gps_last_location ? true : false,
             },
             validationForAttachRake: !captive_id && is_captive,
+            polyline: polyline,
             eta: eta,
             pickup_date: pickup_date,
             rrDoc: rr_document && rr_document.length > 0 ? true : false
@@ -138,7 +142,7 @@ const convertArrayToFilteredArray = (inputArray: any) => {
 
 
 // Main component
-export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, count, onFnrChange, reload, remarksList }: any) {
+export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, count, onFnrChange, reload, remarksList,setTriggerShipments,triggerShipments }: any) {
 
     //language controller
     const t = useTranslations("ORDERS")
@@ -231,6 +235,27 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
         setRowID(id);
         setShowActionBox(prevIndex => (prevIndex === index ? -1 : index));
     }
+    
+    const { showMessage } = useSnackbar();
+
+    async function fetchTrackDetails(rake_id: any){
+     const payload = {
+        rakeId: rake_id
+     }
+     httpsPost(FETCH_TRACK_DETAILS,payload).then((res)=>{
+        if(res && res.statusCode == 200) {
+            showMessage('Track Details Fetched Successfully.','success')
+            setTriggerShipments(!triggerShipments)
+        } else {
+            showMessage('Error Fetching Track Details.','error')
+        }
+        
+     }).catch((err)=>{
+         showMessage('Error Fetching Track Details.','error')
+     })
+      
+    }
+
 
     useEffect(() => {
         const etaResult = sortArray(allShipments, 'eta', currentETAsorting ? 'dec' : 'asc');
@@ -472,7 +497,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                         <div className='action_button_options' onClick={(e) => e.stopPropagation()}>
                                                                             {row.validationForAttachRake && (
                                                                                 <ActionItem
-                                                                                    icon={<img src={attach_icon.src} alt='' />}
+                                                                                    icon={<img src={attach_icon.src} alt='' height={"24px"} width={"24px"} />}
                                                                                     text={t('attach')}
                                                                                     onClick={handleOpen}
                                                                                     id='attach'
@@ -480,21 +505,28 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                                 />
                                                                             )}
                                                                             <ActionItem
-                                                                                icon={<ShareIcon style={{ fontSize: '15px', color: '#3352FF' }} />}
+                                                                                icon={<ShareIcon style={{ width: '24px',height:'24px', color: '#3352FF' }} />}
                                                                                 text={t('share')}
                                                                                 style={{ gap: '7px' }}
                                                                             />
                                                                             <ActionItem
-                                                                                icon={<img src={contactIcon.src} alt='' style={{ objectFit: 'contain', height: '80%', width: '80%' }} />}
+                                                                                icon={<img src={contactIcon.src} alt='' style={{ objectFit: 'contain', height: '24px', width: '24px' }} />}
                                                                                 text={t('contact')}
                                                                             />
                                                                             <ActionItem
-                                                                                icon={<BookmarkAddOutlinedIcon style={{ fontSize: '17px', color: '#658147' }} />}
+                                                                                icon={<BookmarkAddOutlinedIcon style={{ width:"24px",height:'24px', color: '#658147' }} />}
                                                                                 text={t('addremarks')}
                                                                                 onClick={handleOpen}
                                                                                 id='remarks'
-                                                                                style={{ gap: '7px' }}
                                                                             />
+                                                                            { !row.polyline &&
+                                                                            <ActionItem
+                                                                                icon={<img src={fetchTrackDetailsIcon.src} alt='' style={{ objectFit: 'contain', height: '24px', width: '24px' }}/>}
+                                                                                text={t('fetchtrackdetails')}
+                                                                                onClick={()=>fetchTrackDetails(row._id)}
+                                                                                id='fetch track details'
+                                                                            /> 
+                                                                            } 
                                                                         </div>
                                                                     </div>
                                                                 </div>

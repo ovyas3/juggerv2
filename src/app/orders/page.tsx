@@ -42,6 +42,7 @@ const OrdersPage = () => {
   const { showMessage } = useSnackbar();
   const [selected_bound, setSelected_bound] = useState('outbound')
   const [remarksList, setRemarksList] = useState([])
+  const [triggerShipments,setTriggerShipments] = useState(false)
 
 
   //shipment payload
@@ -126,7 +127,7 @@ const OrdersPage = () => {
 
   useEffect(() => {
     if (ShipmentsPayload.from && ShipmentsPayload.to) getAllShipment();
-  }, [ShipmentsPayload])
+  }, [ShipmentsPayload,triggerShipments])
 
 
   return (
@@ -137,7 +138,7 @@ const OrdersPage = () => {
             mobile ? <Header title={'Shipments'} setReloadOnHeaderChange={setReloadOnHeaderChange} isMapHelper={false}/> : <MobileHeader />
           }
 
-          <div className='tableContainer' style={{ paddingInline: 24, paddingTop: 10, paddingBottom: mobile ? 24 : 65, position: 'relative', marginTop: mobile ? '56px' : '0px', marginLeft: mobile ? '70px' : '0px', height: 'calc(100vh - 56px)' }}>
+          <div className='tableContainer' style={{ paddingInline: 24, paddingTop: 10, paddingBottom: mobile ? 24 : 65, position: 'relative', marginTop: mobile ? '56px' : '24px', marginLeft: mobile ? '70px' : '0px', height: 'calc(100vh - 56px)' }}>
 
             <div>
 
@@ -179,21 +180,21 @@ const OrdersPage = () => {
             {/* ----table and filters---- */}
             {
               selected_bound === 'outbound' ?
-                <div className='tableData' style={{ position: 'relative', height: '95%' }}
-                >
+                <div className='tableData' style={{ height: '90%' }}>
                   {
                     selected_bound === 'outbound' ?
                       <div className='filters' style={{
-                        position: 'absolute', top: 0, overflowX: 'auto',
+                        position: 'absolute', overflowX: 'auto',
                         maxWidth: '100%', zIndex: 100,
                         whiteSpace: 'nowrap'
                       }} >
-                        <Filters onToFromChange={handleToFromChange} onChangeStatus={handleChangeStatus} reload={reload} getShipments={getAllShipment} shipmentsPayloadSetter={setShipmentsPayload} />
+                        <Filters onToFromChange={handleToFromChange} onChangeStatus={handleChangeStatus} reload={reload} getShipments={getAllShipment} shipmentsPayloadSetter={setShipmentsPayload} setTriggerShipments={setTriggerShipments} triggerShipments={triggerShipments} />
                       </div>
                       : <></>
                   }
+                  
                   <div style={{ paddingTop: tablePagination ? '25px' : '60px' }}>
-                    <TableData onSkipLimit={handleSkipLimitChange} allShipments={allShipment} count={count} rakeCaptiveList={rakeCaptiveList} onFnrChange={handleChangeByFnr} reload={reload} />
+                  <TableData onSkipLimit={handleSkipLimitChange} allShipments={allShipment} count={count} rakeCaptiveList={rakeCaptiveList} onFnrChange={handleChangeByFnr} reload={reload} />
                   </div>
                 </div>
                 : <></>
