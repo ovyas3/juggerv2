@@ -50,7 +50,7 @@ export interface row {
   pickup_date:string,
   eta:string,
   rrDoc: Boolean
-
+  polyline: string
 }
 
 export interface tagItem {
