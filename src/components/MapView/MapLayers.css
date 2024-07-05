@@ -22,7 +22,6 @@
   border-radius: 11px;
   color: black;
   flex-direction: row;
-  /* align-items: center; */
   justify-content: space-between;
   box-shadow: 0px 2px 10px #0000001A;
 }
@@ -321,6 +320,24 @@
     width: 100px;
     text-align: center;
     transform: rotate(46deg);
+}
+
+.shipment-head-lists:hover{
+  cursor: pointer;
+}
+
+.non-tracking-indication:hover{
+  cursor: pointer;
+  font-weight: 600;
+  color: red;
+  background-color: rgba(355, 0, 0, 0.2);
+}
+
+.tracking-indication:hover{
+  cursor: pointer;
+  font-weight: 600;
+  color: green;
+  background-color: #18be8a80;
 }
 
 @media screen and (max-width: 1140px){
