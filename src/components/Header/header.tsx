@@ -20,9 +20,7 @@ import BackIcon from "@/assets/back.svg";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
-const Header = ({title, setReloadOnHeaderChange, isMapHelper, getAllShipment}:any) => {
-  const isCorporateUser = getCookie("is_corporate_user") === "true";
-  console.log(isCorporateUser, "isCorporateUser");
+const Header = ({title, setReloadOnHeaderChange, isMapHelper}:any) => {
   const router = useRouter();
   const [parent_name, setParentName] = useState<string>("");
   const [shippers, setShippers] = useState([]);
@@ -30,7 +28,7 @@ const Header = ({title, setReloadOnHeaderChange, isMapHelper, getAllShipment}:an
 
   useEffect(() => {
     const parent_name = getCookie("parent_name")?.toString() || "";
-    const shippersData = JSON.parse(localStorage.getItem("corporate_shipper") || "[]");
+    const shippersData = JSON.parse(localStorage.getItem("shippers") || "[]");
     const selected_shipper = localStorage.getItem("selected_shipper");
     setParentName(parent_name);
     setShippers(shippersData);
@@ -51,12 +49,10 @@ const Header = ({title, setReloadOnHeaderChange, isMapHelper, getAllShipment}:an
             alignItems: "center",
           }}
         >
-          { isCorporateUser ? 
-          <div className="drop_down">
-          {shippers.length && <Dropdown reload={setReloadOnHeaderChange} shippers={shippers}  getAllShipment={getAllShipment}/>}
-          </div> : 
           <div className="header_name">{parent_name}</div>
-        }
+          {/* <div className="drop_down">
+            {shippers.length && <Dropdown reload={setReloadOnHeaderChange} shippers={shippers}  />}
+          </div> */}
           {/* <div className="divder"></div> */}
           {/* <div className="bell_icon">
             <Badge
