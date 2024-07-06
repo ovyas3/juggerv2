@@ -367,7 +367,7 @@
   .action_items{
     display: flex;
     align-items: center;
-    /* gap: 6px; */
+    gap: 7px;
     cursor: pointer;
     padding-inline: 8px;
     padding-block: 2px;
