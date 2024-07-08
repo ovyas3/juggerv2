@@ -44,6 +44,8 @@ const OrdersPage = () => {
   const [remarksList, setRemarksList] = useState([])
   const [triggerShipments,setTriggerShipments] = useState(false)
 
+  const[showRefreash, setShowRefreash] = useState(false)
+
 
   //shipment payload
   const [ShipmentsPayload, setShipmentsPayload] = useState<any>({
@@ -129,7 +131,6 @@ const OrdersPage = () => {
     if (ShipmentsPayload.from && ShipmentsPayload.to) getAllShipment();
   }, [ShipmentsPayload,triggerShipments])
 
-
   return (
     <div  >
       <div className='orderContainer'>
@@ -147,13 +148,19 @@ const OrdersPage = () => {
                 <div className={`reload ${reload ? 'loading' : ''}`} onClick={() => {
                   showMessage('Refresh Successfully', 'success')
                   const { fnrNumber, ...updatedShipmentsPayload } = ShipmentsPayload;
+                  updatedShipmentsPayload.status = ['ITNS', 'Delivered'];
                   setShipmentsPayload(updatedShipmentsPayload);
+                  console.log(updatedShipmentsPayload)
                   clearFilter()
                   setReload(true)
                   setTimeout(() => { setReload(false) }, 3000)
-                }}>
+                }}
+                  onMouseEnter={()=>{setShowRefreash(true)}}
+                  onMouseLeave={()=>{setShowRefreash(false)}}
+                >
                   <ReplayIcon style={{ color: '#707070' }} />
                 </div>
+                <div className='refreash_reload' style={{opacity:showRefreash?1:0}}>refresh filters</div>
               </div>
 
               {/* ----otbound ---- */}
@@ -194,7 +201,7 @@ const OrdersPage = () => {
                   }
                   
                   <div style={{ paddingTop: tablePagination ? '25px' : '60px' }}>
-                  <TableData onSkipLimit={handleSkipLimitChange} allShipments={allShipment} count={count} rakeCaptiveList={rakeCaptiveList} onFnrChange={handleChangeByFnr} reload={reload} />
+                    <TableData onSkipLimit={handleSkipLimitChange} allShipments={allShipment} count={count} rakeCaptiveList={rakeCaptiveList} onFnrChange={handleChangeByFnr} reload={reload} getAllShipment={getAllShipment} setTriggerShipments={setTriggerShipments} triggerShipments={triggerShipments}  />
                   </div>
                 </div>
                 : <></>

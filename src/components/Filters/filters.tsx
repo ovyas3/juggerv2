@@ -163,7 +163,8 @@ function Filters({ onToFromChange, onChangeStatus, reload, shipmentsPayloadSette
             if(startDate === twentyDaysBefore && endDate === today){
                 onToFromChange(today, twentyDaysBefore);
             }
-            
+            setStatus(['In Transit', 'Delivered']);
+            // onChangeStatus( ['In Transit', 'Delivered']);
         }
     }, [reload]);
 

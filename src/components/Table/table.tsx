@@ -21,7 +21,7 @@ import Link from 'next/link';
 import { Column, row, tagItem } from '@/utils/interface';
 import { useTranslations } from 'next-intl';
 import RRModal from '../RR Modal/RRModal';
-import { useSnackbar } from '@/hooks/snackBar';
+// import { useSnackbar } from '@/hooks/snackBar';
 
 
 import Autocomplete from '@mui/material/Autocomplete';
@@ -58,6 +58,7 @@ import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import Popover from '@mui/material/Popover';
 import { Typography, } from '@mui/material';
+import { useSnackbar } from '@/hooks/snackBar';
 
 
 
@@ -67,6 +68,7 @@ async function rake_update_id(payload: Object) {
 
 async function remake_update_By_Id(payload: object) {
     const response = await httpsPost(REMARKS_UPDATE_ID, payload);
+    return response;
 }
 
 const convertArrayToFilteredArray = (inputArray: any) => {
@@ -142,7 +144,7 @@ const convertArrayToFilteredArray = (inputArray: any) => {
 
 
 // Main component
-export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, count, onFnrChange, reload, remarksList,setTriggerShipments,triggerShipments }: any) {
+export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, count, onFnrChange, reload, remarksList,setTriggerShipments,triggerShipments, getAllShipment }: any) {
 
     //language controller
     const t = useTranslations("ORDERS")
@@ -668,6 +670,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                         shipmentId={rowId}
                         setOpen={setOpen}
                         remarksList={remarksList}
+                        getAllShipment={getAllShipment}
                     />}
                 </Box>
             </Modal>
@@ -681,7 +684,7 @@ const ActionItem = ({ icon, text, onClick, id, style }: any) => (
         <div>{text}</div>
     </div>
 );
-function Remarks({ shipmentId, setOpen, remarksList }: any) {
+function Remarks({ shipmentId, setOpen, remarksList,getAllShipment }: any) {
     const [others, setOthers] = useState('')
     const t = useTranslations('ORDERS');
     const placeholder = 'Enter Your Remarks'
@@ -696,8 +699,9 @@ function Remarks({ shipmentId, setOpen, remarksList }: any) {
         'Well done',
         'Please revise',
         'Excellent work',
-        'others',
+        'Others :' ,
     ];
+    const { showMessage } = useSnackbar();
 
     const handleMouseEnter = useCallback(() => setIsHovered(true), []);
     const handleMouseLeave = useCallback(() => setIsHovered(false), []);
@@ -723,12 +727,22 @@ function Remarks({ shipmentId, setOpen, remarksList }: any) {
             remarks: [
                 {
                     date: service.getEpoch(new Date()),
-                    remark: remarks === 'others' ? others : remarks,
+                    remark: remarks === 'Others :' ? others : remarks,
                 }
             ]
         }
         if (remarkObject.remarks[0].remark !== placeholder) {
             const response = remake_update_By_Id(remarkObject);
+            response.then((res: any) => {
+                if (res.statusCode === 200) {
+                    showMessage('Remark Updated', 'success');
+                    getAllShipment();
+                }
+            }).catch((err)=>{
+                console.log(err)
+            })
+        }else{
+            showMessage('select remark', 'error');
         }
         setRemarks('');
     }
@@ -742,23 +756,28 @@ function Remarks({ shipmentId, setOpen, remarksList }: any) {
                 color: 'white',
                 borderRadius: '8px 8px 0 0',
                 padding: '4px',
-                fontSize: '20px'
+                fontSize: '20px',
+                paddingLeft: '8px'
             }}>Remarks</div>
 
-            <div style={{ padding: '12px' }}>
+            <div style={{ padding: '12px', position: 'relative' }}>
                 <div
                     className='remarks_update'
                     onClick={(e) => { e.stopPropagation(); setOpenRemarks(!openRemarks); }}
                 >{remarks}{
-                        remarks === 'others' ?
+                        remarks === 'Others :' ?
                             <input
                                 onClick={(e) => { e.stopPropagation(); }}
                                 onChange={(e) => { handleothers(e.target.value) }}
                                 style={{
                                     outline: 'none',
+                                    borderTop: '1px solid #E9E9EB',
+                                    borderLeft: '1px solid #E9E9EB',
+                                    borderRight: '1px solid #E9E9EB',
                                     marginInline: '5px',
                                     backgroundColor: '#E9E9EB',
-                                    borderBottom: '2px solid black',
+                                    borderBottom: '1px solid black',
+                                    height: '24px'
                                 }}
                             /> : <></>
                     }
@@ -824,14 +843,14 @@ function Tags({ rakeCaptiveList, shipmentId, setOpen, setShowActionBox }: any) {
     const [searchTerm, setSearchTerm] = useState('');
     const [filteredList, setFilteredList] = useState(rakeCaptiveList);
 
-    const handleSearch = (e:any) => {
+    const handleSearch = (e: any) => {
         setSearchTerm(e.target.value);
         setItem(e.target.value);
         setOpenCaptiveItems(true);
     };
 
     useEffect(() => {
-        const filtered = rakeCaptiveList.filter((remark:any) =>
+        const filtered = rakeCaptiveList.filter((remark: any) =>
             remark.rake_id?.toLowerCase().includes(searchTerm.toLowerCase())
         );
         setFilteredList(filtered);
@@ -861,22 +880,32 @@ function Tags({ rakeCaptiveList, shipmentId, setOpen, setShowActionBox }: any) {
                 padding: '4px',
                 fontSize: '20px'
             }}>Captive Rakes</div>
-            <div style={{ padding: 16 }} onClick={(e) => { e.stopPropagation(); setOpenCaptiveItems(false) }}>
+            <div style={{ padding: 16, position:'relative' }} onClick={(e) => { e.stopPropagation(); setOpenCaptiveItems(false) }}>
                 <div className='captiveInput' onClick={(e) => { e.stopPropagation(); setOpenCaptiveItems(!openCaptiveItems) }}>
                     <input
                         value={searchTerm}
                         onChange={handleSearch}
                         placeholder="select one"
+                        style={{
+                            width: '100%',
+                            backgroundColor:'#E9E9EB',
+                            outline:'none',
+                            borderTop: '1px solid #E9E9EB',
+                            borderLeft: '1px solid #E9E9EB',
+                            borderRight: '1px solid #E9E9EB',
+                            padding:'4px',
+                            height: '24px'
+                        }}
                     />
                 </div>
                 <ArrowDropDownIcon
                     onClick={() => { }}
-                    className='arrow_down_icon'
+                    className='arrow_down_icon_captive'
                 />
                 <div
                     className='captive_list_box'
                     style={{ display: openCaptiveItems ? 'block' : 'none' }} >
-                    {filteredList.map((remark:any, index:number) => (
+                    {filteredList.map((remark: any, index: number) => (
                         <div
                             key={index}
                             onClick={(e) => {
@@ -888,7 +917,9 @@ function Tags({ rakeCaptiveList, shipmentId, setOpen, setShowActionBox }: any) {
                             }}
                             className='captive_list_item'
                         >
-                            {remark.rake_id} - {remark.name}
+                            <div style={{width:'136px'}}>{remark.rake_id}</div>
+                            <div style={{paddingInline:'4px'}}>-</div>
+                            <div>{remark.name}</div>
                         </div>
                     ))}
                 </div>
@@ -941,7 +972,7 @@ const RemarkComponent = ({ row, firstIndex }: any) => {
     return (
         <Box>
             <Typography
-                aria-owns={open ? `mouse-over-popover-${firstIndex}` : undefined}
+                aria-owns={true ? `mouse-over-popover-${firstIndex}` : undefined}
                 aria-haspopup="true"
                 onMouseEnter={handlePopoverOpen}
                 onMouseLeave={handlePopoverClose}
