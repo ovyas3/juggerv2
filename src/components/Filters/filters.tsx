@@ -83,7 +83,8 @@ function Filters({ onToFromChange, onChangeStatus, reload, shipmentsPayloadSette
     const [openFilterModal,setOpenFilterModal] = useState(false)
     const [filterEDemand, setFilterEDemand] = useState('');
     const [filterDestination, setFilterDestination] = useState('');
-
+    const [disableStartDate, setDisableStartDate] = useState(false);
+    const [disableEndDate, setDisableEndDate] = useState(false);
     const formatDate = (date: any) => {
         const t = service.getLocalTime(new Date(date));
         return t;
@@ -97,6 +98,7 @@ function Filters({ onToFromChange, onChangeStatus, reload, shipmentsPayloadSette
             setError('');
         }
         setStartDate(newStartDate.setHours(0, 0, 0, 0));
+        shouldDisableStartDate(newStartDate.setHours(0, 0, 0, 0));
     };
 
     const handleEndDateChange = (e: any) => {
@@ -107,6 +109,7 @@ function Filters({ onToFromChange, onChangeStatus, reload, shipmentsPayloadSette
             setError('');
         }
         setEndDate(newEndDate);
+        shouldDisableEndDate(newEndDate);
     };
 
     function clearFilter() {
@@ -121,13 +124,14 @@ function Filters({ onToFromChange, onChangeStatus, reload, shipmentsPayloadSette
           });
     }
 
-    function shouldDisableStartDate(date: Date) {
-        return date > new Date() || date > endDate
+    function shouldDisableStartDate(date: Date) : boolean | undefined {
+        const disable = (date > new Date()) || (date > endDate);
+        return disable
     }
 
-    function shouldDisableEndDate(date: Date) {
-        
-        return date > new Date() ||  new Date(new Date(date).setHours(23, 59, 59, 999)) < startDate
+    function shouldDisableEndDate(date: Date) : boolean | undefined {
+        const disable =  (date > new Date()) || (new Date(new Date(date).setHours(23, 59, 59, 999)) < startDate);
+        return disable
     }
 
     function handleSubmit() {
@@ -196,7 +200,7 @@ function Filters({ onToFromChange, onChangeStatus, reload, shipmentsPayloadSette
                             slotProps={{ textField: { placeholder: formatDate(startDate),onClick: ()=> setOpenStartDatePicker(!openStartDatePicker) },  }}
                             value={dayjs(startDate)}
                             onChange={(newDate) => { handleStartDateChange(newDate) }}
-                            shouldDisableDate={shouldDisableStartDate}
+                            disabled={disableStartDate}
                             sx={{
                                 '& .MuiInputBase-input::placeholder': {
                                     fontSize: '14px',
@@ -233,7 +237,8 @@ function Filters({ onToFromChange, onChangeStatus, reload, shipmentsPayloadSette
                             format="DD/MM/YYYY"
                             onChange={(newDate) => { handleEndDateChange(newDate) }}
                             value={dayjs(endDate)}
-                            shouldDisableDate={shouldDisableEndDate}
+                            disableFuture={true}
+                            disabled={disableEndDate}
                             sx={{
                                 '& .MuiInputBase-input::placeholder': {
                                     fontSize: '14px',
