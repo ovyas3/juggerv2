@@ -31,7 +31,7 @@ import Image from 'next/image';
 import MapViewIcon from "@/assets/map_view.svg";
 
 
-function Filters({ onToFromChange, onChangeStatus, reload, shipmentsPayloadSetter }: any) {
+function Filters({ onToFromChange, onChangeStatus, reload, shipmentsPayloadSetter,setTriggerShipments,triggerShipments }: any) {
 
 
 
@@ -112,6 +112,13 @@ function Filters({ onToFromChange, onChangeStatus, reload, shipmentsPayloadSette
     function clearFilter() {
         setFilterDestination('')
         setFilterEDemand('')
+        shipmentsPayloadSetter((prevState: any) => {
+            const newState = { ...prevState };
+            delete newState["eDemand"];
+            delete newState["destination"];
+    
+            return newState;
+          });
     }
 
     function shouldDisableStartDate(date: Date) {
@@ -133,7 +140,6 @@ function Filters({ onToFromChange, onChangeStatus, reload, shipmentsPayloadSette
 
         return newState;
       });
-      clearFilter();
       setOpenFilterModal(false);
     }
 
@@ -157,7 +163,8 @@ function Filters({ onToFromChange, onChangeStatus, reload, shipmentsPayloadSette
             if(startDate === twentyDaysBefore && endDate === today){
                 onToFromChange(today, twentyDaysBefore);
             }
-            
+            setStatus(['In Transit', 'Delivered']);
+            // onChangeStatus( ['In Transit', 'Delivered']);
         }
     }, [reload]);
 

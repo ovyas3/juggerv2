@@ -1,7 +1,7 @@
 .remarks_dropDown_list{
     width: 50%;
     position: absolute;
-    top: 85px;
+    top: 45px;
     border: 1px solid #bbbbbf ;
     border-radius: 4px;
     background-color: #fff;
@@ -20,10 +20,11 @@
 
 .arrow_down_icon{
     position: absolute;
-    right: 23px;
-    top: 65px;
+    right: 25px;
+    top: 25px;
     transform: translateY(-50%);
     cursor: pointer;
+    z-index: 1;
 }
 
 .button-style {
@@ -109,7 +110,6 @@
     width: 100%;
     background-color: #E9E9EB;
     font-size: 14px;
-    padding: 2px 4px ;
     height: 24px;
     cursor: pointer;
   }
@@ -117,7 +117,7 @@
   .captive_list_box{
     width: 60%;
     position: absolute;
-    top: 85px;
+    top: 45px;
     border: 1px solid #bbbbbf ;
     border-radius: 4px;
     background-color: #fff;
@@ -128,8 +128,11 @@
 
 .captive_list_item{
   font-size: small;
-  padding: 2px 8px 1px 8px;
+  padding: 4px 8px 1px 8px;
 cursor: pointer;
+display: flex;
+justify-content:flex-start
+
 }
 .captive_list_item:hover{
   background-color: #E9E9EB;
@@ -148,4 +151,22 @@ cursor: pointer;
 
 .remark_list_item{
   padding: 2px 8px 1px 8px;
+}
+
+.arrow_down_icon_captive{
+  position: absolute;
+  top: 16px;
+  right: 26px;
+}
+
+.refreash_reload{
+  position: absolute;
+  text-wrap: nowrap;
+  right: 2px;
+  top:25px;
+  background-color: #E9E9EB;
+  font-size: 12px;
+  padding: 2px 4px;
+  border-radius: 4px;
+  opacity: 0;
 }

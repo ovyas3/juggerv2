@@ -21,6 +21,7 @@ import Link from 'next/link';
 import { Column, row, tagItem } from '@/utils/interface';
 import { useTranslations } from 'next-intl';
 import RRModal from '../RR Modal/RRModal';
+// import { useSnackbar } from '@/hooks/snackBar';
 
 
 import Autocomplete from '@mui/material/Autocomplete';
@@ -33,7 +34,7 @@ import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import { httpsPost } from '@/utils/Communication';
-import { UPDATE_RAKE_CAPTIVE_ID, REMARKS_UPDATE_ID } from '@/utils/helper'
+import { UPDATE_RAKE_CAPTIVE_ID, REMARKS_UPDATE_ID,FETCH_TRACK_DETAILS } from '@/utils/helper'
 import { statusBuilder } from '../MapView/StatusBuilder/StatusBuilder';
 
 import FOIS from '@/assets/fois_icon.png'
@@ -42,6 +43,7 @@ import RRDOC from '@/assets/Doc-icon.svg'
 import attach_icon from '@/assets/attach_icon.svg'
 import rrDocumentIcon from '@/assets/rr_document_icon.svg'
 import ShareIcon from '@mui/icons-material/Share';
+import fetchTrackDetailsIcon from '@/assets/polylines_icon.svg'
 import contactIcon from '@/assets/inactive_contact_dashboard+icon.svg'
 import BookmarkAddOutlinedIcon from '@mui/icons-material/BookmarkAddOutlined';
 import Image from 'next/image';
@@ -56,6 +58,7 @@ import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import Popover from '@mui/material/Popover';
 import { Typography, } from '@mui/material';
+import { useSnackbar } from '@/hooks/snackBar';
 
 
 
@@ -65,6 +68,7 @@ async function rake_update_id(payload: Object) {
 
 async function remake_update_By_Id(payload: object) {
     const response = await httpsPost(REMARKS_UPDATE_ID, payload);
+    return response;
 }
 
 const convertArrayToFilteredArray = (inputArray: any) => {
@@ -88,8 +92,9 @@ const convertArrayToFilteredArray = (inputArray: any) => {
             is_captive: Boolean,
             trip_tracker: any,
             etaTime: any
+            polyline: any
         }) => {
-        const { edemand_no, FNR, all_FNRs, delivery_location, trip_tracker, others, remarks, unique_code, status, pickup_date, captive_id, is_captive, eta, rr_document } = item;
+        const { edemand_no, FNR, all_FNRs, delivery_location, trip_tracker, others, remarks, unique_code, status, pickup_date, captive_id, is_captive, eta, rr_document,polyline } = item;
         return {
             _id: item._id,
             edemand: edemand_no,
@@ -127,6 +132,7 @@ const convertArrayToFilteredArray = (inputArray: any) => {
                 is_gps: trip_tracker && trip_tracker.gps_last_location ? true : false,
             },
             validationForAttachRake: !captive_id && is_captive,
+            polyline: polyline,
             eta: eta,
             pickup_date: pickup_date,
             rrDoc: rr_document && rr_document.length > 0 ? true : false
@@ -138,7 +144,7 @@ const convertArrayToFilteredArray = (inputArray: any) => {
 
 
 // Main component
-export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, count, onFnrChange, reload, remarksList }: any) {
+export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, count, onFnrChange, reload, remarksList,setTriggerShipments,triggerShipments, getAllShipment }: any) {
 
     //language controller
     const t = useTranslations("ORDERS")
@@ -231,6 +237,27 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
         setRowID(id);
         setShowActionBox(prevIndex => (prevIndex === index ? -1 : index));
     }
+    
+    const { showMessage } = useSnackbar();
+
+    async function fetchTrackDetails(rake_id: any){
+     const payload = {
+        rakeId: rake_id
+     }
+     httpsPost(FETCH_TRACK_DETAILS,payload).then((res)=>{
+        if(res && res.statusCode == 200) {
+            showMessage('Track Details Fetched Successfully.','success')
+            setTriggerShipments(!triggerShipments)
+        } else {
+            showMessage('Error Fetching Track Details.','error')
+        }
+        
+     }).catch((err)=>{
+         showMessage('Error Fetching Track Details.','error')
+     })
+      
+    }
+
 
     useEffect(() => {
         const etaResult = sortArray(allShipments, 'eta', currentETAsorting ? 'dec' : 'asc');
@@ -472,7 +499,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                         <div className='action_button_options' onClick={(e) => e.stopPropagation()}>
                                                                             {row.validationForAttachRake && (
                                                                                 <ActionItem
-                                                                                    icon={<img src={attach_icon.src} alt='' />}
+                                                                                    icon={<img src={attach_icon.src} alt='' height={"24px"} width={"24px"} />}
                                                                                     text={t('attach')}
                                                                                     onClick={handleOpen}
                                                                                     id='attach'
@@ -480,21 +507,28 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                                 />
                                                                             )}
                                                                             <ActionItem
-                                                                                icon={<ShareIcon style={{ fontSize: '15px', color: '#3352FF' }} />}
+                                                                                icon={<ShareIcon style={{ width: '24px',height:'24px', color: '#3352FF' }} />}
                                                                                 text={t('share')}
                                                                                 style={{ gap: '7px' }}
                                                                             />
                                                                             <ActionItem
-                                                                                icon={<img src={contactIcon.src} alt='' style={{ objectFit: 'contain', height: '80%', width: '80%' }} />}
+                                                                                icon={<img src={contactIcon.src} alt='' style={{ objectFit: 'contain', height: '24px', width: '24px' }} />}
                                                                                 text={t('contact')}
                                                                             />
                                                                             <ActionItem
-                                                                                icon={<BookmarkAddOutlinedIcon style={{ fontSize: '17px', color: '#658147' }} />}
+                                                                                icon={<BookmarkAddOutlinedIcon style={{ width:"24px",height:'24px', color: '#658147' }} />}
                                                                                 text={t('addremarks')}
                                                                                 onClick={handleOpen}
                                                                                 id='remarks'
-                                                                                style={{ gap: '7px' }}
                                                                             />
+                                                                            { !row.polyline &&
+                                                                            <ActionItem
+                                                                                icon={<img src={fetchTrackDetailsIcon.src} alt='' style={{ objectFit: 'contain', height: '24px', width: '24px' }}/>}
+                                                                                text={t('fetchtrackdetails')}
+                                                                                onClick={()=>fetchTrackDetails(row._id)}
+                                                                                id='fetch track details'
+                                                                            /> 
+                                                                            } 
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -636,6 +670,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                         shipmentId={rowId}
                         setOpen={setOpen}
                         remarksList={remarksList}
+                        getAllShipment={getAllShipment}
                     />}
                 </Box>
             </Modal>
@@ -649,7 +684,7 @@ const ActionItem = ({ icon, text, onClick, id, style }: any) => (
         <div>{text}</div>
     </div>
 );
-function Remarks({ shipmentId, setOpen, remarksList }: any) {
+function Remarks({ shipmentId, setOpen, remarksList,getAllShipment }: any) {
     const [others, setOthers] = useState('')
     const t = useTranslations('ORDERS');
     const placeholder = 'Enter Your Remarks'
@@ -664,8 +699,9 @@ function Remarks({ shipmentId, setOpen, remarksList }: any) {
         'Well done',
         'Please revise',
         'Excellent work',
-        'others',
+        'Others :' ,
     ];
+    const { showMessage } = useSnackbar();
 
     const handleMouseEnter = useCallback(() => setIsHovered(true), []);
     const handleMouseLeave = useCallback(() => setIsHovered(false), []);
@@ -691,12 +727,22 @@ function Remarks({ shipmentId, setOpen, remarksList }: any) {
             remarks: [
                 {
                     date: service.getEpoch(new Date()),
-                    remark: remarks === 'others' ? others : remarks,
+                    remark: remarks === 'Others :' ? others : remarks,
                 }
             ]
         }
         if (remarkObject.remarks[0].remark !== placeholder) {
             const response = remake_update_By_Id(remarkObject);
+            response.then((res: any) => {
+                if (res.statusCode === 200) {
+                    showMessage('Remark Updated', 'success');
+                    getAllShipment();
+                }
+            }).catch((err)=>{
+                console.log(err)
+            })
+        }else{
+            showMessage('select remark', 'error');
         }
         setRemarks('');
     }
@@ -710,23 +756,28 @@ function Remarks({ shipmentId, setOpen, remarksList }: any) {
                 color: 'white',
                 borderRadius: '8px 8px 0 0',
                 padding: '4px',
-                fontSize: '20px'
+                fontSize: '20px',
+                paddingLeft: '8px'
             }}>Remarks</div>
 
-            <div style={{ padding: '12px' }}>
+            <div style={{ padding: '12px', position: 'relative' }}>
                 <div
                     className='remarks_update'
                     onClick={(e) => { e.stopPropagation(); setOpenRemarks(!openRemarks); }}
                 >{remarks}{
-                        remarks === 'others' ?
+                        remarks === 'Others :' ?
                             <input
                                 onClick={(e) => { e.stopPropagation(); }}
                                 onChange={(e) => { handleothers(e.target.value) }}
                                 style={{
                                     outline: 'none',
+                                    borderTop: '1px solid #E9E9EB',
+                                    borderLeft: '1px solid #E9E9EB',
+                                    borderRight: '1px solid #E9E9EB',
                                     marginInline: '5px',
                                     backgroundColor: '#E9E9EB',
-                                    borderBottom: '2px solid black',
+                                    borderBottom: '1px solid black',
+                                    height: '24px'
                                 }}
                             /> : <></>
                     }
@@ -792,14 +843,14 @@ function Tags({ rakeCaptiveList, shipmentId, setOpen, setShowActionBox }: any) {
     const [searchTerm, setSearchTerm] = useState('');
     const [filteredList, setFilteredList] = useState(rakeCaptiveList);
 
-    const handleSearch = (e:any) => {
+    const handleSearch = (e: any) => {
         setSearchTerm(e.target.value);
         setItem(e.target.value);
         setOpenCaptiveItems(true);
     };
 
     useEffect(() => {
-        const filtered = rakeCaptiveList.filter((remark:any) =>
+        const filtered = rakeCaptiveList.filter((remark: any) =>
             remark.rake_id?.toLowerCase().includes(searchTerm.toLowerCase())
         );
         setFilteredList(filtered);
@@ -829,22 +880,32 @@ function Tags({ rakeCaptiveList, shipmentId, setOpen, setShowActionBox }: any) {
                 padding: '4px',
                 fontSize: '20px'
             }}>Captive Rakes</div>
-            <div style={{ padding: 16 }} onClick={(e) => { e.stopPropagation(); setOpenCaptiveItems(false) }}>
+            <div style={{ padding: 16, position:'relative' }} onClick={(e) => { e.stopPropagation(); setOpenCaptiveItems(false) }}>
                 <div className='captiveInput' onClick={(e) => { e.stopPropagation(); setOpenCaptiveItems(!openCaptiveItems) }}>
                     <input
                         value={searchTerm}
                         onChange={handleSearch}
                         placeholder="select one"
+                        style={{
+                            width: '100%',
+                            backgroundColor:'#E9E9EB',
+                            outline:'none',
+                            borderTop: '1px solid #E9E9EB',
+                            borderLeft: '1px solid #E9E9EB',
+                            borderRight: '1px solid #E9E9EB',
+                            padding:'4px',
+                            height: '24px'
+                        }}
                     />
                 </div>
                 <ArrowDropDownIcon
                     onClick={() => { }}
-                    className='arrow_down_icon'
+                    className='arrow_down_icon_captive'
                 />
                 <div
                     className='captive_list_box'
                     style={{ display: openCaptiveItems ? 'block' : 'none' }} >
-                    {filteredList.map((remark:any, index:number) => (
+                    {filteredList.map((remark: any, index: number) => (
                         <div
                             key={index}
                             onClick={(e) => {
@@ -856,7 +917,9 @@ function Tags({ rakeCaptiveList, shipmentId, setOpen, setShowActionBox }: any) {
                             }}
                             className='captive_list_item'
                         >
-                            {remark.rake_id} - {remark.name}
+                            <div style={{width:'136px'}}>{remark.rake_id}</div>
+                            <div style={{paddingInline:'4px'}}>-</div>
+                            <div>{remark.name}</div>
                         </div>
                     ))}
                 </div>
@@ -909,7 +972,7 @@ const RemarkComponent = ({ row, firstIndex }: any) => {
     return (
         <Box>
             <Typography
-                aria-owns={open ? `mouse-over-popover-${firstIndex}` : undefined}
+                aria-owns={true ? `mouse-over-popover-${firstIndex}` : undefined}
                 aria-haspopup="true"
                 onMouseEnter={handlePopoverOpen}
                 onMouseLeave={handlePopoverClose}
