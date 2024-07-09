@@ -323,6 +323,25 @@
     transform: rotate(46deg);
 }
 
+.shipment-head-lists:hover{
+  cursor: pointer;
+}
+
+.non-tracking-indication:hover{
+  cursor: pointer;
+  font-weight: 600;
+  color: red;
+  background-color: rgba(355, 0, 0, 0.2);
+}
+
+.tracking-indication:hover{
+  cursor: pointer;
+  font-weight: 600;
+  color: green;
+  background-color: #18be8a80;
+}
+
+
 @media screen and (max-width: 1140px){
   .shipment-heads{
     grid-template-columns: repeat(1, 1fr);

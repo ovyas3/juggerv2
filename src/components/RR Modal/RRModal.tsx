@@ -182,7 +182,7 @@ const RRModal: React.FC<PopupProps> = ({ isOpen, isClose, rrNumbers, isRRDoc }) 
                         <TableRow>
                           <TableCell align="left" className="rrmodal-table-headers">S.No</TableCell>
                           <TableCell align="left" className="rrmodal-table-headers">Owning Rly</TableCell>
-                          <TableCell align="left" className="rrmodal-table-headers">Type</TableCell>
+                          <TableCell align="left" className="rrmodal-table-headers">Wagon Type</TableCell>
                           <TableCell align="left" className="rrmodal-table-headers">Wagon No.</TableCell>
                           <TableCell align="left" className="rrmodal-table-headers">CC (MT)</TableCell>
                           <TableCell align="center" className="rrmodal-table-headers">Tare (MT)</TableCell>
