@@ -22,20 +22,19 @@ interface event {
   };
 }
 
-const Dropdown = ({ shippers, reload }:{shippers: shipper[], reload: any}) => {
+const Dropdown = ({ shippers, reload }:{shippers: shipper[], reload: any, getAllShipment:any}) => {
 
-  const [selectedValue, setSelectedValue] = useState<string>('');
   const [options, setOptions] = useState<option[]>([{
     value: '',
     label: ''
   }]);
+  const [selectedValue, setSelectedValue] = useState(options.length > 0 ? options[0].value : '');
   const handleChange = (event: event) => {
     const newValue = event.target.value as string;
     setSelectedValue(newValue);
     localStorage.setItem('selected_shipper', newValue);
     setCookies("selected_shipper", newValue);
-    reload(true)
-    setTimeout(()=>{reload(false)}, 1)
+    window.location.reload();
   };
 
   useEffect(() => {
@@ -44,9 +43,12 @@ const Dropdown = ({ shippers, reload }:{shippers: shipper[], reload: any}) => {
       return { value: shipper._id, label: shipper.name };
     });
     setOptions(optionsData);
-    setSelectedValue(selected_shipper);
-    console.log({options, selectedValue, shippers})
-  }, []);
+    if (selected_shipper) {
+      setSelectedValue(selected_shipper);
+    } else if (optionsData.length > 0) {
+      setSelectedValue(optionsData[0].value);
+    }
+  }, [shippers]);
 
   return (
     <FormControl sx={{ minWidth: 166 }}>

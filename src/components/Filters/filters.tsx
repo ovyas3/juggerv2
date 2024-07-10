@@ -31,7 +31,7 @@ import Image from 'next/image';
 import MapViewIcon from "@/assets/map_view.svg";
 
 
-function Filters({ onToFromChange, onChangeStatus, reload, shipmentsPayloadSetter,setTriggerShipments,triggerShipments }: any) {
+function Filters({ onToFromChange, onChangeStatus, reload, shipmentsPayloadSetter}: any) {
 
 
 
@@ -83,6 +83,10 @@ function Filters({ onToFromChange, onChangeStatus, reload, shipmentsPayloadSette
     const [openFilterModal,setOpenFilterModal] = useState(false)
     const [filterEDemand, setFilterEDemand] = useState('');
     const [filterDestination, setFilterDestination] = useState('');
+    const [disableStartDate, setDisableStartDate] = useState(false);
+    const [disableEndDate, setDisableEndDate] = useState(false);  
+    const [filterMaterial, setFilterMaterial] = useState('');
+
 
     const formatDate = (date: any) => {
         const t = service.getLocalTime(new Date(date));
@@ -97,6 +101,7 @@ function Filters({ onToFromChange, onChangeStatus, reload, shipmentsPayloadSette
             setError('');
         }
         setStartDate(newStartDate.setHours(0, 0, 0, 0));
+        shouldDisableStartDate(newStartDate.setHours(0, 0, 0, 0));
     };
 
     const handleEndDateChange = (e: any) => {
@@ -107,27 +112,31 @@ function Filters({ onToFromChange, onChangeStatus, reload, shipmentsPayloadSette
             setError('');
         }
         setEndDate(newEndDate);
+        shouldDisableEndDate(newEndDate);
     };
 
     function clearFilter() {
+        setFilterMaterial('')
         setFilterDestination('')
         setFilterEDemand('')
         shipmentsPayloadSetter((prevState: any) => {
             const newState = { ...prevState };
             delete newState["eDemand"];
             delete newState["destination"];
+            delete newState["material"];
     
             return newState;
           });
     }
 
-    function shouldDisableStartDate(date: Date) {
-        return date > new Date() || date > endDate
+    function shouldDisableStartDate(date: Date) : boolean | undefined {
+        const disable = (date > new Date()) || (date > endDate);
+        return disable
     }
 
-    function shouldDisableEndDate(date: Date) {
-        
-        return date > new Date() ||  new Date(new Date(date).setHours(23, 59, 59, 999)) < startDate
+    function shouldDisableEndDate(date: Date) : boolean | undefined {
+        const disable =  (date > new Date()) || (new Date(new Date(date).setHours(23, 59, 59, 999)) < startDate);
+        return disable
     }
 
     function handleSubmit() {
@@ -137,6 +146,8 @@ function Filters({ onToFromChange, onChangeStatus, reload, shipmentsPayloadSette
         else newState.eDemand = filterEDemand;
         if (!filterDestination) delete newState["destination"];
         else newState.destination = filterDestination;
+        if (!filterMaterial) delete newState["material"]
+        else newState.material = filterMaterial
 
         return newState;
       });
@@ -186,6 +197,10 @@ function Filters({ onToFromChange, onChangeStatus, reload, shipmentsPayloadSette
                             padding: 0,
                             height: 'auto',
                             overflow: 'hidden',
+                            '.MuiTextField-root':{
+                                minWidth:'150px !important',
+                                width:'150px'
+                            }
                         }}
                     >
                         <DatePicker
@@ -196,7 +211,7 @@ function Filters({ onToFromChange, onChangeStatus, reload, shipmentsPayloadSette
                             slotProps={{ textField: { placeholder: formatDate(startDate),onClick: ()=> setOpenStartDatePicker(!openStartDatePicker) },  }}
                             value={dayjs(startDate)}
                             onChange={(newDate) => { handleStartDateChange(newDate) }}
-                            shouldDisableDate={shouldDisableStartDate}
+                            disabled={disableStartDate}
                             sx={{
                                 '& .MuiInputBase-input::placeholder': {
                                     fontSize: '14px',
@@ -212,6 +227,11 @@ function Filters({ onToFromChange, onChangeStatus, reload, shipmentsPayloadSette
                                         borderColor: '#E9E9EB',
                                     },
                                 },
+                                '& .MuiTextField-root': {
+                                    '& .MuiPickersTextField-root':{
+                                     width:'150px !important'
+                                    }
+                                }
                             }}
                         />
                     </DemoContainer>
@@ -223,6 +243,10 @@ function Filters({ onToFromChange, onChangeStatus, reload, shipmentsPayloadSette
                             padding: 0,
                             height: 'auto',
                             overflow: 'hidden',
+                            '.MuiTextField-root':{
+                                minWidth:'150px !important',
+                                width:'150px'
+                            }
                         }}
                     >
                         <DatePicker
@@ -233,7 +257,8 @@ function Filters({ onToFromChange, onChangeStatus, reload, shipmentsPayloadSette
                             format="DD/MM/YYYY"
                             onChange={(newDate) => { handleEndDateChange(newDate) }}
                             value={dayjs(endDate)}
-                            shouldDisableDate={shouldDisableEndDate}
+                            disableFuture={true}
+                            disabled={disableEndDate}
                             sx={{
                                 '& .MuiInputBase-input::placeholder': {
                                     fontSize: '14px',
@@ -339,6 +364,7 @@ function Filters({ onToFromChange, onChangeStatus, reload, shipmentsPayloadSette
             <div className='filters-wrapper'>
             <input placeholder='e-Demand Number' onChange={(e)=>setFilterEDemand(e.target.value)} value={filterEDemand}/>
             <input placeholder='Destination' onChange={(e)=>setFilterDestination(e.target.value)} value={filterDestination}/>
+            <input placeholder='Material' onChange={(e)=>setFilterMaterial(e.target.value)} value={filterMaterial}/>
             </div>
             <div className='filter-modal-footer'>
                 <button onClick={()=>clearFilter()}>
@@ -352,7 +378,7 @@ function Filters({ onToFromChange, onChangeStatus, reload, shipmentsPayloadSette
            </div>
         </div>
 
-        <div className='overlay-container'/>
+        <div className='overlay-container' onClick={()=>setOpenFilterModal(false)}/>
         </div> : <></>
 }
     

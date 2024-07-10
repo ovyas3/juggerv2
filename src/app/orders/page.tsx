@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 'use client'
 import { useTranslations } from 'next-intl';
 import SideDrawer from '../../components/Drawer/Drawer';
