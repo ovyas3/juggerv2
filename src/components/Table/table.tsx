@@ -34,7 +34,7 @@ import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import { httpsPost } from '@/utils/Communication';
-import { UPDATE_RAKE_CAPTIVE_ID, REMARKS_UPDATE_ID,FETCH_TRACK_DETAILS } from '@/utils/helper'
+import { UPDATE_RAKE_CAPTIVE_ID, REMARKS_UPDATE_ID, FETCH_TRACK_DETAILS } from '@/utils/helper'
 import { statusBuilder } from '../MapView/StatusBuilder/StatusBuilder';
 
 import FOIS from '@/assets/fois_icon.png'
@@ -59,6 +59,7 @@ import Select, { SelectChangeEvent } from '@mui/material/Select';
 import Popover from '@mui/material/Popover';
 import { Typography, } from '@mui/material';
 import { useSnackbar } from '@/hooks/snackBar';
+import captiveRakeIndicator from '@/assets/captive_rakes.svg'
 
 
 
@@ -91,10 +92,11 @@ const convertArrayToFilteredArray = (inputArray: any) => {
             captive_id: string,
             is_captive: Boolean,
             trip_tracker: any,
-            etaTime: any
-            polyline: any
+            etaTime: any,
+            polyline: any,
+            past_etas:any
         }) => {
-        const { edemand_no, FNR, all_FNRs, delivery_location, trip_tracker, others, remarks, unique_code, status, pickup_date, captive_id, is_captive, eta, rr_document,polyline } = item;
+        const { edemand_no, FNR, all_FNRs, delivery_location, trip_tracker, others, remarks, unique_code, status, pickup_date, captive_id, is_captive, eta, rr_document, polyline , past_etas} = item;
         return {
             _id: item._id,
             edemand: edemand_no,
@@ -135,7 +137,9 @@ const convertArrayToFilteredArray = (inputArray: any) => {
             polyline: polyline,
             eta: eta,
             pickup_date: pickup_date,
-            rrDoc: rr_document && rr_document.length > 0 ? true : false
+            rrDoc: rr_document && rr_document.length > 0 ? true : false,
+            past_etas: past_etas? past_etas : 'NA',
+            deliverDate:'NA'
         }
     });
 };
@@ -144,7 +148,7 @@ const convertArrayToFilteredArray = (inputArray: any) => {
 
 
 // Main component
-export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, count, onFnrChange, reload, remarksList,setTriggerShipments,triggerShipments, getAllShipment }: any) {
+export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, count, onFnrChange, reload, remarksList, setTriggerShipments, triggerShipments, getAllShipment }: any) {
 
     //language controller
     const t = useTranslations("ORDERS")
@@ -237,25 +241,25 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
         setRowID(id);
         setShowActionBox(prevIndex => (prevIndex === index ? -1 : index));
     }
-    
+
     const { showMessage } = useSnackbar();
 
-    async function fetchTrackDetails(rake_id: any){
-     const payload = {
-        rakeId: rake_id
-     }
-     httpsPost(FETCH_TRACK_DETAILS,payload).then((res)=>{
-        if(res && res.statusCode == 200) {
-            showMessage('Track Details Fetched Successfully.','success')
-            setTriggerShipments(!triggerShipments)
-        } else {
-            showMessage('Error Fetching Track Details.','error')
+    async function fetchTrackDetails(rake_id: any) {
+        const payload = {
+            rakeId: rake_id
         }
-        
-     }).catch((err)=>{
-         showMessage('Error Fetching Track Details.','error')
-     })
-      
+        httpsPost(FETCH_TRACK_DETAILS, payload).then((res) => {
+            if (res && res.statusCode == 200) {
+                showMessage('Track Details Fetched Successfully.', 'success')
+                setTriggerShipments(!triggerShipments)
+            } else {
+                showMessage('Error Fetching Track Details.', 'error')
+            }
+
+        }).catch((err) => {
+            showMessage('Error Fetching Track Details.', 'error')
+        })
+
     }
 
 
@@ -308,6 +312,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
             { id: 'pickupdate', label: 'Invoiced Date', class: 'pickupdate', innerClass: 'inner_pickup' },
             { id: 'status', label: 'Status', class: 'status', innerClass: 'inner_status' },
             { id: 'currentEta', label: 'Current ETA', class: 'currentEta', innerClass: 'inner_eta' },
+            { id: 'deliverDate', label:'Delivered Date', class:'deliverDate', innerClass:''},
             { id: 'remarks', label: 'Remarks', class: 'remarks', innerClass: '' },
             { id: 'handlingAgent', label: 'Handling Agent', class: 'handlingAgent', innerClass: '' },
             { id: 'action', label: 'Action', class: 'action', innerClass: '' },
@@ -507,7 +512,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                                 />
                                                                             )}
                                                                             <ActionItem
-                                                                                icon={<ShareIcon style={{ width: '24px',height:'24px', color: '#3352FF' }} />}
+                                                                                icon={<ShareIcon style={{ width: '24px', height: '24px', color: '#3352FF' }} />}
                                                                                 text={t('share')}
                                                                                 style={{ gap: '7px' }}
                                                                             />
@@ -516,19 +521,19 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                                 text={t('contact')}
                                                                             />
                                                                             <ActionItem
-                                                                                icon={<BookmarkAddOutlinedIcon style={{ width:"24px",height:'24px', color: '#658147' }} />}
+                                                                                icon={<BookmarkAddOutlinedIcon style={{ width: "24px", height: '24px', color: '#658147' }} />}
                                                                                 text={t('addremarks')}
                                                                                 onClick={handleOpen}
                                                                                 id='remarks'
                                                                             />
-                                                                            { !row.polyline &&
-                                                                            <ActionItem
-                                                                                icon={<img src={fetchTrackDetailsIcon.src} alt='' style={{ objectFit: 'contain', height: '24px', width: '24px' }}/>}
-                                                                                text={t('fetchtrackdetails')}
-                                                                                onClick={()=>fetchTrackDetails(row._id)}
-                                                                                id='fetch track details'
-                                                                            /> 
-                                                                            } 
+                                                                            {!row.polyline &&
+                                                                                <ActionItem
+                                                                                    icon={<img src={fetchTrackDetailsIcon.src} alt='' style={{ objectFit: 'contain', height: '24px', width: '24px' }} />}
+                                                                                    text={t('fetchtrackdetails')}
+                                                                                    onClick={() => fetchTrackDetails(row._id)}
+                                                                                    id='fetch track details'
+                                                                                />
+                                                                            }
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -567,6 +572,11 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                         }
                                                                     </div>
                                                                 </div>
+                                                                <img
+                                                                    src={!row.validationForAttachRake ? captiveRakeIndicator.src : ''}
+                                                                    style={{ display: 'block', marginTop:'8px' }}
+                                                                    alt=''
+                                                                />
                                                             </div>
                                                         }
                                                         {item.id === 'destination' && (
@@ -684,7 +694,7 @@ const ActionItem = ({ icon, text, onClick, id, style }: any) => (
         <div>{text}</div>
     </div>
 );
-function Remarks({ shipmentId, setOpen, remarksList,getAllShipment }: any) {
+function Remarks({ shipmentId, setOpen, remarksList, getAllShipment }: any) {
     const [others, setOthers] = useState('')
     const t = useTranslations('ORDERS');
     const placeholder = 'Enter Your Remarks'
@@ -699,7 +709,7 @@ function Remarks({ shipmentId, setOpen, remarksList,getAllShipment }: any) {
         'Well done',
         'Please revise',
         'Excellent work',
-        'Others :' ,
+        'Others :',
     ];
     const { showMessage } = useSnackbar();
 
@@ -738,10 +748,10 @@ function Remarks({ shipmentId, setOpen, remarksList,getAllShipment }: any) {
                     showMessage('Remark Updated', 'success');
                     getAllShipment();
                 }
-            }).catch((err)=>{
+            }).catch((err) => {
                 console.log(err)
             })
-        }else{
+        } else {
             showMessage('select remark', 'error');
         }
         setRemarks('');
@@ -880,7 +890,7 @@ function Tags({ rakeCaptiveList, shipmentId, setOpen, setShowActionBox }: any) {
                 padding: '4px',
                 fontSize: '20px'
             }}>Captive Rakes</div>
-            <div style={{ padding: 16, position:'relative' }} onClick={(e) => { e.stopPropagation(); setOpenCaptiveItems(false) }}>
+            <div style={{ padding: 16, position: 'relative' }} onClick={(e) => { e.stopPropagation(); setOpenCaptiveItems(false) }}>
                 <div className='captiveInput' onClick={(e) => { e.stopPropagation(); setOpenCaptiveItems(!openCaptiveItems) }}>
                     <input
                         value={searchTerm}
@@ -888,12 +898,12 @@ function Tags({ rakeCaptiveList, shipmentId, setOpen, setShowActionBox }: any) {
                         placeholder="select one"
                         style={{
                             width: '100%',
-                            backgroundColor:'#E9E9EB',
-                            outline:'none',
+                            backgroundColor: '#E9E9EB',
+                            outline: 'none',
                             borderTop: '1px solid #E9E9EB',
                             borderLeft: '1px solid #E9E9EB',
                             borderRight: '1px solid #E9E9EB',
-                            padding:'4px',
+                            padding: '4px',
                             height: '24px'
                         }}
                     />
@@ -917,8 +927,8 @@ function Tags({ rakeCaptiveList, shipmentId, setOpen, setShowActionBox }: any) {
                             }}
                             className='captive_list_item'
                         >
-                            <div style={{width:'136px'}}>{remark.rake_id}</div>
-                            <div style={{paddingInline:'4px'}}>-</div>
+                            <div style={{ width: '136px' }}>{remark.rake_id}</div>
+                            <div style={{ paddingInline: '4px' }}>-</div>
                             <div>{remark.name}</div>
                         </div>
                     ))}

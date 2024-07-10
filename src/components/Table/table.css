@@ -53,7 +53,8 @@
 
 .status{
     /* background-color: darksalmon!important; */
-    min-width: 154px !important;
+    max-width: 150px !important;
+    min-width: 75px !important;
 }
 .inner_status{
     /* background-color: aqua !important; */
@@ -92,6 +93,10 @@
     /* background-color: yellow!important; */
     min-width: 90px !important;
     text-wrap:nowrap;
+}
+.deliverDate{
+    /* background-color: darkslateblue!important; */
+    min-width: 90px !important;
 }
 .remarks{
     /* background-color: darkslategray!important; */
@@ -346,13 +351,15 @@
 
 .edemand_fois_gpis{
     /* background-color: #7C7E8C; */
-    height: 16px;
-    width: 48px;
+   
     margin-top: 8px;
+    display: flex;
+    flex-direction: row;
+
 
     
-    display: grid;
-    grid-template-columns: auto auto;
+    /* display: grid;
+    grid-template-columns: auto auto; */
     row-gap: 6px;
   }
   .action_button_options{

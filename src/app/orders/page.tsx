@@ -107,7 +107,7 @@ const OrdersPage = () => {
     setRakeCaptiveList(list_captive_rake.data)
   }
   async function getRemarksList() {
-    const list_remarks = await httpsGet(REMARKS_LIST);
+    const list_remarks = await httpsPost(REMARKS_LIST,{});
     console.log(list_remarks)
     setRemarksList(list_remarks.data)
   }

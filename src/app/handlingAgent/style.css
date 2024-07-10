@@ -26,20 +26,22 @@
     height: calc(100vh - 56px - 54px);
 }
 .invite_button{
-    font-size: 16px;
-    background-color: #3351FF;
-    color: white;
-    width: 130px;
-    text-align: center;
-    padding-block: 4px;
+    background-color: #2962Ff;
+    color: #fff;
+    width: 100px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     border-radius: 6px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: all 0.3s ease;
+    text-transform: uppercase;
+    font-size: 12px;
+    font-weight: 500;
     border: none;
     outline: none;
     position: relative;
     top: 0;
+    cursor: pointer;
 }
 .invite_button:hover {
     box-shadow: 0 2px 4px rgba(26, 22, 22, 0.2);
@@ -74,12 +76,12 @@
 }
 .invite_container{
     background-color: white;
-    width: 20vw;
-    height: 60vh;
+    width: 15vw;
     border-radius: 16px;
     position: relative;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     padding: 2rem;
+    min-width: 250px
 }
 .close_modal_button{
     position: absolute;
@@ -98,23 +100,18 @@
 .invite-heading {
     color: #42454E;
     font-weight: 500;
-    font-size: 30px;
-    margin-bottom: 2rem;
+    font-size: 20px;
+    /* margin-bottom: 0.5rem; */
 }
-
-.invite-heading:hover {
-    transform: translateY(-2px);
-}
-
-/* style.css */
 
 .form-container {
     background-color: white;
-    padding: 2rem;
+    padding-top: 1.5rem;
     border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    /* box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); */
     width: 100%;
     max-width: 400px;
+    min-width: 200px;
   }
   
   @media (max-width: 480px) {
@@ -133,13 +130,13 @@
     padding: 0.75rem;
     border: 1px solid #ccc;
     border-radius: 4px;
-    font-size: 1rem;
+    font-size: 0.8rem;
     transition: border-color 0.3s;
   }
   
   .form-control:focus {
     outline: none;
-    border-color: #007bff;
+    /* border-color: #007bff; */
   }
   
   .form-label {
@@ -149,6 +146,8 @@
     color: #6c757d;
     transition: all 0.3s;
     pointer-events: none;
+    font-size: 0.7rem;
+    font-weight: 500;
   }
   
   .form-control:focus ~ .form-label,
@@ -171,11 +170,8 @@
     justify-content: center;
     border-radius: 6px;
     text-transform: uppercase;
-    font-size: 16px;
+    font-size: 0.8rem;
     font-weight: 500;
-    position: absolute;
-    bottom: 5%;
-    right: 5%;
     cursor: pointer;
 }
 
@@ -245,4 +241,17 @@
 }
 .add_agent_button:active{
     background-color: #1a4ed9;
+}
+.invite-button-container{
+    display: flex;
+   justify-content: right;
+}
+.divider{
+    background-color: #6c757d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    font-size: 10px;
+    padding-block: 10px;
 }
