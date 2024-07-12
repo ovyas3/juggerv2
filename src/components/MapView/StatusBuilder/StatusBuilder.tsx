@@ -5,6 +5,5 @@ export const statusBuilder = (status: string) => {
   }
   if(status.toLowerCase() === 'in plant')
     return "In Plant"
-  
   return "In Transit"
 }
