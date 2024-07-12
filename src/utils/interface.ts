@@ -51,6 +51,8 @@ export interface row {
   eta:string,
   rrDoc: Boolean
   polyline: string
+  no_of_wagons:number,
+  received_no_of_wagons:number
 }
 
 export interface tagItem {
