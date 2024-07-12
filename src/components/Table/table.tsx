@@ -54,12 +54,15 @@ import './style.css'
 import Backdrop from '@mui/material/Backdrop';
 import Fade from '@mui/material/Fade';
 import { sortArray, separateLatestObject } from '@/utils/hooks';
-import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import Popover from '@mui/material/Popover';
 import { Typography, } from '@mui/material';
 import { useSnackbar } from '@/hooks/snackBar';
 import captiveRakeIndicator from '@/assets/captive_rakes.svg'
+import wagonIcon from '@/assets/captive_rakes_no_wagons.svg'
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import dividerLine from '@/assets/divider_line.svg'
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 
 
 
@@ -94,9 +97,11 @@ const convertArrayToFilteredArray = (inputArray: any) => {
             trip_tracker: any,
             etaTime: any,
             polyline: any,
-            past_etas:any
+            past_etas: any,
+            no_of_wagons: number,
+            received_no_of_wagons: number,
         }) => {
-        const { edemand_no, FNR, all_FNRs, delivery_location, trip_tracker, others, remarks, unique_code, status, pickup_date, captive_id, is_captive, eta, rr_document, polyline , past_etas} = item;
+        const { edemand_no, FNR, all_FNRs, delivery_location, trip_tracker, others, remarks, unique_code, status, pickup_date, captive_id, is_captive, eta, rr_document, polyline, past_etas, no_of_wagons, received_no_of_wagons } = item;
         return {
             _id: item._id,
             edemand: edemand_no,
@@ -138,8 +143,10 @@ const convertArrayToFilteredArray = (inputArray: any) => {
             eta: eta,
             pickup_date: pickup_date,
             rrDoc: rr_document && rr_document.length > 0 ? true : false,
-            past_etas: past_etas? past_etas : 'NA',
-            deliverDate:'NA'
+            past_etas: past_etas ? past_etas : 'NA',
+            deliverDate: 'NA',
+            received_no_of_wagons : received_no_of_wagons ?  received_no_of_wagons : 'NA',
+            no_of_wagons : no_of_wagons ?  no_of_wagons : 'NA',
         }
     });
 };
@@ -312,7 +319,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
             { id: 'pickupdate', label: 'Invoiced Date', class: 'pickupdate', innerClass: 'inner_pickup' },
             { id: 'status', label: 'Status', class: 'status', innerClass: 'inner_status' },
             { id: 'currentEta', label: 'Current ETA', class: 'currentEta', innerClass: 'inner_eta' },
-            { id: 'deliverDate', label:'Delivered Date', class:'deliverDate', innerClass:''},
+            { id: 'deliverDate', label: 'Delivered Date', class: 'deliverDate', innerClass: '' },
             { id: 'remarks', label: 'Remarks', class: 'remarks', innerClass: '' },
             { id: 'handlingAgent', label: 'Handling Agent', class: 'handlingAgent', innerClass: '' },
             { id: 'action', label: 'Action', class: 'action', innerClass: '' },
@@ -388,11 +395,11 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                         >
                                             <div className={column.innerClass}>
                                                 {column.label}
-                                                {
+                                                {/* {
                                                     column.id === 'edemand' && edemand ?
                                                         <div></div>
                                                         : <></>
-                                                }
+                                                } */}
                                                 {
                                                     column.id === 'iconheader' && showEdemand ?
                                                         <div className='inner_iconheader_before'>
@@ -572,11 +579,26 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                         }
                                                                     </div>
                                                                 </div>
-                                                                <img
-                                                                    src={!row.validationForAttachRake ? captiveRakeIndicator.src : ''}
-                                                                    style={{ display: 'block', marginTop:'8px' }}
-                                                                    alt=''
-                                                                />
+                                                                <div className='fnr_logos'>
+                                                                    {row.rrDoc &&
+                                                                        <div style={{ height: 25, width: 25 }}>
+                                                                            <img
+                                                                                src={row.rrDoc ? rrDocumentIcon.src : ''}
+                                                                                style={{ height: '100%', width: '100%' }}
+                                                                                alt=''
+                                                                            />
+                                                                        </div>
+                                                                    }
+                                                                    {!row.validationForAttachRake &&
+                                                                        <div style={{ height: 25, width: 25 }}>
+                                                                            <img
+                                                                                src={!row.validationForAttachRake ? captiveRakeIndicator.src : ''}
+                                                                                style={{ height: '100%', width: '100%' }}
+                                                                                alt=''
+                                                                            />
+                                                                        </div>
+                                                                    }
+                                                                </div>
                                                             </div>
                                                         }
                                                         {item.id === 'destination' && (
@@ -603,25 +625,38 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                             </div>
                                                         }
                                                         {item.id === 'edemand' &&
-                                                            <div className='edemand_fois_gpis' style={{ marginBottom: '5px', display: !row.fois.is_gps && !row.fois.is_fois && !row.rrDoc ? 'none' : '' }}>
+                                                            <div className='edemand_fois_gpis'
+                                                            // style={{ display: !row.fois.is_gps && !row.fois.is_fois && !row.rrDoc ? 'none' : '' }}
 
-                                                                <img
-                                                                    src={row.fois.is_gps && GPIS.src} style={{ display: 'block' }}
-                                                                    alt=''
-                                                                />
-
-                                                                {/* <img
-                                                                    src={row.fois.is_fois && FOIS.src}
-                                                                    style={{ display: 'block' }}
-                                                                    alt=''
-                                                                /> */}
-
-                                                                <img
-                                                                    src={row.rrDoc && rrDocumentIcon.src}
-                                                                    style={{ display: 'block' }}
-                                                                    alt=''
-                                                                />
-
+                                                            >
+                                                                <div className='no_of_wagons'>
+                                                                    <div className='request_wagons'>
+                                                                        <div className='request_wagons_logo'>
+                                                                            <img src={wagonIcon.src} alt='' className='request_image' />
+                                                                            <ArrowUpwardIcon className='ArrowUpwardIcon' style={{ fontSize: '11px' }} />
+                                                                        </div>
+                                                                        <div>{row.no_of_wagons}</div>
+                                                                        <div className='hover_req'>Wagons requested</div>
+                                                                    </div>
+                                                                    <div className='divider_wagons'>
+                                                                    </div>
+                                                                    <div className='received_wagons'>
+                                                                        <div className='request_wagons_logo'>
+                                                                            <img src={wagonIcon.src} alt='' className='request_image' />
+                                                                            <ArrowDownwardIcon className='ArrowDownwardIcon' style={{ fontSize: '11px' }} />
+                                                                        </div>
+                                                                        <div>{row.received_no_of_wagons}</div>
+                                                                        <div className='hover_rece'>Wagons received</div>
+                                                                    </div>
+                                                                </div>
+                                                                <div className='fois_gps_logo'>
+                                                                    {row.fois.is_gps &&
+                                                                        <img src={GPIS.src} style={{ display: 'block' }} alt='' />
+                                                                    }
+                                                                    {row.fois.is_fois &&
+                                                                        <img src={FOIS.src} style={{ display: 'block' }} alt='' />
+                                                                    }
+                                                                </div>
                                                             </div>
                                                         }
                                                         {item.id === 'currentEta' && (

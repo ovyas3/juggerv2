@@ -193,7 +193,7 @@ const OrdersPage = () => {
                     selected_bound === 'outbound' ?
                       <div className='filters' style={{
                         position: 'absolute', overflowX: 'auto',
-                        maxWidth: '100%', zIndex: 100,
+                        maxWidth: '87%', zIndex: 100,
                         whiteSpace: 'nowrap'
                       }} >
                         <Filters onToFromChange={handleToFromChange} onChangeStatus={handleChangeStatus} reload={reload} getShipments={getAllShipment} shipmentsPayloadSetter={setShipmentsPayload} setTriggerShipments={setTriggerShipments} triggerShipments={triggerShipments} />
