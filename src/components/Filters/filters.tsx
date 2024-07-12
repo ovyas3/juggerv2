@@ -187,7 +187,7 @@ function Filters({ onToFromChange, onChangeStatus, reload, shipmentsPayloadSette
 
     return (
     <div>
-        <div style={{ display: 'flex', gap: 20, overflowX: 'auto', position: 'relative' , overflowY:'visible'}} >
+        <div style={{ display: 'flex', gap:20,  position: 'relative' }} >
 
             <div style={{ display: 'flex', gap: 20, }}>
 
@@ -327,6 +327,7 @@ function Filters({ onToFromChange, onChangeStatus, reload, shipmentsPayloadSette
                 </FormControl>
             </div>
             
+            <div>
             <motion.div
                 className="box"
                 whileHover={{ scale: 1.1 }}
@@ -337,6 +338,7 @@ function Filters({ onToFromChange, onChangeStatus, reload, shipmentsPayloadSette
                 <Image src={MapViewIcon} alt="map view" width={16} height={16}/>
                 <span className="map-view-btn-header">Map View</span>
             </motion.div>
+            </div>
 
 
             {/* <div>
