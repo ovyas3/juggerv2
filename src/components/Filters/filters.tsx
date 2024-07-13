@@ -31,7 +31,7 @@ import Image from 'next/image';
 import MapViewIcon from "@/assets/map_view.svg";
 
 
-function Filters({ onToFromChange, onChangeStatus, reload, shipmentsPayloadSetter,setTriggerShipments,triggerShipments }: any) {
+function Filters({ onToFromChange, onChangeStatus, reload, shipmentsPayloadSetter}: any) {
 
 
 
@@ -84,7 +84,10 @@ function Filters({ onToFromChange, onChangeStatus, reload, shipmentsPayloadSette
     const [filterEDemand, setFilterEDemand] = useState('');
     const [filterDestination, setFilterDestination] = useState('');
     const [disableStartDate, setDisableStartDate] = useState(false);
-    const [disableEndDate, setDisableEndDate] = useState(false);
+    const [disableEndDate, setDisableEndDate] = useState(false);  
+    const [filterMaterial, setFilterMaterial] = useState('');
+
+
     const formatDate = (date: any) => {
         const t = service.getLocalTime(new Date(date));
         return t;
@@ -113,12 +116,14 @@ function Filters({ onToFromChange, onChangeStatus, reload, shipmentsPayloadSette
     };
 
     function clearFilter() {
+        setFilterMaterial('')
         setFilterDestination('')
         setFilterEDemand('')
         shipmentsPayloadSetter((prevState: any) => {
             const newState = { ...prevState };
             delete newState["eDemand"];
             delete newState["destination"];
+            delete newState["material"];
     
             return newState;
           });
@@ -141,6 +146,8 @@ function Filters({ onToFromChange, onChangeStatus, reload, shipmentsPayloadSette
         else newState.eDemand = filterEDemand;
         if (!filterDestination) delete newState["destination"];
         else newState.destination = filterDestination;
+        if (!filterMaterial) delete newState["material"]
+        else newState.material = filterMaterial
 
         return newState;
       });
@@ -180,7 +187,7 @@ function Filters({ onToFromChange, onChangeStatus, reload, shipmentsPayloadSette
 
     return (
     <div>
-        <div style={{ display: 'flex', gap: 20, overflowX: 'auto', position: 'relative' , overflowY:'visible'}} >
+        <div style={{ display: 'flex', gap:20,  position: 'relative' }} >
 
             <div style={{ display: 'flex', gap: 20, }}>
 
@@ -190,6 +197,10 @@ function Filters({ onToFromChange, onChangeStatus, reload, shipmentsPayloadSette
                             padding: 0,
                             height: 'auto',
                             overflow: 'hidden',
+                            '.MuiTextField-root':{
+                                minWidth:'150px !important',
+                                width:'150px'
+                            }
                         }}
                     >
                         <DatePicker
@@ -216,6 +227,11 @@ function Filters({ onToFromChange, onChangeStatus, reload, shipmentsPayloadSette
                                         borderColor: '#E9E9EB',
                                     },
                                 },
+                                '& .MuiTextField-root': {
+                                    '& .MuiPickersTextField-root':{
+                                     width:'150px !important'
+                                    }
+                                }
                             }}
                         />
                     </DemoContainer>
@@ -227,6 +243,10 @@ function Filters({ onToFromChange, onChangeStatus, reload, shipmentsPayloadSette
                             padding: 0,
                             height: 'auto',
                             overflow: 'hidden',
+                            '.MuiTextField-root':{
+                                minWidth:'150px !important',
+                                width:'150px'
+                            }
                         }}
                     >
                         <DatePicker
@@ -307,6 +327,7 @@ function Filters({ onToFromChange, onChangeStatus, reload, shipmentsPayloadSette
                 </FormControl>
             </div>
             
+            <div>
             <motion.div
                 className="box"
                 whileHover={{ scale: 1.1 }}
@@ -317,6 +338,7 @@ function Filters({ onToFromChange, onChangeStatus, reload, shipmentsPayloadSette
                 <Image src={MapViewIcon} alt="map view" width={16} height={16}/>
                 <span className="map-view-btn-header">Map View</span>
             </motion.div>
+            </div>
 
 
             {/* <div>
@@ -344,6 +366,7 @@ function Filters({ onToFromChange, onChangeStatus, reload, shipmentsPayloadSette
             <div className='filters-wrapper'>
             <input placeholder='e-Demand Number' onChange={(e)=>setFilterEDemand(e.target.value)} value={filterEDemand}/>
             <input placeholder='Destination' onChange={(e)=>setFilterDestination(e.target.value)} value={filterDestination}/>
+            <input placeholder='Material' onChange={(e)=>setFilterMaterial(e.target.value)} value={filterMaterial}/>
             </div>
             <div className='filter-modal-footer'>
                 <button onClick={()=>clearFilter()}>
@@ -357,7 +380,7 @@ function Filters({ onToFromChange, onChangeStatus, reload, shipmentsPayloadSette
            </div>
         </div>
 
-        <div className='overlay-container'/>
+        <div className='overlay-container' onClick={()=>setOpenFilterModal(false)}/>
         </div> : <></>
 }
     

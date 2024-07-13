@@ -20,3 +20,5 @@ export const UPDATE_RAKE_CAPTIVE_ID = 'rake_shipment/update_rake_captive_id';
 export const REMARKS_UPDATE_ID = 'add/remark';
 export const REMARKS_LIST = 'get/remark/reasons';
 export const FETCH_TRACK_DETAILS = 'fetch/track_details'
+export const HANDLING_AGENT_INVITE = 'handling_agent/handling_agent_invite'
+export const EXISTING_AGENT_INVITE = 'handling_agent/existing_handling_agent_invite'

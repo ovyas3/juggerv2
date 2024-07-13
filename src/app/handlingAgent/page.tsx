@@ -8,8 +8,14 @@ import SideDrawer from '@/components/Drawer/Drawer';
 import MobileDrawer from '@/components/Drawer/mobile_drawer';
 import AgentTable from './agentTable';
 import CloseIcon from '@mui/icons-material/Close';
+import { HANDLING_AGENT_INVITE, EXISTING_AGENT_INVITE} from "@/utils/helper";
+import { httpsGet, httpsPost } from "@/utils/Communication";
+import InviteBox from './invite';
 
-
+async function inviteAgent ({payload}:any){
+    const response = await httpsPost(HANDLING_AGENT_INVITE, payload);
+    return response;
+}
 
 
 function HandlingAgent() {
@@ -37,7 +43,7 @@ function HandlingAgent() {
                 </div>
 
                 {/* --------------- Table content -------------- */}
-                {/* <AgentTable/> */}
+                <AgentTable/>
             </div>
 
             {/* -------modals--------- */}
@@ -64,97 +70,7 @@ function HandlingAgent() {
 
 export default HandlingAgent;
 
-function InviteBox({ setOpenModalInvite }: any) {
-    const [toggleCloseButton, setToggleCloseButton] = useState(false)
-    const [toggleAddAgent, setToggleAddAgent] = useState(false)
 
-    const [panNumber, setPanNumber] = useState('');
-    const [email, setEmail] = useState('');
-    const [mobile, setMobile] = useState('');
-
-    return (
-        <div className='invite_container'
-            onClick={(e) => { e.stopPropagation(); }}
-        >
-            <div className='invite-heading'>Invite</div>
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                <div className="form-container">
-                    <form>
-                        <div className="form-group">
-                            <input
-                                className="form-control"
-                                type="text"
-                                id="pan"
-                                value={panNumber}
-                                onChange={(e) => setPanNumber(e.target.value)}
-                                placeholder=" "
-                                required
-                            />
-                            <label className="form-label" htmlFor="pan">PAN Number</label>
-                        </div>
-                        <div className="form-group">
-                            <input
-                                className="form-control"
-                                type="email"
-                                id="email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                placeholder=" "
-                                required
-                            />
-                            <label className="form-label" htmlFor="email">Email</label>
-                        </div>
-                        <div className="form-group">
-                            <input
-                                className="form-control"
-                                type="tel"
-                                id="mobile"
-                                value={mobile}
-                                onChange={(e) => setMobile(e.target.value)}
-                                placeholder=" "
-                                required
-                            />
-                            <label className="form-label" htmlFor="mobile">Mobile</label>
-                        </div>
-                    </form>
-                </div>
-            </div>
-            <div className='invite_button_send'
-                onClick={(e)=>{e.stopPropagation(); setToggleAddAgent(true)}}
-            >invite</div>
-
-            <div className='close_modal_button'
-                onMouseEnter={() => { setToggleCloseButton(true) }}
-                onMouseLeave={() => { setToggleCloseButton(false) }}
-                onClick={(e) => { e.stopPropagation(); setOpenModalInvite(false) }}
-                style={{ transform: toggleCloseButton ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'all 1s ease-in-out',
-                    
-                 }}
-            >
-                <CloseIcon />
-            </div>
-
-            <div className='addAgentBox' style={{display:toggleAddAgent?'block':'none',}}>
-                <div className='invite-heading-agent'>Add Agent</div>
-                <div className='unitStation'>Units Stations :</div>
-                <div className='input_station_box'>input</div>
-
-                <div className='close_modal_button'
-                onMouseEnter={() => { setToggleCloseButton(true) }}
-                onMouseLeave={() => { setToggleCloseButton(false) }}
-                onClick={(e) => { e.stopPropagation(); setToggleAddAgent(false) }}
-                style={{  transform: toggleCloseButton ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'all 1s ease-in-out' }}
-                ><CloseIcon />
-                </div>
-                <div style={{display:'flex', justifyContent:'right',position:'absolute', bottom:'5%', right:'5%', gap:10 }}>
-                <div className='cancel_button_invite'>cancel</div>
-                <div className='add_agent_button'>add</div>
-                </div>
-            </div>
-
-        </div>
-    );
-}
 
 
 
