@@ -57,7 +57,8 @@ const RRModal: React.FC<PopupProps> = ({ isOpen, isClose, rrNumbers, isRRDoc }) 
         invoicedNo: data && data.invoice_number ?  data.invoice_number : 'N/A',
         invoicedDate: data && data.invoice_date ? service.utcToist(data.invoice_date, 'dd/MM/yyyy') : 'N/A',
         distance: data && data.distance ? data.distance : 'N/A',
-        totalWeight: data && data.chargeable_weight ? data.chargeable_weight : 'N/A',
+        actualWeight: data && data.actual_weight ? data.actual_weight : 'N/A',
+        chargeableWeight: data && data.chargeable_weight ? data.chargeable_weight : 'N/A',
         totalFreight: data && data.total_freight ? data.total_freight.toLocaleString('en-IN') : 'N/A',
       };
   
@@ -128,8 +129,31 @@ const RRModal: React.FC<PopupProps> = ({ isOpen, isClose, rrNumbers, isRRDoc }) 
               </div>
               <div className="rrmodal-content">
                 <div className="rrmodal-content-upper">
-                 {rrDetails && <>
-                  <div className="rrmodal-content-upper-body">
+                {rrDetails && <>
+                <div className="rrmodal-content-left-body">
+                  <div className="rrmodal-content-upper-item">
+                     <h4 className="rrmodal-content-upper-item-heading">Consignee Name</h4>
+                     <p className="rrmodal-content-upper-item-value">M/S JINDAL STEEL AND POWER LTD</p>
+                  </div>
+                  <div className="rrmodal-content-upper-item">
+                     <h4 className="rrmodal-content-upper-item-heading">Consignee Address</h4>
+                     <p className="rrmodal-content-upper-item-value">M/S JINDAL STEEL AND POWER LTD</p>
+                  </div>
+                  <div className="rrmodal-content-upper-item">
+                     <h4 className="rrmodal-content-upper-item-heading">Sender Weight (MT)</h4>
+                     <p className="rrmodal-content-upper-item-value">0</p>
+                  </div>
+                  <div className="rrmodal-content-upper-item">
+                     <h4 className="rrmodal-content-upper-item-heading">Actual Weight (MT)</h4>
+                     <p className="rrmodal-content-upper-item-value">{ rrDetails.actualWeight }</p>
+                  </div>
+                  <div className="rrmodal-content-upper-item">
+                     <h4 className="rrmodal-content-upper-item-heading">Chargable Weight (MT)</h4>
+                     <p className="rrmodal-content-upper-item-value">{ rrDetails.chargeableWeight }</p>
+                  </div>
+                </div>
+
+                <div className="rrmodal-content-right-body">
                   <div className="rrmodal-content-upper-item">
                      <h4 className="rrmodal-content-upper-item-heading">RR No.</h4>
                      <p className="rrmodal-content-upper-item-value">{ rrDetails.rrNo }</p>
@@ -137,6 +161,10 @@ const RRModal: React.FC<PopupProps> = ({ isOpen, isClose, rrNumbers, isRRDoc }) 
                   <div className="rrmodal-content-upper-item">
                     <h4 className="rrmodal-content-upper-item-heading">RR Date</h4>
                     <p className="rrmodal-content-upper-item-value">{ rrDetails.rrDate }</p>
+                  </div>
+                  <div className="rrmodal-content-upper-item">
+                    <h4 className="rrmodal-content-upper-item-heading">Total Wagons</h4>
+                    <p className="rrmodal-content-upper-item-value">{ rrDetails.totalWagons }</p>
                   </div>
                   <div className="rrmodal-content-upper-item">
                     <h4 className="rrmodal-content-upper-item-heading">Station From</h4>
@@ -147,11 +175,9 @@ const RRModal: React.FC<PopupProps> = ({ isOpen, isClose, rrNumbers, isRRDoc }) 
                     <p className="rrmodal-content-upper-item-value">{ rrDetails.stationTo }</p>
                   </div>
                   <div className="rrmodal-content-upper-item">
-                    <h4 className="rrmodal-content-upper-item-heading">Total Wagons</h4>
-                    <p className="rrmodal-content-upper-item-value">{ rrDetails.totalWagons }</p>
+                    <h4 className="rrmodal-content-upper-item-heading">Total Distance (km)</h4>
+                    <p className="rrmodal-content-upper-item-value">{ rrDetails.distance }</p>
                   </div>
-                 </div>
-                <div className="rrmodal-content-lower-body">
                   <div className="rrmodal-content-upper-item">
                     <h4 className="rrmodal-content-upper-item-heading">Invoice No.</h4>
                     <p className="rrmodal-content-upper-item-value">{ rrDetails.invoicedNo }</p>
@@ -159,15 +185,7 @@ const RRModal: React.FC<PopupProps> = ({ isOpen, isClose, rrNumbers, isRRDoc }) 
                   <div className="rrmodal-content-upper-item">
                     <h4 className="rrmodal-content-upper-item-heading">Invoiced Date</h4>
                     <p className="rrmodal-content-upper-item-value">{ rrDetails.invoicedDate }</p>
-                  </div>
-                  <div className="rrmodal-content-upper-item">
-                    <h4 className="rrmodal-content-upper-item-heading">Total Distance (km)</h4>
-                    <p className="rrmodal-content-upper-item-value">{ rrDetails.distance }</p>
-                  </div>
-                  <div className="rrmodal-content-upper-item">
-                    <h4 className="rrmodal-content-upper-item-heading">Total Weight (MT)</h4>
-                    <p className="rrmodal-content-upper-item-value">{ rrDetails.totalWeight }</p>
-                  </div>
+                  </div>            
                   <div className="rrmodal-content-upper-item">
                     <h4 className="rrmodal-content-upper-item-heading">Total Freight (₹)</h4>
                     <p className="rrmodal-content-upper-item-value">{ rrDetails.totalFreight }</p>
@@ -184,10 +202,10 @@ const RRModal: React.FC<PopupProps> = ({ isOpen, isClose, rrNumbers, isRRDoc }) 
                           <TableCell align="left" className="rrmodal-table-headers">Owning Rly</TableCell>
                           <TableCell align="left" className="rrmodal-table-headers">Wagon Type</TableCell>
                           <TableCell align="left" className="rrmodal-table-headers">Wagon No.</TableCell>
-                          <TableCell align="left" className="rrmodal-table-headers">CC (MT)</TableCell>
-                          <TableCell align="center" className="rrmodal-table-headers">Tare (MT)</TableCell>
                           <TableCell align="left" className="rrmodal-table-headers">No. Of Articles</TableCell>
                           <TableCell align="left" className="rrmodal-table-headers">Gross Weight (MT)</TableCell>
+                          <TableCell align="center" className="rrmodal-table-headers">Tare (MT)</TableCell>
+                          <TableCell align="left" className="rrmodal-table-headers">CC (MT)</TableCell>
                           <TableCell align="left" className="rrmodal-table-headers">Actual Weight (MT)</TableCell>
                         </TableRow>
                       </TableHead>
@@ -196,13 +214,13 @@ const RRModal: React.FC<PopupProps> = ({ isOpen, isClose, rrNumbers, isRRDoc }) 
                         {rrTableData.map((row: any, index: number) => (
                           <TableRow key={index}>
                             <TableCell align="left" className="rrmodal-table-body-items">{index + 1}.</TableCell>
-                            <TableCell align="center" className="rrmodal-table-body-items">{row.owningRly}</TableCell>
+                            <TableCell align="left" className="rrmodal-table-body-items">{row.owningRly}</TableCell>
                             <TableCell align="left" className="rrmodal-table-body-items">{row.type}</TableCell>
                             <TableCell align="left" className="rrmodal-table-body-items">{row.wagonNo}</TableCell>
-                            <TableCell align="left" className="rrmodal-table-body-items">{row.cc}</TableCell>
-                            <TableCell align="left" className="rrmodal-table-body-items">{row.tare}</TableCell>
                             <TableCell align="left" className="rrmodal-table-body-items">{row.noOfArticles}</TableCell>
                             <TableCell align="left" className="rrmodal-table-body-items">{row.grossWeight}</TableCell>
+                            <TableCell align="left" className="rrmodal-table-body-items">{row.tare}</TableCell>
+                            <TableCell align="left" className="rrmodal-table-body-items">{row.cc}</TableCell>
                             <TableCell align="left" className="rrmodal-table-body-items">{row.actualWt}</TableCell>
                           </TableRow>
                         ))}
