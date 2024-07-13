@@ -216,7 +216,7 @@
   position: absolute;
   top: 10%;
   right: 8%;
-  z-index: 10000;
+  z-index: 10;
   width: 30%;
   justify-content: space-around;
   display: flex !important;
