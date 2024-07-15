@@ -35,7 +35,10 @@ export interface row {
   },
   status: string,
   currentEta: string,
-  remarks: string,
+  remarks: {
+    latest:string,
+    rest : Array<Object>,
+  },
   handlingAgent: string,
   action: string,
   validationForAttachRake: Boolean,
@@ -47,9 +50,23 @@ export interface row {
   pickup_date:string,
   eta:string,
   rrDoc: Boolean
-
+  polyline: string
+  no_of_wagons:number,
+  received_no_of_wagons:number
 }
 
 export interface tagItem {
   _id: string;
+}
+
+export interface Remarks {
+  latest: {
+    remark: string;
+  };
+  rest: any[];
+}
+
+export interface SeparatedRemarks {
+ latest:Object,
+ rest:Array<Object>
 }

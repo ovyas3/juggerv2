@@ -32,6 +32,7 @@ const httpsPost = async (path: string, data: any, type = 0) => {
     headers: authorization,
     data,
   }
+ 
   const response = await axios(config);
   return response.data;
 }

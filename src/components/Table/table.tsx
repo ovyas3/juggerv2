@@ -21,6 +21,7 @@ import Link from 'next/link';
 import { Column, row, tagItem } from '@/utils/interface';
 import { useTranslations } from 'next-intl';
 import RRModal from '../RR Modal/RRModal';
+// import { useSnackbar } from '@/hooks/snackBar';
 
 
 import Autocomplete from '@mui/material/Autocomplete';
@@ -33,7 +34,7 @@ import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import { httpsPost } from '@/utils/Communication';
-import { UPDATE_RAKE_CAPTIVE_ID, REMARKS_UPDATE_ID } from '@/utils/helper'
+import { UPDATE_RAKE_CAPTIVE_ID, REMARKS_UPDATE_ID, FETCH_TRACK_DETAILS } from '@/utils/helper'
 import { statusBuilder } from '../MapView/StatusBuilder/StatusBuilder';
 
 import FOIS from '@/assets/fois_icon.png'
@@ -42,6 +43,7 @@ import RRDOC from '@/assets/Doc-icon.svg'
 import attach_icon from '@/assets/attach_icon.svg'
 import rrDocumentIcon from '@/assets/rr_document_icon.svg'
 import ShareIcon from '@mui/icons-material/Share';
+import fetchTrackDetailsIcon from '@/assets/polylines_icon.svg'
 import contactIcon from '@/assets/inactive_contact_dashboard+icon.svg'
 import BookmarkAddOutlinedIcon from '@mui/icons-material/BookmarkAddOutlined';
 import Image from 'next/image';
@@ -51,9 +53,18 @@ import { Menu, MenuItem } from '@mui/material';
 import './style.css'
 import Backdrop from '@mui/material/Backdrop';
 import Fade from '@mui/material/Fade';
-import { sortArray } from '@/utils/hooks';
-import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import { sortArray, separateLatestObject } from '@/utils/hooks';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
+import Popover from '@mui/material/Popover';
+import { Typography, } from '@mui/material';
+import { useSnackbar } from '@/hooks/snackBar';
+import captiveRakeIndicator from '@/assets/captive_rakes.svg'
+import wagonIcon from '@/assets/captive_rakes_no_wagons.svg'
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import dividerLine from '@/assets/divider_line.svg'
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+
+
 
 async function rake_update_id(payload: Object) {
     return await httpsPost(UPDATE_RAKE_CAPTIVE_ID, payload);
@@ -61,278 +72,7 @@ async function rake_update_id(payload: Object) {
 
 async function remake_update_By_Id(payload: object) {
     const response = await httpsPost(REMARKS_UPDATE_ID, payload);
-}
-
-function Tags({ rakeCaptiveList, shipmentId, setOpen, setShowActionBox }: any) {
-    const t = useTranslations('ORDERS');
-    const [selectedItems, setSelectedItems] = useState<tagItem>({
-        _id: '',
-    });
-    const [isHovered, setIsHovered] = useState(false);
-    const handleMouseEnter = useCallback(() => setIsHovered(true), []);
-    const handleMouseLeave = useCallback(() => setIsHovered(false), []);
-    const handleSubmit = (e: any) => {
-        e.stopPropagation();
-
-        const updatedObject = {
-            shipmentId: shipmentId,
-            captiveId: selectedItems._id
-        };
-        if (selectedItems._id) {
-            rake_update_id(updatedObject)
-        }
-
-        setOpen(false)
-        setShowActionBox(-1)
-        setSelectedItems({ _id: '' });
-    };
-
-    const CustomPopper = (props: any) => {
-        return <Popper {...props} style={{ fontSize: '10px' }} placement="bottom-start" />;
-    };
-
-    const CustomPaper = (props: any) => {
-        return <Paper {...props} style={{ fontSize: '10px' }} />;
-    };
-
-    return (
-        <div >
-            <div style={{
-                width: '100%',
-                backgroundColor: '#3351FF',
-                color: 'white',
-                borderRadius: '8px 8px 0 0',
-                padding: '4px',
-                fontSize: '20px'
-            }}>Captive Rakes</div>
-            <div style={{ padding: 16 }}>
-                <Stack spacing={1} sx={{ border: 'none', paddingInline: '2px' }}>
-                    <Autocomplete
-                        id="tags-standard"
-                        options={rakeCaptiveList}
-                        PopperComponent={CustomPopper}
-                        PaperComponent={CustomPaper}
-                        value={selectedItems}
-
-
-                        getOptionLabel={(option: any) => option.rake_id || "Select one"}
-                        isOptionEqualToValue={(option: any, value) => option.rake_id === value.rake_id}
-                        renderOption={(props, option) => (
-                            <li {...props} key={`Unnamed-Option-${Math.random()}`}>
-                                {option.rake_id || "Unnamed Option"} - {option.name || "Unnamed Option"}
-                            </li>
-                        )}
-                        onChange={(event, newValue) => {
-                            event.stopPropagation();
-                            setSelectedItems(newValue)
-                        }}
-                        renderInput={(params) => (
-                            <TextField
-                                {...params}
-                                variant="standard"
-                                // label="Captive Rakes"
-
-                                InputProps={{
-                                    ...params.InputProps,
-                                    style: { fontSize: '12px', border: 'none' }
-                                }}
-                                InputLabelProps={{
-                                    style: { fontSize: '12px', paddingLeft: '5px', border: 'none' }
-                                }}
-                                sx={{
-                                    '.mui-38raov-MuiButtonBase-root-MuiChip-root': {
-                                        // fontSize:'10px',
-                                        m: 0,
-                                        p: 0,
-                                        height: '22px',
-                                        backgroundColor: 'transparent',
-                                        mb: '0.5px',
-                                        border: 'none'
-                                    },
-                                    '.mui-p1olib-MuiAutocomplete-endAdornment': {
-                                        top: '-5%',
-                                        border: 'none'
-                                    },
-                                    '.mui-953pxc-MuiInputBase-root-MuiInput-root::after': {
-                                        border: 'none'
-                                    }
-                                }}
-                            />
-                        )}
-                    />
-                </Stack>
-                <div style={{ textAlign: 'end', paddingTop: '8px' }}>
-                    <Button variant="contained" size='small' style={{ textTransform: 'none', backgroundColor: '#3351FF' }} onClick={(e) => { handleSubmit(e) }}>{t('submit')}</Button>
-                </div>
-            </div>
-            <div
-                style={{
-                    height: '32px',
-                    width: '32px',
-                    borderRadius: '50%',
-                    backgroundColor: 'white',
-                    position: 'absolute',
-                    top: -40,
-                    right: 0,
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    cursor: 'pointer',
-                    zIndex: 999,
-                    boxShadow: '0 1px 2px rgba(0, 0, 0, 0.1)',
-                    transition: 'all 0.5s ease-in-out',
-                    transform: `rotate(${isHovered ? 90 : 0}deg)`
-                }}
-                onClick={(e) => { e.stopPropagation() }}
-                onMouseEnter={handleMouseEnter}
-                onMouseLeave={handleMouseLeave}
-            >
-                <CloseIcon
-                    onClick={(e) => { e.stopPropagation(); setOpen(false) }}
-                />
-            </div>
-        </div>
-    );
-}
-
-function Remarks({ shipmentId, setOpen,remarksList }: any) {
-    const [others, setOthers] = useState('')
-    const t = useTranslations('ORDERS');
-    const [remarks, setRemarks] = useState('Enter Your Remarks');
-    const inputRef = useRef<HTMLInputElement>(null);
-    const [openRemarks, setOpenRemarks] = useState(false);
-    const [inputEnabled, setInputEnabled] = useState(true);
-    const [isHovered, setIsHovered] = useState(false);
-    const predefinedRemarks = [
-        'Great job!',
-        'Needs improvement',
-        'Well done',
-        'Please revise',
-        'Excellent work',
-        'others',
-    ];
-    console.log(remarksList)
-
-    const handleMouseEnter = useCallback(() => setIsHovered(true), []);
-    const handleMouseLeave = useCallback(() => setIsHovered(false), []);
-
-    const handleCustom = () => {
-        setOpenRemarks(false)
-        setRemarks('')
-        setInputEnabled(false)
-        setTimeout(() => {
-            if (inputRef.current) {
-                inputRef.current.focus();
-            }
-        }, 0);
-    }
-
-    const handlePreDefineRemarks = (remark: string) => {
-        setRemarks(remark);
-        setOpenRemarks(false)
-    };
-
-    function handleothers(e:string){
-       setOthers(e)
-    }
-
-
-    async function handleSubmit(e: any) {
-        setOpen(false)
-        setInputEnabled(true);
-        setOpenRemarks(false);
-        setRemarks('')
-        e.stopPropagation();
-        if (remarks.trim() === '') return;
-        const remarkObject = {
-            id: shipmentId,
-            remarks: [
-                {
-                    date: service.getEpoch(new Date()),
-                    remark: remarks === 'others' ? others : remarks,
-                }
-            ]
-        }
-        console.log(remarkObject);
-        const response = await remake_update_By_Id(remarkObject);
-        console.log(response)
-        setRemarks('');
-    }
-
-    return (
-        <div onClick={(e) => { e.stopPropagation(); setOpenRemarks(false) }}>
-
-            <div style={{
-                width: '100%',
-                backgroundColor: '#3351FF',
-                color: 'white',
-                borderRadius: '8px 8px 0 0',
-                padding: '4px',
-                fontSize: '20px'
-            }}>Remarks</div>
-
-            <div style={{ padding: '12px' }}>
-                <div
-                    className='remarks_update'
-                    onClick={(e) => { e.stopPropagation(); setOpenRemarks(!openRemarks); }}
-                >{remarks}{
-                        remarks === 'others' ?
-                            <input
-                                onClick={(e) => { e.stopPropagation(); }}
-                                onChange={(e) => { handleothers(e.target.value) }}
-                                style={{
-                                    outline: 'none',
-                                    marginInline: '5px',
-                                    backgroundColor: '#E9E9EB',
-                                    borderBottom: '2px solid black',
-                                }}
-                            /> : <></>
-                    }</div>
-                <ArrowDropDownIcon
-                    onClick={() => { setOpenRemarks(!openRemarks) }}
-                    className='arrow_down_icon'
-                />
-                <div className='remarks_dropDown_list' style={{ display: openRemarks ? 'block' : 'none' }}>
-                    {predefinedRemarks.map((remark:string, index:number) => (
-                        <div
-                            key={index}
-                            onClick={() => handlePreDefineRemarks(remark)}
-                            className='remarks_dropDown_list_item'
-                        >{remark}</div>
-                    ))}
-                </div>
-                <div style={{ textAlign: 'end', paddingTop: '8px' }}>
-                    <Button variant="contained" size='small' color="secondary" style={{ textTransform: 'none', backgroundColor: '#3351FF' }} onClick={(e) => { handleSubmit(e) }}>{t('submit')}</Button>
-                </div>
-            </div>
-            <div
-                style={{
-                    height: '32px',
-                    width: '32px',
-                    borderRadius: '50%',
-                    backgroundColor: 'white',
-                    position: 'absolute',
-                    top: -40,
-                    right: 0,
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    cursor: 'pointer',
-                    zIndex: 999,
-                    boxShadow: '0 1px 2px rgba(0, 0, 0, 0.1)',
-                    transition: 'all 0.5s ease-in-out',
-                    transform: `rotate(${isHovered ? 90 : 0}deg)`
-                }}
-                onClick={(e) => { e.stopPropagation() }}
-                onMouseEnter={handleMouseEnter}
-                onMouseLeave={handleMouseLeave}
-            >
-                <CloseIcon
-                    onClick={(e) => { e.stopPropagation(); setOpen(false) }}
-                />
-            </div>
-        </div>
-    )
+    return response;
 }
 
 const convertArrayToFilteredArray = (inputArray: any) => {
@@ -355,9 +95,13 @@ const convertArrayToFilteredArray = (inputArray: any) => {
             captive_id: string,
             is_captive: Boolean,
             trip_tracker: any,
-            etaTime: any
+            etaTime: any,
+            polyline: any,
+            past_etas: any,
+            no_of_wagons: number,
+            received_no_of_wagons: number,
         }) => {
-        const { edemand_no, FNR, all_FNRs, delivery_location, trip_tracker, others, remarks, unique_code, status, pickup_date, captive_id, is_captive, eta, rr_document } = item;
+        const { edemand_no, FNR, all_FNRs, delivery_location, trip_tracker, others, remarks, unique_code, status, pickup_date, captive_id, is_captive, eta, rr_document, polyline, past_etas, no_of_wagons, received_no_of_wagons } = item;
         return {
             _id: item._id,
             edemand: edemand_no,
@@ -383,7 +127,10 @@ const convertArrayToFilteredArray = (inputArray: any) => {
                 date: service.utcToist(eta) || 'NA',
                 etaTime: service.utcToistTime(eta) || 'NA'
             },
-            remarks: 'NA',
+            remarks: remarks.length === 0 ? "NA" : {
+                latest: separateLatestObject(remarks).latest?.remark || "NA",
+                rest: separateLatestObject(remarks)?.rest || "NA"
+            },
             handlingAgent: 'NA',
             action: null,
             iconheader: '',
@@ -392,9 +139,14 @@ const convertArrayToFilteredArray = (inputArray: any) => {
                 is_gps: trip_tracker && trip_tracker.gps_last_location ? true : false,
             },
             validationForAttachRake: !captive_id && is_captive,
+            polyline: polyline,
             eta: eta,
             pickup_date: pickup_date,
-            rrDoc: rr_document && rr_document.length > 0 ? true : false
+            rrDoc: rr_document && rr_document.length > 0 ? true : false,
+            past_etas: past_etas ? past_etas : 'NA',
+            deliverDate: 'NA',
+            received_no_of_wagons : received_no_of_wagons ?  received_no_of_wagons : 'NA',
+            no_of_wagons : no_of_wagons ?  no_of_wagons : 'NA',
         }
     });
 };
@@ -403,7 +155,7 @@ const convertArrayToFilteredArray = (inputArray: any) => {
 
 
 // Main component
-export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, count, onFnrChange, reload,remarksList }: any) {
+export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, count, onFnrChange, reload, remarksList, setTriggerShipments, triggerShipments, getAllShipment }: any) {
 
     //language controller
     const t = useTranslations("ORDERS")
@@ -497,9 +249,29 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
         setShowActionBox(prevIndex => (prevIndex === index ? -1 : index));
     }
 
+    const { showMessage } = useSnackbar();
+
+    async function fetchTrackDetails(rake_id: any) {
+        const payload = {
+            rakeId: rake_id
+        }
+        httpsPost(FETCH_TRACK_DETAILS, payload).then((res) => {
+            if (res && res.statusCode == 200) {
+                showMessage('Track Details Fetched Successfully.', 'success')
+                setTriggerShipments(!triggerShipments)
+            } else {
+                showMessage('Error Fetching Track Details.', 'error')
+            }
+
+        }).catch((err) => {
+            showMessage('Error Fetching Track Details.', 'error')
+        })
+
+    }
+
+
     useEffect(() => {
         const etaResult = sortArray(allShipments, 'eta', currentETAsorting ? 'dec' : 'asc');
-        console.log(etaResult)
         const resData = convertArrayToFilteredArray(etaResult)
         setResponse(resData)
     }, [currentETAsorting])
@@ -547,6 +319,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
             { id: 'pickupdate', label: 'Invoiced Date', class: 'pickupdate', innerClass: 'inner_pickup' },
             { id: 'status', label: 'Status', class: 'status', innerClass: 'inner_status' },
             { id: 'currentEta', label: 'Current ETA', class: 'currentEta', innerClass: 'inner_eta' },
+            { id: 'deliverDate', label: 'Delivered Date', class: 'deliverDate', innerClass: '' },
             { id: 'remarks', label: 'Remarks', class: 'remarks', innerClass: '' },
             { id: 'handlingAgent', label: 'Handling Agent', class: 'handlingAgent', innerClass: '' },
             { id: 'action', label: 'Action', class: 'action', innerClass: '' },
@@ -576,10 +349,14 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                     },
                     '.mui-dmz9g-MuiTableContainer-root ': {
                         border: ' 1px solid #E9E9EB',
-                        borderRadius: '8px'
+                        borderRadius: '8px',
+
                     },
                     '.mui-1briqcb-MuiTableCell-root': {
                         fontFamily: 'inherit'
+                    },
+                    '.mui-1ncgey5-MuiTableContainer-root': {
+
                     }
                 }}>
                 <TablePagination
@@ -593,13 +370,14 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                     labelRowsPerPage="Shipments per page:"
                 />
                 <TableContainer sx={{
-                    border: '1px solid #E9E9EB', borderRadius: '8px', maxHeight: 'calc(90vh - 110px)', minHeight: '200px',
+                    border: '1px solid #E9E9EB', borderRadius: '8px', maxHeight: 'calc(90vh - 100px)',
                     overflowY: 'scroll',
                     '&::-webkit-scrollbar': {
                         display: 'none',
                     },
                     scrollbarWidth: 'none',
                     '-ms-overflow-style': 'none',
+
                 }}>
                     <Table stickyHeader aria-label="sticky table">
                         <TableHead sx={{
@@ -617,11 +395,11 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                         >
                                             <div className={column.innerClass}>
                                                 {column.label}
-                                                {
+                                                {/* {
                                                     column.id === 'edemand' && edemand ?
                                                         <div></div>
                                                         : <></>
-                                                }
+                                                } */}
                                                 {
                                                     column.id === 'iconheader' && showEdemand ?
                                                         <div className='inner_iconheader_before'>
@@ -728,30 +506,41 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                         style={{ color: 'white', cursor: 'pointer', scale: '0.9' }}
                                                                         onClick={(e) => clickActionBox(e, firstindex, row._id)}
                                                                     />
-                                                                    <div className={`action_button_target ${showActionBox === firstindex ? 'show' : ''}`}>
+                                                                    <div className={`action_button_target ${showActionBox === firstindex ? 'show' : ''}`}
+                                                                    >
                                                                         <div className='action_button_options' onClick={(e) => e.stopPropagation()}>
                                                                             {row.validationForAttachRake && (
                                                                                 <ActionItem
-                                                                                    icon={<img src={attach_icon.src} alt='' />}
+                                                                                    icon={<img src={attach_icon.src} alt='' height={"24px"} width={"24px"} />}
                                                                                     text={t('attach')}
                                                                                     onClick={handleOpen}
                                                                                     id='attach'
+                                                                                    style={{ gap: '5px' }}
                                                                                 />
                                                                             )}
                                                                             <ActionItem
-                                                                                icon={<ShareIcon style={{ fontSize: '15px', color: '#3352FF' }} />}
+                                                                                icon={<ShareIcon style={{ width: '24px', height: '24px', color: '#3352FF' }} />}
                                                                                 text={t('share')}
+                                                                                style={{ gap: '7px' }}
                                                                             />
                                                                             <ActionItem
-                                                                                icon={<img src={contactIcon.src} alt='' style={{ objectFit: 'contain', height: '100%', width: '100%' }} />}
+                                                                                icon={<img src={contactIcon.src} alt='' style={{ objectFit: 'contain', height: '24px', width: '24px' }} />}
                                                                                 text={t('contact')}
                                                                             />
                                                                             <ActionItem
-                                                                                icon={<BookmarkAddOutlinedIcon style={{ fontSize: '17px', color: '#658147' }} />}
+                                                                                icon={<BookmarkAddOutlinedIcon style={{ width: "24px", height: '24px', color: '#658147' }} />}
                                                                                 text={t('addremarks')}
                                                                                 onClick={handleOpen}
                                                                                 id='remarks'
                                                                             />
+                                                                            {!row.polyline &&
+                                                                                <ActionItem
+                                                                                    icon={<img src={fetchTrackDetailsIcon.src} alt='' style={{ objectFit: 'contain', height: '24px', width: '24px' }} />}
+                                                                                    text={t('fetchtrackdetails')}
+                                                                                    onClick={() => fetchTrackDetails(row._id)}
+                                                                                    id='fetch track details'
+                                                                                />
+                                                                            }
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -790,6 +579,26 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                         }
                                                                     </div>
                                                                 </div>
+                                                                <div className='fnr_logos'>
+                                                                    {row.rrDoc &&
+                                                                        <div style={{ height: 25, width: 25 }}>
+                                                                            <img
+                                                                                src={row.rrDoc ? rrDocumentIcon.src : ''}
+                                                                                style={{ height: '100%', width: '100%' }}
+                                                                                alt=''
+                                                                            />
+                                                                        </div>
+                                                                    }
+                                                                    {!row.validationForAttachRake &&
+                                                                        <div style={{ height: 25, width: 25 }}>
+                                                                            <img
+                                                                                src={!row.validationForAttachRake ? captiveRakeIndicator.src : ''}
+                                                                                style={{ height: '100%', width: '100%' }}
+                                                                                alt=''
+                                                                            />
+                                                                        </div>
+                                                                    }
+                                                                </div>
                                                             </div>
                                                         }
                                                         {item.id === 'destination' && (
@@ -816,25 +625,38 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                             </div>
                                                         }
                                                         {item.id === 'edemand' &&
-                                                            <div className='edemand_fois_gpis' style={{ marginBottom: '5px', display: !row.fois.is_gps && !row.fois.is_fois && !row.rrDoc ? 'none' : '' }}>
+                                                            <div className='edemand_fois_gpis'
+                                                            // style={{ display: !row.fois.is_gps && !row.fois.is_fois && !row.rrDoc ? 'none' : '' }}
 
-                                                                <img
-                                                                    src={row.fois.is_gps && GPIS.src} style={{ display: 'block' }}
-                                                                    alt=''
-                                                                />
-
-                                                                {/* <img
-                                                                    src={row.fois.is_fois && FOIS.src}
-                                                                    style={{ display: 'block' }}
-                                                                    alt=''
-                                                                /> */}
-
-                                                                <img
-                                                                    src={row.rrDoc && rrDocumentIcon.src}
-                                                                    style={{ display: 'block' }}
-                                                                    alt=''
-                                                                />
-
+                                                            >
+                                                                <div className='no_of_wagons'>
+                                                                    <div className='request_wagons'>
+                                                                        <div className='request_wagons_logo'>
+                                                                            <img src={wagonIcon.src} alt='' className='request_image' />
+                                                                            <ArrowUpwardIcon className='ArrowUpwardIcon' style={{ fontSize: '11px' }} />
+                                                                        </div>
+                                                                        <div>{row.no_of_wagons}</div>
+                                                                        <div className='hover_req'>Wagons requested</div>
+                                                                    </div>
+                                                                    <div className='divider_wagons'>
+                                                                    </div>
+                                                                    <div className='received_wagons'>
+                                                                        <div className='request_wagons_logo'>
+                                                                            <img src={wagonIcon.src} alt='' className='request_image' />
+                                                                            <ArrowDownwardIcon className='ArrowDownwardIcon' style={{ fontSize: '11px' }} />
+                                                                        </div>
+                                                                        <div>{row.received_no_of_wagons}</div>
+                                                                        <div className='hover_rece'>Wagons received</div>
+                                                                    </div>
+                                                                </div>
+                                                                <div className='fois_gps_logo'>
+                                                                    {row.fois.is_gps &&
+                                                                        <img src={GPIS.src} style={{ display: 'block' }} alt='' />
+                                                                    }
+                                                                    {row.fois.is_fois &&
+                                                                        <img src={FOIS.src} style={{ display: 'block' }} alt='' />
+                                                                    }
+                                                                </div>
                                                             </div>
                                                         }
                                                         {item.id === 'currentEta' && (
@@ -848,6 +670,9 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                     'NA'
                                                                 )}
                                                             </div>
+                                                        )}
+                                                        {item.id === 'remarks' && (
+                                                            <RemarkComponent row={row} firstIndex={firstindex} />
                                                         )}
                                                     </div>
                                                 </TableCell>
@@ -890,6 +715,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                         shipmentId={rowId}
                         setOpen={setOpen}
                         remarksList={remarksList}
+                        getAllShipment={getAllShipment}
                     />}
                 </Box>
             </Modal>
@@ -897,13 +723,339 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
     );
 }
 
-const ActionItem = ({ icon, text, onClick, id }: any) => (
-    <div className='action_items' onClick={onClick} id={id}>
+const ActionItem = ({ icon, text, onClick, id, style }: any) => (
+    <div className={`action_items `} onClick={onClick} id={id} style={style}>
         <div>{icon}</div>
         <div>{text}</div>
     </div>
 );
+function Remarks({ shipmentId, setOpen, remarksList, getAllShipment }: any) {
+    const [others, setOthers] = useState('')
+    const t = useTranslations('ORDERS');
+    const placeholder = 'Enter Your Remarks'
+    const [remarks, setRemarks] = useState(placeholder);
+    const inputRef = useRef<HTMLInputElement>(null);
+    const [openRemarks, setOpenRemarks] = useState(false);
+    const [inputEnabled, setInputEnabled] = useState(true);
+    const [isHovered, setIsHovered] = useState(false);
+    const predefinedRemarks = [
+        'Great job!',
+        'Needs improvement',
+        'Well done',
+        'Please revise',
+        'Excellent work',
+        'Others :',
+    ];
+    const { showMessage } = useSnackbar();
 
+    const handleMouseEnter = useCallback(() => setIsHovered(true), []);
+    const handleMouseLeave = useCallback(() => setIsHovered(false), []);
+
+    const handlePreDefineRemarks = (remark: string) => {
+        setRemarks(remark);
+        setOpenRemarks(false)
+    };
+
+    function handleothers(e: string) {
+        setOthers(e)
+    }
+
+    function handleSubmit(e: any) {
+        setOpen(false)
+        setInputEnabled(true);
+        setOpenRemarks(false);
+        setRemarks('')
+        e.stopPropagation();
+        if (remarks.trim() === '') return;
+        const remarkObject = {
+            id: shipmentId,
+            remarks: [
+                {
+                    date: service.getEpoch(new Date()),
+                    remark: remarks === 'Others :' ? others : remarks,
+                }
+            ]
+        }
+        if (remarkObject.remarks[0].remark !== placeholder) {
+            const response = remake_update_By_Id(remarkObject);
+            response.then((res: any) => {
+                if (res.statusCode === 200) {
+                    showMessage('Remark Updated', 'success');
+                    getAllShipment();
+                }
+            }).catch((err) => {
+                console.log(err)
+            })
+        } else {
+            showMessage('select remark', 'error');
+        }
+        setRemarks('');
+    }
+
+    return (
+        <div onClick={(e) => { e.stopPropagation(); setOpenRemarks(false) }}>
+
+            <div style={{
+                width: '100%',
+                backgroundColor: '#3351FF',
+                color: 'white',
+                borderRadius: '8px 8px 0 0',
+                padding: '4px',
+                fontSize: '20px',
+                paddingLeft: '8px'
+            }}>Remarks</div>
+
+            <div style={{ padding: '12px', position: 'relative' }}>
+                <div
+                    className='remarks_update'
+                    onClick={(e) => { e.stopPropagation(); setOpenRemarks(!openRemarks); }}
+                >{remarks}{
+                        remarks === 'Others :' ?
+                            <input
+                                onClick={(e) => { e.stopPropagation(); }}
+                                onChange={(e) => { handleothers(e.target.value) }}
+                                style={{
+                                    outline: 'none',
+                                    borderTop: '1px solid #E9E9EB',
+                                    borderLeft: '1px solid #E9E9EB',
+                                    borderRight: '1px solid #E9E9EB',
+                                    marginInline: '5px',
+                                    backgroundColor: '#E9E9EB',
+                                    borderBottom: '1px solid black',
+                                    height: '24px'
+                                }}
+                            /> : <></>
+                    }
+                </div>
+                <ArrowDropDownIcon
+                    onClick={() => { setOpenRemarks(!openRemarks) }}
+                    className='arrow_down_icon'
+                />
+                <div className='remarks_dropDown_list' style={{ display: openRemarks ? 'block' : 'none' }}>
+                    {predefinedRemarks.map((remark: string, index: number) => (
+                        <div
+                            key={index}
+                            onClick={() => handlePreDefineRemarks(remark)}
+                            className='remarks_dropDown_list_item'
+                        >{remark}</div>
+                    ))}
+                </div>
+                <div style={{ textAlign: 'end', paddingTop: '8px' }}>
+                    <Button variant="contained" size='small' color="secondary" style={{ textTransform: 'none', backgroundColor: '#3351FF' }} onClick={(e) => { handleSubmit(e) }}>{t('submit')}</Button>
+                </div>
+            </div>
+            <div
+                style={{
+                    height: '32px',
+                    width: '32px',
+                    borderRadius: '50%',
+                    backgroundColor: 'white',
+                    position: 'absolute',
+                    top: -40,
+                    right: 0,
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    cursor: 'pointer',
+                    zIndex: 999,
+                    boxShadow: '0 1px 2px rgba(0, 0, 0, 0.1)',
+                    transition: 'all 0.5s ease-in-out',
+                    transform: `rotate(${isHovered ? 90 : 0}deg)`
+                }}
+                onClick={(e) => { e.stopPropagation() }}
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
+            >
+                <CloseIcon
+                    onClick={(e) => { e.stopPropagation(); setOpen(false) }}
+                />
+            </div>
+        </div>
+    )
+}
+function Tags({ rakeCaptiveList, shipmentId, setOpen, setShowActionBox }: any) {
+
+    const placeHolder = 'Select One';
+    const [item, setItem] = useState(placeHolder)
+    const [itemId, setItemID] = useState(null)
+    const t = useTranslations('ORDERS');
+    const [openCaptiveItems, setOpenCaptiveItems] = useState(false)
+
+    const [isHovered, setIsHovered] = useState(false);
+    const handleMouseEnter = useCallback(() => setIsHovered(true), []);
+    const handleMouseLeave = useCallback(() => setIsHovered(false), []);
+
+    const [searchTerm, setSearchTerm] = useState('');
+    const [filteredList, setFilteredList] = useState(rakeCaptiveList);
+
+    const handleSearch = (e: any) => {
+        setSearchTerm(e.target.value);
+        setItem(e.target.value);
+        setOpenCaptiveItems(true);
+    };
+
+    useEffect(() => {
+        const filtered = rakeCaptiveList.filter((remark: any) =>
+            remark.rake_id?.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+        setFilteredList(filtered);
+    }, [searchTerm, rakeCaptiveList]);
+
+    const handleSubmit = (e: any) => {
+        e.stopPropagation();
+        const updatedObject = {
+            shipmentId: shipmentId,
+            captiveId: itemId
+        };
+        if (updatedObject.captiveId) {
+            rake_update_id(updatedObject)
+        }
+
+        setOpen(false)
+
+    };
+
+    return (
+        <div >
+            <div style={{
+                width: '100%',
+                backgroundColor: '#3351FF',
+                color: 'white',
+                borderRadius: '8px 8px 0 0',
+                padding: '4px',
+                fontSize: '20px'
+            }}>Captive Rakes</div>
+            <div style={{ padding: 16, position: 'relative' }} onClick={(e) => { e.stopPropagation(); setOpenCaptiveItems(false) }}>
+                <div className='captiveInput' onClick={(e) => { e.stopPropagation(); setOpenCaptiveItems(!openCaptiveItems) }}>
+                    <input
+                        value={searchTerm}
+                        onChange={handleSearch}
+                        placeholder="select one"
+                        style={{
+                            width: '100%',
+                            backgroundColor: '#E9E9EB',
+                            outline: 'none',
+                            borderTop: '1px solid #E9E9EB',
+                            borderLeft: '1px solid #E9E9EB',
+                            borderRight: '1px solid #E9E9EB',
+                            padding: '4px',
+                            height: '24px'
+                        }}
+                    />
+                </div>
+                <ArrowDropDownIcon
+                    onClick={() => { }}
+                    className='arrow_down_icon_captive'
+                />
+                <div
+                    className='captive_list_box'
+                    style={{ display: openCaptiveItems ? 'block' : 'none' }} >
+                    {filteredList.map((remark: any, index: number) => (
+                        <div
+                            key={index}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setItem(remark.rake_id ?? remark.name);
+                                setSearchTerm(remark.rake_id ?? remark.name);
+                                setOpenCaptiveItems(false);
+                                setItemID(remark._id);
+                            }}
+                            className='captive_list_item'
+                        >
+                            <div style={{ width: '136px' }}>{remark.rake_id}</div>
+                            <div style={{ paddingInline: '4px' }}>-</div>
+                            <div>{remark.name}</div>
+                        </div>
+                    ))}
+                </div>
+                <div style={{ textAlign: 'end', paddingTop: '8px' }}>
+                    <Button variant="contained" size='small' style={{ textTransform: 'none', backgroundColor: '#3351FF' }} onClick={(e) => { handleSubmit(e) }}>{t('submit')}</Button>
+                </div>
+            </div>
+            <div
+                style={{
+                    height: '32px',
+                    width: '32px',
+                    borderRadius: '50%',
+                    backgroundColor: 'white',
+                    position: 'absolute',
+                    top: -40,
+                    right: 0,
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    cursor: 'pointer',
+                    zIndex: 999,
+                    boxShadow: '0 1px 2px rgba(0, 0, 0, 0.1)',
+                    transition: 'all 0.5s ease-in-out',
+                    transform: `rotate(${isHovered ? 90 : 0}deg)`
+                }}
+                onClick={(e) => { e.stopPropagation() }}
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
+            >
+                <CloseIcon
+                    onClick={(e) => { e.stopPropagation(); setOpen(false) }}
+                />
+            </div>
+        </div>
+    );
+}
+const RemarkComponent = ({ row, firstIndex }: any) => {
+    const [anchorEl, setAnchorEl] = useState(null);
+
+    const handlePopoverOpen = (event: any) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handlePopoverClose = () => {
+        setAnchorEl(null);
+    };
+
+    const open = Boolean(anchorEl);
+
+    return (
+        <Box>
+            <Typography
+                aria-owns={true ? `mouse-over-popover-${firstIndex}` : undefined}
+                aria-haspopup="true"
+                onMouseEnter={handlePopoverOpen}
+                onMouseLeave={handlePopoverClose}
+                sx={{ fontSize: '12px', fontFamily: '"Inter", sans-serif !important', }}
+            >
+                {row.remarks.latest}
+            </Typography>
+            {row.remarks.rest && row.remarks.rest.length > 0 && (
+                <Popover
+                    id={`mouse-over-popover-${firstIndex}`}
+                    sx={{
+                        pointerEvents: 'none',
+                    }}
+                    open={open}
+                    anchorEl={anchorEl}
+                    anchorOrigin={{
+                        vertical: 'bottom',
+                        horizontal: 'left',
+                    }}
+                    transformOrigin={{
+                        vertical: 'top',
+                        horizontal: 'left',
+                    }}
+                    onClose={handlePopoverClose}
+                    disableRestoreFocus
+                >
+                    <Box sx={{}}>
+                        {row.remarks.rest?.map((item: any, remarkListIndex: number) => (
+                            <Typography key={remarkListIndex} sx={{ fontSize: '12px', paddingInline: '4px' }}>
+                                {item.remark}
+                            </Typography>
+                        ))}
+                    </Box>
+                </Popover>
+            )}
+        </Box>
+    );
+};
 
 
 

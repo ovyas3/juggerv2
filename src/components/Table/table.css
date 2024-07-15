@@ -31,6 +31,7 @@
     min-width: 70px !important;
     /* display: flex !important;
     flex-direction: row !important; */
+    text-wrap: nowrap;
 }
 .inner_pickup{
     /* background-color: chocolate!important; */
@@ -52,7 +53,8 @@
 
 .status{
     /* background-color: darksalmon!important; */
-    min-width: 154px !important;
+    max-width: 150px !important;
+    min-width: 75px !important;
 }
 .inner_status{
     /* background-color: aqua !important; */
@@ -90,12 +92,15 @@
 .currentEta{
     /* background-color: yellow!important; */
     min-width: 90px !important;
-
+    text-wrap:nowrap;
+}
+.deliverDate{
+    /* background-color: darkslateblue!important; */
+    min-width: 90px !important;
 }
 .remarks{
     /* background-color: darkslategray!important; */
     min-width: 86px !important;
-
 }
 .handlingAgent{
     /* background-color: wheat!important; */
@@ -321,9 +326,9 @@
     position: absolute;
     /* background-color: rgb(110, 208, 115); */
    
-    right: 30px;
-    top: 7px;
-    z-index: 1;
+    right: 33px;
+    top: -52px;
+    z-index: 100 !important;
    
     opacity: 0;
     transform: scale(0.95);
@@ -345,15 +350,13 @@
 
 
 .edemand_fois_gpis{
-    /* background-color: #7C7E8C; */
-    height: 16px;
-    width: 48px;
+    /* background-color: #7C7E8C;
     margin-top: 8px;
-
-    
-    display: grid;
-    grid-template-columns: auto auto;
-    row-gap: 6px;
+    display: flex;
+    flex-direction: row; */
+    /* display: grid;
+    grid-template-columns: auto auto; */
+    /* row-gap: 6px; */
   }
   .action_button_options{
    display: flex;
@@ -367,9 +370,10 @@
   .action_items{
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 7px;
     cursor: pointer;
-    padding: 6px 8px;
+    padding-inline: 8px;
+    padding-block: 2px;
   
   }
 
@@ -387,3 +391,104 @@
     font-weight: bold;
     outline: none;
   }
+  .fois_gps_logo{
+    margin-top: 6px;
+    display: flex;
+    flex-direction: row;
+    gap:6px
+  }
+.no_of_wagons{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+  .fnr_logos{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+  }
+  .request_wagons{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap:3px;
+    position: relative;
+  }
+  .request_wagons_logo{
+    height: 25px;
+    width:25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+  }
+  .request_wagons:hover .hover_req {
+    opacity: 1;
+  visibility: visible;
+  }
+ 
+.request_image{
+    height: 100%;
+    width: 100%;
+}
+.ArrowUpwardIcon{
+    color: #00B275;
+    position: absolute;
+    top:6px
+}
+.divider_wagons{
+    height: 16px;
+    width: 1px;
+    background-color: #E9E9EB;
+    margin-inline: 4px;
+}
+.ArrowDownwardIcon{
+    color: #334FFC;
+    position: absolute;
+    top:6px
+}
+.hover_req{
+    position: absolute;
+    background-color: #00B275;
+    color: white;
+    text-wrap: nowrap;
+    width: 106px;
+    height: 20px;
+    text-align: center;
+    font-size: 10px;
+    padding-block: 2px;
+    border-radius: 4px;
+    top:100%;
+    opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+.received_wagons{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap:3px;
+    position: relative;
+}
+.hover_rece{
+    position: absolute;
+    background-color: #314FFC;
+    color: white;
+    text-wrap: nowrap;
+    width: 106px;
+    height: 20px;
+    text-align: center;
+    font-size: 10px;
+    padding-block: 2px;
+    border-radius: 4px;
+    top:100%;
+    opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+.received_wagons:hover .hover_rece {
+    opacity: 1;
+    visibility: visible;
+}

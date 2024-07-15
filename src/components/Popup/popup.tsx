@@ -142,6 +142,9 @@ export const Popup: React.FC<PopupProps> = ({ data }) => {
 
   // Get data for parent dialog component
   const getDataParentTabele = async () => {
+    setCount(0);
+    setPage(0);
+    setRowsPerPage(rowsPerPageOptions[0]);
     setSearchTerm('');
     setSchemeType('');
     const currentTime = new Date();
