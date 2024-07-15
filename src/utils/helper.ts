@@ -19,3 +19,15 @@ export const CAPTIVE_RAKE = 'rake_shipment/get/captive_rakes';
 export const UPDATE_RAKE_CAPTIVE_ID = 'rake_shipment/update_rake_captive_id';
 export const REMARKS_UPDATE_ID = 'add/remark';
 export const REMARKS_LIST = 'get/remark/reasons';
+
+export const STATIONS ='get/stations';
+export const ZONES = 'get/zones';
+export const STATES = 'get/states';
+export const ADDSTATIONS = 'add/stations';
+export const EDITSTATIONS = 'edit/stations';
+
+// export const STATIONS = https://dev-rms-api.instavans.com/api/mysterio/v1/get/stations;
+// export const ZONES = https://dev-rms-api.instavans.com/api/mysterio/v1/get/zones;
+// export const STATES = https://dev-rms-api.instavans.com/api/mysterio/v1/get/states;
+// export const ADDSTATIONS = https://dev-rms-api.instavans.com/api/mysterio/v1/add/stations;
+// export const EDITSTATIONS = https://dev-rms-api.instavans.com/api/mysterio/v1/edit/stations;
