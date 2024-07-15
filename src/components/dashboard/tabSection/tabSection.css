@@ -69,7 +69,7 @@
   display: flex;
 }
 
-.tracking-status{
+.tracking-status-dashboard{
   padding: 20px 4px;
   width: 29vw;
 }
@@ -88,7 +88,7 @@
 }
 
 @media screen and (max-width: 1240px) {
-  .tracking-status{
+  .tracking-status-dashboard{
     width: 28vw;
   }
 
@@ -104,7 +104,7 @@
     flex-direction: column;
   }
 
-  .tracking-status{
+  .tracking-status-dashboard{
     width: 90vw;
   }
 
@@ -120,7 +120,7 @@
 }
 
 @media screen and (max-width: 950px){
-  .tracking-status{
+  .tracking-status-dashboard{
     width: 90vw;
   }
 
@@ -139,7 +139,7 @@
     margin: 12px 0 0 6px;
   }
 
-  .tracking-status{
+  .tracking-status-dashboard{
     width: 95vw;
   }
 

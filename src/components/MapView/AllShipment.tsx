@@ -323,6 +323,7 @@ const MapLayers = () => {
         if (selectedMarkerRef.current) {
           selectedMarkerRef.current.closePopup();
         }
+        map?.flyTo(center, 5, { duration: 1 });
       } else {
         setSelectedShipment(shipment);
         focusOnShipment(shipment);
@@ -350,7 +351,7 @@ const MapLayers = () => {
 
     return (
       <div>
-        <div className="map-container">
+        <div className="shipment-map-container">
           {isMobile ? <SideDrawer /> : null}
           <div style={{ width: '100%', overflow: 'hidden' }}>
             {isMobile ? <Header title="Shipments Map View" isMapHelper={false}></Header> : <MobileHeader />}
@@ -485,7 +486,7 @@ const MapLayers = () => {
                 height: '100vh',
                 padding: '10px',
                 boxShadow: '0px 00px 10px 0px rgba(0,0,0,0.3)',
-                overflowY: 'scroll',
+                
               }} 
               >
                 <Box className="shipment-heads">
@@ -529,12 +530,17 @@ const MapLayers = () => {
                     </Typography>
                   </Paper>
                 </Box>
-                {showAll && allShipments.map((item, index) => {
-                  return <ShipmentCard key={index} index={index} shipment={item} handleShipmentSelection={handleShipmentSelection}/>
-                })}
-                {showFiltered && filteredShipments.map((item, index) => {
-                  return <ShipmentCard key={index} index={index} shipment={item} handleShipmentSelection={handleShipmentSelection}/>
-                })}
+                <Box sx={{
+                  maxHeight: 'calc(75vh - 60px)',
+                  overflowY: 'scroll',
+                }} className="shipment-details-container">
+                  {showFiltered && filteredShipments.map((shipment, index) => {
+                    return <ShipmentCard key={index} index={index} shipment={shipment} handleShipmentSelection={handleShipmentSelection} />
+                  })}
+                  {showAll && allShipments.map((shipment, index) => {
+                    return <ShipmentCard key={index} index={index} shipment={shipment} handleShipmentSelection={handleShipmentSelection} />
+                  })}
+                </Box>
               </Box>
             </div>
           </div>

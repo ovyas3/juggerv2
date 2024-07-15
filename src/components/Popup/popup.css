@@ -57,12 +57,7 @@
     padding-right: 0px;
     padding-left: 0px;
   }
-
-  .MuiTableHead-root .table-columns:nth-child(3){
-    padding-left: 0px;
-  }
-
-
+  
   .MuiTableBody-root  .table-rows{
     color: #42454E;
     font-size: 12px;
@@ -88,10 +83,6 @@
       color: #334FFC ;
       padding-bottom: 2px;
     }
-  }
-
-  .MuiTableBody-root .table-rows:nth-child(3){
-    padding-left: 0px;
   }
 
   .MuiFormControl-root input{
