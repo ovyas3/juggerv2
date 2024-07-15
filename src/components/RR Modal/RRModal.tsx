@@ -60,6 +60,9 @@ const RRModal: React.FC<PopupProps> = ({ isOpen, isClose, rrNumbers, isRRDoc }) 
         actualWeight: data && data.actual_weight ? data.actual_weight : 'N/A',
         chargeableWeight: data && data.chargeable_weight ? data.chargeable_weight : 'N/A',
         totalFreight: data && data.total_freight ? data.total_freight.toLocaleString('en-IN') : 'N/A',
+        senderWeight: data && data.sender_weight ? data.sender_weight : 'N/A',
+        consigneeName: data && data.consignee && data.consignee.name ? data.consignee.name : 'N/A',
+        consigneeAddress: data && data.consignee && data.consignee.address ? data.consignee.address : 'N/A',
       };
   
       const tableData = data && data.wagon_details ? 
@@ -133,15 +136,15 @@ const RRModal: React.FC<PopupProps> = ({ isOpen, isClose, rrNumbers, isRRDoc }) 
                 <div className="rrmodal-content-left-body">
                   <div className="rrmodal-content-upper-item">
                      <h4 className="rrmodal-content-upper-item-heading">Consignee Name</h4>
-                     <p className="rrmodal-content-upper-item-value">M/S JINDAL STEEL AND POWER LTD</p>
+                     <p className="rrmodal-content-upper-item-value">{ rrDetails.consigneeName }</p>
                   </div>
                   <div className="rrmodal-content-upper-item">
                      <h4 className="rrmodal-content-upper-item-heading">Consignee Address</h4>
-                     <p className="rrmodal-content-upper-item-value">M/S JINDAL STEEL AND POWER LTD</p>
+                     <p className="rrmodal-content-upper-item-value">{ rrDetails.consigneeAddress }</p>
                   </div>
                   <div className="rrmodal-content-upper-item">
                      <h4 className="rrmodal-content-upper-item-heading">Sender Weight (MT)</h4>
-                     <p className="rrmodal-content-upper-item-value">0</p>
+                     <p className="rrmodal-content-upper-item-value">{ rrDetails.senderWeight }</p>
                   </div>
                   <div className="rrmodal-content-upper-item">
                      <h4 className="rrmodal-content-upper-item-heading">Actual Weight (MT)</h4>
