@@ -13,6 +13,15 @@
   width: 100%;
 }
 
+.shipment-map-container{
+  display: flex;
+  flex-direction: row;
+  position: relative;
+  height: 100vh;
+  width: 100%;
+  overflow-y: hidden;
+}
+
 .shipment-details {
   display: flex;
   position: absolute;
@@ -56,6 +65,32 @@
 .cluster-icon-delivered {
   background-color: #18BE8A;
   box-shadow: 0 0 0px 10px #18be8980;
+  height: 2em;
+  width: 2em;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 1.2rem;
+}
+
+.cluster-icon-tracking-mapshelper{
+  background-color: #18BE8A;
+  box-shadow: 0 0 0px 10px #18be8980;
+  height: 2em;
+  width: 2em;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 1.2rem;
+}
+
+.cluster-icon-idle-mapshelper{
+  background-color: #FF981A;
+  box-shadow: 0 0 0px 10px #FF981A61;
   height: 2em;
   width: 2em;
   color: #fff;
@@ -180,7 +215,7 @@
 
   .table-mapview-container{
     width: 100%;
-    height: 440px;
+    height: 420px;
     border-radius: 0px 0px 12px 12px;
   }
 
@@ -339,6 +374,15 @@
   font-weight: 600;
   color: green;
   background-color: #18be8a80;
+}
+
+.shipment-details-container{
+  scrollbar-width: none; 
+    -ms-overflow-style: none; 
+  }
+  
+.shipment-details-container::-webkit-scrollbar {
+    width: 0px;
 }
 
 
