@@ -620,7 +620,7 @@ const MapLayers = () => {
                   {showRoute && route.length && <Polyline pathOptions={{ color:'blue' }} positions={route} />}
                   {currentLocation.length && currentLocation.map((cr:any, index: number) => <Marker key={index} position={cr.coords} icon={customIcon}>
                     <Popup>
-                      <h3 style={{marginTop: '1em', marginBottom: "1em"}}>Rake Scheme ID: {cr.data.title}</h3>
+                      <h3 style={{marginTop: '1em', marginBottom: "1em"}}>Rake Name: {cr.data.title}</h3>
                       <h4 style={{marginTop: '1em', marginBottom: "1em"}}>Last Updated At: {cr.data.ts}</h4>
                     </Popup>
                   </Marker>)}
@@ -634,7 +634,7 @@ const MapLayers = () => {
                       }
                       }}>
                       <Popup>
-                        <h3 style={{marginTop: '1em', marginBottom: "1em"}}>Rake Scheme ID: {rake.data.title}</h3>
+                        <h3 style={{marginTop: '1em', marginBottom: "1em"}}>Rake Name: {rake.data.title}</h3>
                         <hr></hr>
                         <h4 style={{marginTop: '1em', marginBottom: "1em"}}>Last Updated At: {rake.data.ts}</h4>
                       </Popup>
@@ -648,7 +648,7 @@ const MapLayers = () => {
                       }
                       }}>
                       <Popup>
-                        <h3 style={{marginTop: '1em', marginBottom: "1em"}}>Rake Scheme ID: {rake.data.title}</h3>
+                        <h3 style={{marginTop: '1em', marginBottom: "1em"}}>Rake Name: {rake.data.title}</h3>
                         <hr></hr>
                         <h4 style={{marginTop: '1em', marginBottom: "1em"}}>Last Updated At: {rake.data.ts}</h4>
                       </Popup>
