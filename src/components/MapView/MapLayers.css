@@ -381,8 +381,8 @@
   display: flex;
   justify-content: space-evenly;
   align-items: center;
-  gap: 20px;
-  padding: 20px;
+  gap: 12px;
+  padding: 12px;
   border-radius: 8px;
   background-color: white;
   margin-top: 30px;
@@ -395,7 +395,7 @@
   align-items: center;
   border-radius: 50%;
   background-color: #f0f3f9;
-  padding: 5px;
+  padding: 3px;
   border: 1px solid #f0f3f9;
   cursor: pointer;
 }

@@ -545,7 +545,7 @@ const MapLayers = () => {
                           fontSize: '14px',
                           height: '36px',
                           padding: '8px',
-                          width: '90px',
+                          width: '135px',
                           boxSizing: 'border-box',
                       },
                       '& .MuiOutlinedInput-root': {
@@ -584,7 +584,7 @@ const MapLayers = () => {
                             fontSize: '14px',
                             height: '36px',
                             padding: '8px',
-                            width: '90px',
+                            width: '135px',
                             boxSizing: 'border-box',
                         },
                         '& .MuiOutlinedInput-root': {
