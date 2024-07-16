@@ -523,7 +523,7 @@ const MapLayers = () => {
                 
               }} 
               >
-                <Box className="date-range-container">
+                <Box className="date-range-container-heads">
                   <LocalizationProvider dateAdapter={AdapterDayjs}>
                     <DatePicker
                     label="From"
