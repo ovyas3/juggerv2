@@ -41,11 +41,6 @@ const TrackingStatus: React.FC<TrackingStatusProps> = ({ handleAllRakesAndTable,
     },
   ]);
 
-  
-  useEffect(() => {
-    console.log("statusInfo", statusInfo);
-  console.log("statusNumber", statusNumber);
-  }, [statusInfo, statusNumber]);
 
   let trackingStructure = {
     totalTracking: 0,
