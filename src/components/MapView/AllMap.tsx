@@ -56,16 +56,16 @@ const customIconIdle = L.icon({
   popupAnchor: [0, -38] // adjust popup anchor as needed
 });
 
-const createClusterCustomIconInTransit = function (cluster: any) {
+const createClusterCustomIconTracking = function (cluster: any) {
   return divIcon({
-    html: `<span class="cluster-icon-in-transit">${cluster.getChildCount()}</span>`,
+    html: `<span class="cluster-icon-tracking-mapshelper">${cluster.getChildCount()}</span>`,
     className: "custom-marker-cluster",
     iconSize: point(33, 33, true)
   });
 };
 const createClusterCustomIconIdle = function (cluster: any) {
   return divIcon({
-    html: `<span class="cluster-icon-idle">${cluster.getChildCount()}</span>`,
+    html: `<span class="cluster-icon-idle-mapshelper">${cluster.getChildCount()}</span>`,
     className: "custom-marker-cluster",
     iconSize: point(33, 33, true)
   });
@@ -353,11 +353,12 @@ const MapLayers = () => {
     };
     
     const focusOnRake = (rake: any) => {
+      console.log((rake && parseFloat(rake.hours.split('h')[0]) > 720), 'rake');
       if (rake && parseFloat(rake.hours.split('h')[0]) > 720) {
         if (selectedMarkerRef.current) {
           selectedMarkerRef.current.closePopup();
-          map?.flyTo(center, 5, { duration: 1 });
         }
+        map?.flyTo(center, 5, { duration: 1 });
         return;
       }
       if (rake && map) {
@@ -530,7 +531,7 @@ const MapLayers = () => {
                           <TableHead>
                             <TableRow>
                               <TableCell align="left" className="table-heads">S.No</TableCell>
-                              <TableCell align="left" className="table-heads">Rake ID</TableCell>
+                              <TableCell align="left" className="table-heads">Rake Name</TableCell>
                               <TableCell align="center" className="table-heads" style={{lineHeight: '16px'}}>Last Updated <br/> <span style={{fontSize: '10px', color:'#7C7E8C', fontWeight: '500', textAlign: 'center' }}>(hr & min)</span></TableCell>
                               <TableCell align="left" className="table-heads">FNR No.</TableCell>
                             </TableRow>
@@ -547,7 +548,7 @@ const MapLayers = () => {
                             }}
                             >
                               <TableCell align="left" className="captive-rake-rows" style={{fontWeight: selectedRake && selectedRake.rake_id === rake.rake_id ? "bold" : 'inherit'}}>{index + 1}.</TableCell>
-                              <TableCell align="left" className="captive-rake-rows" style={{fontWeight: selectedRake && selectedRake.rake_id === rake.rake_id ? "bold" : 'inherit'}}>{rake.rake_id}</TableCell>
+                              <TableCell align="left" className="captive-rake-rows" style={{fontWeight: selectedRake && selectedRake.rake_id === rake.rake_id ? "bold" : 'inherit'}}>{rake.name}</TableCell>
                               <TableCell align="center" className="captive-rake-rows" style={{fontWeight: selectedRake && selectedRake.rake_id === rake.rake_id ? "bold" : 'inherit'}}>
                               {rake.hours && parseFloat(rake.hours.split('h')[0]) <= 720 ? rake.hours : 'N/A'}
                               </TableCell>
@@ -619,13 +620,13 @@ const MapLayers = () => {
                   {showRoute && route.length && <Polyline pathOptions={{ color:'blue' }} positions={route} />}
                   {currentLocation.length && currentLocation.map((cr:any, index: number) => <Marker key={index} position={cr.coords} icon={customIcon}>
                     <Popup>
-                      <h3 style={{marginTop: '1em', marginBottom: "1em"}}>Rake Scheme ID: {cr.data.title}</h3>
+                      <h3 style={{marginTop: '1em', marginBottom: "1em"}}>Rake Name: {cr.data.title}</h3>
                       <h4 style={{marginTop: '1em', marginBottom: "1em"}}>Last Updated At: {cr.data.ts}</h4>
                     </Popup>
                   </Marker>)}
                   {showAllRakes &&
                   <>
-                  <MarkerClusterGroup chunkedLoading iconCreateFunction={createClusterCustomIconInTransit}>
+                  <MarkerClusterGroup chunkedLoading iconCreateFunction={createClusterCustomIconTracking}>
                   {/* Mapping through the markers */}
                     {showAllRakes && ['total','tracking'].includes(selectedType) && allRakesPositions.map((rake:any, index: number) => <Marker key={index} position={rake.coords} icon={customIcon} ref={(el) => {
                       if (selectedRake && selectedRake.name === rake.data.title) {
@@ -633,7 +634,7 @@ const MapLayers = () => {
                       }
                       }}>
                       <Popup>
-                        <h3 style={{marginTop: '1em', marginBottom: "1em"}}>Rake Scheme ID: {rake.data.title}</h3>
+                        <h3 style={{marginTop: '1em', marginBottom: "1em"}}>Rake Name: {rake.data.title}</h3>
                         <hr></hr>
                         <h4 style={{marginTop: '1em', marginBottom: "1em"}}>Last Updated At: {rake.data.ts}</h4>
                       </Popup>
@@ -647,7 +648,7 @@ const MapLayers = () => {
                       }
                       }}>
                       <Popup>
-                        <h3 style={{marginTop: '1em', marginBottom: "1em"}}>Rake Scheme ID: {rake.data.title}</h3>
+                        <h3 style={{marginTop: '1em', marginBottom: "1em"}}>Rake Name: {rake.data.title}</h3>
                         <hr></hr>
                         <h4 style={{marginTop: '1em', marginBottom: "1em"}}>Last Updated At: {rake.data.ts}</h4>
                       </Popup>

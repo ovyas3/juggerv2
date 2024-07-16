@@ -227,7 +227,7 @@ const Tabsection = () => {
                     <Status />
                     <BarsDataset/>
                   </div> */}
-                  <div className="tracking-status">
+                  <div className="tracking-status-dashboard">
                     <TrackingStatus 
                           handleAllRakesAndTable={handleAllRakesAndTable}
                           handleSchemeTypeAndTable={handleSchemeTypeAndTable}
