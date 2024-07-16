@@ -497,8 +497,10 @@
 }
 
 .shipment-details-container{
+  max-height: calc(75vh - 200px) !important;
+  overflow-y: scroll;
   scrollbar-width: none; 
-    -ms-overflow-style: none; 
+  -ms-overflow-style: none; 
   }
   
 .shipment-details-container::-webkit-scrollbar {
