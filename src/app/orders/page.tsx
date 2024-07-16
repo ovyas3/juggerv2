@@ -201,7 +201,7 @@ const OrdersPage = () => {
                       : <></>
                   }
                   
-                  <div style={{ paddingTop: tablePagination ? '25px' : '60px' }}>
+                  <div style={{ paddingTop: tablePagination ? '30px' : '60px' }}>
                     <TableData onSkipLimit={handleSkipLimitChange} allShipments={allShipment} count={count} rakeCaptiveList={rakeCaptiveList} onFnrChange={handleChangeByFnr} reload={reload} getAllShipment={getAllShipment} setTriggerShipments={setTriggerShipments} triggerShipments={triggerShipments}  />
                   </div>
                 </div>

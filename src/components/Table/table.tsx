@@ -53,7 +53,7 @@ import { Menu, MenuItem } from '@mui/material';
 import './style.css'
 import Backdrop from '@mui/material/Backdrop';
 import Fade from '@mui/material/Fade';
-import { sortArray, separateLatestObject } from '@/utils/hooks';
+import { sortArray, separateLatestObject ,calculateDaysDifference} from '@/utils/hooks';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import Popover from '@mui/material/Popover';
 import { Typography, } from '@mui/material';
@@ -100,8 +100,10 @@ const convertArrayToFilteredArray = (inputArray: any) => {
             past_etas: any,
             no_of_wagons: number,
             received_no_of_wagons: number,
+            demand_date:any,
+            paid_by:string,
         }) => {
-        const { edemand_no, FNR, all_FNRs, delivery_location, trip_tracker, others, remarks, unique_code, status, pickup_date, captive_id, is_captive, eta, rr_document, polyline, past_etas, no_of_wagons, received_no_of_wagons } = item;
+        const { edemand_no, FNR, all_FNRs, delivery_location, trip_tracker, others, remarks, unique_code, status, pickup_date, captive_id, is_captive, eta, rr_document, polyline, past_etas, no_of_wagons, received_no_of_wagons, demand_date,paid_by } = item;
         return {
             _id: item._id,
             edemand: edemand_no,
@@ -144,9 +146,12 @@ const convertArrayToFilteredArray = (inputArray: any) => {
             pickup_date: pickup_date,
             rrDoc: rr_document && rr_document.length > 0 ? true : false,
             past_etas: past_etas ? past_etas : 'NA',
-            deliverDate: 'NA',
+            // deliverDate: 'NA',
             received_no_of_wagons : received_no_of_wagons ?  received_no_of_wagons : 'NA',
             no_of_wagons : no_of_wagons ?  no_of_wagons : 'NA',
+            is_captive: is_captive && is_captive,
+            daysAging : calculateDaysDifference(demand_date,pickup_date),
+            paid_by:paid_by ? paid_by : 'NA',
         }
     });
 };
@@ -314,8 +319,9 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
     useEffect(() => {
         const commonColumns: Column[] = [
             { id: 'fnr', label: '', class: 'fnr', innerClass: 'inner_fnr' },
-            { id: 'destination', label: 'Destination', class: 'destination', innerClass: '' },
-            { id: 'material', label: 'Material', class: 'material', innerClass: '' },
+            { id: 'destination', label: 'Destination/Paid By', class: 'destination', innerClass: '' },
+            { id: 'material', label: 'Material/Commodities', class: 'material', innerClass: '' },
+            { id: 'aging', label: 'Aging', class: 'aging', innerClass: '' },
             { id: 'pickupdate', label: 'Invoiced Date', class: 'pickupdate', innerClass: 'inner_pickup' },
             { id: 'status', label: 'Status', class: 'status', innerClass: 'inner_status' },
             { id: 'currentEta', label: 'Current ETA', class: 'currentEta', innerClass: 'inner_eta' },
@@ -472,7 +478,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                             {response.map((row: row, firstindex: number) => {
                                 return (
                                     <TableRow hover key={row.edemand}
-                                        onClick={() => { handleRRDoc(row._id) }}
+                                        onClick={(e) => { handleRRDoc(row._id) }}
                                         sx={{ cursor: 'pointer' }}
                                     >
                                         {columns.map((item, index) => {
@@ -483,11 +489,13 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                 fnr: 'body_fnr',
                                                 destination: 'body_destination',
                                                 material: 'body_material',
+                                                aging:'body_aging',
                                                 pickupdate: 'body_pickupdate',
                                                 ownedby: 'body_ownedby',
                                                 status: 'body_status',
                                                 initialETAL: 'body_initialETA',
                                                 currentEta: 'body_currentEta',
+                                                deliverDate:'body_deliveryDate',
                                                 remarks: 'body_remarks',
                                                 handlingAgent: 'body_handlingAgent',
                                                 action: 'body_action',
@@ -589,10 +597,10 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                             />
                                                                         </div>
                                                                     }
-                                                                    {!row.validationForAttachRake &&
+                                                                    {row.is_captive &&
                                                                         <div style={{ height: 25, width: 25 }}>
                                                                             <img
-                                                                                src={!row.validationForAttachRake ? captiveRakeIndicator.src : ''}
+                                                                                src={row.is_captive ? captiveRakeIndicator.src : ''}
                                                                                 style={{ height: '100%', width: '100%' }}
                                                                                 alt=''
                                                                             />
@@ -604,6 +612,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                         {item.id === 'destination' && (
                                                             <div style={{ position: 'relative' }}>
                                                                 <div>{value.name !== 'NA' ? value.name : value.code} ({value.code})</div>
+                                                                <div>{row.paid_by}</div>
                                                             </div>
                                                         )}
                                                         {item.id === 'pickupdate' && (
@@ -625,10 +634,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                             </div>
                                                         }
                                                         {item.id === 'edemand' &&
-                                                            <div className='edemand_fois_gpis'
-                                                            // style={{ display: !row.fois.is_gps && !row.fois.is_fois && !row.rrDoc ? 'none' : '' }}
-
-                                                            >
+                                                            <div className='edemand_fois_gpis'>
                                                                 <div className='no_of_wagons'>
                                                                     <div className='request_wagons'>
                                                                         <div className='request_wagons_logo'>
@@ -653,9 +659,6 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                     {row.fois.is_gps &&
                                                                         <img src={GPIS.src} style={{ display: 'block' }} alt='' />
                                                                     }
-                                                                    {row.fois.is_fois &&
-                                                                        <img src={FOIS.src} style={{ display: 'block' }} alt='' />
-                                                                    }
                                                                 </div>
                                                             </div>
                                                         }
@@ -673,6 +676,21 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                         )}
                                                         {item.id === 'remarks' && (
                                                             <RemarkComponent row={row} firstIndex={firstindex} />
+                                                        )}
+                                                        {item.id === 'aging' && row.daysAging !== "NA" && (
+                                                            <span>{row.daysAging} Days</span>
+                                                        )}
+                                                        {item.id ==='deliverDate' && (
+                                                            <div>
+                                                            {row.eta && row.status.name === 'Delivered' ? (
+                                                                <>
+                                                                    <div>{service.utcToist(row.eta)}</div>
+                                                                    <div>{service.utcToistTime(row.eta)}</div>
+                                                                </>
+                                                            ) : (
+                                                                'NA'
+                                                            )}
+                                                            </div>
                                                         )}
                                                     </div>
                                                 </TableCell>

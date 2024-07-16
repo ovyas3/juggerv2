@@ -40,7 +40,7 @@ export const sortArray = (inputArray: Array<Object>, parameter: string = 'pickup
 
     // If both dates are valid, compare them
     if (!isNaN(dateA.getTime()) && !isNaN(dateB.getTime())) {
-      return type === 'asc' ? dateA.getTime() - dateB.getTime() : dateB.getTime() - dateA.getTime();
+      return type === 'dec' ? dateA.getTime() - dateB.getTime() : dateB.getTime() - dateA.getTime();
     }
 
     // If we reach here, treat them as equal
@@ -67,4 +67,26 @@ export const  separateLatestObject = (dataArray: Array<Object>) : any => {
   const rest = sortedArray.slice(1);
 
   return { latest, rest };
+}
+
+export function calculateDaysDifference(demandDate: string | null, pickupDate: string | null): number | "NA" {
+  if (!demandDate || !pickupDate) {
+      return "NA";
+  }
+
+  try {
+      const demand = new Date(demandDate);
+      const pickup = new Date(pickupDate);
+
+      if (isNaN(demand.getTime()) || isNaN(pickup.getTime())) {
+          return "NA";
+      }
+
+      const differenceInTime = Math.abs(demand.getTime() - pickup.getTime());
+      const differenceInDays = Math.floor(differenceInTime / (1000 * 3600 * 24));
+
+      return differenceInDays;
+  } catch (error) {
+      return "NA";
+  }
 }
