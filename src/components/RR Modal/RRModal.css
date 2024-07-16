@@ -53,7 +53,7 @@
   border-radius: 12px;
   font-family: 'Inter', sans-serif !important;
   flex: 1;
-  overflow-y: auto;
+  overflow-y: hidden;
   scrollbar-width: none; 
   -ms-overflow-style: none; 
   
@@ -67,6 +67,11 @@
     top: 0;
     z-index: 1;
     background-color: #fff;
+  }
+
+  .rrmodal-sidebar-details-item{
+    max-height: 560px;
+    overflow-y: scroll;
   }
 
   .rrmodal-sidebar-details-item-value{
