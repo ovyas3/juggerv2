@@ -11,17 +11,17 @@ const getStatusStyle = (status: string) => {
     case "delivered":
       return{
         backgroundColor: 'white',
-        color: 'rgba(0, 142, 39, 1)'
+        color: '#18BE8A'
       };
     case "in transit":
       return{
         backgroundColor: 'white',
-        color: 'rgba(255, 152, 0, 1)'
+        color: '#FF9800'
       }
     case "in plant": 
       return{
         backgroundColor: 'white',
-        color: 'rgba(41, 98, 255, 1)'
+        color: '#334FFC'
       }  
   }
 }

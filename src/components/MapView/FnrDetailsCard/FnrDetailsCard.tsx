@@ -13,6 +13,7 @@ import service from "@/utils/timeService";
 import { Tooltip } from "@mui/material";
 
 export const FNRDetailsCard = (props: any) => {
+  console.log("props",props)
 
     return(
     <React.Fragment>
@@ -87,7 +88,7 @@ export const FNRDetailsCard = (props: any) => {
               />
             </Grid>
             <Grid item xs={10} fontSize={"12px"} >
-                No of Wagons: <b>{props.fnr_data?.no_of_wagons}</b>
+                No of Wagons: <b>{props.fnr_data && props.fnr_data.received_no_of_wagons ? props.fnr_data.received_no_of_wagons : props.fnr_data.no_of_wagons}</b>
             </Grid>
           </Grid>
           <Grid container spacing={2} item xs={12} >

@@ -63,6 +63,7 @@ const StationHeader = ({ count } : any) => {
     const [item,setItem] = useState(false);
     const [zones, setZones] = useState<string[]>([]);
     const [states, setStates] = useState<string[]>([]);
+    console.log("states1", states)
     const [searchType, setSearchType] = useState('Station Code');
     const [editStationId, setEditStationId] = useState(null);
     const [totalCount, setTotalCount] = useState(0);
@@ -76,6 +77,7 @@ const StationHeader = ({ count } : any) => {
     const [addStationCode, setAddStationCode] = useState('');
     const [addZone, setAddZone] = useState('');
     const [addState, setAddState] = useState('');
+    console.log("addState",addState)
     const [addLat, setAddLat] = useState('');
     const [addLong, setAddLong] = useState('');
     const [editIndex1, setEditIndex1] = useState<number | null>(null);
@@ -111,7 +113,7 @@ const StationHeader = ({ count } : any) => {
     useEffect(() => {
         getStations()
         .then((data: any) => {
-            if (Array.isArray(data.data.stations)) {
+            if (data.data.stations) {
                 setResponse(data.data.stations);
                 setTotalCount(data.data.count); 
               } else {
@@ -127,16 +129,7 @@ const StationHeader = ({ count } : any) => {
         const getZones = async () => {
             try {
                 const result = await httpsGet(ZONES);
-                if (typeof result.data === 'string') {
-                    const parsedData = JSON.parse(result.data);
-                    if (Array.isArray(parsedData)) {
-                        setZones(parsedData);
-                    } else {
-                        console.error('Parsed data is not an array:', parsedData);
-                    }
-                } else {
-                    console.error('Data fetched is not a string:', result.data);
-                }
+                setZones( result && result.data)
             } catch (error) {
                 console.error('Error fetching zones:', error);
             }
@@ -149,16 +142,8 @@ const StationHeader = ({ count } : any) => {
         const getStates = async () => {
             try {
                 const result = await httpsGet(STATES);
-                if (typeof result.data === 'string') {
-                    const parsedData = JSON.parse(result.data);
-                    if (Array.isArray(parsedData)) {
-                        setStates(parsedData);
-                    } else {
-                        console.error('Parsed data is not an array:', parsedData);
-                    }
-                } else {
-                    console.error('Data fetched is not a string:', result.data);
-                }
+                console.log("result",result)
+                setStates( result && result.data)
             } catch (error) {
                 console.error('Error fetching states:', error);
             }
@@ -687,7 +672,10 @@ const StationHeader = ({ count } : any) => {
                                 return(
                                     <TableRow  key={row._id} sx={{ cursor: 'pointer' }}>
                                         {columns.map((item, index) => {
+                                            console.log("row", row)
+                                            console.log("item.id", item.id)
                                             const value = item.id === 'sno' ? startIndex+rowIndex + 1 : row[item.id];
+                                            console.log("value", value)
                                             const columnClassNames: any = {
                                                 stationName: 'body_stationName',
                                                 stationCode: 'body_stationCode',
@@ -714,7 +702,6 @@ const StationHeader = ({ count } : any) => {
                                                                                 text = {('edit')}
                                                                                 onClick={(e: any) =>{ e.stopPropagation(); handleOpen1(e);handleEditClick(row,rowIndex);validateEditLat(row.geo_point ? row.geo_point.coordinates[1] : row.lat);validateEditLong( row.geo_point ? row.geo_point.coordinates[0] : row.long)}}
                                                                             />
-                                                                            
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -726,17 +713,17 @@ const StationHeader = ({ count } : any) => {
                                                                     <PlaceIcon style={{ color: '#0168FF' }}/>
                                                                 </IconButton>}
                                                                 <div  onClick={() => handleLocation(
-                                                                row.geo_point ? row.geo_point.coordinates[1] : row.lat,
+                                                                row.geo_point ? row.geo_point.coordinates[1] : row.lat, 
                                                                 row.geo_point ? row.geo_point.coordinates[0] : row.long
                                                             )}>
-                                                                {row.geo_point ? `${row.geo_point.coordinates[1]},${row.geo_point.coordinates[0]}` : `${row.lat},${row.long}`}
+                                                                {row.geo_point ? `${row.geo_point.coordinates[1]}, ${row.geo_point.coordinates[0]}` : `${row.lat}, ${row.long}`}
                                                                {(typeof value) === 'object' ? '' : ''}
                                                                 </div>
                                                             </div>
                                                         ): ''}
                                                         { item.id ==='state' && (
                                                             <div>
-                                                                {value.state}
+                                                                { value && value.state }
                                                                 {(typeof value) === 'object' ? '' : value}
                                                             </div>
                                                         )}
