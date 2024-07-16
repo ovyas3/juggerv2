@@ -38,8 +38,13 @@ import MobileHeader from "@/components/Header/mobileHeader";
 import SideDrawer from "@/components/Drawer/Drawer";
 import Header from "@/components/Header/header";
 
+import Image from "next/image";
+import IdleIcon from "@/assets/idle_icon.svg";
+import InactiveIcon from "@/assets/inactive_icon.svg";
+
 import { DateTime } from "luxon";
 import service from "@/utils/timeService";
+import { all } from "axios";
 
 // Custom Icons
 const customIcon = L.icon({
@@ -88,6 +93,7 @@ const MapLayers = () => {
     const [showRouteFor, setShowRouteFor] = useState<any>(null);
     const [allStations, setAllStations] = useState([]);
     const [allIdleRakes, setAllIdleRakes] = useState<any>([]);
+    const [allNonTrackingRakes, setAllNonTrackingRakes] = useState<any>([]);
     const [showAllRakes, setShowAllRakes] = useState(false);
     const [allRakesPositions, setAllRakesPositions] = useState<any>([]);
     const [list, setList] = useState<any>([]);
@@ -200,6 +206,27 @@ const MapLayers = () => {
         });
         setAllRakes(filteredData);
         setSelectedType('tracking');
+      } else if (type === 'idle&non-tracking') {
+        const rakeIds = allIdleRakes.map(
+          (item: { rake_id: any }) => item.rake_id
+        );
+      
+        const filteredDataIdle = allRakesBackUp.filter(
+          (item: { rake_id: unknown }) => {
+            return rakeIds.includes(item.rake_id);
+          }
+        );
+      
+        const filteredDataNonTracking = allRakesBackUp.filter(
+          (rake: { hours: string }) => {
+            return rake.hours && parseFloat(rake.hours.split("h")[0]) > 24;
+          }
+        );
+      
+        const combinedData = [...filteredDataIdle, ...filteredDataNonTracking];
+      
+        setAllRakes(combinedData);
+        setSelectedType('idle&non-tracking');
       } else if (type === 'idle') {
         const rakeIds = allIdleRakes.map(
           (item: { rake_id: any }) => item.rake_id
@@ -214,7 +241,7 @@ const MapLayers = () => {
       } else if (type === 'non-tracking') {
         const filteredData = allRakesBackUp.filter(
           (rake: { hours: string }) => {
-            return rake.hours && parseFloat(rake.hours.split("h")[0]) > 720;
+            return rake.hours && parseFloat(rake.hours.split("h")[0]) > 24;
           }
         );
         setAllRakes(filteredData);
@@ -264,26 +291,25 @@ const MapLayers = () => {
 
         const formattedDateTime = `${date} ${time}`;
        if(lastCords.geo_point && lastCords.geo_point.coordinates && lastCords.geo_point.coordinates[0] && lastCords.geo_point.coordinates[1] && lastCords.time_stamp && lastCords.time_stamp.$date) {
-        if (service.differenceToday(lastCords.time_stamp.$date, 0, 'hours') < -3) {
+        if (service.differenceToday(lastCords.time_stamp.$date, 0, 'hours') < -3 && service.differenceToday(lastCords.time_stamp.$date, 0, 'hours') > -24) {
           allIdleRakes.push({
             rake_id: coords[key][0].rake_id,
             data: {
               title: key,
-              // ts: DateTime.fromJSDate(new Date(lastCords.time_stamp.$date)).toFormat('dd/MM/yyyy HH:mm')
               ts: formattedDateTime
             },
             coords: [lastCords.geo_point.coordinates[1], lastCords.geo_point.coordinates[0]]
           });
-        } else {
+        } else if (service.differenceToday(lastCords.time_stamp.$date, 0, 'hours') > -3) {
           allLocations.push({
+            rake_id: coords[key][0].rake_id,
             data: {
               title: key,
-              // ts: DateTime.fromJSDate(new Date(lastCords.time_stamp.$date)).toFormat('dd/MM/yyyy HH:mm')
               ts: formattedDateTime
             },
             coords: [lastCords.geo_point.coordinates[1], lastCords.geo_point.coordinates[0]]
           });
-        }
+        } 
        }
       }
       const allRakesData = [];
@@ -301,6 +327,7 @@ const MapLayers = () => {
           tracking: tracking,
         });
       }
+
       setAllRakesPositions(allLocations);
       setAllIdleRakes(allIdleRakes);
       setShowAllRakes(true);
@@ -353,8 +380,7 @@ const MapLayers = () => {
     };
     
     const focusOnRake = (rake: any) => {
-      console.log((rake && parseFloat(rake.hours.split('h')[0]) > 720), 'rake');
-      if (rake && parseFloat(rake.hours.split('h')[0]) > 720) {
+      if (rake && parseFloat(rake.hours.split('h')[0]) > 24) {
         if (selectedMarkerRef.current) {
           selectedMarkerRef.current.closePopup();
         }
@@ -437,38 +463,13 @@ const MapLayers = () => {
                     labelPlacement="start"
                   />
                 </FormGroup>
-                <Grid style={{
-                    position: 'absolute',
-                    height:'100%',
-                    width: '424px',
-                    background: 'white',
-                    left: '70px',
-                    top: '5%',
-                    overflowX: 'auto',
-                    backgroundColor:'#F8F8F8',
-                    zIndex:10
-                  }}  >
-                    <Grid>
-                    <div style={{
-                        width: '394px',
-                        height: '25%',
-                        marginTop: '24px',
-                        marginLeft: '16px',
-                        borderRadius: '12px',
-                        backgroundColor: '#ffffff',
-                        padding: '20px 16px',
-                       }}>
+                <Grid className="mapshelper-sidebar-container" >
+                  <Grid>
+                    <div className="tracking-details-container">
                         <div className="tracking-heading">
                         Tracking Status
                         </div>
-                        <hr style={{
-                          backgroundColor: '#E9E9EB',
-                          color: '#E9E9EB',
-                          height: '1px',
-                          borderRadius: '12px',
-                          width: '90%',
-                          margin: '0 auto',
-                        }}/>
+                        <hr />
                         <div style={{
                           display: 'flex',
                           flexDirection: 'row',
@@ -495,7 +496,7 @@ const MapLayers = () => {
                             </div>
                             </Tooltip>
                           </div>
-                          <div className="tracking-status" onClick={()=>handleFilter('idle')} style={selectedType==='idle'? {background:"rgba(255, 152, 26, 0.1)"}:{}}>
+                          {/* <div className="tracking-status" onClick={()=>handleFilter('idle')} style={selectedType==='idle'? {background:"rgba(255, 152, 26, 0.1)"}:{}}>
                      
                             <div className="tracking-number">
                               {allIdleRakes.length}
@@ -506,10 +507,11 @@ const MapLayers = () => {
                               </div>
                             </Tooltip>
 
-                          </div>
-                          <div className="tracking-status" onClick={()=>handleFilter('non-tracking')} style={selectedType==='non-tracking'? {background:"rgba(230, 102, 123, 0.1)"}:{}}>
+                          </div> */}
+                          <div className="tracking-status" onClick={()=>handleFilter('idle&non-tracking')} style={selectedType==='idle&non-tracking' || selectedType==='idle' || selectedType==='non-tracking'? {background:"rgba(230, 102, 123, 0.1)"}:{}}>
                             <div className="tracking-number">
-                              {list.length - allRakesPositions.length - allIdleRakes.length}
+                              {/* {list.length - allRakesPositions.length - allIdleRakes.length} */}
+                              {list.length - allRakesPositions.length}
                             </div>
                             <Tooltip title="Items that are not currently being tracked or monitored" arrow placement="bottom">
                               <div className="tracking-text" style={{ color: '#E6667B', cursor: 'pointer' }}>
@@ -518,47 +520,78 @@ const MapLayers = () => {
                             </Tooltip>
                           </div>
                         </div>
-                      </div>
-                       <div className="tracking-container">
-                        <div className="tracking-heading">
-                          Captive Rakes
+                    </div>
+
+                    <div className="idle-non-tracking-container">
+                      <div className="idle-non-tracking-indicator-container" onClick={()=>handleFilter('idle')} style={selectedType==='idle'? {background:"#FF98001F"}:{}}>
+                        <Image src={IdleIcon} alt="Idle Icon" width={32} height={32} />
+                        <div className="idle-non-tracking-indicator-item">
+                          <div className="idle-non-tracking-indicator-number">
+                            {allIdleRakes.length}
+                          </div>
+                          <Tooltip title="Items that are not moving or are stationary for a significant period" arrow placement="bottom">
+                            <div className="idle-non-tracking-indicator-text">
+                              {"Idle ( 3 - 24 hrs)"}
+                            </div>
+                          </Tooltip>
                         </div>
-                        <TableContainer
-                          component={Paper}
-                          className="table-mapview-container"
+                      </div>
+                      <div className="idle-non-tracking-indicator-container" onClick={()=>handleFilter('non-tracking')} style={selectedType==='non-tracking'? {background:"#E6667B1F"}:{}}>
+                        <Image src={InactiveIcon} alt="Idle Icon" width={32} height={32} />
+                        <div className="idle-non-tracking-indicator-item">
+                          <div className="idle-non-tracking-indicator-number">
+                            {list.length - allRakesPositions.length - allIdleRakes.length}
+                          </div>
+                          <Tooltip title="Items that have been inactive for more than 24 hours" arrow placement="bottom">
+                            <div className="idle-non-tracking-indicator-text">
+                              {"Inactive ( > 24 hrs)"}
+                            </div>
+                          </Tooltip>
+                      </div>
+                    </div>
+                     
+                    </div>
+
+                    <div className="tracking-table-container">
+                      <div className="tracking-heading">
+                       Captive Rakes
+                      </div>
+                      <TableContainer
+                        component={Paper}
+                        className="table-mapview-container"
                       >
-                        <Table sx={{ minWidth: '100%', borderRadius: '0px 0px 12px 12px' }} aria-label="simple table" stickyHeader>
-                          <TableHead>
-                            <TableRow>
-                              <TableCell align="left" className="table-heads">S.No</TableCell>
-                              <TableCell align="left" className="table-heads">Rake Name</TableCell>
-                              <TableCell align="center" className="table-heads" style={{lineHeight: '16px'}}>Last Updated <br/> <span style={{fontSize: '10px', color:'#7C7E8C', fontWeight: '500', textAlign: 'center' }}>(hr & min)</span></TableCell>
-                              <TableCell align="left" className="table-heads">FNR No.</TableCell>
-                            </TableRow>
-                          </TableHead>
-                          <TableBody>
-                          {allRakes && allRakes.map((rake: any, index: number) => (
-                            <TableRow
-                            key={index}
-                            sx={{ '&:last-child td, &:last-child th': { border: 0 }, backgroundColor: selectedRake && selectedRake.rake_id === rake.rake_id ? '#F0F3F9' : 'inherit' }}
-                            className='table-rows-container'
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleRakeSelection(rake);
-                            }}
-                            >
-                              <TableCell align="left" className="captive-rake-rows" style={{fontWeight: selectedRake && selectedRake.rake_id === rake.rake_id ? "bold" : 'inherit'}}>{index + 1}.</TableCell>
-                              <TableCell align="left" className="captive-rake-rows" style={{fontWeight: selectedRake && selectedRake.rake_id === rake.rake_id ? "bold" : 'inherit'}}>{rake.name}</TableCell>
-                              <TableCell align="center" className="captive-rake-rows" style={{fontWeight: selectedRake && selectedRake.rake_id === rake.rake_id ? "bold" : 'inherit'}}>
-                              {rake.hours && parseFloat(rake.hours.split('h')[0]) <= 720 ? rake.hours : 'N/A'}
-                              </TableCell>
-                              <TableCell align="left" className="captive-rake-rows" style={{fontWeight: selectedRake && selectedRake.rake_id === rake.rake_id ? "bold" : 'inherit'}}>{rake.fnr_no}</TableCell>
-                            </TableRow>
-                            ))}
-                          </TableBody>
-                        </Table>
+                      <Table sx={{ minWidth: '100%', borderRadius: '0px 0px 12px 12px' }} aria-label="simple table" stickyHeader>
+                        <TableHead>
+                          <TableRow>
+                            <TableCell align="left" className="table-heads">S.No</TableCell>
+                            <TableCell align="left" className="table-heads">Rake Name</TableCell>
+                            <TableCell align="center" className="table-heads" style={{lineHeight: '16px'}}>Last Updated <br/> <span style={{fontSize: '10px', color:'#7C7E8C', fontWeight: '500', textAlign: 'center' }}>(hr & min)</span></TableCell>
+                            <TableCell align="left" className="table-heads">FNR No.</TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                        {allRakes && allRakes.map((rake: any, index: number) => (
+                          <TableRow
+                          key={index}
+                          sx={{ '&:last-child td, &:last-child th': { border: 0 }, backgroundColor: selectedRake && selectedRake.rake_id === rake.rake_id ? '#F0F3F9' : 'inherit' }}
+                          className='table-rows-container'
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleRakeSelection(rake);
+                          }}
+                          >
+                            <TableCell align="left" className="captive-rake-rows" style={{fontWeight: selectedRake && selectedRake.rake_id === rake.rake_id ? "bold" : 'inherit'}}>{index + 1}.</TableCell>
+                            <TableCell align="left" className="captive-rake-rows" style={{fontWeight: selectedRake && selectedRake.rake_id === rake.rake_id ? "bold" : 'inherit'}}>{rake.name}</TableCell>
+                            <TableCell align="center" className="captive-rake-rows" style={{fontWeight: selectedRake && selectedRake.rake_id === rake.rake_id ? "bold" : 'inherit'}}>
+                            {rake.hours && parseFloat(rake.hours.split('h')[0]) < 24 ? rake.hours : 'N/A'}
+                            </TableCell>
+                            <TableCell align="left" className="captive-rake-rows" style={{fontWeight: selectedRake && selectedRake.rake_id === rake.rake_id ? "bold" : 'inherit'}}>{rake.fnr_no}</TableCell>
+                          </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
                       </TableContainer>
-                       </div>
+                    </div>
                       
                        {/* {
                           list.length && list.map((item: any, index: number)=>{

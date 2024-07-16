@@ -18,6 +18,12 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Paper from "@mui/material/Paper";
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import dayjs from 'dayjs';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
+
 
 import { Icon, divIcon, point } from "leaflet";
 import L from 'leaflet';
@@ -191,6 +197,10 @@ const MapLayers = () => {
     const [showIdle, setShowIdle] = useState<boolean>(true);
     const [showInTransit, setShowInTransit] = useState<boolean>(true);
     const [showDelivered, setShowDelivered] = useState<boolean>(true);
+    const [selectedFromDate, setSelectedFromDate] = React.useState<dayjs.Dayjs | null>(dayjs());
+    const [selectedToDate, setSelectedToDate] = React.useState<dayjs.Dayjs | null>(dayjs());
+    const [openFromDatePicker,setOpenFromDatePicker] = useState(false);
+    const [openToDatePicker,setOpenToDatePicker] = useState(false);
 
     const geoJSONStyle: L.PathOptions = {
       color: 'black', // Set the color of train tracks
@@ -266,8 +276,20 @@ const MapLayers = () => {
       map?.flyTo(center, 5, { duration: 1 });
     }
 
+    const handleFromDateChange = (date: dayjs.Dayjs | null) => {
+      setSelectedFromDate(date);
+    };
+
+    const handleToDateChange = (date: dayjs.Dayjs | null) => {
+      setSelectedToDate(date);
+    };
+
     const getShipments = async () => {
-      const shipments = await httpsPost('/shipment_map_view', {});
+      const payload = {
+        from: service.getEpoch(selectedFromDate),
+        to: service.getEpoch(selectedToDate),
+      };
+      const shipments = await httpsPost('/shipment_map_view', payload);
       const inTransit = shipments.filter((shipment: any) => (shipment.status !== 'Delivered' && shipment.status !== ''));
       const idle = shipments.filter((shipment: any) => (shipment.status === ''));
       const delivered = shipments.filter((shipment: any) => (shipment.status === 'Delivered'));
@@ -294,8 +316,20 @@ const MapLayers = () => {
       if (map) {
         addIndiaBoundaries();
       }
-      getShipments();
     }, [map]);
+
+    useEffect(() => {
+      const toTime = dayjs();
+      const fromTime = toTime.subtract(30, 'day');
+      setSelectedFromDate(fromTime);
+      setSelectedToDate(toTime);
+    }, []);
+    
+    useEffect(() => {
+      if (selectedFromDate && selectedToDate) {
+        getShipments();
+      }
+    }, [selectedFromDate, selectedToDate]);
 
     useEffect(() => {
       const handleClickOutside = (event: MouseEvent) => {
@@ -489,6 +523,85 @@ const MapLayers = () => {
                 
               }} 
               >
+                <Box className="date-range-container">
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <DatePicker
+                    label="From"
+                    value={selectedFromDate}
+                    onChange={handleFromDateChange}
+                    format="DD/MM/YYYY"
+                    open={openFromDatePicker}
+                    onOpen={() => setOpenFromDatePicker(true)}
+                    onClose={() => setOpenFromDatePicker(false)}
+                    slotProps={{ textField: { placeholder: 'DD/MM/YYYY', onClick: () => setOpenFromDatePicker(!openFromDatePicker) },}}
+                    disableFuture={true}
+                    sx={{
+                      '& .MuiInputBase-input::placeholder': {
+                          fontSize: '14px',
+                          fontFamily: '"Inter", sans-serif !important',
+                          fontWeight: '500',
+                      },
+                      '& .MuiInputBase-input': {
+                          fontSize: '14px',
+                          height: '36px',
+                          padding: '8px',
+                          width: '90px',
+                          boxSizing: 'border-box',
+                      },
+                      '& .MuiOutlinedInput-root': {
+                          '& fieldset': {
+                              borderColor: '#E9E9EB',
+                          },
+                      },
+                      '& .MuiButtonBase-root': {
+                        height: '36px',
+                        padding: '8px',
+                        width: '36px',
+                        boxSizing: 'border-box',
+                      },
+                  }}
+                  />
+                  </LocalizationProvider>
+                  <div className="date-range-divider">
+                    <SwapHorizIcon />
+                  </div>
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <DatePicker
+                      label="To"
+                      value={selectedToDate}
+                      onChange={handleToDateChange}
+                      format="DD/MM/YYYY"
+                      open={openToDatePicker}
+                      onOpen={() => setOpenToDatePicker(true)}
+                      onClose={() => setOpenToDatePicker(false)}
+                      slotProps={{ textField: { placeholder: 'DD/MM/YYYY', onClick: () => setOpenToDatePicker(!openToDatePicker) },}}
+                      disableFuture={true}
+                      sx={{
+                        '& .MuiInputBase-input::placeholder': {
+                            fontSize: '14px',
+                        },
+                        '& .MuiInputBase-input': {
+                            fontSize: '14px',
+                            height: '36px',
+                            padding: '8px',
+                            width: '90px',
+                            boxSizing: 'border-box',
+                        },
+                        '& .MuiOutlinedInput-root': {
+                            '& fieldset': {
+                                borderColor: '#E9E9EB',
+                            },
+                        },
+                        '& .MuiButtonBase-root': {
+                          height: '36px',
+                          padding: '8px',
+                          width: '36px',
+                          boxSizing: 'border-box',
+                        },
+                    }}
+                    />
+                  </LocalizationProvider>
+                </Box>
                 <Box className="shipment-heads">
                 <Paper className="shipment-head-lists"
                       onClick={() => {
