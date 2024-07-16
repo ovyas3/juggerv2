@@ -33,7 +33,10 @@ export interface row {
   pickupdate: {
       date: string
   },
-  status: string,
+  status: {
+    name:string,
+    code:string
+  },
   currentEta: string,
   remarks: {
     latest:string,
@@ -52,7 +55,10 @@ export interface row {
   rrDoc: Boolean
   polyline: string
   no_of_wagons:number,
-  received_no_of_wagons:number
+  received_no_of_wagons:number,
+  is_captive:Boolean,
+  daysAging:string,
+  paid_by:string
 }
 
 export interface tagItem {
