@@ -13,7 +13,6 @@ import service from "@/utils/timeService";
 import { Tooltip } from "@mui/material";
 
 export const FNRDetailsCard = (props: any) => {
-  console.log("props",props)
 
     return(
     <React.Fragment>

@@ -37,6 +37,8 @@
     border-bottom-color: #DFE3EB;
     border-bottom-width: 1px;
     border-bottom-style: solid;
+    padding-bottom: 37px;
+    border: 1px solid red !important;
 }
 
 
@@ -105,7 +107,10 @@ margin-top: 20px;
 
 .selected_bound{
     color: #2962FF;
+    /* margin-bottom: 60px; */
     border-bottom: 2px solid #2962FF;
     font-weight: 600;
+    /* border: 1px solid red; */
+    height: 20px;
 }
 

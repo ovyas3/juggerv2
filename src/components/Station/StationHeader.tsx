@@ -63,7 +63,6 @@ const StationHeader = ({ count } : any) => {
     const [item,setItem] = useState(false);
     const [zones, setZones] = useState<string[]>([]);
     const [states, setStates] = useState<string[]>([]);
-    console.log("states1", states)
     const [searchType, setSearchType] = useState('Station Code');
     const [editStationId, setEditStationId] = useState(null);
     const [totalCount, setTotalCount] = useState(0);
@@ -77,7 +76,6 @@ const StationHeader = ({ count } : any) => {
     const [addStationCode, setAddStationCode] = useState('');
     const [addZone, setAddZone] = useState('');
     const [addState, setAddState] = useState('');
-    console.log("addState",addState)
     const [addLat, setAddLat] = useState('');
     const [addLong, setAddLong] = useState('');
     const [editIndex1, setEditIndex1] = useState<number | null>(null);
@@ -672,10 +670,7 @@ const StationHeader = ({ count } : any) => {
                                 return(
                                     <TableRow  key={row._id} sx={{ cursor: 'pointer' }}>
                                         {columns.map((item, index) => {
-                                            console.log("row", row)
-                                            console.log("item.id", item.id)
                                             const value = item.id === 'sno' ? startIndex+rowIndex + 1 : row[item.id];
-                                            console.log("value", value)
                                             const columnClassNames: any = {
                                                 stationName: 'body_stationName',
                                                 stationCode: 'body_stationCode',
