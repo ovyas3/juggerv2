@@ -3,19 +3,10 @@
 import './filters.css'
 import * as React from 'react';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-
 import { useState, useEffect } from 'react';
-
-import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { DateRangePicker } from '@mui/x-date-pickers-pro/DateRangePicker';
-import { SingleInputDateRangeField } from '@mui/x-date-pickers-pro/SingleInputDateRangeField';
-
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-
 import OutlinedInput from '@mui/material/OutlinedInput';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
@@ -34,8 +25,6 @@ import calenderIcon from '@/assets/calender_icon_filters.svg'
 
 function Filters({ onToFromChange, onChangeStatus, reload, shipmentsPayloadSetter }: any) {
 
-
-
     const MenuProps = {
         PaperProps: {
             style: {
@@ -46,23 +35,14 @@ function Filters({ onToFromChange, onChangeStatus, reload, shipmentsPayloadSette
     };
 
     const names = [
-
         'In Transit',
         'Delivered',
         'In Plant'
     ];
 
-
-
     const [status, setStatus] = useState(['In Transit', 'Delivered',]);
     const [openStartDatePicker, setOpenStartDatePicker] = useState(false);
     const [openEndDatePicker, setOpenEndDatePicker] = useState(false);
-
-    // const handleChange = (event: SelectChangeEvent<string>) => {
-    //     onChangeStatus(event.target.value as string)
-    //     setStatus(event.target.value as string);
-    //     // setStatusForShipment(event.target.value as string)
-    // };
 
     const handleChange = (event: any) => {
         const {
@@ -176,71 +156,18 @@ function Filters({ onToFromChange, onChangeStatus, reload, shipmentsPayloadSette
                 onToFromChange(today, twentyDaysBefore);
             }
             setStatus(['In Transit', 'Delivered']);
-            // onChangeStatus( ['In Transit', 'Delivered']);
         }
     }, [reload]);
 
-    function check(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
-        console.log(e)
-    }
-
-
-
     return (
         <div>
-            <div style={{ display: 'flex', gap: 20, position: 'relative' }} >
+            <div style={{ display: 'flex', gap: 20, position: 'relative', overflowY: 'hidden' }} >
 
                 <div style={{ display: 'flex', gap: 20, }}>
-
-                    {/* <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <DemoContainer components={['DatePicker']}
-                        sx={{
-                            padding: 0,
-                            height: 'auto',
-                            overflow: 'hidden',
-                            '.MuiTextField-root':{
-                                minWidth:'150px !important',
-                                width:'150px'
-                            }
-                        }}
-                    >
-                        <DatePicker
-                            format="DD/MM/YYYY"
-                            open={openStartDatePicker}
-                            onOpen={() => setOpenStartDatePicker(true)}
-                            onClose={() => setOpenStartDatePicker(false)}
-                            slotProps={{ textField: { placeholder: formatDate(startDate),onClick: ()=> setOpenStartDatePicker(!openStartDatePicker) },  }}
-                            value={dayjs(startDate)}
-                            onChange={(newDate) => { handleStartDateChange(newDate) }}
-                            disabled={disableStartDate}
-                            sx={{
-                                '& .MuiInputBase-input::placeholder': {
-                                    fontSize: '14px',
-                                },
-                                '& .MuiInputBase-input': {
-                                    fontSize: '14px',
-                                    height: '36px',
-                                    padding: '8px 14px',
-                                    boxSizing: 'border-box',
-                                },
-                                '& .MuiOutlinedInput-root': {
-                                    '& fieldset': {
-                                        borderColor: '#E9E9EB',
-                                    },
-                                },
-                                '& .MuiTextField-root': {
-                                    '& .MuiPickersTextField-root':{
-                                     width:'150px !important'
-                                    }
-                                }
-                            }}
-                        />
-                    </DemoContainer>
-                </LocalizationProvider> */}
                     <div style={{ height: 36, width: 132, border: '1px solid #E9E9EB', borderRadius: '6px', display: 'flex', alignItems: 'center', paddingLeft: 8 }} >
                         <div style={{ height: 16, width: 16, marginBottom: 4 }}><img src={calenderIcon.src} alt='' /></div>
-                        <div style={{  flex: 1, marginTop:6, marginLeft:10 }}>
-                            <div style={{fontSize:10, color:'#44475B'}}>From</div>
+                        <div style={{ flex: 1, marginTop: 6, marginLeft: 10 }}>
+                            <div style={{ fontSize: 10, color: '#44475B' }}>From</div>
                             <LocalizationProvider dateAdapter={AdapterDayjs}>
                                 <DatePicker
                                     format="DD/MM/YYYY"
@@ -258,14 +185,14 @@ function Filters({ onToFromChange, onChangeStatus, reload, shipmentsPayloadSette
                                         },
                                     }}
                                     sx={{
-                                        paddingRight: 0,
-                                        '.mui-nxo287-MuiInputBase-input-MuiOutlinedInput-input':{
-                                            padding:0,
-                                            fontSize:'12px',
+
+                                        '.MuiInputBase-input': {
+                                            padding: '0 !important',
+                                            fontSize: '12px !important',
                                         },
                                         '.MuiInputBase-root': {
-                                            paddingRight: 0,
-                                            padding:0,
+
+                                            padding: 0,
                                             border: 'none',
                                             '& fieldset': { border: 'none' },
                                         },
@@ -288,33 +215,33 @@ function Filters({ onToFromChange, onChangeStatus, reload, shipmentsPayloadSette
 
                     <div style={{ height: 36, width: 132, border: '1px solid #E9E9EB', borderRadius: '6px', display: 'flex', alignItems: 'center', paddingLeft: 8 }} >
                         <div style={{ height: 16, width: 16, marginBottom: 4 }}><img src={calenderIcon.src} alt='' /></div>
-                        <div style={{  flex: 1, marginTop:6, marginLeft:10 }}>
-                            <div style={{fontSize:10, color:'#44475B'}}>To</div>
+                        <div style={{ flex: 1, marginTop: 6, marginLeft: 10 }}>
+                            <div style={{ fontSize: 10, color: '#44475B' }}>To</div>
                             <LocalizationProvider dateAdapter={AdapterDayjs}>
                                 <DatePicker
                                     format="DD/MM/YYYY"
                                     open={openEndDatePicker}
                                     onOpen={() => setOpenEndDatePicker(true)}
                                     onClose={() => setOpenEndDatePicker(false)}
-                                    slotProps={{ 
-                                        textField: { 
-                                            placeholder: formatDate(endDate), 
+                                    slotProps={{
+                                        textField: {
+                                            placeholder: formatDate(endDate),
                                             onClick: () => setOpenEndDatePicker(!openEndDatePicker),
                                             fullWidth: true,
                                             InputProps: {
                                                 endAdornment: null,
-                                            }, 
-                                        } 
+                                            },
+                                        }
                                     }}
                                     sx={{
-                                        paddingRight: 0,
-                                        '.mui-nxo287-MuiInputBase-input-MuiOutlinedInput-input':{
-                                            padding:0,
-                                            fontSize:'12px',
+
+                                        '.MuiInputBase-input': {
+                                            padding: '0 !important',
+                                            fontSize: '12px !important',
                                         },
                                         '.MuiInputBase-root': {
-                                            paddingRight: 0,
-                                            padding:0,
+
+                                            padding: 0,
                                             border: 'none',
                                             '& fieldset': { border: 'none' },
                                         },
@@ -338,12 +265,7 @@ function Filters({ onToFromChange, onChangeStatus, reload, shipmentsPayloadSette
                 </div>
 
                 <div className='status_container' style={{ width: '170px' }}>
-                    <FormControl sx={{
-                        width: '170px', margin: 0, padding: 0,
-                        '.mui-kk1bwy-MuiButtonBase-root-MuiMenuItem-root': {
-                            padding: 0,
-                        },
-                    }}>
+                    <FormControl sx={{ width: '170px', margin: 0, padding: 0 }}>
                         <InputLabel id="demo-multiple-checkbox-label" sx={{
                             padding: 0, fontSize: 14, marginTop: '-8px',
                         }}>Status</InputLabel>
@@ -373,7 +295,7 @@ function Filters({ onToFromChange, onChangeStatus, reload, shipmentsPayloadSette
                             MenuProps={MenuProps}
                         >
                             {names.map((name) => (
-                                <MenuItem key={name} value={name} sx={{ padding: 0}} >
+                                <MenuItem key={name} value={name} sx={{ padding: 0 }} >
                                     <Checkbox checked={status.indexOf(name) > -1} sx={{ paddingLeft: '8px', padding: '4px', '& .MuiSvgIcon-root': { fontSize: 15 } }} />
                                     <ListItemText primary={name} primaryTypographyProps={{ fontSize: '12px', fontFamily: 'Inter, sans-serif' }} />
                                 </MenuItem>
@@ -382,17 +304,9 @@ function Filters({ onToFromChange, onChangeStatus, reload, shipmentsPayloadSette
                     </FormControl>
                 </div>
 
-                <div>
-                    <motion.div
-                        className="box"
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.9 }}
-                        transition={{ type: "spring", stiffness: 400, damping: 10 }}
-                        onClick={() => window.open('/shipment_map_view', '_blank')}
-                    >
-                        <Image src={MapViewIcon} alt="map view" width={16} height={16} />
-                        <span className="map-view-btn-header">Map View</span>
-                    </motion.div>
+                <div className="box" onClick={() => window.open('/shipment_map_view', '_blank')}>
+                    <img src={MapViewIcon.src} alt="map view" />
+                    <span className="map-view-btn-header">Map View</span>
                 </div>
 
 

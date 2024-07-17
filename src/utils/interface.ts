@@ -58,7 +58,8 @@ export interface row {
   received_no_of_wagons:number,
   is_captive:Boolean,
   daysAging:string,
-  paid_by:string
+  paid_by:string,
+  commodity_desc:any
 }
 
 export interface tagItem {
