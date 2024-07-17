@@ -99,7 +99,7 @@ const OrdersPage = () => {
     const response = await httpsPost(GET_SHIPMENTS, ShipmentsPayload);
     console.log(response)
     setAllShipment(response.data.data)
-    setCount(response.data.count)
+    setCount(response.data.total)
   }
 
   async function getCaptiveRake() {
@@ -108,8 +108,8 @@ const OrdersPage = () => {
     setRakeCaptiveList(list_captive_rake.data)
   }
   async function getRemarksList() {
-    const list_remarks = await httpsPost(REMARKS_LIST,{});
-    console.log(list_remarks)
+    const list_remarks = await httpsGet(REMARKS_LIST);
+    console.log('------------>',list_remarks)
     setRemarksList(list_remarks.data)
   }
 
@@ -166,7 +166,7 @@ const OrdersPage = () => {
 
               {/* ----otbound ---- */}
               {mobile ?
-                <div className='outbound_inbound'>
+                <div className='outbound_inbound' style={{ marginTop:10}}>
                   {['outbound', 'inbound'].map(bound => (
                     <div
                       key={bound}
@@ -188,7 +188,7 @@ const OrdersPage = () => {
             {/* ----table and filters---- */}
             {
               selected_bound === 'outbound' ?
-                <div className='tableData' style={{ height: '90%' }}>
+                <div className='tableData' style={{ height: '90%'}}>
                   {
                     selected_bound === 'outbound' ?
                       <div className='filters' style={{
@@ -201,7 +201,7 @@ const OrdersPage = () => {
                       : <></>
                   }
                   
-                  <div style={{ paddingTop: tablePagination ? '30px' : '60px' }}>
+                  <div style={{ paddingTop: tablePagination ? '20px' : '45px' }}>
                     <TableData onSkipLimit={handleSkipLimitChange} allShipments={allShipment} count={count} rakeCaptiveList={rakeCaptiveList} onFnrChange={handleChangeByFnr} reload={reload} getAllShipment={getAllShipment} setTriggerShipments={setTriggerShipments} triggerShipments={triggerShipments}  />
                   </div>
                 </div>
