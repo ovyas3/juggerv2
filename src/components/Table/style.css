@@ -171,7 +171,41 @@ justify-content:flex-start
   opacity: 0;
 }
 
-.fnr_container{
-  
- 
+.fnr_container{}
+
+.material_items{
+  position: relative;
 }
+.view_more_materials{
+  position: absolute;
+  width: 16px !important;
+  height: 16px !important;
+  background-color:#484A57;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #fff;
+  top:-15px;
+  right: -15px;
+  cursor: pointer;
+}
+
+.list_of_materials{
+  background-color: #484A57;
+  position: absolute;
+  top: 0px;
+  right: 20px;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+  font-size: 10px;
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+.view_more_materials:hover .list_of_materials{
+  visibility: visible;
+  opacity: 1;
+  z-index: 10;
+}
+
