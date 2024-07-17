@@ -35,8 +35,12 @@ type Station1 = {
     lat: string;
     long: string;
 }
-async function getStations() {
-    const result = await httpsGet(STATIONS);
+async function getStations(searchValue = '', searchType = 'Station Code', page = 0, limit = 3339) {
+    let url = `${STATIONS}?page=${page}&limit=${limit}`;
+    if (searchValue) {
+        url += searchType === 'Station Code' ? `&code=${searchValue}` : `&state=${searchValue}`;
+    }
+    const result = await httpsGet(url);
     return result;
 }
 
@@ -46,7 +50,7 @@ const StationHeader = ({ count } : any) => {
     const { showMessage } = useSnackbar();
 
     const [columns, setColumns] = useState<Column[]>([]);
-    const [rowsPerPage, setRowsPerPage] = React.useState(50);
+    const [rowsPerPage, setRowsPerPage] = React.useState(10);
     const [page, setPage] = React.useState(0);
     const [response, setResponse] = useState<Station[]>([]);
     const [rowId, setRowID] = useState('');
@@ -109,7 +113,7 @@ const StationHeader = ({ count } : any) => {
     const handleClose1 = (e: any) => {e.stopPropagation(); setEdit(false)}
 
     useEffect(() => {
-        getStations()
+        getStations(searchValue, searchType, page, rowsPerPage)
         .then((data: any) => {
             if (data.data.stations) {
                 setResponse(data.data.stations);
@@ -121,7 +125,7 @@ const StationHeader = ({ count } : any) => {
         .catch((error: any) => {
             console.error('Error fetching stations:', error);
         })
-    }, [])
+    }, [searchValue, searchType, page, rowsPerPage])
 
     useEffect(() => {
         const getZones = async () => {
@@ -204,6 +208,28 @@ const StationHeader = ({ count } : any) => {
         setRowsPerPage(parseInt(event.target.value, 10));
         setPage(0);
       }; 
+
+      const handleSearch = (searchText: any) => {
+        let filteredResponse1 = response;
+    
+        if (searchText.trim() !== "") {
+            const searchValueLower = searchText.toLowerCase().trim();
+            console.log("searchValueLower", searchValueLower)
+    
+            if (searchType === 'Station Code') {
+                filteredResponse1 = response.filter((row) =>
+                    row.code && row.code.toLowerCase().trim().startsWith(searchValueLower)
+                );
+            } else if (searchType === 'State') {
+                filteredResponse1 = response.filter((row) =>
+                    row.state && row.state.toLowerCase().trim().startsWith(searchValueLower)
+                );
+            }
+        }
+    
+        setResponse(filteredResponse1);
+    };
+      
 
 
     const handleAddsubmit = async () => {
@@ -539,18 +565,20 @@ const StationHeader = ({ count } : any) => {
         setEditLongValid(true);
     }
 
-    const filteredResponse = response.filter((row) => {
+    const filteredResponse = response.filter((row: any) => {
+        const searchValueLower = searchValue.toLowerCase();
+    
         if (searchType === 'Station Code') {
-            return row.code && row.code.toLowerCase().trim().includes(searchValue.toLowerCase());
+            return row.code && row.code.toLowerCase().trim().startsWith(searchValueLower);
         } else if (searchType === 'State') {
-            return row.state && row.state.toLowerCase().trim().includes(searchValue.toLowerCase());
+            return row.state && row.state.toLowerCase().trim().startsWith(searchValueLower);
         }
-        return true; 
+        return true;
     });
-
+    
 
     const startIndex = page * rowsPerPage;
-    const paginatedResponse = filteredResponse.slice(startIndex, startIndex + rowsPerPage);
+    const paginatedData = filteredResponse.slice(startIndex, startIndex + rowsPerPage);
 
     
     const CustomFormControl = styled(FormControl)({
@@ -576,7 +604,10 @@ const StationHeader = ({ count } : any) => {
                 type="search"
                 variant="outlined"
                 value={searchValue}
-                onChange={(event) => setSearchValue(event.target.value)}
+                onChange={(event) => 
+                   { setSearchValue(event.target.value);
+                    handleSearch(event.target.value);}
+                }
                 placeholder="Search for station code"
                 className="search-input"
                 InputProps={{
@@ -596,7 +627,7 @@ const StationHeader = ({ count } : any) => {
             ),
             endAdornment: (
                 <InputAdornment position="end">
-                <Image src={SearchIcon} alt=""/>
+                <Image src={SearchIcon} alt="" style={{cursor: 'pointer'}}/>
                 {/* <SearchIcon /> */}
                 </InputAdornment>
             ),
@@ -665,7 +696,7 @@ const StationHeader = ({ count } : any) => {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {paginatedResponse
+                            {paginatedData
                             .map((row: any, rowIndex: any) => {
                                 return(
                                     <TableRow  key={row._id} sx={{ cursor: 'pointer' }}>
@@ -724,19 +755,19 @@ const StationHeader = ({ count } : any) => {
                                                         )}
                                                         { item.id ==='zone' && (
                                                             <div>
-                                                                {value.zone}
+                                                                {value && value.zone}
                                                                 {(typeof value) === 'object' ? '' : value}
                                                             </div>
                                                         )}
                                                         { item.id ==='code' && (
                                                             <div>
-                                                                {value.code}
+                                                                {value && value.code}
                                                                 {(typeof value) === 'object' ? '' : value}
                                                             </div>
                                                         )}
                                                         { item.id ==='name' && (
                                                             <div>
-                                                                {value.name}
+                                                                {value && value.name}
                                                                 {(typeof value) === 'object' ? '' : value}
                                                             </div>
                                                         )}

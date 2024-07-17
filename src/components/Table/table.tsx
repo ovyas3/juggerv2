@@ -588,17 +588,20 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                     </div>
                                                                 </div>
                                                                 <div className='fnr_logos'>
-                                                                    {row.rrDoc &&
-                                                                        <div style={{ height: 25, width: 25 }}>
+                                                                    
+                                                                    {row.rrDoc ?
+                                                                        (<div style={{ height: 25, width: 25}}>
                                                                             <img
                                                                                 src={row.rrDoc ? rrDocumentIcon.src : ''}
                                                                                 style={{ height: '100%', width: '100%' }}
                                                                                 alt=''
                                                                             />
-                                                                        </div>
+                                                                        </div>) : (
+                                                                            <div style={{ width: '25px', height: '25px'}}></div>
+                                                                        )
                                                                     }
                                                                     {row.is_captive &&
-                                                                        <div style={{ height: 25, width: 25 }}>
+                                                                        <div style={{ height: 25, width: 25}}>
                                                                             <img
                                                                                 src={row.is_captive ? captiveRakeIndicator.src : ''}
                                                                                 style={{ height: '100%', width: '100%' }}

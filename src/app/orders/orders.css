@@ -32,13 +32,12 @@
 
 .outbound_inbound{
     display: flex;
-    height: 33px;
+    height: 30px;
     /* background-color:antiquewhite; */
     border-bottom-color: #DFE3EB;
     border-bottom-width: 1px;
     border-bottom-style: solid;
     padding-bottom: 37px;
-    border: 1px solid red !important;
 }
 
 
@@ -107,6 +106,7 @@ margin-top: 20px;
 
 .selected_bound{
     color: #2962FF;
+    height: 20px;
     border-bottom: 1.5px solid #2962FF;
     font-weight: 500;
 }
