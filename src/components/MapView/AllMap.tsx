@@ -191,6 +191,7 @@ const MapLayers = () => {
   }
 
     function handleFilter(type: string) {
+      map?.flyTo(center, 5, { duration: 1 });
       if (type === 'total') {
         setAllRakes(allRakesBackUp);
         setSelectedType('total');

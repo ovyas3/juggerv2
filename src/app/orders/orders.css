@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
+
 .input_fnr_reload{
    display: flex;
    /* background-color:darksalmon; */
@@ -109,3 +111,25 @@ margin-top: 15px;
     font-weight: 500;
 }
 
+.coming-soon{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 80%;
+    width: 100%;
+    font-size: 42px;
+    /* font-family: 'Plus Jakarta Sans', sans-serif; */
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    color: #42454E;
+    animation: fadeInOut 2s infinite;
+}
+
+@keyframes fadeInOut {
+  0% {opacity: 1;}
+  25% {opacity: 0.75;}
+  50% {opacity: 0.5;}
+  75% {opacity: 0.75;}
+  100% {opacity: 1;}
+}
+  

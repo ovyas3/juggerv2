@@ -210,7 +210,7 @@ const OrdersPage = () => {
 
             {
               selected_bound === 'inbound' ?
-                <div>COMING SOON !!!!</div>
+                <div className='coming-soon'>COMING SOON !!!</div>
                 : <></>
             }
           </div>
