@@ -627,8 +627,7 @@ const StationHeader = ({ count } : any) => {
             ),
             endAdornment: (
                 <InputAdornment position="end">
-                <Image src={SearchIcon} alt="" style={{cursor: 'pointer'}}/>
-                {/* <SearchIcon /> */}
+                    <Image src={SearchIcon} alt="" style={{cursor: 'pointer'}}/>
                 </InputAdornment>
             ),
             }}
