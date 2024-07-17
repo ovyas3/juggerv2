@@ -1,13 +1,12 @@
 .edemand {
-    /* background-color:blueviolet !important; */
     min-width: 120px !important;
+    padding-right: 25px !important;
 }
 
 .fnr {
-    /* background-color: cadetblue !important; */
     min-width: 130px !important;
     color: #484A57 !important;
-
+    padding-inline: 20px !important;
 }
 
 .inner_fnr {
@@ -20,10 +19,10 @@
 }
 
 .destination {
-    /* background-color: antiquewhite!important; */
     min-width: 120px !important;
     text-wrap: nowrap !important;
-    padding-right: 41px !important;
+    /* padding-right: 41px !important; */
+    padding-inline:30px !important;
 }
 
 .aging {
@@ -33,6 +32,7 @@
 
 .material {
     min-width: 88px !important;
+    max-width: 150px !important;
 }
 
 .pickupdate {
@@ -127,14 +127,9 @@
 
 }
 
-.iconheader {
-    /* background-color: tomato!important; */
-    /* padding-left: 50px !important; */
-    /* width: 60px !important; */
-}
+.iconheader {}
 
 .inner_iconheader {
-    /* background-color: #E24D65 !important; */
     position: relative;
 }
 
@@ -153,33 +148,43 @@
 
 
 /* -------------------------------- */
-
-.body_fnr {
-    padding-right: 10px !important;
-
+.body_edemand{
+    padding-right: 25px !important;
 }
+.body_fnr {
+    padding-inline: 25px !important;
+}
+
 .body_destination {
-    padding-right: 10px !important;
     max-width: 150px;
+    padding-inline:35px !important;
+}
+.body_material{
+    max-width: 150px !important;
 }
 .body_aging {
     text-wrap: nowrap;
     padding-left: 36px !important;
     padding-right: 48px !important;
 }
+
 .body_ownedby {
     padding-right: 10px !important;
     text-align: center !important;
 }
+
 .body_status {
     padding-right: 10px !important;
 }
+
 .body_remarks {
     padding-right: 10px !important;
 }
+
 .body_action {
     padding-inline: auto !important;
 }
+
 .body_deliveryDate {
     padding-inline: 26px !important;
 }
@@ -383,7 +388,6 @@
     margin-top: 10px;
     display: flex;
     flex-direction: row;
-    gap: 6px
 }
 
 .no_of_wagons {

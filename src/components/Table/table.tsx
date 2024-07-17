@@ -53,7 +53,7 @@ import { Menu, MenuItem } from '@mui/material';
 import './style.css'
 import Backdrop from '@mui/material/Backdrop';
 import Fade from '@mui/material/Fade';
-import { sortArray, separateLatestObject ,calculateDaysDifference} from '@/utils/hooks';
+import { sortArray, separateLatestObject, calculateDaysDifference } from '@/utils/hooks';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import Popover from '@mui/material/Popover';
 import { Typography, } from '@mui/material';
@@ -100,10 +100,12 @@ const convertArrayToFilteredArray = (inputArray: any) => {
             past_etas: any,
             no_of_wagons: number,
             received_no_of_wagons: number,
-            demand_date:any,
-            paid_by:string,
+            demand_date: any,
+            paid_by: string,
+            commodity_desc: any,
+
         }) => {
-        const { edemand_no, FNR, all_FNRs, delivery_location, trip_tracker, others, remarks, unique_code, status, pickup_date, captive_id, is_captive, eta, rr_document, polyline, past_etas, no_of_wagons, received_no_of_wagons, demand_date,paid_by } = item;
+        const { edemand_no, FNR, all_FNRs, delivery_location, trip_tracker, others, remarks, unique_code, status, pickup_date, captive_id, is_captive, eta, rr_document, polyline, past_etas, no_of_wagons, received_no_of_wagons, demand_date, paid_by, commodity_desc } = item;
         return {
             _id: item._id,
             edemand: edemand_no,
@@ -147,11 +149,12 @@ const convertArrayToFilteredArray = (inputArray: any) => {
             rrDoc: rr_document && rr_document.length > 0 ? true : false,
             past_etas: past_etas ? past_etas : 'NA',
             // deliverDate: 'NA',
-            received_no_of_wagons : received_no_of_wagons ?  received_no_of_wagons : 'NA',
-            no_of_wagons : no_of_wagons ?  no_of_wagons : 'NA',
+            received_no_of_wagons: received_no_of_wagons ? received_no_of_wagons : 'NA',
+            no_of_wagons: no_of_wagons ? no_of_wagons : 'NA',
             is_captive: is_captive && is_captive,
-            daysAging : calculateDaysDifference(demand_date,pickup_date),
-            paid_by:paid_by ? paid_by : 'NA',
+            daysAging: calculateDaysDifference(demand_date, pickup_date),
+            paid_by: paid_by ? paid_by : 'NA',
+            commodity_desc: commodity_desc && commodity_desc
         }
     });
 };
@@ -344,27 +347,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
 
     return (
         <div className='target' >
-            <Paper
-                sx={{
-                    width: '100%', overflow: 'hidden', boxShadow: 'none',
-                    '.mui-78c6dr-MuiToolbar-root-MuiTablePagination-toolbar ': {
-                        padding: '0 2 0 24',
-                    },
-                    '    .mui-78c6dr-MuiToolbar-root-MuiTablePagination-toolbar': {
-                        minHeight: 40
-                    },
-                    '.mui-dmz9g-MuiTableContainer-root ': {
-                        border: ' 1px solid #E9E9EB',
-                        borderRadius: '8px',
-
-                    },
-                    '.mui-1briqcb-MuiTableCell-root': {
-                        fontFamily: 'inherit'
-                    },
-                    '.mui-1ncgey5-MuiTableContainer-root': {
-
-                    }
-                }}>
+            <Paper sx={{ width: '100%', overflow: 'hidden', boxShadow: 'none' }}>
                 <TablePagination
                     rowsPerPageOptions={[5, 10, 25, 50, 100]}
                     component="div"
@@ -374,6 +357,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                     onPageChange={handleChangePage}
                     onRowsPerPageChange={handleChangeRowsPerPage}
                     labelRowsPerPage="Shipments per page:"
+                    sx={{ height: 40, overflowY: 'hidden' }}
                 />
                 <TableContainer sx={{
                     border: '1px solid #E9E9EB', borderRadius: '8px', maxHeight: 'calc(90vh - 100px)',
@@ -383,29 +367,19 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                     },
                     scrollbarWidth: 'none',
                     '-ms-overflow-style': 'none',
-
                 }}>
                     <Table stickyHeader aria-label="sticky table">
-                        <TableHead sx={{
-                            '.mui-y8ay40-MuiTableCell-root ': { padding: 0 },
-                            '.mui-78trlr-MuiButtonBase-root-MuiIconButton-root ': { width: '5px' },
-                            '.mui-y8ay40-MuiTableCell-root': { fontFamily: 'inherit' }
-                        }}>
-                            <TableRow >
+                        <TableHead>
+                            <TableRow>
                                 {columns.map((column) => {
                                     return (
                                         <TableCell
                                             key={column.id}
-                                            style={{ fontSize: 12, fontWeight: 'bold', color: '#484A57', paddingLeft: '10px' }}
+                                            style={{ fontSize: 12, fontWeight: 'bold', color: '#484A57', padding: '0px 0px 0px 10px', }}
                                             className={column.class}
                                         >
                                             <div className={column.innerClass}>
                                                 {column.label}
-                                                {/* {
-                                                    column.id === 'edemand' && edemand ?
-                                                        <div></div>
-                                                        : <></>
-                                                } */}
                                                 {
                                                     column.id === 'iconheader' && showEdemand ?
                                                         <div className='inner_iconheader_before'>
@@ -489,20 +463,20 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                 fnr: 'body_fnr',
                                                 destination: 'body_destination',
                                                 material: 'body_material',
-                                                aging:'body_aging',
+                                                aging: 'body_aging',
                                                 pickupdate: 'body_pickupdate',
                                                 ownedby: 'body_ownedby',
                                                 status: 'body_status',
                                                 initialETAL: 'body_initialETA',
                                                 currentEta: 'body_currentEta',
-                                                deliverDate:'body_deliveryDate',
+                                                deliverDate: 'body_deliveryDate',
                                                 remarks: 'body_remarks',
                                                 handlingAgent: 'body_handlingAgent',
                                                 action: 'body_action',
                                                 iconheader: 'body_iconheader'
                                             }
                                             return (
-                                                <TableCell key={index} sx={{ fontSize: '12px', color: '#44475B', p: '16px 10px 24px 10px' }}
+                                                <TableCell key={index} sx={{ fontSize: '12px', color: '#44475B', p: '16px 10px 16px 10px' }}
                                                     className={columnClassNames[item.id]} >
                                                     <div>
                                                         {(typeof value) === 'object' ? '' : value}
@@ -615,7 +589,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                         {item.id === 'destination' && (
                                                             <div style={{ position: 'relative' }}>
                                                                 <div>{value.name !== 'NA' ? value.name : value.code} ({value.code})</div>
-                                                                <div>{row.paid_by}</div>
+                                                                <div style={{color:'#7C7E8C'}}>{row.paid_by}</div>
                                                             </div>
                                                         )}
                                                         {item.id === 'pickupdate' && (
@@ -658,11 +632,11 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                         <div className='hover_rece'>Wagons received</div>
                                                                     </div>
                                                                 </div>
-                                                                <div className='fois_gps_logo'>
+                                                                {row.fois.is_gps && <div className='fois_gps_logo'>
                                                                     {row.fois.is_gps &&
                                                                         <img src={GPIS.src} style={{ display: 'block' }} alt='' />
                                                                     }
-                                                                </div>
+                                                                </div>}
                                                             </div>
                                                         }
                                                         {item.id === 'currentEta' && (
@@ -683,20 +657,37 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                         {item.id === 'aging' && row.daysAging !== "NA" && (
                                                             <span>{row.daysAging} Days</span>
                                                         )}
-                                                        {item.id ==='deliverDate' && (
+                                                        {item.id === 'deliverDate' && (
                                                             <div>
-                                                            {row.eta && row.status.name === 'Delivered' ? (
-                                                                <>
-                                                                    <div>{service.utcToist(row.eta)}</div>
-                                                                    <div>{service.utcToistTime(row.eta)}</div>
-                                                                </>
-                                                            ) : (
-                                                                'NA'
-                                                            )}
+                                                                {row.eta && row.status.name === 'Delivered' ? (
+                                                                    <>
+                                                                        <div>{service.utcToist(row.eta)}</div>
+                                                                        <div>{service.utcToistTime(row.eta)}</div>
+                                                                    </>
+                                                                ) : (
+                                                                    'NA'
+                                                                )}
+                                                            </div>
+                                                        )}
+                                                        {item.id === 'material' && row.commodity_desc && (
+                                                            <div className='material_items'>
+                                                                <div style={{color:'#7C7E8C'}}>{row.commodity_desc[0]}</div>
+                                                                {row.commodity_desc.length > 1 &&
+                                                                    <div className='view_more_materials'>
+                                                                        <div style={{fontSize:8}}>+{row.commodity_desc.length-1}</div>
+                                                                        <div className='list_of_materials'>
+                                                                            {row.commodity_desc.slice(1).map((item:any, index:number)=>{
+                                                                                return(
+                                                                                    <div key={index}>{item}</div>
+                                                                                );
+                                                                            })}
+                                                                        </div>
+                                                                    </div>
+                                                                }
                                                             </div>
                                                         )}
                                                     </div>
-                                                </TableCell>
+                                                </TableCell>  
                                             );
                                         })}
                                     </TableRow>
