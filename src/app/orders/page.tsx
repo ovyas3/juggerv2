@@ -109,7 +109,6 @@ const OrdersPage = () => {
   }
   async function getRemarksList() {
     const list_remarks = await httpsGet(REMARKS_LIST);
-    console.log('------------>',list_remarks)
     setRemarksList(list_remarks.data)
   }
 

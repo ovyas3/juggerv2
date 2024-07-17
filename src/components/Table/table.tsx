@@ -21,14 +21,6 @@ import Link from 'next/link';
 import { Column, row, tagItem } from '@/utils/interface';
 import { useTranslations } from 'next-intl';
 import RRModal from '../RR Modal/RRModal';
-// import { useSnackbar } from '@/hooks/snackBar';
-
-
-import Autocomplete from '@mui/material/Autocomplete';
-import TextField from '@mui/material/TextField';
-import Stack from '@mui/material/Stack';
-
-import { Popper, } from '@mui/material';
 import Button from '@mui/material/Button';
 
 import Box from '@mui/material/Box';
@@ -586,7 +578,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                         {item.id === 'destination' && (
                                                             <div style={{ position: 'relative' }}>
                                                                 <div>{value.name !== 'NA' ? value.name : value.code} ({value.code})</div>
-                                                                <div style={{color:'#7C7E8C'}}>{row.paid_by}</div>
+                                                                <div style={{ color: '#7C7E8C' }}>{row.paid_by}</div>
                                                             </div>
                                                         )}
                                                         {item.id === 'pickupdate' && (
@@ -637,16 +629,17 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                             </div>
                                                         }
                                                         {item.id === 'currentEta' && (
-                                                            <div>
-                                                                {row.eta ? (
-                                                                    <>
-                                                                        <div>{value.date}</div>
-                                                                        <div>{value.etaTime}</div>
-                                                                    </>
-                                                                ) : (
-                                                                    'NA'
-                                                                )}
-                                                            </div>
+                                                            // <div>
+                                                            //     {row.eta ? (
+                                                            //         <>
+                                                            //             <div>{value.date}</div>
+                                                            //             <div>{value.etaTime}</div>
+                                                            //         </>
+                                                            //     ) : (
+                                                            //         'NA'
+                                                            //     )}
+                                                            // </div>
+                                                            <PastEta row={row} firstIndex={firstindex} />
                                                         )}
                                                         {item.id === 'remarks' && (
                                                             <RemarkComponent row={row} firstIndex={firstindex} />
@@ -668,13 +661,13 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                         )}
                                                         {item.id === 'material' && row.commodity_desc && (
                                                             <div className='material_items'>
-                                                                <div style={{color:'#7C7E8C'}}>{row.commodity_desc[0]}</div>
+                                                                <div style={{ color: '#7C7E8C' }}>{row.commodity_desc[0]}</div>
                                                                 {row.commodity_desc.length > 1 &&
                                                                     <div className='view_more_materials'>
-                                                                        <div style={{fontSize:8}}>+{row.commodity_desc.length-1}</div>
+                                                                        <div style={{ fontSize: 8 }}>+{row.commodity_desc.length - 1}</div>
                                                                         <div className='list_of_materials'>
-                                                                            {row.commodity_desc.slice(1).map((item:any, index:number)=>{
-                                                                                return(
+                                                                            {row.commodity_desc.slice(1).map((item: any, index: number) => {
+                                                                                return (
                                                                                     <div key={index}>{item}</div>
                                                                                 );
                                                                             })}
@@ -684,7 +677,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                             </div>
                                                         )}
                                                     </div>
-                                                </TableCell>  
+                                                </TableCell>
                                             );
                                         })}
                                     </TableRow>
@@ -1065,7 +1058,68 @@ const RemarkComponent = ({ row, firstIndex }: any) => {
         </Box>
     );
 };
+const PastEta = ({ row, firstIndex }: any) => {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const [anchorEl, setAnchorEl] = useState(null);
 
+    const handlePopoverOpen = (event: any) => {
+        setAnchorEl(event.currentTarget);
+    };
 
+    const handlePopoverClose = () => {
+        setAnchorEl(null);
+    };
 
+    const open = Boolean(anchorEl);
 
+    return (
+        <Box>
+            <Typography
+                aria-owns={true ? `mouse-over-popover-${firstIndex}` : undefined}
+                aria-haspopup="true"
+                onMouseEnter={handlePopoverOpen}
+                onMouseLeave={handlePopoverClose}
+                sx={{ fontSize: '12px', fontFamily: '"Inter", sans-serif !important', }}
+            >
+                <div>
+                    {row.eta ? (
+                        <>
+                            <div>{row.currentEta.date}</div>
+                            <div>{row.currentEta.etaTime}</div>
+                        </>
+                    ) : (
+                        'NA'
+                    )}
+                </div>
+            </Typography>
+            {row.past_etas && row.past_etas.length > 0 && (
+                <Popover
+                    id={`mouse-over-popover-${firstIndex}`}
+                    sx={{
+                        pointerEvents: 'none',
+                    }}
+                    open={open}
+                    anchorEl={anchorEl}
+                    anchorOrigin={{
+                        vertical: 'bottom',
+                        horizontal: 'left',
+                    }}
+                    transformOrigin={{
+                        vertical: 'top',
+                        horizontal: 'left',
+                    }}
+                    onClose={handlePopoverClose}
+                    disableRestoreFocus
+                >
+                    <Box sx={{paddingBlock:'4px'}}>
+                        {row.past_etas?.map((item: any, remarkListIndex: number) => (
+                            <Typography key={remarkListIndex} sx={{ fontSize: '12px', paddingInline: '8px'}}>
+                                {service.utcToist(item)}  -  {service.utcToistTime(item)}
+                            </Typography>
+                        ))}
+                    </Box>
+                </Popover>
+            )}
+        </Box>
+    );
+};

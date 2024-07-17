@@ -21,6 +21,7 @@ import { motion } from 'framer-motion';
 import Image from 'next/image';
 import MapViewIcon from "@/assets/map_view.svg";
 import calenderIcon from '@/assets/calender_icon_filters.svg'
+import filter_icon from '@/assets/filter_icon.svg'
 
 
 function Filters({ onToFromChange, onChangeStatus, reload, shipmentsPayloadSetter }: any) {
@@ -319,7 +320,8 @@ function Filters({ onToFromChange, onChangeStatus, reload, shipmentsPayloadSette
 
                 <div>
                     <div className="filter-container" onClick={() => setOpenFilterModal(true)}>
-                        <FilterAltIcon className="filter-icon" />
+                        {/* <FilterAltIcon className="filter-icon" /> */}
+                        <img src={filter_icon.src} alt=''/>
                     </div>
                 </div>
 
