@@ -100,7 +100,7 @@ function SideDrawer() {
 
             </div>
         </div>
-
+        </div>
     );
 
 }
