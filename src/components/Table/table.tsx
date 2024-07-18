@@ -688,11 +688,16 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                             );
                                         })}
                                     </TableRow>
-                                );
-                            })}
+                               );
+                            }       
+                          )
+                        }
                         </TableBody>
                     </Table>
                 </TableContainer>
+                { !response.length ? <div className='no_shipments_found'>No Shipments Found</div>
+                    : <></>
+                }
             </Paper>
             <RRModal isOpen={isRRModalOpen} isClose={() => setRRModalOpen(false)} rrNumbers={rrNumbers} isRRDoc={isRRDoc} />
             <Modal
