@@ -343,7 +343,7 @@ function Filters({ onToFromChange, onChangeStatus, onChangeRakeTypes , reload, s
                         onChange={handleChangeRakeType}
                         input={<OutlinedInput
                             sx={{
-                                width: '170px',
+                                width: '180px',
                                 '& .MuiOutlinedInput-notchedOutline': {
                                     border: '1px solid #E9E9EB'
                                 },
