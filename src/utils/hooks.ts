@@ -69,20 +69,24 @@ export const  separateLatestObject = (dataArray: Array<Object>) : any => {
   return { latest, rest };
 }
 
-export function calculateDaysDifference(demandDate: string | null, pickupDate: string | null): number | "NA" {
-  if (!demandDate || !pickupDate) {
+export function calculateDaysDifference(demandDate: string | null): number | "NA" {
+  if (!demandDate) {
       return "NA";
   }
 
   try {
       const demand = new Date(demandDate);
-      const pickup = new Date(pickupDate);
+      const today = new Date();
 
-      if (isNaN(demand.getTime()) || isNaN(pickup.getTime())) {
+      if (isNaN(demand.getTime())) {
           return "NA";
       }
 
-      const differenceInTime = Math.abs(demand.getTime() - pickup.getTime());
+      // Set both dates to the start of the day for accurate day calculation
+      demand.setHours(0, 0, 0, 0);
+      today.setHours(0, 0, 0, 0);
+
+      const differenceInTime = Math.abs(today.getTime() - demand.getTime());
       const differenceInDays = Math.floor(differenceInTime / (1000 * 3600 * 24));
 
       return differenceInDays;

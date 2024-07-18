@@ -56,6 +56,11 @@ import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import dividerLine from '@/assets/divider_line.svg'
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 
+import InputLabel from '@mui/material/InputLabel';
+import ListSubheader from '@mui/material/ListSubheader';
+import FormControl from '@mui/material/FormControl';
+import TextField from '@mui/material/TextField';
+import {Popper ,ClickAwayListener} from '@mui/material';
 
 
 async function rake_update_id(payload: Object) {
@@ -140,11 +145,10 @@ const convertArrayToFilteredArray = (inputArray: any) => {
             pickup_date: pickup_date,
             rrDoc: rr_document && rr_document.length > 0 ? true : false,
             past_etas: past_etas ? past_etas : 'NA',
-            // deliverDate: 'NA',
             received_no_of_wagons: received_no_of_wagons ? received_no_of_wagons : 'NA',
             no_of_wagons: no_of_wagons ? no_of_wagons : 'NA',
             is_captive: is_captive && is_captive,
-            daysAging: calculateDaysDifference(demand_date, pickup_date),
+            daysAging: calculateDaysDifference(demand_date),
             paid_by: paid_by ? paid_by : 'NA',
             commodity_desc: commodity_desc && commodity_desc
         }
@@ -316,7 +320,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
             { id: 'fnr', label: '', class: 'fnr', innerClass: 'inner_fnr' },
             { id: 'destination', label: 'Destination/Paid By', class: 'destination', innerClass: '' },
             { id: 'material', label: 'Material/Commodities', class: 'material', innerClass: '' },
-            { id: 'aging', label: 'Aging', class: 'aging', innerClass: '' },
+            { id: 'aging', label: 'Ageing', class: 'aging', innerClass: '' },
             { id: 'pickupdate', label: 'Invoiced Date', class: 'pickupdate', innerClass: 'inner_pickup' },
             { id: 'status', label: 'Status', class: 'status', innerClass: 'inner_status' },
             { id: 'currentEta', label: 'Current ETA', class: 'currentEta', innerClass: 'inner_eta' },
@@ -629,24 +633,15 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                             </div>
                                                         }
                                                         {item.id === 'currentEta' && (
-                                                            // <div>
-                                                            //     {row.eta ? (
-                                                            //         <>
-                                                            //             <div>{value.date}</div>
-                                                            //             <div>{value.etaTime}</div>
-                                                            //         </>
-                                                            //     ) : (
-                                                            //         'NA'
-                                                            //     )}
-                                                            // </div>
                                                             <PastEta row={row} firstIndex={firstindex} />
                                                         )}
                                                         {item.id === 'remarks' && (
                                                             <RemarkComponent row={row} firstIndex={firstindex} />
                                                         )}
-                                                        {item.id === 'aging' && row.daysAging !== "NA" && (
+                                                        {item.id === 'aging' &&
+                                                            !row.rrDoc &&
                                                             <span>{row.daysAging} Days</span>
-                                                        )}
+                                                        }
                                                         {item.id === 'deliverDate' && (
                                                             <div>
                                                                 {row.eta && row.status.name === 'Delivered' ? (
@@ -725,78 +720,91 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
     );
 }
 
+interface RemarksListType {
+    [category: string]: string[];
+  }
+
+interface RemarksProps {
+    shipmentId: any;
+    setOpen: (open: boolean) => void;
+    remarksList: RemarksListType;
+    getAllShipment: () => void;
+  }
+
 const ActionItem = ({ icon, text, onClick, id, style }: any) => (
     <div className={`action_items `} onClick={onClick} id={id} style={style}>
         <div>{icon}</div>
         <div>{text}</div>
     </div>
 );
-function Remarks({ shipmentId, setOpen, remarksList, getAllShipment }: any) {
-    const [others, setOthers] = useState('')
+function Remarks({ shipmentId, setOpen, remarksList, getAllShipment }: RemarksProps) {
+    const [others, setOthers] = useState('');
     const t = useTranslations('ORDERS');
-    const placeholder = 'Enter Your Remarks'
+    const placeholder = 'Select a remark';
     const [remarks, setRemarks] = useState(placeholder);
-    const inputRef = useRef<HTMLInputElement>(null);
     const [openRemarks, setOpenRemarks] = useState(false);
-    const [inputEnabled, setInputEnabled] = useState(true);
     const [isHovered, setIsHovered] = useState(false);
-    const predefinedRemarks = [
-        'Great job!',
-        'Needs improvement',
-        'Well done',
-        'Please revise',
-        'Excellent work',
-        'Others :',
-    ];
     const { showMessage } = useSnackbar();
-
+    
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const handleMouseEnter = useCallback(() => setIsHovered(true), []);
     const handleMouseLeave = useCallback(() => setIsHovered(false), []);
 
-    const handlePreDefineRemarks = (remark: string) => {
+    const handleRemarkSelect = (remark: string) => {
         setRemarks(remark);
-        setOpenRemarks(false)
+        setOpenRemarks(false);
     };
 
-    function handleothers(e: string) {
-        setOthers(e)
+    function handleOthers(e: React.ChangeEvent<HTMLInputElement>) {
+        setOthers(e.target.value);
     }
 
-    function handleSubmit(e: any) {
-        setOpen(false)
-        setInputEnabled(true);
-        setOpenRemarks(false);
-        setRemarks('')
+    function handleSubmit(e: React.MouseEvent) {
         e.stopPropagation();
-        if (remarks.trim() === '') return;
+        setOpen(false);
+        setOpenRemarks(false);
+
+        if (remarks === placeholder) {
+            showMessage('Please select a remark', 'error');
+            return;
+        }
+
         const remarkObject = {
             id: shipmentId,
             remarks: [
                 {
                     date: service.getEpoch(new Date()),
-                    remark: remarks === 'Others :' ? others : remarks,
+                    remark: remarks === 'Others' ? others : remarks,
                 }
             ]
-        }
-        if (remarkObject.remarks[0].remark !== placeholder) {
-            const response = remake_update_By_Id(remarkObject);
-            response.then((res: any) => {
-                if (res.statusCode === 200) {
-                    showMessage('Remark Updated', 'success');
-                    getAllShipment();
-                }
-            }).catch((err) => {
-                console.log(err)
-            })
-        } else {
-            showMessage('select remark', 'error');
-        }
-        setRemarks('');
+        };
+
+        const response = remake_update_By_Id(remarkObject);
+        response.then((res: any) => {
+            if (res.statusCode === 200) {
+                showMessage('Remark Updated', 'success');
+                getAllShipment();
+            }
+        }).catch((err) => {
+            console.log(err);
+        });
+
+        setRemarks(placeholder);
+        setOthers('');
     }
+    const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+        event.stopPropagation();
+        setAnchorEl(event.currentTarget);
+        setOpenRemarks(true);
+    };
+
+    const handleClose = (e:any) => {
+        e.stopPropagation();
+        setOpenRemarks(false);
+    };
 
     return (
         <div onClick={(e) => { e.stopPropagation(); setOpenRemarks(false) }}>
-
             <div style={{
                 width: '100%',
                 backgroundColor: '#3351FF',
@@ -808,42 +816,67 @@ function Remarks({ shipmentId, setOpen, remarksList, getAllShipment }: any) {
             }}>Remarks</div>
 
             <div style={{ padding: '12px', position: 'relative' }}>
-                <div
-                    className='remarks_update'
-                    onClick={(e) => { e.stopPropagation(); setOpenRemarks(!openRemarks); }}
-                >{remarks}{
-                        remarks === 'Others :' ?
-                            <input
-                                onClick={(e) => { e.stopPropagation(); }}
-                                onChange={(e) => { handleothers(e.target.value) }}
-                                style={{
-                                    outline: 'none',
-                                    borderTop: '1px solid #E9E9EB',
-                                    borderLeft: '1px solid #E9E9EB',
-                                    borderRight: '1px solid #E9E9EB',
-                                    marginInline: '5px',
-                                    backgroundColor: '#E9E9EB',
-                                    borderBottom: '1px solid black',
-                                    height: '24px'
-                                }}
-                            /> : <></>
-                    }
-                </div>
-                <ArrowDropDownIcon
-                    onClick={() => { setOpenRemarks(!openRemarks) }}
-                    className='arrow_down_icon'
-                />
-                <div className='remarks_dropDown_list' style={{ display: openRemarks ? 'block' : 'none' }}>
-                    {predefinedRemarks.map((remark: string, index: number) => (
-                        <div
-                            key={index}
-                            onClick={() => handlePreDefineRemarks(remark)}
-                            className='remarks_dropDown_list_item'
-                        >{remark}</div>
-                    ))}
-                </div>
+                <FormControl fullWidth>
+                    <InputLabel id="remarks-select-label">remarks</InputLabel>
+                    <Select
+                        labelId="remarks-select-label"
+                        id="remarks-select"
+                        value={remarks}
+                        label="remarks"
+                        onClick={(e) => handleClick(e)}
+                        open={false}
+                    >
+                        <MenuItem value={remarks}>
+                            {remarks}
+                        </MenuItem>
+                    </Select>
+                </FormControl>
+
+                <Popper 
+                    open={openRemarks} 
+                    anchorEl={anchorEl}
+                    placement="bottom-start"
+                    style={{ zIndex: 1300000 }}
+                >
+                    <ClickAwayListener onClickAway={(e) => handleClose(e)}>
+                        <Paper style={{ maxHeight: 300, overflow: 'auto' }}>
+                            {Object.entries(remarksList).map(([category, options]) => [
+                                <ListSubheader key={category}>{category}</ListSubheader>,
+                                ...options.map((option: string, index: number) => (
+                                    <MenuItem 
+                                        key={`${category}-${index}`} 
+                                        // value={remarks}
+                                        onClick={(e) =>{ handleRemarkSelect(option);  handleClose(e);}}
+                                    >
+                                        {option}
+                                    </MenuItem>
+                                ))
+                            ])}
+                        </Paper>
+                    </ClickAwayListener>
+                </Popper>
+                
+                {remarks === 'Others' && (
+                    <TextField
+                        fullWidth
+                        margin="normal"
+                        label="Other Reason"
+                        variant="outlined"
+                        value={others}
+                        onChange={handleOthers}
+                    />
+                )}
+                
                 <div style={{ textAlign: 'end', paddingTop: '8px' }}>
-                    <Button variant="contained" size='small' color="secondary" style={{ textTransform: 'none', backgroundColor: '#3351FF' }} onClick={(e) => { handleSubmit(e) }}>{t('submit')}</Button>
+                    <Button
+                        variant="contained"
+                        size='small'
+                        color="secondary"
+                        style={{ textTransform: 'none', backgroundColor: '#3351FF' }}
+                        onClick={handleSubmit}
+                    >
+                        {t('submit')}
+                    </Button>
                 </div>
             </div>
             <div
@@ -1111,9 +1144,9 @@ const PastEta = ({ row, firstIndex }: any) => {
                     onClose={handlePopoverClose}
                     disableRestoreFocus
                 >
-                    <Box sx={{paddingBlock:'4px'}}>
+                    <Box sx={{ paddingBlock: '4px' }}>
                         {row.past_etas?.map((item: any, remarkListIndex: number) => (
-                            <Typography key={remarkListIndex} sx={{ fontSize: '12px', paddingInline: '8px'}}>
+                            <Typography key={remarkListIndex} sx={{ fontSize: '12px', paddingInline: '8px' }}>
                                 {service.utcToist(item)}  -  {service.utcToistTime(item)}
                             </Typography>
                         ))}

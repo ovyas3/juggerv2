@@ -42,7 +42,7 @@ const OrdersPage = () => {
   const [reloadOnHeaderChange, setReloadOnHeaderChange] = useState(false);
   const { showMessage } = useSnackbar();
   const [selected_bound, setSelected_bound] = useState('outbound')
-  const [remarksList, setRemarksList] = useState([])
+  const [remarksList, setRemarksList] = useState({})
   const [triggerShipments,setTriggerShipments] = useState(false)
 
   const[showRefreash, setShowRefreash] = useState(false)
@@ -109,7 +109,7 @@ const OrdersPage = () => {
   }
   async function getRemarksList() {
     const list_remarks = await httpsGet(REMARKS_LIST);
-    setRemarksList(list_remarks.data)
+    setRemarksList(list_remarks.data.remark_reasons)
   }
 
   function clearFilter() {
@@ -201,7 +201,7 @@ const OrdersPage = () => {
                   }
                   
                   <div style={{ paddingTop: tablePagination ? '20px' : '45px' }}>
-                    <TableData onSkipLimit={handleSkipLimitChange} allShipments={allShipment} count={count} rakeCaptiveList={rakeCaptiveList} onFnrChange={handleChangeByFnr} reload={reload} getAllShipment={getAllShipment} setTriggerShipments={setTriggerShipments} triggerShipments={triggerShipments}  />
+                    <TableData onSkipLimit={handleSkipLimitChange} allShipments={allShipment} count={count} rakeCaptiveList={rakeCaptiveList} onFnrChange={handleChangeByFnr} reload={reload} getAllShipment={getAllShipment} setTriggerShipments={setTriggerShipments} triggerShipments={triggerShipments} remarksList={remarksList} />
                   </div>
                 </div>
                 : <></>
