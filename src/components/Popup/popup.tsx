@@ -88,6 +88,7 @@ export const Popup: React.FC<PopupProps> = ({ data }) => {
   const [filteredData, setFilteredData] = useState<any>([]);
   const [schemeType, setSchemeType] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
+  const [searchRakeName, setSearchRakeName] = useState('')
   const [wagonType, setWagonType] = useState<any>('');
   const [showWagonTypes, setShowWagonTypes] = useState(false);
   const [searchChildTerm, setSearchChildTerm] = useState('');
@@ -146,6 +147,7 @@ export const Popup: React.FC<PopupProps> = ({ data }) => {
     setPage(0);
     setRowsPerPage(rowsPerPageOptions[0]);
     setSearchTerm('');
+    setSearchRakeName('')
     setSchemeType('');
     const currentTime = new Date();
     const newData = data && data.map((item : any) => {
@@ -190,12 +192,18 @@ export const Popup: React.FC<PopupProps> = ({ data }) => {
     getDataParentTabele();
   }, [data]);
 
-  const handleFilterChange = (newSearchTerm = searchTerm, newSchemeType = schemeType) => {
+  const handleFilterChange = (newSearchTerm = searchTerm, newSearchRakeName = searchRakeName ,newSchemeType = schemeType) => {
+    const filteredByRakeName = newSearchRakeName
+    ? parentTableData.filter((item: any) =>
+        item.rake_name.toLowerCase().includes(newSearchRakeName.toLowerCase())
+      )
+    : parentTableData;  
+
     const filteredBySearchTerm = newSearchTerm
-      ? parentTableData.filter((item: any) =>
+      ? filteredByRakeName.filter((item: any) =>
           item.rake_id.toLowerCase().includes(newSearchTerm.toLowerCase())
         )
-      : parentTableData;
+      : filteredByRakeName;
 
     const finalFilteredData = (newSchemeType === 'ALL' || !newSchemeType)
       ? filteredBySearchTerm
@@ -209,13 +217,19 @@ export const Popup: React.FC<PopupProps> = ({ data }) => {
   const handleSearchChange = (event: any) => {
     const newSearchTerm = event.target.value;
     setSearchTerm(newSearchTerm);
-    handleFilterChange(newSearchTerm, schemeType);
+    handleFilterChange(newSearchTerm,searchRakeName,schemeType);
+  };
+
+  const handleSearchRakeName = (event: any) => {
+    const newSearchRakename = event.target.value;
+    setSearchRakeName(newSearchRakename);
+    handleFilterChange(searchTerm, newSearchRakename ,schemeType);
   };
 
   const handleSchemeTypeChange = (event: any) => {
     const selectedSchemeType = event.target.value;
     setSchemeType(selectedSchemeType);
-    handleFilterChange(searchTerm, selectedSchemeType);
+    handleFilterChange(searchTerm, searchRakeName,selectedSchemeType);
   };
 
   // Open and close state for child dialog
@@ -318,12 +332,20 @@ export const Popup: React.FC<PopupProps> = ({ data }) => {
   const TableHeadComponent = () => {
 
     const inputRef = useRef<any>(null);
+    const inputRefRakeName = useRef<any>(null);
 
     useEffect(() => {
       if (inputRef.current && searchTerm !== '') {
         inputRef.current.focus();
       }
     }, [searchTerm]);
+
+
+    useEffect(() => {
+      if (inputRefRakeName.current && searchRakeName !== '') {
+        inputRefRakeName.current.focus();
+      }
+    }, [searchRakeName]);
   
      return (
       <TableHead>
@@ -332,7 +354,12 @@ export const Popup: React.FC<PopupProps> = ({ data }) => {
             S.No
           </TableCell>
           <TableCell align="left" className="table-columns">
-            Rake Name
+            <CustomTextField
+            inputRef={inputRefRakeName}
+            label="Rake Name"
+            value={searchRakeName}
+            onChange={handleSearchRakeName}
+          />
           </TableCell>
           <TableCell align="left" className="table-columns">
           <CustomTextField
