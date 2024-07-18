@@ -30,6 +30,18 @@ const getStatusCode = (status: string): string => {
   }
 }
 
+
+const getRakeTypeCode = (rakeTypes: string): string => {
+  switch (rakeTypes) {
+    case "Captive Rakes":
+      return "CR"
+    case "Indian Railway Rakes":
+      return 'IR'
+    default:
+      return 'All'
+  }
+}
+
 const OrdersPage = () => {
   const t = useTranslations('ORDERS');
   const mobile = useWindowSize(500);
@@ -53,7 +65,8 @@ const OrdersPage = () => {
     is_outbound: true,
     to: '',
     from: '',
-    status: ['ITNS', 'Delivered']
+    status: ['ITNS', 'Delivered'],
+    rake_types: ['CR','IR']
   })
 
   //adding to and from to shipmentpayload
@@ -93,13 +106,29 @@ const OrdersPage = () => {
     });
   }
 
+  const handleChangeRakeType = (rakeTypes: string[]) => {
+    setShipmentsPayload((prevState: any) => {
+      if (rakeTypes.length === 0) {
+        const { rakeTypes, ...newState } = prevState;
+        return newState;
+      } else {
+        const modifiedStatus = rakeTypes.map(getRakeTypeCode);
+        return { ...prevState, rake_types: modifiedStatus };
+      }
+    });
+  }
+
   // function which bring allshipment 
   async function getAllShipment() {
     console.log(ShipmentsPayload)
     const response = await httpsPost(GET_SHIPMENTS, ShipmentsPayload);
-    console.log(response)
-    setAllShipment(response.data.data)
-    setCount(response.data.total)
+    if(response.data && response.data.data) {
+      setAllShipment(response.data.data)
+      setCount(response.data.total)
+    } else {
+      setAllShipment([])
+      setCount(0)
+    }
   }
 
   async function getCaptiveRake() {
@@ -132,7 +161,7 @@ const OrdersPage = () => {
   }, [ShipmentsPayload,triggerShipments])
 
   return (
-    <div  >
+    <div>
       <div className='orderContainer'>
         <div style={{ width: '100%', overflowX: 'auto' }}>
           {
@@ -195,7 +224,7 @@ const OrdersPage = () => {
                         maxWidth: '87%', zIndex: 100,
                         whiteSpace: 'nowrap'
                       }} >
-                        <Filters onToFromChange={handleToFromChange} onChangeStatus={handleChangeStatus} reload={reload} getShipments={getAllShipment} shipmentsPayloadSetter={setShipmentsPayload} setTriggerShipments={setTriggerShipments} triggerShipments={triggerShipments} />
+                        <Filters onToFromChange={handleToFromChange} onChangeStatus={handleChangeStatus} onChangeRakeTypes={handleChangeRakeType} reload={reload} getShipments={getAllShipment} shipmentsPayloadSetter={setShipmentsPayload} setTriggerShipments={setTriggerShipments} triggerShipments={triggerShipments} />
                       </div>
                       : <></>
                   }
