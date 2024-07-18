@@ -9,12 +9,15 @@ import { useEffect, useState } from 'react';
 import TrainIcon from '@mui/icons-material/Train';
 import SupportAgentIcon from '@mui/icons-material/SupportAgent';
 import DashboardIcon from '@mui/icons-material/Dashboard';
+import StationManagementActive from '../../assets/station_management_active_icon.svg';
+import StationManagementInactive from '../../assets/station_management_inactive_icon.svg';
 import { useRouter, usePathname } from 'next/navigation';
 import fullLogo from '@/assets/Smartruck_hover_logo.svg'
 
 function SideDrawer() {
     const [open, setOpen] = useState(false);
     const [activeContact, setActiveContact] = useState(false);
+    const [station, setStation] = useState(false);
     const [active, setActive] = useState('orders')
     const router = useRouter();
     const pathName = usePathname();
@@ -54,11 +57,46 @@ function SideDrawer() {
                 </div>
             </div>
 
-            <div onMouseEnter={() => { setActiveContact(true) }} onMouseLeave={() => { setActiveContact(false) }} onClick={() => handleRouting('dashboard')} className='contact-icon' style={{ width: open ? '190px' : '42px', justifyContent: open ? 'start' : 'center', backgroundColor: ((active == 'dashboard') || (active=="MapsHelper") || activeContact) ? 'white' : '', cursor: 'pointer' }}>
-                <DashboardIcon style={{ marginLeft: open ? '9px' : '', color: ((active == 'dashboard')  || (active=="MapsHelper") || activeContact) ? 'black' : 'white' }} /><div className={`${open ? 'fnr_text' : 'fnr_text_none'}`} style={{ color: ((active == 'dashboard')  || (active=="MapsHelper") || activeContact) ? 'black' : 'white' }} >Captive Rakes</div>
+            <div 
+                onMouseEnter={() => { setActiveContact(true) }} 
+                onMouseLeave={() => { setActiveContact(false) }} 
+                onClick={() => handleRouting('dashboard')} 
+                className='contact-icon' 
+                style={{ 
+                    width: open ? '190px' : '42px',
+                    justifyContent: open ? 'start' : 'center',
+                    backgroundColor: ((active == 'dashboard') || activeContact) ? 'white' : '',
+                    cursor: 'pointer' }}
+            >
+                <DashboardIcon style={{ marginLeft: open ? '9px' : '', color: ((active == 'dashboard') || activeContact) ? 'black' : 'white' }} />
+                <div 
+                    className={`${open ? 'fnr_text' : 'fnr_text_none'}`} 
+                    style={{ color: ((active == 'dashboard') || activeContact) ? 'black' : 'white' }} >
+                        Captive Rakes
+                </div>
+            </div>
+            <div 
+                onMouseEnter={() => { setStation(true) }}
+                onMouseLeave={() => { setStation(false) }}
+                onClick={() => handleRouting('stationManagement')}
+                className='station-code'
+                style={{ 
+                    width: open ? '190px' : '42px',
+                    justifyContent: open ? 'start' : 'center',
+                    backgroundColor: ((active === 'stationManagement') || station) ? 'white' : '',
+                    cursor: 'pointer'
+                }}
+            >
+                <Image 
+                    src={ (active === 'stationManagement' || station) ?  StationManagementActive : StationManagementInactive} alt='stationManagementIcon'  
+                    style={{ marginLeft: open ? '9px' : '', color: ((active == 'stationManagement') || station) ? 'black' : 'white' }}/>
+                <div 
+                    className={`${open ? 'fnr_text' : 'fnr_text_none'}`}
+                    style={{ color: ((active === 'stationManagement') || station) ? 'black' : 'white' }} >
+                        Station Management
+                </div>
             </div>
         </div>
-
     );
 
 }

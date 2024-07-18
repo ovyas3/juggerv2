@@ -36,6 +36,17 @@ function MobileDrawer (){
             <Image src={contactIcon} alt=''/>
         </div>
 
+        <div style={{ 
+            height:'30px',
+            width:'30px',
+            display:'flex',
+            justifyContent:'center',
+            alignItems:'center',
+            borderRadius:'6px'
+        }}>
+            <TrainIcon style={{color:'#7C7E8C'}}/>
+        </div>
+
     </div>
 );
 }

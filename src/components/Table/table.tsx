@@ -21,6 +21,14 @@ import Link from 'next/link';
 import { Column, row, tagItem } from '@/utils/interface';
 import { useTranslations } from 'next-intl';
 import RRModal from '../RR Modal/RRModal';
+// import { useSnackbar } from '@/hooks/snackBar';
+
+
+import Autocomplete from '@mui/material/Autocomplete';
+import TextField from '@mui/material/TextField';
+import Stack from '@mui/material/Stack';
+
+import { ClickAwayListener, Popper, Tooltip, } from '@mui/material';
 import Button from '@mui/material/Button';
 
 import Box from '@mui/material/Box';
@@ -59,8 +67,6 @@ import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import InputLabel from '@mui/material/InputLabel';
 import ListSubheader from '@mui/material/ListSubheader';
 import FormControl from '@mui/material/FormControl';
-import TextField from '@mui/material/TextField';
-import {Popper ,ClickAwayListener} from '@mui/material';
 
 
 async function rake_update_id(payload: Object) {
@@ -189,6 +195,8 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
     const [isRRDoc, setIsRRDoc] = useState<boolean>(false);
     const [rrNumbers, setRRNumbers] = useState([]);
     const [fnr, setFnr] = useState('')
+    const textRef = useRef<HTMLDivElement>(null);
+    const [isOverflowing, setIsOverflowing] = useState(false);
 
     //getting row id to pass it to tag element
     const [rowId, setRowID] = useState('')
@@ -341,6 +349,15 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
         setSettingFnrChange('')
     }, [reload])
 
+    useEffect(() => {
+        const element = textRef.current;
+        if (element) {
+          const lineHeight = parseInt(window.getComputedStyle(element).lineHeight);
+          const numberOfLines = element.scrollHeight / lineHeight;
+          setIsOverflowing(numberOfLines > 5);
+        }
+      }, [textRef, response]);
+      
     return (
         <div className='target' >
             <Paper sx={{ width: '100%', overflow: 'hidden', boxShadow: 'none' }}>
@@ -558,17 +575,20 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                     </div>
                                                                 </div>
                                                                 <div className='fnr_logos'>
-                                                                    {row.rrDoc &&
-                                                                        <div style={{ height: 25, width: 25 }}>
+                                                                    
+                                                                    {row.rrDoc ?
+                                                                        (<div style={{ height: 25, width: 25}}>
                                                                             <img
                                                                                 src={row.rrDoc ? rrDocumentIcon.src : ''}
                                                                                 style={{ height: '100%', width: '100%' }}
                                                                                 alt=''
                                                                             />
-                                                                        </div>
+                                                                        </div>) : (
+                                                                            <div style={{ width: '25px', height: '25px'}}></div>
+                                                                        )
                                                                     }
                                                                     {row.is_captive &&
-                                                                        <div style={{ height: 25, width: 25 }}>
+                                                                        <div style={{ height: 25, width: 25}}>
                                                                             <img
                                                                                 src={row.is_captive ? captiveRakeIndicator.src : ''}
                                                                                 style={{ height: '100%', width: '100%' }}
@@ -579,12 +599,44 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                 </div>
                                                             </div>
                                                         }
-                                                        {item.id === 'destination' && (
-                                                            <div style={{ position: 'relative' }}>
-                                                                <div>{value.name !== 'NA' ? value.name : value.code} ({value.code})</div>
-                                                                {row.paid_by !== 'NA' && (
-                                                                    <div style={{ color: '#7C7E8C' }}>{row.paid_by}</div>
-                                                                )}
+                                                       {item.id === 'destination' && (
+                                                            <div
+                                                            style={{
+                                                                position: 'relative',
+                                                                right: '5px',
+                                                                width: '160px',
+                                                                height: '70px',
+                                                                overflow: 'hidden',
+                                                            }}
+                                                            >
+                                                            <div
+                                                                style={{
+                                                                position: 'relative',
+                                                                right: '0px',
+                                                                overflow: 'hidden',
+                                                                }}
+                                                            >
+                                                                <Tooltip
+                                                                title={isOverflowing ? `(${value.code} ${value.name !== 'NA' ? value.name : value.code})` : ' '}
+                                                                disableHoverListener={!isOverflowing}
+                                                                >
+                                                                <div
+                                                                    ref={textRef}
+                                                                    style={{
+                                                                    display: '-webkit-box',
+                                                                    WebkitBoxOrient: 'vertical',
+                                                                    WebkitLineClamp: 4,
+                                                                    overflow: 'hidden',
+                                                                    textOverflow: 'ellipsis',
+                                                                    whiteSpace: 'pre-wrap',
+                                                                    height: '100%',
+                                                                    cursor: isOverflowing ? 'pointer' : 'default'
+                                                                    }}
+                                                                >
+                                                                    {value.code} {value.name !== 'NA' ? value.name : value.code}
+                                                                </div>
+                                                                </Tooltip>
+                                                            </div>
                                                             </div>
                                                         )}
                                                         {item.id === 'pickupdate' && (
@@ -658,7 +710,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                         )}
                                                         {item.id === 'material' && row.commodity_desc && (
                                                             <div className='material_items'>
-                                                                <div style={{ color: '#7C7E8C' }}>{row.commodity_desc[0]}</div>
+                                                                <div style={{color:'#7C7E8C', marginTop: '5px'}}>{row.commodity_desc[0]}</div>
                                                                 {row.commodity_desc.length > 1 &&
                                                                     <div className='view_more_materials'>
                                                                         <div style={{ fontSize: 8 }}>+{row.commodity_desc.length - 1}</div>

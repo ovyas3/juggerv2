@@ -28,7 +28,15 @@
     margin-bottom: 21px;
     margin-inline:14px;
 }
-
+.station-code{
+    height:42px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    margin-bottom: 21px;
+    margin-inline: 14px;
+    margin-top: -10px;
+}
 .fnr_text {
     font-size: 13px;
     margin-left: 12px;

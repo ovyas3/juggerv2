@@ -19,7 +19,7 @@
 }
 
 .destination {
-    min-width: 120px !important;
+    min-width: 220px !important;
     text-wrap: nowrap !important;
     /* padding-right: 41px !important; */
     padding-inline:30px !important;

@@ -168,7 +168,7 @@ const OrdersPage = () => {
             mobile ? <Header title={'Shipments'} setReloadOnHeaderChange={setReloadOnHeaderChange} isMapHelper={false}/> : <MobileHeader />
           }
 
-          <div className='tableContainer' style={{ paddingInline: 24, paddingTop: 10, paddingBottom: mobile ? 24 : 65, position: 'relative', marginTop: mobile ? '56px' : '24px', marginLeft: mobile ? '70px' : '0px', height: 'calc(100vh - 56px)' }}>
+          <div className='tableContainer' style={{ paddingInline: 24, paddingTop: 10, paddingBottom: mobile ? 24 : 65, position: 'relative', marginTop: mobile ? '56px' : '24px', marginLeft: mobile ? '70px' : '0px', height: 'calc(100vh - 56px)'}}>
 
             <div>
 
@@ -194,7 +194,7 @@ const OrdersPage = () => {
 
               {/* ----otbound ---- */}
               {mobile ?
-                <div className='outbound_inbound' style={{ marginTop:10}}>
+                <div className='outbound_inbound' style={{ marginBottom: "4px"}}>
                   {['outbound', 'inbound'].map(bound => (
                     <div
                       key={bound}
