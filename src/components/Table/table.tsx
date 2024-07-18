@@ -582,7 +582,9 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                         {item.id === 'destination' && (
                                                             <div style={{ position: 'relative' }}>
                                                                 <div>{value.name !== 'NA' ? value.name : value.code} ({value.code})</div>
-                                                                <div style={{ color: '#7C7E8C' }}>{row.paid_by}</div>
+                                                                {row.paid_by !== 'NA' && (
+                                                                    <div style={{ color: '#7C7E8C' }}>{row.paid_by}</div>
+                                                                )}
                                                             </div>
                                                         )}
                                                         {item.id === 'pickupdate' && (
@@ -699,7 +701,8 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                         backgroundColor: 'white',
                         borderRadius: '12px',
                         width: '30vw',
-                        maxHeight: '90vh',
+                        minWidth:'320px',
+                        height: '267px',
                         position: 'relative',
                         outline: 'none'
                     }}>
@@ -804,27 +807,28 @@ function Remarks({ shipmentId, setOpen, remarksList, getAllShipment }: RemarksPr
     };
 
     return (
-        <div onClick={(e) => { e.stopPropagation(); setOpenRemarks(false) }}>
-            <div style={{
-                width: '100%',
-                backgroundColor: '#3351FF',
-                color: 'white',
-                borderRadius: '8px 8px 0 0',
-                padding: '4px',
-                fontSize: '20px',
-                paddingLeft: '8px'
-            }}>Remarks</div>
+        <div 
+            style={{padding:24}}
+            onClick={(e) => { e.stopPropagation(); setOpenRemarks(false) }}
+        >
+            <div style={{color:'#131722', fontSize:20, fontWeight:500, marginBottom:'36px'}}>Remarks</div>
+            <div style={{color:'#42454E', fontSize:12}}>Select Remarks</div>
 
-            <div style={{ padding: '12px', position: 'relative' }}>
-                <FormControl fullWidth>
-                    <InputLabel id="remarks-select-label">remarks</InputLabel>
+
+            <div style={{position: 'relative' }}>
+                <FormControl fullWidth >
+                    {/* <InputLabel id="remarks-select-label">remarks</InputLabel> */}
                     <Select
                         labelId="remarks-select-label"
                         id="remarks-select"
                         value={remarks}
-                        label="remarks"
                         onClick={(e) => handleClick(e)}
                         open={false}
+                        sx={{
+                            height:36,
+                            fontSize:14,
+                            outline:'none'
+                        }}
                     >
                         <MenuItem value={remarks}>
                             {remarks}
@@ -836,16 +840,15 @@ function Remarks({ shipmentId, setOpen, remarksList, getAllShipment }: RemarksPr
                     open={openRemarks} 
                     anchorEl={anchorEl}
                     placement="bottom-start"
-                    style={{ zIndex: 1300000 }}
+                    style={{ zIndex: 1300000, width: 'calc(30vw - 48px)',minWidth: '272px'}}
                 >
                     <ClickAwayListener onClickAway={(e) => handleClose(e)}>
-                        <Paper style={{ maxHeight: 300, overflow: 'auto' }}>
+                        <Paper style={{ maxHeight: 300, overflow: 'auto'}}>
                             {Object.entries(remarksList).map(([category, options]) => [
                                 <ListSubheader key={category}>{category}</ListSubheader>,
                                 ...options.map((option: string, index: number) => (
                                     <MenuItem 
                                         key={`${category}-${index}`} 
-                                        // value={remarks}
                                         onClick={(e) =>{ handleRemarkSelect(option);  handleClose(e);}}
                                     >
                                         {option}
@@ -867,7 +870,7 @@ function Remarks({ shipmentId, setOpen, remarksList, getAllShipment }: RemarksPr
                     />
                 )}
                 
-                <div style={{ textAlign: 'end', paddingTop: '8px' }}>
+                <div style={{marginTop:64}}>
                     <Button
                         variant="contained"
                         size='small'
