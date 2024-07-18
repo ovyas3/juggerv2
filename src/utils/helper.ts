@@ -19,7 +19,6 @@ export const CAPTIVE_RAKE = 'rake_shipment/get/captive_rakes';
 export const UPDATE_RAKE_CAPTIVE_ID = 'rake_shipment/update_rake_captive_id';
 export const REMARKS_UPDATE_ID = 'add/remark';
 export const REMARKS_LIST = 'get/remark/reasons';
-<<<<<<< HEAD
 
 export const STATIONS ='get/stations';
 export const ZONES = 'get/zones';
@@ -27,13 +26,6 @@ export const STATES = 'get/states';
 export const ADDSTATIONS = 'add/stations';
 export const EDITSTATIONS = 'edit/stations';
 
-// export const STATIONS = https://dev-rms-api.instavans.com/api/mysterio/v1/get/stations;
-// export const ZONES = https://dev-rms-api.instavans.com/api/mysterio/v1/get/zones;
-// export const STATES = https://dev-rms-api.instavans.com/api/mysterio/v1/get/states;
-// export const ADDSTATIONS = https://dev-rms-api.instavans.com/api/mysterio/v1/add/stations;
-// export const EDITSTATIONS = https://dev-rms-api.instavans.com/api/mysterio/v1/edit/stations;
-=======
 export const FETCH_TRACK_DETAILS = 'fetch/track_details'
 export const HANDLING_AGENT_INVITE = 'handling_agent/handling_agent_invite'
 export const EXISTING_AGENT_INVITE = 'handling_agent/existing_handling_agent_invite'
->>>>>>> 9db28a8904198f7f7f1d8419f80909c15eb4aa7f
