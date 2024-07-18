@@ -28,7 +28,7 @@ import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 import Stack from '@mui/material/Stack';
 
-import { Popper, Tooltip, } from '@mui/material';
+import { ClickAwayListener, Popper, Tooltip, } from '@mui/material';
 import Button from '@mui/material/Button';
 
 import Box from '@mui/material/Box';
@@ -67,8 +67,6 @@ import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import InputLabel from '@mui/material/InputLabel';
 import ListSubheader from '@mui/material/ListSubheader';
 import FormControl from '@mui/material/FormControl';
-import TextField from '@mui/material/TextField';
-import {Popper ,ClickAwayListener} from '@mui/material';
 
 
 async function rake_update_id(payload: Object) {
@@ -712,7 +710,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                         )}
                                                         {item.id === 'material' && row.commodity_desc && (
                                                             <div className='material_items'>
-                                                                <div style={{color:'#7C7E8C'}}>{row.commodity_desc[0]}</div>
+                                                                <div style={{color:'#7C7E8C', marginTop: '5px'}}>{row.commodity_desc[0]}</div>
                                                                 {row.commodity_desc.length > 1 &&
                                                                     <div className='view_more_materials'>
                                                                         <div style={{ fontSize: 8 }}>+{row.commodity_desc.length - 1}</div>
