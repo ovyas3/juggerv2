@@ -166,7 +166,7 @@ const OrdersPage = () => {
 
               {/* ----otbound ---- */}
               {mobile ?
-                <div className='outbound_inbound' style={{ marginTop:10}}>
+                <div className='outbound_inbound' style={{ marginBottom: "4px"}}>
                   {['outbound', 'inbound'].map(bound => (
                     <div
                       key={bound}
