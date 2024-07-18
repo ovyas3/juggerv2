@@ -48,12 +48,12 @@ function SideDrawer() {
                 style={{ 
                     width: open ? '190px' : '42px', 
                     transition: 'width 0.2s ease-in', 
-                    backgroundColor: (active == 'orders') ? 'white' : '', 
+                    backgroundColor: (active == 'orders' || active == 'shipment_map_view') ? 'white' : '', 
                     cursor: 'pointer' 
                 }}>
-                <TrainIcon style={{ marginLeft: '9px', color: (active == 'orders') ? 'black' : 'white' }} />
+                <TrainIcon style={{ marginLeft: '9px', color: (active == 'orders' || active == 'shipment_map_view') ? 'black' : 'white' }} />
                 <div className={`${open ? 'fnr_text' : 'fnr_text_none'}`} 
-                    style={{ color: (active == 'orders') ? 'black' : 'white' }} >Shipments
+                    style={{ color: (active == 'orders' || active == 'shipment_map_view') ? 'black' : 'white' }} >Shipments
                 </div>
             </div>
 

@@ -30,6 +30,18 @@ const getStatusCode = (status: string): string => {
   }
 }
 
+
+const getRakeTypeCode = (rakeTypes: string): string => {
+  switch (rakeTypes) {
+    case "Captive Rakes":
+      return "CR"
+    case "Indian Railway Rakes":
+      return 'IR'
+    default:
+      return 'All'
+  }
+}
+
 const OrdersPage = () => {
   const t = useTranslations('ORDERS');
   const mobile = useWindowSize(500);
@@ -42,7 +54,7 @@ const OrdersPage = () => {
   const [reloadOnHeaderChange, setReloadOnHeaderChange] = useState(false);
   const { showMessage } = useSnackbar();
   const [selected_bound, setSelected_bound] = useState('outbound')
-  const [remarksList, setRemarksList] = useState([])
+  const [remarksList, setRemarksList] = useState({})
   const [triggerShipments,setTriggerShipments] = useState(false)
 
   const[showRefreash, setShowRefreash] = useState(false)
@@ -53,7 +65,8 @@ const OrdersPage = () => {
     is_outbound: true,
     to: '',
     from: '',
-    status: ['ITNS', 'Delivered']
+    status: ['ITNS', 'Delivered'],
+    rake_types: ['CR','IR']
   })
 
   //adding to and from to shipmentpayload
@@ -93,13 +106,29 @@ const OrdersPage = () => {
     });
   }
 
+  const handleChangeRakeType = (rakeTypes: string[]) => {
+    setShipmentsPayload((prevState: any) => {
+      if (rakeTypes.length === 0) {
+        const { rakeTypes, ...newState } = prevState;
+        return newState;
+      } else {
+        const modifiedStatus = rakeTypes.map(getRakeTypeCode);
+        return { ...prevState, rake_types: modifiedStatus };
+      }
+    });
+  }
+
   // function which bring allshipment 
   async function getAllShipment() {
     console.log(ShipmentsPayload)
     const response = await httpsPost(GET_SHIPMENTS, ShipmentsPayload);
-    console.log(response)
-    setAllShipment(response.data.data)
-    setCount(response.data.total)
+    if(response.data && response.data.data) {
+      setAllShipment(response.data.data)
+      setCount(response.data.total)
+    } else {
+      setAllShipment([])
+      setCount(0)
+    }
   }
 
   async function getCaptiveRake() {
@@ -109,8 +138,7 @@ const OrdersPage = () => {
   }
   async function getRemarksList() {
     const list_remarks = await httpsGet(REMARKS_LIST);
-    console.log('------------>',list_remarks)
-    setRemarksList(list_remarks.data)
+    setRemarksList(list_remarks.data.remark_reasons)
   }
 
   function clearFilter() {
@@ -133,7 +161,7 @@ const OrdersPage = () => {
   }, [ShipmentsPayload,triggerShipments])
 
   return (
-    <div  >
+    <div>
       <div className='orderContainer'>
         <div style={{ width: '100%', overflowX: 'auto' }}>
           {
@@ -196,13 +224,13 @@ const OrdersPage = () => {
                         maxWidth: '87%', zIndex: 100,
                         whiteSpace: 'nowrap'
                       }} >
-                        <Filters onToFromChange={handleToFromChange} onChangeStatus={handleChangeStatus} reload={reload} getShipments={getAllShipment} shipmentsPayloadSetter={setShipmentsPayload} setTriggerShipments={setTriggerShipments} triggerShipments={triggerShipments} />
+                        <Filters onToFromChange={handleToFromChange} onChangeStatus={handleChangeStatus} onChangeRakeTypes={handleChangeRakeType} reload={reload} getShipments={getAllShipment} shipmentsPayloadSetter={setShipmentsPayload} setTriggerShipments={setTriggerShipments} triggerShipments={triggerShipments} />
                       </div>
                       : <></>
                   }
                   
                   <div style={{ paddingTop: tablePagination ? '20px' : '45px' }}>
-                    <TableData onSkipLimit={handleSkipLimitChange} allShipments={allShipment} count={count} rakeCaptiveList={rakeCaptiveList} onFnrChange={handleChangeByFnr} reload={reload} getAllShipment={getAllShipment} setTriggerShipments={setTriggerShipments} triggerShipments={triggerShipments}  />
+                    <TableData onSkipLimit={handleSkipLimitChange} allShipments={allShipment} count={count} rakeCaptiveList={rakeCaptiveList} onFnrChange={handleChangeByFnr} reload={reload} getAllShipment={getAllShipment} setTriggerShipments={setTriggerShipments} triggerShipments={triggerShipments} remarksList={remarksList} />
                   </div>
                 </div>
                 : <></>
@@ -211,7 +239,7 @@ const OrdersPage = () => {
 
             {
               selected_bound === 'inbound' ?
-                <div>COMING SOON !!!!</div>
+                <div className='coming-soon'>COMING SOON !!!</div>
                 : <></>
             }
           </div>

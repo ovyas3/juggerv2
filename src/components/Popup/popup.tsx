@@ -155,6 +155,7 @@ export const Popup: React.FC<PopupProps> = ({ data }) => {
         _id: item._id,  
         rake_id: item.rake_id,
         scheme_type: item.scheme,
+        rake_name: item.name ? item.name : 'N/A',
         no_of_wagons: item.no_of_wagons ? item.no_of_wagons : 0,
         date_of_commissioning: item.commissioned ? service.utcToist(item.commissioned, 'dd/MM/yyyy') : 'N/A',
         roh_done: item.roh ? service.utcToist(item.roh, 'dd/MM/yyyy') : 'N/A',
@@ -224,10 +225,12 @@ export const Popup: React.FC<PopupProps> = ({ data }) => {
     setChildFilteredDataCount(0);
     const newChildUpperData = {
       _id: item._id,
+      rake_name: item.rake_name ? item.rake_name : 'N/A',
       rake_id: item.rake_id,
       scheme_type: item.scheme_type,
       no_of_wagons: item.no_of_wagons
     };
+    console.log(newChildUpperData);
     const res = await httpsGet(`get_all_wagon_details?rakeId=${newChildUpperData._id}`, 0);
     const newChildLowerData = res && res.map((item: any) => {
       return {
@@ -329,6 +332,9 @@ export const Popup: React.FC<PopupProps> = ({ data }) => {
             S.No
           </TableCell>
           <TableCell align="left" className="table-columns">
+            Rake Name
+          </TableCell>
+          <TableCell align="left" className="table-columns">
           <CustomTextField
             inputRef={inputRef}
             label="Rake ID"
@@ -416,6 +422,7 @@ export const Popup: React.FC<PopupProps> = ({ data }) => {
           className='table-rows-container'
           onClick={() => handleChildClickOpen(item)}>
           <TableCell align="left" className='table-rows'>{serialNumber}.</TableCell>
+          <TableCell align="left" className='table-rows'>{item.rake_name}</TableCell>
            <TableCell align="left" className='table-rows'>
             <p className="rake-id">{item.rake_id}</p>
             {item.isTracking ? <Image src={TrackingIcon} alt="tracking"/>: <Image src={NonTrackingIcon} alt="tracking"/>}
@@ -435,6 +442,10 @@ export const Popup: React.FC<PopupProps> = ({ data }) => {
   const ChildDialogComponent = () => (
     childData && (
       <div className="child-upper-containers" key={childData.rake_id}>
+      <DialogContent>
+        <p className="title">Rake Name</p>
+        <p className="number">{childData.rake_name}</p>
+      </DialogContent>
       <DialogContent>
         <p className="title">Rake ID</p>
         <p className="number">{childData.rake_id}</p>

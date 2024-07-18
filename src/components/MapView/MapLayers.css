@@ -81,6 +81,18 @@
   border-radius: 8px;
 }
 
+.tracking-status:first-child:hover {
+  background-color: rgba(51, 79, 252, 0.1);
+}
+
+.tracking-status:nth-child(2):hover {
+  background-color: rgba(24, 190, 138, 0.1);
+}
+
+.tracking-status:last-child:hover {
+  background-color: rgba(230, 102, 123, 0.1);
+}
+
 .tracking-number{
   text-align: left;
   font-weight: bold;

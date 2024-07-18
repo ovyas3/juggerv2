@@ -21,9 +21,12 @@ import { motion } from 'framer-motion';
 import Image from 'next/image';
 import MapViewIcon from "@/assets/map_view.svg";
 import calenderIcon from '@/assets/calender_icon_filters.svg'
+import filter_icon from '@/assets/filter_icon.svg'
 
 
-function Filters({ onToFromChange, onChangeStatus, reload, shipmentsPayloadSetter }: any) {
+function Filters({ onToFromChange, onChangeStatus, onChangeRakeTypes , reload, shipmentsPayloadSetter}: any) {
+
+
 
     const MenuProps = {
         PaperProps: {
@@ -40,7 +43,14 @@ function Filters({ onToFromChange, onChangeStatus, reload, shipmentsPayloadSette
         'In Plant'
     ];
 
+
+    const rakeTypes = [
+        'Captive Rakes',
+        'Indian Railway Rakes'
+    ];
+
     const [status, setStatus] = useState(['In Transit', 'Delivered',]);
+    const [rakeType, setRakeType] = useState([ 'Captive Rakes','Indian Railway Rakes'])
     const [openStartDatePicker, setOpenStartDatePicker] = useState(false);
     const [openEndDatePicker, setOpenEndDatePicker] = useState(false);
 
@@ -53,6 +63,18 @@ function Filters({ onToFromChange, onChangeStatus, reload, shipmentsPayloadSette
         );
         onChangeStatus(typeof value === 'string' ? value.split(',') : value,)
     };
+
+     const handleChangeRakeType = (event : any) => {
+        const {
+          target: { value },
+        } = event;
+        setRakeType(
+          typeof value === 'string' ? value.split(',') : value,
+        );
+        onChangeRakeTypes(typeof value === 'string' ? value.split(',') : value,)
+      };
+
+
 
     const today = new Date();
     const twentyDaysBefore = new Date();
@@ -264,50 +286,102 @@ function Filters({ onToFromChange, onChangeStatus, reload, shipmentsPayloadSette
                     </div>
                 </div>
 
-                <div className='status_container' style={{ width: '170px' }}>
+                <div className='status_container' style={{ width: '170px',marginRight:'20px' }}>
                     <FormControl sx={{ width: '170px', margin: 0, padding: 0 }}>
                         <InputLabel id="demo-multiple-checkbox-label" sx={{
                             padding: 0, fontSize: 14, marginTop: '-8px',
                         }}>Status</InputLabel>
                         <Select
 
-                            labelId="demo-multiple-checkbox-label"
-                            id="demo-multiple-checkbox"
-                            value={status}
-                            multiple
-                            onChange={handleChange}
-                            input={<OutlinedInput
-                                sx={{
-                                    width: '170px',
-                                    '& .MuiOutlinedInput-notchedOutline': {
-                                        border: '1px solid #E9E9EB'
-                                    },
-                                    '&:hover .MuiOutlinedInput-notchedOutline': {
-                                        border: '1px solid #E9E9EB'
-                                    },
-                                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                                        border: '1px solid #E9E9EB'
-                                    },
-                                }}
-                            />}
-                            renderValue={(selected: any) => selected.join(', ')}
-                            // renderValue={(selected) => selected}
-                            MenuProps={MenuProps}
-                        >
-                            {names.map((name) => (
-                                <MenuItem key={name} value={name} sx={{ padding: 0 }} >
-                                    <Checkbox checked={status.indexOf(name) > -1} sx={{ paddingLeft: '8px', padding: '4px', '& .MuiSvgIcon-root': { fontSize: 15 } }} />
-                                    <ListItemText primary={name} primaryTypographyProps={{ fontSize: '12px', fontFamily: 'Inter, sans-serif' }} />
-                                </MenuItem>
-                            ))}
-                        </Select>
-                    </FormControl>
-                </div>
-
-                <div className="box" onClick={() => window.open('/shipment_map_view', '_blank')}>
-                    <img src={MapViewIcon.src} alt="map view" />
-                    <span className="map-view-btn-header">Map View</span>
-                </div>
+                        labelId="demo-multiple-checkbox-label"
+                        id="demo-multiple-checkbox"
+                        value={status}
+                        multiple
+                        onChange={handleChange}
+                        input={<OutlinedInput
+                            sx={{
+                                width: '170px',
+                                '& .MuiOutlinedInput-notchedOutline': {
+                                    border: '1px solid #E9E9EB'
+                                },
+                                '&:hover .MuiOutlinedInput-notchedOutline': {
+                                    border: '1px solid #E9E9EB'
+                                },
+                                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                    border: '1px solid #E9E9EB'
+                                },
+                            }}
+                        />}
+                        renderValue={(selected : any) => selected.join(', ')}
+                        // renderValue={(selected) => selected}
+                        MenuProps={MenuProps}
+                    >
+                        {names.map((name) => (
+                            <MenuItem key={name} value={name} sx={{ padding: 0 }} >
+                                <Checkbox checked={status.indexOf(name) > -1} sx={{ paddingLeft: '8px', padding: '4px', '& .MuiSvgIcon-root': { fontSize: 15 } }} />
+                                <ListItemText primary={name} primaryTypographyProps={{ fontSize: '12px', fontFamily: 'Inter, sans-serif' }} />
+                            </MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
+            </div>
+            <div className='status_container' style={{width:'180px'}}>
+                <FormControl sx={{
+                    width:'180px', margin: 0, padding: 0,
+                    '.mui-kk1bwy-MuiButtonBase-root-MuiMenuItem-root': {
+                        padding: 0,
+                    },
+                }}>
+                    <InputLabel id="demo-multiple-checkbox-label" sx={{
+                        padding: 0, fontSize: 14, marginTop: '-8px',
+                    }}>Rake Type</InputLabel>
+                    <Select
+                        labelId="demo-multiple-checkbox-label"
+                        id="demo-multiple-checkbox"
+                        value={rakeType}
+                        multiple
+                        className='status_select'
+                        onChange={handleChangeRakeType}
+                        input={<OutlinedInput
+                            sx={{
+                                width: '180px',
+                                '& .MuiOutlinedInput-notchedOutline': {
+                                    border: '1px solid #E9E9EB'
+                                },
+                                '&:hover .MuiOutlinedInput-notchedOutline': {
+                                    border: '1px solid #E9E9EB'
+                                },
+                                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                    border: '1px solid #E9E9EB'
+                                },
+                            }}
+                        />}
+                        renderValue={(selected : any) => selected.join(', ')}
+                        // renderValue={(selected) => selected}
+                        MenuProps={MenuProps}
+                    >
+                        {rakeTypes.map((name) => (
+                            <MenuItem key={name} value={name} sx={{ padding: 0 }} >
+                                <Checkbox checked={rakeType.indexOf(name) > -1} sx={{ paddingLeft: '8px', padding: '4px', '& .MuiSvgIcon-root': { fontSize: 15 } }} />
+                                <ListItemText primary={name} primaryTypographyProps={{ fontSize: '12px', fontFamily: 'Inter, sans-serif' }} />
+                            </MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
+            </div>
+            
+            <div>
+            <motion.div
+                className="box"
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                onClick={() => window.open('/shipment_map_view', '_blank')}
+            >
+                <Image src={MapViewIcon} alt="map view" width={16} height={16}/>
+                <span className="map-view-btn-header">Map View</span>
+            </motion.div>
+            </div>
 
 
                 {/* <div>
@@ -319,7 +393,8 @@ function Filters({ onToFromChange, onChangeStatus, reload, shipmentsPayloadSette
 
                 <div>
                     <div className="filter-container" onClick={() => setOpenFilterModal(true)}>
-                        <FilterAltIcon className="filter-icon" />
+                        {/* <FilterAltIcon className="filter-icon" /> */}
+                        <img src={filter_icon.src} alt=''/>
                     </div>
                 </div>
 

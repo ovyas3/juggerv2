@@ -46,14 +46,14 @@
     font-size: 12px;
     font-weight: 600;
     padding: 12px;
-    line-height: 16px;
+    line-height: 14px;
   }
 
   .MuiTableHead-root .table-columns:first-child{
     width: 25px;
   }
 
-  .MuiTableHead-root .table-columns:nth-child(2){
+  .MuiTableHead-root .table-columns:nth-child(3){
     padding-right: 0px;
     padding-left: 0px;
   }
@@ -73,6 +73,10 @@
   }
 
   .MuiTableBody-root .table-rows:nth-child(2){
+    width: 100px;
+  }
+
+  .MuiTableBody-root .table-rows:nth-child(3){
     padding-left: 0px;
     .rake-id{
       text-decoration: underline;
@@ -169,9 +173,8 @@
 
 .child-dialog-styles .child-upper-containers {
   padding: 24px 32px 24px 24px;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
 
   .title {
     font-size: 16px;
@@ -207,7 +210,7 @@
 
   .table-child-container{
     min-width: 500px !important;
-    max-height: 450px;
+    max-height: 350px;
   }
 
   .MuiTable-root .MuiTableBody-root .MuiTableRow-root:hover{
@@ -485,10 +488,6 @@
   }
 
   .child-dialog-styles .child-upper-containers {
-    flex-direction: column;
-  }
-
-  .child-dialog-styles .child-upper-containers {
     padding: 18px 24px 18px 18px;
 
     .title {
@@ -550,6 +549,11 @@
     .table-child-container{
       min-width: 280px !important;
     }
+  }
+
+
+  .child-dialog-styles .child-upper-containers {
+    grid-template-columns: 1fr;
   }
 }
 
