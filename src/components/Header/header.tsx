@@ -20,7 +20,7 @@ import BackIcon from "@/assets/back.svg";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
-const Header = ({title, setReloadOnHeaderChange, isMapHelper, getAllShipment}:any) => {
+const Header = ({title, setReloadOnHeaderChange, isMapHelper, getAllShipment, isShipmentMapView}:any) => {
   const isCorporateUser = getCookie("is_corporate_user") === "true";
   const router = useRouter();
   const [parent_name, setParentName] = useState<string>("");
@@ -41,6 +41,7 @@ const Header = ({title, setReloadOnHeaderChange, isMapHelper, getAllShipment}:an
       <Box className="container">
         <div className="shipment_title">
           {isMapHelper ? <Image src={BackIcon} alt="back" width={25} height={30} style={{cursor: 'pointer'}} onClick={() => router.push('/dashboard')}/> : <></>}
+          {isShipmentMapView ? <Image src={BackIcon} alt="back" width={25} height={30} style={{cursor: 'pointer'}} onClick={() => router.push('/orders')}/> : <></>}
            <p className="shipment_text">{title}</p>
         </div>
         <div

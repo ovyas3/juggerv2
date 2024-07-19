@@ -128,7 +128,7 @@ const convertArrayToFilteredArray = (inputArray: any) => {
             },
             status: {
                 name: statusBuilder(status),
-                code: (status === "Delivered" || status === "OB") ? null : ((trip_tracker && trip_tracker.fois_last_location) || '')
+                code: (status === "Delivered" || status === "OB") ? null : status || '',
             },
             currentEta: {
                 date: service.utcToist(eta) || 'NA',
