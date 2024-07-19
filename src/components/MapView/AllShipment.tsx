@@ -167,7 +167,7 @@ const ShipmentCard: React.FC<ShipmentCardProps> = ({
       </Typography>
       <Typography variant="h6" component="div" id="shipment-list-fnr" sx={{fontFamily: '"Inter", sans-serif !important'}}>
       # {shipment.all_FNRs ?
-          <a onClick={handleLinkClick} style={{ cursor: 'pointer' }}>
+          <a  onClick={handleLinkClick}  style={{ cursor: 'pointer', textDecoration: 'underline', color: 'blue' }}>
             {shipment.all_FNRs[0]}
           </a> : 'N/A'}
       </Typography>
