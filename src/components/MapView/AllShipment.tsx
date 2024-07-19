@@ -25,6 +25,9 @@ import dayjs from 'dayjs';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 
+import IdleIcon from "@/assets/idle_icon.svg";
+import InactiveIcon from "@/assets/inactive_icon.svg";
+import {countTracking} from '@/utils/hooks'
 
 import { Icon, divIcon, point } from "leaflet";
 import L from 'leaflet';
@@ -166,18 +169,25 @@ const ShipmentCard: React.FC<ShipmentCardProps> = ({
         </Grid>
       </Typography>
       <Typography variant="h6" component="div" id="shipment-list-fnr" sx={{fontFamily: '"Inter", sans-serif !important'}}>
-      # {shipment.all_FNRs ?
-          <a  onClick={handleLinkClick}  style={{ cursor: 'pointer', textDecoration: 'underline', color: 'blue' }}>
+        # {shipment.all_FNRs ? <a  onClick={handleLinkClick}  style={{ cursor: 'pointer', textDecoration: 'underline', color: 'blue' }}>
             {shipment.all_FNRs[0]}
-          </a> : 'N/A'}
+          </a>: 'N/A'}
+        <span className="extraFnr-indicator">
+          <span className="fnr-count">{shipment.all_FNRs && shipment.all_FNRs.length > 1 ? `+${shipment.all_FNRs.length - 1} more` : ''}</span>
+          <span className="more-fnr-indicator">
+              {shipment.all_FNRs && shipment.all_FNRs.length > 1 ? shipment.all_FNRs.slice(1).map((item:any, index:number)=>{
+                return <div key={index} className="each-fnr">{item}</div>
+              }) : '' }
+          </span>
+        </span>
       </Typography>
       <Typography variant="body2" component="div">
         <Grid container >
-          <Grid item xs={12}>
+          {/* <Grid item xs={12}>
             <Typography variant="body2" component="div" id="shipment-list-bottom">
               <Image height={10} alt="pickup" src={pickupIcon} /> - {shipment.pickup_location?.name} ({shipment.pickup_location?.code})
             </Typography>
-          </Grid>
+          </Grid> */}
           <Grid item xs={12}>
             <Typography variant="body2" component="div" id="shipment-list-bottom">
             <Image height={10} alt="drop" src={dropIcon} /> - {shipment.delivery_location?.name} ({shipment.delivery_location?.code})
@@ -189,13 +199,19 @@ const ShipmentCard: React.FC<ShipmentCardProps> = ({
   </Card>
 }
 
-type StatusKey = 'OB' | 'ITNS' | 'Delivered';
+type StatusKey = 'OB' | 'ITNS' | 'Delivered'|'none';
 
 const statusMapping: Record<StatusKey, string[]> = {
   OB: ['', 'OB'],
   ITNS: ['Delivered', '', 'OB'],
-  Delivered: ['Delivered']
+  Delivered: ['Delivered'],
+  none: [''],
 };
+
+interface TrackingStatus {
+  tracking: number;
+  notTracking: number;
+}
 
 // Main Component for Map Layers
 const MapLayers = () => {
@@ -223,6 +239,8 @@ const MapLayers = () => {
     const [selectedToDate, setSelectedToDate] = React.useState<dayjs.Dayjs | null>(dayjs());
     const [openFromDatePicker,setOpenFromDatePicker] = useState(false);
     const [openToDatePicker,setOpenToDatePicker] = useState(false);
+    const [trackingNonTracking, setTrackingNonTracking] = useState<TrackingStatus>({ tracking: 0, notTracking: 0 });
+  
     const router = useRouter();
 
     const handleNavigation = (unique_code: string) => {
@@ -280,18 +298,21 @@ const MapLayers = () => {
       return shipmentData;
     }
 
-    const filterShipments = (status: StatusKey) => {
+    const filterShipments = (status: StatusKey, event:any) => {
       let filteredShipments: any[] = [];
       if (status === 'OB') {
         filteredShipments = allShipments.filter((shipment: any) => shipment.status === '');
+        setTrackingNonTracking(countTracking(filteredShipments))
         const idle = getTrackingShipment(filteredShipments);
         setIdleShipments(idle);
       } else if (status === 'ITNS') {
         filteredShipments = allShipments.filter((shipment: any) => shipment.status !== 'Delivered' && shipment.status !== '');
+        setTrackingNonTracking(countTracking(filteredShipments))
         const inTransit = getTrackingShipment(filteredShipments);
         setInTransitShipments(inTransit);
       } else if (status === 'Delivered') {
         filteredShipments = allShipments.filter((shipment: any) => shipment.status === 'Delivered');
+        setTrackingNonTracking(countTracking(filteredShipments))
         const delivered = getTrackingShipment(filteredShipments);
         setDeliveredShipments(delivered);
       }
@@ -337,6 +358,7 @@ const MapLayers = () => {
       setShowIdle(true);
       setShowInTransit(true);
       setShowDelivered(true);
+      setTrackingNonTracking(countTracking(shipments))
 
       setAllShipments([...inTransit, ...idle, ...delivered]);
     }
@@ -417,7 +439,7 @@ const MapLayers = () => {
         <div className="shipment-map-container">
           {isMobile ? <SideDrawer /> : null}
           <div style={{ width: '100%', overflow: 'hidden' }}>
-            {isMobile ? <Header title="Shipments Map View" isMapHelper={false}></Header> : <MobileHeader />}
+            {isMobile ? <Header title="Shipments Map View" isMapHelper={false} isShipmentMapView={true}></Header> : <MobileHeader />}
             <div style={{ paddingInline: 24, paddingTop: 24, paddingBottom: 65,  position:'relative' }}>
               <MapContainer className="map" id="shipment-map" center={center} zoom={5.4} style={{ minHeight: '105%',width: '101%', padding: '0px', zIndex: '0', position: 'fixed' }} attributionControl={false} ref={setMap} >
                 <div className={"layersControl"} style={{marginTop:'10px'}} >
@@ -448,11 +470,11 @@ const MapLayers = () => {
                           </Typography>
                           <Typography variant="body2" component="div">
                             <Grid container>
-                              <Grid item xs={12}>
+                              {/* <Grid item xs={12}>
                                 <Typography variant="body2" component="div">
                                   <Image height={10} alt="pickup" src={pickupIcon} /> - {shipment.pickup}
                                 </Typography>
-                              </Grid>
+                              </Grid> */}
                               <Grid item xs={12}>
                                 <Typography variant="body2" component="div">
                                 <Image height={10} alt="drop" src={dropIcon} /> - {shipment.delivery}
@@ -478,11 +500,11 @@ const MapLayers = () => {
                           </Typography>
                           <Typography variant="body2" component="div">
                             <Grid container>
-                              <Grid item xs={12}>
+                              {/* <Grid item xs={12}>
                                 <Typography variant="body2" component="div">
                                   <Image height={10} alt="pickup" src={pickupIcon} /> - {shipment.pickup}
                                 </Typography>
-                              </Grid>
+                              </Grid> */}
                               <Grid item xs={12}>
                                 <Typography variant="body2" component="div">
                                 <Image height={10} alt="drop" src={dropIcon} /> - {shipment.delivery}
@@ -508,11 +530,11 @@ const MapLayers = () => {
                           </Typography>
                           <Typography variant="body2" component="div">
                             <Grid container>
-                              <Grid item xs={12}>
+                              {/* <Grid item xs={12}>
                                 <Typography variant="body2" component="div">
                                   <Image height={10} alt="pickup" src={pickupIcon} /> - {shipment.pickup}
                                 </Typography>
-                              </Grid>
+                              </Grid> */}
                               <Grid item xs={12}>
                                 <Typography variant="body2" component="div">
                                 <Image height={10} alt="drop" src={dropIcon} /> - {shipment.delivery}
@@ -632,7 +654,7 @@ const MapLayers = () => {
                   </LocalizationProvider>
                 </Box>
                 <Box className="shipment-heads">
-                <Paper className="shipment-head-lists"
+                  <Paper className="shipment-head-lists"
                       onClick={() => {
                         getShipments();
                         map?.flyTo(center, 5, { duration: 1 });
@@ -645,7 +667,7 @@ const MapLayers = () => {
                     </Typography>
                   </Paper>
                   <Paper className="shipment-head-lists"
-                      onClick={() => filterShipments('OB')}  elevation={3} color="info">
+                      onClick={(e) => filterShipments('OB',e)}  elevation={3} color="info">
                     <Typography variant="h6" color="info" component="div" className="shipment-head-list-texts">
                       In Plant
                     </Typography>
@@ -654,7 +676,7 @@ const MapLayers = () => {
                     </Typography>
                   </Paper>
                   <Paper className="shipment-head-lists" 
-                      onClick={() => filterShipments('ITNS')} elevation={3} color="info">
+                      onClick={(e) => filterShipments('ITNS',e)} elevation={3} color="info">
                     <Typography variant="h6" component="div" className="shipment-head-list-texts">
                       In Transit
                     </Typography>
@@ -663,7 +685,7 @@ const MapLayers = () => {
                     </Typography>
                   </Paper>
                   <Paper className="shipment-head-lists" 
-                      onClick={() => filterShipments('Delivered')}  elevation={3} color="info">
+                      onClick={(e) => filterShipments('Delivered',e)}  elevation={3} color="info">
                     <Typography variant="h6" component="div" className="shipment-head-list-texts">
                       Delivered
                     </Typography>
@@ -671,6 +693,22 @@ const MapLayers = () => {
                       {deliveryCount}
                     </Typography>
                   </Paper>
+                </Box>
+                <Box className="tracking-nonTracking-status">
+                  <div className="tracking_firstSection" id="tracking">
+                    <Image src={IdleIcon} alt="" className="Image_idleIcon" width={32} height={32} />
+                    <div className="">
+                      <div style={{fontWeight:600, fontSize:16}}>{trackingNonTracking.tracking}</div>
+                      <div style={{fontSize:12}}>Tracking</div>
+                    </div>
+                  </div>
+                  <div className="tracking_secondSection" id="nonTracking" >
+                    <Image src={InactiveIcon} alt="" className="Image_idleIcon" width={32} height={32} />
+                    <div className="">
+                      <div style={{fontWeight:600, fontSize:16}}>{trackingNonTracking.notTracking}</div>
+                      <div style={{fontSize:12}}>Non Tracking</div>
+                    </div>
+                  </div>
                 </Box>
                 <Box sx={{
                   maxHeight: 'calc(75vh - 60px)',
