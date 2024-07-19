@@ -27,6 +27,7 @@
     "@nextui-org/date-picker": "^2.1.1",
     "@nextui-org/react": "^2.4.1",
     "@svgr/webpack": "^8.1.0",
+    "@types/uuid": "^10.0.0",
     "axios": "^1.7.2",
     "cookies-next": "^4.2.1",
     "dayjs": "^1.11.11",
