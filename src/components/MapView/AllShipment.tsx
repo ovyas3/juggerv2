@@ -1,4 +1,5 @@
 'use client'
+import { useRouter } from 'next/navigation';
 import React, { useState, useEffect, useRef } from "react";
 import { MapContainer, TileLayer, Marker, LayersControl, Popup, GeoJSON, Polyline } from 'react-leaflet';
 import MarkerClusterGroup from "react-leaflet-cluster";
@@ -115,9 +116,27 @@ const colorOfStatus = (status: string) => {
   }
 }
 
-const ShipmentCard = ({ index, shipment, handleShipmentSelection }: {index: number, shipment: any, handleShipmentSelection:any}) => {
+interface ShipmentCardProps {
+  index: number;
+  shipment: any;
+  handleShipmentSelection: (shipment: any) => void;
+  handleNavigation: (unique_code: string) => void;
+}
+
+const ShipmentCard: React.FC<ShipmentCardProps> = ({ 
+  index, 
+  shipment, 
+  handleShipmentSelection, 
+  handleNavigation 
+}) => {
   const gps = shipment.trip_tracker?.last_location?.fois || shipment.pickup_location?.geo_point;
   const isTracking = gps && gps.coordinates.length > 0 ? true : false;
+
+  const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+    e.stopPropagation();
+    handleNavigation(shipment.unique_code);
+  };
+
   return <Card style={{
     borderRadius: '10px',
     marginTop: index == 0 ? '24px' :'15px',
@@ -150,7 +169,9 @@ const ShipmentCard = ({ index, shipment, handleShipmentSelection }: {index: numb
         </Grid>
       </Typography>
       <Typography variant="h6" component="div" id="shipment-list-fnr" sx={{fontFamily: '"Inter", sans-serif !important'}}>
-        # {shipment.all_FNRs ? shipment.all_FNRs[0]: 'N/A'}
+        # {shipment.all_FNRs ? <a  onClick={handleLinkClick}  style={{ cursor: 'pointer', textDecoration: 'underline', color: 'blue' }}>
+            {shipment.all_FNRs[0]}
+          </a>: 'N/A'}
         <span className="extraFnr-indicator">
           <span className="fnr-count">{shipment.all_FNRs && shipment.all_FNRs.length > 1 ? `+${shipment.all_FNRs.length - 1} more` : ''}</span>
           <span className="more-fnr-indicator">
@@ -220,6 +241,14 @@ const MapLayers = () => {
     const [openToDatePicker,setOpenToDatePicker] = useState(false);
     const [trackingNonTracking, setTrackingNonTracking] = useState<TrackingStatus>({ tracking: 0, notTracking: 0 });
   
+    const router = useRouter();
+
+    const handleNavigation = (unique_code: string) => {
+      setTimeout(() => {
+        router.push(`/tracker?unique_code=${unique_code}`);
+      }, 0);
+    };
+
     const geoJSONStyle: L.PathOptions = {
       color: 'black', // Set the color of train tracks
       weight: 3, // Set the thickness of the tracks
@@ -686,10 +715,10 @@ const MapLayers = () => {
                   overflowY: 'scroll',
                 }} className="shipment-details-container">
                   {showFiltered && filteredShipments.map((shipment, index) => {
-                    return <ShipmentCard key={index} index={index} shipment={shipment} handleShipmentSelection={handleShipmentSelection} />
+                    return <ShipmentCard key={index} index={index} shipment={shipment} handleShipmentSelection={handleShipmentSelection}  handleNavigation={handleNavigation} />
                   })}
                   {showAll && allShipments.map((shipment, index) => {
-                    return <ShipmentCard key={index} index={index} shipment={shipment} handleShipmentSelection={handleShipmentSelection} />
+                    return <ShipmentCard key={index} index={index} shipment={shipment} handleShipmentSelection={handleShipmentSelection} handleNavigation={handleNavigation} />
                   })}
                 </Box>
               </Box>
