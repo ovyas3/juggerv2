@@ -94,3 +94,27 @@ export function calculateDaysDifference(demandDate: string | null): number | "NA
       return "NA";
   }
 }
+
+export function countTracking(arr: any[]) {
+  // Initialize counts
+  let trackingCount = 0;
+  let nonTrackingCount = 0;
+
+  // Iterate over each item in the array
+  arr.forEach((shipment: any) => {
+    const gps = shipment.trip_tracker?.last_location?.fois || shipment.pickup_location?.geo_point;
+    const isTracking = gps && gps.coordinates && gps.coordinates.length > 0;
+
+    if (isTracking) {
+      trackingCount++;
+    } else {
+      nonTrackingCount++;
+    }
+  });
+
+  // Return an object with counts
+  return {
+    tracking: trackingCount,
+    notTracking: nonTrackingCount
+  };
+}
