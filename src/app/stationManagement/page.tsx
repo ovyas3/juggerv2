@@ -9,7 +9,7 @@ import MobileHeader from "@/components/Header/mobileHeader";
 import { useState } from "react";
 import './page.css'
 
-const page = () => {
+const Page = () => {
   const mobile = useWindowSize(600);
   const [count,setCount] = useState(0)
 
@@ -32,4 +32,4 @@ const page = () => {
   )
 }
 
-export default page
+export default Page
