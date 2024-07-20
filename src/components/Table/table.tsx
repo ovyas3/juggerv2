@@ -927,7 +927,7 @@ function Remarks({ shipmentId, setOpen, remarksList, getAllShipment }: RemarksPr
                     />
                 )}
                 
-                <div style={{marginTop:64}}>
+                <div style={{marginTop:64, display: 'flex', justifyContent: 'end'}}>
                     <Button
                         variant="contained"
                         size='small'
