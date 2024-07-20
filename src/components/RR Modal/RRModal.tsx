@@ -63,6 +63,7 @@ const RRModal: React.FC<PopupProps> = ({ isOpen, isClose, rrNumbers, isRRDoc }) 
         senderWeight: data && data.sender_weight ? data.sender_weight : 'N/A',
         consigneeName: data && data.consignee && data.consignee.name ? data.consignee.name : 'N/A',
         consigneeAddress: data && data.consignee && data.consignee.address ? data.consignee.address : 'N/A',
+        GST: data && data.other_charges && data.other_charges.GST ? data.other_charges.GST.toLocaleString('en-IN') : 'N/A',
       };
   
       const tableData = data && data.wagon_details ? 
@@ -192,6 +193,10 @@ const RRModal: React.FC<PopupProps> = ({ isOpen, isClose, rrNumbers, isRRDoc }) 
                   <div className="rrmodal-content-upper-item">
                     <h4 className="rrmodal-content-upper-item-heading">Total Freight (₹)</h4>
                     <p className="rrmodal-content-upper-item-value">{ rrDetails.totalFreight }</p>
+                  </div>
+                  <div className="rrmodal-content-upper-item">
+                    <h4 className="rrmodal-content-upper-item-heading">GST (₹)</h4>
+                    <p className="rrmodal-content-upper-item-value">{ rrDetails.GST }</p>
                   </div>
                 </div>
               </>}
