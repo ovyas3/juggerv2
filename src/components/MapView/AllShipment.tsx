@@ -42,6 +42,10 @@ import {
     CardContent,
     Chip,
     Grid,
+    ListItemText,
+    MenuItem,
+    OutlinedInput,
+    Select,
     Typography,
     useMediaQuery,
   } from "@mui/material";
@@ -115,6 +119,18 @@ const colorOfStatus = (status: string) => {
       return 'info';
   }
 }
+
+
+const MenuProps = {
+  PaperProps: {
+      style: {
+          minWidth:'7%',
+          width: '7%',
+          marginTop: '4px',
+          border: '1px solid grey'
+      },
+  },
+};
 
 interface ShipmentCardProps {
   index: number;
@@ -230,6 +246,8 @@ const MapLayers = () => {
     const [inTransitShipments, setInTransitShipments] = useState<any[]>([]);
     const [deliveredShipments, setDeliveredShipments] = useState<any[]>([]);
     const [filteredShipments, setFilteredShipments] = useState<any[]>([]);
+    const [searcedShipments, setSearchedShipments] = useState<any[]>([]);
+    const [showSearched, setShowSearched] = useState<boolean>(false);
     const [showFiltered, setShowFiltered] = useState<boolean>(false);
     const [showAll, setShowAll] = useState<boolean>(true);
     const [showIdle, setShowIdle] = useState<boolean>(true);
@@ -241,6 +259,8 @@ const MapLayers = () => {
     const [openToDatePicker,setOpenToDatePicker] = useState(false);
     const [trackingNonTracking, setTrackingNonTracking] = useState<TrackingStatus>({ tracking: 0, notTracking: 0 });
   
+    const [selectedType,setSelectedType] = useState('FNR No.')
+    const [searchInput,setSearchInput] = useState('')
     const router = useRouter();
 
     const handleNavigation = (unique_code: string) => {
@@ -248,6 +268,72 @@ const MapLayers = () => {
         router.push(`/tracker?unique_code=${unique_code}`);
       }, 0);
     };
+
+
+    const filterTypes = ["FNR No.","Dest. Code"]
+
+    function handleChange(event: any) {
+      const type = event.target.value
+      if(type!== selectedType) {
+       setSelectedType(event.target.value)
+       setSearchInput('')
+      }
+    }
+
+
+    useEffect(() => {
+       setShowSearched(false )
+    }, [allShipments,filteredShipments]);
+   
+    function handleSearchInput(event: any) {
+      const searchQuery = event.target.value;
+      setSearchInput(searchQuery);
+      setShowSearched(true);
+      if (selectedType === "FNR No.") {
+        if (showFiltered) {
+          const filteredData = filteredShipments.filter((shipment) =>
+          { 
+              const data = shipment.all_FNRs.filter((fnr: String) =>
+              fnr.toLowerCase().includes(searchQuery.toLowerCase())
+            )
+            return Boolean(data.length)
+          }
+          );
+          setSearchedShipments(filteredData);
+          setShowSearched(true);
+        } else {
+          const filteredData = allShipments.filter((shipment) =>
+          {
+            const data = shipment?.all_FNRs?.filter((fnr: String) =>
+              fnr.toLowerCase().includes(searchQuery.toLowerCase())
+            )
+            return Boolean(data.length)
+          }
+          );
+          setSearchedShipments(filteredData);
+          setShowSearched(true);
+        }
+      } else if (selectedType === "Dest. Code") {
+        setShowSearched(true);
+        if (showFiltered) {
+          const filteredData = filteredShipments.filter((shipment) =>
+            shipment?.delivery_location?.code
+              ?.toLowerCase()
+              .includes(searchQuery.toLowerCase())
+          );
+          setSearchedShipments(filteredData);
+          setShowSearched(true);
+        } else {
+          const filteredData = allShipments.filter((shipment) =>
+            shipment?.delivery_location?.code
+              ?.toLowerCase()
+              .includes(searchQuery.toLowerCase())
+          );
+          setSearchedShipments(filteredData);
+          setShowSearched(true);
+        }
+      }
+    }
 
     const geoJSONStyle: L.PathOptions = {
       color: 'black', // Set the color of train tracks
@@ -371,7 +457,7 @@ const MapLayers = () => {
 
     useEffect(() => {
       const toTime = dayjs();
-      const fromTime = toTime.subtract(30, 'day');
+      const fromTime = toTime.subtract(7, 'day');
       setSelectedFromDate(fromTime);
       setSelectedToDate(toTime);
     }, []);
@@ -695,6 +781,7 @@ const MapLayers = () => {
                   </Paper>
                 </Box>
                 <Box className="tracking-nonTracking-status">
+                  <div style={{display:'flex'}}>
                   <div className="tracking_firstSection" id="tracking">
                     <Image src={IdleIcon} alt="" className="Image_idleIcon" width={32} height={32} />
                     <div className="">
@@ -709,15 +796,55 @@ const MapLayers = () => {
                       <div style={{fontSize:12}}>Non Tracking</div>
                     </div>
                   </div>
+                  </div>
+                  <div className='search-wrapper'>
+                    <Select
+                        labelId="demo-multiple-checkbox-label"
+                        id="demo-multiple-checkbox"
+                        value={selectedType}
+                        className='status_select'
+                        onChange={handleChange}
+                        style={{height:'28px',background:'lightgray',width:"105px"}}
+                        sx={{
+                          '&.MuiPaper-root': {
+                            border:'1px solid black'
+                          }
+                        }}
+                        input={<OutlinedInput
+                            sx={{
+                                width: '120px',
+                                '& .MuiOutlinedInput-notchedOutline': {
+                                    border: '1px solid #E9E9EB'
+                                },
+                                '&:hover .MuiOutlinedInput-notchedOutline': {
+                                    border: '1px solid #E9E9EB'
+                                },
+                                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                    border: '1px solid #E9E9EB'
+                                }
+                            }}
+                        />}
+                        MenuProps={MenuProps}
+                    >
+                        {filterTypes.map((name) => (
+                            <MenuItem key={name} value={name} sx={{ padding: 0,paddingLeft:'8px' }} >
+                                <ListItemText primary={name} primaryTypographyProps={{ fontSize: '12px', fontFamily: 'Inter, sans-serif' }} />
+                            </MenuItem>
+                        ))}
+                    </Select><input placeholder="search" value={searchInput} onInput={handleSearchInput}/>
+                    </div>
                 </Box>
                 <Box sx={{
                   maxHeight: 'calc(75vh - 60px)',
                   overflowY: 'scroll',
                 }} className="shipment-details-container">
-                  {showFiltered && filteredShipments.map((shipment, index) => {
+                  {showFiltered && !showSearched  && filteredShipments.map((shipment, index) => {
                     return <ShipmentCard key={index} index={index} shipment={shipment} handleShipmentSelection={handleShipmentSelection}  handleNavigation={handleNavigation} />
                   })}
-                  {showAll && allShipments.map((shipment, index) => {
+                  {showAll && !showSearched && allShipments.map((shipment, index) => {
+                    return <ShipmentCard key={index} index={index} shipment={shipment} handleShipmentSelection={handleShipmentSelection} handleNavigation={handleNavigation} />
+                  })}
+                    {showSearched && searcedShipments.map((shipment, index) => {
                     return <ShipmentCard key={index} index={index} shipment={shipment} handleShipmentSelection={handleShipmentSelection} handleNavigation={handleNavigation} />
                   })}
                 </Box>
