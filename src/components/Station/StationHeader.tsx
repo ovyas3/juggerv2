@@ -35,10 +35,12 @@ type Station1 = {
     lat: string;
     long: string;
 }
-async function getStations(searchValue = '', searchType = 'Station Code', page = 0, limit = 3339) {
-    let url = `${STATIONS}?page=${page}&limit=${limit}`;
+async function getStations(searchValue = '', searchType = 'Station Code', page = 0, rowsPerPage = 10) {
+    const skip = page * rowsPerPage;
+    let url = `${STATIONS}?skip=${skip}&limit=${rowsPerPage}`;
     if (searchValue) {
-        url += searchType === 'Station Code' ? `&code=${searchValue}` : `&state=${searchValue}`;
+        const searchField = searchType === 'Station Code' ? 'code' : 'state';
+        url += `&${searchField}=${encodeURIComponent(searchValue)}&partialMatch=true`;
     }
     const result = await httpsGet(url);
     return result;
@@ -144,7 +146,6 @@ const StationHeader = ({ count } : any) => {
         const getStates = async () => {
             try {
                 const result = await httpsGet(STATES);
-                console.log("result",result)
                 setStates( result && result.data)
             } catch (error) {
                 console.error('Error fetching states:', error);
@@ -202,32 +203,54 @@ const StationHeader = ({ count } : any) => {
 
     const handleChangePage = (event: unknown, newPage: number) => {
         setPage(newPage);
+        getStations(searchValue, searchType, newPage, rowsPerPage)
+        .then((data: any) => {
+            if (data.data.stations) {
+                setResponse(data.data.stations);
+                setTotalCount(data.data.count);
+            } else {
+                console.error('Data fetched is not an array:', data);
+            }
+        })
+        .catch((error: any) => {
+            console.error('Error fetching stations:', error);
+        });
     };
 
     const handleChangeRowsPerPage = (event: any) => {
-        setRowsPerPage(parseInt(event.target.value, 10));
+        const newRowsPerPage = parseInt(event.target.value, 10);
+        setRowsPerPage(newRowsPerPage);
         setPage(0);
+        getStations(searchValue, searchType, 0, newRowsPerPage)
+            .then((data: any) => {
+                if (data.data.stations) {
+                    setResponse(data.data.stations);
+                    setTotalCount(data.data.count);
+                } else {
+                    console.error('Data fetched is not an array:', data);
+                }
+            })
+            .catch((error: any) => {
+                console.error('Error fetching stations:', error);
+            });
       }; 
 
       const handleSearch = (searchText: any) => {
-        let filteredResponse1 = response;
-    
-        if (searchText.trim() !== "") {
-            const searchValueLower = searchText.toLowerCase().trim();
-            console.log("searchValueLower", searchValueLower)
-    
-            if (searchType === 'Station Code') {
-                filteredResponse1 = response.filter((row) =>
-                    row.code && row.code.toLowerCase().trim().startsWith(searchValueLower)
-                );
-            } else if (searchType === 'State') {
-                filteredResponse1 = response.filter((row) =>
-                    row.state && row.state.toLowerCase().trim().startsWith(searchValueLower)
-                );
-            }
-        }
-    
-        setResponse(filteredResponse1);
+        setSearchValue(searchText);
+        setPage(0); 
+      
+        getStations(searchText, searchType, 0, rowsPerPage)
+            .then((data: any) => {
+                if (data.data.stations) {
+                    setResponse(data.data.stations);
+                    setTotalCount(data.data.count);
+                } else {
+                    console.error('Data fetched is not an array:', data);
+                }
+            })
+            .catch((error: any) => {
+                console.error('Error fetching stations:', error);
+            });
     };
       
 
@@ -695,7 +718,7 @@ const StationHeader = ({ count } : any) => {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {paginatedData
+                            {response
                             .map((row: any, rowIndex: any) => {
                                 return(
                                     <TableRow  key={row._id} sx={{ cursor: 'pointer' }}>
