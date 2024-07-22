@@ -15,6 +15,7 @@ import { httpsGet, httpsPost } from "@/utils/Communication";
 import { GET_SHIPMENTS, CAPTIVE_RAKE, REMARKS_LIST } from "@/utils/helper";
 import { useSnackbar } from '@/hooks/snackBar';
 import service from '@/utils/timeService';
+import { color } from 'framer-motion';
 
 
 const getStatusCode = (status: string): string => {
@@ -30,6 +31,12 @@ const getStatusCode = (status: string): string => {
   }
 }
 
+const ageingCode = [
+  { color: 'green', code: '#18BE8A', text: '1-2 days' },
+  { color: 'yellow', code: '#FFD60A', text: '3-6 days' },
+  { color: 'orange', code: '#FF9800', text: '6-9 days' },
+  { color: 'red', code: '#E6667B', text: '≥10 days' },
+]
 
 const getRakeTypeCode = (rakeTypes: string): string => {
   switch (rakeTypes) {
@@ -55,9 +62,9 @@ const OrdersPage = () => {
   const { showMessage } = useSnackbar();
   const [selected_bound, setSelected_bound] = useState('outbound')
   const [remarksList, setRemarksList] = useState({})
-  const [triggerShipments,setTriggerShipments] = useState(false)
+  const [triggerShipments, setTriggerShipments] = useState(false)
 
-  const[showRefreash, setShowRefreash] = useState(false)
+  const [showRefreash, setShowRefreash] = useState(false)
 
 
   //shipment payload
@@ -66,7 +73,7 @@ const OrdersPage = () => {
     to: '',
     from: '',
     status: ['ITNS', 'Delivered'],
-    rake_types: ['CR','IR']
+    rake_types: ['CR', 'IR']
   })
 
   //adding to and from to shipmentpayload
@@ -109,7 +116,7 @@ const OrdersPage = () => {
   const handleChangeRakeType = (rakeTypes: string[]) => {
     setShipmentsPayload((prevState: any) => {
       if (rakeTypes.length === 0) {
-        const { rakeTypes, ...newState } = prevState;
+        const { rake_types, ...newState } = prevState;
         return newState;
       } else {
         const modifiedStatus = rakeTypes.map(getRakeTypeCode);
@@ -120,9 +127,9 @@ const OrdersPage = () => {
 
   // function which bring allshipment 
   async function getAllShipment() {
-    console.log(ShipmentsPayload)
+    // console.log(ShipmentsPayload)
     const response = await httpsPost(GET_SHIPMENTS, ShipmentsPayload);
-    if(response.data && response.data.data) {
+    if (response.data && response.data.data) {
       setAllShipment(response.data.data)
       setCount(response.data.total)
     } else {
@@ -133,7 +140,7 @@ const OrdersPage = () => {
 
   async function getCaptiveRake() {
     const list_captive_rake = await httpsGet(CAPTIVE_RAKE);
-    console.log(list_captive_rake)
+    // console.log(list_captive_rake)
     setRakeCaptiveList(list_captive_rake.data)
   }
   async function getRemarksList() {
@@ -158,43 +165,29 @@ const OrdersPage = () => {
 
   useEffect(() => {
     if (ShipmentsPayload.from && ShipmentsPayload.to) getAllShipment();
-  }, [ShipmentsPayload,triggerShipments])
+  }, [ShipmentsPayload, triggerShipments])
 
   return (
     <div>
       <div className='orderContainer'>
         <div style={{ width: '100%', overflowX: 'auto' }}>
-          {
-            mobile ? <Header title={'Shipments'} setReloadOnHeaderChange={setReloadOnHeaderChange} isMapHelper={false}/> : <MobileHeader />
-          }
-
-          <div className='tableContainer' style={{ paddingInline: 24, paddingTop: 10, paddingBottom: mobile ? 24 : 65, position: 'relative', marginTop: mobile ? '56px' : '24px', marginLeft: mobile ? '70px' : '0px', height: 'calc(100vh - 56px)'}}>
-
-            <div>
-
-              {/* ---- reloader---- */}
-              <div className='input_fnr_reload'>
-                <div className={`reload ${reload ? 'loading' : ''}`} onClick={() => {
-                  showMessage('Refresh Successfully', 'success')
-                  const { fnrNumber, ...updatedShipmentsPayload } = ShipmentsPayload;
-                  updatedShipmentsPayload.status = ['ITNS', 'Delivered'];
-                  setShipmentsPayload(updatedShipmentsPayload);
-                  console.log(updatedShipmentsPayload)
-                  clearFilter()
-                  setReload(true)
-                  setTimeout(() => { setReload(false) }, 3000)
-                }}
-                  onMouseEnter={()=>{setShowRefreash(true)}}
-                  onMouseLeave={()=>{setShowRefreash(false)}}
-                >
-                  <ReplayIcon style={{ color: '#707070' }} />
-                </div>
-                <div className='refreash_reload' style={{opacity:showRefreash?1:0}}>refresh filters</div>
-              </div>
-
-              {/* ----otbound ---- */}
+          {mobile ? <Header title={'Shipments'} setReloadOnHeaderChange={setReloadOnHeaderChange} isMapHelper={false} /> : <MobileHeader />}
+          <div
+            className='tableContainer'
+            style={{
+              paddingInline: 24,
+              paddingTop: 10,
+              paddingBottom: mobile ? 24 : 65,
+              position: 'relative',
+              marginTop: mobile ? '56px' : '24px',
+              marginLeft: mobile ? '70px' : '0px',
+              height: 'calc(100vh - 56px)'
+            }}
+          >
+            
+            <div className='outbound_inbound_ageing'>
               {mobile ?
-                <div className='outbound_inbound' style={{ marginBottom: "4px"}}>
+                <div className='outbound_inbound'>
                   {['outbound', 'inbound'].map(bound => (
                     <div
                       key={bound}
@@ -210,37 +203,69 @@ const OrdersPage = () => {
                   <div className='mobile_outbound'>{t('outbound')}</div>
                 </div>
               }
+              <div className='ageing_reload'>
+
+                {selected_bound === 'outbound' ?
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                    <div style={{ fontSize: '12px', color: '#484A57', fontWeight: '500' }}>{t('ageing')}</div>
+                    <div className='ageing_group'>
+                      {ageingCode.map((item, index) => {
+                        return (
+                          <div key={index} className='Ageing'>
+                            <div className='Ageing_dot' style={{ backgroundColor: item.color }}></div>
+                            <div style={{ fontSize: '10px', color: '#484A57' }}>{item.text}</div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                  : <></>
+                }
+                <div className='input_fnr_reload'>
+                  <div className={`reload ${reload ? 'loading' : ''}`} onClick={() => {
+                    showMessage('Refresh Successfully', 'success')
+                    const { fnrNumber, ...updatedShipmentsPayload } = ShipmentsPayload;
+                    updatedShipmentsPayload.status = ['ITNS', 'Delivered'];
+                    setShipmentsPayload(updatedShipmentsPayload);
+                    // console.log(updatedShipmentsPayload)
+                    clearFilter()
+                    setReload(true)
+                    setTimeout(() => { setReload(false) }, 3000)
+                  }}
+                    onMouseEnter={() => { setShowRefreash(true) }}
+                    onMouseLeave={() => { setShowRefreash(false) }}
+                  >
+                    <ReplayIcon style={{ color: '#707070' }} />
+                  </div>
+                  <div className='refreash_reload' style={{ opacity: showRefreash ? 1 : 0 }}>refresh filters</div>
+                </div>
+              </div>
             </div>
 
+            {selected_bound === 'outbound' ?
+              <div className='tableData' style={{ height: '90%' }}>
+                {
+                  selected_bound === 'outbound' ?
+                    <div className='filters' style={{
+                      position: 'absolute', overflowX: 'auto',
+                      maxWidth: '87%', zIndex: 100,
+                      whiteSpace: 'nowrap'
+                    }} >
+                      <Filters onToFromChange={handleToFromChange} onChangeStatus={handleChangeStatus} onChangeRakeTypes={handleChangeRakeType} reload={reload} getShipments={getAllShipment} shipmentsPayloadSetter={setShipmentsPayload} setTriggerShipments={setTriggerShipments} triggerShipments={triggerShipments} />
+                    </div>
+                    : <></>
+                }
 
-            {/* ----table and filters---- */}
-            {
-              selected_bound === 'outbound' ?
-                <div className='tableData' style={{ height: '90%'}}>
-                  {
-                    selected_bound === 'outbound' ?
-                      <div className='filters' style={{
-                        position: 'absolute', overflowX: 'auto',
-                        maxWidth: '87%', zIndex: 100,
-                        whiteSpace: 'nowrap'
-                      }} >
-                        <Filters onToFromChange={handleToFromChange} onChangeStatus={handleChangeStatus} onChangeRakeTypes={handleChangeRakeType} reload={reload} getShipments={getAllShipment} shipmentsPayloadSetter={setShipmentsPayload} setTriggerShipments={setTriggerShipments} triggerShipments={triggerShipments} />
-                      </div>
-                      : <></>
-                  }
-                  
-                  <div style={{ paddingTop: tablePagination ? '20px' : '45px' }}>
-                    <TableData onSkipLimit={handleSkipLimitChange} allShipments={allShipment} count={count} rakeCaptiveList={rakeCaptiveList} onFnrChange={handleChangeByFnr} reload={reload} getAllShipment={getAllShipment} setTriggerShipments={setTriggerShipments} triggerShipments={triggerShipments} remarksList={remarksList} />
-                  </div>
+                <div style={{ paddingTop: tablePagination ? '20px' : '45px' }}>
+                  <TableData onSkipLimit={handleSkipLimitChange} allShipments={allShipment} count={count} rakeCaptiveList={rakeCaptiveList} onFnrChange={handleChangeByFnr} reload={reload} getAllShipment={getAllShipment} setTriggerShipments={setTriggerShipments} triggerShipments={triggerShipments} remarksList={remarksList} />
                 </div>
-                : <></>
+              </div>
+              : <></>
             }
 
-
-            {
-              selected_bound === 'inbound' ?
-                <div className='coming-soon'>COMING SOON !!!</div>
-                : <></>
+            {selected_bound === 'inbound' ?
+              <div className='coming-soon'>COMING SOON !!!</div>
+              : <></>
             }
           </div>
         </div>

@@ -59,7 +59,11 @@ export interface row {
   is_captive:Boolean,
   daysAging:string,
   paid_by:string,
-  commodity_desc:any
+  commodity_desc:any,
+  expected_loading_date:{
+    ELDdate:string,
+    ELDtime:string
+  }
 }
 
 export interface tagItem {

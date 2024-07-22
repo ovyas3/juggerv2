@@ -29,3 +29,4 @@ export const EDITSTATIONS = 'edit/stations';
 export const FETCH_TRACK_DETAILS = 'fetch/track_details'
 export const HANDLING_AGENT_INVITE = 'handling_agent/handling_agent_invite'
 export const EXISTING_AGENT_INVITE = 'handling_agent/existing_handling_agent_invite'
+export const UPDATE_ELD = 'edit/expected_loading_date'

@@ -118,3 +118,28 @@ export function countTracking(arr: any[]) {
     notTracking: nonTrackingCount
   };
 }
+
+const ageingCode = [
+  { color: 'green', code: '#18BE8A', text: '1-2 days' },
+  { color: 'yellow', code: '#FFD60A', text: '3-6 days' },
+  { color: 'orange', code: '#FF9800', text: '6-9 days' },
+  { color: 'red', code: '#E6667B', text: '≥10 days' },
+];
+
+export function getColorCode(days : any) {
+  if (days >= 1 && days <= 2) {
+    return ageingCode[0].code;
+  } else if (days >= 3 && days <= 6) {
+    return ageingCode[1].code;
+  } else if (days >= 7 && days <= 9) {
+    return ageingCode[2].code;
+  } else if (days >= 10) {
+    return ageingCode[3].code;
+  } else {
+    return '#FFFFFF';
+  }
+}
+
+export function getUniqueValues(arr : any) {
+  return [...new Set(arr)];
+}
