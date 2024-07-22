@@ -34,7 +34,7 @@ import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import { httpsPost } from '@/utils/Communication';
-import { UPDATE_RAKE_CAPTIVE_ID, REMARKS_UPDATE_ID, FETCH_TRACK_DETAILS } from '@/utils/helper'
+import { UPDATE_RAKE_CAPTIVE_ID, REMARKS_UPDATE_ID, FETCH_TRACK_DETAILS, UPDATE_ELD } from '@/utils/helper'
 import { statusBuilder } from '../MapView/StatusBuilder/StatusBuilder';
 
 import FOIS from '@/assets/fois_icon.png'
@@ -53,7 +53,7 @@ import { Menu, MenuItem } from '@mui/material';
 import './style.css'
 import Backdrop from '@mui/material/Backdrop';
 import Fade from '@mui/material/Fade';
-import { sortArray, separateLatestObject, calculateDaysDifference } from '@/utils/hooks';
+import { sortArray, separateLatestObject, calculateDaysDifference,getColorCode,getUniqueValues } from '@/utils/hooks';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import Popover from '@mui/material/Popover';
 import { Typography, } from '@mui/material';
@@ -67,6 +67,7 @@ import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import InputLabel from '@mui/material/InputLabel';
 import ListSubheader from '@mui/material/ListSubheader';
 import FormControl from '@mui/material/FormControl';
+import EditNoteOutlinedIcon from '@mui/icons-material/EditNoteOutlined';
 
 
 async function rake_update_id(payload: Object) {
@@ -106,9 +107,9 @@ const convertArrayToFilteredArray = (inputArray: any) => {
             demand_date: any,
             paid_by: string,
             commodity_desc: any,
-
+            expected_loading_date: any,
         }) => {
-        const { edemand_no, FNR, all_FNRs, delivery_location, trip_tracker, others, remarks, unique_code, status, pickup_date, captive_id, is_captive, eta, rr_document, polyline, past_etas, no_of_wagons, received_no_of_wagons, demand_date, paid_by, commodity_desc } = item;
+        const { edemand_no, FNR, all_FNRs, delivery_location, trip_tracker, others, remarks, unique_code, status, pickup_date, captive_id, is_captive, eta, rr_document, polyline, past_etas, no_of_wagons, received_no_of_wagons, demand_date, paid_by, commodity_desc, expected_loading_date } = item;
         return {
             _id: item._id,
             edemand: edemand_no,
@@ -156,7 +157,11 @@ const convertArrayToFilteredArray = (inputArray: any) => {
             is_captive: is_captive && is_captive,
             daysAging: calculateDaysDifference(demand_date),
             paid_by: paid_by ? paid_by : 'NA',
-            commodity_desc: commodity_desc && commodity_desc
+            commodity_desc: commodity_desc && commodity_desc,
+            expected_loading_date: expected_loading_date && {
+                ELDdate: service.utcToist(expected_loading_date) || 'NA',
+                ELDtime: service.utcToistTime(expected_loading_date) || 'NA'
+            }
         }
     });
 };
@@ -327,8 +332,9 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
         const commonColumns: Column[] = [
             { id: 'fnr', label: '', class: 'fnr', innerClass: 'inner_fnr' },
             { id: 'destination', label: 'Destination/Paid By', class: 'destination', innerClass: '' },
-            { id: 'material', label: 'Material/Commodities', class: 'material', innerClass: '' },
-            { id: 'aging', label: 'Ageing', class: 'aging', innerClass: '' },
+            { id: 'material', label: 'Commodities', class: 'material', innerClass: '' },
+            { id: 'eld', label: 'Expected Loading Date', class: 'eld', innerClass: '' },
+            // { id: 'aging', label: 'Ageing', class: 'aging', innerClass: '' },
             { id: 'pickupdate', label: 'Invoiced Date', class: 'pickupdate', innerClass: 'inner_pickup' },
             { id: 'status', label: 'Status', class: 'status', innerClass: 'inner_status' },
             { id: 'currentEta', label: 'Current ETA', class: 'currentEta', innerClass: 'inner_eta' },
@@ -352,12 +358,12 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
     useEffect(() => {
         const element = textRef.current;
         if (element) {
-          const lineHeight = parseInt(window.getComputedStyle(element).lineHeight);
-          const numberOfLines = element.scrollHeight / lineHeight;
-          setIsOverflowing(numberOfLines > 5);
+            const lineHeight = parseInt(window.getComputedStyle(element).lineHeight);
+            const numberOfLines = element.scrollHeight / lineHeight;
+            setIsOverflowing(numberOfLines > 5);
         }
-      }, [textRef, response]);
-      
+    }, [textRef, response]);
+
     return (
         <div className='target' >
             <Paper sx={{ width: '100%', overflow: 'hidden', boxShadow: 'none' }}>
@@ -486,7 +492,8 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                 remarks: 'body_remarks',
                                                 handlingAgent: 'body_handlingAgent',
                                                 action: 'body_action',
-                                                iconheader: 'body_iconheader'
+                                                iconheader: 'body_iconheader',
+                                                eld: 'body_eld',
                                             }
                                             return (
                                                 <TableCell key={index} sx={{ fontSize: '12px', color: '#44475B', p: '16px 10px 16px 10px' }}
@@ -514,7 +521,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                                 />
                                                                             )}
                                                                             <ActionItem
-                                                                                icon={<ShareIcon style={{ width: '24px', height: '24px', color: '#3352FF' }} />}
+                                                                                icon={<ShareIcon style={{ width: '22px', height: '22px', color: '#3352FF' }} />}
                                                                                 text={t('share')}
                                                                                 style={{ gap: '7px' }}
                                                                             />
@@ -536,6 +543,12 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                                     id='fetch track details'
                                                                                 />
                                                                             }
+                                                                            <ActionItem
+                                                                                icon={<EditNoteOutlinedIcon style={{ width: "24px", height: '24px', color: '#658147' }} />}
+                                                                                text={t('edit')}
+                                                                                onClick={handleOpen}
+                                                                                id="editELD"
+                                                                            />
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -543,7 +556,12 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                         )}
                                                         {item.id === 'fnr' &&
                                                             <div className='fnr_container'>
-                                                                <div>Primary</div>
+                                                                <div style={{ display: 'flex', alignItems: 'center' , gap:4}}>
+                                                                    <div>Primary</div>
+                                                                    {row.status.name === 'In Plant' && 
+                                                                        <div className='aging_dot' style={{backgroundColor:`${getColorCode(row.daysAging)}`}} ></div>
+                                                                    }
+                                                                </div>
                                                                 <div className='fnr_inner_data'>
                                                                     <Link target="_blank"
                                                                         href={"/tracker?unique_code=" + value.unique_code}
@@ -575,20 +593,20 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                     </div>
                                                                 </div>
                                                                 <div className='fnr_logos'>
-                                                                    
+
                                                                     {row.rrDoc ?
-                                                                        (<div style={{ height: 25, width: 25}}>
+                                                                        (<div style={{ height: 25, width: 25 }}>
                                                                             <img
                                                                                 src={row.rrDoc ? rrDocumentIcon.src : ''}
                                                                                 style={{ height: '100%', width: '100%' }}
                                                                                 alt=''
                                                                             />
                                                                         </div>) : (
-                                                                            <div style={{ width: '25px', height: '25px'}}></div>
+                                                                            <div style={{ width: '25px', height: '25px' }}></div>
                                                                         )
                                                                     }
                                                                     {row.is_captive &&
-                                                                        <div style={{ height: 25, width: 25}}>
+                                                                        <div style={{ height: 25, width: 25 }}>
                                                                             <img
                                                                                 src={row.is_captive ? captiveRakeIndicator.src : ''}
                                                                                 style={{ height: '100%', width: '100%' }}
@@ -599,44 +617,44 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                 </div>
                                                             </div>
                                                         }
-                                                       {item.id === 'destination' && (
-                                                            <div
-                                                            style={{
-                                                                position: 'relative',
-                                                                right: '5px',
-                                                                width: '160px',
-                                                                height: '70px',
-                                                                overflow: 'hidden',
-                                                            }}
-                                                            >
+                                                        {item.id === 'destination' && (
                                                             <div
                                                                 style={{
-                                                                position: 'relative',
-                                                                right: '0px',
-                                                                overflow: 'hidden',
+                                                                    position: 'relative',
+                                                                    right: '5px',
+                                                                    width: '160px',
+                                                                    height: '70px',
+                                                                    overflow: 'hidden',
                                                                 }}
                                                             >
-                                                                <Tooltip
-                                                                title={isOverflowing ? `(${value.code} ${value.name !== 'NA' ? value.name : value.code})` : ' '}
-                                                                disableHoverListener={!isOverflowing}
-                                                                >
                                                                 <div
-                                                                    ref={textRef}
                                                                     style={{
-                                                                    display: '-webkit-box',
-                                                                    WebkitBoxOrient: 'vertical',
-                                                                    WebkitLineClamp: 4,
-                                                                    overflow: 'hidden',
-                                                                    textOverflow: 'ellipsis',
-                                                                    whiteSpace: 'pre-wrap',
-                                                                    height: '100%',
-                                                                    cursor: isOverflowing ? 'pointer' : 'default'
+                                                                        position: 'relative',
+                                                                        right: '0px',
+                                                                        overflow: 'hidden',
                                                                     }}
                                                                 >
-                                                                    {value.code} {value.name !== 'NA' ? value.name : value.code}
+                                                                    <Tooltip
+                                                                        title={isOverflowing ? `(${value.code} ${value.name !== 'NA' ? value.name : value.code})` : ' '}
+                                                                        disableHoverListener={!isOverflowing}
+                                                                    >
+                                                                        <div
+                                                                            ref={textRef}
+                                                                            style={{
+                                                                                display: '-webkit-box',
+                                                                                WebkitBoxOrient: 'vertical',
+                                                                                WebkitLineClamp: 4,
+                                                                                overflow: 'hidden',
+                                                                                textOverflow: 'ellipsis',
+                                                                                whiteSpace: 'pre-wrap',
+                                                                                height: '100%',
+                                                                                cursor: isOverflowing ? 'pointer' : 'default'
+                                                                            }}
+                                                                        >
+                                                                            {value.code} {value.name !== 'NA' ? value.name : value.code}
+                                                                        </div>
+                                                                    </Tooltip>
                                                                 </div>
-                                                                </Tooltip>
-                                                            </div>
                                                             </div>
                                                         )}
                                                         {item.id === 'pickupdate' && (
@@ -692,10 +710,10 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                         {item.id === 'remarks' && (
                                                             <RemarkComponent row={row} firstIndex={firstindex} />
                                                         )}
-                                                        {item.id === 'aging' &&
+                                                        {/* {item.id === 'aging' &&
                                                             !row.rrDoc &&
                                                             <span>{row.daysAging} Days</span>
-                                                        }
+                                                        } */}
                                                         {item.id === 'deliverDate' && (
                                                             <div>
                                                                 {row.eta && row.status.name === 'Delivered' ? (
@@ -710,14 +728,14 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                         )}
                                                         {item.id === 'material' && row.commodity_desc && (
                                                             <div className='material_items'>
-                                                                <div style={{color:'#7C7E8C', marginTop: '5px'}}>{row.commodity_desc[0]}</div>
-                                                                {row.commodity_desc.length > 1 &&
+                                                                <div style={{ color: '#7C7E8C', marginTop: '5px' }}>{row.commodity_desc[0]}</div>
+                                                                {getUniqueValues(row.commodity_desc).length > 1 &&
                                                                     <div className='view_more_materials'>
-                                                                        <div style={{ fontSize: 8 }}>+{row.commodity_desc.length - 1}</div>
+                                                                        <div style={{ fontSize: 8 }}>+{getUniqueValues(row.commodity_desc).length - 1}</div>
                                                                         <div className='list_of_materials'>
-                                                                            {row.commodity_desc.slice(1).map((item: any, index: number) => {
+                                                                            {getUniqueValues(row.commodity_desc).slice(1).map((item: any, index: number) => {
                                                                                 return (
-                                                                                    <div key={index}>{item}</div>
+                                                                                    <div className='material_item' key={index}>{item}</div>
                                                                                 );
                                                                             })}
                                                                         </div>
@@ -725,19 +743,25 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                 }
                                                             </div>
                                                         )}
+                                                        {item.id === 'eld' && (
+                                                            <div>
+                                                                <div>{row.expected_loading_date?.ELDdate}</div>
+                                                                <div>{row.expected_loading_date?.ELDtime}</div>
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 </TableCell>
                                             );
                                         })}
                                     </TableRow>
-                               );
-                            }       
-                          )
-                        }
+                                );
+                            }
+                            )
+                            }
                         </TableBody>
                     </Table>
                 </TableContainer>
-                { !response.length ? <div className='no_shipments_found'>No Shipments Found</div>
+                {!response.length ? <div className='no_shipments_found'>No Shipments Found</div>
                     : <></>
                 }
             </Paper>
@@ -749,7 +773,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    zIndex: 100000
+                    zIndex: 1000
                 }}
             >
                 <Box
@@ -758,7 +782,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                         backgroundColor: 'white',
                         borderRadius: '12px',
                         width: '30vw',
-                        minWidth:'320px',
+                        minWidth: '320px',
                         height: '267px',
                         position: 'relative',
                         outline: 'none'
@@ -774,6 +798,11 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                         remarksList={remarksList}
                         getAllShipment={getAllShipment}
                     />}
+                    {actionOptions === 'editELD' && <EditELD
+                        shipmentId={rowId}
+                        setOpen={setOpen}
+                        getAllShipment={getAllShipment}
+                    />}
                 </Box>
             </Modal>
         </div>
@@ -782,14 +811,14 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
 
 interface RemarksListType {
     [category: string]: string[];
-  }
+}
 
 interface RemarksProps {
     shipmentId: any;
     setOpen: (open: boolean) => void;
     remarksList: RemarksListType;
     getAllShipment: () => void;
-  }
+}
 
 const ActionItem = ({ icon, text, onClick, id, style }: any) => (
     <div className={`action_items `} onClick={onClick} id={id} style={style}>
@@ -805,7 +834,7 @@ function Remarks({ shipmentId, setOpen, remarksList, getAllShipment }: RemarksPr
     const [openRemarks, setOpenRemarks] = useState(false);
     const [isHovered, setIsHovered] = useState(false);
     const { showMessage } = useSnackbar();
-    
+
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const handleMouseEnter = useCallback(() => setIsHovered(true), []);
     const handleMouseLeave = useCallback(() => setIsHovered(false), []);
@@ -858,23 +887,22 @@ function Remarks({ shipmentId, setOpen, remarksList, getAllShipment }: RemarksPr
         setOpenRemarks(true);
     };
 
-    const handleClose = (e:any) => {
+    const handleClose = (e: any) => {
         e.stopPropagation();
         setOpenRemarks(false);
     };
 
     return (
-        <div 
-            style={{padding:24}}
+        <div
+            style={{ padding: 24 }}
             onClick={(e) => { e.stopPropagation(); setOpenRemarks(false) }}
         >
-            <div style={{color:'#131722', fontSize:20, fontWeight:500, marginBottom:'36px'}}>Remarks</div>
-            <div style={{color:'#42454E', fontSize:12}}>Select Remarks</div>
+            <div style={{ color: '#131722', fontSize: 20, fontWeight: 500, marginBottom: '36px' }}>Remarks</div>
+            <div style={{ color: '#42454E', fontSize: 12 }}>Select Remarks</div>
 
 
-            <div style={{position: 'relative' }}>
+            <div style={{ position: 'relative' }}>
                 <FormControl fullWidth >
-                    {/* <InputLabel id="remarks-select-label">remarks</InputLabel> */}
                     <Select
                         labelId="remarks-select-label"
                         id="remarks-select"
@@ -882,9 +910,9 @@ function Remarks({ shipmentId, setOpen, remarksList, getAllShipment }: RemarksPr
                         onClick={(e) => handleClick(e)}
                         open={false}
                         sx={{
-                            height:36,
-                            fontSize:14,
-                            outline:'none'
+                            height: 36,
+                            fontSize: 14,
+                            outline: 'none'
                         }}
                     >
                         <MenuItem value={remarks}>
@@ -893,20 +921,20 @@ function Remarks({ shipmentId, setOpen, remarksList, getAllShipment }: RemarksPr
                     </Select>
                 </FormControl>
 
-                <Popper 
-                    open={openRemarks} 
+                <Popper
+                    open={openRemarks}
                     anchorEl={anchorEl}
                     placement="bottom-start"
-                    style={{ zIndex: 1300000, width: 'calc(30vw - 48px)',minWidth: '272px'}}
+                    style={{ zIndex: 1300, width: 'calc(30vw - 48px)', minWidth: '272px' }}
                 >
                     <ClickAwayListener onClickAway={(e) => handleClose(e)}>
-                        <Paper style={{ maxHeight: 300, overflow: 'auto'}}>
+                        <Paper style={{ maxHeight: 300, overflow: 'auto' }}>
                             {Object.entries(remarksList).map(([category, options]) => [
                                 <ListSubheader key={category}>{category}</ListSubheader>,
                                 ...options.map((option: string, index: number) => (
-                                    <MenuItem 
-                                        key={`${category}-${index}`} 
-                                        onClick={(e) =>{ handleRemarkSelect(option);  handleClose(e);}}
+                                    <MenuItem
+                                        key={`${category}-${index}`}
+                                        onClick={(e) => { handleRemarkSelect(option); handleClose(e); }}
                                     >
                                         {option}
                                     </MenuItem>
@@ -915,7 +943,7 @@ function Remarks({ shipmentId, setOpen, remarksList, getAllShipment }: RemarksPr
                         </Paper>
                     </ClickAwayListener>
                 </Popper>
-                
+
                 {remarks === 'Others' && (
                     <TextField
                         fullWidth
@@ -1216,3 +1244,133 @@ const PastEta = ({ row, firstIndex }: any) => {
         </Box>
     );
 };
+
+
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import dayjs from 'dayjs';
+
+const EditELD = ({ shipmentId, setOpen,getAllShipment }: any) => {
+
+    const t = useTranslations('ORDERS');
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+    const [isHovered, setIsHovered] = useState(false);
+    const { showMessage } = useSnackbar();
+    const handleMouseEnter = useCallback(() => setIsHovered(true), []);
+    const handleMouseLeave = useCallback(() => setIsHovered(false), []);
+    const [openDatePicker, setOpenDatePicker] = useState(false);
+    const [selectDate, setSelectDate] = useState(new Date());
+
+    const handleDatePickerToggle = () => {
+        setOpenDatePicker((prev) => !prev);
+    };
+
+    const handleDateSubmit = async () => {
+        const dateObject = new Date(selectDate);
+        const epochTimestamp = dateObject.getTime();
+        const payload = {
+            id: shipmentId,
+            date: epochTimestamp
+        }
+        if(!epochTimestamp){
+            showMessage('Please select a date.', 'error');
+            return;
+        }
+        try{
+            const res = await httpsPost(UPDATE_ELD,payload)
+            if(res.statusCode === 200){
+                showMessage('Expected Loading Date Updated Successfully.', 'success');
+                setOpen(false);
+                getAllShipment();
+            }
+        }catch(err){
+            console.log(err)
+        }
+    }
+
+    return (
+        <div style={{ position: 'relative', padding: 24 }}>
+            <div>Add Expected Loading Date</div>
+
+            <div style={{marginTop:'24px'}}>
+                <div style={{fontSize:10, color:'#7C7E8C', paddingBottom:'4px'}}>Select Expected Loading Date</div>
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <DatePicker
+                        format='DD/MM/YYYY'
+                        open={openDatePicker}
+                        onClose={() => setOpenDatePicker(false)}
+                        slots={{
+                            openPickerIcon: () => null,
+                        }}
+                        slotProps={{
+                            textField: {
+                                onClick: handleDatePickerToggle,
+                            },
+                        }}
+                        sx={{
+                            padding: 0,
+                            width: '100%',
+                            '.MuiInputBase-input': {
+                                padding: '6px !important',
+                                fontSize: '14px !important',
+                            },
+                            '& .MuiOutlinedInput-root': {
+                                '&:hover fieldset': {
+                                    // border: 'none',
+                                },
+                                '&.Mui-focused fieldset': {
+                                    border: '1px solid #7C7E8C',
+                                },
+                            },
+                        }}
+                        onChange={(newDate) => {
+                            if (newDate) {
+                                setSelectDate(newDate.toDate());
+                            }
+                        }}
+                        value={dayjs(selectDate)}
+                    />
+                </LocalizationProvider>
+            </div>
+
+            <div style={{ marginTop: 64 }}>
+                    <Button
+                        variant="contained"
+                        size='small'
+                        color="secondary"
+                        style={{ textTransform: 'none', backgroundColor: '#3351FF' }}
+                        onClick={handleDateSubmit}
+                    >
+                        {t('submit')}
+                    </Button>
+            </div>
+            <div
+                style={{
+                    height: '32px',
+                    width: '32px',
+                    borderRadius: '50%',
+                    backgroundColor: 'white',
+                    position: 'absolute',
+                    top: -40,
+                    right: 0,
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    cursor: 'pointer',
+                    zIndex: 999,
+                    boxShadow: '0 1px 2px rgba(0, 0, 0, 0.1)',
+                    transition: 'all 0.5s ease-in-out',
+                    transform: `rotate(${isHovered ? 90 : 0}deg)`
+                }}
+                onClick={(e) => { e.stopPropagation() }}
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
+            >
+                <CloseIcon
+                    onClick={(e) => { e.stopPropagation(); setOpen(false) }}
+                />
+            </div>
+        </div>
+    )
+}

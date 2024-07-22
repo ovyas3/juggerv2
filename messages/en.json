@@ -44,7 +44,9 @@
     "delivered":"Delivered",
     "inplant":"In Plant",
     "addremarks":"Remarks",
-    "fetchtrackdetails":"Fetch Track Details"
+    "fetchtrackdetails":"Fetch Track Details",
+    "ageing":"Ageing",
+    "edit":"Edit ELD"
   },
   "DRAWER":{
     "shipments":"shipments",

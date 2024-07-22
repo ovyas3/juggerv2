@@ -18,11 +18,17 @@
 
 }
 
+.eld{
+    min-width: 130px !important;
+    padding-inline: 20px !important;
+    line-height: 20px !important;
+}
+
 .destination {
-    min-width: 220px !important;
+    min-width: 180px !important;
     text-wrap: nowrap !important;
     /* padding-right: 41px !important; */
-    padding-inline:30px !important;
+    padding-inline:20px !important;
 }
 
 .aging {
@@ -31,8 +37,10 @@
 }
 
 .material {
-    min-width: 88px !important;
-    max-width: 150px !important;
+    min-width: 120px !important;
+    /* max-width: 150px !important; */
+    /* padding-inline: 20px !important; */
+    /* background-color: #18BE8A !important; */
 }
 
 .pickupdate {
@@ -161,6 +169,7 @@
 }
 .body_material{
     max-width: 150px !important;
+    /* background-color: #0168FF; */
 }
 .body_aging {
     text-wrap: nowrap;
@@ -187,6 +196,9 @@
 
 .body_deliveryDate {
     padding-inline: 26px !important;
+}
+.body_eld{
+    padding-inline: 20px !important;
 }
 
 
