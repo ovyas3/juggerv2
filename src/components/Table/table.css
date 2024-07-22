@@ -37,9 +37,10 @@
 }
 
 .material {
-    min-width: 88px !important;
+    min-width: 120px !important;
     /* max-width: 150px !important; */
-    padding-inline: 20px !important;
+    /* padding-inline: 20px !important; */
+    /* background-color: #18BE8A !important; */
 }
 
 .pickupdate {
@@ -168,6 +169,7 @@
 }
 .body_material{
     max-width: 150px !important;
+    /* background-color: #0168FF; */
 }
 .body_aging {
     text-wrap: nowrap;

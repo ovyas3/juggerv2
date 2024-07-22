@@ -729,13 +729,13 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                         {item.id === 'material' && row.commodity_desc && (
                                                             <div className='material_items'>
                                                                 <div style={{ color: '#7C7E8C', marginTop: '5px' }}>{row.commodity_desc[0]}</div>
-                                                                {row.commodity_desc.length > 1 &&
+                                                                {getUniqueValues(row.commodity_desc).length > 1 &&
                                                                     <div className='view_more_materials'>
                                                                         <div style={{ fontSize: 8 }}>+{getUniqueValues(row.commodity_desc).length - 1}</div>
                                                                         <div className='list_of_materials'>
                                                                             {getUniqueValues(row.commodity_desc).slice(1).map((item: any, index: number) => {
                                                                                 return (
-                                                                                    <div key={index}>{item}</div>
+                                                                                    <div className='material_item' key={index}>{item}</div>
                                                                                 );
                                                                             })}
                                                                         </div>
