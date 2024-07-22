@@ -125,7 +125,7 @@ export default function AccountMenu() {
         </MenuItem>
         <MenuItem onClick={() => handleNavigation('/handlingAgent')} className="menuItem"  sx={{fontSize:14, fontWeight:500}}>
             <div className="iconContainer">
-            <img src={InviteIcon.src } className="translateIcon" sx={{height:14, width:14}}/>
+              <img src={InviteIcon.src} className="translateIcon" style={{height: 14, width: 14}} />
             </div>
             Invite
         </MenuItem>
