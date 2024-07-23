@@ -3,7 +3,7 @@ import { useTranslations } from "next-intl";
 import React, { useEffect, useState } from "react";
 import { Column } from "@/utils/interface";
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import { Box, Button, IconButton, Input, InputAdornment, InputLabel, Link, MenuItem, Modal, Paper, Select, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TextField, styled } from "@mui/material";
+import { Box, Button, IconButton, Input, InputAdornment, InputLabel, Link, MenuItem, Modal, Paper, Select, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TextField, styled, useMediaQuery } from "@mui/material";
 import ShareIcon from '@mui/icons-material/Share';
 import './StationHeader.css';
 import FormControl from '@mui/material/FormControl';
@@ -104,7 +104,10 @@ const StationHeader = ({ count } : any) => {
     const [addlatValid, setAddLatValid] = useState(false);
     const [addlongValid, setAddLongValid] = useState(false);
 
-    const [codeValid, setCodeValid] = useState(false)
+    const [codeValid, setCodeValid] = useState(false);
+    const [pageInput, setPageInput] = useState<string>(String(page + 1));
+    const [totalPages, setTotalPages] = useState(Math.ceil(totalCount / rowsPerPage));
+    const isSmallScreen = useMediaQuery('(max-width:453px)');
 
   
     const handleOpen = (e: any) => {e.stopPropagation(); setOpen(true);}
@@ -163,7 +166,7 @@ const StationHeader = ({ count } : any) => {
             { id: 'code', label: 'Station Code', class: 'stationCode1', innerClass: '' },
             { id: 'zone', label: 'Zone', class: 'zone1', innerClass: 'inner_pickup' },
             { id: 'state', label: 'State', class: 'state1', innerClass: 'inner_pickup' },
-            { id: 'location', label: 'Location', class: 'location1', innerClass: 'inner_status' },
+            { id: 'location', label: 'Location', class: 'location1', innerClass: '' },
             { id: 'action', label: 'Action', class: 'action1', innerClass: '' },
         ];
         setColumns(commonColumns);
@@ -190,6 +193,10 @@ const StationHeader = ({ count } : any) => {
         };
     }, [showActionBox]);
 
+    useEffect(() => {
+        setTotalPages(Math.ceil(totalCount / rowsPerPage));
+    }, [totalCount, rowsPerPage]);
+
     const handleSchemeTypeChange = (event: any) => {
         const selectedSchemeType = event.target.value;
         setSchemeType(selectedSchemeType);
@@ -203,6 +210,7 @@ const StationHeader = ({ count } : any) => {
 
     const handleChangePage = (event: unknown, newPage: number) => {
         setPage(newPage);
+        setPageInput(String(newPage + 1));
         getStations(searchValue, searchType, newPage, rowsPerPage)
         .then((data: any) => {
             if (data.data.stations) {
@@ -613,366 +621,433 @@ const StationHeader = ({ count } : any) => {
             borderColor: 'transparent',
           },
         },
-      });
+    });
+
+    const handlePageInputChange = ( event: React.ChangeEvent<HTMLInputElement> ) => {
+        const value = event.target.value;
+        const numValue = parseInt(value, 10);
+        if (value === '' || (!isNaN(numValue) && numValue > 0 && numValue <= totalPages)) {
+            setPageInput(value);
+        }
+    }
+
+    const handlePageInputSubmit = ( event: React.KeyboardEvent<HTMLInputElement> ) => {
+        if (event.key === 'Enter') {
+            if(pageInput.trim() == ''){
+                return;
+            }
+            const newPage = parseInt(pageInput.toString(), 10) - 1;
+            if (newPage >= 0 && newPage < totalPages) {
+                handleChangePage(null, newPage);
+            } else {
+                showMessage('Invalid page number', 'error');
+                setPageInput(String(page + 1));
+            }
+        }
+    }
+
+    const getPlaceholder = () => {
+        if(isSmallScreen){
+            return 'Serach...'
+        }
+        return searchType === 'Station Code' ? 'Search for station code' : 'Search for state'
+    }
     
 
     return(
         <div className="target1">
-                
-    
-        <div className="btn-container">
-        <div className="search-container">
-            <TextField
-                id="search-station-code"
-                type="search"
-                variant="outlined"
-                value={searchValue}
-                onChange={(event) => 
-                   { setSearchValue(event.target.value);
-                    handleSearch(event.target.value);}
-                }
-                placeholder="Search for station code"
-                className="search-input"
-                InputProps={{
-                startAdornment: (
-                    <InputAdornment position="start">
-                    <CustomFormControl variant="outlined">
-                    <Select
-                        value={searchType}
-                        onChange={(e) => setSearchType(e.target.value)}
-                        className="search-select"
-                    >
-                        <MenuItem value="Station Code">Station Code</MenuItem>
-                        <MenuItem value="State">State</MenuItem>
-                    </Select>
-                    </CustomFormControl>
-                </InputAdornment>
-            ),
-            endAdornment: (
-                <InputAdornment position="end">
-                    <Image src={SearchIcon} alt="" style={{cursor: 'pointer'}}/>
-                </InputAdornment>
-            ),
-            }}
-        />
-        </div>
-            <button className="add-btn" onClick={(e) => { e.stopPropagation();handleOpen(e)}}>Add Station</button>
-        </div>
-        <div className="table-container">
-            <Paper sx={{
-                    width: '100%', overflow: 'hidden', boxShadow: 'none',
-                    '.mui-78c6dr-MuiToolbar-root-MuiTablePagination-toolbar ': {
-                        padding: '0 2 0 24',
-                    },
-                    '    .mui-78c6dr-MuiToolbar-root-MuiTablePagination-toolbar': {
-                        minHeight: 40
-                    },
-                    '.mui-dmz9g-MuiTableContainer-root ': {
-                        border: ' 1px solid #E9E9EB',
-                        borderRadius: '8px'
-                    },
-                    '.mui-1briqcb-MuiTableCell-root': {
-                        fontFamily: 'inherit'
-                    }
-                }}
-            >
-                <TablePagination
-                    rowsPerPageOptions={[5, 10, 25, 50, 100]}
-                    component="div"
-                    count={totalCount}
-                    rowsPerPage={rowsPerPage}
-                    page={page}
-                    onPageChange={handleChangePage}
-                    onRowsPerPageChange={handleChangeRowsPerPage}
-                    labelRowsPerPage="Shipments per page:"
-                />
-                <TableContainer sx={{
-                    border: '1px solid #E9E9EB', borderRadius: '8px', maxHeight: 'calc(90vh - 110px)', minHeight: '200px',
-                    overflowY: 'scroll',
-                    '&::-webkit-scrollbar': {
-                        display: 'none',
-                    },
-                    scrollbarWidth: 'none',
-                    '-ms-overflow-style': 'none',
-                }}>
-                    <Table className="main-table" stickyHeader aria-label="sticky table">
-                        <TableHead className="head" sx={{
-                            '.mui-y8ay40-MuiTableCell-root ': { padding: 0 },
-                            '.mui-78trlr-MuiButtonBase-root-MuiIconButton-root ': { width: '5px' },
-                            '.mui-y8ay40-MuiTableCell-root': { fontFamily: 'inherit' },
+            <div className="btn-container">
+            <div className="search-container">
+                <div className="search1-container">
+                    <TextField
+                            id="search-station-code"
+                            type="search"
+                            variant="outlined"
+                            value={searchValue}
+                            onChange={(event) => 
+                            { setSearchValue(event.target.value);
+                                handleSearch(event.target.value);}
+                            }
+                            placeholder={getPlaceholder()}
+                            className="search-input"
+                            InputProps={{
+                            startAdornment: (
+                                <InputAdornment position="start">
+                                <CustomFormControl variant="outlined">
+                                <Select
+                                    value={searchType}
+                                    onChange={(e) => setSearchType(e.target.value)}
+                                    className="search-select"
+                                >
+                                    <MenuItem value="Station Code">Station Code</MenuItem>
+                                    <MenuItem value="State">State</MenuItem>
+                                </Select>
+                                </CustomFormControl>
+                            </InputAdornment>
+                        ),
+                        endAdornment: (
+                            <InputAdornment position="end">
+                                <Image src={SearchIcon} alt="" style={{cursor: 'pointer'}}/>
+                            </InputAdornment>
+                        ),
+                        }}
+                    />
+                </div> 
+                </div>
+                    <button className="add-btn" onClick={(e) => { e.stopPropagation();handleOpen(e)}}>Add Station</button>
+            </div>
+            <div className="table-container">
+                <Paper sx={{
+                        width: '100%', overflow: 'hidden', boxShadow: 'none',
+                        '.mui-78c6dr-MuiToolbar-root-MuiTablePagination-toolbar ': {
+                            padding: '0 2 0 24',
+                        },
+                        '    .mui-78c6dr-MuiToolbar-root-MuiTablePagination-toolbar': {
+                            minHeight: 40
+                        },
+                        '.mui-dmz9g-MuiTableContainer-root ': {
+                            border: ' 1px solid #E9E9EB',
+                            borderRadius: '8px'
+                        },
+                        '.mui-1briqcb-MuiTableCell-root': {
+                            fontFamily: 'inherit'
+                        }
+                    }}
+                >
+                    <div style={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        justifyContent: 'end',
+                        overflowX: 'auto'
+                    }}>
+                        <div style={{ 
+                            display: 'flex', 
+                            alignItems: 'center',
+                            marginLeft: '20px'
                         }}>
-                            <TableRow>
-                                {columns.map((column) => {
+                            <span style={{ marginRight: '8px', whiteSpace: 'nowrap' }}>Go to page : </span>
+                            <div style={{ 
+                                display: 'flex', 
+                                alignItems: 'center',  
+                                borderRadius: '4px', 
+                                border: "1px solid #E0E0E0",
+                                padding: '2px 4px',
+                                maxWidth : '100px'
+                            }}>
+                                <input
+                                    value={pageInput}
+                                    onChange={handlePageInputChange}
+                                    onKeyPress={handlePageInputSubmit}
+                                    style={{
+                                        border: 'none',
+                                        outline: 'none',
+                                        width: '50%',
+                                        fontSize: '14px'
+                                    }}
+                                    min={1}
+                                    max={totalPages}
+                                />
+                                <span style={{  fontSize: '14px', width: "50%"}}>/ {totalPages}</span>
+                            </div>
+                        </div>
+                        <TablePagination
+                            rowsPerPageOptions={[5, 10, 25, 50, 100]}
+                            component="div"
+                            count={totalCount}
+                            rowsPerPage={rowsPerPage}
+                            page={page}
+                            onPageChange={handleChangePage}
+                            onRowsPerPageChange={handleChangeRowsPerPage}
+                            labelRowsPerPage="Shipments per page:"
+                        />
+                    </div>
+                    <TableContainer sx={{
+                        border: '1px solid #E9E9EB', borderRadius: '8px', maxHeight: 'calc(90vh - 110px)', minHeight: '200px',
+                        overflowY: 'scroll',
+                        '&::-webkit-scrollbar': {
+                            display: 'none',
+                        },
+                        scrollbarWidth: 'none',
+                        '-ms-overflow-style': 'none',
+                    }}>
+                        <Table className="main-table" stickyHeader aria-label="sticky table">
+                            <TableHead className="head" sx={{
+                                '.mui-y8ay40-MuiTableCell-root ': { padding: 0 },
+                                '.mui-78trlr-MuiButtonBase-root-MuiIconButton-root ': { width: '5px' },
+                                '.mui-y8ay40-MuiTableCell-root': { fontFamily: 'inherit' },
+                            }}>
+                                <TableRow>
+                                    {columns.map((column) => {
+                                        return(
+                                            <TableCell  
+                                                key={column.id}
+                                                style={{ fontSize: 12, fontWeight: 'bold', color: '#484A57', paddingLeft: '10px' }}
+                                                className={column.class}
+                                            >
+                                                <div className={column.innerClass} style={{ overflow: "scroll"}}>
+                                                    {column.label}
+                                                </div>
+                                            </TableCell>
+                                        )
+                                    })}
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {response
+                                .map((row: any, rowIndex: any) => {
                                     return(
-                                        <TableCell  
-                                            key={column.id}
-                                            style={{ fontSize: 12, fontWeight: 'bold', color: '#484A57', paddingLeft: '10px' }}
-                                            className={column.class}
-                                        >
-                                            <div className={column.innerClass} style={{ overflow: "scroll"}}>
-                                                {column.label}
-                                            </div>
-                                        </TableCell>
-                                    )
-                                })}
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {response
-                            .map((row: any, rowIndex: any) => {
-                                return(
-                                    <TableRow  key={row._id} sx={{ cursor: 'pointer' }}>
-                                        {columns.map((item, index) => {
-                                            const value = item.id === 'sno' ? startIndex+rowIndex + 1 : row[item.id];
-                                            const columnClassNames: any = {
-                                                stationName: 'body_stationName',
-                                                stationCode: 'body_stationCode',
-                                                zone: 'body_zone',
-                                                state: 'body_state',
-                                                location: 'body_location',
-                                                action: 'body_action'
-                                            }
-                                            return(
-                                                <TableCell key={row._id} sx={{ fontSize: '12px', color: '#44475B', p: '16px 10px 24px 10px' }} className={columnClassNames[item.id]}>
-                                                    
-                                                    
-                                                        { item.id === 'action' && (
-                                                            <div style={{ display: 'flex', justifyContent: 'center' }}>
-                                                                <div className="action_icon">
-                                                                    <MoreHorizIcon
-                                                                        style={{ color: 'white', cursor: 'pointer', scale: '0.9'}}
-                                                                        onClick={(e) => {clickActionBox(e, rowIndex, row._id); setItem(true)}}
-                                                                    />
-                                                                    <div className={`action_button_target ${showActionBox === rowIndex ? 'show' : ''}`}>
-                                                                        <div className="action_button_options" onClick={(e) => {e.stopPropagation()}}>
-                                                                            <ActionItem 
-                                                                                icon = {<Image src={ editIcon } alt='edit'/>}
-                                                                                text = {('edit')}
-                                                                                onClick={(e: any) =>{ e.stopPropagation(); handleOpen1(e);handleEditClick(row,rowIndex);validateEditLat(row.geo_point ? row.geo_point.coordinates[1] : row.lat);validateEditLong( row.geo_point ? row.geo_point.coordinates[0] : row.long)}}
-                                                                            />
+                                        <TableRow  key={row._id} sx={{ cursor: 'pointer' }}>
+                                            {columns.map((item, index) => {
+                                                const value = item.id === 'sno' ? startIndex+rowIndex + 1 : row[item.id];
+                                                const columnClassNames: any = {
+                                                    stationName: 'body_stationName',
+                                                    stationCode: 'body_stationCode',
+                                                    zone: 'body_zone',
+                                                    state: 'body_state',
+                                                    location: 'body_location',
+                                                    action: 'body_action'
+                                                }
+                                                return(
+                                                    <TableCell key={row._id} sx={{ fontSize: '12px', color: '#44475B', p: '16px 10px 24px 10px' }} className={columnClassNames[item.id]}>
+                                                        
+                                                        
+                                                            { item.id === 'action' && (
+                                                                <div style={{ display: 'flex', justifyContent: 'center' }}>
+                                                                    <div className="action_icon">
+                                                                        <MoreHorizIcon
+                                                                            style={{ color: 'white', cursor: 'pointer', scale: '0.9'}}
+                                                                            onClick={(e) => {clickActionBox(e, rowIndex, row._id); setItem(true)}}
+                                                                        />
+                                                                        <div className={`action_button_target ${showActionBox === rowIndex ? 'show' : ''}`}>
+                                                                            <div className="action_button_options" onClick={(e) => {e.stopPropagation()}}>
+                                                                                <ActionItem 
+                                                                                    icon = {<Image src={ editIcon } alt='edit'/>}
+                                                                                    text = {('edit')}
+                                                                                    onClick={(e: any) =>{ e.stopPropagation(); handleOpen1(e);handleEditClick(row,rowIndex);validateEditLat(row.geo_point ? row.geo_point.coordinates[1] : row.lat);validateEditLong( row.geo_point ? row.geo_point.coordinates[0] : row.long)}}
+                                                                                />
+                                                                            </div>
                                                                         </div>
                                                                     </div>
                                                                 </div>
-                                                            </div>
-                                                        )}
-                                                        { item.id ==='location' ? (
-                                                            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                                                                {<IconButton onClick={() => handleLocation(row.geo_point.coordinates[1], row.geo_point.coordinates[0])}>
-                                                                    <PlaceIcon style={{ color: '#0168FF' }}/>
-                                                                </IconButton>}
-                                                                <div  onClick={() => handleLocation(
-                                                                row.geo_point ? row.geo_point.coordinates[1] : row.lat, 
-                                                                row.geo_point ? row.geo_point.coordinates[0] : row.long
-                                                            )}>
-                                                                {row.geo_point ? `${row.geo_point.coordinates[1]}, ${row.geo_point.coordinates[0]}` : `${row.lat}, ${row.long}`}
-                                                               {(typeof value) === 'object' ? '' : ''}
+                                                            )}
+                                                            { item.id ==='location' ? (
+                                                                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                                                                    {<IconButton onClick={() => handleLocation(row.geo_point.coordinates[1], row.geo_point.coordinates[0])}>
+                                                                        <PlaceIcon style={{ color: '#0168FF' }}/>
+                                                                    </IconButton>}
+                                                                    <div  onClick={() => handleLocation(
+                                                                    row.geo_point ? row.geo_point.coordinates[1] : row.lat, 
+                                                                    row.geo_point ? row.geo_point.coordinates[0] : row.long
+                                                                )}>
+                                                                    {row.geo_point ? `${row.geo_point.coordinates[1]}, ${row.geo_point.coordinates[0]}` : `${row.lat}, ${row.long}`}
+                                                                {(typeof value) === 'object' ? '' : ''}
+                                                                    </div>
                                                                 </div>
-                                                            </div>
-                                                        ): ''}
-                                                        { item.id ==='state' && (
-                                                            <div>
-                                                                { value && value.state }
-                                                                {(typeof value) === 'object' ? '' : value}
-                                                            </div>
-                                                        )}
-                                                        { item.id ==='zone' && (
-                                                            <div>
-                                                                {value && value.zone}
-                                                                {(typeof value) === 'object' ? '' : value}
-                                                            </div>
-                                                        )}
-                                                        { item.id ==='code' && (
-                                                            <div>
-                                                                {value && value.code}
-                                                                {(typeof value) === 'object' ? '' : value}
-                                                            </div>
-                                                        )}
-                                                        { item.id ==='name' && (
-                                                            <div>
-                                                                {value && value.name}
-                                                                {(typeof value) === 'object' ? '' : value}
-                                                            </div>
-                                                        )}
-                                                        {
-                                                            item.id === 'sno' && (
+                                                            ): ''}
+                                                            { item.id ==='state' && (
                                                                 <div>
-                                                                  {value}
+                                                                    { value && value.state }
+                                                                    {(typeof value) === 'object' ? '' : value}
                                                                 </div>
-                                                            )
-                                                        }
-                                                    
-                                                </TableCell>
-                                            )
-                                        })}
-                                    </TableRow>
-                                )
-                            })}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-            </Paper>
-            <Modal open={ open } onClose={(e) => {handleClose(e); setAddStationName(''); setAddStationCode(''); setAddZone('');setAddState(''); setAddLat(''); setAddLong(''); setAddLatValid(false); setAddLongValid(false)}} sx={{ display: 'flex' ,alignItems: 'center', justifyContent: 'center'}}>
-                <Box onClick={(e) => e.stopPropagation()} sx={{
-                    display: 'flex',
-                    alignItems: 'start',
-                    justifyContent: 'start',
-                    fontSize: '50px',
-                    minWidth: '30vw',
-                    maxheight: '60vh',
-                    backgroundColor: 'white',
-                    outline: 'none',
-                    borderRadius: '12px',
-                    flexDirection: 'column',
-                    position: 'relative',
-                    overflow:'visible'
-                }}>
-                <div className="close-icon1" onClick={handleAddPopUpClose}>  
-                       <Image src={ CloseButtonIcon } alt="close icon"/>
-                </div>
-                <div className="whole-popup">
-                    <div className="heading">
-                        <p>    
-                            Add Station
-                        </p>
+                                                            )}
+                                                            { item.id ==='zone' && (
+                                                                <div>
+                                                                    {value && value.zone}
+                                                                    {(typeof value) === 'object' ? '' : value}
+                                                                </div>
+                                                            )}
+                                                            { item.id ==='code' && (
+                                                                <div>
+                                                                    {value && value.code}
+                                                                    {(typeof value) === 'object' ? '' : value}
+                                                                </div>
+                                                            )}
+                                                            { item.id ==='name' && (
+                                                                <div>
+                                                                    {value && value.name}
+                                                                    {(typeof value) === 'object' ? '' : value}
+                                                                </div>
+                                                            )}
+                                                            {
+                                                                item.id === 'sno' && (
+                                                                    <div>
+                                                                    {value}
+                                                                    </div>
+                                                                )
+                                                            }
+                                                        
+                                                    </TableCell>
+                                                )
+                                            })}
+                                        </TableRow>
+                                    )
+                                })}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                </Paper>
+                <Modal open={ open } onClose={(e) => {handleClose(e); setAddStationName(''); setAddStationCode(''); setAddZone('');setAddState(''); setAddLat(''); setAddLong(''); setAddLatValid(false); setAddLongValid(false)}} sx={{ display: 'flex' ,alignItems: 'center', justifyContent: 'center'}}>
+                    <Box onClick={(e) => e.stopPropagation()} sx={{
+                        display: 'flex',
+                        alignItems: 'start',
+                        justifyContent: 'start',
+                        fontSize: '50px',
+                        minWidth: '30vw',
+                        maxheight: '60vh',
+                        backgroundColor: 'white',
+                        outline: 'none',
+                        borderRadius: '12px',
+                        flexDirection: 'column',
+                        position: 'relative',
+                        overflow:'visible'
+                    }}>
+                    <div className="close-icon1" onClick={handleAddPopUpClose}>  
+                        <Image src={ CloseButtonIcon } alt="close icon"/>
                     </div>
-                   <div className="select-container">
-                       <div className="select-div">
-                            <InputLabel className="label">Station Name</InputLabel>
-                            <Input type="text" className="input" value={addStationName} onChange={(e) => setAddStationName(e.target.value)}/>
-                       </div>
-                       <div className="select-div">
-                            <InputLabel className="label">Station Code</InputLabel>
-                            <input type="text" className="input" value={addStationCode} maxLength={4}  onChange={(e) => {setAddStationCode(e.target.value); validateStationCode(e.target.value)}}/>
-                       </div>
-                       <div className="select-div">
-                        <InputLabel className="label1">Zone</InputLabel>
-                        <Autocomplete
-                            className="form-select"
-                            value={addZone}
-                            onChange={(e, newValue) => setAddZone(newValue || '')}
-                            options={zones}
-                            renderInput={(params) => <TextField {...params}  />}
-                        />
-                       </div>
-                       <div className="select-div">
-                        <InputLabel className="label1">State</InputLabel>
-                        <Autocomplete
-                            className="form-select"
-                            value={addState}
-                            onChange={(e, newValue) => setAddState(newValue || '')}
-                            options={states}
-                            renderInput={(params) => <TextField {...params}  />}
-                        />
-                       </div>
-                       <div className="select-div">
-                            <InputLabel className="label">Latitude</InputLabel>
-                            <Input type="text" className="input" value={addLat} onChange={(e) => {setAddLat(e.target.value); validateAddLat(e.target.value)}}/>
-                       </div>
-                       <div className="select-div">
-                            <InputLabel className="label">Longitude</InputLabel>
-                            <Input type="text" className="input" value={addLong} onChange={(e) => {setAddLong(e.target.value); validateAddLong(e.target.value)}}/>
-                       </div>
-                    </div> 
-                    <div className="link-btn">
-                        <div className="link1">
-                            {addlatValid && addlongValid && <Link className="link" href={`https://www.google.com/maps/search/?api=1&query=${lat1},${long1}`} target="_blank" rel="noopener noreferrer">View on Map</Link>}
+                    <div className="whole-popup">
+                        <div className="heading">
+                            <p>    
+                                Add Station
+                            </p>
                         </div>
-                        <div className="btn1">
-                            <Button className="btn" onClick={(e) =>{ handleAddsubmit() }}
-                                style={{backgroundColor:  "#1976d2" , color:  "white" }}
-                                >
-                                SUBMIT
-                            </Button>
-                            <Button onClick={() => handleAddCancel()} className="btn" id="btn2" >
-                                CANCEL
-                            </Button>
+                    <div className="select-container">
+                        <div className="select-div">
+                                <InputLabel className="label">Station Name</InputLabel>
+                                <Input type="text" className="input" value={addStationName} onChange={(e) => setAddStationName(e.target.value)}/>
+                        </div>
+                        <div className="select-div">
+                                <InputLabel className="label">Station Code</InputLabel>
+                                <input type="text" className="input" value={addStationCode} maxLength={4}  onChange={(e) => {setAddStationCode(e.target.value); validateStationCode(e.target.value)}}/>
+                        </div>
+                        <div className="select-div">
+                            <InputLabel className="label">Zone</InputLabel>
+                            <Autocomplete
+                                className="form-select"
+                                value={addZone}
+                                onChange={(e, newValue) => setAddZone(newValue || '')}
+                                options={zones}
+                                renderInput={(params) => <TextField {...params}  />}
+                            />
+                        </div>
+                        <div className="select-div">
+                            <InputLabel className="label">State</InputLabel>
+                            <Autocomplete
+                                className="form-select"
+                                value={addState}
+                                onChange={(e, newValue) => setAddState(newValue || '')}
+                                options={states}
+                                renderInput={(params) => <TextField {...params}  />}
+                            />
+                        </div>
+                        <div className="select-div">
+                                <InputLabel className="label">Latitude</InputLabel>
+                                <Input type="text" className="input" value={addLat} onChange={(e) => {setAddLat(e.target.value); validateAddLat(e.target.value)}}/>
+                        </div>
+                        <div className="select-div">
+                                <InputLabel className="label">Longitude</InputLabel>
+                                <Input type="text" className="input" value={addLong} onChange={(e) => {setAddLong(e.target.value); validateAddLong(e.target.value)}}/>
+                        </div>
+                        </div> 
+                        <div className="link-btn">
+                            <div className="link1">
+                                {addlatValid && addlongValid && <Link className="link" href={`https://www.google.com/maps/search/?api=1&query=${lat1},${long1}`} target="_blank" rel="noopener noreferrer">View on Map</Link>}
+                            </div>
+                            <div className="btn1">
+                                <Button onClick={() => handleAddCancel()} className="btn" id="btn2" >
+                                    CANCEL
+                                </Button>
+                                <Button className="btn" onClick={(e) =>{ handleAddsubmit() }}
+                                    style={{backgroundColor:  "#1976d2" , color:  "white" }}
+                                    >
+                                    SUBMIT
+                                </Button>
+                            </div>
                         </div>
                     </div>
-                </div>
-                </Box>
-            </Modal>
-            <Modal open={ edit } onClose={(e) => {handleClose1(e); setEditStationName(''); setEditStationCode(''); setEditZone('');setEditState('');setEditLat(''); setEditLong('');setEditLatValid(false); setEditLongValid(false)}} sx={{ display: 'flex' ,alignItems: 'center', justifyContent: 'center'}}>
-                <Box onClick={(e) => e.stopPropagation()} sx={{
-                    display: 'flex',
-                    alignItems: 'start',
-                    justifyContent: 'start',
-                    fontSize: '50px',
-                    minWidth: '30vw',
-                    maxheight: '60vh',
-                    backgroundColor: 'white',
-                    outline: 'none',
-                    borderRadius: '12px',
-                    flexDirection: 'column',
-                    position: 'relative',
-                    overflow:'visible'
-                }}>  
-                <div className="close-icon1" onClick={handleEditPopUpClose}>  
-                       <Image src={ CloseButtonIcon } alt="close icon"/>
-                </div>
+                    </Box>
+                </Modal>
+                <Modal open={ edit } onClose={(e) => {handleClose1(e); setEditStationName(''); setEditStationCode(''); setEditZone('');setEditState('');setEditLat(''); setEditLong('');setEditLatValid(false); setEditLongValid(false)}} sx={{ display: 'flex' ,alignItems: 'center', justifyContent: 'center'}}>
+                    <Box onClick={(e) => e.stopPropagation()} sx={{
+                        display: 'flex',
+                        alignItems: 'start',
+                        justifyContent: 'start',
+                        fontSize: '50px',
+                        minWidth: '30vw',
+                        maxheight: '60vh',
+                        backgroundColor: 'white',
+                        outline: 'none',
+                        borderRadius: '12px',
+                        flexDirection: 'column',
+                        position: 'relative',
+                        overflow:'visible'
+                    }}>  
+                    <div className="close-icon1" onClick={handleEditPopUpClose}>  
+                        <Image src={ CloseButtonIcon } alt="close icon"/>
+                    </div>
 
-                <div className="whole-popup">
-                    <div className="heading">
-                        <p>    
-                            Edit Station
-                        </p>
-                    </div>
-                   <div className="select-container">
-                       <div className="select-div">
-                            <InputLabel className="label">Station Name</InputLabel>
-                            <Input type="text" className="input" value={editStationName} onChange={(e) => setEditStationName(e.target.value)}/>
-                       </div>
-                       <div className="select-div">
-                            <InputLabel className="label">Station Code</InputLabel>
-                            <input type="text" className="input" value={editStationCode} maxLength={4}  onChange={(e) => {setEditStationCode(e.target.value); validateStationCode(e.target.value)}}/>
-                       </div>
-                       <div className="select-div">
-                        <InputLabel className="label1">Zone</InputLabel>
-                        <Autocomplete
-                            className="form-select"
-                            value={editZone}
-                            onChange={(e, newValue) => setEditZone(newValue || '')}
-                            options={zones}
-                            renderInput={(params) => <TextField {...params}  />}
-                        />
-                       </div>
-                       <div className="select-div">
-                        <InputLabel className="label1">Zone</InputLabel>
-                        <Autocomplete
-                            className="form-select"
-                            value={editState}
-                            onChange={(e, newValue) => setEditState(newValue || '')}
-                            options={states}
-                            renderInput={(params) => <TextField {...params}  />}
-                        />
-                       </div>
-                       <div className="select-div">
-                            <InputLabel className="label">Latitude</InputLabel>
-                            <Input type="text" className="input" value={editLat} onChange={(e) => {setEditLat(e.target.value); validateEditLat(e.target.value) }}/>
-                       </div>
-                       <div className="select-div">
-                            <InputLabel className="label">Longitude</InputLabel>
-                            <Input type="text" className="input" value={editLong} onChange={(e) => {setEditLong(e.target.value); validateEditLong(e.target.value)}}/>
-                       </div>
-                    </div> 
-                    <div className="link-btn">
-                        <div className="link1">
-                             {editLatValid && editLongValid && <Link className="link" href={`https://www.google.com/maps/search/?api=1&query=${editLat},${editLong}`} target="_blank" rel="noopener noreferrer">View on Map</Link>}
+                    <div className="whole-popup">
+                        <div className="heading">
+                            <p>    
+                                Edit Station
+                            </p>
                         </div>
-                        <div className="btn1">
-                            <Button className="btn" onClick={(e) =>{ handleEditSubmit()}}
-                                style={{backgroundColor:  "#1976d2" , color:  "white" }}
-                                >
-                                SUBMIT
-                            </Button>
-                            <Button onClick={() => handleEditCancel()} className="btn" id="btn2" >
-                                CANCEL
-                            </Button>
+                    <div className="select-container">
+                        <div className="select-div">
+                                <InputLabel className="label">Station Name</InputLabel>
+                                <Input type="text" className="input" value={editStationName} onChange={(e) => setEditStationName(e.target.value)}/>
                         </div>
-                    </div>
-                </div>            
-                </Box>
-            </Modal>
-        </div>
+                        <div className="select-div">
+                                <InputLabel className="label">Station Code</InputLabel>
+                                <input type="text" className="input" value={editStationCode} maxLength={4}  onChange={(e) => {setEditStationCode(e.target.value); validateStationCode(e.target.value)}}/>
+                        </div>
+                        <div className="select-div">
+                            <InputLabel className="label">Zone</InputLabel>
+                            <Autocomplete
+                                className="form-select"
+                                value={editZone}
+                                onChange={(e, newValue) => setEditZone(newValue || '')}
+                                options={zones}
+                                renderInput={(params) => <TextField {...params}  />}
+                            />
+                        </div>
+                        <div className="select-div">
+                            <InputLabel className="label">Zone</InputLabel>
+                            <Autocomplete
+                                className="form-select"
+                                value={editState}
+                                onChange={(e, newValue) => setEditState(newValue || '')}
+                                options={states}
+                                renderInput={(params) => <TextField {...params}  />}
+                            />
+                        </div>
+                        <div className="select-div">
+                                <InputLabel className="label">Latitude</InputLabel>
+                                <Input type="text" className="input" value={editLat} onChange={(e) => {setEditLat(e.target.value); validateEditLat(e.target.value) }}/>
+                        </div>
+                        <div className="select-div">
+                                <InputLabel className="label">Longitude</InputLabel>
+                                <Input type="text" className="input" value={editLong} onChange={(e) => {setEditLong(e.target.value); validateEditLong(e.target.value)}}/>
+                        </div>
+                        </div> 
+                        <div className="link-btn">
+                            <div className="link1">
+                                {editLatValid && editLongValid && <Link className="link" href={`https://www.google.com/maps/search/?api=1&query=${editLat},${editLong}`} target="_blank" rel="noopener noreferrer">View on Map</Link>}
+                            </div>
+                            <div className="btn1">
+                                <Button onClick={() => handleEditCancel()} className="btn" id="btn2" >
+                                    CANCEL
+                                </Button>
+                                <Button className="btn" onClick={(e) =>{ handleEditSubmit()}}
+                                    style={{backgroundColor:  "#1976d2" , color:  "white" }}
+                                    >
+                                    SUBMIT
+                                </Button>
+                            </div>
+                        </div>
+                    </div>            
+                    </Box>
+                </Modal>
+            </div>
         </div>
     )
 }
