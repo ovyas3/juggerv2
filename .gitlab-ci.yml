@@ -29,4 +29,3 @@ dev_build:
     - npm ci
     - pm2 reload lucy
     - exit
-  when: manual
