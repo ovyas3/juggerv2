@@ -16,6 +16,7 @@ import { GET_SHIPMENTS, CAPTIVE_RAKE, REMARKS_LIST } from "@/utils/helper";
 import { useSnackbar } from '@/hooks/snackBar';
 import service from '@/utils/timeService';
 import { color } from 'framer-motion';
+import {getShipmentStatusSummary} from '@/utils/hooks'
 
 
 const getStatusCode = (status: string): string => {
@@ -184,43 +185,24 @@ const OrdersPage = () => {
               height: 'calc(100vh - 56px)'
             }}
           >
-            
+
             <div className='outbound_inbound_ageing'>
-              {mobile ?
-                <div className='outbound_inbound'>
-                  {['outbound', 'inbound'].map(bound => (
-                    <div
-                      key={bound}
-                      onClick={() => setSelected_bound(bound)}
-                      className={`outbound_inner ${selected_bound === bound ? 'selected_bound' : ''}`}
-                    >
-                      {t(bound)}
-                    </div>
-                  ))}
-                </div>
+              {mobile ? <div className='outbound_inbound'>
+                {['outbound', 'inbound'].map(bound => (
+                  <div
+                    key={bound}
+                    onClick={() => setSelected_bound(bound)}
+                    className={`outbound_inner ${selected_bound === bound ? 'selected_bound' : ''}`}
+                  >
+                    {t(bound)}
+                  </div>
+                ))}</div>
                 :
                 <div className='mobile_outbound_inbound'>
                   <div className='mobile_outbound'>{t('outbound')}</div>
                 </div>
               }
               <div className='ageing_reload'>
-
-                {selected_bound === 'outbound' ?
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                    <div style={{ fontSize: '12px', color: '#484A57', fontWeight: '500' }}>{t('ageing')}</div>
-                    <div className='ageing_group'>
-                      {ageingCode.map((item, index) => {
-                        return (
-                          <div key={index} className='Ageing'>
-                            <div className='Ageing_dot' style={{ backgroundColor: item.color }}></div>
-                            <div style={{ fontSize: '10px', color: '#484A57' }}>{item.text}</div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                  : <></>
-                }
                 <div className='input_fnr_reload'>
                   <div className={`reload ${reload ? 'loading' : ''}`} onClick={() => {
                     showMessage('Refresh Successfully', 'success')
@@ -242,26 +224,57 @@ const OrdersPage = () => {
               </div>
             </div>
 
-            {selected_bound === 'outbound' ?
-              <div className='tableData' style={{ height: '90%' }}>
-                {
-                  selected_bound === 'outbound' ?
-                    <div className='filters' style={{
-                      position: 'absolute', overflowX: 'auto',
-                      maxWidth: '87%', zIndex: 100,
-                      whiteSpace: 'nowrap'
-                    }} >
-                      <Filters onToFromChange={handleToFromChange} onChangeStatus={handleChangeStatus} onChangeRakeTypes={handleChangeRakeType} reload={reload} getShipments={getAllShipment} shipmentsPayloadSetter={setShipmentsPayload} setTriggerShipments={setTriggerShipments} triggerShipments={triggerShipments} />
-                    </div>
-                    : <></>
-                }
-
-                <div style={{ paddingTop: tablePagination ? '20px' : '45px' }}>
-                  <TableData onSkipLimit={handleSkipLimitChange} allShipments={allShipment} count={count} rakeCaptiveList={rakeCaptiveList} onFnrChange={handleChangeByFnr} reload={reload} getAllShipment={getAllShipment} setTriggerShipments={setTriggerShipments} triggerShipments={triggerShipments} remarksList={remarksList} />
+            <div className='filter_aging_table_display' style={{display:selected_bound==='inbound'?'none':'block'}}>
+              <div className='filters_aging'>
+                <div className='filters' style={{ overflowX: 'auto', maxWidth: '87%' }}>
+                  <Filters onToFromChange={handleToFromChange} onChangeStatus={handleChangeStatus} onChangeRakeTypes={handleChangeRakeType} reload={reload} getShipments={getAllShipment} shipmentsPayloadSetter={setShipmentsPayload} setTriggerShipments={setTriggerShipments} triggerShipments={triggerShipments} />
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 16}}>
+                  <div style={{ fontSize: '12px', color: '#484A57', fontWeight: '500' }}>{t('ageing')}</div>
+                  <div className='ageing_group'>
+                    {ageingCode.map((item, index) => {
+                      return (
+                        <div key={index} className='Ageing'>
+                          <div className='Ageing_dot' style={{ backgroundColor: item.color }}></div>
+                          <div style={{ fontSize: '10px', color: '#484A57' }}>{item.text}</div>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
-              : <></>
-            }
+              <div className='display_status'>
+                    <div className='display_status_inner_box'>
+                      <div style={{fontSize:20, fontWeight:500}}>{getShipmentStatusSummary(allShipment).total}</div>
+                      <div style={{fontSize:12, color:'#7C7E8C'}}>Total</div>
+                    </div>
+                    <div className='display_status_inner_box'>
+                      <div style={{fontSize:20, fontWeight:500}}>{getShipmentStatusSummary(allShipment).inPlant}</div>
+                      <div style={{fontSize:12, color:'#7C7E8C'}}>In Plant</div>
+                    </div>
+                    <div className='display_status_inner_box'>
+                      <div style={{fontSize:20, fontWeight:500}}>{getShipmentStatusSummary(allShipment).inTransit}</div>
+                      <div style={{fontSize:12, color:'#7C7E8C'}}>In Transit</div>
+                    </div>
+                    <div className='display_status_inner_box'>
+                      <div style={{fontSize:20, fontWeight:500}}>{getShipmentStatusSummary(allShipment).delivered}</div>
+                      <div style={{fontSize:12, color:'#7C7E8C'}}>Delivered</div>
+                    </div>
+              </div>
+              <div className='table'>
+                <TableData 
+                  onSkipLimit={handleSkipLimitChange} 
+                  allShipments={allShipment} 
+                  count={count} 
+                  rakeCaptiveList={rakeCaptiveList} 
+                  onFnrChange={handleChangeByFnr} 
+                  reload={reload} 
+                  getAllShipment={getAllShipment} 
+                  setTriggerShipments={setTriggerShipments} 
+                  triggerShipments={triggerShipments} 
+                  remarksList={remarksList} />
+              </div>
+            </div>
 
             {selected_bound === 'inbound' ?
               <div className='coming-soon'>COMING SOON !!!</div>

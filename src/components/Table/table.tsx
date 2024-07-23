@@ -338,7 +338,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
             { id: 'pickupdate', label: 'Invoiced Date', class: 'pickupdate', innerClass: 'inner_pickup' },
             { id: 'status', label: 'Status', class: 'status', innerClass: 'inner_status' },
             { id: 'currentEta', label: 'Current ETA', class: 'currentEta', innerClass: 'inner_eta' },
-            { id: 'deliverDate', label: 'Delivered Date', class: 'deliverDate', innerClass: '' },
+            // { id: 'deliverDate', label: 'Delivered Date', class: 'deliverDate', innerClass: '' },
             { id: 'remarks', label: 'Remarks', class: 'remarks', innerClass: '' },
             { id: 'handlingAgent', label: 'Handling Agent', class: 'handlingAgent', innerClass: '' },
             { id: 'action', label: 'Action', class: 'action', innerClass: '' },
@@ -367,19 +367,8 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
     return (
         <div className='target' >
             <Paper sx={{ width: '100%', overflow: 'hidden', boxShadow: 'none' }}>
-                <TablePagination
-                    rowsPerPageOptions={[5, 10, 25, 50, 100]}
-                    component="div"
-                    count={count}
-                    rowsPerPage={rowsPerPage}
-                    page={page}
-                    onPageChange={handleChangePage}
-                    onRowsPerPageChange={handleChangeRowsPerPage}
-                    labelRowsPerPage="Shipments per page:"
-                    sx={{ height: 40, overflowY: 'hidden' }}
-                />
                 <TableContainer sx={{
-                    border: '1px solid #E9E9EB', borderRadius: '8px', maxHeight: 'calc(90vh - 100px)',
+                    border: '1px solid #E9E9EB', borderRadius: '8px', maxHeight: 'calc(80vh - 100px)',
                     overflowY: 'scroll',
                     '&::-webkit-scrollbar': {
                         display: 'none',
@@ -394,7 +383,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                     return (
                                         <TableCell
                                             key={column.id}
-                                            style={{ fontSize: 12, fontWeight: 'bold', color: '#484A57', padding: '0px 0px 0px 10px', }}
+                                            style={{ fontSize: 12, fontWeight: 'bold', color: '#484A57', padding: '0px 0px 0px 0px', }}
                                             className={column.class}
                                         >
                                             <div className={column.innerClass}>
@@ -425,6 +414,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                 }
                                                 {
                                                     column.id === 'pickupdate' ?
+                                                       
                                                         <div style={{
                                                             transform: pickupSorting ? 'rotate(180deg)' : 'rotate(0deg)',
                                                             transformOrigin: 'center center',
@@ -439,11 +429,14 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                 fontSize='small'
                                                                 style={{ color: 'darkgrey' }}
                                                             /></div>
+                                                   
                                                         : <></>
                                                 }
                                                 {
                                                     column.id === 'currentEta' ?
-                                                        <div style={{
+                                                    <div>
+                                                         <div style={{position:'absolute', top:10, left:90}}>
+                                                         <div style={{
                                                             transform: currentETAsorting ? 'rotate(180deg)' : 'rotate(0deg)',
                                                             transformOrigin: 'center center',
                                                             transition: 'transform 0.3s ease-in-out',
@@ -456,7 +449,13 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                         ><ArrowDownwardIcon
                                                                 fontSize='small'
                                                                 style={{ color: 'darkgrey' }}
-                                                            /></div>
+                                                            />
+                                                        </div>
+                                                         </div>
+                                                         <div>Delivered Date</div>
+                                                    </div>
+                                                       
+                                                       
                                                         : <></>
                                                 }
 
@@ -705,7 +704,19 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                             </div>
                                                         }
                                                         {item.id === 'currentEta' && (
+                                                            <div>
                                                             <PastEta row={row} firstIndex={firstindex} />
+                                                            <div style={{marginTop:16}}>
+                                                            {row.eta && row.status.name === 'Delivered' ? (
+                                                                <>
+                                                                    <div>{service.utcToist(row.eta)}</div>
+                                                                    <div>{service.utcToistTime(row.eta)}</div>
+                                                                </>
+                                                            ) : (
+                                                                'NA'
+                                                            )}
+                                                            </div>
+                                                            </div>
                                                         )}
                                                         {item.id === 'remarks' && (
                                                             <RemarkComponent row={row} firstIndex={firstindex} />
@@ -714,7 +725,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                             !row.rrDoc &&
                                                             <span>{row.daysAging} Days</span>
                                                         } */}
-                                                        {item.id === 'deliverDate' && (
+                                                        {/* {item.id === 'deliverDate' && (
                                                             <div>
                                                                 {row.eta && row.status.name === 'Delivered' ? (
                                                                     <>
@@ -725,7 +736,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                     'NA'
                                                                 )}
                                                             </div>
-                                                        )}
+                                                        )} */}
                                                         {item.id === 'material' && row.commodity_desc && (
                                                             <div className='material_items'>
                                                                 <div style={{ color: '#7C7E8C', marginTop: '5px' }}>{row.commodity_desc[0]}</div>
@@ -764,6 +775,17 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                 {!response.length ? <div className='no_shipments_found'>No Shipments Found</div>
                     : <></>
                 }
+                <TablePagination
+                    rowsPerPageOptions={[5, 10, 25, 50, 100]}
+                    component="div"
+                    count={count}
+                    rowsPerPage={rowsPerPage}
+                    page={page}
+                    onPageChange={handleChangePage}
+                    onRowsPerPageChange={handleChangeRowsPerPage}
+                    labelRowsPerPage="Shipments per page:"
+                    sx={{ height:40, overflowY: 'hidden', position:'absolute',top: '139px',right: '12px'}}
+                />
             </Paper>
             <RRModal isOpen={isRRModalOpen} isClose={() => setRRModalOpen(false)} rrNumbers={rrNumbers} isRRDoc={isRRDoc} />
             <Modal
@@ -929,9 +951,9 @@ function Remarks({ shipmentId, setOpen, remarksList, getAllShipment }: RemarksPr
                 >
                     <ClickAwayListener onClickAway={(e) => handleClose(e)}>
                         <Paper style={{ maxHeight: 300, overflow: 'auto' }}>
-                            {Object.entries(remarksList).map(([category, options]) => [
+                            {remarksList && Object.entries(remarksList)?.map(([category, options]) => [
                                 <ListSubheader key={category}>{category}</ListSubheader>,
-                                ...options.map((option: string, index: number) => (
+                                ...options?.map((option: string, index: number) => (
                                     <MenuItem
                                         key={`${category}-${index}`}
                                         onClick={(e) => { handleRemarkSelect(option); handleClose(e); }}
