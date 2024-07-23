@@ -16,7 +16,7 @@ import { GET_SHIPMENTS, CAPTIVE_RAKE, REMARKS_LIST } from "@/utils/helper";
 import { useSnackbar } from '@/hooks/snackBar';
 import service from '@/utils/timeService';
 import { color } from 'framer-motion';
-import {getShipmentStatusSummary} from '@/utils/hooks'
+import { getShipmentStatusSummary } from '@/utils/hooks'
 
 
 const getStatusCode = (status: string): string => {
