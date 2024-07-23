@@ -143,3 +143,24 @@ export function getColorCode(days : any) {
 export function getUniqueValues(arr : any) {
   return [...new Set(arr)];
 }
+
+export function getShipmentStatusSummary(shipments:any) {
+  const summary = {
+    total: shipments.length,
+    inTransit: 0,
+    inPlant: 0,
+    delivered: 0
+  };
+
+  for (const shipment of shipments) {
+    if (!shipment.status) {
+      summary.inPlant++;
+    } else if (shipment.status.toLowerCase() === 'delivered') {
+      summary.delivered++;
+    } else {
+      summary.inTransit++;
+    }
+  }
+
+  return summary;
+}

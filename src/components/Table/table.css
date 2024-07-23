@@ -1,6 +1,6 @@
 .edemand {
     min-width: 120px !important;
-    padding-right: 25px !important;
+    padding-left: 10px !important;
 }
 
 .fnr {
@@ -15,20 +15,18 @@
     width: 90px !important;
     padding: 0 4px;
     text-align: center;
-
-}
-
-.eld{
-    min-width: 130px !important;
-    padding-inline: 20px !important;
-    line-height: 20px !important;
 }
 
 .destination {
-    min-width: 180px !important;
+    max-width: 150px !important;
     text-wrap: nowrap !important;
-    /* padding-right: 41px !important; */
-    padding-inline:20px !important;
+    padding-inline: 20px !important;
+}
+
+.eld {
+    min-width: 130px !important;
+    padding-inline: 20px !important;
+    line-height: 20px !important;
 }
 
 .aging {
@@ -37,16 +35,15 @@
 }
 
 .material {
-    min-width: 120px !important;
-    /* max-width: 150px !important; */
-    /* padding-inline: 20px !important; */
-    /* background-color: #18BE8A !important; */
+    padding-inline: 10px !important;
+    min-width: 130px !important;
 }
 
 .pickupdate {
     min-width: 100px !important;
     text-wrap: nowrap;
-    padding-right: 15px !important;
+    padding-inline: 20px !important;
+
 }
 
 .inner_pickup {
@@ -57,8 +54,8 @@
 
 .inner_eta {
     display: flex !important;
-    flex-direction: row !important;
-    gap: 10px;
+    flex-direction: column !important;
+    position: relative;
 }
 
 .ownedby {
@@ -67,15 +64,8 @@
 
 .status {
     max-width: 150px !important;
-    min-width: 75px !important;
-}
-
-.inner_status {
-    /* background-color: aqua !important; */
-    display: flex;
-    gap: 24px;
-    width: 150px;
-    align-items: center;
+    min-width: 100px !important;
+    padding-inline: 10px !important;
 }
 
 .fois {
@@ -106,8 +96,10 @@
 }
 
 .currentEta {
-    min-width: 90px !important;
+    min-width: 120px !important;
     text-wrap: nowrap;
+    /* background-color: #0168FF !important; */
+    line-height: 20px !important;
 }
 
 .deliverDate {
@@ -117,8 +109,8 @@
 }
 
 .remarks {
-    /* background-color: darkslategray!important; */
     min-width: 86px !important;
+    padding-inline: 10px !important;
 }
 
 .handlingAgent {
@@ -156,21 +148,22 @@
 
 
 /* -------------------------------- */
-.body_edemand{
-    padding-right: 25px !important;
-}
+.body_edemand {}
+
 .body_fnr {
     padding-inline: 25px !important;
 }
 
 .body_destination {
     max-width: 150px;
-    padding-inline:35px !important;
+    padding-inline: 25px !important;
 }
-.body_material{
-    max-width: 150px !important;
-    /* background-color: #0168FF; */
+
+.body_material {
+    max-width: 180px !important;
+    padding-inline: 15px !important;
 }
+
 .body_aging {
     text-wrap: nowrap;
     padding-left: 36px !important;
@@ -184,10 +177,16 @@
 
 .body_status {
     padding-right: 10px !important;
+    max-width: 150px !important;
+
+}
+
+.body_pickupdate {
+    padding-inline: 25px !important;
 }
 
 .body_remarks {
-    padding-right: 10px !important;
+    padding-inline: 15px !important;
 }
 
 .body_action {
@@ -197,8 +196,9 @@
 .body_deliveryDate {
     padding-inline: 26px !important;
 }
-.body_eld{
-    padding-inline: 20px !important;
+
+.body_eld {
+    padding-inline: 25px !important;
 }
 
 
@@ -514,8 +514,8 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    height:400px;
-    width:calc(100vw - 120px);
+    height: 400px;
+    width: calc(100vw - 120px);
     font-family: "Plus Jakarta Sans";
 }
 .mui-1ncgey5-MuiTableContainer-root {
