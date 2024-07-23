@@ -518,3 +518,6 @@
     width:calc(100vw - 120px);
     font-family: "Plus Jakarta Sans";
 }
+.mui-1ncgey5-MuiTableContainer-root {
+    margin-top: 10px !important;
+}
