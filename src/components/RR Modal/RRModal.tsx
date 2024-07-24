@@ -63,6 +63,7 @@ const RRModal: React.FC<PopupProps> = ({ isOpen, isClose, rrNumbers, isRRDoc }) 
         senderWeight: data && data.sender_weight ? data.sender_weight : 'N/A',
         consigneeName: data && data.consignee && data.consignee.name ? data.consignee.name : 'N/A',
         consigneeAddress: data && data.consignee && data.consignee.address ? data.consignee.address : 'N/A',
+        GST: data && data.other_charges && data.other_charges.GST ? data.other_charges.GST.toLocaleString('en-IN') : 'N/A',
       };
   
       const tableData = data && data.wagon_details ? 
@@ -76,6 +77,7 @@ const RRModal: React.FC<PopupProps> = ({ isOpen, isClose, rrNumbers, isRRDoc }) 
               noOfArticles: wagon.no_of_articles ? wagon.no_of_articles : 'N/A',
               grossWeight: wagon.grossWeight ? wagon.grossWeight : 'N/A',
               actualWt: wagon.actualWeight ? wagon.actualWeight : 'N/A',
+              utilised:(wagon.actualWeight && wagon.grossWeight) ? (wagon.actualWeight / wagon.grossWeight) * 100 : 'N/A',
             };
           } )
           : [];
@@ -193,6 +195,10 @@ const RRModal: React.FC<PopupProps> = ({ isOpen, isClose, rrNumbers, isRRDoc }) 
                     <h4 className="rrmodal-content-upper-item-heading">Total Freight (₹)</h4>
                     <p className="rrmodal-content-upper-item-value">{ rrDetails.totalFreight }</p>
                   </div>
+                  <div className="rrmodal-content-upper-item">
+                    <h4 className="rrmodal-content-upper-item-heading">GST (₹)</h4>
+                    <p className="rrmodal-content-upper-item-value">{ rrDetails.GST }</p>
+                  </div>
                 </div>
               </>}
                 </div>
@@ -206,10 +212,11 @@ const RRModal: React.FC<PopupProps> = ({ isOpen, isClose, rrNumbers, isRRDoc }) 
                           <TableCell align="left" className="rrmodal-table-headers">Wagon Type</TableCell>
                           <TableCell align="left" className="rrmodal-table-headers">Wagon No.</TableCell>
                           <TableCell align="left" className="rrmodal-table-headers">No. Of Articles</TableCell>
-                          <TableCell align="left" className="rrmodal-table-headers">Gross Weight (MT)</TableCell>
-                          <TableCell align="center" className="rrmodal-table-headers">Tare (MT)</TableCell>
-                          <TableCell align="left" className="rrmodal-table-headers">CC (MT)</TableCell>
                           <TableCell align="left" className="rrmodal-table-headers">Actual Weight (MT)</TableCell>
+                          <TableCell align="left" className="rrmodal-table-headers">Gross Weight (MT)</TableCell>
+                          <TableCell align="left" className="rrmodal-table-headers">CC (MT)</TableCell>
+                          <TableCell align="center" className="rrmodal-table-headers">Tare (MT)</TableCell>
+                          <TableCell align="left" className="rrmodal-table-headers">Utilised</TableCell>
                         </TableRow>
                       </TableHead>
 
@@ -221,10 +228,11 @@ const RRModal: React.FC<PopupProps> = ({ isOpen, isClose, rrNumbers, isRRDoc }) 
                             <TableCell align="left" className="rrmodal-table-body-items">{row.type}</TableCell>
                             <TableCell align="left" className="rrmodal-table-body-items">{row.wagonNo}</TableCell>
                             <TableCell align="left" className="rrmodal-table-body-items">{row.noOfArticles}</TableCell>
-                            <TableCell align="left" className="rrmodal-table-body-items">{row.grossWeight}</TableCell>
-                            <TableCell align="left" className="rrmodal-table-body-items">{row.tare}</TableCell>
-                            <TableCell align="left" className="rrmodal-table-body-items">{row.cc}</TableCell>
                             <TableCell align="left" className="rrmodal-table-body-items">{row.actualWt}</TableCell>
+                            <TableCell align="left" className="rrmodal-table-body-items">{row.grossWeight}</TableCell>
+                            <TableCell align="left" className="rrmodal-table-body-items">{row.cc}</TableCell>
+                            <TableCell align="left" className="rrmodal-table-body-items">{row.tare}</TableCell>
+                            <TableCell align="left" className="rrmodal-table-body-items">{row.utilised} %</TableCell>
                           </TableRow>
                         ))}
                       </TableBody>

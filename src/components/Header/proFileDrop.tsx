@@ -11,6 +11,7 @@ import PersonIcon from '@mui/icons-material/Person';
 import SettingsIcon from '@mui/icons-material/Settings';
 import EmailIcon from '@mui/icons-material/Email';
 import HelpIcon from '@mui/icons-material/Help';
+import InviteIcon from '../../assets/Invite_icon.svg';
 import LogoutIcon from '@mui/icons-material/Logout';
 
 import './proFileDrop.css'
@@ -56,6 +57,11 @@ export default function AccountMenu() {
       }
     }
   }, []);
+
+  const handleNavigation = (path: string) => {
+    router.push(path);
+    handleClose();
+  };
 
   return (
     <React.Fragment>
@@ -116,6 +122,12 @@ export default function AccountMenu() {
                 <PersonIcon className="translateIcon" sx={{height:14, width:14}}/>
             </div>
             Profile
+        </MenuItem>
+        <MenuItem onClick={() => handleNavigation('/handlingAgent')} className="menuItem"  sx={{fontSize:14, fontWeight:500}}>
+            <div className="iconContainer">
+              <img src={InviteIcon.src} className="translateIcon" style={{height: 14, width: 14}} />
+            </div>
+            Invite
         </MenuItem>
 
         <MenuItem onClick={handleClose} className="menuItem" sx={{fontSize:14, fontWeight:500}}>

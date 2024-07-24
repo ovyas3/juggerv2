@@ -1,4 +1,5 @@
 'use client'
+import { useRouter } from 'next/navigation';
 import React, { useState, useEffect, useRef } from "react";
 import { MapContainer, TileLayer, Marker, LayersControl, Popup, GeoJSON, Polyline } from 'react-leaflet';
 import MarkerClusterGroup from "react-leaflet-cluster";
@@ -24,6 +25,9 @@ import dayjs from 'dayjs';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 
+import IdleIcon from "@/assets/idle_icon.svg";
+import InactiveIcon from "@/assets/inactive_icon.svg";
+import {countTracking} from '@/utils/hooks'
 
 import { Icon, divIcon, point } from "leaflet";
 import L from 'leaflet';
@@ -38,6 +42,10 @@ import {
     CardContent,
     Chip,
     Grid,
+    ListItemText,
+    MenuItem,
+    OutlinedInput,
+    Select,
     Typography,
     useMediaQuery,
   } from "@mui/material";
@@ -112,9 +120,39 @@ const colorOfStatus = (status: string) => {
   }
 }
 
-const ShipmentCard = ({ index, shipment, handleShipmentSelection }: {index: number, shipment: any, handleShipmentSelection:any}) => {
+
+const MenuProps = {
+  PaperProps: {
+      style: {
+          minWidth:'7%',
+          width: '7%',
+          marginTop: '4px',
+          border: '1px solid grey'
+      },
+  },
+};
+
+interface ShipmentCardProps {
+  index: number;
+  shipment: any;
+  handleShipmentSelection: (shipment: any) => void;
+  handleNavigation: (unique_code: string) => void;
+}
+
+const ShipmentCard: React.FC<ShipmentCardProps> = ({ 
+  index, 
+  shipment, 
+  handleShipmentSelection, 
+  handleNavigation 
+}) => {
   const gps = shipment.trip_tracker?.last_location?.fois || shipment.pickup_location?.geo_point;
   const isTracking = gps && gps.coordinates.length > 0 ? true : false;
+
+  const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+    e.stopPropagation();
+    handleNavigation(shipment.unique_code);
+  };
+
   return <Card style={{
     borderRadius: '10px',
     marginTop: index == 0 ? '24px' :'15px',
@@ -147,15 +185,25 @@ const ShipmentCard = ({ index, shipment, handleShipmentSelection }: {index: numb
         </Grid>
       </Typography>
       <Typography variant="h6" component="div" id="shipment-list-fnr" sx={{fontFamily: '"Inter", sans-serif !important'}}>
-        # {shipment.all_FNRs ? shipment.all_FNRs[0]: 'N/A'}
+        # {shipment.all_FNRs ? <a  onClick={handleLinkClick}  style={{ cursor: 'pointer', textDecoration: 'underline', color: 'blue' }}>
+            {shipment.all_FNRs[0]}
+          </a>: 'N/A'}
+        <span className="extraFnr-indicator">
+          <span className="fnr-count">{shipment.all_FNRs && shipment.all_FNRs.length > 1 ? `+${shipment.all_FNRs.length - 1} more` : ''}</span>
+          <span className="more-fnr-indicator">
+              {shipment.all_FNRs && shipment.all_FNRs.length > 1 ? shipment.all_FNRs.slice(1).map((item:any, index:number)=>{
+                return <div key={index} className="each-fnr">{item}</div>
+              }) : '' }
+          </span>
+        </span>
       </Typography>
       <Typography variant="body2" component="div">
         <Grid container >
-          <Grid item xs={12}>
+          {/* <Grid item xs={12}>
             <Typography variant="body2" component="div" id="shipment-list-bottom">
               <Image height={10} alt="pickup" src={pickupIcon} /> - {shipment.pickup_location?.name} ({shipment.pickup_location?.code})
             </Typography>
-          </Grid>
+          </Grid> */}
           <Grid item xs={12}>
             <Typography variant="body2" component="div" id="shipment-list-bottom">
             <Image height={10} alt="drop" src={dropIcon} /> - {shipment.delivery_location?.name} ({shipment.delivery_location?.code})
@@ -167,13 +215,19 @@ const ShipmentCard = ({ index, shipment, handleShipmentSelection }: {index: numb
   </Card>
 }
 
-type StatusKey = 'OB' | 'ITNS' | 'Delivered';
+type StatusKey = 'OB' | 'ITNS' | 'Delivered'|'none';
 
 const statusMapping: Record<StatusKey, string[]> = {
   OB: ['', 'OB'],
   ITNS: ['Delivered', '', 'OB'],
-  Delivered: ['Delivered']
+  Delivered: ['Delivered'],
+  none: [''],
 };
+
+interface TrackingStatus {
+  tracking: number;
+  notTracking: number;
+}
 
 // Main Component for Map Layers
 const MapLayers = () => {
@@ -192,6 +246,8 @@ const MapLayers = () => {
     const [inTransitShipments, setInTransitShipments] = useState<any[]>([]);
     const [deliveredShipments, setDeliveredShipments] = useState<any[]>([]);
     const [filteredShipments, setFilteredShipments] = useState<any[]>([]);
+    const [searcedShipments, setSearchedShipments] = useState<any[]>([]);
+    const [showSearched, setShowSearched] = useState<boolean>(false);
     const [showFiltered, setShowFiltered] = useState<boolean>(false);
     const [showAll, setShowAll] = useState<boolean>(true);
     const [showIdle, setShowIdle] = useState<boolean>(true);
@@ -201,6 +257,83 @@ const MapLayers = () => {
     const [selectedToDate, setSelectedToDate] = React.useState<dayjs.Dayjs | null>(dayjs());
     const [openFromDatePicker,setOpenFromDatePicker] = useState(false);
     const [openToDatePicker,setOpenToDatePicker] = useState(false);
+    const [trackingNonTracking, setTrackingNonTracking] = useState<TrackingStatus>({ tracking: 0, notTracking: 0 });
+  
+    const [selectedType,setSelectedType] = useState('FNR No.')
+    const [searchInput,setSearchInput] = useState('')
+    const router = useRouter();
+
+    const handleNavigation = (unique_code: string) => {
+      setTimeout(() => {
+        router.push(`/tracker?unique_code=${unique_code}`);
+      }, 0);
+    };
+
+
+    const filterTypes = ["FNR No.","Dest. Code"]
+
+    function handleChange(event: any) {
+      const type = event.target.value
+      if(type!== selectedType) {
+       setSelectedType(event.target.value)
+       setSearchInput('')
+      }
+    }
+
+
+    useEffect(() => {
+       setShowSearched(false )
+    }, [allShipments,filteredShipments]);
+   
+    function handleSearchInput(event: any) {
+      const searchQuery = event.target.value;
+      setSearchInput(searchQuery);
+      setShowSearched(true);
+      if (selectedType === "FNR No.") {
+        if (showFiltered) {
+          const filteredData = filteredShipments.filter((shipment) =>
+          { 
+              const data = shipment.all_FNRs.filter((fnr: String) =>
+              fnr.toLowerCase().includes(searchQuery.toLowerCase())
+            )
+            return Boolean(data.length)
+          }
+          );
+          setSearchedShipments(filteredData);
+          setShowSearched(true);
+        } else {
+          const filteredData = allShipments.filter((shipment) =>
+          {
+            const data = shipment?.all_FNRs?.filter((fnr: String) =>
+              fnr.toLowerCase().includes(searchQuery.toLowerCase())
+            )
+            return Boolean(data.length)
+          }
+          );
+          setSearchedShipments(filteredData);
+          setShowSearched(true);
+        }
+      } else if (selectedType === "Dest. Code") {
+        setShowSearched(true);
+        if (showFiltered) {
+          const filteredData = filteredShipments.filter((shipment) =>
+            shipment?.delivery_location?.code
+              ?.toLowerCase()
+              .includes(searchQuery.toLowerCase())
+          );
+          setSearchedShipments(filteredData);
+          setShowSearched(true);
+        } else {
+          const filteredData = allShipments.filter((shipment) =>
+            shipment?.delivery_location?.code
+              ?.toLowerCase()
+              .includes(searchQuery.toLowerCase())
+          );
+          setSearchedShipments(filteredData);
+          setShowSearched(true);
+        }
+      }
+    }
 
     const geoJSONStyle: L.PathOptions = {
       color: 'black', // Set the color of train tracks
@@ -251,18 +384,21 @@ const MapLayers = () => {
       return shipmentData;
     }
 
-    const filterShipments = (status: StatusKey) => {
+    const filterShipments = (status: StatusKey, event:any) => {
       let filteredShipments: any[] = [];
       if (status === 'OB') {
         filteredShipments = allShipments.filter((shipment: any) => shipment.status === '');
+        setTrackingNonTracking(countTracking(filteredShipments))
         const idle = getTrackingShipment(filteredShipments);
         setIdleShipments(idle);
       } else if (status === 'ITNS') {
         filteredShipments = allShipments.filter((shipment: any) => shipment.status !== 'Delivered' && shipment.status !== '');
+        setTrackingNonTracking(countTracking(filteredShipments))
         const inTransit = getTrackingShipment(filteredShipments);
         setInTransitShipments(inTransit);
       } else if (status === 'Delivered') {
         filteredShipments = allShipments.filter((shipment: any) => shipment.status === 'Delivered');
+        setTrackingNonTracking(countTracking(filteredShipments))
         const delivered = getTrackingShipment(filteredShipments);
         setDeliveredShipments(delivered);
       }
@@ -308,6 +444,7 @@ const MapLayers = () => {
       setShowIdle(true);
       setShowInTransit(true);
       setShowDelivered(true);
+      setTrackingNonTracking(countTracking(shipments))
 
       setAllShipments([...inTransit, ...idle, ...delivered]);
     }
@@ -320,7 +457,7 @@ const MapLayers = () => {
 
     useEffect(() => {
       const toTime = dayjs();
-      const fromTime = toTime.subtract(30, 'day');
+      const fromTime = toTime.subtract(7, 'day');
       setSelectedFromDate(fromTime);
       setSelectedToDate(toTime);
     }, []);
@@ -388,7 +525,7 @@ const MapLayers = () => {
         <div className="shipment-map-container">
           {isMobile ? <SideDrawer /> : null}
           <div style={{ width: '100%', overflow: 'hidden' }}>
-            {isMobile ? <Header title="Shipments Map View" isMapHelper={false}></Header> : <MobileHeader />}
+            {isMobile ? <Header title="Shipments Map View" isMapHelper={false} isShipmentMapView={true}></Header> : <MobileHeader />}
             <div style={{ paddingInline: 24, paddingTop: 24, paddingBottom: 65,  position:'relative' }}>
               <MapContainer className="map" id="shipment-map" center={center} zoom={5.4} style={{ minHeight: '105%',width: '101%', padding: '0px', zIndex: '0', position: 'fixed' }} attributionControl={false} ref={setMap} >
                 <div className={"layersControl"} style={{marginTop:'10px'}} >
@@ -419,11 +556,11 @@ const MapLayers = () => {
                           </Typography>
                           <Typography variant="body2" component="div">
                             <Grid container>
-                              <Grid item xs={12}>
+                              {/* <Grid item xs={12}>
                                 <Typography variant="body2" component="div">
                                   <Image height={10} alt="pickup" src={pickupIcon} /> - {shipment.pickup}
                                 </Typography>
-                              </Grid>
+                              </Grid> */}
                               <Grid item xs={12}>
                                 <Typography variant="body2" component="div">
                                 <Image height={10} alt="drop" src={dropIcon} /> - {shipment.delivery}
@@ -449,11 +586,11 @@ const MapLayers = () => {
                           </Typography>
                           <Typography variant="body2" component="div">
                             <Grid container>
-                              <Grid item xs={12}>
+                              {/* <Grid item xs={12}>
                                 <Typography variant="body2" component="div">
                                   <Image height={10} alt="pickup" src={pickupIcon} /> - {shipment.pickup}
                                 </Typography>
-                              </Grid>
+                              </Grid> */}
                               <Grid item xs={12}>
                                 <Typography variant="body2" component="div">
                                 <Image height={10} alt="drop" src={dropIcon} /> - {shipment.delivery}
@@ -479,11 +616,11 @@ const MapLayers = () => {
                           </Typography>
                           <Typography variant="body2" component="div">
                             <Grid container>
-                              <Grid item xs={12}>
+                              {/* <Grid item xs={12}>
                                 <Typography variant="body2" component="div">
                                   <Image height={10} alt="pickup" src={pickupIcon} /> - {shipment.pickup}
                                 </Typography>
-                              </Grid>
+                              </Grid> */}
                               <Grid item xs={12}>
                                 <Typography variant="body2" component="div">
                                 <Image height={10} alt="drop" src={dropIcon} /> - {shipment.delivery}
@@ -603,7 +740,7 @@ const MapLayers = () => {
                   </LocalizationProvider>
                 </Box>
                 <Box className="shipment-heads">
-                <Paper className="shipment-head-lists"
+                  <Paper className="shipment-head-lists"
                       onClick={() => {
                         getShipments();
                         map?.flyTo(center, 5, { duration: 1 });
@@ -616,7 +753,7 @@ const MapLayers = () => {
                     </Typography>
                   </Paper>
                   <Paper className="shipment-head-lists"
-                      onClick={() => filterShipments('OB')}  elevation={3} color="info">
+                      onClick={(e) => filterShipments('OB',e)}  elevation={3} color="info">
                     <Typography variant="h6" color="info" component="div" className="shipment-head-list-texts">
                       In Plant
                     </Typography>
@@ -625,7 +762,7 @@ const MapLayers = () => {
                     </Typography>
                   </Paper>
                   <Paper className="shipment-head-lists" 
-                      onClick={() => filterShipments('ITNS')} elevation={3} color="info">
+                      onClick={(e) => filterShipments('ITNS',e)} elevation={3} color="info">
                     <Typography variant="h6" component="div" className="shipment-head-list-texts">
                       In Transit
                     </Typography>
@@ -634,7 +771,7 @@ const MapLayers = () => {
                     </Typography>
                   </Paper>
                   <Paper className="shipment-head-lists" 
-                      onClick={() => filterShipments('Delivered')}  elevation={3} color="info">
+                      onClick={(e) => filterShipments('Delivered',e)}  elevation={3} color="info">
                     <Typography variant="h6" component="div" className="shipment-head-list-texts">
                       Delivered
                     </Typography>
@@ -643,15 +780,72 @@ const MapLayers = () => {
                     </Typography>
                   </Paper>
                 </Box>
+                <Box className="tracking-nonTracking-status">
+                  <div style={{display:'flex'}}>
+                  <div className="tracking_firstSection" id="tracking">
+                    <Image src={IdleIcon} alt="" className="Image_idleIcon" width={32} height={32} />
+                    <div className="">
+                      <div style={{fontWeight:600, fontSize:16}}>{trackingNonTracking.tracking}</div>
+                      <div style={{fontSize:12}}>Tracking</div>
+                    </div>
+                  </div>
+                  <div className="tracking_secondSection" id="nonTracking" >
+                    <Image src={InactiveIcon} alt="" className="Image_idleIcon" width={32} height={32} />
+                    <div className="">
+                      <div style={{fontWeight:600, fontSize:16}}>{trackingNonTracking.notTracking}</div>
+                      <div style={{fontSize:12}}>Non Tracking</div>
+                    </div>
+                  </div>
+                  </div>
+                  <div className='search-wrapper'>
+                    <Select
+                        labelId="demo-multiple-checkbox-label"
+                        id="demo-multiple-checkbox"
+                        value={selectedType}
+                        className='status_select'
+                        onChange={handleChange}
+                        style={{height:'28px',background:'lightgray',width:"105px"}}
+                        sx={{
+                          '&.MuiPaper-root': {
+                            border:'1px solid black'
+                          }
+                        }}
+                        input={<OutlinedInput
+                            sx={{
+                                width: '120px',
+                                '& .MuiOutlinedInput-notchedOutline': {
+                                    border: '1px solid #E9E9EB'
+                                },
+                                '&:hover .MuiOutlinedInput-notchedOutline': {
+                                    border: '1px solid #E9E9EB'
+                                },
+                                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                    border: '1px solid #E9E9EB'
+                                }
+                            }}
+                        />}
+                        MenuProps={MenuProps}
+                    >
+                        {filterTypes.map((name) => (
+                            <MenuItem key={name} value={name} sx={{ padding: 0,paddingLeft:'8px' }} >
+                                <ListItemText primary={name} primaryTypographyProps={{ fontSize: '12px', fontFamily: 'Inter, sans-serif' }} />
+                            </MenuItem>
+                        ))}
+                    </Select><input placeholder="search" value={searchInput} onInput={handleSearchInput}/>
+                    </div>
+                </Box>
                 <Box sx={{
                   maxHeight: 'calc(75vh - 60px)',
                   overflowY: 'scroll',
                 }} className="shipment-details-container">
-                  {showFiltered && filteredShipments.map((shipment, index) => {
-                    return <ShipmentCard key={index} index={index} shipment={shipment} handleShipmentSelection={handleShipmentSelection} />
+                  {showFiltered && !showSearched  && filteredShipments.map((shipment, index) => {
+                    return <ShipmentCard key={index} index={index} shipment={shipment} handleShipmentSelection={handleShipmentSelection}  handleNavigation={handleNavigation} />
                   })}
-                  {showAll && allShipments.map((shipment, index) => {
-                    return <ShipmentCard key={index} index={index} shipment={shipment} handleShipmentSelection={handleShipmentSelection} />
+                  {showAll && !showSearched && allShipments.map((shipment, index) => {
+                    return <ShipmentCard key={index} index={index} shipment={shipment} handleShipmentSelection={handleShipmentSelection} handleNavigation={handleNavigation} />
+                  })}
+                    {showSearched && searcedShipments.map((shipment, index) => {
+                    return <ShipmentCard key={index} index={index} shipment={shipment} handleShipmentSelection={handleShipmentSelection} handleNavigation={handleNavigation} />
                   })}
                 </Box>
               </Box>

@@ -325,6 +325,8 @@ function Filters({ onToFromChange, onChangeStatus, onChangeRakeTypes , reload, s
                     </Select>
                 </FormControl>
             </div>
+
+
             <div className='status_container' style={{width:'180px'}}>
                 <FormControl sx={{
                     width:'180px', margin: 0, padding: 0,
@@ -373,7 +375,7 @@ function Filters({ onToFromChange, onChangeStatus, onChangeRakeTypes , reload, s
             <div>
             <motion.div
                 className="box"
-                whileHover={{ scale: 1.1 }}
+                whileHover={{ scale: 0.95 }}
                 whileTap={{ scale: 0.9 }}
                 transition={{ type: "spring", stiffness: 400, damping: 10 }}
                 onClick={() => window.open('/shipment_map_view', '_blank')}

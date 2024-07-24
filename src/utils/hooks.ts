@@ -94,3 +94,73 @@ export function calculateDaysDifference(demandDate: string | null): number | "NA
       return "NA";
   }
 }
+
+export function countTracking(arr: any[]) {
+  // Initialize counts
+  let trackingCount = 0;
+  let nonTrackingCount = 0;
+
+  // Iterate over each item in the array
+  arr.forEach((shipment: any) => {
+    const gps = shipment.trip_tracker?.last_location?.fois || shipment.pickup_location?.geo_point;
+    const isTracking = gps && gps.coordinates && gps.coordinates.length > 0;
+
+    if (isTracking) {
+      trackingCount++;
+    } else {
+      nonTrackingCount++;
+    }
+  });
+
+  // Return an object with counts
+  return {
+    tracking: trackingCount,
+    notTracking: nonTrackingCount
+  };
+}
+
+const ageingCode = [
+  { color: 'green', code: '#18BE8A', text: '1-2 days' },
+  { color: 'yellow', code: '#FFD60A', text: '3-6 days' },
+  { color: 'orange', code: '#FF9800', text: '6-9 days' },
+  { color: 'red', code: '#E6667B', text: '≥10 days' },
+];
+
+export function getColorCode(days : any) {
+  if (days >= 1 && days <= 2) {
+    return ageingCode[0].code;
+  } else if (days >= 3 && days <= 6) {
+    return ageingCode[1].code;
+  } else if (days >= 7 && days <= 9) {
+    return ageingCode[2].code;
+  } else if (days >= 10) {
+    return ageingCode[3].code;
+  } else {
+    return '#FFFFFF';
+  }
+}
+
+export function getUniqueValues(arr : any) {
+  return [...new Set(arr)];
+}
+
+export function getShipmentStatusSummary(shipments:any) {
+  const summary = {
+    total: shipments.length,
+    inTransit: 0,
+    inPlant: 0,
+    delivered: 0
+  };
+
+  for (const shipment of shipments) {
+    if (!shipment.status) {
+      summary.inPlant++;
+    } else if (shipment.status.toLowerCase() === 'delivered') {
+      summary.delivered++;
+    } else {
+      summary.inTransit++;
+    }
+  }
+
+  return summary;
+}

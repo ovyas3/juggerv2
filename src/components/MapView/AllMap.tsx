@@ -16,7 +16,7 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
-import { Tooltip } from '@mui/material';
+import { TextField, Tooltip } from '@mui/material';
 
 import { Icon, divIcon, point } from "leaflet";
 import L from 'leaflet';
@@ -41,6 +41,8 @@ import Header from "@/components/Header/header";
 import Image from "next/image";
 import IdleIcon from "@/assets/idle_icon.svg";
 import InactiveIcon from "@/assets/inactive_icon.svg";
+import { styled as muiStyled } from '@mui/material/styles';
+
 
 import { DateTime } from "luxon";
 import service from "@/utils/timeService";
@@ -101,6 +103,23 @@ const MapLayers = () => {
     const [selectedRake, setSelectedRake] = useState<any>(null);
     const selectedMarkerRef = useRef<L.Marker | null>(null);
     const [selectedType,setSelectedType] = useState('total')
+    const [searchRakeName, setSearchRakeName] = useState('')
+    const [searchFnrNumber, setSearchFnrNumber] = useState('')
+
+    const inputRefRakeName = useRef<any>(null);
+    const inputRefFnrNumber = useRef<any>(null);    
+
+    useEffect(() => {
+      if (inputRefRakeName.current && searchRakeName !== '') {
+        inputRefRakeName.current.focus();
+      }
+    }, [searchRakeName]);
+
+    useEffect(() => {
+      if (inputRefFnrNumber.current && searchFnrNumber !== '') {
+        inputRefFnrNumber.current.focus();
+      }
+    }, [searchFnrNumber]);
 
     const geoJSONStyle: L.PathOptions = {
       color: 'black', // Set the color of train tracks
@@ -110,6 +129,41 @@ const MapLayers = () => {
       dashArray: '2, 10', // Set the dash pattern to mimic railroad ties
       lineCap: 'square' as 'square', // This should be a LineCapShape
     };
+
+    const CustomTextField = muiStyled(TextField)(({ theme }) => ({
+      '& .MuiInputLabel-root': {
+        transition: 'transform 0.2s ease-out, color 0.2s ease-out',
+        fontSize: '12px !important',
+        color: '#42454E !important',
+        fontWeight: '600 !important',
+        fontFamily: '"Inter", sans-serif !important',
+        position: 'absolute !important',
+        left: '0px !important',
+        top: '-11px !important',
+      },
+      '& .MuiInputLabel-root.Mui-focused': {
+        transform: 'translateY(5px) !important',
+        fontSize: '10px !important',
+        color: '#454545 !important',
+        position: 'absolute !important',
+        left: '14px !important',
+        lineHeight: '1em !important',
+        letterSpacing: '0.00938em !important',
+      },
+      '& .MuiInputLabel-root.MuiInputLabel-shrink':{
+        transform: 'translateY(5px) !important',
+        fontSize: '10px !important',
+        color: '#454545 !important',
+        position: 'absolute !important',
+        left: '14px !important',
+        lineHeight: '1em !im portant',
+        letterSpacing: '0.00938em !important',
+      },
+      'input':{
+        boxSizing:'border-box',
+        fontSize:'12px !important'
+      } 
+    }));
 
     const boundaryStyle = (feature: any) => {
       switch (feature.properties.boundary) {
@@ -135,11 +189,32 @@ const MapLayers = () => {
       }
     }
 
+    const handleSearchRakeName = (event: any) => {
+      const newSearchRakename = event.target.value;
+      setSearchRakeName(newSearchRakename);
+      handleSearchFilter(newSearchRakename,searchFnrNumber)
+    };
+
+
+    const handleSearchFnrNumber = (event: any) => {
+      const newSearchFnrNumber = event.target.value;
+      setSearchFnrNumber(newSearchFnrNumber);
+      handleSearchFilter(searchRakeName,newSearchFnrNumber)
+    };
+
+    const handleSearchFilter = (rakeName: string,fnrNumber: string) => {
+      const filteredDataByRakeName = rakeName ? allRakesBackUp.filter((itr: { name: string})=>itr.name.toLowerCase().includes(rakeName.toLowerCase())) : allRakesBackUp
+      const filteredDataByFnrNumber = fnrNumber ? filteredDataByRakeName.filter((itr: { fnr_no: string})=>itr.fnr_no.toLowerCase().includes(fnrNumber.toLowerCase())): filteredDataByRakeName
+      setAllRakes(filteredDataByFnrNumber)
+    }
+
     const getRakeShipmentDatas = async () => {
       try {
         // setLoading(true);
         const res = await httpsGet('get/maps/captive_rakes', 0);
         const data = res.data;
+        setSearchRakeName('')
+        setSearchFnrNumber('')
         data.map((data: any) => {
           if (data && data.rake_updates && data.rake_id) {
             const isDuplicate = Object.values(coords).flat().some((item: any) => item.rake_id === data.rake_id);
@@ -565,9 +640,23 @@ const MapLayers = () => {
                         <TableHead>
                           <TableRow>
                             <TableCell align="left" className="table-heads">S.No</TableCell>
-                            <TableCell align="left" className="table-heads">Rake Name</TableCell>
+                            <TableCell align="left" className="table-heads">
+                            <CustomTextField
+                             inputRef={inputRefRakeName}
+                             label="Rake Name"
+                             value={searchRakeName}
+                             onChange={handleSearchRakeName}
+                             />
+                            </TableCell>
                             <TableCell align="center" className="table-heads" style={{lineHeight: '16px'}}>Last Updated <br/> <span style={{fontSize: '10px', color:'#7C7E8C', fontWeight: '500', textAlign: 'center' }}>(hr & min)</span></TableCell>
-                            <TableCell align="left" className="table-heads">FNR No.</TableCell>
+                            <TableCell align="left" className="table-heads">
+                            <CustomTextField
+                            inputRef={inputRefFnrNumber}
+                            label="FNR Number"
+                            value={searchFnrNumber}
+                            onChange={handleSearchFnrNumber}
+                            />
+                            </TableCell>
                           </TableRow>
                         </TableHead>
                         <TableBody>
