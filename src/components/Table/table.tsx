@@ -18,42 +18,39 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import './table.css'
 import service from '@/utils/timeService';
 import Link from 'next/link';
-import { Column, row, tagItem } from '@/utils/interface';
+import { Column, row } from '@/utils/interface';
 import { useTranslations } from 'next-intl';
 import RRModal from '../RR Modal/RRModal';
-// import { useSnackbar } from '@/hooks/snackBar';
 
 
-import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
-import Stack from '@mui/material/Stack';
+
 
 import { ClickAwayListener, Popper, Tooltip, } from '@mui/material';
 import Button from '@mui/material/Button';
 
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
-import { httpsPost } from '@/utils/Communication';
-import { UPDATE_RAKE_CAPTIVE_ID, REMARKS_UPDATE_ID, FETCH_TRACK_DETAILS, UPDATE_ELD } from '@/utils/helper'
+import { httpsPost, httpsGet } from '@/utils/Communication';
+import { UPDATE_RAKE_CAPTIVE_ID, REMARKS_UPDATE_ID, FETCH_TRACK_DETAILS, UPDATE_ELD, GET_HANDLING_AGENT_LIST } from '@/utils/helper'
 import { statusBuilder } from '../MapView/StatusBuilder/StatusBuilder';
 
-import FOIS from '@/assets/fois_icon.png'
+
 import GPIS from '@/assets/gps_icon.svg'
-import RRDOC from '@/assets/Doc-icon.svg'
+
 import attach_icon from '@/assets/attach_icon.svg'
 import rrDocumentIcon from '@/assets/rr_document_icon.svg'
 import ShareIcon from '@mui/icons-material/Share';
 import fetchTrackDetailsIcon from '@/assets/polylines_icon.svg'
 import contactIcon from '@/assets/inactive_contact_dashboard+icon.svg'
 import BookmarkAddOutlinedIcon from '@mui/icons-material/BookmarkAddOutlined';
-import Image from 'next/image';
+
 import CloseIcon from '@mui/icons-material/Close';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import { Menu, MenuItem } from '@mui/material';
+import { MenuItem } from '@mui/material';
 import './style.css'
-import Backdrop from '@mui/material/Backdrop';
-import Fade from '@mui/material/Fade';
-import { sortArray, separateLatestObject, calculateDaysDifference,getColorCode,getUniqueValues } from '@/utils/hooks';
+
+import { sortArray, separateLatestObject, calculateDaysDifference, getColorCode, getUniqueValues } from '@/utils/hooks';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import Popover from '@mui/material/Popover';
 import { Typography, } from '@mui/material';
@@ -61,14 +58,18 @@ import { useSnackbar } from '@/hooks/snackBar';
 import captiveRakeIndicator from '@/assets/captive_rakes.svg'
 import wagonIcon from '@/assets/captive_rakes_no_wagons.svg'
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
-import dividerLine from '@/assets/divider_line.svg'
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 
-import InputLabel from '@mui/material/InputLabel';
 import ListSubheader from '@mui/material/ListSubheader';
 import FormControl from '@mui/material/FormControl';
 import EditNoteOutlinedIcon from '@mui/icons-material/EditNoteOutlined';
 
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import dayjs from 'dayjs';
+import RvHookupIcon from '@mui/icons-material/RvHookup';
+import Autocomplete from '@mui/material/Autocomplete';
 
 async function rake_update_id(payload: Object) {
     return await httpsPost(UPDATE_RAKE_CAPTIVE_ID, payload);
@@ -119,6 +120,7 @@ const convertArrayToFilteredArray = (inputArray: any) => {
                 unique_code,
             },
             destination: {
+                locationId: delivery_location?._id ?? 'NA',
                 name: delivery_location?.name ?? 'NA',
                 code: delivery_location?.code ?? 'NA'
             },
@@ -194,7 +196,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
     // action box toggle
     const [showActionBox, setShowActionBox] = useState(-1)
     const [open, setOpen] = React.useState(false);
-    const handleOpen = (e: any) => { e.stopPropagation(); setOpen(true); setActionOptions(e.currentTarget.id) };
+    const handleOpen = (e: any) => { e.stopPropagation(); setOpen(true); setActionOptions(e.currentTarget.id); setAnchorEl(null); };
     const handleClose = (e: any) => { e.stopPropagation(); setOpen(false); }
     const [isRRModalOpen, setRRModalOpen] = useState<boolean>(false);
     const [isRRDoc, setIsRRDoc] = useState<boolean>(false);
@@ -203,9 +205,12 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
     const textRef = useRef<HTMLDivElement>(null);
     const [isOverflowing, setIsOverflowing] = useState(false);
 
+    const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
+
     //getting row id to pass it to tag element
     const [rowId, setRowID] = useState('')
     const [response, setResponse] = useState([])
+    const [locationId, setLocationId] = useState('')
 
     //search fnr 
     const [settingFnrChange, setSettingFnrChange] = useState('');
@@ -260,10 +265,11 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
         setPage(0);
     };
 
-    function clickActionBox(e: React.MouseEvent<SVGSVGElement, MouseEvent>, index: number, id: string) {
+    function clickActionBox(e: React.MouseEvent<SVGSVGElement, MouseEvent>, index: number, id: string, locationId: string) {
         e.stopPropagation();
         setRowID(id);
         setShowActionBox(prevIndex => (prevIndex === index ? -1 : index));
+        setLocationId(locationId);
     }
 
     const { showMessage } = useSnackbar();
@@ -334,11 +340,9 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
             { id: 'destination', label: 'Destination/Paid By', class: 'destination', innerClass: '' },
             { id: 'material', label: 'Commodities', class: 'material', innerClass: '' },
             { id: 'eld', label: 'Expected Loading Date', class: 'eld', innerClass: '' },
-            // { id: 'aging', label: 'Ageing', class: 'aging', innerClass: '' },
-            { id: 'pickupdate', label: 'Invoiced Date', class: 'pickupdate', innerClass: 'inner_pickup' },
+            { id: 'pickupdate', label: 'RR Date', class: 'pickupdate', innerClass: 'inner_pickup' },
             { id: 'status', label: 'Status', class: 'status', innerClass: 'inner_status' },
             { id: 'currentEta', label: 'Current ETA', class: 'currentEta', innerClass: 'inner_eta' },
-            // { id: 'deliverDate', label: 'Delivered Date', class: 'deliverDate', innerClass: '' },
             { id: 'remarks', label: 'Remarks', class: 'remarks', innerClass: '' },
             { id: 'handlingAgent', label: 'Handling Agent', class: 'handlingAgent', innerClass: '' },
             { id: 'action', label: 'Action', class: 'action', innerClass: '' },
@@ -414,7 +418,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                 }
                                                 {
                                                     column.id === 'pickupdate' ?
-                                                       
+
                                                         <div style={{
                                                             transform: pickupSorting ? 'rotate(180deg)' : 'rotate(0deg)',
                                                             transformOrigin: 'center center',
@@ -429,33 +433,31 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                 fontSize='small'
                                                                 style={{ color: 'darkgrey' }}
                                                             /></div>
-                                                   
+
                                                         : <></>
                                                 }
                                                 {
                                                     column.id === 'currentEta' ?
-                                                    <div>
-                                                         <div style={{position:'absolute', top:10, left:90}}>
-                                                         <div style={{
-                                                            transform: currentETAsorting ? 'rotate(180deg)' : 'rotate(0deg)',
-                                                            transformOrigin: 'center center',
-                                                            transition: 'transform 0.3s ease-in-out',
-                                                            cursor: 'pointer',
-                                                            display: 'flex',
-                                                            justifyContent: 'center',
-                                                            alignItems: 'center',
-                                                        }}
-                                                            onClick={() => { setCurrentETAsorting(!currentETAsorting) }}
-                                                        ><ArrowDownwardIcon
-                                                                fontSize='small'
-                                                                style={{ color: 'darkgrey' }}
-                                                            />
+                                                        <div>
+                                                            <div style={{ position: 'absolute', top: 10, left: 90 }}>
+                                                                <div style={{
+                                                                    transform: currentETAsorting ? 'rotate(180deg)' : 'rotate(0deg)',
+                                                                    transformOrigin: 'center center',
+                                                                    transition: 'transform 0.3s ease-in-out',
+                                                                    cursor: 'pointer',
+                                                                    display: 'flex',
+                                                                    justifyContent: 'center',
+                                                                    alignItems: 'center',
+                                                                }}
+                                                                    onClick={() => { setCurrentETAsorting(!currentETAsorting) }}
+                                                                ><ArrowDownwardIcon
+                                                                        fontSize='small'
+                                                                        style={{ color: 'darkgrey' }}
+                                                                    />
+                                                                </div>
+                                                            </div>
+                                                            <div>Delivered Date</div>
                                                         </div>
-                                                         </div>
-                                                         <div>Delivered Date</div>
-                                                    </div>
-                                                       
-                                                       
                                                         : <></>
                                                 }
 
@@ -505,9 +507,16 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                 <div className='action_icon'>
                                                                     <MoreHorizIcon
                                                                         style={{ color: 'white', cursor: 'pointer', scale: '0.9' }}
-                                                                        onClick={(e) => clickActionBox(e, firstindex, row._id)}
+                                                                        onClick={(e) => { clickActionBox(e, firstindex, row._id, row.destination.locationId); setAnchorEl(e.currentTarget as unknown as HTMLButtonElement); }}
                                                                     />
-                                                                    <div className={`action_button_target ${showActionBox === firstindex ? 'show' : ''}`}
+                                                                    <Popover
+                                                                        open={showActionBox === firstindex ? true : false}
+                                                                        onClose={handleClose}
+                                                                        anchorOrigin={{
+                                                                            vertical: 30,
+                                                                            horizontal: -85,
+                                                                        }}
+                                                                        anchorEl={anchorEl}
                                                                     >
                                                                         <div className='action_button_options' onClick={(e) => e.stopPropagation()}>
                                                                             {row.validationForAttachRake && (
@@ -548,17 +557,24 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                                 onClick={handleOpen}
                                                                                 id="editELD"
                                                                             />
+                                                                            <ActionItem
+                                                                                icon={<RvHookupIcon style={{ width: "24px", height: '24px', color: '#E24D65' }} />}
+                                                                                text={t('addHAndlingAgent')}
+                                                                                onClick={handleOpen}
+                                                                                id="addHAndlingAgent"
+
+                                                                            />
                                                                         </div>
-                                                                    </div>
+                                                                    </Popover>
                                                                 </div>
                                                             </div>
                                                         )}
                                                         {item.id === 'fnr' &&
                                                             <div className='fnr_container'>
-                                                                <div style={{ display: 'flex', alignItems: 'center' , gap:4}}>
+                                                                <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                                                                     <div>Primary</div>
-                                                                    {row.status.name === 'In Plant' && 
-                                                                        <div className='aging_dot' style={{backgroundColor:`${getColorCode(row.daysAging)}`}} ></div>
+                                                                    {row.status.name === 'In Plant' &&
+                                                                        <div className='aging_dot' style={{ backgroundColor: `${getColorCode(row.daysAging)}` }} ></div>
                                                                     }
                                                                 </div>
                                                                 <div className='fnr_inner_data'>
@@ -618,19 +634,20 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                         }
                                                         {item.id === 'destination' && (
                                                             <div
-                                                                style={{
-                                                                    position: 'relative',
-                                                                    right: '5px',
-                                                                    width: '160px',
-                                                                    height: '70px',
-                                                                    overflow: 'hidden',
-                                                                }}
+                                                            // style={{
+                                                            //     position: 'relative',
+                                                            //     right: '5px',
+                                                            //     width: '160px',
+                                                            //     height: '70px',
+                                                            //     overflow: 'hidden',
+                                                            // }}
                                                             >
                                                                 <div
                                                                     style={{
                                                                         position: 'relative',
                                                                         right: '0px',
                                                                         overflow: 'hidden',
+                                                                        color: '#7C7E8C'
                                                                     }}
                                                                 >
                                                                     <Tooltip
@@ -654,6 +671,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                         </div>
                                                                     </Tooltip>
                                                                 </div>
+                                                                <div style={{ marginTop: '6px', color: '#07004D' }}>{row.paid_by}</div>
                                                             </div>
                                                         )}
                                                         {item.id === 'pickupdate' && (
@@ -705,38 +723,22 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                         }
                                                         {item.id === 'currentEta' && (
                                                             <div>
-                                                            <PastEta row={row} firstIndex={firstindex} />
-                                                            <div style={{marginTop:16}}>
-                                                            {row.eta && row.status.name === 'Delivered' ? (
-                                                                <>
-                                                                    <div>{service.utcToist(row.eta)}</div>
-                                                                    <div>{service.utcToistTime(row.eta)}</div>
-                                                                </>
-                                                            ) : (
-                                                                'NA'
-                                                            )}
-                                                            </div>
+                                                                <PastEta row={row} firstIndex={firstindex} />
+                                                                <div style={{ marginTop: 16 }}>
+                                                                    {row.eta && row.status.name === 'Delivered' ? (
+                                                                        <>
+                                                                            <div>{service.utcToist(row.eta)}</div>
+                                                                            <div>{service.utcToistTime(row.eta)}</div>
+                                                                        </>
+                                                                    ) : (
+                                                                        'NA'
+                                                                    )}
+                                                                </div>
                                                             </div>
                                                         )}
                                                         {item.id === 'remarks' && (
                                                             <RemarkComponent row={row} firstIndex={firstindex} />
                                                         )}
-                                                        {/* {item.id === 'aging' &&
-                                                            !row.rrDoc &&
-                                                            <span>{row.daysAging} Days</span>
-                                                        } */}
-                                                        {/* {item.id === 'deliverDate' && (
-                                                            <div>
-                                                                {row.eta && row.status.name === 'Delivered' ? (
-                                                                    <>
-                                                                        <div>{service.utcToist(row.eta)}</div>
-                                                                        <div>{service.utcToistTime(row.eta)}</div>
-                                                                    </>
-                                                                ) : (
-                                                                    'NA'
-                                                                )}
-                                                            </div>
-                                                        )} */}
                                                         {item.id === 'material' && row.commodity_desc && (
                                                             <div className='material_items'>
                                                                 <div style={{ color: '#7C7E8C', marginTop: '5px' }}>{row.commodity_desc[0]}</div>
@@ -784,7 +786,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                     onPageChange={handleChangePage}
                     onRowsPerPageChange={handleChangeRowsPerPage}
                     labelRowsPerPage="Shipments per page:"
-                    sx={{ height:40, overflowY: 'hidden', position:'absolute',top: '139px',right: '12px'}}
+                    sx={{ height: 40, overflowY: 'hidden', position: 'absolute', top: '139px', right: '12px' }}
                 />
             </Paper>
             <RRModal isOpen={isRRModalOpen} isClose={() => setRRModalOpen(false)} rrNumbers={rrNumbers} isRRDoc={isRRDoc} />
@@ -825,6 +827,12 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                         setOpen={setOpen}
                         getAllShipment={getAllShipment}
                     />}
+                    {actionOptions === 'addHAndlingAgent' && <AttachHandlingAgent
+                        shipmentId={rowId}
+                        setOpen={setOpen}
+                        locationId={locationId}
+                    // getAllShipment={getAllShipment}
+                    />}
                 </Box>
             </Modal>
         </div>
@@ -845,7 +853,7 @@ interface RemarksProps {
 const ActionItem = ({ icon, text, onClick, id, style }: any) => (
     <div className={`action_items `} onClick={onClick} id={id} style={style}>
         <div>{icon}</div>
-        <div>{text}</div>
+        <div style={{ fontSize: 12 }}>{text}</div>
     </div>
 );
 function Remarks({ shipmentId, setOpen, remarksList, getAllShipment }: RemarksProps) {
@@ -976,8 +984,8 @@ function Remarks({ shipmentId, setOpen, remarksList, getAllShipment }: RemarksPr
                         onChange={handleOthers}
                     />
                 )}
-                
-                <div style={{marginTop:64, display: 'flex', justifyContent: 'end'}}>
+
+                <div style={{ marginTop: 64, display: 'flex', justifyContent: 'end' }}>
                     <Button
                         variant="contained"
                         size='small'
@@ -1024,7 +1032,11 @@ function Tags({ rakeCaptiveList, shipmentId, setOpen, setShowActionBox }: any) {
     const [item, setItem] = useState(placeHolder)
     const [itemId, setItemID] = useState(null)
     const t = useTranslations('ORDERS');
-    const [openCaptiveItems, setOpenCaptiveItems] = useState(false)
+    const [selectedRake, setSelectedRake] = useState<{ _id: string } | null>(null);
+    const { showMessage } = useSnackbar();
+
+
+
 
     const [isHovered, setIsHovered] = useState(false);
     const handleMouseEnter = useCallback(() => setIsHovered(true), []);
@@ -1032,12 +1044,6 @@ function Tags({ rakeCaptiveList, shipmentId, setOpen, setShowActionBox }: any) {
 
     const [searchTerm, setSearchTerm] = useState('');
     const [filteredList, setFilteredList] = useState(rakeCaptiveList);
-
-    const handleSearch = (e: any) => {
-        setSearchTerm(e.target.value);
-        setItem(e.target.value);
-        setOpenCaptiveItems(true);
-    };
 
     useEffect(() => {
         const filtered = rakeCaptiveList.filter((remark: any) =>
@@ -1048,74 +1054,58 @@ function Tags({ rakeCaptiveList, shipmentId, setOpen, setShowActionBox }: any) {
 
     const handleSubmit = (e: any) => {
         e.stopPropagation();
+
         const updatedObject = {
             shipmentId: shipmentId,
-            captiveId: itemId
+            captiveId: selectedRake?._id
         };
+
         if (updatedObject.captiveId) {
-            rake_update_id(updatedObject)
+            rake_update_id(updatedObject).then((res: any) => {
+                if (res === null) showMessage('Captive Rake Updated Successfully.', 'success');
+                setOpen(false);
+            }).catch((err: any) => {
+                console.log(err);
+            })
+        } else {
+            showMessage('Please select captive rake.', 'error');
         }
-
-        setOpen(false)
-
     };
 
     return (
-        <div >
-            <div style={{
-                width: '100%',
-                backgroundColor: '#3351FF',
-                color: 'white',
-                borderRadius: '8px 8px 0 0',
-                padding: '4px',
-                fontSize: '20px'
-            }}>Captive Rakes</div>
-            <div style={{ padding: 16, position: 'relative' }} onClick={(e) => { e.stopPropagation(); setOpenCaptiveItems(false) }}>
-                <div className='captiveInput' onClick={(e) => { e.stopPropagation(); setOpenCaptiveItems(!openCaptiveItems) }}>
-                    <input
-                        value={searchTerm}
-                        onChange={handleSearch}
-                        placeholder="select one"
-                        style={{
-                            width: '100%',
-                            backgroundColor: '#E9E9EB',
-                            outline: 'none',
-                            borderTop: '1px solid #E9E9EB',
-                            borderLeft: '1px solid #E9E9EB',
-                            borderRight: '1px solid #E9E9EB',
-                            padding: '4px',
-                            height: '24px'
-                        }}
-                    />
-                </div>
-                <ArrowDropDownIcon
-                    onClick={() => { }}
-                    className='arrow_down_icon_captive'
+        <div style={{ position: 'relative', padding: 24 }} >
+
+            <div style={{ fontSize: 20, color: '#131722', marginBottom: 36 }}>Captive Rakes</div>
+            <div >
+                <label style={{ color: '#42454E', fontSize: 12 }}>Select captive rake</label>
+                <Autocomplete
+                    disablePortal
+                    options={rakeCaptiveList}
+                    getOptionLabel={(option: any) => `${option.rake_id} (${option.name || 'No Rake ID'})`}
+                    renderInput={(params) => <TextField {...params} />}
+                    onChange={(event, newValue) => {
+                        setSelectedRake(newValue);
+                    }}
+                    sx={{
+                        '.MuiOutlinedInput-root ': {
+                            padding: 0, height: 36, boxShadow: 'none', border: 'none'
+                        },
+                        '.MuiAutocomplete-input, .MuiAutocomplete-option': {
+                            fontSize: '14px',
+                        },
+                    }}
                 />
-                <div
-                    className='captive_list_box'
-                    style={{ display: openCaptiveItems ? 'block' : 'none' }} >
-                    {filteredList.map((remark: any, index: number) => (
-                        <div
-                            key={index}
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                setItem(remark.rake_id ?? remark.name);
-                                setSearchTerm(remark.rake_id ?? remark.name);
-                                setOpenCaptiveItems(false);
-                                setItemID(remark._id);
-                            }}
-                            className='captive_list_item'
-                        >
-                            <div style={{ width: '136px' }}>{remark.rake_id}</div>
-                            <div style={{ paddingInline: '4px' }}>-</div>
-                            <div>{remark.name}</div>
-                        </div>
-                    ))}
-                </div>
-                <div style={{ textAlign: 'end', paddingTop: '8px' }}>
-                    <Button variant="contained" size='small' style={{ textTransform: 'none', backgroundColor: '#3351FF' }} onClick={(e) => { handleSubmit(e) }}>{t('submit')}</Button>
-                </div>
+            </div>
+            <div style={{ marginTop: 64, display: 'flex', justifyContent: 'end' }}>
+                <Button
+                    variant="contained"
+                    size='small'
+                    color="secondary"
+                    style={{ textTransform: 'none', backgroundColor: '#3351FF' }}
+                    onClick={handleSubmit}
+                >
+                    {t('submit')}
+                </Button>
             </div>
             <div
                 style={{
@@ -1266,14 +1256,7 @@ const PastEta = ({ row, firstIndex }: any) => {
         </Box>
     );
 };
-
-
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import dayjs from 'dayjs';
-
-const EditELD = ({ shipmentId, setOpen,getAllShipment }: any) => {
+const EditELD = ({ shipmentId, setOpen, getAllShipment }: any) => {
 
     const t = useTranslations('ORDERS');
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -1295,18 +1278,18 @@ const EditELD = ({ shipmentId, setOpen,getAllShipment }: any) => {
             id: shipmentId,
             date: epochTimestamp
         }
-        if(!epochTimestamp){
+        if (!epochTimestamp) {
             showMessage('Please select a date.', 'error');
             return;
         }
-        try{
-            const res = await httpsPost(UPDATE_ELD,payload)
-            if(res.statusCode === 200){
+        try {
+            const res = await httpsPost(UPDATE_ELD, payload)
+            if (res.statusCode === 200) {
                 showMessage('Expected Loading Date Updated Successfully.', 'success');
                 setOpen(false);
                 getAllShipment();
             }
-        }catch(err){
+        } catch (err) {
             console.log(err)
         }
     }
@@ -1315,8 +1298,8 @@ const EditELD = ({ shipmentId, setOpen,getAllShipment }: any) => {
         <div style={{ position: 'relative', padding: 24 }}>
             <div>Add Expected Loading Date</div>
 
-            <div style={{marginTop:'24px'}}>
-                <div style={{fontSize:10, color:'#7C7E8C', paddingBottom:'4px'}}>Select Expected Loading Date</div>
+            <div style={{ marginTop: '24px' }}>
+                <div style={{ fontSize: 10, color: '#7C7E8C', paddingBottom: '4px' }}>Select Expected Loading Date</div>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                     <DatePicker
                         format='DD/MM/YYYY'
@@ -1357,15 +1340,15 @@ const EditELD = ({ shipmentId, setOpen,getAllShipment }: any) => {
             </div>
 
             <div style={{ marginTop: 64 }}>
-                    <Button
-                        variant="contained"
-                        size='small'
-                        color="secondary"
-                        style={{ textTransform: 'none', backgroundColor: '#3351FF' }}
-                        onClick={handleDateSubmit}
-                    >
-                        {t('submit')}
-                    </Button>
+                <Button
+                    variant="contained"
+                    size='small'
+                    color="secondary"
+                    style={{ textTransform: 'none', backgroundColor: '#3351FF' }}
+                    onClick={handleDateSubmit}
+                >
+                    {t('submit')}
+                </Button>
             </div>
             <div
                 style={{
@@ -1395,4 +1378,139 @@ const EditELD = ({ shipmentId, setOpen,getAllShipment }: any) => {
             </div>
         </div>
     )
+}
+
+import OutlinedInput from '@mui/material/OutlinedInput';
+import InputLabel from '@mui/material/InputLabel';
+import ListItemText from '@mui/material/ListItemText';
+
+const AttachHandlingAgent = ({ shipmentId, setOpen, locationId }: any) => {
+
+    const t = useTranslations('ORDERS');
+    const [isHovered, setIsHovered] = useState(false);
+    const handleMouseEnter = useCallback(() => setIsHovered(true), []);
+    const handleMouseLeave = useCallback(() => setIsHovered(false), []);
+
+    const [listOfLocation, setListOfLocation] = useState<any>([]);
+
+    const getLocationList = async () => {
+        const res = await httpsGet(`${GET_HANDLING_AGENT_LIST}?delivery_locations=${locationId}`);
+        console.log(res)
+        if (res.statusCode === 200) setListOfLocation(res?.data);
+    }
+
+    useEffect(() => {
+        if (locationId) {
+            getLocationList();
+        }
+    }, [])
+
+    const [personName, setPersonName] = React.useState<any[]>([]);
+    const handleChange = (event: SelectChangeEvent<typeof personName>) => {
+        const {target: { value },} = event;
+        setPersonName(typeof value === 'string' ? value.split(',') : value,);
+    };
+    const ITEM_HEIGHT = 48;
+    const ITEM_PADDING_TOP = 8;
+    const MenuProps = {
+        PaperProps: {
+            style: {
+                maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+                maxWidth:'100%',
+                minWidth:'calc(100% - 1400px)',
+            },
+        },
+    };
+      console.log(personName, 'personName')
+      const getSelectedItemNames = (selected :any) => {
+        return selected.map((id : any) => 
+          listOfLocation.find((item : any) => item._id === id)?.name
+        ).filter(Boolean).join(', ');
+      };
+      const handleDateSubmit = async () => {
+        //   const res = await httpsPost('rake_shipment/assign_ha', )
+      }
+
+    return (
+        <div style={{ position: 'relative', padding: 24 }}>
+
+            <div style={{ fontSize: 20, color: '#131722', fontWeight: 500 }} >Assign Handling Agent</div>
+
+            <div>
+                <FormControl sx={{width:'100%', marginTop: '36px' }}>
+                    <InputLabel id="demo-multiple-checkbox-label">handling agent</InputLabel>
+                    <Select
+                        labelId="demo-multiple-checkbox-label"
+                        id="demo-multiple-checkbox"
+                        multiple
+                        value={personName}
+                        onChange={handleChange}
+                        input={<OutlinedInput label="handling agent" />}
+                        renderValue={(selected) => getSelectedItemNames(selected)}
+                        MenuProps={MenuProps}
+                        sx={{
+                           
+                        }}
+                    >
+                        {listOfLocation?.map((item : any, index: number) => (
+                          
+                            <MenuItem key={index} value={item._id} sx={{padding:0, display:'flex', flexDirection:'column', alignItems:'flex-start',paddingRight:'12px' }}>
+                                <div style={{display:'flex', alignItems:'center', padding:0}}> 
+                                    <Checkbox checked={personName.indexOf(item._id) > -1} sx={{'& .MuiSvgIcon-root': { fontSize: 18 }}}/>
+                                    <ListItemText primary={item.name} primaryTypographyProps={{padding:0, fontSize: '14px', fontFamily: 'Inter, sans-serif' }} />
+                                </div>
+                                <div style={{ marginLeft:42,fontSize:12, marginTop:-8, color:'#7C7E8C'}}>
+                                    {item.location.map((location:any, locationIndex : number)=>{
+                                        return(
+                                            <div key={locationIndex} >{location.name}</div>
+                                        );
+                                    })}
+                                </div>
+                            </MenuItem>
+                            
+                        ))}
+                    </Select>
+                </FormControl>
+            </div>
+
+            <div style={{ marginTop: 64,textAlign:'right'}}>
+                <Button
+                    variant="contained"
+                    size='small'
+                    color="secondary"
+                    style={{ textTransform: 'none', backgroundColor: '#3351FF' }}
+                    onClick={handleDateSubmit}
+                >
+                    {t('submit')}
+                </Button>
+            </div>
+
+            <div
+                style={{
+                    height: '32px',
+                    width: '32px',
+                    borderRadius: '50%',
+                    backgroundColor: 'white',
+                    position: 'absolute',
+                    top: -40,
+                    right: 0,
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    cursor: 'pointer',
+                    zIndex: 999,
+                    boxShadow: '0 1px 2px rgba(0, 0, 0, 0.1)',
+                    transition: 'all 0.5s ease-in-out',
+                    transform: `rotate(${isHovered ? 90 : 0}deg)`
+                }}
+                onClick={(e) => { e.stopPropagation() }}
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
+            >
+                <CloseIcon
+                    onClick={(e) => { e.stopPropagation(); setOpen(false) }}
+                />
+            </div>
+        </div>
+    );
 }

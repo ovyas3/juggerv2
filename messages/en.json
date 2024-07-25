@@ -46,7 +46,8 @@
     "addremarks":"Remarks",
     "fetchtrackdetails":"Fetch Track Details",
     "ageing":"Ageing",
-    "edit":"Edit ELD"
+    "edit":"Edit ELD",
+    "addHAndlingAgent":"Attach Agent"
   },
   "DRAWER":{
     "shipments":"shipments",

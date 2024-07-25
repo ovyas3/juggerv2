@@ -26,6 +26,7 @@ export interface row {
       unique_code: string
   },
   destination: {
+      locationId:string,
       name: string,
       code: string
   },

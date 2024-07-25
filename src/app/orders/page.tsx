@@ -235,7 +235,7 @@ const OrdersPage = () => {
                     {ageingCode.map((item, index) => {
                       return (
                         <div key={index} className='Ageing'>
-                          <div className='Ageing_dot' style={{ backgroundColor: item.color }}></div>
+                          <div className='Ageing_dot' style={{ backgroundColor: item.code }}></div>
                           <div style={{ fontSize: '10px', color: '#484A57' }}>{item.text}</div>
                         </div>
                       );
