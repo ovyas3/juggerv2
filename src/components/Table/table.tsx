@@ -92,6 +92,7 @@ const convertArrayToFilteredArray = (inputArray: any) => {
             all_FNRs: any;
             unique_code: string,
             _id: string,
+            new_status: string,
             status: string,
             pickup_date: any,
             fois: any,
@@ -109,7 +110,7 @@ const convertArrayToFilteredArray = (inputArray: any) => {
             commodity_desc: any,
             expected_loading_date: any,
         }) => {
-        const { edemand_no, FNR, all_FNRs, delivery_location, trip_tracker, others, remarks, unique_code, status, pickup_date, captive_id, is_captive, eta, rr_document, polyline, past_etas, no_of_wagons, received_no_of_wagons, demand_date, paid_by, commodity_desc, expected_loading_date } = item;
+        const { edemand_no, FNR, all_FNRs, delivery_location, trip_tracker, others, remarks, unique_code, new_status, status, pickup_date, captive_id, is_captive, eta, rr_document, polyline, past_etas, no_of_wagons, received_no_of_wagons, demand_date, paid_by, commodity_desc, expected_loading_date } = item;
         return {
             _id: item._id,
             edemand: edemand_no,
@@ -128,7 +129,7 @@ const convertArrayToFilteredArray = (inputArray: any) => {
                 pickupTime: service.utcToistTime(pickup_date) || 'NA'
             },
             status: {
-                name: statusBuilder(status),
+                name: statusBuilder(new_status || status),
                 code: (status === "Delivered" || status === "OB") ? null : status || '',
             },
             currentEta: {

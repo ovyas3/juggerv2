@@ -21,9 +21,15 @@ import { getShipmentStatusSummary } from '@/utils/hooks'
 
 const getStatusCode = (status: string): string => {
   switch (status) {
+    case "Available eIndent":
+      return "AVE"
+    case "Ready for Departure":
+      return "RFD"
     case "In Transit":
       return "ITNS"
-    case "Delivered":
+    case "Delivered At Hub":
+      return 'Delivered'
+    case "Delivered At Customer":
       return 'Delivered'
     case "In Plant":
       return 'OB'

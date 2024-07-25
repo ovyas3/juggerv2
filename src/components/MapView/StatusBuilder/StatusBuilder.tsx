@@ -1,5 +1,11 @@
 export const statusBuilder = (status: string) => {
-  if (!status) return "In Plant";
-  if(status.toLowerCase() === "delivered") {return "Delivered";}
-  return "In Transit"
+  const statusMap: { [key: string]: string } = {
+    'AVE': 'Available eIndent',
+    'RFD': 'Ready for Departure',
+    'ITNS': 'In Transit',
+    'Delivered': 'Delivered',
+    'OB': 'In Plant',
+     '': 'In Plant'
+  }
+  return statusMap[status] || 'In Transit';
 }
