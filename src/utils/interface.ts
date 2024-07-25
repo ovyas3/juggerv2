@@ -1,3 +1,5 @@
+import React from "react";
+
 export interface ShipmentsObjectPayload  {
     is_outbound: Boolean,
     from: string,
