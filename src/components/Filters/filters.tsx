@@ -38,8 +38,11 @@ function Filters({ onToFromChange, onChangeStatus, onChangeRakeTypes , reload, s
     };
 
     const names = [
+        'Available eIndent',
+        'Ready for Departure',
         'In Transit',
-        'Delivered',
+        'Delivered At Hub',
+        'Delivered At Customer',
         'In Plant'
     ];
 
@@ -49,7 +52,7 @@ function Filters({ onToFromChange, onChangeStatus, onChangeRakeTypes , reload, s
         'Indian Railway Rakes'
     ];
 
-    const [status, setStatus] = useState(['In Transit', 'Delivered',]);
+    const [status, setStatus] = useState(['In Transit', 'Delivered At Hub', 'Delivered At Customer']);
     const [rakeType, setRakeType] = useState([ 'Captive Rakes','Indian Railway Rakes'])
     const [openStartDatePicker, setOpenStartDatePicker] = useState(false);
     const [openEndDatePicker, setOpenEndDatePicker] = useState(false);
