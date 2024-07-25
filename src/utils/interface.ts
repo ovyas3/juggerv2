@@ -12,6 +12,7 @@ export interface ShipmentsObjectPayload  {
 export  interface Column {
     id: string;
     label: string | React.ReactNode;
+    subLabel: string | React.ReactNode;
     class: string;
     innerClass: string;
 }
