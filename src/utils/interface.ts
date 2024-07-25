@@ -11,6 +11,7 @@ export interface ShipmentsObjectPayload  {
 
 export  interface Column {
     id: string;
+    subLabel: string | React.ReactNode;
     label: string | React.ReactNode;
     class: string;
     innerClass: string;
@@ -35,8 +36,9 @@ export interface row {
       date: string
   },
   status: {
-    name:string,
-    code:string
+    name: string,
+    code: string,
+    raw: string
   },
   currentEta: string,
   remarks: {
