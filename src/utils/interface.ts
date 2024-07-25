@@ -34,8 +34,9 @@ export interface row {
       date: string
   },
   status: {
-    name:string,
-    code:string
+    name: string,
+    code: string,
+    raw: string
   },
   currentEta: string,
   remarks: {
