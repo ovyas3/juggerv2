@@ -1,3 +1,5 @@
+import React from "react";
+
 export interface ShipmentsObjectPayload  {
     is_outbound: Boolean,
     from: string,
@@ -13,6 +15,7 @@ export  interface Column {
     id: string;
     subLabel: string | React.ReactNode;
     label: string | React.ReactNode;
+    subLabel: string | React.ReactNode;
     class: string;
     innerClass: string;
 }
