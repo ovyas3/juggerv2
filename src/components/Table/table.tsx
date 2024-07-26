@@ -71,6 +71,10 @@ import dayjs from 'dayjs';
 import RvHookupIcon from '@mui/icons-material/RvHookup';
 import Autocomplete from '@mui/material/Autocomplete';
 
+import OutlinedInput from '@mui/material/OutlinedInput';
+import InputLabel from '@mui/material/InputLabel';
+import ListItemText from '@mui/material/ListItemText';
+
 async function rake_update_id(payload: Object) {
     return await httpsPost(UPDATE_RAKE_CAPTIVE_ID, payload);
 }
@@ -121,7 +125,9 @@ const convertArrayToFilteredArray = (inputArray: any) => {
         const { edemand_no, FNR, all_FNRs, delivery_location, trip_tracker, others, remarks, unique_code, status, pickup_date, captive_id, is_captive, eta, rr_document, polyline, past_etas, no_of_wagons, received_no_of_wagons, demand_date, paid_by, commodity_desc, expected_loading_date } = item;
         return {
             _id: item._id,
-            edemand: edemand_no,
+            edemand: {
+                edemand_no: edemand_no || 'NA',
+            },
             fnr: {
                 primary: FNR,
                 others: all_FNRs || 'NA',
@@ -132,7 +138,9 @@ const convertArrayToFilteredArray = (inputArray: any) => {
                 name: delivery_location?.name ?? 'NA',
                 code: delivery_location?.code ?? 'NA'
             },
-            material: others.demandedCommodity || 'NA',
+            material: {
+                name: others.demandedCommodity || 'NA',
+            },
             pickupdate: {
                 date: service.utcToist(pickup_date) || 'NA',
                 pickupTime: service.utcToistTime(pickup_date) || 'NA'
@@ -302,6 +310,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
     }
 
 
+
     useEffect(() => {
         const etaResult = sortArray(allShipments, 'eta', currentETAsorting ? 'dec' : 'asc');
         const resData = convertArrayToFilteredArray(etaResult)
@@ -346,22 +355,22 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
     useEffect(() => {
         const commonColumns: Column[] = [
             { id: 'fnr', label: '', subLabel: '', class: 'fnr', innerClass: 'inner_fnr' },
-            { id: 'destination', subLabel: 'Paid By',label: 'Destination', class: 'destination', innerClass: '' },
-            { id: 'material', subLabel: '',label: 'Commodities', class: 'material', innerClass: '' },
-            { id: 'eld', subLabel: '',label: 'Expected Loading Date', class: 'eld', innerClass: '' },
+            { id: 'destination', subLabel: 'Paid By', label: 'Destination', class: 'destination', innerClass: '' },
+            { id: 'material', subLabel: '', label: 'Commodities', class: 'material', innerClass: '' },
+            { id: 'eld', subLabel: '', label: 'Expected Loading Date', class: 'eld', innerClass: '' },
             // { id: 'aging', label: 'Ageing', class: 'aging', innerClass: '' },
-            { id: 'pickupdate', subLabel: '',label: 'Invoiced Date', class: 'pickupdate', innerClass: 'inner_pickup' },
-            { id: 'status', subLabel: '',label: 'Status', class: 'status', innerClass: 'inner_status' },
+            { id: 'pickupdate', subLabel: '', label: 'Invoiced Date', class: 'pickupdate', innerClass: 'inner_pickup' },
+            { id: 'status', subLabel: '', label: 'Status', class: 'status', innerClass: 'inner_status' },
             { id: 'currentEta', subLabel: 'Delivered Date', label: 'Current ETA', class: 'currentEta', innerClass: 'inner_eta' },
             // { id: 'deliverDate', label: 'Delivered Date', class: 'deliverDate', innerClass: '' },
-            { id: 'remarks',  subLabel: '', label: 'Remarks', class: 'remarks', innerClass: '' },
-            { id: 'handlingAgent',  subLabel: '', label: 'Handling Agent', class: 'handlingAgent', innerClass: '' },
-            { id: 'action',  subLabel: '', label: 'Action', class: 'action', innerClass: '' },
+            { id: 'remarks', subLabel: '', label: 'Remarks', class: 'remarks', innerClass: '' },
+            { id: 'handlingAgent', subLabel: '', label: 'Handling Agent', class: 'handlingAgent', innerClass: '' },
+            { id: 'action', subLabel: '', label: 'Action', class: 'action', innerClass: '' },
             { id: 'iconheader', subLabel: '', label: <IconButton onClick={() => { setShowEdemad(!showEdemand) }}><MoreVertIcon /></IconButton>, class: 'iconheader', innerClass: 'inner_iconheader' },
         ];
 
         if (edemand) {
-            commonColumns.unshift({ id: 'edemand',  subLabel: '', label: 'e-Demand', class: 'edemand', innerClass: '' });
+            commonColumns.unshift({ id: 'edemand', subLabel: '', label: 'e-Demand', class: 'edemand', innerClass: '' });
         }
         setColumns(commonColumns);
     }, [edemand, showEdemand,])
@@ -403,10 +412,10 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                         >
                                             <div className={column.innerClass}>
                                                 {column.subLabel && (column.subLabel as string).length ? <div>
-                                                        {column.label}
-                                                        <br />
-                                                        {column.subLabel}
-                                                    </div> : column.label}
+                                                    {column.label}
+                                                    <br />
+                                                    {column.subLabel}
+                                                </div> : column.label}
                                                 {
                                                     column.id === 'iconheader' && showEdemand ?
                                                         <div className='inner_iconheader_before'>
@@ -453,7 +462,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                 }
                                                 {
                                                     column.id === 'currentEta' ?
-                                                    <div style={{position:'absolute', top:10, left:90}}>
+                                                        <div style={{ position: 'absolute', top: 10, left: 90 }}>
                                                             <div style={{
                                                                 transform: currentETAsorting ? 'rotate(180deg)' : 'rotate(0deg)',
                                                                 transformOrigin: 'center center',
@@ -483,8 +492,8 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                         <TableBody>
                             {response.map((row: row, firstindex: number) => {
                                 return (
-                                    <TableRow hover key={row.edemand}
-                                        onClick={(e) => { handleRRDoc(row._id) }}
+                                    <TableRow hover key={firstindex}
+                                        onClick={(e: any) => { handleRRDoc(row._id) }}
                                         sx={{ cursor: 'pointer' }}
                                     >
                                         {columns.map((item, index) => {
@@ -585,9 +594,9 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                             <div className='fnr_container'>
                                                                 <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                                                                     <div>Primary</div>
-                                                                    {(row.status.name === 'AVE') && 
+                                                                    {/* {(row.status.name === 'AVE') && 
                                                                         <div className='aging_dot' style={{backgroundColor:`${getColorCode(row.daysAging)}`}} ></div>
-                                                                    }
+                                                                    } */}
                                                                 </div>
                                                                 <div className='fnr_inner_data'>
                                                                     <Link target="_blank"
@@ -621,16 +630,14 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                 </div>
                                                                 <div className='fnr_logos'>
 
-                                                                    {row.rrDoc ?
+                                                                    {row.rrDoc &&
                                                                         (<div style={{ height: 25, width: 25 }}>
                                                                             <img
                                                                                 src={row.rrDoc ? rrDocumentIcon.src : ''}
                                                                                 style={{ height: '100%', width: '100%' }}
                                                                                 alt=''
                                                                             />
-                                                                        </div>) : (
-                                                                            <div style={{ width: '25px', height: '25px' }}></div>
-                                                                        )
+                                                                        </div>)
                                                                     }
                                                                     {row.is_captive &&
                                                                         <div style={{ height: 25, width: 25 }}>
@@ -706,6 +713,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                         }
                                                         {item.id === 'edemand' &&
                                                             <div className='edemand_fois_gpis'>
+                                                                <div style={{ color: row.status.raw === 'AVE' ? parseInt(row.daysAging) > 10 ? 'red' : 'green' : 'black' }}>{value.edemand_no}</div>
                                                                 <div className='no_of_wagons'>
                                                                     <div className='request_wagons'>
                                                                         <div className='request_wagons_logo'>
@@ -752,20 +760,25 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                             <RemarkComponent row={row} firstIndex={firstindex} />
                                                         )}
                                                         {item.id === 'material' && row.commodity_desc && (
-                                                            <div className='material_items'>
-                                                                <div style={{ color: '#7C7E8C', marginTop: '5px' }}>{row.commodity_desc[0]}</div>
-                                                                {getUniqueValues(row.commodity_desc).length > 1 &&
-                                                                    <div className='view_more_materials'>
-                                                                        <div style={{ fontSize: 8 }}>+{getUniqueValues(row.commodity_desc).length - 1}</div>
-                                                                        <div className='list_of_materials'>
-                                                                            {getUniqueValues(row.commodity_desc).slice(1).map((item: any, index: number) => {
-                                                                                return (
-                                                                                    <div className='material_item' key={index}>{item}</div>
-                                                                                );
-                                                                            })}
+                                                            <div>
+                                                                <div style={{display:'flex', gap:4, alignItems:'center'}}>
+                                                                    <div style={{textWrap:'nowrap'}}>{value.name}</div>
+                                                                    {getUniqueValues(row.commodity_desc).length > 1 &&
+                                                                        <div className='view_more_materials'>
+                                                                            <div style={{ fontSize: 8 }}>+{getUniqueValues(row.commodity_desc).length - 1}</div>
+                                                                            <div className='list_of_materials'>
+                                                                                {getUniqueValues(row.commodity_desc).slice(1).map((item: any, index: number) => {
+                                                                                    return (
+                                                                                        <div className='material_item' key={index}>{item}</div>
+                                                                                    );
+                                                                                })}
+                                                                            </div>
                                                                         </div>
-                                                                    </div>
-                                                                }
+                                                                    }
+                                                                </div>
+                                                                <div className='material_items'>
+                                                                    <div style={{ color: '#7C7E8C', marginTop: '5px' }}>{row.commodity_desc[0]}</div>
+                                                                </div>
                                                             </div>
                                                         )}
                                                         {item.id === 'eld' && (
@@ -1391,11 +1404,6 @@ const EditELD = ({ shipmentId, setOpen, getAllShipment }: any) => {
         </div>
     )
 }
-
-import OutlinedInput from '@mui/material/OutlinedInput';
-import InputLabel from '@mui/material/InputLabel';
-import ListItemText from '@mui/material/ListItemText';
-
 const AttachHandlingAgent = ({ shipmentId, setOpen, locationId }: any) => {
 
     const t = useTranslations('ORDERS');
@@ -1419,7 +1427,7 @@ const AttachHandlingAgent = ({ shipmentId, setOpen, locationId }: any) => {
 
     const [personName, setPersonName] = React.useState<any[]>([]);
     const handleChange = (event: SelectChangeEvent<typeof personName>) => {
-        const {target: { value },} = event;
+        const { target: { value }, } = event;
         setPersonName(typeof value === 'string' ? value.split(',') : value,);
     };
     const ITEM_HEIGHT = 48;
@@ -1428,20 +1436,20 @@ const AttachHandlingAgent = ({ shipmentId, setOpen, locationId }: any) => {
         PaperProps: {
             style: {
                 maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-                maxWidth:'100%',
-                minWidth:'calc(100% - 1400px)',
+                maxWidth: '100%',
+                minWidth: 'calc(100% - 1400px)',
             },
         },
     };
-      console.log(personName, 'personName')
-      const getSelectedItemNames = (selected :any) => {
-        return selected.map((id : any) => 
-          listOfLocation.find((item : any) => item._id === id)?.name
+    console.log(personName, 'personName')
+    const getSelectedItemNames = (selected: any) => {
+        return selected.map((id: any) =>
+            listOfLocation.find((item: any) => item._id === id)?.name
         ).filter(Boolean).join(', ');
-      };
-      const handleDateSubmit = async () => {
+    };
+    const handleDateSubmit = async () => {
         //   const res = await httpsPost('rake_shipment/assign_ha', )
-      }
+    }
 
     return (
         <div style={{ position: 'relative', padding: 24 }}>
@@ -1449,7 +1457,7 @@ const AttachHandlingAgent = ({ shipmentId, setOpen, locationId }: any) => {
             <div style={{ fontSize: 20, color: '#131722', fontWeight: 500 }} >Assign Handling Agent</div>
 
             <div>
-                <FormControl sx={{width:'100%', marginTop: '36px' }}>
+                <FormControl sx={{ width: '100%', marginTop: '36px' }}>
                     <InputLabel id="demo-multiple-checkbox-label">handling agent</InputLabel>
                     <Select
                         labelId="demo-multiple-checkbox-label"
@@ -1461,31 +1469,31 @@ const AttachHandlingAgent = ({ shipmentId, setOpen, locationId }: any) => {
                         renderValue={(selected) => getSelectedItemNames(selected)}
                         MenuProps={MenuProps}
                         sx={{
-                           
+
                         }}
                     >
-                        {listOfLocation?.map((item : any, index: number) => (
-                          
-                            <MenuItem key={index} value={item._id} sx={{padding:0, display:'flex', flexDirection:'column', alignItems:'flex-start',paddingRight:'12px' }}>
-                                <div style={{display:'flex', alignItems:'center', padding:0}}> 
-                                    <Checkbox checked={personName.indexOf(item._id) > -1} sx={{'& .MuiSvgIcon-root': { fontSize: 18 }}}/>
-                                    <ListItemText primary={item.name} primaryTypographyProps={{padding:0, fontSize: '14px', fontFamily: 'Inter, sans-serif' }} />
+                        {listOfLocation?.map((item: any, index: number) => (
+
+                            <MenuItem key={index} value={item._id} sx={{ padding: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', paddingRight: '12px' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', padding: 0 }}>
+                                    <Checkbox checked={personName.indexOf(item._id) > -1} sx={{ '& .MuiSvgIcon-root': { fontSize: 18 } }} />
+                                    <ListItemText primary={item.name} primaryTypographyProps={{ padding: 0, fontSize: '14px', fontFamily: 'Inter, sans-serif' }} />
                                 </div>
-                                <div style={{ marginLeft:42,fontSize:12, marginTop:-8, color:'#7C7E8C'}}>
-                                    {item.location.map((location:any, locationIndex : number)=>{
-                                        return(
+                                <div style={{ marginLeft: 42, fontSize: 12, marginTop: -8, color: '#7C7E8C' }}>
+                                    {item.location.map((location: any, locationIndex: number) => {
+                                        return (
                                             <div key={locationIndex} >{location.name}</div>
                                         );
                                     })}
                                 </div>
                             </MenuItem>
-                            
+
                         ))}
                     </Select>
                 </FormControl>
             </div>
 
-            <div style={{ marginTop: 64,textAlign:'right'}}>
+            <div style={{ marginTop: 64, textAlign: 'right' }}>
                 <Button
                     variant="contained"
                     size='small'

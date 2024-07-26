@@ -20,7 +20,9 @@ export  interface Column {
 export interface row {
   // [id]: any,
   _id:string
-  edemand: string,
+  edemand: {
+    edemand_no: string
+  },
   fnr: {
       primary: string,
       others: string,

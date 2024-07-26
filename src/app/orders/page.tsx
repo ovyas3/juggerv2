@@ -38,6 +38,12 @@ const getStatusCode = (status: string): string => {
   }
 }
 
+async function totalCount () {
+  const response = await httpsGet('get/status_count');
+  return response;
+}
+
+
 const ageingCode = [
   { color: 'green', code: '#18BE8A', text: '1-2 days' },
   { color: 'yellow', code: '#FFD60A', text: '3-6 days' },
@@ -72,6 +78,10 @@ const OrdersPage = () => {
   const [triggerShipments, setTriggerShipments] = useState(false)
 
   const [showRefreash, setShowRefreash] = useState(false)
+
+    //totalCount
+    const [totalCountrake, setTotalCountrake] = useState<any>({})
+
 
 
   //shipment payload
@@ -144,6 +154,18 @@ const OrdersPage = () => {
       setCount(0)
     }
   }
+
+  useEffect(()=>{
+    totalCount().then((res : any)=>{
+        if(res && res.statusCode == 200){
+            setTotalCountrake(res.data)
+        }
+
+    }).catch((err)=>{
+        console.log(err)
+    })
+},[])
+console.log(totalCountrake[0]?.statuses, 'totalCountrake')
 
   async function getCaptiveRake() {
     const list_captive_rake = await httpsGet(CAPTIVE_RAKE);
@@ -235,7 +257,7 @@ const OrdersPage = () => {
                 <div className='filters' style={{ overflowX: 'auto', maxWidth: '87%' }}>
                   <Filters onToFromChange={handleToFromChange} onChangeStatus={handleChangeStatus} onChangeRakeTypes={handleChangeRakeType} reload={reload} getShipments={getAllShipment} shipmentsPayloadSetter={setShipmentsPayload} setTriggerShipments={setTriggerShipments} triggerShipments={triggerShipments} />
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 16}}>
+                {/* <div style={{ display: 'flex', alignItems: 'center', gap: 16}}>
                   <div style={{ fontSize: '12px', color: '#484A57', fontWeight: '500' }}>{t('ageing')}</div>
                   <div className='ageing_group'>
                     {ageingCode.map((item, index) => {
@@ -247,23 +269,23 @@ const OrdersPage = () => {
                       );
                     })}
                   </div>
-                </div>
+                </div> */}
               </div>
               <div className='display_status'>
                     <div className='display_status_inner_box'>
-                      <div style={{fontSize:20, fontWeight:500}}>{getShipmentStatusSummary(allShipment).total}</div>
+                      <div style={{fontSize:20, fontWeight:500}}>{totalCountrake[0]?.totalCount ? totalCountrake[0]?.totalCount : 0}</div>
                       <div style={{fontSize:12, color:'#7C7E8C'}}>Total</div>
                     </div>
                     <div className='display_status_inner_box'>
-                      <div style={{fontSize:20, fontWeight:500}}>{getShipmentStatusSummary(allShipment).inPlant}</div>
+                      <div style={{fontSize:20, fontWeight:500}}>{totalCountrake[0]?.statuses?.find((item: any) => item.status === "")?.count || 0}</div>
                       <div style={{fontSize:12, color:'#7C7E8C'}}>In Plant</div>
                     </div>
                     <div className='display_status_inner_box'>
-                      <div style={{fontSize:20, fontWeight:500}}>{getShipmentStatusSummary(allShipment).inTransit}</div>
+                      <div style={{fontSize:20, fontWeight:500}}>{totalCountrake[0]?.statuses?.find((item: any) => item.status === "ITNS")?.count || 0}</div>
                       <div style={{fontSize:12, color:'#7C7E8C'}}>In Transit</div>
                     </div>
                     <div className='display_status_inner_box'>
-                      <div style={{fontSize:20, fontWeight:500}}>{getShipmentStatusSummary(allShipment).delivered}</div>
+                      <div style={{fontSize:20, fontWeight:500}}>{totalCountrake[0]?.statuses?.find((item: any) => item.status === "Delivered")?.count || 0}</div>
                       <div style={{fontSize:12, color:'#7C7E8C'}}>Delivered</div>
                     </div>
               </div>
