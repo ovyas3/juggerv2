@@ -107,7 +107,7 @@ const StationHeader = ({ count } : any) => {
     const [codeValid, setCodeValid] = useState(false);
     const [pageInput, setPageInput] = useState<string>(String(page + 1));
     const [totalPages, setTotalPages] = useState(Math.ceil(totalCount / rowsPerPage));
-    const isSmallScreen = useMediaQuery('(max-width:453px)');
+    const isSmallScreen = useMediaQuery('(max-width:808px)');
 
   
     const handleOpen = (e: any) => {e.stopPropagation(); setOpen(true);}
@@ -656,45 +656,43 @@ const StationHeader = ({ count } : any) => {
 
     return(
         <div className="target1">
-            <div className="btn-container">
             <div className="search-container">
-                <div className="search1-container">
+                <div className="search-wrapper">
                     <TextField
-                            id="search-station-code"
-                            type="search"
-                            variant="outlined"
-                            value={searchValue}
-                            onChange={(event) => 
-                            { setSearchValue(event.target.value);
-                                handleSearch(event.target.value);}
-                            }
-                            placeholder={getPlaceholder()}
-                            className="search-input"
-                            InputProps={{
-                            startAdornment: (
-                                <InputAdornment position="start">
-                                <CustomFormControl variant="outlined">
-                                <Select
-                                    value={searchType}
-                                    onChange={(e) => setSearchType(e.target.value)}
-                                    className="search-select"
-                                >
-                                    <MenuItem value="Station Code">Station Code</MenuItem>
-                                    <MenuItem value="State">State</MenuItem>
-                                </Select>
-                                </CustomFormControl>
-                            </InputAdornment>
+                    type="search"
+                    variant="outlined"
+                    value={searchValue}
+                    onChange={(event) => {
+                        setSearchValue(event.target.value);
+                        handleSearch(event.target.value);
+                    }}
+                    placeholder={getPlaceholder()}
+                    className="search-input"
+                    InputProps={{
+                        startAdornment: (
+                        <InputAdornment position="start">
+                            <Select
+                            value={searchType}
+                            onChange={(e) => setSearchType(e.target.value)}
+                            className="search-select"
+                            >
+                            <MenuItem value="Station Code">Station Code</MenuItem>
+                            <MenuItem value="State">State</MenuItem>
+                            </Select>
+                        </InputAdornment>
                         ),
                         endAdornment: (
-                            <InputAdornment position="end">
-                                <Image src={SearchIcon} alt="" style={{cursor: 'pointer'}}/>
-                            </InputAdornment>
+                        <InputAdornment position="end">
+                            <Image src={SearchIcon} alt="" style={{ cursor: 'pointer' }} />
+                        </InputAdornment>
                         ),
-                        }}
+                    }}
                     />
-                </div> 
                 </div>
-                    <button className="add-btn" onClick={(e) => { e.stopPropagation();handleOpen(e)}}>Add Station</button>
+    
+                <button className="add-btn" onClick={(e) => { e.stopPropagation(); handleOpen(e); }}>
+                    Add Station
+                </button>
             </div>
             <div className="table-container">
                 <Paper sx={{
@@ -732,7 +730,7 @@ const StationHeader = ({ count } : any) => {
                                 borderRadius: '4px', 
                                 border: "1px solid #E0E0E0",
                                 padding: '2px 4px',
-                                maxWidth : '100px'
+                                minWidth : '150px',
                             }}>
                                 <input
                                     value={pageInput}
@@ -923,6 +921,7 @@ const StationHeader = ({ count } : any) => {
                             <InputLabel className="label">Zone</InputLabel>
                             <Autocomplete
                                 className="form-select"
+                                style={{ height: '32px',width: "100%",fontSize: "16x", borderRadius: "5px",marginTop: '30px'}}
                                 value={addZone}
                                 onChange={(e, newValue) => setAddZone(newValue || '')}
                                 options={zones}
@@ -933,6 +932,7 @@ const StationHeader = ({ count } : any) => {
                             <InputLabel className="label">State</InputLabel>
                             <Autocomplete
                                 className="form-select"
+                                style={{ height: '32px',width: "100%",fontSize: "16x", borderRadius: "5px",marginTop: '30px'}}
                                 value={addState}
                                 onChange={(e, newValue) => setAddState(newValue || '')}
                                 options={states}
@@ -1003,6 +1003,7 @@ const StationHeader = ({ count } : any) => {
                         <div className="select-div">
                             <InputLabel className="label">Zone</InputLabel>
                             <Autocomplete
+                                style={{ height: '32px',width: "100%",fontSize: "16x", borderRadius: "5px",marginTop: '30px'}}
                                 className="form-select"
                                 value={editZone}
                                 onChange={(e, newValue) => setEditZone(newValue || '')}
@@ -1013,6 +1014,7 @@ const StationHeader = ({ count } : any) => {
                         <div className="select-div">
                             <InputLabel className="label">Zone</InputLabel>
                             <Autocomplete
+                                style={{ height: '32px',width: "100%",fontSize: "16x", borderRadius: "5px",marginTop: '30px'}}
                                 className="form-select"
                                 value={editState}
                                 onChange={(e, newValue) => setEditState(newValue || '')}

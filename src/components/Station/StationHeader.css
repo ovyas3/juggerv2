@@ -51,7 +51,7 @@
     cursor: pointer;
     transition: background-color 0.3s;
     position: absolute;
-    right: 1rem;
+    right: 1.5rem;
 }
 .btn{
     font-size: 16px;
@@ -260,33 +260,11 @@
         height: 680px;
     }
 }
-#search-station-code{
-    height: 0px;
-}
+
 .mui-1nrlq1o-MuiFormControl-root{
     height: 100% !important;
 }
 
-  .search-container {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-  }
-  .search1-container{
-    width: 400px;
-  }
-  
-  .search-input {
-    width: 100% ;
-  }
-  
-  .search-select {
-    width: 150px; 
-    height: 32px;
-    font-size: 14px; 
-    position: absolute;
-    left: 1px;
-  }
   .mui-1yk1gt9-MuiInputBase-root-MuiOutlinedInput-root-MuiSelect-root{
     height: 32px;
     margin-left: -15px !important;
@@ -301,33 +279,70 @@
         
     }
   }
-
-  @media (max-width: 768px) {
+@media (max-width: 768px) {
     .table-container{
-        height: 625px;
-    }
-    .btn-container {
-        flex-direction: column;
-        align-items: end;
-        position: static; 
-    }
-
-    .search-container {
-        justify-content: center;
-        margin-bottom: 1rem;
-    }
-
-    .add-btn {
-        width: 30%;
-        position: static; 
+        height: 550px;
     }
 }
-@media (max-width: 453px){
+
+.search-container {
+    margin-top: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+  }
+  .search-input {
+    width: 400px;
+    border-radius: 5px;
+  }
+  
+  .search-input .MuiOutlinedInput-root {
+    height: 30px;
+  }
+
+  .search-select {
+    min-width: 120px;
+    height: 40px;
+  }
+  
+  .search-select .MuiSelect-select {
+    padding: 8px 14px;
+  }
+
+@media (max-width:808px){
     .search-container{
-        font-size: 12px;
-        max-width: 300px;
+        margin-bottom: 50px;
+    }
+    .add-btn{
+        margin-top: 91px;
     }
     .search-input {
-        width: 100%;
-    }
+        width: 300px;
+        border-radius: 5px;
+      }
+}
+
+
+.select-container .select-div:nth-child(3) .form-select,
+.select-container .select-div:nth-child(4) .form-select {
+    height: 30px; 
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 600px;
+    box-sizing: border-box;
+}
+
+.select-container .select-div:nth-child(3) .form-select input,
+.select-container .select-div:nth-child(4) .form-select input {
+    height: 100%;
+    padding: 0;
+}
+
+
+.select-container .select-div:nth-child(3) .form-select::after,
+.select-container .select-div:nth-child(4) .form-select::after {
+    top: 50%;
+    transform: translateY(-50%);
 }
