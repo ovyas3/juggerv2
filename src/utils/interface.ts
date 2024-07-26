@@ -15,7 +15,6 @@ export  interface Column {
     id: string;
     subLabel: string | React.ReactNode;
     label: string | React.ReactNode;
-    subLabel: string | React.ReactNode;
     class: string;
     innerClass: string;
 }
