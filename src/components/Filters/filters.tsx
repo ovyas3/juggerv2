@@ -24,7 +24,7 @@ import calenderIcon from '@/assets/calender_icon_filters.svg'
 import filter_icon from '@/assets/filter_icon.svg'
 
 
-function Filters({ onToFromChange, onChangeStatus, onChangeRakeTypes , reload, shipmentsPayloadSetter}: any) {
+function Filters({ onToFromChange, onChangeStatus, onChangeRakeTypes, reload, shipmentsPayloadSetter }: any) {
 
 
 
@@ -53,7 +53,7 @@ function Filters({ onToFromChange, onChangeStatus, onChangeRakeTypes , reload, s
     ];
 
     const [status, setStatus] = useState(['In Transit', 'Delivered At Hub', 'Delivered At Customer']);
-    const [rakeType, setRakeType] = useState([ 'Captive Rakes','Indian Railway Rakes'])
+    const [rakeType, setRakeType] = useState(['Captive Rakes', 'Indian Railway Rakes'])
     const [openStartDatePicker, setOpenStartDatePicker] = useState(false);
     const [openEndDatePicker, setOpenEndDatePicker] = useState(false);
 
@@ -67,15 +67,15 @@ function Filters({ onToFromChange, onChangeStatus, onChangeRakeTypes , reload, s
         onChangeStatus(typeof value === 'string' ? value.split(',') : value,)
     };
 
-     const handleChangeRakeType = (event : any) => {
+    const handleChangeRakeType = (event: any) => {
         const {
-          target: { value },
+            target: { value },
         } = event;
         setRakeType(
-          typeof value === 'string' ? value.split(',') : value,
+            typeof value === 'string' ? value.split(',') : value,
         );
         onChangeRakeTypes(typeof value === 'string' ? value.split(',') : value,)
-      };
+    };
 
 
 
@@ -188,7 +188,7 @@ function Filters({ onToFromChange, onChangeStatus, onChangeRakeTypes , reload, s
         <div>
             <div style={{ display: 'flex', gap: 20, position: 'relative', overflowY: 'hidden' }} >
 
-                <div style={{ display: 'flex', gap: 20, }}>
+                <div style={{ display: 'flex', gap: 20}}>
                     <div style={{ height: 36, width: 132, border: '1px solid #E9E9EB', borderRadius: '6px', display: 'flex', alignItems: 'center', paddingLeft: 8 }} >
                         <div style={{ height: 16, width: 16, marginBottom: 4 }}><img src={calenderIcon.src} alt='' /></div>
                         <div style={{ flex: 1, marginTop: 6, marginLeft: 10 }}>
@@ -289,147 +289,138 @@ function Filters({ onToFromChange, onChangeStatus, onChangeRakeTypes , reload, s
                     </div>
                 </div>
 
-                <div className='status_container' style={{ width: '170px',marginRight:'20px' }}>
-                    <FormControl sx={{ width: '170px', margin: 0, padding: 0 }}>
+                <div className='status_container' style={{marginRight: 40 }}>
+                    <FormControl sx={{  margin: 0, padding: 0 }}>
                         <InputLabel id="demo-multiple-checkbox-label" sx={{
                             padding: 0, fontSize: 14, marginTop: '-8px',
                         }}>Status</InputLabel>
                         <Select
 
-                        labelId="demo-multiple-checkbox-label"
-                        id="demo-multiple-checkbox"
-                        value={status}
-                        multiple
-                        onChange={handleChange}
-                        input={<OutlinedInput
-                            sx={{
-                                width: '170px',
-                                '& .MuiOutlinedInput-notchedOutline': {
-                                    border: '1px solid #E9E9EB'
-                                },
-                                '&:hover .MuiOutlinedInput-notchedOutline': {
-                                    border: '1px solid #E9E9EB'
-                                },
-                                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                                    border: '1px solid #E9E9EB'
-                                },
-                            }}
-                        />}
-                        renderValue={(selected : any) => selected.join(', ')}
-                        // renderValue={(selected) => selected}
-                        MenuProps={MenuProps}
-                    >
-                        {names.map((name) => (
-                            <MenuItem key={name} value={name} sx={{ padding: 0 }} >
-                                <Checkbox checked={status.indexOf(name) > -1} sx={{ paddingLeft: '8px', padding: '4px', '& .MuiSvgIcon-root': { fontSize: 15 } }} />
-                                <ListItemText primary={name} primaryTypographyProps={{ fontSize: '12px', fontFamily: 'Inter, sans-serif' }} />
-                            </MenuItem>
-                        ))}
-                    </Select>
-                </FormControl>
-            </div>
-
-
-            <div className='status_container' style={{width:'180px'}}>
-                <FormControl sx={{
-                    width:'180px', margin: 0, padding: 0,
-                    '.mui-kk1bwy-MuiButtonBase-root-MuiMenuItem-root': {
-                        padding: 0,
-                    },
-                }}>
-                    <InputLabel id="demo-multiple-checkbox-label" sx={{
-                        padding: 0, fontSize: 14, marginTop: '-8px',
-                    }}>Rake Type</InputLabel>
-                    <Select
-                        labelId="demo-multiple-checkbox-label"
-                        id="demo-multiple-checkbox"
-                        value={rakeType}
-                        multiple
-                        className='status_select'
-                        onChange={handleChangeRakeType}
-                        input={<OutlinedInput
-                            sx={{
-                                width: '180px',
-                                '& .MuiOutlinedInput-notchedOutline': {
-                                    border: '1px solid #E9E9EB'
-                                },
-                                '&:hover .MuiOutlinedInput-notchedOutline': {
-                                    border: '1px solid #E9E9EB'
-                                },
-                                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                                    border: '1px solid #E9E9EB'
-                                },
-                            }}
-                        />}
-                        renderValue={(selected : any) => selected.join(', ')}
-                        // renderValue={(selected) => selected}
-                        MenuProps={MenuProps}
-                    >
-                        {rakeTypes.map((name) => (
-                            <MenuItem key={name} value={name} sx={{ padding: 0 }} >
-                                <Checkbox checked={rakeType.indexOf(name) > -1} sx={{ paddingLeft: '8px', padding: '4px', '& .MuiSvgIcon-root': { fontSize: 15 } }} />
-                                <ListItemText primary={name} primaryTypographyProps={{ fontSize: '12px', fontFamily: 'Inter, sans-serif' }} />
-                            </MenuItem>
-                        ))}
-                    </Select>
-                </FormControl>
-            </div>
-            
-            <div>
-            <motion.div
-                className="box"
-                whileHover={{ scale: 0.95 }}
-                whileTap={{ scale: 0.9 }}
-                transition={{ type: "spring", stiffness: 400, damping: 10 }}
-                onClick={() => window.open('/shipment_map_view', '_blank')}
-            >
-                <Image src={MapViewIcon} alt="map view" width={16} height={16}/>
-                <span className="map-view-btn-header">Map View</span>
-            </motion.div>
-            </div>
-
-
-                {/* <div>
-                <div className="upload-container">
-                    <CloudUploadIcon className="upload-icon" />
-                    <div className="upload-text">Upload File</div>
+                            labelId="demo-multiple-checkbox-label"
+                            id="demo-multiple-checkbox"
+                            value={status}
+                            multiple
+                            onChange={handleChange}
+                            input={<OutlinedInput
+                                sx={{
+                                    width: '170px',
+                                    '& .MuiOutlinedInput-notchedOutline': {
+                                        border: '1px solid #E9E9EB'
+                                    },
+                                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                                        border: '1px solid #E9E9EB'
+                                    },
+                                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                        border: '1px solid #E9E9EB'
+                                    },
+                                }}
+                            />}
+                            renderValue={(selected: any) => selected.join(', ')}
+                            // renderValue={(selected) => selected}
+                            MenuProps={MenuProps}
+                        >
+                            {names.map((name) => (
+                                <MenuItem key={name} value={name} sx={{ padding: 0 }} >
+                                    <Checkbox checked={status.indexOf(name) > -1} sx={{ paddingLeft: '8px', padding: '4px', '& .MuiSvgIcon-root': { fontSize: 15 } }} />
+                                    <ListItemText primary={name} primaryTypographyProps={{ fontSize: '12px', fontFamily: 'Inter, sans-serif' }} />
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
                 </div>
-            </div> */}
+
+
+                <div className='status_container' style={{ marginRight:30 }}>
+                    <FormControl sx={{
+                        width: '180px', margin: 0, padding: 0,
+                        '.mui-kk1bwy-MuiButtonBase-root-MuiMenuItem-root': {
+                            padding: 0,
+                        },
+                    }}>
+                        <InputLabel id="demo-multiple-checkbox-label" sx={{
+                            padding: 0, fontSize: 14, marginTop: '-8px',
+                        }}>Rake Type</InputLabel>
+                        <Select
+                            labelId="demo-multiple-checkbox-label"
+                            id="demo-multiple-checkbox"
+                            value={rakeType}
+                            multiple
+                            className='status_select'
+                            onChange={handleChangeRakeType}
+                            input={<OutlinedInput
+                                sx={{
+                                    width: '180px',
+                                    '& .MuiOutlinedInput-notchedOutline': {
+                                        border: '1px solid #E9E9EB'
+                                    },
+                                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                                        border: '1px solid #E9E9EB'
+                                    },
+                                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                        border: '1px solid #E9E9EB'
+                                    },
+                                }}
+                            />}
+                            renderValue={(selected: any) => selected.join(', ')}
+                            // renderValue={(selected) => selected}
+                            MenuProps={MenuProps}
+                        >
+                            {rakeTypes.map((name) => (
+                                <MenuItem key={name} value={name} sx={{ padding: 0 }} >
+                                    <Checkbox checked={rakeType.indexOf(name) > -1} sx={{ paddingLeft: '8px', padding: '4px', '& .MuiSvgIcon-root': { fontSize: 15 } }} />
+                                    <ListItemText primary={name} primaryTypographyProps={{ fontSize: '12px', fontFamily: 'Inter, sans-serif' }} />
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                </div>
 
                 <div>
+                    <motion.div
+                        className="box"
+                        whileHover={{ scale: 0.95 }}
+                        whileTap={{ scale: 0.9 }}
+                        transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                        onClick={() => window.open('/shipment_map_view', '_blank')}
+                    >
+                        <Image src={MapViewIcon} alt="map view" width={16} height={16} />
+                        <span className="map-view-btn-header">Map View</span>
+                    </motion.div>
+                </div>
+
+                <div style={{backgroundColor:'yellow'}}>
                     <div className="filter-container" onClick={() => setOpenFilterModal(true)}>
                         {/* <FilterAltIcon className="filter-icon" /> */}
-                        <img src={filter_icon.src} alt=''/>
+                        <img src={filter_icon.src} alt='' />
                     </div>
                 </div>
 
             </div>
-            {
 
-                openFilterModal ?
-                    <div>
-                        <div className='modal-wrapper'>
-                            <div className='modal-container'>
-                                <div className='modal-header'><span className='modal-filter-header'>Advanced Search</span><Image src={closeIcon} alt='' className='close-icon' onClick={() => setOpenFilterModal(false)} /></div>
-                                <div className='filters-wrapper'>
-                                    <input placeholder='e-Demand Number' onChange={(e) => setFilterEDemand(e.target.value)} value={filterEDemand} />
-                                    <input placeholder='Destination' onChange={(e) => setFilterDestination(e.target.value)} value={filterDestination} />
-                                    <input placeholder='Material' onChange={(e) => setFilterMaterial(e.target.value)} value={filterMaterial} />
-                                </div>
-                                <div className='filter-modal-footer'>
-                                    <button onClick={() => clearFilter()}>
-                                        Clear Filter
-                                    </button>
-                                    <button onClick={handleSubmit}>
-                                        Search
-                                    </button>
+            {openFilterModal ?
+                <div>
+                    <div className='modal-wrapper'>
+                        <div className='modal-container'>
+                            <div className='modal-header'><span className='modal-filter-header'>Advanced Search</span><Image src={closeIcon} alt='' className='close-icon' onClick={() => setOpenFilterModal(false)} /></div>
+                            <div className='filters-wrapper'>
+                                <input placeholder='e-Demand Number' onChange={(e) => setFilterEDemand(e.target.value)} value={filterEDemand} />
+                                <input placeholder='Destination' onChange={(e) => setFilterDestination(e.target.value)} value={filterDestination} />
+                                <input placeholder='Material' onChange={(e) => setFilterMaterial(e.target.value)} value={filterMaterial} />
+                            </div>
+                            <div className='filter-modal-footer'>
+                                <button onClick={() => clearFilter()}>
+                                    Clear Filter
+                                </button>
+                                <button onClick={handleSubmit}>
+                                    Search
+                                </button>
 
-                                </div>
                             </div>
                         </div>
+                    </div>
 
-                        <div className='overlay-container' onClick={() => setOpenFilterModal(false)} />
-                    </div> : <></>
+                    <div className='overlay-container' onClick={() => setOpenFilterModal(false)} />
+                </div> : <></>
             }
 
         </div>

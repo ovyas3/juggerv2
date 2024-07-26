@@ -173,11 +173,11 @@ justify-content:flex-start
 
 .fnr_container{}
 
-.material_items{
+/* .material_items{
   position: relative;
-}
+} */
 .view_more_materials{
-  position: absolute;
+  position: relative;
   width: 16px !important;
   height: 16px !important;
   background-color:#484A57;
@@ -186,8 +186,6 @@ justify-content:flex-start
   justify-content: center;
   align-items: center;
   color: #fff;
-  top: -24px;
-  right: 5px;
   cursor: pointer;
 }
 
