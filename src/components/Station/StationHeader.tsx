@@ -161,13 +161,13 @@ const StationHeader = ({ count } : any) => {
 
     useEffect(() => {
         const commonColumns: Column[] = [
-            { id: 'sno', label: 'S.No', class: 'sNo1', innerClass: ''  },
-            { id: 'name', label: 'Station Name', class: 'stationName1', innerClass: '' },
-            { id: 'code', label: 'Station Code', class: 'stationCode1', innerClass: '' },
-            { id: 'zone', label: 'Zone', class: 'zone1', innerClass: 'inner_pickup' },
-            { id: 'state', label: 'State', class: 'state1', innerClass: 'inner_pickup' },
-            { id: 'location', label: 'Location', class: 'location1', innerClass: '' },
-            { id: 'action', label: 'Action', class: 'action1', innerClass: '' },
+            { id: 'sno', subLabel: '', label: 'S.No', class: 'sNo1', innerClass: ''  },
+            { id: 'name', subLabel: '',label: 'Station Name', class: 'stationName1', innerClass: '' },
+            { id: 'code', subLabel: '',label: 'Station Code', class: 'stationCode1', innerClass: '' },
+            { id: 'zone', subLabel: '',label: 'Zone', class: 'zone1', innerClass: 'inner_pickup' },
+            { id: 'state', subLabel: '',label: 'State', class: 'state1', innerClass: 'inner_pickup' },
+            { id: 'location', subLabel: '',label: 'Location', class: 'location1', innerClass: '' },
+            { id: 'action', subLabel: '',label: 'Action', class: 'action1', innerClass: '' },
         ];
         setColumns(commonColumns);
     }, [])

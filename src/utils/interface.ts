@@ -1,3 +1,5 @@
+import React from "react";
+
 export interface ShipmentsObjectPayload  {
     is_outbound: Boolean,
     from: string,
@@ -12,6 +14,7 @@ export interface ShipmentsObjectPayload  {
 export  interface Column {
     id: string;
     label: string | React.ReactNode;
+    subLabel: string | React.ReactNode;
     class: string;
     innerClass: string;
 }
@@ -34,8 +37,9 @@ export interface row {
       date: string
   },
   status: {
-    name:string,
-    code:string
+    name: string,
+    code: string,
+    raw: string
   },
   currentEta: string,
   remarks: {

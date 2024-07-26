@@ -79,6 +79,14 @@ async function remake_update_By_Id(payload: object) {
     return response;
 }
 
+const status_class_map: { [key: string]: string } = {
+    'OB': 'status_title_In_Plant',
+    'AVE': 'status_title_In_Plant',
+    'RFD': 'status_title_rfd',
+    'ITNS': 'status_title_In_Transit',
+    'Delivered': 'status_title_Delivered'
+}
+
 const convertArrayToFilteredArray = (inputArray: any) => {
     return inputArray.map((
         item: {
@@ -92,7 +100,6 @@ const convertArrayToFilteredArray = (inputArray: any) => {
             all_FNRs: any;
             unique_code: string,
             _id: string,
-            new_status: string,
             status: string,
             pickup_date: any,
             fois: any,
@@ -110,7 +117,7 @@ const convertArrayToFilteredArray = (inputArray: any) => {
             commodity_desc: any,
             expected_loading_date: any,
         }) => {
-        const { edemand_no, FNR, all_FNRs, delivery_location, trip_tracker, others, remarks, unique_code, new_status, status, pickup_date, captive_id, is_captive, eta, rr_document, polyline, past_etas, no_of_wagons, received_no_of_wagons, demand_date, paid_by, commodity_desc, expected_loading_date } = item;
+        const { edemand_no, FNR, all_FNRs, delivery_location, trip_tracker, others, remarks, unique_code, status, pickup_date, captive_id, is_captive, eta, rr_document, polyline, past_etas, no_of_wagons, received_no_of_wagons, demand_date, paid_by, commodity_desc, expected_loading_date } = item;
         return {
             _id: item._id,
             edemand: edemand_no,
@@ -129,8 +136,9 @@ const convertArrayToFilteredArray = (inputArray: any) => {
                 pickupTime: service.utcToistTime(pickup_date) || 'NA'
             },
             status: {
-                name: statusBuilder(new_status || status),
-                code: (status === "Delivered" || status === "OB") ? null : status || '',
+                name: statusBuilder(status),
+                code: (status === "Delivered" || status === "OB" || status === "") ? null : (trip_tracker && trip_tracker.fois_last_location) || '',
+                raw: status,
             },
             currentEta: {
                 date: service.utcToist(eta) || 'NA',
@@ -331,23 +339,23 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
 
     useEffect(() => {
         const commonColumns: Column[] = [
-            { id: 'fnr', label: '', class: 'fnr', innerClass: 'inner_fnr' },
-            { id: 'destination', label: 'Destination/Paid By', class: 'destination', innerClass: '' },
-            { id: 'material', label: 'Commodities', class: 'material', innerClass: '' },
-            { id: 'eld', label: 'Expected Loading Date', class: 'eld', innerClass: '' },
+            { id: 'fnr', label: '', subLabel: '', class: 'fnr', innerClass: 'inner_fnr' },
+            { id: 'destination', subLabel: 'Paid By',label: 'Destination', class: 'destination', innerClass: '' },
+            { id: 'material', subLabel: '',label: 'Commodities', class: 'material', innerClass: '' },
+            { id: 'eld', subLabel: '',label: 'Expected Loading Date', class: 'eld', innerClass: '' },
             // { id: 'aging', label: 'Ageing', class: 'aging', innerClass: '' },
-            { id: 'pickupdate', label: 'Invoiced Date', class: 'pickupdate', innerClass: 'inner_pickup' },
-            { id: 'status', label: 'Status', class: 'status', innerClass: 'inner_status' },
-            { id: 'currentEta', label: 'Current ETA', class: 'currentEta', innerClass: 'inner_eta' },
+            { id: 'pickupdate', subLabel: '',label: 'Invoiced Date', class: 'pickupdate', innerClass: 'inner_pickup' },
+            { id: 'status', subLabel: '',label: 'Status', class: 'status', innerClass: 'inner_status' },
+            { id: 'currentEta', subLabel: 'Delivered Date', label: 'Current ETA', class: 'currentEta', innerClass: 'inner_eta' },
             // { id: 'deliverDate', label: 'Delivered Date', class: 'deliverDate', innerClass: '' },
-            { id: 'remarks', label: 'Remarks', class: 'remarks', innerClass: '' },
-            { id: 'handlingAgent', label: 'Handling Agent', class: 'handlingAgent', innerClass: '' },
-            { id: 'action', label: 'Action', class: 'action', innerClass: '' },
-            { id: 'iconheader', label: <IconButton onClick={() => { setShowEdemad(!showEdemand) }}><MoreVertIcon /></IconButton>, class: 'iconheader', innerClass: 'inner_iconheader' },
+            { id: 'remarks',  subLabel: '', label: 'Remarks', class: 'remarks', innerClass: '' },
+            { id: 'handlingAgent',  subLabel: '', label: 'Handling Agent', class: 'handlingAgent', innerClass: '' },
+            { id: 'action',  subLabel: '', label: 'Action', class: 'action', innerClass: '' },
+            { id: 'iconheader', subLabel: '', label: <IconButton onClick={() => { setShowEdemad(!showEdemand) }}><MoreVertIcon /></IconButton>, class: 'iconheader', innerClass: 'inner_iconheader' },
         ];
 
         if (edemand) {
-            commonColumns.unshift({ id: 'edemand', label: 'e-Demand', class: 'edemand', innerClass: '' });
+            commonColumns.unshift({ id: 'edemand',  subLabel: '', label: 'e-Demand', class: 'edemand', innerClass: '' });
         }
         setColumns(commonColumns);
     }, [edemand, showEdemand,])
@@ -384,11 +392,15 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                     return (
                                         <TableCell
                                             key={column.id}
-                                            style={{ fontSize: 12, fontWeight: 'bold', color: '#484A57', padding: '0px 0px 0px 0px', }}
+                                            style={{ fontSize: 12, fontWeight: 'bold', color: '#484A57', padding: '0px 0px 0px 0px' }}
                                             className={column.class}
                                         >
                                             <div className={column.innerClass}>
-                                                {column.label}
+                                                {column.subLabel && (column.subLabel as string).length ? <div>
+                                                        {column.label}
+                                                        <br />
+                                                        {column.subLabel}
+                                                    </div> : column.label}
                                                 {
                                                     column.id === 'iconheader' && showEdemand ?
                                                         <div className='inner_iconheader_before'>
@@ -435,28 +447,23 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                 }
                                                 {
                                                     column.id === 'currentEta' ?
-                                                    <div>
-                                                         <div style={{position:'absolute', top:10, left:90}}>
-                                                         <div style={{
-                                                            transform: currentETAsorting ? 'rotate(180deg)' : 'rotate(0deg)',
-                                                            transformOrigin: 'center center',
-                                                            transition: 'transform 0.3s ease-in-out',
-                                                            cursor: 'pointer',
-                                                            display: 'flex',
-                                                            justifyContent: 'center',
-                                                            alignItems: 'center',
-                                                        }}
-                                                            onClick={() => { setCurrentETAsorting(!currentETAsorting) }}
-                                                        ><ArrowDownwardIcon
-                                                                fontSize='small'
-                                                                style={{ color: 'darkgrey' }}
-                                                            />
+                                                    <div style={{position:'absolute', top:10, left:90}}>
+                                                            <div style={{
+                                                                transform: currentETAsorting ? 'rotate(180deg)' : 'rotate(0deg)',
+                                                                transformOrigin: 'center center',
+                                                                transition: 'transform 0.3s ease-in-out',
+                                                                cursor: 'pointer',
+                                                                display: 'flex',
+                                                                justifyContent: 'center',
+                                                                alignItems: 'center',
+                                                            }}
+                                                                onClick={() => { setCurrentETAsorting(!currentETAsorting) }}
+                                                            ><ArrowDownwardIcon
+                                                                    fontSize='small'
+                                                                    style={{ color: 'darkgrey' }}
+                                                                />
+                                                            </div>
                                                         </div>
-                                                         </div>
-                                                         <div>Delivered Date</div>
-                                                    </div>
-                                                       
-                                                       
                                                         : <></>
                                                 }
 
@@ -558,7 +565,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                             <div className='fnr_container'>
                                                                 <div style={{ display: 'flex', alignItems: 'center' , gap:4}}>
                                                                     <div>Primary</div>
-                                                                    {row.status.name === 'In Plant' && 
+                                                                    {(row.status.name === 'AVE') && 
                                                                         <div className='aging_dot' style={{backgroundColor:`${getColorCode(row.daysAging)}`}} ></div>
                                                                     }
                                                                 </div>
@@ -669,7 +676,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                         )}
                                                         {item.id === 'status' &&
                                                             <div className='status_container'>
-                                                                <div className={` ${value.name === t('intransit') ? 'status_title_In_Transit' : value.name === t('delivered') ? 'status_title_Delivered' : 'status_title_In_Plant'}`}>
+                                                                <div className={`status_resize ${status_class_map[value.raw]}`}>
                                                                     <div>{value.name}</div>
                                                                 </div>
                                                                 <div className='status_body'>{value.code}</div>
@@ -1258,7 +1265,7 @@ const PastEta = ({ row, firstIndex }: any) => {
                     <Box sx={{ paddingBlock: '4px' }}>
                         {row.past_etas?.map((item: any, remarkListIndex: number) => (
                             <Typography key={remarkListIndex} sx={{ fontSize: '12px', paddingInline: '8px' }}>
-                                {service.utcToist(item)}  -  {service.utcToistTime(item)}
+                                {service.utcToist(item)} - {service.utcToistTime(item)}
                             </Typography>
                         ))}
                     </Box>
