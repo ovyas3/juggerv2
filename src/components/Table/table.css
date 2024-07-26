@@ -102,6 +102,7 @@
     text-wrap: nowrap;
     /* background-color: #0168FF !important; */
     line-height: 20px !important;
+    padding-inline: 15px !important;
 }
 
 .deliverDate {
@@ -112,7 +113,7 @@
 
 .remarks {
     min-width: 86px !important;
-    padding-inline: 10px !important;
+    padding-inline: 20px !important;
 }
 
 .handlingAgent {
@@ -188,7 +189,7 @@
 }
 
 .body_remarks {
-    padding-inline: 15px !important;
+    padding-inline: 20px !important;
 }
 
 .body_action {
@@ -295,10 +296,12 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    height: 25px;
+    margin-bottom: 6px;
 }
 
 .status_title_Delivered {
-    padding-top: 2px;
+    height: 25px;
     background-color: #18BE8A1F;
     color: #18BE8A;
     display: flex;
@@ -326,8 +329,8 @@
 }
 
 .status_title_In_Plant {
-    height: 20px;
-    width: 72px;
+    height: 25px;
+    /* width: 72px; */
     background-color: #334FFC1F;
     color: #334FFC;
     display: flex;
@@ -347,7 +350,7 @@
     height: 24px;
     padding: 0;
     border-radius: 4px;
-    width: 24px;
+    /* width: 24px; */
     position: relative;
 }
 
@@ -357,7 +360,7 @@
 
     right: 33px;
     top: -52px;
-    z-index: 100 !important;
+    z-index : 999999999 !important;
 
     opacity: 0;
     transform: scale(0.95);
@@ -375,7 +378,7 @@
 }
 
 .status_container {
-    max-width: 150px;
+    max-width: 130px;
 }
 
 
@@ -535,4 +538,7 @@
 }
 .mui-1ncgey5-MuiTableContainer-root {
     margin-top: 10px !important;
+}
+.body_currentEta{
+    padding-left: 20px !important;
 }

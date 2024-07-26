@@ -30,3 +30,4 @@ export const FETCH_TRACK_DETAILS = 'fetch/track_details'
 export const HANDLING_AGENT_INVITE = 'handling_agent/handling_agent_invite'
 export const EXISTING_AGENT_INVITE = 'handling_agent/existing_handling_agent_invite'
 export const UPDATE_ELD = 'edit/expected_loading_date'
+export const GET_HANDLING_AGENT_LIST = 'handling_agent/get_ha';

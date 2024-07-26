@@ -13,6 +13,7 @@ export interface ShipmentsObjectPayload  {
 
 export  interface Column {
     id: string;
+    subLabel: string | React.ReactNode;
     label: string | React.ReactNode;
     subLabel: string | React.ReactNode;
     class: string;
@@ -22,13 +23,16 @@ export  interface Column {
 export interface row {
   // [id]: any,
   _id:string
-  edemand: string,
+  edemand: {
+    edemand_no: string
+  },
   fnr: {
       primary: string,
       others: string,
       unique_code: string
   },
   destination: {
+      locationId:string,
       name: string,
       code: string
   },
