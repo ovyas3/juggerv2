@@ -223,3 +223,33 @@ justify-content:flex-start
   background-color: #bbbbbf;
   color: #484A57;
 }
+.view_more_agents{
+  background-color: #717cc5;
+  height: 18px;
+  width: 18px;
+  border-radius: 50%;
+  color: wheat;
+  text-align: center;
+}
+.handlingAgentColume{
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  gap:4px
+}
+.list_of_agents{
+  position: absolute;
+  background-color: #555659;
+  top: 23px;
+  right: 3px;
+  color: #fff;
+  padding: 4px;
+  border-radius: 4px;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+.handlingAgentColume:hover .list_of_agents{
+  visibility: visible;
+  opacity: 1;
+}

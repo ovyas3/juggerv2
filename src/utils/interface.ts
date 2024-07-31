@@ -70,7 +70,9 @@ export interface row {
   expected_loading_date:{
     ELDdate:string,
     ELDtime:string
-  }
+  },
+  past_etas:any
+
 }
 
 export interface tagItem {

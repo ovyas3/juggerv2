@@ -11,6 +11,8 @@ import CloseIcon from '@mui/icons-material/Close';
 import { HANDLING_AGENT_INVITE, EXISTING_AGENT_INVITE} from "@/utils/helper";
 import { httpsGet, httpsPost } from "@/utils/Communication";
 import InviteBox from './invite';
+import searchIcon from '@/assets/search_icon.svg'
+import ArrowDropDownSharpIcon from '@mui/icons-material/ArrowDropDownSharp';
 
 async function inviteAgent ({payload}:any){
     const response = await httpsPost(HANDLING_AGENT_INVITE, payload);
@@ -33,17 +35,23 @@ function HandlingAgent() {
             <div className={`content_container ${mobile ? 'adjustMargin' : 'adjustMarginMobile'}`}  >
 
                 {/* -------------other than table content ------------------- */}
-                <div style={{ height: '10%' }}>
+                <div className='search_invite'>
+                    <div></div>
+                    <div className='search_container'>
+                        <div className='dropDown_agentName' >
+                            <div>Agent Name</div>
+                            <div><ArrowDropDownSharpIcon/></div>
+                        </div>
+                        <div><input placeholder='Search for handling agent' className='search-input-agent' type='text'/></div>
+                        <div style={{ cursor: 'pointer', height:24, width:24, position: 'absolute', right: 10 }}><img src={searchIcon.src} alt='searchIcon' style={{ width: '100%', height: '100%' }} /></div>
+                    </div>
                     <div className='invite_button_container'>
-                        <div
-                            className='invite_button'
-                            onClick={(e) => { e.stopPropagation(); setOpenModalInvite(true) }}
-                        >Invite Agent</div>
+                        <div className='invite_button' onClick={(e) => { e.stopPropagation(); setOpenModalInvite(true) }}>Invite Agent</div>
                     </div>
                 </div>
 
                 {/* --------------- Table content -------------- */}
-                <AgentTable/>
+                {/* <AgentTable/> */}
             </div>
 
             {/* -------modals--------- */}
