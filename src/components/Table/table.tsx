@@ -38,7 +38,7 @@ import contactIcon from '@/assets/inactive_contact_dashboard+icon.svg'
 import BookmarkAddOutlinedIcon from '@mui/icons-material/BookmarkAddOutlined';
 import './style.css'
 
-import { sortArray, separateLatestObject, calculateDaysDifference, getColorCode, getUniqueValues } from '@/utils/hooks';
+import { sortArray, separateLatestObject, calculateDaysDifference, getColorCode, getUniqueValues, processETAs } from '@/utils/hooks';
 import Popover from '@mui/material/Popover';
 import { useSnackbar } from '@/hooks/snackBar';
 import captiveRakeIndicator from '@/assets/captive_rakes.svg'
@@ -113,7 +113,8 @@ const convertArrayToFilteredArray = (inputArray: any) => {
             },
             status: {
                 name: statusBuilder(status),
-                code: (status === "Delivered" || status === "OB" || status === "") ? null : (trip_tracker && trip_tracker.fois_last_location) || '',
+                code: (status === "Delivered" || status === "OB" || status === "") ? null : (trip_tracker && trip_tracker[0]?.fois_last_location) || '',
+                // code: trip_tracker[0]?.fois_last_location || '',
                 raw: status,
             },
             currentEta: {
@@ -136,7 +137,7 @@ const convertArrayToFilteredArray = (inputArray: any) => {
             eta: eta,
             pickup_date: pickup_date,
             rrDoc: rr_document && rr_document.length > 0 ? true : false,
-            past_etas: past_etas ? past_etas : 'NA',
+            past_etas: past_etas ? processETAs(past_etas) : 'NA',
             received_no_of_wagons: received_no_of_wagons ? received_no_of_wagons : 'NA',
             no_of_wagons: no_of_wagons ? no_of_wagons : 'NA',
             is_captive: is_captive && is_captive,
@@ -659,7 +660,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                 {row.pickup_date ? (
                                                                     <>
                                                                         <div>{value.date}</div>
-                                                                        <div>{value.pickupTime}</div>
+                                                                        {/* <div>{value.pickupTime}</div> */}
                                                                     </>
                                                                 ) : 'NA'}
                                                             </div>
@@ -669,7 +670,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                 <div className={`status_resize ${status_class_map[value.raw]}`}>
                                                                     <div>{value.name}</div>
                                                                 </div>
-                                                                <div className='status_body'>{value.code}</div>
+                                                                <div>{value.code}</div>
                                                             </div>
                                                         }
                                                         {item.id === 'edemand' &&
@@ -704,14 +705,14 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                         }
                                                         {item.id === 'currentEta' && (
                                                             <div>
-                                                                <PastEta row={row} firstIndex={firstindex} />
-                                                                <div style={{ marginTop: 16 }}>
-                                                                    {row.past_etas && row.past_etas.length > 0 && 
-                                                                    <div>
-                                                                        <div>{service.utcToist(row.past_etas[row.past_etas.length -1])}</div>
-                                                                        <div>{service.utcToistTime(row.past_etas[row.past_etas.length -1])}</div>
-                                                                    </div>
-                                                                    }
+                                                                {/* <PastEta row={row} firstIndex={firstindex} /> */}
+                                                                <div>
+                                                                    {row.past_etas.initialETA !== 'NA' && <div>
+                                                                        <div>{service.utcToist(row.past_etas.initialETA)}</div>
+                                                                    </div> }
+                                                                    { row.past_etas.currentETA !== 'NA' && <div style={{ marginTop: 16 }}>
+                                                                        <div >{service.utcToist(row.past_etas.currentETA)}</div>
+                                                                    </div>}
                                                                 </div>
                                                             </div>
                                                         )}
@@ -743,7 +744,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                         {item.id === 'eld' && (
                                                             <div>
                                                                 <div>{row.expected_loading_date?.ELDdate}</div>
-                                                                <div>{row.expected_loading_date?.ELDtime}</div>
+                                                                {/* <div>{row.expected_loading_date?.ELDtime}</div> */}
                                                             </div>
                                                         )}
                                                         {item.id === 'handlingAgent' && (

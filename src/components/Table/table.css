@@ -340,6 +340,7 @@
 
 .status_body {
     font-size: 12px;
+    min-width: 140px !important;
 }
 
 .action_icon {
