@@ -12,7 +12,7 @@
 .content_container{
     width: calc(100vw - 70px);
     height: calc(100vh - 56px);
-    padding: 8px;
+    padding: 24px;
     
 }
 
@@ -26,25 +26,21 @@
     height: calc(100vh - 56px - 54px);
 }
 .invite_button{
-    background-color: #2962Ff;
-    color: #fff;
-    width: 100px;
+    background-color: #3352FF1F;
+    color: #3352FF;
+    width: 101px;
     height: 36px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 6px;
-    text-transform: uppercase;
+    border-radius: 4px;
     font-size: 12px;
-    font-weight: 500;
-    border: none;
-    outline: none;
-    position: relative;
-    top: 0;
+    font-weight: 400;
     cursor: pointer;
 }
 .invite_button:hover {
-    box-shadow: 0 2px 4px rgba(26, 22, 22, 0.2);
+    background-color: #3352FF;
+    color: #fff;
 }
 
 .invite_button:active {
@@ -76,12 +72,12 @@
 }
 .invite_container{
     background-color: white;
-    width: 15vw;
-    border-radius: 16px;
+    min-width: 480px !important;
+    min-height: 426px !important;
+    border-radius: 12px;
     position: relative;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    padding: 2rem;
-    min-width: 250px
+    padding: 24px;
 }
 .close_modal_button{
     position: absolute;
@@ -98,10 +94,9 @@
 }
 
 .invite-heading {
-    color: #42454E;
+    color: #131722;
     font-weight: 500;
     font-size: 20px;
-    /* margin-bottom: 0.5rem; */
 }
 
 .form-container {
@@ -243,8 +238,9 @@
     background-color: #1a4ed9;
 }
 .invite-button-container{
+    margin-top: 48px;
     display: flex;
-   justify-content: right;
+   justify-content: left;
 }
 .divider{
     background-color: #6c757d;
@@ -254,4 +250,58 @@
     width: 100%;
     font-size: 10px;
     padding-block: 10px;
+}
+.search_invite{
+    /* background-color: violet; */
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+.search_container{
+    position: relative;
+    display: flex;
+    align-items: center;
+    font-size: 12px;
+    width: 472px;
+    border: 1px solid #DFE3EB;
+    border-radius: 8px;
+    height: 40px;
+}
+.dropDown_agentName{
+    background-color: #F0F3F9;
+    width: 121px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-left: 12px;
+    gap:11px;
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+    border-top: 1px solid #DFE3EB;
+    border-bottom: 1px solid #DFE3EB;
+    border-right: 1px solid #DFE3EB;  
+}
+.search-input-agent{
+    margin-left: 16px;
+    border: none;
+    width: 200px;
+    outline: none;
+    font-size: 14px;
+}
+.inputBox{
+    width: 100%;
+    height: 36px;
+    border: 1px solid #E9E9EB;
+    border-radius: 6px;
+    margin-top: 8px;
+    margin-bottom: 20px;
+    outline: none;
+    font-size: 16px;
+    color: #42454E;
+    padding-inline: 16px;
+}
+.lable_name{
+    font-size: 12px;
+    color: #42454E;
 }

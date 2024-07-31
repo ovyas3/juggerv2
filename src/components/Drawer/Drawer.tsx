@@ -13,6 +13,8 @@ import StationManagementActive from '../../assets/station_management_active_icon
 import StationManagementInactive from '../../assets/station_management_inactive_icon.svg';
 import { useRouter, usePathname } from 'next/navigation';
 import fullLogo from '@/assets/Smartruck_hover_logo.svg'
+import HandlingAgentInactive from '@/assets/handling_agent_inactive_icon.svg';
+import handlingAgentActive from '@/assets/handling_agent_active_icon.svg'
 
 function SideDrawer() {
     const [open, setOpen] = useState(false);
@@ -20,6 +22,7 @@ function SideDrawer() {
     const [station, setStation] = useState(false);
     const [active, setActive] = useState('orders')
     const router = useRouter();
+    const [handleAgent, setHandleAgent] = useState(false);
     const pathName = usePathname();
     const handleRouting = (route: string) => {
         console.log(route)
@@ -94,6 +97,27 @@ function SideDrawer() {
                     className={`${open ? 'fnr_text' : 'fnr_text_none'}`}
                     style={{ color: ((active === 'stationManagement') || station) ? 'black' : 'white' }} >
                         Station Management
+                </div>
+            </div>
+            <div 
+                onMouseEnter={() => { setHandleAgent(true) }}
+                onMouseLeave={() => { setHandleAgent(false) }}
+                onClick={() => handleRouting('handlingAgent')}
+                className='station-code'
+                style={{ 
+                    width: open ? '190px' : '42px',
+                    justifyContent: open ? 'start' : 'center',
+                    backgroundColor: handleAgent === true ? 'white' : '',
+                    cursor: 'pointer'
+                }}
+            >
+                <Image 
+                    src={ handleAgent?  handlingAgentActive : HandlingAgentInactive} alt='stationManagementIcon'  
+                    style={{ marginLeft: open ? '10px' : '2px', color: handleAgent === true ? 'black' : 'white'}}/>
+                <div 
+                    className={`${open ? 'fnr_text' : 'fnr_text_none'}`}
+                    style={{ color: handleAgent ? 'black' : 'white' }} >
+                        Handling Agent
                 </div>
             </div>
         </div>

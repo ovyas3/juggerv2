@@ -14,28 +14,20 @@ import IconButton from '@mui/material/IconButton';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import Checkbox from '@mui/material/Checkbox';
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import './table.css'
 import service from '@/utils/timeService';
 import Link from 'next/link';
 import { Column, row } from '@/utils/interface';
 import { useTranslations } from 'next-intl';
 import RRModal from '../RR Modal/RRModal';
-
-
-import TextField from '@mui/material/TextField';
-
-
-import { ClickAwayListener, Popper, Tooltip, } from '@mui/material';
-import Button from '@mui/material/Button';
+import { Tooltip, } from '@mui/material';
 
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
-import { httpsPost, httpsGet } from '@/utils/Communication';
+import { httpsPost } from '@/utils/Communication';
 import { UPDATE_RAKE_CAPTIVE_ID, REMARKS_UPDATE_ID, FETCH_TRACK_DETAILS, UPDATE_ELD, GET_HANDLING_AGENT_LIST } from '@/utils/helper'
 import { statusBuilder } from '../MapView/StatusBuilder/StatusBuilder';
-
-
 import GPIS from '@/assets/gps_icon.svg'
 
 import attach_icon from '@/assets/attach_icon.svg'
@@ -44,45 +36,18 @@ import ShareIcon from '@mui/icons-material/Share';
 import fetchTrackDetailsIcon from '@/assets/polylines_icon.svg'
 import contactIcon from '@/assets/inactive_contact_dashboard+icon.svg'
 import BookmarkAddOutlinedIcon from '@mui/icons-material/BookmarkAddOutlined';
-
-import CloseIcon from '@mui/icons-material/Close';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import { MenuItem } from '@mui/material';
 import './style.css'
 
 import { sortArray, separateLatestObject, calculateDaysDifference, getColorCode, getUniqueValues } from '@/utils/hooks';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
 import Popover from '@mui/material/Popover';
-import { Typography, } from '@mui/material';
 import { useSnackbar } from '@/hooks/snackBar';
 import captiveRakeIndicator from '@/assets/captive_rakes.svg'
 import wagonIcon from '@/assets/captive_rakes_no_wagons.svg'
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
-
-import ListSubheader from '@mui/material/ListSubheader';
-import FormControl from '@mui/material/FormControl';
 import EditNoteOutlinedIcon from '@mui/icons-material/EditNoteOutlined';
-
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import dayjs from 'dayjs';
 import RvHookupIcon from '@mui/icons-material/RvHookup';
-import Autocomplete from '@mui/material/Autocomplete';
-
-import OutlinedInput from '@mui/material/OutlinedInput';
-import InputLabel from '@mui/material/InputLabel';
-import ListItemText from '@mui/material/ListItemText';
-
-async function rake_update_id(payload: Object) {
-    return await httpsPost(UPDATE_RAKE_CAPTIVE_ID, payload);
-}
-
-async function remake_update_By_Id(payload: object) {
-    const response = await httpsPost(REMARKS_UPDATE_ID, payload);
-    return response;
-}
+import { ActionItem, EditELD, HandlingAgentSelection, PastEta, RemarkComponent, Remarks, Tags } from './tableComp'
 
 const status_class_map: { [key: string]: string } = {
     'OB': 'status_title_In_Plant',
@@ -121,8 +86,9 @@ const convertArrayToFilteredArray = (inputArray: any) => {
             paid_by: string,
             commodity_desc: any,
             expected_loading_date: any,
+            HA: any
         }) => {
-        const { edemand_no, FNR, all_FNRs, delivery_location, trip_tracker, others, remarks, unique_code, status, pickup_date, captive_id, is_captive, eta, rr_document, polyline, past_etas, no_of_wagons, received_no_of_wagons, demand_date, paid_by, commodity_desc, expected_loading_date } = item;
+        const { edemand_no, FNR, all_FNRs, delivery_location, trip_tracker, others, remarks, unique_code, status, pickup_date, captive_id, is_captive, eta, rr_document, polyline, past_etas, no_of_wagons, received_no_of_wagons, demand_date, paid_by, commodity_desc, expected_loading_date, HA } = item;
         return {
             _id: item._id,
             edemand: {
@@ -158,7 +124,7 @@ const convertArrayToFilteredArray = (inputArray: any) => {
                 latest: separateLatestObject(remarks).latest?.remark || "NA",
                 rest: separateLatestObject(remarks)?.rest || "NA"
             },
-            handlingAgent: 'NA',
+            handlingAgent: HA ? HA : [],
             action: null,
             iconheader: '',
             fois: {
@@ -359,9 +325,9 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
             { id: 'material', subLabel: '', label: 'Commodities', class: 'material', innerClass: '' },
             { id: 'eld', subLabel: '', label: 'Expected Loading Date', class: 'eld', innerClass: '' },
             // { id: 'aging', label: 'Ageing', class: 'aging', innerClass: '' },
-            { id: 'pickupdate', subLabel: '', label: 'Invoiced Date', class: 'pickupdate', innerClass: 'inner_pickup' },
+            { id: 'pickupdate', subLabel: '', label: 'RR Date', class: 'pickupdate', innerClass: 'inner_pickup' },
             { id: 'status', subLabel: '', label: 'Status', class: 'status', innerClass: 'inner_status' },
-            { id: 'currentEta', subLabel: 'Delivered Date', label: 'Current ETA', class: 'currentEta', innerClass: 'inner_eta' },
+            { id: 'currentEta', subLabel: 'Current ETA', label: 'Initial ETA', class: 'currentEta', innerClass: 'inner_eta' },
             // { id: 'deliverDate', label: 'Delivered Date', class: 'deliverDate', innerClass: '' },
             { id: 'remarks', subLabel: '', label: 'Remarks', class: 'remarks', innerClass: '' },
             { id: 'handlingAgent', subLabel: '', label: 'Handling Agent', class: 'handlingAgent', innerClass: '' },
@@ -440,11 +406,27 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                         </div>
                                                         : <></>
                                                 }
-                                                {
-                                                    column.id === 'pickupdate' ?
-
+                                                {column.id === 'pickupdate' &&
+                                                    <div style={{
+                                                        transform: pickupSorting ? 'rotate(180deg)' : 'rotate(0deg)',
+                                                        transformOrigin: 'center center',
+                                                        transition: 'transform 0.3s ease-in-out',
+                                                        cursor: 'pointer',
+                                                        display: 'flex',
+                                                        justifyContent: 'center',
+                                                        alignItems: 'center',
+                                                    }}
+                                                        onClick={() => { setPickupSorting(!pickupSorting) }}
+                                                    ><ArrowDownwardIcon
+                                                            fontSize='small'
+                                                            style={{ color: 'darkgrey' }}
+                                                        />
+                                                    </div>
+                                                }
+                                                {column.id === 'currentEta' &&
+                                                    <div style={{ position: 'absolute', top: 10, left: 90 }}>
                                                         <div style={{
-                                                            transform: pickupSorting ? 'rotate(180deg)' : 'rotate(0deg)',
+                                                            transform: currentETAsorting ? 'rotate(180deg)' : 'rotate(0deg)',
                                                             transformOrigin: 'center center',
                                                             transition: 'transform 0.3s ease-in-out',
                                                             cursor: 'pointer',
@@ -452,34 +434,13 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                             justifyContent: 'center',
                                                             alignItems: 'center',
                                                         }}
-                                                            onClick={() => { setPickupSorting(!pickupSorting) }}
+                                                            onClick={() => { setCurrentETAsorting(!currentETAsorting) }}
                                                         ><ArrowDownwardIcon
                                                                 fontSize='small'
                                                                 style={{ color: 'darkgrey' }}
-                                                            /></div>
-
-                                                        : <></>
-                                                }
-                                                {
-                                                    column.id === 'currentEta' ?
-                                                        <div style={{ position: 'absolute', top: 10, left: 90 }}>
-                                                            <div style={{
-                                                                transform: currentETAsorting ? 'rotate(180deg)' : 'rotate(0deg)',
-                                                                transformOrigin: 'center center',
-                                                                transition: 'transform 0.3s ease-in-out',
-                                                                cursor: 'pointer',
-                                                                display: 'flex',
-                                                                justifyContent: 'center',
-                                                                alignItems: 'center',
-                                                            }}
-                                                                onClick={() => { setCurrentETAsorting(!currentETAsorting) }}
-                                                            ><ArrowDownwardIcon
-                                                                    fontSize='small'
-                                                                    style={{ color: 'darkgrey' }}
-                                                                />
-                                                            </div>
+                                                            />
                                                         </div>
-                                                        : <></>
+                                                    </div>
                                                 }
 
                                             </div>
@@ -745,14 +706,12 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                             <div>
                                                                 <PastEta row={row} firstIndex={firstindex} />
                                                                 <div style={{ marginTop: 16 }}>
-                                                                    {row.eta && row.status.name === 'Delivered' ? (
-                                                                        <>
-                                                                            <div>{service.utcToist(row.eta)}</div>
-                                                                            <div>{service.utcToistTime(row.eta)}</div>
-                                                                        </>
-                                                                    ) : (
-                                                                        'NA'
-                                                                    )}
+                                                                    {row.past_etas && row.past_etas.length > 0 && 
+                                                                    <div>
+                                                                        <div>{service.utcToist(row.past_etas[row.past_etas.length -1])}</div>
+                                                                        <div>{service.utcToistTime(row.past_etas[row.past_etas.length -1])}</div>
+                                                                    </div>
+                                                                    }
                                                                 </div>
                                                             </div>
                                                         )}
@@ -761,8 +720,8 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                         )}
                                                         {item.id === 'material' && row.commodity_desc && (
                                                             <div>
-                                                                <div style={{display:'flex', gap:4, alignItems:'center'}}>
-                                                                    <div style={{textWrap:'nowrap'}}>{value.name}</div>
+                                                                <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+                                                                    <div style={{ textWrap: 'nowrap' }}>{value.name}</div>
                                                                     {getUniqueValues(row.commodity_desc).length > 1 &&
                                                                         <div className='view_more_materials'>
                                                                             <div style={{ fontSize: 8 }}>+{getUniqueValues(row.commodity_desc).length - 1}</div>
@@ -785,6 +744,24 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                             <div>
                                                                 <div>{row.expected_loading_date?.ELDdate}</div>
                                                                 <div>{row.expected_loading_date?.ELDtime}</div>
+                                                            </div>
+                                                        )}
+                                                        {item.id === 'handlingAgent' && (
+                                                            <div className='handlingAgentColume'>
+                                                                <div style={{ textWrap: 'nowrap' }}>{row.handlingAgent[0] ? row.handlingAgent[0] : "NA"}</div>
+                                                                {row.handlingAgent.length > 1 && <div className='view_more_agents'>+{row.handlingAgent.length - 1}</div>}
+                                                                {row.handlingAgent.length > 1 &&
+                                                                    <div className='list_of_agents'>
+                                                                        {Array.isArray(row.handlingAgent) &&
+                                                                            row.handlingAgent.map((item: any, index: number) => {
+                                                                                return (
+                                                                                    <div key={index}>{item}</div>
+                                                                                );
+                                                                            })
+                                                                        }
+                                                                    </div>
+                                                                }
+
                                                             </div>
                                                         )}
                                                     </div>
@@ -852,7 +829,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                         setOpen={setOpen}
                         getAllShipment={getAllShipment}
                     />}
-                    {actionOptions === 'addHAndlingAgent' && <AttachHandlingAgent
+                    {actionOptions === 'addHAndlingAgent' && <HandlingAgentSelection
                         shipmentId={rowId}
                         setOpen={setOpen}
                         locationId={locationId}
@@ -864,673 +841,5 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
     );
 }
 
-interface RemarksListType {
-    [category: string]: string[];
-}
-
-interface RemarksProps {
-    shipmentId: any;
-    setOpen: (open: boolean) => void;
-    remarksList: RemarksListType;
-    getAllShipment: () => void;
-}
-
-const ActionItem = ({ icon, text, onClick, id, style }: any) => (
-    <div className={`action_items `} onClick={onClick} id={id} style={style}>
-        <div>{icon}</div>
-        <div style={{ fontSize: 12 }}>{text}</div>
-    </div>
-);
-function Remarks({ shipmentId, setOpen, remarksList, getAllShipment }: RemarksProps) {
-    const [others, setOthers] = useState('');
-    const t = useTranslations('ORDERS');
-    const placeholder = 'Select a remark';
-    const [remarks, setRemarks] = useState(placeholder);
-    const [openRemarks, setOpenRemarks] = useState(false);
-    const [isHovered, setIsHovered] = useState(false);
-    const { showMessage } = useSnackbar();
-
-    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-    const handleMouseEnter = useCallback(() => setIsHovered(true), []);
-    const handleMouseLeave = useCallback(() => setIsHovered(false), []);
-
-    const handleRemarkSelect = (remark: string) => {
-        setRemarks(remark);
-        setOpenRemarks(false);
-    };
-
-    function handleOthers(e: React.ChangeEvent<HTMLInputElement>) {
-        setOthers(e.target.value);
-    }
-
-    function handleSubmit(e: React.MouseEvent) {
-        e.stopPropagation();
-        setOpen(false);
-        setOpenRemarks(false);
-
-        if (remarks === placeholder) {
-            showMessage('Please select a remark', 'error');
-            return;
-        }
-
-        const remarkObject = {
-            id: shipmentId,
-            remarks: [
-                {
-                    date: service.getEpoch(new Date()),
-                    remark: remarks === 'Others' ? others : remarks,
-                }
-            ]
-        };
-
-        const response = remake_update_By_Id(remarkObject);
-        response.then((res: any) => {
-            if (res.statusCode === 200) {
-                showMessage('Remark Updated', 'success');
-                getAllShipment();
-            }
-        }).catch((err) => {
-            console.log(err);
-        });
-
-        setRemarks(placeholder);
-        setOthers('');
-    }
-    const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-        event.stopPropagation();
-        setAnchorEl(event.currentTarget);
-        setOpenRemarks(true);
-    };
-
-    const handleClose = (e: any) => {
-        e.stopPropagation();
-        setOpenRemarks(false);
-    };
-
-    return (
-        <div
-            style={{ padding: 24 }}
-            onClick={(e) => { e.stopPropagation(); setOpenRemarks(false) }}
-        >
-            <div style={{ color: '#131722', fontSize: 20, fontWeight: 500, marginBottom: '36px' }}>Remarks</div>
-            <div style={{ color: '#42454E', fontSize: 12 }}>Select Remarks</div>
 
 
-            <div style={{ position: 'relative' }}>
-                <FormControl fullWidth >
-                    <Select
-                        labelId="remarks-select-label"
-                        id="remarks-select"
-                        value={remarks}
-                        onClick={(e) => handleClick(e)}
-                        open={false}
-                        sx={{
-                            height: 36,
-                            fontSize: 14,
-                            outline: 'none'
-                        }}
-                    >
-                        <MenuItem value={remarks}>
-                            {remarks}
-                        </MenuItem>
-                    </Select>
-                </FormControl>
-
-                <Popper
-                    open={openRemarks}
-                    anchorEl={anchorEl}
-                    placement="bottom-start"
-                    style={{ zIndex: 1300, width: 'calc(30vw - 48px)', minWidth: '272px' }}
-                >
-                    <ClickAwayListener onClickAway={(e) => handleClose(e)}>
-                        <Paper style={{ maxHeight: 300, overflow: 'auto' }}>
-                            {remarksList && Object.entries(remarksList)?.map(([category, options]) => [
-                                <ListSubheader key={category}>{category}</ListSubheader>,
-                                ...options?.map((option: string, index: number) => (
-                                    <MenuItem
-                                        key={`${category}-${index}`}
-                                        onClick={(e) => { handleRemarkSelect(option); handleClose(e); }}
-                                    >
-                                        {option}
-                                    </MenuItem>
-                                ))
-                            ])}
-                        </Paper>
-                    </ClickAwayListener>
-                </Popper>
-
-                {remarks === 'Others' && (
-                    <TextField
-                        fullWidth
-                        margin="normal"
-                        label="Other Reason"
-                        variant="outlined"
-                        value={others}
-                        onChange={handleOthers}
-                    />
-                )}
-
-                <div style={{ marginTop: 64, display: 'flex', justifyContent: 'end' }}>
-                    <Button
-                        variant="contained"
-                        size='small'
-                        color="secondary"
-                        style={{ textTransform: 'none', backgroundColor: '#3351FF' }}
-                        onClick={handleSubmit}
-                    >
-                        {t('submit')}
-                    </Button>
-                </div>
-            </div>
-            <div
-                style={{
-                    height: '32px',
-                    width: '32px',
-                    borderRadius: '50%',
-                    backgroundColor: 'white',
-                    position: 'absolute',
-                    top: -40,
-                    right: 0,
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    cursor: 'pointer',
-                    zIndex: 999,
-                    boxShadow: '0 1px 2px rgba(0, 0, 0, 0.1)',
-                    transition: 'all 0.5s ease-in-out',
-                    transform: `rotate(${isHovered ? 90 : 0}deg)`
-                }}
-                onClick={(e) => { e.stopPropagation() }}
-                onMouseEnter={handleMouseEnter}
-                onMouseLeave={handleMouseLeave}
-            >
-                <CloseIcon
-                    onClick={(e) => { e.stopPropagation(); setOpen(false) }}
-                />
-            </div>
-        </div>
-    )
-}
-function Tags({ rakeCaptiveList, shipmentId, setOpen, setShowActionBox }: any) {
-
-    const placeHolder = 'Select One';
-    const [item, setItem] = useState(placeHolder)
-    const [itemId, setItemID] = useState(null)
-    const t = useTranslations('ORDERS');
-    const [selectedRake, setSelectedRake] = useState<{ _id: string } | null>(null);
-    const { showMessage } = useSnackbar();
-
-
-
-
-    const [isHovered, setIsHovered] = useState(false);
-    const handleMouseEnter = useCallback(() => setIsHovered(true), []);
-    const handleMouseLeave = useCallback(() => setIsHovered(false), []);
-
-    const [searchTerm, setSearchTerm] = useState('');
-    const [filteredList, setFilteredList] = useState(rakeCaptiveList);
-
-    useEffect(() => {
-        const filtered = rakeCaptiveList.filter((remark: any) =>
-            remark.rake_id?.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-        setFilteredList(filtered);
-    }, [searchTerm, rakeCaptiveList]);
-
-    const handleSubmit = (e: any) => {
-        e.stopPropagation();
-
-        const updatedObject = {
-            shipmentId: shipmentId,
-            captiveId: selectedRake?._id
-        };
-
-        if (updatedObject.captiveId) {
-            rake_update_id(updatedObject).then((res: any) => {
-                if (res === null) showMessage('Captive Rake Updated Successfully.', 'success');
-                setOpen(false);
-            }).catch((err: any) => {
-                console.log(err);
-            })
-        } else {
-            showMessage('Please select captive rake.', 'error');
-        }
-    };
-
-    return (
-        <div style={{ position: 'relative', padding: 24 }} >
-
-            <div style={{ fontSize: 20, color: '#131722', marginBottom: 36 }}>Captive Rakes</div>
-            <div >
-                <label style={{ color: '#42454E', fontSize: 12 }}>Select captive rake</label>
-                <Autocomplete
-                    disablePortal
-                    options={rakeCaptiveList}
-                    getOptionLabel={(option: any) => `${option.rake_id} (${option.name || 'No Rake ID'})`}
-                    renderInput={(params) => <TextField {...params} />}
-                    onChange={(event, newValue) => {
-                        setSelectedRake(newValue);
-                    }}
-                    sx={{
-                        '.MuiOutlinedInput-root ': {
-                            padding: 0, height: 36, boxShadow: 'none', border: 'none'
-                        },
-                        '.MuiAutocomplete-input, .MuiAutocomplete-option': {
-                            fontSize: '14px',
-                        },
-                    }}
-                />
-            </div>
-            <div style={{ marginTop: 64, display: 'flex', justifyContent: 'end' }}>
-                <Button
-                    variant="contained"
-                    size='small'
-                    color="secondary"
-                    style={{ textTransform: 'none', backgroundColor: '#3351FF' }}
-                    onClick={handleSubmit}
-                >
-                    {t('submit')}
-                </Button>
-            </div>
-            <div
-                style={{
-                    height: '32px',
-                    width: '32px',
-                    borderRadius: '50%',
-                    backgroundColor: 'white',
-                    position: 'absolute',
-                    top: -40,
-                    right: 0,
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    cursor: 'pointer',
-                    zIndex: 999,
-                    boxShadow: '0 1px 2px rgba(0, 0, 0, 0.1)',
-                    transition: 'all 0.5s ease-in-out',
-                    transform: `rotate(${isHovered ? 90 : 0}deg)`
-                }}
-                onClick={(e) => { e.stopPropagation() }}
-                onMouseEnter={handleMouseEnter}
-                onMouseLeave={handleMouseLeave}
-            >
-                <CloseIcon
-                    onClick={(e) => { e.stopPropagation(); setOpen(false) }}
-                />
-            </div>
-        </div>
-    );
-}
-const RemarkComponent = ({ row, firstIndex }: any) => {
-    const [anchorEl, setAnchorEl] = useState(null);
-
-    const handlePopoverOpen = (event: any) => {
-        setAnchorEl(event.currentTarget);
-    };
-
-    const handlePopoverClose = () => {
-        setAnchorEl(null);
-    };
-
-    const open = Boolean(anchorEl);
-
-    return (
-        <Box>
-            <Typography
-                aria-owns={true ? `mouse-over-popover-${firstIndex}` : undefined}
-                aria-haspopup="true"
-                onMouseEnter={handlePopoverOpen}
-                onMouseLeave={handlePopoverClose}
-                sx={{ fontSize: '12px', fontFamily: '"Inter", sans-serif !important', }}
-            >
-                {row.remarks.latest}
-            </Typography>
-            {row.remarks.rest && row.remarks.rest.length > 0 && (
-                <Popover
-                    id={`mouse-over-popover-${firstIndex}`}
-                    sx={{
-                        pointerEvents: 'none',
-                    }}
-                    open={open}
-                    anchorEl={anchorEl}
-                    anchorOrigin={{
-                        vertical: 'bottom',
-                        horizontal: 'left',
-                    }}
-                    transformOrigin={{
-                        vertical: 'top',
-                        horizontal: 'left',
-                    }}
-                    onClose={handlePopoverClose}
-                    disableRestoreFocus
-                >
-                    <Box sx={{}}>
-                        {row.remarks.rest?.map((item: any, remarkListIndex: number) => (
-                            <Typography key={remarkListIndex} sx={{ fontSize: '12px', paddingInline: '4px' }}>
-                                {item.remark}
-                            </Typography>
-                        ))}
-                    </Box>
-                </Popover>
-            )}
-        </Box>
-    );
-};
-const PastEta = ({ row, firstIndex }: any) => {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    const [anchorEl, setAnchorEl] = useState(null);
-
-    const handlePopoverOpen = (event: any) => {
-        setAnchorEl(event.currentTarget);
-    };
-
-    const handlePopoverClose = () => {
-        setAnchorEl(null);
-    };
-
-    const open = Boolean(anchorEl);
-
-    return (
-        <Box>
-            <Typography
-                aria-owns={true ? `mouse-over-popover-${firstIndex}` : undefined}
-                aria-haspopup="true"
-                onMouseEnter={handlePopoverOpen}
-                onMouseLeave={handlePopoverClose}
-                sx={{ fontSize: '12px', fontFamily: '"Inter", sans-serif !important', }}
-            >
-                <div>
-                    {row.eta ? (
-                        <>
-                            <div>{row.currentEta.date}</div>
-                            <div>{row.currentEta.etaTime}</div>
-                        </>
-                    ) : (
-                        'NA'
-                    )}
-                </div>
-            </Typography>
-            {row.past_etas && row.past_etas.length > 0 && (
-                <Popover
-                    id={`mouse-over-popover-${firstIndex}`}
-                    sx={{
-                        pointerEvents: 'none',
-                    }}
-                    open={open}
-                    anchorEl={anchorEl}
-                    anchorOrigin={{
-                        vertical: 'bottom',
-                        horizontal: 'left',
-                    }}
-                    transformOrigin={{
-                        vertical: 'top',
-                        horizontal: 'left',
-                    }}
-                    onClose={handlePopoverClose}
-                    disableRestoreFocus
-                >
-                    <Box sx={{ paddingBlock: '4px' }}>
-                        {row.past_etas?.map((item: any, remarkListIndex: number) => (
-                            <Typography key={remarkListIndex} sx={{ fontSize: '12px', paddingInline: '8px' }}>
-                                {service.utcToist(item)} - {service.utcToistTime(item)}
-                            </Typography>
-                        ))}
-                    </Box>
-                </Popover>
-            )}
-        </Box>
-    );
-};
-const EditELD = ({ shipmentId, setOpen, getAllShipment }: any) => {
-
-    const t = useTranslations('ORDERS');
-    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-    const [isHovered, setIsHovered] = useState(false);
-    const { showMessage } = useSnackbar();
-    const handleMouseEnter = useCallback(() => setIsHovered(true), []);
-    const handleMouseLeave = useCallback(() => setIsHovered(false), []);
-    const [openDatePicker, setOpenDatePicker] = useState(false);
-    const [selectDate, setSelectDate] = useState(new Date());
-
-    const handleDatePickerToggle = () => {
-        setOpenDatePicker((prev) => !prev);
-    };
-
-    const handleDateSubmit = async () => {
-        const dateObject = new Date(selectDate);
-        const epochTimestamp = dateObject.getTime();
-        const payload = {
-            id: shipmentId,
-            date: epochTimestamp
-        }
-        if (!epochTimestamp) {
-            showMessage('Please select a date.', 'error');
-            return;
-        }
-        try {
-            const res = await httpsPost(UPDATE_ELD, payload)
-            if (res.statusCode === 200) {
-                showMessage('Expected Loading Date Updated Successfully.', 'success');
-                setOpen(false);
-                getAllShipment();
-            }
-        } catch (err) {
-            console.log(err)
-        }
-    }
-
-    return (
-        <div style={{ position: 'relative', padding: 24 }}>
-            <div>Add Expected Loading Date</div>
-
-            <div style={{ marginTop: '24px' }}>
-                <div style={{ fontSize: 10, color: '#7C7E8C', paddingBottom: '4px' }}>Select Expected Loading Date</div>
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <DatePicker
-                        format='DD/MM/YYYY'
-                        open={openDatePicker}
-                        onClose={() => setOpenDatePicker(false)}
-                        slots={{
-                            openPickerIcon: () => null,
-                        }}
-                        slotProps={{
-                            textField: {
-                                onClick: handleDatePickerToggle,
-                            },
-                        }}
-                        sx={{
-                            padding: 0,
-                            width: '100%',
-                            '.MuiInputBase-input': {
-                                padding: '6px !important',
-                                fontSize: '14px !important',
-                            },
-                            '& .MuiOutlinedInput-root': {
-                                '&:hover fieldset': {
-                                    // border: 'none',
-                                },
-                                '&.Mui-focused fieldset': {
-                                    border: '1px solid #7C7E8C',
-                                },
-                            },
-                        }}
-                        onChange={(newDate) => {
-                            if (newDate) {
-                                setSelectDate(newDate.toDate());
-                            }
-                        }}
-                        value={dayjs(selectDate)}
-                    />
-                </LocalizationProvider>
-            </div>
-
-            <div style={{ marginTop: 64 }}>
-                <Button
-                    variant="contained"
-                    size='small'
-                    color="secondary"
-                    style={{ textTransform: 'none', backgroundColor: '#3351FF' }}
-                    onClick={handleDateSubmit}
-                >
-                    {t('submit')}
-                </Button>
-            </div>
-            <div
-                style={{
-                    height: '32px',
-                    width: '32px',
-                    borderRadius: '50%',
-                    backgroundColor: 'white',
-                    position: 'absolute',
-                    top: -40,
-                    right: 0,
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    cursor: 'pointer',
-                    zIndex: 999,
-                    boxShadow: '0 1px 2px rgba(0, 0, 0, 0.1)',
-                    transition: 'all 0.5s ease-in-out',
-                    transform: `rotate(${isHovered ? 90 : 0}deg)`
-                }}
-                onClick={(e) => { e.stopPropagation() }}
-                onMouseEnter={handleMouseEnter}
-                onMouseLeave={handleMouseLeave}
-            >
-                <CloseIcon
-                    onClick={(e) => { e.stopPropagation(); setOpen(false) }}
-                />
-            </div>
-        </div>
-    )
-}
-const AttachHandlingAgent = ({ shipmentId, setOpen, locationId }: any) => {
-
-    const t = useTranslations('ORDERS');
-    const [isHovered, setIsHovered] = useState(false);
-    const handleMouseEnter = useCallback(() => setIsHovered(true), []);
-    const handleMouseLeave = useCallback(() => setIsHovered(false), []);
-
-    const [listOfLocation, setListOfLocation] = useState<any>([]);
-
-    const getLocationList = async () => {
-        const res = await httpsGet(`${GET_HANDLING_AGENT_LIST}?delivery_locations=${locationId}`);
-        console.log(res)
-        if (res.statusCode === 200) setListOfLocation(res?.data);
-    }
-
-    useEffect(() => {
-        if (locationId) {
-            getLocationList();
-        }
-    }, [])
-
-    const [personName, setPersonName] = React.useState<any[]>([]);
-    const handleChange = (event: SelectChangeEvent<typeof personName>) => {
-        const { target: { value }, } = event;
-        setPersonName(typeof value === 'string' ? value.split(',') : value,);
-    };
-    const ITEM_HEIGHT = 48;
-    const ITEM_PADDING_TOP = 8;
-    const MenuProps = {
-        PaperProps: {
-            style: {
-                maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-                maxWidth: '100%',
-                minWidth: 'calc(100% - 1400px)',
-            },
-        },
-    };
-    console.log(personName, 'personName')
-    const getSelectedItemNames = (selected: any) => {
-        return selected.map((id: any) =>
-            listOfLocation.find((item: any) => item._id === id)?.name
-        ).filter(Boolean).join(', ');
-    };
-    const handleDateSubmit = async () => {
-        //   const res = await httpsPost('rake_shipment/assign_ha', )
-    }
-
-    return (
-        <div style={{ position: 'relative', padding: 24 }}>
-
-            <div style={{ fontSize: 20, color: '#131722', fontWeight: 500 }} >Assign Handling Agent</div>
-
-            <div>
-                <FormControl sx={{ width: '100%', marginTop: '36px' }}>
-                    <InputLabel id="demo-multiple-checkbox-label">handling agent</InputLabel>
-                    <Select
-                        labelId="demo-multiple-checkbox-label"
-                        id="demo-multiple-checkbox"
-                        multiple
-                        value={personName}
-                        onChange={handleChange}
-                        input={<OutlinedInput label="handling agent" />}
-                        renderValue={(selected) => getSelectedItemNames(selected)}
-                        MenuProps={MenuProps}
-                        sx={{
-
-                        }}
-                    >
-                        {listOfLocation?.map((item: any, index: number) => (
-
-                            <MenuItem key={index} value={item._id} sx={{ padding: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', paddingRight: '12px' }}>
-                                <div style={{ display: 'flex', alignItems: 'center', padding: 0 }}>
-                                    <Checkbox checked={personName.indexOf(item._id) > -1} sx={{ '& .MuiSvgIcon-root': { fontSize: 18 } }} />
-                                    <ListItemText primary={item.name} primaryTypographyProps={{ padding: 0, fontSize: '14px', fontFamily: 'Inter, sans-serif' }} />
-                                </div>
-                                <div style={{ marginLeft: 42, fontSize: 12, marginTop: -8, color: '#7C7E8C' }}>
-                                    {item.location.map((location: any, locationIndex: number) => {
-                                        return (
-                                            <div key={locationIndex} >{location.name}</div>
-                                        );
-                                    })}
-                                </div>
-                            </MenuItem>
-
-                        ))}
-                    </Select>
-                </FormControl>
-            </div>
-
-            <div style={{ marginTop: 64, textAlign: 'right' }}>
-                <Button
-                    variant="contained"
-                    size='small'
-                    color="secondary"
-                    style={{ textTransform: 'none', backgroundColor: '#3351FF' }}
-                    onClick={handleDateSubmit}
-                >
-                    {t('submit')}
-                </Button>
-            </div>
-
-            <div
-                style={{
-                    height: '32px',
-                    width: '32px',
-                    borderRadius: '50%',
-                    backgroundColor: 'white',
-                    position: 'absolute',
-                    top: -40,
-                    right: 0,
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    cursor: 'pointer',
-                    zIndex: 999,
-                    boxShadow: '0 1px 2px rgba(0, 0, 0, 0.1)',
-                    transition: 'all 0.5s ease-in-out',
-                    transform: `rotate(${isHovered ? 90 : 0}deg)`
-                }}
-                onClick={(e) => { e.stopPropagation() }}
-                onMouseEnter={handleMouseEnter}
-                onMouseLeave={handleMouseLeave}
-            >
-                <CloseIcon
-                    onClick={(e) => { e.stopPropagation(); setOpen(false) }}
-                />
-            </div>
-        </div>
-    );
-}

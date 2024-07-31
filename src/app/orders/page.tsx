@@ -80,7 +80,7 @@ const OrdersPage = () => {
   const [showRefreash, setShowRefreash] = useState(false)
 
     //totalCount
-    const [totalCountrake, setTotalCountrake] = useState<any>({})
+    const [totalCountrake, setTotalCountrake] = useState<any>([])
 
 
 
@@ -165,7 +165,6 @@ const OrdersPage = () => {
         console.log(err)
     })
 },[])
-console.log(totalCountrake[0]?.statuses, 'totalCountrake')
 
   async function getCaptiveRake() {
     const list_captive_rake = await httpsGet(CAPTIVE_RAKE);
