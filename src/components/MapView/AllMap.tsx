@@ -48,6 +48,8 @@ import { DateTime } from "luxon";
 import service from "@/utils/timeService";
 import { all } from "axios";
 
+import { useSnackbar } from '@/hooks/snackBar';
+
 // Custom Icons
 const customIcon = L.icon({
   iconUrl: "/assets/train_on_map_icon_in_transit.svg",
@@ -107,7 +109,9 @@ const MapLayers = () => {
     const [searchFnrNumber, setSearchFnrNumber] = useState('')
 
     const inputRefRakeName = useRef<any>(null);
-    const inputRefFnrNumber = useRef<any>(null);    
+    const inputRefFnrNumber = useRef<any>(null);   
+    const { showMessage } = useSnackbar();
+
 
     useEffect(() => {
       if (inputRefRakeName.current && searchRakeName !== '') {
@@ -250,6 +254,7 @@ const MapLayers = () => {
               "name": data.name,
               "hours": timeSinceUpdate,
               "fnr_no": data.shipment ? data.shipment.FNR : 'N/A',
+              "unique_code": data.shipment ? data.shipment.unique_code : ''
             });
           }
 
@@ -322,6 +327,14 @@ const MapLayers = () => {
         );
         setAllRakes(filteredData);
         setSelectedType('non-tracking');
+      }
+    }
+
+    const handleTripTracker = (unique_code: string, fnr_no: string) => {
+      if(fnr_no !== 'N/A'){
+        window.open(`https://tracker.instavans.com/track/${unique_code}`, '_blank');
+      } else {
+        showMessage('FNR number is not available', 'info')
       }
     }
 
@@ -675,7 +688,7 @@ const MapLayers = () => {
                             <TableCell align="center" className="captive-rake-rows" style={{fontWeight: selectedRake && selectedRake.rake_id === rake.rake_id ? "bold" : 'inherit'}}>
                             {rake.hours && parseFloat(rake.hours.split('h')[0]) < 24 ? rake.hours : 'N/A'}
                             </TableCell>
-                            <TableCell align="left" className="captive-rake-rows" style={{fontWeight: selectedRake && selectedRake.rake_id === rake.rake_id ? "bold" : 'inherit'}}>{rake.fnr_no}</TableCell>
+                            <TableCell align="left" className="captive-rake-rows" style={{fontWeight: selectedRake && selectedRake.rake_id === rake.rake_id ? "bold" : 'inherit', color: rake.fnr_no !== 'N/A' ? "#3351ff" : "#42454E", textDecoration: rake.fnr_no !== 'N/A' ? "underline" : "none"}} onClick={() => handleTripTracker(rake.unique_code, rake.fnr_no)}>{rake.fnr_no}</TableCell>
                           </TableRow>
                           ))}
                         </TableBody>
