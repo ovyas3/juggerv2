@@ -13,32 +13,32 @@ interface InviteForm {
     mobile: string;
 }
 
-const validation = (inviteForm: InviteForm): Boolean => {
-    const { showMessage } = useSnackbar();
+// const validation = (inviteForm: InviteForm): Boolean => {
+//     const { showMessage } = useSnackbar();
 
-    // PAN card validation (Indian)
-    const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
-    if (!panRegex.test(inviteForm.pan)) {
-        showMessage('Invalid PAN number', 'error');
-        return false;
-    }
+//     // PAN card validation (Indian)
+//     const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
+//     if (!panRegex.test(inviteForm.pan)) {
+//         showMessage('Invalid PAN number', 'error');
+//         return false;
+//     }
 
-    // Email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(inviteForm.email_id)) {
-        showMessage('Invalid email address', 'error');
-        return false;
-    }
+//     // Email validation
+//     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+//     if (!emailRegex.test(inviteForm.email_id)) {
+//         showMessage('Invalid email address', 'error');
+//         return false;
+//     }
 
-    // Mobile number validation (Indian)
-    const mobileRegex = /^[6-9]\d{9}$/;
-    if (!mobileRegex.test(inviteForm.mobile)) {
-        showMessage('Invalid mobile number', 'error');
-        return false;
-    }
+//     // Mobile number validation (Indian)
+//     const mobileRegex = /^[6-9]\d{9}$/;
+//     if (!mobileRegex.test(inviteForm.mobile)) {
+//         showMessage('Invalid mobile number', 'error');
+//         return false;
+//     }
 
-    return true;
-}
+//     return true;
+// }
 
 function InviteBox({ setOpenModalInvite }: any) {
     const { showMessage } = useSnackbar();
