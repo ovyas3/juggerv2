@@ -164,3 +164,32 @@ export function getShipmentStatusSummary(shipments:any) {
 
   return summary;
 }
+
+
+
+export function processETAs(dates: any) {
+  if (!dates || dates.length === 0) {
+    return {
+      currentETA: 'NA',
+      initialETA: 'NA'
+    };
+  }
+
+  // Helper function to safely parse dates
+  const parseDate = (dateString: any): number => {
+    if (dateString instanceof Date) {
+      return dateString.getTime();
+    }
+    const parsed = new Date(dateString).getTime();
+    return isNaN(parsed) ? 0 : parsed;
+  };
+
+  const dateTimes = dates.map(parseDate);
+  const maxTime = Math.max(...dateTimes);
+  const minTime = Math.min(...dateTimes);
+
+  return {
+    currentETA: maxTime ? new Date(maxTime).toISOString() : 'NA',
+    initialETA: minTime ? new Date(minTime).toISOString() : 'NA'
+  };
+}

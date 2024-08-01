@@ -276,7 +276,7 @@ const OrdersPage = () => {
                       <div style={{fontSize:12, color:'#7C7E8C'}}>Total</div>
                     </div>
                     <div className='display_status_inner_box'>
-                      <div style={{fontSize:20, fontWeight:500}}>{totalCountrake[0]?.statuses?.find((item: any) => item.status === "")?.count || 0}</div>
+                      <div style={{fontSize:20, fontWeight:500}}>{totalCountrake[0]?.totalCount ? totalCountrake[0]?.totalCount - (totalCountrake[0]?.statuses?.find((item: any) => item.status === "ITNS")?.count + totalCountrake[0]?.statuses?.find((item: any) => item.status === "Delivered")?.count) : 0}</div>
                       <div style={{fontSize:12, color:'#7C7E8C'}}>In Plant</div>
                     </div>
                     <div className='display_status_inner_box'>
