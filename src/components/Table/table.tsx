@@ -705,15 +705,16 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                         }
                                                         {item.id === 'currentEta' && (
                                                             <div>
-                                                                {/* <PastEta row={row} firstIndex={firstindex} /> */}
-                                                                <div>
-                                                                    {row.past_etas.initialETA !== 'NA' && <div>
-                                                                        <div>{service.utcToist(row.past_etas.initialETA)}</div>
-                                                                    </div> }
-                                                                    { row.past_etas.currentETA !== 'NA' && <div style={{ marginTop: 16 }}>
-                                                                        <div >{service.utcToist(row.past_etas.currentETA)}</div>
-                                                                    </div>}
-                                                                </div>
+                                                                {row.past_etas.initialETA === 'NA' && row.past_etas.currentETA === 'NA' ?
+                                                                    'NA' : <div>
+                                                                        {row.past_etas.initialETA !== 'NA' ? <div>
+                                                                            <div>{service.utcToist(row.past_etas.initialETA)}</div>
+                                                                        </div> : <div>NA</div>}
+                                                                        {row.past_etas.currentETA !== 'NA' ? <div style={{ marginTop: 16 }}>
+                                                                            <div >{service.utcToist(row.past_etas.currentETA)}</div>
+                                                                        </div> : <div style={{ marginTop: 16 }}>NA</div>}
+                                                                    </div>
+                                                                }
                                                             </div>
                                                         )}
                                                         {item.id === 'remarks' && (
