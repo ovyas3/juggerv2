@@ -103,7 +103,7 @@ function InviteBox({ setOpenModalInvite }: any) {
 
             <div style={{ marginTop: 36 }}>
                 <div>
-                    <label className='lable_name'>Pan Number</label>
+                    <label className='lable_name'>PAN Number</label>
                     <div><input type="text" className='inputBox' value={inviteForm.pan} onChange={(e) => setInviteForm(prevState => ({ ...prevState, pan: e.target.value }))} /></div>
                 </div>
                 <div>
