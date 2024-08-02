@@ -99,7 +99,7 @@ function InviteBox({ setOpenModalInvite }: any) {
         <div className='invite_container'
             onClick={(e) => { e.stopPropagation(); }}
         >
-            <div className='invite-heading'>Edit</div>
+            <div className='invite-heading'>Invite</div>
 
             <div style={{ marginTop: 36 }}>
                 <div>

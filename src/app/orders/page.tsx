@@ -32,7 +32,7 @@ const getStatusCode = (status: string): string => {
     case "Delivered At Customer":
       return 'Delivered'
     case "In Plant":
-      return 'OB'
+      return 'AVE'
     default:
       return 'All'
   }
