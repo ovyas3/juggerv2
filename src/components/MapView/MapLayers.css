@@ -24,10 +24,30 @@
   padding-left:14px;
 }
 
+.status_container {
+  margin-top: 12px;
+  margin-bottom: 18px;
+}
+
+.status_container .MuiFormControl-root .MuiInputBase-root .MuiSelect-select{
+  padding: 6.5px 10px;
+  font-size: 14px;
+ }
+
+ .status_container .MuiPaper-root .MuiList-root .MuiButtonBase-root{
+   padding: 0px 8px 6px 6px !important;
+   width: 160px;
+
+ }
+
+ .status_container .mui-10hburv-MuiTypography-root{
+   font-size: 12px;
+ }
+
 .shipments-filter input {
   padding:5px;
   border: 1px solid lightgray;
-  border-radius: 4px;
+  border-radius: 6px;
 }
 .shipments-filter input:hover {
   border: 1px solid grey;
@@ -35,6 +55,20 @@
 
 .search-wrapper {
   margin-top:8px;
+  position: relative;
+}
+
+.status_select {
+  position:absolute;
+  border-radius: 4px 0px 0px 4px;
+  left: 1px;
+}
+
+.search-wrapper .search-input {
+  width: 320px;
+  padding: 6px 6px 7px 114px;
+  outline: none; 
+  border-radius: 6px;
 }
 
 .cluster-icon-tracking-mapshelper{
@@ -622,7 +656,7 @@
 }
 
 .shipment-details-container{
-  max-height: calc(75vh - 320px) !important;
+  max-height: calc(75vh - 400px) !important;
   overflow-y: scroll; 
   scrollbar-width: none; 
   -ms-overflow-style: none; 

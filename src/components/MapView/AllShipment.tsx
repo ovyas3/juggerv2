@@ -24,6 +24,8 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import dayjs from 'dayjs';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
+import InputLabel from '@mui/material/InputLabel';
+import captiveRakeIndicator from '@/assets/captive_rakes.svg'
 
 import IdleIcon from "@/assets/idle_icon.svg";
 import InactiveIcon from "@/assets/inactive_icon.svg";
@@ -40,6 +42,7 @@ import {
     Box,
     Card,
     CardContent,
+    Checkbox,
     Chip,
     Grid,
     ListItemText,
@@ -120,6 +123,11 @@ const colorOfStatus = (status: string) => {
   }
 }
 
+const rakeTypes = [
+  'Captive Rakes',
+  'Indian Railway Rakes'
+];
+
 
 const MenuProps = {
   PaperProps: {
@@ -181,7 +189,7 @@ const ShipmentCard: React.FC<ShipmentCardProps> = ({
           }}>
             {/* <Chip label="In Transit" variant="outlined" color="info" /> */}
             <Chip label={statusBuilder(shipment.status)} variant="outlined" color={colorOfStatus(statusBuilder(shipment.status))} id="chip-label"/>
-          </Grid>
+          </Grid>   
         </Grid>
       </Typography>
       <Typography variant="h6" component="div" id="shipment-list-fnr" sx={{fontFamily: '"Inter", sans-serif !important'}}>
@@ -208,6 +216,13 @@ const ShipmentCard: React.FC<ShipmentCardProps> = ({
             <Typography variant="body2" component="div" id="shipment-list-bottom">
             <Image height={10} alt="drop" src={dropIcon} /> - {shipment.delivery_location?.name} ({shipment.delivery_location?.code})
             </Typography>
+          </Grid>
+          <Grid  item xs={12} sx={{
+            display: 'flex',
+            justifyContent: 'flex-end',
+            alignItems: 'flex-start',
+          }}>
+          {shipment.is_captive && <div><img src={captiveRakeIndicator.src}/></div>}
           </Grid>
         </Grid>
       </Typography>
@@ -258,6 +273,9 @@ const MapLayers = () => {
     const [openFromDatePicker,setOpenFromDatePicker] = useState(false);
     const [openToDatePicker,setOpenToDatePicker] = useState(false);
     const [trackingNonTracking, setTrackingNonTracking] = useState<TrackingStatus>({ tracking: 0, notTracking: 0 });
+    const [rakeType, setRakeType] = useState(['Captive Rakes', 'Indian Railway Rakes'])
+    const [showRakeTypeFiltered,setShowRakeTypeFiltered] = useState(false)
+    const [rakeTypeFilteredShipments,setRakeTypeFilteredShipments] = useState<any[]>([])
   
     const [selectedType,setSelectedType] = useState('FNR No.')
     const [searchInput,setSearchInput] = useState('')
@@ -280,15 +298,63 @@ const MapLayers = () => {
       }
     }
 
+    useEffect(()=>{
+      if(rakeType.length === 1) {
+      let data
+      let isCaptive = rakeType[0]
+      if(showSearched) {
+        data = searcedShipments.filter((val)=>{
+          if(isCaptive==='Captive Rakes')
+          return val.is_captive === true
+          else 
+          return val.is_captive === false
+        })
+        setRakeTypeFilteredShipments(data)
+      } else if(showFiltered) {
+        data = filteredShipments.filter((val)=>{
+          if(isCaptive==='Captive Rakes')
+          return val.is_captive === true
+          else 
+          return val.is_captive === false
+        })
+        setRakeTypeFilteredShipments(data)
+      } else if(showAll) {
+        data = allShipments.filter((val)=>
+        {
+          if(isCaptive==='Captive Rakes')
+          return val.is_captive === true
+          else 
+          return val.is_captive === false
+        }
+        )
+        setRakeTypeFilteredShipments(data)
+      } 
+      setShowRakeTypeFiltered(true)
+    } else {
+      setShowRakeTypeFiltered(false)
+    }
+    },[rakeType,allShipments,searcedShipments,filteredShipments])
+
+    const handleChangeRakeType = (event: any) => {
+      const {
+          target: { value },
+      } = event;
+      setRakeType(
+          typeof value === 'string' ? value.split(',') : value,
+      )
+    }
+
 
     useEffect(() => {
-       setShowSearched(false )
-    }, [allShipments,filteredShipments]);
+       setShowSearched(false)
+       setSearchInput('')
+    }, [allShipments,filteredShipments])
    
     function handleSearchInput(event: any) {
       const searchQuery = event.target.value;
       setSearchInput(searchQuery);
       setShowSearched(true);
+      setShowRakeTypeFiltered(false)
       if (selectedType === "FNR No.") {
         if (showFiltered) {
           const filteredData = filteredShipments.filter((shipment) =>
@@ -301,7 +367,7 @@ const MapLayers = () => {
           );
           setSearchedShipments(filteredData);
           setShowSearched(true);
-        } else {
+        } else if(showAll) {
           const filteredData = allShipments.filter((shipment) =>
           {
             const data = shipment?.all_FNRs?.filter((fnr: String) =>
@@ -313,6 +379,18 @@ const MapLayers = () => {
           setSearchedShipments(filteredData);
           setShowSearched(true);
         }
+        else {
+            const filteredData = rakeTypeFilteredShipments.filter((shipment) =>
+            {
+              const data = shipment?.all_FNRs?.filter((fnr: String) =>
+                fnr.toLowerCase().includes(searchQuery.toLowerCase())
+              )
+              return Boolean(data.length)
+            }
+            );
+            setSearchedShipments(filteredData);
+            setShowSearched(true);
+        }
       } else if (selectedType === "Dest. Code") {
         setShowSearched(true);
         if (showFiltered) {
@@ -323,7 +401,7 @@ const MapLayers = () => {
           );
           setSearchedShipments(filteredData);
           setShowSearched(true);
-        } else {
+        } else if(showAll) {
           const filteredData = allShipments.filter((shipment) =>
             shipment?.delivery_location?.code
               ?.toLowerCase()
@@ -331,6 +409,14 @@ const MapLayers = () => {
           );
           setSearchedShipments(filteredData);
           setShowSearched(true);
+        } else {
+          const filteredData = rakeTypeFilteredShipments.filter((shipment) =>
+            shipment?.delivery_location?.code
+              ?.toLowerCase()
+              .includes(searchQuery.toLowerCase())
+          );
+          setSearchedShipments(filteredData);
+          setShowSearched(true)
         }
       }
     }
@@ -831,20 +917,66 @@ const MapLayers = () => {
                                 <ListItemText primary={name} primaryTypographyProps={{ fontSize: '12px', fontFamily: 'Inter, sans-serif' }} />
                             </MenuItem>
                         ))}
-                    </Select><input placeholder="search" value={searchInput} onInput={handleSearchInput}/>
+                    </Select><input placeholder="search" value={searchInput} onInput={handleSearchInput} className='search-input'/>
+                   </div>
+                  <div className='status_container'>
+                    <FormControl sx={{
+                        width: '180px', margin: 0, padding: 0,
+                        '.mui-kk1bwy-MuiButtonBase-root-MuiMenuItem-root': {
+                            padding: 0,
+                        },
+                    }}>
+                        <InputLabel id="demo-multiple-checkbox-label" sx={{
+                            padding: 0, fontSize: 14, marginTop: '-8px',
+                        }}>Rake Type</InputLabel>
+                        <Select
+                            labelId="demo-multiple-checkbox-label"
+                            id="demo-multiple-checkbox"
+                            value={rakeType}
+                            multiple
+                            className='status_select'
+                            onChange={handleChangeRakeType}
+                            input={<OutlinedInput
+                                sx={{
+                                    width: '180px',
+                                    '& .MuiOutlinedInput-notchedOutline': {
+                                        border: '1px solid #E9E9EB'
+                                    },
+                                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                                        border: '1px solid #E9E9EB'
+                                    },
+                                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                        border: '1px solid #E9E9EB'
+                                    },
+                                }}
+                            />}
+                            renderValue={(selected: any) => selected.join(', ')}
+                            // renderValue={(selected) => selected}
+                        >
+                            {rakeTypes.map((name) => (
+                                <MenuItem key={name} value={name} sx={{ padding: 0 }} >
+                                    <Checkbox checked={rakeType.indexOf(name) > -1} sx={{ paddingLeft: '8px', padding: '4px', '& .MuiSvgIcon-root': { fontSize: 15 } }} />
+                                    <ListItemText primary={name} primaryTypographyProps={{ fontSize: '12px', fontFamily: 'Inter, sans-serif' }} />
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
                     </div>
                 </Box>
                 <Box sx={{
                   maxHeight: 'calc(75vh - 60px)',
                   overflowY: 'scroll',
                 }} className="shipment-details-container">
-                  {showFiltered && !showSearched  && filteredShipments.map((shipment, index) => {
+                  {showFiltered && !showSearched && !showRakeTypeFiltered && filteredShipments.map((shipment, index) => {
                     return <ShipmentCard key={index} index={index} shipment={shipment} handleShipmentSelection={handleShipmentSelection}  handleNavigation={handleNavigation} />
                   })}
-                  {showAll && !showSearched && allShipments.map((shipment, index) => {
+                  {showAll && !showSearched  && !showRakeTypeFiltered && allShipments.map((shipment, index) => {
                     return <ShipmentCard key={index} index={index} shipment={shipment} handleShipmentSelection={handleShipmentSelection} handleNavigation={handleNavigation} />
                   })}
-                    {showSearched && searcedShipments.map((shipment, index) => {
+                    {showSearched && !showRakeTypeFiltered && searcedShipments.map((shipment, index) => {
+                    return <ShipmentCard key={index} index={index} shipment={shipment} handleShipmentSelection={handleShipmentSelection} handleNavigation={handleNavigation} />
+                  })}
+                  {showRakeTypeFiltered  && rakeTypeFilteredShipments.map((shipment, index) => {
                     return <ShipmentCard key={index} index={index} shipment={shipment} handleShipmentSelection={handleShipmentSelection} handleNavigation={handleNavigation} />
                   })}
                 </Box>
