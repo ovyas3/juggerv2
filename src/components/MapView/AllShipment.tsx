@@ -24,6 +24,8 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import dayjs from 'dayjs';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
+import InputLabel from '@mui/material/InputLabel';
+import captiveRakeIndicator from '@/assets/captive_rakes.svg'
 
 import IdleIcon from "@/assets/idle_icon.svg";
 import InactiveIcon from "@/assets/inactive_icon.svg";
@@ -40,6 +42,7 @@ import {
     Box,
     Card,
     CardContent,
+    Checkbox,
     Chip,
     Grid,
     ListItemText,
@@ -120,6 +123,11 @@ const colorOfStatus = (status: string) => {
   }
 }
 
+const rakeTypes = [
+  'Captive Rakes',
+  'Indian Railway Rakes'
+];
+
 
 const MenuProps = {
   PaperProps: {
@@ -181,7 +189,7 @@ const ShipmentCard: React.FC<ShipmentCardProps> = ({
           }}>
             {/* <Chip label="In Transit" variant="outlined" color="info" /> */}
             <Chip label={statusBuilder(shipment.status)} variant="outlined" color={colorOfStatus(statusBuilder(shipment.status))} id="chip-label"/>
-          </Grid>
+          </Grid>   
         </Grid>
       </Typography>
       <Typography variant="h6" component="div" id="shipment-list-fnr" sx={{fontFamily: '"Inter", sans-serif !important'}}>
@@ -208,6 +216,13 @@ const ShipmentCard: React.FC<ShipmentCardProps> = ({
             <Typography variant="body2" component="div" id="shipment-list-bottom">
             <Image height={10} alt="drop" src={dropIcon} /> - {shipment.delivery_location?.name} ({shipment.delivery_location?.code})
             </Typography>
+          </Grid>
+          <Grid  item xs={12} sx={{
+            display: 'flex',
+            justifyContent: 'flex-end',
+            alignItems: 'flex-start',
+          }}>
+          {shipment.is_captive && <div><img src={captiveRakeIndicator.src}/></div>}
           </Grid>
         </Grid>
       </Typography>
@@ -250,6 +265,7 @@ const MapLayers = () => {
     const [showSearched, setShowSearched] = useState<boolean>(false);
     const [showFiltered, setShowFiltered] = useState<boolean>(false);
     const [showAll, setShowAll] = useState<boolean>(true);
+    const [isTotal,setIsTotal] = useState(true)
     const [showIdle, setShowIdle] = useState<boolean>(true);
     const [showInTransit, setShowInTransit] = useState<boolean>(true);
     const [showDelivered, setShowDelivered] = useState<boolean>(true);
@@ -258,6 +274,11 @@ const MapLayers = () => {
     const [openFromDatePicker,setOpenFromDatePicker] = useState(false);
     const [openToDatePicker,setOpenToDatePicker] = useState(false);
     const [trackingNonTracking, setTrackingNonTracking] = useState<TrackingStatus>({ tracking: 0, notTracking: 0 });
+    const [rakeType, setRakeType] = useState(['Captive Rakes', 'Indian Railway Rakes'])
+    const [showRakeTypeFiltered,setShowRakeTypeFiltered] = useState(false)
+    const [rakeTypeFilteredShipments,setRakeTypeFilteredShipments] = useState<any[]>([])
+    const [isTracking,setIsTracking] = useState(0)
+    const [filteredShipmentsBackup,setFilteredShipmentsBackup]=useState<any[]>([])
   
     const [selectedType,setSelectedType] = useState('FNR No.')
     const [searchInput,setSearchInput] = useState('')
@@ -280,15 +301,63 @@ const MapLayers = () => {
       }
     }
 
+    useEffect(()=>{
+      if(rakeType.length === 1) {
+      let data
+      let isCaptive = rakeType[0]
+      if(showSearched) {
+        data = searcedShipments.filter((val)=>{
+          if(isCaptive==='Captive Rakes')
+          return val.is_captive === true
+          else 
+          return val.is_captive === false
+        })
+        setRakeTypeFilteredShipments(data)
+      } else if(showFiltered) {
+        data = filteredShipments.filter((val)=>{
+          if(isCaptive==='Captive Rakes')
+          return val.is_captive === true
+          else 
+          return val.is_captive === false
+        })
+        setRakeTypeFilteredShipments(data)
+      } else if(showAll) {
+        data = allShipments.filter((val)=>
+        {
+          if(isCaptive==='Captive Rakes')
+          return val.is_captive === true
+          else 
+          return val.is_captive === false
+        }
+        )
+        setRakeTypeFilteredShipments(data)
+      } 
+      setShowRakeTypeFiltered(true)
+    } else {
+      setShowRakeTypeFiltered(false)
+    }
+    },[rakeType,allShipments,searcedShipments,filteredShipments])
+
+    const handleChangeRakeType = (event: any) => {
+      const {
+          target: { value },
+      } = event;
+      setRakeType(
+          typeof value === 'string' ? value.split(',') : value,
+      )
+    }
+
 
     useEffect(() => {
-       setShowSearched(false )
-    }, [allShipments,filteredShipments]);
+       setShowSearched(false)
+       setSearchInput('')
+    }, [allShipments,filteredShipments])
    
     function handleSearchInput(event: any) {
       const searchQuery = event.target.value;
       setSearchInput(searchQuery);
       setShowSearched(true);
+      setShowRakeTypeFiltered(false)
       if (selectedType === "FNR No.") {
         if (showFiltered) {
           const filteredData = filteredShipments.filter((shipment) =>
@@ -301,7 +370,7 @@ const MapLayers = () => {
           );
           setSearchedShipments(filteredData);
           setShowSearched(true);
-        } else {
+        } else if(showAll) {
           const filteredData = allShipments.filter((shipment) =>
           {
             const data = shipment?.all_FNRs?.filter((fnr: String) =>
@@ -313,6 +382,18 @@ const MapLayers = () => {
           setSearchedShipments(filteredData);
           setShowSearched(true);
         }
+        else {
+            const filteredData = rakeTypeFilteredShipments.filter((shipment) =>
+            {
+              const data = shipment?.all_FNRs?.filter((fnr: String) =>
+                fnr.toLowerCase().includes(searchQuery.toLowerCase())
+              )
+              return Boolean(data.length)
+            }
+            );
+            setSearchedShipments(filteredData);
+            setShowSearched(true);
+        }
       } else if (selectedType === "Dest. Code") {
         setShowSearched(true);
         if (showFiltered) {
@@ -323,7 +404,7 @@ const MapLayers = () => {
           );
           setSearchedShipments(filteredData);
           setShowSearched(true);
-        } else {
+        } else if(showAll) {
           const filteredData = allShipments.filter((shipment) =>
             shipment?.delivery_location?.code
               ?.toLowerCase()
@@ -331,6 +412,14 @@ const MapLayers = () => {
           );
           setSearchedShipments(filteredData);
           setShowSearched(true);
+        } else {
+          const filteredData = rakeTypeFilteredShipments.filter((shipment) =>
+            shipment?.delivery_location?.code
+              ?.toLowerCase()
+              .includes(searchQuery.toLowerCase())
+          );
+          setSearchedShipments(filteredData);
+          setShowSearched(true)
         }
       }
     }
@@ -386,6 +475,7 @@ const MapLayers = () => {
 
     const filterShipments = (status: StatusKey, event:any) => {
       let filteredShipments: any[] = [];
+      setIsTracking(0)
       if (status === 'OB') {
         filteredShipments = allShipments.filter((shipment: any) => shipment.status === '');
         setTrackingNonTracking(countTracking(filteredShipments))
@@ -408,7 +498,14 @@ const MapLayers = () => {
       setShowDelivered(status === 'Delivered');
       setShowAll(false);
       setShowFiltered(true);
-      setFilteredShipments(filteredShipments);
+      const filteredWithTracking = filteredShipments.map((shipment)=> {
+      const gps = shipment.trip_tracker?.last_location?.fois || shipment.pickup_location?.geo_point;
+      const isTracking = gps && gps.coordinates && gps.coordinates.length > 0;
+      return {...shipment,isTracking}
+      }
+      )
+      setFilteredShipments(filteredWithTracking);
+      setFilteredShipmentsBackup(filteredWithTracking)
       map?.flyTo(center, 5, { duration: 1 });
     }
 
@@ -425,6 +522,7 @@ const MapLayers = () => {
         from: service.getEpoch(selectedFromDate),
         to: service.getEpoch(selectedToDate),
       };
+      setIsTracking(0)
       const shipments = await httpsPost('/shipment_map_view', payload);
       const inTransit = shipments.filter((shipment: any) => (shipment.status !== 'Delivered' && shipment.status !== ''));
       const idle = shipments.filter((shipment: any) => (shipment.status === ''));
@@ -446,7 +544,12 @@ const MapLayers = () => {
       setShowDelivered(true);
       setTrackingNonTracking(countTracking(shipments))
 
-      setAllShipments([...inTransit, ...idle, ...delivered]);
+      const allShipmentsWithTracking = [...inTransit, ...idle, ...delivered].map((shipment)=>{
+        const gps = shipment.trip_tracker?.last_location?.fois || shipment.pickup_location?.geo_point;
+        const isTracking = gps && gps.coordinates && gps.coordinates.length > 0;
+        return {...shipment,isTracking}
+      })
+      setAllShipments(allShipmentsWithTracking);
     }
 
     useEffect(() => {
@@ -500,6 +603,25 @@ const MapLayers = () => {
         focusOnShipment(shipment);
       }
     };
+
+    const handleTrackingNonTracking = (isTracking:any) => {
+      setIsTracking(isTracking ? 1 : 2)
+      let trackingData;
+      if(isTotal) {
+        if(isTracking)
+          trackingData = allShipments.filter((shipment)=> shipment.isTracking )
+        else 
+         trackingData = allShipments.filter((shipment)=> !shipment.isTracking )
+      } else {
+        if(isTracking)
+        trackingData = filteredShipmentsBackup.filter((shipment)=> shipment.isTracking )
+        else 
+       trackingData = filteredShipmentsBackup.filter((shipment)=> !shipment.isTracking )
+      }
+      setFilteredShipments(trackingData)
+      setShowAll(false)
+      setShowFiltered(true)
+    }
 
     const focusOnShipment = (shipment: any) => {
       const gps = shipment.trip_tracker?.last_location?.fois || shipment.pickup_location?.geo_point;
@@ -743,6 +865,7 @@ const MapLayers = () => {
                   <Paper className="shipment-head-lists"
                       onClick={() => {
                         getShipments();
+                        setIsTotal(true)
                         map?.flyTo(center, 5, { duration: 1 });
                         }}  elevation={3} color="info">
                     <Typography variant="h6" color="info" component="div" className="shipment-head-list-texts">
@@ -753,7 +876,9 @@ const MapLayers = () => {
                     </Typography>
                   </Paper>
                   <Paper className="shipment-head-lists"
-                      onClick={(e) => filterShipments('OB',e)}  elevation={3} color="info">
+                      onClick={(e) => {filterShipments('OB',e)
+                      setIsTotal(false)
+                      }}  elevation={3} color="info">
                     <Typography variant="h6" color="info" component="div" className="shipment-head-list-texts">
                       In Plant
                     </Typography>
@@ -762,7 +887,8 @@ const MapLayers = () => {
                     </Typography>
                   </Paper>
                   <Paper className="shipment-head-lists" 
-                      onClick={(e) => filterShipments('ITNS',e)} elevation={3} color="info">
+                      onClick={(e) => { filterShipments('ITNS',e);
+                      setIsTotal(false)}} elevation={3} color="info">
                     <Typography variant="h6" component="div" className="shipment-head-list-texts">
                       In Transit
                     </Typography>
@@ -771,7 +897,9 @@ const MapLayers = () => {
                     </Typography>
                   </Paper>
                   <Paper className="shipment-head-lists" 
-                      onClick={(e) => filterShipments('Delivered',e)}  elevation={3} color="info">
+                      onClick={(e) => {filterShipments('Delivered',e);
+                      setIsTotal(false)}
+                      }  elevation={3} color="info">
                     <Typography variant="h6" component="div" className="shipment-head-list-texts">
                       Delivered
                     </Typography>
@@ -782,14 +910,14 @@ const MapLayers = () => {
                 </Box>
                 <Box className="tracking-nonTracking-status">
                   <div style={{display:'flex'}}>
-                  <div className="tracking_firstSection" id="tracking">
+                  <div className={isTracking === 1 ? "tracking_firstSection active-tracking":"tracking_firstSection" } id="tracking" onClick={()=>handleTrackingNonTracking(true)}>
                     <Image src={IdleIcon} alt="" className="Image_idleIcon" width={32} height={32} />
                     <div className="">
                       <div style={{fontWeight:600, fontSize:16}}>{trackingNonTracking.tracking}</div>
                       <div style={{fontSize:12}}>Tracking</div>
                     </div>
                   </div>
-                  <div className="tracking_secondSection" id="nonTracking" >
+                  <div className={isTracking === 2 ? "tracking_secondSection active-nontracking":"tracking_secondSection" } id="nonTracking" onClick={()=>handleTrackingNonTracking(false)}>
                     <Image src={InactiveIcon} alt="" className="Image_idleIcon" width={32} height={32} />
                     <div className="">
                       <div style={{fontWeight:600, fontSize:16}}>{trackingNonTracking.notTracking}</div>
@@ -831,20 +959,66 @@ const MapLayers = () => {
                                 <ListItemText primary={name} primaryTypographyProps={{ fontSize: '12px', fontFamily: 'Inter, sans-serif' }} />
                             </MenuItem>
                         ))}
-                    </Select><input placeholder="search" value={searchInput} onInput={handleSearchInput}/>
+                    </Select><input placeholder="search" value={searchInput} onInput={handleSearchInput} className='search-input'/>
+                   </div>
+                  <div className='status_container'>
+                    <FormControl sx={{
+                        width: '180px', margin: 0, padding: 0,
+                        '.mui-kk1bwy-MuiButtonBase-root-MuiMenuItem-root': {
+                            padding: 0,
+                        },
+                    }}>
+                        <InputLabel id="demo-multiple-checkbox-label" sx={{
+                            padding: 0, fontSize: 14, marginTop: '-8px',
+                        }}>Rake Type</InputLabel>
+                        <Select
+                            labelId="demo-multiple-checkbox-label"
+                            id="demo-multiple-checkbox"
+                            value={rakeType}
+                            multiple
+                            className='status_select'
+                            onChange={handleChangeRakeType}
+                            input={<OutlinedInput
+                                sx={{
+                                    width: '320px',
+                                    '& .MuiOutlinedInput-notchedOutline': {
+                                        border: '1px solid #E9E9EB'
+                                    },
+                                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                                        border: '1px solid #E9E9EB'
+                                    },
+                                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                        border: '1px solid #E9E9EB'
+                                    },
+                                }}
+                            />}
+                            renderValue={(selected: any) => selected.join(', ')}
+                            // renderValue={(selected) => selected}
+                        >
+                            {rakeTypes.map((name) => (
+                                <MenuItem key={name} value={name} sx={{ padding: 0 }} >
+                                    <Checkbox checked={rakeType.indexOf(name) > -1} sx={{ paddingLeft: '8px', padding: '4px', '& .MuiSvgIcon-root': { fontSize: 15 } }} />
+                                    <ListItemText primary={name} primaryTypographyProps={{ fontSize: '12px', fontFamily: 'Inter, sans-serif' }} />
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
                     </div>
                 </Box>
                 <Box sx={{
                   maxHeight: 'calc(75vh - 60px)',
                   overflowY: 'scroll',
                 }} className="shipment-details-container">
-                  {showFiltered && !showSearched  && filteredShipments.map((shipment, index) => {
+                  {showFiltered && !showSearched && !showRakeTypeFiltered && filteredShipments.map((shipment, index) => {
                     return <ShipmentCard key={index} index={index} shipment={shipment} handleShipmentSelection={handleShipmentSelection}  handleNavigation={handleNavigation} />
                   })}
-                  {showAll && !showSearched && allShipments.map((shipment, index) => {
+                  {showAll && !showSearched  && !showRakeTypeFiltered && allShipments.map((shipment, index) => {
                     return <ShipmentCard key={index} index={index} shipment={shipment} handleShipmentSelection={handleShipmentSelection} handleNavigation={handleNavigation} />
                   })}
-                    {showSearched && searcedShipments.map((shipment, index) => {
+                    {showSearched && !showRakeTypeFiltered && searcedShipments.map((shipment, index) => {
+                    return <ShipmentCard key={index} index={index} shipment={shipment} handleShipmentSelection={handleShipmentSelection} handleNavigation={handleNavigation} />
+                  })}
+                  {showRakeTypeFiltered  && rakeTypeFilteredShipments.map((shipment, index) => {
                     return <ShipmentCard key={index} index={index} shipment={shipment} handleShipmentSelection={handleShipmentSelection} handleNavigation={handleNavigation} />
                   })}
                 </Box>
