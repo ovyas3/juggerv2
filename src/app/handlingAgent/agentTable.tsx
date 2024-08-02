@@ -9,61 +9,55 @@ import TableHead from '@mui/material/TableHead';
 import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 
+import EditNoteOutlinedIcon from '@mui/icons-material/EditNoteOutlined';
+import { useEffect, useState } from 'react';
+import IconButton from '@mui/material/IconButton';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import { color } from 'framer-motion';
+import './agentTable.css'
+
 interface Column {
     id: string,
     label: string;
-    minWidth?: number;
-   
+    style:string  
 }
-
 interface Data {
     [key: string]: any; 
   }
-
 const columns: readonly Column[] = [
-    { id: 'name', label: 'Name', minWidth: 100 },
-    { id: 'email', label: 'Email', minWidth: 100 },
-    { id: 'mobile', label: 'Mobile', minWidth: 100 },
-    { id: 'units', label: 'Units', minWidth: 100 },
-    { id: 'verified', label: 'Verified', minWidth: 100 },
-    { id: 'action', label: 'Action', minWidth:100  },
+    {id: 'sno', label:'S No.',style:'header_sno' },
+    { id: 'name', label: 'Handling Agent Name', style:'header_name' },
+    { id: 'email', label: 'Email',  style:'header_email' },
+    { id: 'mobile', label: 'Mobile', style:'header_mobile'},
+    { id: 'verified', label: 'Verified', style:'header_verified'  },
+    { id: 'action', label: 'Action',style:'header_action'  },
 ];
 
-interface Data {
-    name: string;
-    email: string;
-    mobile: string;
-    units: string;
-    verified: string;
-    action:any
+function contructingData(agentList:any) {
+    return agentList.map((
+        agent:{
+            handling_agent:{name:string},
+            email_id:string,
+            mobile:string,
+            agentId:string,
+            status:string
+    }) => {
+        return {
+            name :agent?.handling_agent?.name ? agent?.handling_agent?.name : 'NA', 
+            email:agent?.email_id ? agent?.email_id : 'NA', 
+            mobile: agent?.mobile ? agent?.mobile : 'NA', 
+            agentID:agent?.agentId ? agent?.agentId : 'NA', 
+            verified: agent?.status ? agent?.status : 'NA',
+            id:agent?.agentId ? agent?.agentId : 'NA',
+        }
+    })
 }
 
-function createData(
-    name: string,
-    email: string,
-    mobile: string,
-    units: string,
-    verified: string,
-    action:any
-): Data {
-    return { name, email, mobile, units, verified, action };
-}
-
-const rows = [
-    createData('this', 'Is', 'dummy', 'data', 'for','checking'),
-    // createData('India', 'IN', '1324171354', '3287263', 'sdfffefer',''),
-    // createData('India', 'IN', '1324171354', '3287263', 'sdfffefer',''),
-    // createData('India', 'IN', '1324171354', '3287263', 'sdfffefer',''),
-    // createData('India', 'IN', '1324171354', '3287263', 'sdfffefer',''),
-    // createData('India', 'IN', '1324171354', '3287263', 'sdfffefer',''),
-    // createData('India', 'IN', '1324171354', '3287263', 'sdfffefer',''),
-    // createData('India', 'IN', '1324171354', '3287263', 'sdfffefer',''),    
-];
-
-function AgentTable() {
+function AgentTable({agentList,count,setSkipAndLimit}:any) {  
 
     const [page, setPage] = React.useState(0);
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
+    const [result, setResult] = React.useState([]);
 
     const handleChangePage = (event: unknown, newPage: number) => {
         setPage(newPage);
@@ -73,26 +67,36 @@ function AgentTable() {
         setRowsPerPage(+event.target.value);
         setPage(0);
     };
+
+    useEffect(()=>{
+        const finalResult = contructingData(agentList)
+        setResult(finalResult)
+    },[agentList])
+
+    useEffect(()=>{
+        setSkipAndLimit({skip:page*rowsPerPage,limit:rowsPerPage})
+    },[page,rowsPerPage])
+
     return (
-        <div style={{ width: '100%', height: '90%', display: 'flex', flexDirection: 'column' }}>
-            <Paper sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', boxShadow:'none' }}>
+        <div style={{ width: '100%', height: '90%', display: 'flex', flexDirection: 'column', marginTop: '35px'}}>
+             <Paper sx={{position:'relative', width: '100%', height: '100%', display: 'flex', flexDirection: 'column', boxShadow:'none' }}>
                 <TablePagination
-                    rowsPerPageOptions={[10, 25, 100]}
+                    rowsPerPageOptions={[5,10, 25,50, 100]}
                     component="div"
-                    count={rows.length}
+                    count={count}
                     rowsPerPage={rowsPerPage}
                     page={page}
                     onPageChange={handleChangePage}
                     onRowsPerPageChange={handleChangeRowsPerPage}
-                    sx={{minHeight:50}}
+                    sx={{position:'absolute',top:-40, zIndex:100, right:-10 }}
                 />
-                <TableContainer sx={{ flexGrow: 1, overflow: 'auto',boxShadow:'  0 2px 4px rgba(26, 22, 22, 0.2)',borderRadius: '4px' }}>
+                <TableContainer sx={{ overflow: 'auto',borderRadius: '4px', border:'1px solid #E9E9EB' }}>
                     <Table stickyHeader aria-label="sticky table">
                         <TableHead>
                             <TableRow>
                                 {columns.map((column) => (
-                                    <TableCell
-                                        key={column.id}
+                                    <TableCell  
+                                    key={column.id} className={column.style} style={{textAlign:'center',padding:'8px 0px 8px 0px', fontSize:14, fontWeight:600, color:'#484A57'}}
                                     >
                                         {column.label}
                                     </TableCell>
@@ -100,25 +104,32 @@ function AgentTable() {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {rows.map((row, firstIndex) => {
-                                    return (
-                                        <TableRow hover role="checkbox" tabIndex={-1} key={firstIndex}>
-                                            {columns.map((column, index):any => {
-                                                const value = row[column.id];
-                                                return (
-                                                    <TableCell key={column.id} >
-                                                        {value}
-                                                    </TableCell>
-                                                );
-                                            })}
-                                        </TableRow>
-                                    );
-                                })
-                            }
+                        {result.map((row, rowIndex) => {
+                                return (
+                                    <TableRow hover role="checkbox" tabIndex={-1} key={rowIndex}>
+                                        {columns.map((column) => {
+                                            const value = row[column.id];
+                                            return (
+                                                <TableCell key={column.id} sx={{ textAlign:'center' }}>
+                                                    {typeof value !== 'object' && value }
+                                                    {column.id === 'sno' && (
+                                                        <div>{rowIndex+1+page*rowsPerPage}.</div>
+                                                    )}
+                                                    {column.id === 'action' && (
+                                                        <div style={{backgroundColor:'#3352FF',borderRadius:'6px',height:'28px', width:'28px', display:'flex', justifyContent:'center', alignItems:'center'}}>
+                                                            <MoreVertIcon  style={{ color: 'black', cursor: 'pointer', fontSize: '16px' }}/>
+                                                        </div>
+                                                    )}
+                                                </TableCell>
+                                            );
+                                        })}
+                                    </TableRow>
+                                );
+                            })
+                        }
                         </TableBody>
                     </Table>
                 </TableContainer>
-
             </Paper>
         </div>
     )

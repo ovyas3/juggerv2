@@ -1,0 +1,30 @@
+.header_sno{
+    /* background-color: yellow !important; */
+    /* padding-left:20px !important; */
+    min-width: 65px !important;
+    /* text-align: left !important; */
+}
+.header_name{
+ /* background-color: violet !important; */
+ min-width: 215px !important;
+}
+.header_email{
+    /* background-color: tomato !important; */
+    min-width: 215px !important;
+}
+.header_mobile{
+    /* background-color: turquoise !important; */
+    min-width: 140px !important;
+}
+.header_units{
+    /* background-color: bisque !important; */
+    min-width: 110px !important;
+}
+.header_verified{
+    /* background-color: brown !important; */
+    min-width: 80px !important;
+}
+.header_action{
+    /* background-color: teal !important; */
+    width: 75px !important;
+}
