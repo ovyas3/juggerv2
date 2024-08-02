@@ -476,6 +476,11 @@
   gap:4px;
   cursor: pointer;
 }
+
+.active-tracking {
+  background-color: #FF98001F;
+}
+
 .tracking_firstSection:hover{
   background-color: #FF98001F;
 }
@@ -491,6 +496,10 @@
   cursor: pointer;
 }
 .tracking_secondSection:hover{
+  background-color: #E6667B1F;
+}
+
+.active-nontracking {
   background-color: #E6667B1F;
 }
 

@@ -265,6 +265,7 @@ const MapLayers = () => {
     const [showSearched, setShowSearched] = useState<boolean>(false);
     const [showFiltered, setShowFiltered] = useState<boolean>(false);
     const [showAll, setShowAll] = useState<boolean>(true);
+    const [isTotal,setIsTotal] = useState(true)
     const [showIdle, setShowIdle] = useState<boolean>(true);
     const [showInTransit, setShowInTransit] = useState<boolean>(true);
     const [showDelivered, setShowDelivered] = useState<boolean>(true);
@@ -276,6 +277,8 @@ const MapLayers = () => {
     const [rakeType, setRakeType] = useState(['Captive Rakes', 'Indian Railway Rakes'])
     const [showRakeTypeFiltered,setShowRakeTypeFiltered] = useState(false)
     const [rakeTypeFilteredShipments,setRakeTypeFilteredShipments] = useState<any[]>([])
+    const [isTracking,setIsTracking] = useState(0)
+    const [filteredShipmentsBackup,setFilteredShipmentsBackup]=useState<any[]>([])
   
     const [selectedType,setSelectedType] = useState('FNR No.')
     const [searchInput,setSearchInput] = useState('')
@@ -472,6 +475,7 @@ const MapLayers = () => {
 
     const filterShipments = (status: StatusKey, event:any) => {
       let filteredShipments: any[] = [];
+      setIsTracking(0)
       if (status === 'OB') {
         filteredShipments = allShipments.filter((shipment: any) => shipment.status === '');
         setTrackingNonTracking(countTracking(filteredShipments))
@@ -494,7 +498,14 @@ const MapLayers = () => {
       setShowDelivered(status === 'Delivered');
       setShowAll(false);
       setShowFiltered(true);
-      setFilteredShipments(filteredShipments);
+      const filteredWithTracking = filteredShipments.map((shipment)=> {
+      const gps = shipment.trip_tracker?.last_location?.fois || shipment.pickup_location?.geo_point;
+      const isTracking = gps && gps.coordinates && gps.coordinates.length > 0;
+      return {...shipment,isTracking}
+      }
+      )
+      setFilteredShipments(filteredWithTracking);
+      setFilteredShipmentsBackup(filteredWithTracking)
       map?.flyTo(center, 5, { duration: 1 });
     }
 
@@ -511,6 +522,7 @@ const MapLayers = () => {
         from: service.getEpoch(selectedFromDate),
         to: service.getEpoch(selectedToDate),
       };
+      setIsTracking(0)
       const shipments = await httpsPost('/shipment_map_view', payload);
       const inTransit = shipments.filter((shipment: any) => (shipment.status !== 'Delivered' && shipment.status !== ''));
       const idle = shipments.filter((shipment: any) => (shipment.status === ''));
@@ -532,7 +544,12 @@ const MapLayers = () => {
       setShowDelivered(true);
       setTrackingNonTracking(countTracking(shipments))
 
-      setAllShipments([...inTransit, ...idle, ...delivered]);
+      const allShipmentsWithTracking = [...inTransit, ...idle, ...delivered].map((shipment)=>{
+        const gps = shipment.trip_tracker?.last_location?.fois || shipment.pickup_location?.geo_point;
+        const isTracking = gps && gps.coordinates && gps.coordinates.length > 0;
+        return {...shipment,isTracking}
+      })
+      setAllShipments(allShipmentsWithTracking);
     }
 
     useEffect(() => {
@@ -586,6 +603,25 @@ const MapLayers = () => {
         focusOnShipment(shipment);
       }
     };
+
+    const handleTrackingNonTracking = (isTracking:any) => {
+      setIsTracking(isTracking ? 1 : 2)
+      let trackingData;
+      if(isTotal) {
+        if(isTracking)
+          trackingData = allShipments.filter((shipment)=> shipment.isTracking )
+        else 
+         trackingData = allShipments.filter((shipment)=> !shipment.isTracking )
+      } else {
+        if(isTracking)
+        trackingData = filteredShipmentsBackup.filter((shipment)=> shipment.isTracking )
+        else 
+       trackingData = filteredShipmentsBackup.filter((shipment)=> !shipment.isTracking )
+      }
+      setFilteredShipments(trackingData)
+      setShowAll(false)
+      setShowFiltered(true)
+    }
 
     const focusOnShipment = (shipment: any) => {
       const gps = shipment.trip_tracker?.last_location?.fois || shipment.pickup_location?.geo_point;
@@ -829,6 +865,7 @@ const MapLayers = () => {
                   <Paper className="shipment-head-lists"
                       onClick={() => {
                         getShipments();
+                        setIsTotal(true)
                         map?.flyTo(center, 5, { duration: 1 });
                         }}  elevation={3} color="info">
                     <Typography variant="h6" color="info" component="div" className="shipment-head-list-texts">
@@ -839,7 +876,9 @@ const MapLayers = () => {
                     </Typography>
                   </Paper>
                   <Paper className="shipment-head-lists"
-                      onClick={(e) => filterShipments('OB',e)}  elevation={3} color="info">
+                      onClick={(e) => {filterShipments('OB',e)
+                      setIsTotal(false)
+                      }}  elevation={3} color="info">
                     <Typography variant="h6" color="info" component="div" className="shipment-head-list-texts">
                       In Plant
                     </Typography>
@@ -848,7 +887,8 @@ const MapLayers = () => {
                     </Typography>
                   </Paper>
                   <Paper className="shipment-head-lists" 
-                      onClick={(e) => filterShipments('ITNS',e)} elevation={3} color="info">
+                      onClick={(e) => { filterShipments('ITNS',e);
+                      setIsTotal(false)}} elevation={3} color="info">
                     <Typography variant="h6" component="div" className="shipment-head-list-texts">
                       In Transit
                     </Typography>
@@ -857,7 +897,9 @@ const MapLayers = () => {
                     </Typography>
                   </Paper>
                   <Paper className="shipment-head-lists" 
-                      onClick={(e) => filterShipments('Delivered',e)}  elevation={3} color="info">
+                      onClick={(e) => {filterShipments('Delivered',e);
+                      setIsTotal(false)}
+                      }  elevation={3} color="info">
                     <Typography variant="h6" component="div" className="shipment-head-list-texts">
                       Delivered
                     </Typography>
@@ -868,14 +910,14 @@ const MapLayers = () => {
                 </Box>
                 <Box className="tracking-nonTracking-status">
                   <div style={{display:'flex'}}>
-                  <div className="tracking_firstSection" id="tracking">
+                  <div className={isTracking === 1 ? "tracking_firstSection active-tracking":"tracking_firstSection" } id="tracking" onClick={()=>handleTrackingNonTracking(true)}>
                     <Image src={IdleIcon} alt="" className="Image_idleIcon" width={32} height={32} />
                     <div className="">
                       <div style={{fontWeight:600, fontSize:16}}>{trackingNonTracking.tracking}</div>
                       <div style={{fontSize:12}}>Tracking</div>
                     </div>
                   </div>
-                  <div className="tracking_secondSection" id="nonTracking" >
+                  <div className={isTracking === 2 ? "tracking_secondSection active-nontracking":"tracking_secondSection" } id="nonTracking" onClick={()=>handleTrackingNonTracking(false)}>
                     <Image src={InactiveIcon} alt="" className="Image_idleIcon" width={32} height={32} />
                     <div className="">
                       <div style={{fontWeight:600, fontSize:16}}>{trackingNonTracking.notTracking}</div>
@@ -938,7 +980,7 @@ const MapLayers = () => {
                             onChange={handleChangeRakeType}
                             input={<OutlinedInput
                                 sx={{
-                                    width: '180px',
+                                    width: '320px',
                                     '& .MuiOutlinedInput-notchedOutline': {
                                         border: '1px solid #E9E9EB'
                                     },
