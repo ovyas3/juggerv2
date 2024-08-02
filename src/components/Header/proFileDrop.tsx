@@ -13,6 +13,8 @@ import EmailIcon from '@mui/icons-material/Email';
 import HelpIcon from '@mui/icons-material/Help';
 import InviteIcon from '../../assets/Invite_icon.svg';
 import LogoutIcon from '@mui/icons-material/Logout';
+// {t('submit')}
+import { useTranslations } from 'next-intl';
 
 import './proFileDrop.css'
 import { deleteAllCache } from '@/utils/storageService';
@@ -23,6 +25,8 @@ export default function AccountMenu() {
   const open = Boolean(anchorEl);
   const [profileName, setProfileName] = React.useState<string>('OP' as string);
   const router = useRouter();
+  const t = useTranslations("ORDERS")
+
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
@@ -117,52 +121,52 @@ export default function AccountMenu() {
         transformOrigin={{ horizontal: 'right', vertical: 'top' }}
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
       >
-        <MenuItem onClick={handleClose} className="menuItem"  sx={{fontSize:14, fontWeight:500}}>
+        {/* <MenuItem onClick={handleClose} className="menuItem"  sx={{fontSize:14, fontWeight:500}}>
             <div className="iconContainer">
                 <PersonIcon className="translateIcon" sx={{height:14, width:14}}/>
             </div>
             Profile
-        </MenuItem>
+        </MenuItem> */}
         <MenuItem onClick={() => handleNavigation('/handlingAgent')} className="menuItem"  sx={{fontSize:14, fontWeight:500}}>
             <div className="iconContainer">
               <img src={InviteIcon.src} className="translateIcon" style={{height: 14, width: 14}} />
             </div>
-            Invite
+             {t('handlingAgent')}
         </MenuItem>
 
-        <MenuItem onClick={handleClose} className="menuItem" sx={{fontSize:14, fontWeight:500}}>
+        {/* <MenuItem onClick={handleClose} className="menuItem" sx={{fontSize:14, fontWeight:500}}>
             <div className="iconContainer">
                 <TranslateIcon className="translateIcon" sx={{height:14, width:14}} />
             </div>
             Language
-        </MenuItem>
+        </MenuItem> */}
 
-        <MenuItem onClick={handleClose} className="menuItem" sx={{fontSize:14, fontWeight:500}}>
+        {/* <MenuItem onClick={handleClose} className="menuItem" sx={{fontSize:14, fontWeight:500}}>
             <div className="iconContainer">
                 <SettingsIcon className="translateIcon" sx={{height:14, width:14}} />
             </div>
             Settings
-        </MenuItem>
+        </MenuItem> */}
 
-        <MenuItem onClick={handleClose} className="menuItem" sx={{fontSize:14, fontWeight:500}}>
+        {/* <MenuItem onClick={handleClose} className="menuItem" sx={{fontSize:14, fontWeight:500}}>
             <div className="iconContainer">
                 <EmailIcon className="translateIcon" sx={{height:14, width:14}} />
             </div>
             Email/Sms
-        </MenuItem>
+        </MenuItem> */}
 
-        <MenuItem onClick={handleClose} className="menuItem" sx={{fontSize:14, fontWeight:500}}>
+        {/* <MenuItem onClick={handleClose} className="menuItem" sx={{fontSize:14, fontWeight:500}}>
             <div className="iconContainer">
                 <HelpIcon className="translateIcon" sx={{height:14, width:14}} />
             </div>
             Help
-        </MenuItem>
+        </MenuItem> */}
 
         <MenuItem onClick={() => handleLogout()} className="menuItem" sx={{fontSize:14, fontWeight:500}}>
             <div className="iconContainer">
                 <LogoutIcon className="translateIcon" sx={{height:14, width:14}} />
             </div>
-            Log out
+            {t('logout')}
         </MenuItem>
         
       </Menu>
