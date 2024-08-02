@@ -5,7 +5,8 @@ import SideDrawer from '../../components/Drawer/Drawer';
 import React, { useEffect, useState } from 'react';
 import Header from '@/components/Header/header';
 import './orders.css'
-import ReplayIcon from '@mui/icons-material/Replay';
+// import ReplayIcon from '@mui/icons-material/Replay';
+import RefreshIcon from '@mui/icons-material/Refresh';
 import Filters from '@/components/Filters/filters';
 import TableData from '@/components/Table/table';
 import MobileDrawer from "@/components/Drawer/mobile_drawer";
@@ -239,12 +240,12 @@ const OrdersPage = () => {
                     // console.log(updatedShipmentsPayload)
                     clearFilter()
                     setReload(true)
-                    setTimeout(() => { setReload(false) }, 3000)
+                    setTimeout(() => { setReload(false) }, 1500)
                   }}
                     onMouseEnter={() => { setShowRefreash(true) }}
                     onMouseLeave={() => { setShowRefreash(false) }}
                   >
-                    <ReplayIcon style={{ color: '#707070' }} />
+                    <RefreshIcon style={{ color: '#707070' }} />
                   </div>
                   <div className='refreash_reload' style={{ opacity: showRefreash ? 1 : 0 }}>refresh filters</div>
                 </div>

@@ -377,7 +377,7 @@ function Filters({ onToFromChange, onChangeStatus, onChangeRakeTypes, reload, sh
 
                 <div>
                     <motion.div
-                        className="box"
+                        className="map-view-btn-orders"
                         whileHover={{ scale: 0.95 }}
                         whileTap={{ scale: 0.9 }}
                         transition={{ type: "spring", stiffness: 400, damping: 10 }}
