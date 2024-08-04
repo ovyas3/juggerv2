@@ -274,7 +274,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding-left: 12px;
+    /* padding-left: 12px; */
     gap:11px;
     border-top-left-radius: 8px;
     border-bottom-left-radius: 8px;
