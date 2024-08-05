@@ -17,6 +17,8 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import { TextField, Tooltip } from '@mui/material';
+import { useRouter } from 'next/navigation';
+
 
 import { Icon, divIcon, point } from "leaflet";
 import L from 'leaflet';
@@ -111,6 +113,7 @@ const MapLayers = () => {
     const inputRefRakeName = useRef<any>(null);
     const inputRefFnrNumber = useRef<any>(null);   
     const { showMessage } = useSnackbar();
+    const router = useRouter();
 
 
     useEffect(() => {
@@ -332,7 +335,7 @@ const MapLayers = () => {
 
     const handleTripTracker = (unique_code: string, fnr_no: string) => {
       if(fnr_no !== 'N/A'){
-        window.open(`https://tracker.instavans.com/track/${unique_code}`, '_blank');
+        router.push(`/tracker?unique_code=${unique_code}`);
       } else {
         showMessage('FNR number is not available', 'info')
       }
