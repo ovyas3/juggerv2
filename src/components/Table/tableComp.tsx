@@ -692,12 +692,14 @@ export const HandlingAgentSelection = ({ shipmentId, setOpen, locationId }: any)
     };
 
     const handleSubmit = async () => {
-        if (newIds.length === 0) { showMessage('Please select HA.', 'error'); }
-        else if (removeIds.length === 0) { showMessage('Please select HA.', 'error'); }
+        if (newIds.length === 0) { showMessage('Please select HA.', 'success'); }
         try {
             const res = await httpsPost(`rake_shipment/assign_edit_ha`, { id: shipmentId, addIds: newIds, removeIds: removeIds });
             if (res.statusCode === 200) {
-                showMessage('HA assigned successfully.', 'success');
+                if(newIds.length === 0) {
+                    showMessage('HA removed successfully.', 'success');
+                }else{showMessage('HA assigned successfully.', 'success');}
+                
                 setOpen(false);
             }
         } catch (error) {
@@ -705,15 +707,11 @@ export const HandlingAgentSelection = ({ shipmentId, setOpen, locationId }: any)
         }
     };
 
-    const ITEM_HEIGHT = 48;
+    const ITEM_HEIGHT = 30;
     const ITEM_PADDING_TOP = 8;
     const MenuProps = {
         PaperProps: {
-            style: {
-                maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-                maxWidth: '100%',
-                minWidth: 'calc(100% - 1400px)',
-            },
+            style: {},
         },
     };
 
@@ -722,8 +720,8 @@ export const HandlingAgentSelection = ({ shipmentId, setOpen, locationId }: any)
             <div style={{ fontSize: 20, color: '#131722', fontWeight: 500 }}>Assign Handling Agent</div>
 
             <div>
-                <FormControl sx={{ width: '100%', marginTop: '36px' }}>
-                    <InputLabel id="demo-multiple-checkbox-label">handling agent</InputLabel>
+                <FormControl sx={{ width: '100%', marginTop: '36px', position:'relative' }}>
+                    <InputLabel id="demo-multiple-checkbox-label">Handling Agent</InputLabel>
                     <Select
                         labelId="demo-multiple-checkbox-label"
                         id="demo-multiple-checkbox"
@@ -740,8 +738,8 @@ export const HandlingAgentSelection = ({ shipmentId, setOpen, locationId }: any)
                                     <Checkbox checked={selectedHAids.has(item._id)} sx={{ '& .MuiSvgIcon-root': { fontSize: 18 } }} />
                                     <ListItemText primary={item.name} primaryTypographyProps={{ padding: 0, fontSize: '14px', fontFamily: 'Inter, sans-serif' }} />
                                 </div>
-                                <div style={{ marginLeft: 42, fontSize: 12, marginTop: -8, color: '#7C7E8C' }}>
-                                    {item.location.map((location: any, locationIndex: any) => (
+                                <div style={{ marginLeft: 42, fontSize: 12,  color: '#7C7E8C'}}>
+                                    {item?.location?.map((location: any, locationIndex: any) => (
                                         <div key={locationIndex}>{location.name}</div>
                                     ))}
                                 </div>

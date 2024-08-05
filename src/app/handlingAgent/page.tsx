@@ -49,22 +49,6 @@ function HandlingAgent() {
             console.log(error)
         })
     },[skipAndLimit])
-
-    // const handleChange = (e: any) => {
-    //     const oG = agentList;
-    //     const targetValue = e.target.value;
-    //     console.log(targetValue)
-    //     const filteredArrayAgentList = oG.filter((agent: any) => {
-    //         return (agent?.handling_agent?.name.toLowerCase().includes(targetValue.toLowerCase()))
-    //     })
-    //     if(targetValue === ''){
-            
-    //     }
-    //     setAgentList(filteredArrayAgentList)
-    //     if(targetValue === ''){
-    //         setAgentList(agentList)
-    //     }
-    // }
     
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const targetValue = e.target.value.toLowerCase();
@@ -78,8 +62,6 @@ function HandlingAgent() {
             setAgentList(filteredAgentList);
         }
     };
-
-    console.log(agentList)
 
     return (
         <div className='handlingAgent_Container'>
