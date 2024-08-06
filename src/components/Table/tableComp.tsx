@@ -625,7 +625,9 @@ export const HandlingAgentSelection = ({ shipmentId, setOpen, locationId }: any)
     const getLocationList = async () => {
         try {
             const res = await httpsGet(`${GET_HANDLING_AGENT_LIST}?delivery_locations=${locationId}`);
-            if (res.statusCode === 200) setAllListOfHAids(res?.data);
+            if (res.statusCode === 200) {
+                setAllListOfHAids(res?.data);
+            }
         } catch (error) {
             console.error("Error fetching location list:", error);
         }
@@ -635,7 +637,7 @@ export const HandlingAgentSelection = ({ shipmentId, setOpen, locationId }: any)
         try {
             const res = await httpsGet(`handling_agent/get_rake_shipment_ha?id=${shipmentId}`);
             if (res.statusCode === 200) {
-                const initialSelectedIds = new Set(res?.data[0]?.HA.map((ha: any) => ha._id));
+                const initialSelectedIds = new Set(res?.data[0]?.HA?.map((ha: any) => ha._id));
                 setSelectedHAids(initialSelectedIds);
                 setOriginalSelectedHAids(initialSelectedIds);
             }
@@ -687,7 +689,7 @@ export const HandlingAgentSelection = ({ shipmentId, setOpen, locationId }: any)
 
     const getSelectedItemNames = (selected: any) => {
         return selected.map((id: any) =>
-            allListOfHAids.find(item => item._id === id)?.parent_name
+            allListOfHAids.find((item:any) => item.parent === id)?.parent_name
         ).filter(Boolean).join(', ');
     };
 
@@ -715,6 +717,7 @@ export const HandlingAgentSelection = ({ shipmentId, setOpen, locationId }: any)
         },
     };
 
+
     return (
         <div style={{ position: 'relative', padding: 24 }}>
             <div style={{ fontSize: 20, color: '#131722', fontWeight: 500 }}>Assign Handling Agent</div>
@@ -733,9 +736,9 @@ export const HandlingAgentSelection = ({ shipmentId, setOpen, locationId }: any)
                         MenuProps={MenuProps}
                     >
                         {allListOfHAids?.map((item: any, index) => (
-                            <MenuItem key={index} value={item._id} sx={{ padding: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', paddingRight: '12px' }}>
+                            <MenuItem key={index} value={item.parent} sx={{ padding: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', paddingRight: '12px' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', padding: 0 }}>
-                                    <Checkbox checked={selectedHAids.has(item._id)} sx={{ '& .MuiSvgIcon-root': { fontSize: 18 } }} />
+                                    <Checkbox checked={selectedHAids.has(item.parent)} sx={{ '& .MuiSvgIcon-root': { fontSize: 18 } }} />
                                     <ListItemText primary={item.parent_name} primaryTypographyProps={{ padding: 0, fontSize: '14px', fontFamily: 'Inter, sans-serif' }} />
                                 </div>
                                 <div style={{ marginLeft: 42, fontSize: 12,  color: '#7C7E8C'}}>
