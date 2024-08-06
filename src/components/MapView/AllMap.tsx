@@ -332,7 +332,6 @@ const MapLayers = () => {
         setSelectedType('non-tracking');
       }
     }
-
     const handleTripTracker = (unique_code: string, fnr_no: string) => {
       if(fnr_no !== 'N/A'){
         router.push(`/tracker?unique_code=${unique_code}`);
