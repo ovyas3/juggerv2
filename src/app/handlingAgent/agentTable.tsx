@@ -36,14 +36,15 @@ const columns: readonly Column[] = [
 function contructingData(agentList:any) {
     return agentList.map((
         agent:{
-            handling_agent:{name:string},
+            handling_agent:{parent_name:string},
             email_id:string,
             mobile:string,
             agentId:string,
-            status:string
+            status:string,
+            parent_name:string,
     }) => {
         return {
-            name :agent?.handling_agent?.name ? agent?.handling_agent?.name : 'NA', 
+            name :agent?.handling_agent?.parent_name ? agent?.handling_agent?.parent_name : 'NA', 
             email:agent?.email_id ? agent?.email_id : 'NA', 
             mobile: agent?.mobile ? agent?.mobile : 'NA', 
             agentID:agent?.agentId ? agent?.agentId : 'NA', 

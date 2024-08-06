@@ -751,13 +751,13 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                         {item.id === 'handlingAgent' && (
                                                             <div className='handlingAgentColume'>
                                                                 <div style={{ textWrap: 'nowrap' }}>{row.handlingAgent[0] ? row.handlingAgent[0] : "NA"}</div>
-                                                                {row.handlingAgent.length > 1 && <div className='view_more_agents'>+{row.handlingAgent.length - 1}</div>}
+                                                                {row.handlingAgent.length > 1 && <div className='view_more_agents'><div>+{row.handlingAgent.length - 1}</div></div>}
                                                                 {row.handlingAgent.length > 1 &&
                                                                     <div className='list_of_agents'>
                                                                         {Array.isArray(row.handlingAgent) &&
                                                                             row.handlingAgent.map((item: any, index: number) => {
                                                                                 return (
-                                                                                    <div key={index}>{item}</div>
+                                                                                    <div key={index} className='agent_item'>{item}</div>
                                                                                 );
                                                                             })
                                                                         }

@@ -40,7 +40,7 @@ interface InviteForm {
 //     return true;
 // }
 
-function InviteBox({ setOpenModalInvite }: any) {
+function InviteBox({ setOpenModalInvite ,getHandlingAgents}: any) {
     const { showMessage } = useSnackbar();
     const [toggleCloseButton, setToggleCloseButton] = useState(false)
 
@@ -85,6 +85,7 @@ function InviteBox({ setOpenModalInvite }: any) {
                             pan: '',
                             mobile: '',
                         });
+                        getHandlingAgents({skipAndLimit: {skip: 0, limit:10 }});
                         showMessage('Invitation Sent Successfully', 'success');
                         setOpenModalInvite(false);
                     }

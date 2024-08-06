@@ -23,10 +23,7 @@ async function inviteAgent ({payload}:any){
     const response = await httpsPost(HANDLING_AGENT_INVITE, payload);
     return response;
 }
-async function getHandlingAgents ({skipAndLimit}: {skipAndLimit: SkipAndLimit}){
-    const response = await httpsGet(`get/invited/handling_agent?skip=${skipAndLimit.skip}&limit=${skipAndLimit.limit}`);
-    return response;
-}
+
 
 function HandlingAgent() {
 
@@ -40,14 +37,21 @@ function HandlingAgent() {
     })
     const [count, setCount] = useState(0);
 
-    useEffect(()=>{
-        getHandlingAgents({skipAndLimit}).then((response)=>{
-            setAgentList(response?.data?.data)
-            setCount(response?.data?.count)
-            setOriginalAgentList(response?.data?.data)
-        }).catch((error)=>{
+    async function getHandlingAgents ({skipAndLimit}: {skipAndLimit: SkipAndLimit}){
+        try {
+            const response = await httpsGet(`get/invited/handling_agent?skip=${skipAndLimit.skip}&limit=${skipAndLimit.limit}`)
+            .then((response)=>{
+                setCount(response?.data?.count);
+                setAgentList(response?.data?.data);
+                setOriginalAgentList(response?.data?.data);
+            })
+        } catch (error) {
             console.log(error)
-        })
+        }
+    }
+
+    useEffect(()=>{
+        getHandlingAgents({skipAndLimit});
     },[skipAndLimit])
     
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -89,7 +93,7 @@ function HandlingAgent() {
                 </div>
 
                 {/* --------------- Table content -------------- */}
-               <AgentTable agentList={agentList} count={count} setSkipAndLimit={setSkipAndLimit}/>
+               <AgentTable agentList={agentList} count={count} setSkipAndLimit={setSkipAndLimit} />
             </div>
 
             {/* -------modals--------- */}
@@ -99,7 +103,7 @@ function HandlingAgent() {
             >
                 <div className='modal_inner_box'>
                     <div className='invite_box_carriers'>
-                        <InviteBox setOpenModalInvite={setOpenModalInvite} />
+                        <InviteBox setOpenModalInvite={setOpenModalInvite} getHandlingAgents={getHandlingAgents}/>
                     </div>
 
                 </div>
