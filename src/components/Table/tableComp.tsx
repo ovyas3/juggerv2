@@ -697,8 +697,8 @@ export const HandlingAgentSelection = ({ shipmentId, setOpen, locationId }: any)
             const res = await httpsPost(`rake_shipment/assign_edit_ha`, { id: shipmentId, addIds: newIds, removeIds: removeIds });
             if (res.statusCode === 200) {
                 if(newIds.length === 0) {
-                    showMessage('HA removed successfully.', 'success');
-                }else{showMessage('HA assigned successfully.', 'success');}
+                    showMessage('Handling Agent removed successfully.', 'success');
+                }else{showMessage('Handling Agent successfully.', 'success');}
                 
                 setOpen(false);
             }

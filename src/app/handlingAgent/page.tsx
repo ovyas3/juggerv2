@@ -24,7 +24,7 @@ async function inviteAgent ({payload}:any){
     return response;
 }
 async function getHandlingAgents ({skipAndLimit}: {skipAndLimit: SkipAndLimit}){
-    const response = await httpsGet(`get/invied/handling_agent?skip=${skipAndLimit.skip}&limit=${skipAndLimit.limit}`);
+    const response = await httpsGet(`get/invited/handling_agent?skip=${skipAndLimit.skip}&limit=${skipAndLimit.limit}`);
     return response;
 }
 
