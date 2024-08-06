@@ -42,8 +42,7 @@ function Filters({ onToFromChange, onChangeStatus, onChangeRakeTypes, reload, sh
         'Ready for Departure',
         'In Transit',
         'Delivered At Hub',
-        'Delivered At Customer',
-        'In Plant'
+        'Delivered At Customer'
     ];
 
 
