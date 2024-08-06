@@ -329,7 +329,6 @@ const MapLayers = () => {
         setSelectedType('non-tracking');
       }
     }
-
     const handleTripTracker = (unique_code: string, fnr_no: string) => {
       if(fnr_no !== 'N/A'){
         window.open(`https://tracker.instavans.com/track/${unique_code}`, '_blank');
