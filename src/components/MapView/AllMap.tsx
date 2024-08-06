@@ -332,7 +332,7 @@ const MapLayers = () => {
 
     const handleTripTracker = (unique_code: string, fnr_no: string) => {
       if(fnr_no !== 'N/A'){
-        window.open(`https://tracker.instavans.com/track/${unique_code}`, '_blank');
+        window.open(`https://rms.instavans.com/tracker?unique_code=${unique_code}`, '_blank');
       } else {
         showMessage('FNR number is not available', 'info')
       }
