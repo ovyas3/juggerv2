@@ -41,7 +41,6 @@ function contructingData(agentList:any) {
             mobile:string,
             agentId:string,
             status:string,
-            parent_name:string,
     }) => {
         return {
             name :agent?.handling_agent?.parent_name ? agent?.handling_agent?.parent_name : 'NA', 
