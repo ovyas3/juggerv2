@@ -113,7 +113,7 @@ const convertArrayToFilteredArray = (inputArray: any) => {
             },
             status: {
                 name: statusBuilder(status),
-                code: (status === "Delivered" || status === "OB" || status === "") ? null : (trip_tracker && trip_tracker[0]?.fois_last_location) || '',
+                code: ( status === "OB" || status === "") ? null : (trip_tracker && trip_tracker[0]?.fois_last_location) || '',
                 // code: trip_tracker[0]?.fois_last_location || '',
                 raw: status,
             },

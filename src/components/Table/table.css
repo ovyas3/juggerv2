@@ -307,6 +307,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    margin-bottom: 6px;
 }
 
 .status_title_rfd {
