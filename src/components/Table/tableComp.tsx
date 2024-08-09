@@ -605,7 +605,7 @@ export const EditELD = ({ shipmentId, setOpen, getAllShipment }: any) => {
         </div>
     )
 }
-export const HandlingAgentSelection = ({ shipmentId, setOpen, locationId }: any) => {
+export const HandlingAgentSelection = ({ shipmentId, setOpen, locationId, getAllShipment }: any) => {
     const t = useTranslations('ORDERS');
     const [isHovered, setIsHovered] = useState(false);
     const handleMouseEnter = useCallback(() => setIsHovered(true), []);
@@ -701,7 +701,7 @@ export const HandlingAgentSelection = ({ shipmentId, setOpen, locationId }: any)
                 if(newIds.length === 0) {
                     showMessage('Handling Agent removed successfully.', 'success');
                 }else{showMessage('Handling Agent successfully.', 'success');}
-                
+                getAllShipment();
                 setOpen(false);
             }
         } catch (error) {
