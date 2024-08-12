@@ -118,7 +118,7 @@ function InviteBox({ setOpenModalInvite ,getHandlingAgents}: any) {
             <div className='invite-button-container' style={{ display: 'hidden' }}>
                 <div className='invite_button_send'
                     onClick={(e) => { submitInvite(e); e.stopPropagation(); }}
-                >Submit</div>
+                >Invite</div>
             </div>
 
             <div className='close_modal_button'

@@ -177,10 +177,7 @@ function AgentTable({ agentList, count, setSkipAndLimit,getHandlingAgents }: any
                                                                 <div className='action_items_box_HA' >
                                                                     {row.verified !== 'verified' && <div id='verified' onClick={(e)=>{sendingVerification(row)}}>Verification</div> }
                                                                     {row.verified === 'expired' && <div id='reInvite' onClick={(e)=>{sendingReinvite(row)}} >Re-Invite</div>}
-                                                                    
-                                                                    
-                                                                    <div id='Edit' onClick={(e)=>{setOpenModal(true);}}>Edit</div>
-                                                                    <div id='Delete' onClick={(e)=>{setOpenModal(true);}}>Delete</div>
+                                                                    <div id='Delete' onClick={(e)=>{}}>Delete</div>
                                                                 </div>
                                                             </Popover>
                                                         </div>

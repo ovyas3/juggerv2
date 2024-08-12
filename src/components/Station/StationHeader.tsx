@@ -11,6 +11,7 @@ import { useState, useEffect } from 'react';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import './StationHeader.css'
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import {environment} from '@/environments/env.api';
 
 interface Column {
     id: string
@@ -70,66 +71,67 @@ export default function StationHeader({ countStation, allStations, setStationPay
         setResultStation(contructingData(allStations))
     }, [allStations])
 
-    useEffect(()=>{
-        setStationPayload({...stationPayload, skip: page * rowsPerPage, limit: rowsPerPage })
-    },[page, rowsPerPage])
+    useEffect(() => {
+        setStationPayload({ ...stationPayload, skip: page * rowsPerPage, limit: rowsPerPage })
+    }, [page, rowsPerPage])
 
     return (
         <div style={{ width: '100%', height: '90%', display: 'flex', flexDirection: 'column', paddingTop: 28 }}>
-        <Paper sx={{ position: 'relative', width: '100%', height: '100%', display: 'flex', flexDirection: 'column', boxShadow: 'none' }}>
-             <TablePagination
-                rowsPerPageOptions={[5,10, 25,50,100]}
-                component="div"
-                count={countStation}
-                rowsPerPage={rowsPerPage}
-                page={page}
-                onPageChange={handleChangePage}
-                onRowsPerPageChange={handleChangeRowsPerPage}
-                sx={{ position: 'absolute', top: -40, zIndex: 100, right: -10 }}
-            />
-            <TableContainer sx={{ overflow: 'auto', borderRadius: '4px', border: '1px solid #E9E9EB' }}>
-                <Table stickyHeader aria-label="sticky table">
-                    <TableHead>
-                        <TableRow>
-                            {columns.map((column) => (
-                                <TableCell key={column.id} className={column.style} style={{ textAlign: 'center', padding: '8px 0px 8px 0px', fontSize: 14, fontWeight: 600, color: '#484A57' }}>
-                                    {column.label}
-                                </TableCell>
-                            ))}
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {resultStation.map((row: any, rowIndex:number) => {
-                            return (
-                                <TableRow hover role="checkbox" tabIndex={-1} key={row.code}>
-                                    {columns.map((column) => {
-                                        const value = row[column.id];
-                                        return (
-                                            <TableCell key={column.id} sx={{ textAlign: 'center', padding:'16px 8px 16px 8px' }}>
-                                                {typeof value === 'string' && value}
-                                                {column.id === 'sno' && (<div>{rowIndex + 1 + page * rowsPerPage}.</div>)}
-                                                {column.id === 'location' && (
-                                                    <div className='loactionClass'>
-                                                        <div><LocationOnIcon style={{color:"#2962FF"}}/></div>
-                                                         <div>{value[0]}, {value[1]}</div>
-                                                    </div>
-                                                ) }
-                                                {column.id === 'action' && (
-                                                    <div className='blue-square-station' >
-                                                         <MoreVertIcon style={{ color: 'white', cursor: 'pointer', fontSize: '16px' }}/>
-                                                    </div>
-                                                )}
-                                            </TableCell>
-                                        );
-                                    })}
-                                </TableRow>
-                            );
-                        })}
-                    </TableBody>
-                </Table>
-            </TableContainer>
-           
-        </Paper>
+            <Paper sx={{ position: 'relative', width: '100%', height: '100%', display: 'flex', flexDirection: 'column', boxShadow: 'none' }}>
+                <TablePagination
+                    rowsPerPageOptions={[5, 10, 25, 50, 100]}
+                    component="div"
+                    count={countStation}
+                    rowsPerPage={rowsPerPage}
+                    page={page}
+                    onPageChange={handleChangePage}
+                    onRowsPerPageChange={handleChangeRowsPerPage}
+                    sx={{ position: 'absolute', top: -40, zIndex: 100, right: -10 }}
+                />
+                <TableContainer sx={{ overflow: 'auto', borderRadius: '4px', border: '1px solid #E9E9EB' }}>
+                    <Table stickyHeader aria-label="sticky table">
+                        <TableHead>
+                            <TableRow>
+                                {columns.map((column) => (
+                                    <TableCell key={column.id} className={column.style} style={{ textAlign: 'center', padding: '8px 0px 8px 0px', fontSize: 14, fontWeight: 600, color: '#484A57' }}>
+                                        {column.label}
+                                    </TableCell>
+                                ))}
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {resultStation.map((row: any, rowIndex: number) => {
+                                return (
+                                    <TableRow hover role="checkbox" tabIndex={-1} key={row.code}>
+                                        {columns.map((column) => {
+                                            const value = row[column.id];
+                                            return (
+                                                <TableCell key={column.id} sx={{ textAlign: 'center', padding: '16px 8px 16px 8px' }}>
+                                                    {typeof value === 'string' && value}
+                                                    {column.id === 'sno' && (<div>{rowIndex + 1 + page * rowsPerPage}.</div>)}
+                                                    {column.id === 'location' && (
+                                                        <div className='loactionClass'>
+                                                            <a href={`${environment.GOOGLE_MAP_API}maps?q=${value[0]},${value[1]}`} target="_blank" rel="noopener noreferrer">
+                                                                <LocationOnIcon style={{ color: "#2962FF" }} />
+                                                            </a>
+                                                        </div>
+                                                    )}
+                                                    {column.id === 'action' && (
+                                                        <div className='blue-square-station' >
+                                                            <MoreVertIcon style={{ color: 'white', cursor: 'pointer', fontSize: '16px' }} />
+                                                        </div>
+                                                    )}
+                                                </TableCell>
+                                            );
+                                        })}
+                                    </TableRow>
+                                );
+                            })}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+
+            </Paper>
         </div>
     );
 }
