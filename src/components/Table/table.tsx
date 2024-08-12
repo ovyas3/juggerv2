@@ -835,7 +835,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                         shipmentId={rowId}
                         setOpen={setOpen}
                         locationId={locationId}
-                    // getAllShipment={getAllShipment}
+                        getAllShipment={getAllShipment}
                     />}
                 </Box>
             </Modal>

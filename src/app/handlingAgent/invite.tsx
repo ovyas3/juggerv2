@@ -13,37 +13,10 @@ interface InviteForm {
     mobile: string;
 }
 
-// const validation = (inviteForm: InviteForm): Boolean => {
-//     const { showMessage } = useSnackbar();
-
-//     // PAN card validation (Indian)
-//     const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
-//     if (!panRegex.test(inviteForm.pan)) {
-//         showMessage('Invalid PAN number', 'error');
-//         return false;
-//     }
-
-//     // Email validation
-//     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-//     if (!emailRegex.test(inviteForm.email_id)) {
-//         showMessage('Invalid email address', 'error');
-//         return false;
-//     }
-
-//     // Mobile number validation (Indian)
-//     const mobileRegex = /^[6-9]\d{9}$/;
-//     if (!mobileRegex.test(inviteForm.mobile)) {
-//         showMessage('Invalid mobile number', 'error');
-//         return false;
-//     }
-
-//     return true;
-// }
-
 function InviteBox({ setOpenModalInvite ,getHandlingAgents}: any) {
     const { showMessage } = useSnackbar();
     const [toggleCloseButton, setToggleCloseButton] = useState(false)
-
+    const [alreadyRegistered, setAlreadyRegistered] = useState(false)
     const [inviteForm, setInviteForm] = useState({
         email_id: '',
         pan: '',
@@ -96,6 +69,30 @@ function InviteBox({ setOpenModalInvite ,getHandlingAgents}: any) {
         }
     }
 
+    async function handlePanChange(e: any) {
+        e.preventDefault();
+        setInviteForm(prevState => ({ ...prevState, pan: e.target.value }));
+        let validForPan = false;
+        const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
+        if(e.target.value.length === 10){
+            if(!panRegex.test(e.target.value)){
+                showMessage('Invalid PAN number', 'error');
+                return;
+            }
+            validForPan = true;
+            if(e.target.value.length === 10 && validForPan){
+                try {
+                    await httpsGet(`get/pan?pan=${e.target.value}`).then((res) => {
+                        setAlreadyRegistered(true);
+                        if(res?.data) setInviteForm(prevState => ({ ...prevState, email_id: res?.data?.email_id, mobile: res?.data?.mobile }));
+                    }).catch((err) => {console.log(err)})
+                } catch (error) {
+                    console.log(error)
+                }
+            }
+        }
+    }
+
     return (
         <div className='invite_container'
             onClick={(e) => { e.stopPropagation(); }}
@@ -105,27 +102,29 @@ function InviteBox({ setOpenModalInvite ,getHandlingAgents}: any) {
             <div style={{ marginTop: 36 }}>
                 <div>
                     <label className='lable_name'>PAN Number</label>
-                    <div><input type="text" className='inputBox' value={inviteForm.pan} onChange={(e) => setInviteForm(prevState => ({ ...prevState, pan: e.target.value }))} /></div>
+                    <div><input type="text" className='inputBox' value={inviteForm.pan} onChange={(e) => {handlePanChange(e)}} /></div>
                 </div>
-                <div>
+                {alreadyRegistered && <div>
                     <label className='lable_name'>Email Id</label>
-                    <div><input type="text" className='inputBox' value={inviteForm.email_id} onChange={(e) => setInviteForm(prevState => ({ ...prevState, email_id: e.target.value }))} /></div>
-                </div>
-                <div>
+                    <div><input type="text" className='inputBox' style={{cursor:'text'}} disabled={false} value={inviteForm.email_id} onChange={(e) => setInviteForm(prevState => ({ ...prevState, email_id: e.target.value }))} /></div>
+                </div> }
+                
+                {alreadyRegistered && <div>
                     <label className='lable_name'>Mobile Number</label>
                     <div><input type="text" className='inputBox' value={inviteForm.mobile} onChange={(e) => setInviteForm(prevState => ({ ...prevState, mobile: e.target.value }))} /></div>
-                </div>
+                </div> }
+                
             </div>
             <div className='invite-button-container' style={{ display: 'hidden' }}>
                 <div className='invite_button_send'
                     onClick={(e) => { submitInvite(e); e.stopPropagation(); }}
-                >Submit</div>
+                >Invite</div>
             </div>
 
             <div className='close_modal_button'
                 onMouseEnter={() => { setToggleCloseButton(true) }}
                 onMouseLeave={() => { setToggleCloseButton(false) }}
-                onClick={(e) => { e.stopPropagation(); setOpenModalInvite(false) }}
+                onClick={(e) => { e.stopPropagation(); setOpenModalInvite(false), setInviteForm({ email_id: '', pan: '', mobile: '' }); setAlreadyRegistered(false) }}
                 style={{
                     transform: toggleCloseButton ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'all 1s ease-in-out',
 

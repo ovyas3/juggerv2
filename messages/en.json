@@ -54,5 +54,9 @@
   "DRAWER":{
     "shipments":"shipments",
     "contactDashboard":"Contact Dashboard"
+  },
+  "HANDLING_AGENT":{
+    "invitedHA":"Invited Handling Agents",
+    "activeHA":"Active Handling Agents"
   }
 }

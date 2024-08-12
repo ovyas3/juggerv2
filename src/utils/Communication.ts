@@ -4,7 +4,8 @@ import { environment } from '@/environments/env.api';
 import { getAuth } from '@/services/Authenticator/Auth';
 
 const prefix = [
-  environment.DEV_API_URL
+  environment.DEV_API_URL,
+  environment.PROD_API_URL_MANHUNTER
 ]
 
 const httpsGet = async (path: string, type: number = 0) => {
