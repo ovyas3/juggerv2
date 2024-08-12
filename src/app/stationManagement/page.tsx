@@ -19,7 +19,7 @@ const Page = () => {
   const [countStation, setCountStation] = useState(0)
   const [allStations, setAllStations] = useState([])
   const [stationPayload, setStationPayload] = useState({
-    limit:10,
+    limit:0,
     skip:0,
     zone:'',
     code:'',
@@ -40,6 +40,7 @@ const Page = () => {
   }
 
   useEffect(()=>{
+    if(stationPayload.limit > 0)
     getStations({stationPayload});
   },[stationPayload])
 
@@ -64,7 +65,7 @@ const Page = () => {
         </div>
 
         {/* --------------table content----------- */}
-        <StationHeader  countStation={countStation} allStations={allStations} setStationPayload={setStationPayload} />
+        <StationHeader  countStation={countStation} allStations={allStations} setStationPayload={setStationPayload} stationPayload={stationPayload} />
       </div>
 
       {/* -------------modals ------------ */}

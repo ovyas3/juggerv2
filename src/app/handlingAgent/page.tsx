@@ -16,6 +16,7 @@ import ArrowDropDownSharpIcon from '@mui/icons-material/ArrowDropDownSharp';
 import { useTranslations } from 'next-intl';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import { useSnackbar } from '@/hooks/snackBar';
+import ActiveAgentList from '@/app/handlingAgent/activeHAtable';
 
 interface SkipAndLimit {
     skip: number,
@@ -37,15 +38,24 @@ function HandlingAgent() {
     const [openModalInvite, setOpenModalInvite] = useState(false);
     const [skipAndLimit, setSkipAndLimit] = useState<SkipAndLimit>({
         skip: 0,
-        limit: 10
+        limit: 0
     })
     const [count, setCount] = useState(0);
     const t = useTranslations("HANDLING_AGENT")
     const [selectedHeading, setSelectedHeading] = useState('invitedHA');
-    const [refresh, setRefresh] = useState(false)
+    const [refresh, setRefresh] = useState(false);
 
-    async function reload(){
+    const [activeSkipAndLimit, setActiveSkipAndLimit] = useState<SkipAndLimit>({
+        skip: 0,
+        limit: 0,
+    })
+    const [activeCount, setActiveCount] = useState(0);
+    const [activeAgentList, setActiveAgentList] = useState([]);
+    const [activeOriginalAgentList, setActiveOriginalAgentList] = useState([]);
+
+    async function reload() {
         getHandlingAgents({ skipAndLimit });
+        getAllActiveHandlingAgents({ activeSkipAndLimit });
         showMessage('Refreshed successfully', 'success');
     }
 
@@ -62,22 +72,55 @@ function HandlingAgent() {
         }
     }
 
+    async function getAllActiveHandlingAgents({ activeSkipAndLimit }: { activeSkipAndLimit: SkipAndLimit }) {
+        try {
+            await httpsGet(`get/associatedHAs?limit=${activeSkipAndLimit.limit}&skip=${activeSkipAndLimit.skip}`).then((response) => {
+                setActiveCount(response?.data?.count);
+                setActiveAgentList(response?.data?.data);
+                setActiveOriginalAgentList(response?.data?.data);
+            }).catch((error) => {
+                console.log(error);
+            })
+        } catch (error) {
+
+        }
+    }
+
     useEffect(() => {
+        if(skipAndLimit.limit>0)
         getHandlingAgents({ skipAndLimit });
     }, [skipAndLimit])
 
+    useEffect(() => {
+        if(activeSkipAndLimit.limit>0)
+        getAllActiveHandlingAgents({ activeSkipAndLimit });
+    }, [activeSkipAndLimit])
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const targetValue = e.target.value.toLowerCase();
-
         if (targetValue === '') {
-            setAgentList(originalAgentList); // Assuming you have the original list stored
+            setAgentList(originalAgentList);
         } else {
-            const filteredAgentList = originalAgentList.filter((agent: any) =>
-                agent?.handling_agent?.name.toLowerCase().includes(targetValue)
-            );
+            const filteredAgentList = originalAgentList.filter((agent: any) => {
+                const parentName = agent?.handling_agent?.parent_name?.toLowerCase();
+                return parentName?.includes(targetValue);
+            });
             setAgentList(filteredAgentList);
         }
     };
+
+    const handleChangeActiveAgents =(e: React.ChangeEvent<HTMLInputElement>) => {
+        const targetValue = e.target.value.toLowerCase();
+        if (targetValue === '') {
+            setActiveAgentList(activeOriginalAgentList);
+        } else {
+            const filteredAgentList = activeOriginalAgentList.filter((agent: any) => {
+                const parentName = agent?.parent_name?.toLowerCase();
+                return parentName?.includes(targetValue);
+            });
+            setActiveAgentList(filteredAgentList);
+        }
+    }
 
     return (
         <div className='handlingAgent_Container'>
@@ -92,16 +135,17 @@ function HandlingAgent() {
                         <div className={`handlingAgent_heading ${selectedHeading === 'invitedHA' ? 'active' : ''} `} onClick={() => setSelectedHeading('invitedHA')} >{t('invitedHA')}</div>
                         <div className={`handlingAgent_heading ${selectedHeading === 'activeHA' ? 'active' : ''} `} onClick={() => setSelectedHeading('activeHA')}>{t('activeHA')}</div>
                     </div>
-                    <div 
-                        className={`refresh_icon ${refresh? 'reload':''} `} 
+                    <div
+                        className={`refresh_icon ${refresh ? 'reload' : ''} `}
                         onClick={
-                            ()=>{reload(); 
-                            setRefresh(true); 
-                            setTimeout(() => {setRefresh(false);}, 1500);
-                        }}><RefreshIcon/></div>
+                            () => {
+                                reload();
+                                setRefresh(true);
+                                setTimeout(() => { setRefresh(false); }, 1500);
+                            }}><RefreshIcon /></div>
                 </div>
 
-                <div style={{ marginTop:24, display: selectedHeading === 'invitedHA' ? 'block' : 'none', height: '90%' }}>
+                <div style={{ marginTop: 24, display: selectedHeading === 'invitedHA' ? 'block' : 'none', height: '90%' }}>
                     {/* -------------other than table content ------------------- */}
                     <div className='search_invite'>
                         <div></div>
@@ -117,8 +161,23 @@ function HandlingAgent() {
                         </div>
                     </div>
                     {/* --------------- Table content -------------- */}
-                    <AgentTable agentList={agentList} count={count} setSkipAndLimit={setSkipAndLimit} getHandlingAgents={getHandlingAgents}/>
+                    <AgentTable agentList={agentList} count={count} setSkipAndLimit={setSkipAndLimit} getHandlingAgents={getHandlingAgents} />
                 </div>
+
+                <div style={{ display: selectedHeading === 'activeHA' ? 'block' : 'none', height: '90%', marginTop:24 }} >
+                    <div className='search_invite'>
+                        <div className='search_container'>
+                            <div className='dropDown_agentName' >
+                                <div>Agent Name</div>
+                            </div>
+                            <div><input placeholder='Search for handling agent' className='search-input-agent' type='text' onChange={e => handleChangeActiveAgents(e)} /></div>
+                            <div style={{ cursor: 'pointer', height: 24, width: 24, position: 'absolute', right: 10 }}><img src={searchIcon.src} alt='searchIcon' style={{ width: '100%', height: '100%' }} /></div>
+                        </div>
+                    </div>
+                    {/* --------------- Table content -------------- */}
+                    <ActiveAgentList activeAgentList={activeAgentList} activeCount={activeCount} setActiveSkipAndLimit={setActiveSkipAndLimit} getAllActiveHandlingAgents={getAllActiveHandlingAgents} />
+                </div>
+
             </div>
 
             {/* -------modals--------- */}
@@ -141,8 +200,3 @@ function HandlingAgent() {
 }
 
 export default HandlingAgent;
-
-
-
-
-

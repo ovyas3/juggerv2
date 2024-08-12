@@ -51,7 +51,7 @@ function contructingData(stationList: any) {
 
 
 
-export default function StationHeader({ countStation, allStations, setStationPayload }: any) {
+export default function StationHeader({ countStation, allStations, setStationPayload, stationPayload }: any) {
 
     const [resultStation, setResultStation] = useState(contructingData([]));
     const [page, setPage] = React.useState(0);
@@ -70,13 +70,15 @@ export default function StationHeader({ countStation, allStations, setStationPay
         setResultStation(contructingData(allStations))
     }, [allStations])
 
-    console.log(resultStation)
+    useEffect(()=>{
+        setStationPayload({...stationPayload, skip: page * rowsPerPage, limit: rowsPerPage })
+    },[page, rowsPerPage])
 
     return (
         <div style={{ width: '100%', height: '90%', display: 'flex', flexDirection: 'column', paddingTop: 28 }}>
         <Paper sx={{ position: 'relative', width: '100%', height: '100%', display: 'flex', flexDirection: 'column', boxShadow: 'none' }}>
              <TablePagination
-                rowsPerPageOptions={[10, 25, 100]}
+                rowsPerPageOptions={[5,10, 25,50,100]}
                 component="div"
                 count={countStation}
                 rowsPerPage={rowsPerPage}

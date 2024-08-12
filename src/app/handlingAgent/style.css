@@ -238,7 +238,8 @@
     background-color: #1a4ed9;
 }
 .invite-button-container{
-    margin-top: 48px;
+    position: absolute;
+    bottom: 24px;
     display: flex;
    justify-content: left;
 }

@@ -30,7 +30,6 @@ const columns: readonly Column[] = [
     { id: 'pan', label: 'PAN Number', style: 'header_pan' },
     { id: 'email', label: 'Email', style: 'header_email' },
     { id: 'mobile', label: 'Mobile', style: 'header_mobile' },
-    { id: 'verified', label: 'Verified', style: 'header_verified' },
     { id: 'action', label: 'Action', style: 'header_action' },
    
 ];
@@ -39,7 +38,7 @@ function contructingData(agentList: any) {
     return agentList.map((
         agent: {
             _id: string,
-            handling_agent: { parent_name: string },
+             parent_name: string,
             email_id: string,
             mobile: string,
             agentId: string,
@@ -48,7 +47,7 @@ function contructingData(agentList: any) {
         }) => {
         return {
             _id: agent?._id ? agent?._id : 'NA',
-            name: agent?.handling_agent?.parent_name ? agent?.handling_agent?.parent_name : 'NA',
+            name: agent?.parent_name ? agent?.parent_name  : 'NA',
             email: agent?.email_id ? agent?.email_id : 'NA',
             mobile: agent?.mobile ? agent?.mobile : 'NA',
             agentID: agent?.agentId ? agent?.agentId : 'NA',
@@ -59,7 +58,7 @@ function contructingData(agentList: any) {
     })
 }
 
-function AgentTable({ agentList, count, setSkipAndLimit,getHandlingAgents }: any) {
+function ActiveAgentList({ activeAgentList, activeCount, setActiveSkipAndLimit,getAllActiveHandlingAgents }: any) {
 
     const [page, setPage] = React.useState(0);
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
@@ -89,7 +88,7 @@ function AgentTable({ agentList, count, setSkipAndLimit,getHandlingAgents }: any
                     showMessage('Invited Successfully.', 'success');
                     setAnchorEl(null);
                     setShowActionBox(-1);
-                    getHandlingAgents({skipAndLimit: {skip: 0, limit:10 }});
+                    getAllActiveHandlingAgents({skipAndLimit: {skip: 0, limit:10 }});
                 }
             }).catch((err) => {
                 console.log(err)
@@ -103,7 +102,6 @@ function AgentTable({ agentList, count, setSkipAndLimit,getHandlingAgents }: any
             showMessage('REINVITE is required', 'error');
             return;
         }
-
         const payload = {invite_id : item._id}
         try {
             await httpsPost('verify/HA', payload).then((res) => {
@@ -111,7 +109,7 @@ function AgentTable({ agentList, count, setSkipAndLimit,getHandlingAgents }: any
                     showMessage('verified Successfully.', 'success');
                     setAnchorEl(null);
                     setShowActionBox(-1);
-                    getHandlingAgents({skipAndLimit: {skip: 0, limit:10 }});
+                    getAllActiveHandlingAgents({skipAndLimit: {skip: 0, limit:10 }});
                 }
             }).catch((err) => {
                 console.log(err)
@@ -122,12 +120,12 @@ function AgentTable({ agentList, count, setSkipAndLimit,getHandlingAgents }: any
     }
 
     useEffect(() => {
-        const finalResult = contructingData(agentList)
+        const finalResult = contructingData(activeAgentList)
         setResult(finalResult)
-    }, [agentList])
+    }, [activeAgentList])
 
     useEffect(() => {
-        setSkipAndLimit({ skip: page * rowsPerPage, limit: rowsPerPage })
+        setActiveSkipAndLimit({ skip: page * rowsPerPage, limit: rowsPerPage })
     }, [page, rowsPerPage])
 
     return (
@@ -136,7 +134,7 @@ function AgentTable({ agentList, count, setSkipAndLimit,getHandlingAgents }: any
                 <TablePagination
                     rowsPerPageOptions={[5, 10, 25, 50, 100]}
                     component="div"
-                    count={count}
+                    count={activeCount}
                     rowsPerPage={rowsPerPage}
                     page={page}
                     onPageChange={handleChangePage}
@@ -175,12 +173,7 @@ function AgentTable({ agentList, count, setSkipAndLimit,getHandlingAgents }: any
                                                                 anchorOrigin={{vertical: 25,horizontal: -130,}}
                                                             >
                                                                 <div className='action_items_box_HA' >
-                                                                    {row.verified !== 'verified' && <div id='verified' onClick={(e)=>{sendingVerification(row)}}>Verification</div> }
-                                                                    {row.verified === 'expired' && <div id='reInvite' onClick={(e)=>{sendingReinvite(row)}} >Re-Invite</div>}
-                                                                    
-                                                                    
-                                                                    <div id='Edit' onClick={(e)=>{setOpenModal(true);}}>Edit</div>
-                                                                    <div id='Delete' onClick={(e)=>{setOpenModal(true);}}>Delete</div>
+                                                                    <div id='Delete' onClick={(e)=>{}}>Delete</div>
                                                                 </div>
                                                             </Popover>
                                                         </div>
@@ -201,4 +194,4 @@ function AgentTable({ agentList, count, setSkipAndLimit,getHandlingAgents }: any
     )
 }
 
-export default AgentTable;
+export default ActiveAgentList;

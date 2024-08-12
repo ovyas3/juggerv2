@@ -203,7 +203,6 @@ function StationAdd({ setOpenAddStationModal, getStations, stationPayload }: any
                                 return (<div key={index} className='zoneItem' onClick={()=>{setOpenStationCode(false); setStationAddObject({...stationAddObject, stationCodeId:item._id, stationName:item.name}) }} >{item.name}</div>)
                             })}
                         </div>
-
                     }</div>
                 </div>
                 <div>
