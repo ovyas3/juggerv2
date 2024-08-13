@@ -22,6 +22,7 @@ import { Column, row } from '@/utils/interface';
 import { useTranslations } from 'next-intl';
 import RRModal from '../RR Modal/RRModal';
 import { Tooltip, } from '@mui/material';
+import fileUpload from '@/assets/file-upload.svg'
 
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
@@ -47,7 +48,9 @@ import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import EditNoteOutlinedIcon from '@mui/icons-material/EditNoteOutlined';
 import RvHookupIcon from '@mui/icons-material/RvHookup';
-import { ActionItem, EditELD, HandlingAgentSelection, PastEta, RemarkComponent, Remarks, Tags } from './tableComp'
+import UploadAnnexure from '../uploadAnnexureModal/uploadAnnexureModal';
+
+import { ActionItem, EditELD, HandlingAgentSelection, PastEta, RemarkComponent, Remarks, Tags} from './tableComp'
 
 const status_class_map: { [key: string]: string } = {
     'OB': 'status_title_In_Plant',
@@ -183,6 +186,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
     const handleOpen = (e: any) => { e.stopPropagation(); setOpen(true); setActionOptions(e.currentTarget.id); setAnchorEl(null); };
     const handleClose = (e: any) => { e.stopPropagation(); setOpen(false); }
     const [isRRModalOpen, setRRModalOpen] = useState<boolean>(false);
+    const [openAnnexureModal, setOpenAnnexureModal] = useState<boolean>(false);
     const [isRRDoc, setIsRRDoc] = useState<boolean>(false);
     const [rrNumbers, setRRNumbers] = useState([]);
     const [fnr, setFnr] = useState('')
@@ -210,6 +214,8 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
 
     //currentETA sorting filter
     const [currentETAsorting, setCurrentETAsorting] = useState(false)
+    const [uploadAnnexureShipID,setUploadAnnexureShipID] = useState('')
+    const [uploadAnnexureFNR,setUploadAnnexureFNR] = useState('')
 
 
     const handleRRDoc = (id: any) => {  // for rr documents
@@ -219,6 +225,12 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
         const rrDocumnets = allShipments.filter((shipment: any) => shipment._id === id)[0].rr_document;
         const isRRDocument = rrDocumnets && rrDocumnets.length > 0;
         setIsRRDoc(isRRDocument);
+    }
+
+    const handleUploadAnnexureModal = (element:any)=> {
+        setUploadAnnexureFNR(element.fnr.primary)
+        setUploadAnnexureShipID(element._id)
+        setOpenAnnexureModal(true);
     }
 
     const handleChangeByFnr = (changeFnr: string) => {
@@ -546,7 +558,13 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                                 onClick={handleOpen}
                                                                                 id="addHAndlingAgent"
 
-                                                                            />
+                                                                            />                                     
+                                                                            <ActionItem
+                                                                            icon={<img src={fileUpload.src} style={{ width: "24px", height: '24px'}} />}
+                                                                            text={t('uploadAnnexure')}
+                                                                            onClick={()=>{handleUploadAnnexureModal(row)}}
+                                                                            id="uploadAnnexure"
+                                                                        />
                                                                         </div>
                                                                     </Popover>
                                                                 </div>
@@ -794,6 +812,8 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                 />
             </Paper>
             <RRModal isOpen={isRRModalOpen} isClose={() => setRRModalOpen(false)} rrNumbers={rrNumbers} isRRDoc={isRRDoc} />
+            {openAnnexureModal && 
+               <UploadAnnexure isOpen={openAnnexureModal} isClose={()=> setOpenAnnexureModal(false)} shipmentID={uploadAnnexureShipID} FNR_No={uploadAnnexureFNR}/>}
             <Modal
                 open={open}
                 onClose={(e) => { handleClose(e) }}
