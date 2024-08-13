@@ -336,7 +336,7 @@ const UploadAnnexure: React.FC<PopupProps> = ({
                         <TableCell>{index+1}</TableCell>
                         <TableCell>{row.date}</TableCell>
                         <TableCell>
-                          {row.handling_agent?.parent_name || "N/A"}
+                          {row.handling_agent?.name || "N/A"}
                         </TableCell>
                         <TableCell>
                           <div
