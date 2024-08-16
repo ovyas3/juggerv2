@@ -130,6 +130,12 @@
 
 }
 
+.upload-annexure-close {
+    position: absolute;
+    top: 0;
+    left:200px;
+  }
+
 .iconheader {}
 
 .inner_iconheader {
