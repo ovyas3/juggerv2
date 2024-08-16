@@ -383,6 +383,7 @@ const UploadAnnexure: React.FC<PopupProps> = ({
                                 {actions.map((item, index) => (
                                   <div
                                     className="actions-row"
+                                    key={index}
                                     onClick={() => {item.fn(row);setActionsDrop(-1)}}
                                   >
                                     <img
