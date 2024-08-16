@@ -155,7 +155,7 @@ const RRModal: React.FC<PopupProps> = ({ isOpen, isClose, rrNumbers, isRRDoc }) 
                      <p className="rrmodal-content-upper-item-value">{ rrDetails.actualWeight }</p>
                   </div>
                   <div className="rrmodal-content-upper-item">
-                     <h4 className="rrmodal-content-upper-item-heading">Chargable Weight (MT)</h4>
+                     <h4 className="rrmodal-content-upper-item-heading">Chargeable Weight (MT)</h4>
                      <p className="rrmodal-content-upper-item-value">{ rrDetails.chargeableWeight }</p>
                   </div>
                 </div>

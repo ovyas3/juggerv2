@@ -514,7 +514,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                         anchorEl={anchorEl}
                                                                     >
                                                                         <div className='action_button_options' onClick={(e) => e.stopPropagation()}>
-                                                                            {row.validationForAttachRake && (
+                                                                            {row.status.name != 'Delivered' && row.validationForAttachRake && (
                                                                                 <ActionItem
                                                                                     icon={<img src={attach_icon.src} alt='' height={"24px"} width={"24px"} />}
                                                                                     text={t('attach')}
