@@ -5,7 +5,8 @@ import SideDrawer from '../../components/Drawer/Drawer';
 import React, { useEffect, useState } from 'react';
 import Header from '@/components/Header/header';
 import './orders.css'
-import ReplayIcon from '@mui/icons-material/Replay';
+// import ReplayIcon from '@mui/icons-material/Replay';
+import RefreshIcon from '@mui/icons-material/Refresh';
 import Filters from '@/components/Filters/filters';
 import TableData from '@/components/Table/table';
 import MobileDrawer from "@/components/Drawer/mobile_drawer";
@@ -32,7 +33,7 @@ const getStatusCode = (status: string): string => {
     case "Delivered At Customer":
       return 'Delivered'
     case "In Plant":
-      return 'OB'
+      return 'AVE'
     default:
       return 'All'
   }
@@ -239,12 +240,12 @@ const OrdersPage = () => {
                     // console.log(updatedShipmentsPayload)
                     clearFilter()
                     setReload(true)
-                    setTimeout(() => { setReload(false) }, 3000)
+                    setTimeout(() => { setReload(false) }, 1500)
                   }}
                     onMouseEnter={() => { setShowRefreash(true) }}
                     onMouseLeave={() => { setShowRefreash(false) }}
                   >
-                    <ReplayIcon style={{ color: '#707070' }} />
+                    <RefreshIcon style={{ color: '#707070' }} />
                   </div>
                   <div className='refreash_reload' style={{ opacity: showRefreash ? 1 : 0 }}>refresh filters</div>
                 </div>
@@ -256,38 +257,28 @@ const OrdersPage = () => {
                 <div className='filters' style={{ overflowX: 'auto', maxWidth: '87%' }}>
                   <Filters onToFromChange={handleToFromChange} onChangeStatus={handleChangeStatus} onChangeRakeTypes={handleChangeRakeType} reload={reload} getShipments={getAllShipment} shipmentsPayloadSetter={setShipmentsPayload} setTriggerShipments={setTriggerShipments} triggerShipments={triggerShipments} />
                 </div>
-                {/* <div style={{ display: 'flex', alignItems: 'center', gap: 16}}>
-                  <div style={{ fontSize: '12px', color: '#484A57', fontWeight: '500' }}>{t('ageing')}</div>
-                  <div className='ageing_group'>
-                    {ageingCode.map((item, index) => {
-                      return (
-                        <div key={index} className='Ageing'>
-                          <div className='Ageing_dot' style={{ backgroundColor: item.code }}></div>
-                          <div style={{ fontSize: '10px', color: '#484A57' }}>{item.text}</div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div> */}
               </div>
               <div className='display_status'>
                     <div className='display_status_inner_box'>
-                      <div style={{fontSize:20, fontWeight:500}}>{totalCountrake[0]?.totalCount ? totalCountrake[0]?.totalCount : 0}</div>
+                      {/* <div style={{fontSize:20, fontWeight:500}}>{totalCountrake[0]?.totalCount ? totalCountrake[0]?.totalCount : 0}</div> */}
+                      <div style={{fontSize:20, fontWeight:500}}>{getShipmentStatusSummary(allShipment).total}</div>
                       <div style={{fontSize:12, color:'#7C7E8C'}}>Total</div>
                     </div>
                     <div className='display_status_inner_box'>
-                      <div style={{fontSize:20, fontWeight:500}}>{totalCountrake[0]?.totalCount ? totalCountrake[0]?.totalCount - (totalCountrake[0]?.statuses?.find((item: any) => item.status === "ITNS")?.count + totalCountrake[0]?.statuses?.find((item: any) => item.status === "Delivered")?.count) : 0}</div>
+                      {/* <div style={{fontSize:20, fontWeight:500}}>{totalCountrake[0]?.totalCount ? totalCountrake[0]?.totalCount - ((totalCountrake[0]?.statuses?.find((item: any) => item.status === "ITNS")?.count || 0) + (totalCountrake[0]?.statuses?.find((item: any) => item.status === "Delivered")?.count || 0)) : 0}</div> */}
+                      <div style={{fontSize:20, fontWeight:500}}>{getShipmentStatusSummary(allShipment).inPlant}</div>
                       <div style={{fontSize:12, color:'#7C7E8C'}}>In Plant</div>
                     </div>
                     <div className='display_status_inner_box'>
-                      <div style={{fontSize:20, fontWeight:500}}>{totalCountrake[0]?.statuses?.find((item: any) => item.status === "ITNS")?.count || 0}</div>
+                      {/* <div style={{fontSize:20, fontWeight:500}}>{totalCountrake[0]?.statuses?.find((item: any) => item.status === "ITNS")?.count || 0}</div> */}
+                      <div style={{fontSize:20, fontWeight:500}}>{getShipmentStatusSummary(allShipment).inTransit}</div>
                       <div style={{fontSize:12, color:'#7C7E8C'}}>In Transit</div>
                     </div>
                     <div className='display_status_inner_box'>
-                      <div style={{fontSize:20, fontWeight:500}}>{totalCountrake[0]?.statuses?.find((item: any) => item.status === "Delivered")?.count || 0}</div>
+                      <div style={{fontSize:20, fontWeight:500}}>{getShipmentStatusSummary(allShipment).delivered}</div>
                       <div style={{fontSize:12, color:'#7C7E8C'}}>Delivered</div>
                     </div>
-              </div>
+              </div>              
               <div className='table'>
                 <TableData 
                   onSkipLimit={handleSkipLimitChange} 

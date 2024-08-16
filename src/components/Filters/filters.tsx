@@ -42,8 +42,7 @@ function Filters({ onToFromChange, onChangeStatus, onChangeRakeTypes, reload, sh
         'Ready for Departure',
         'In Transit',
         'Delivered At Hub',
-        'Delivered At Customer',
-        'In Plant'
+        'Delivered At Customer'
     ];
 
 
@@ -180,7 +179,8 @@ function Filters({ onToFromChange, onChangeStatus, onChangeRakeTypes, reload, sh
             if (startDate === twentyDaysBefore && endDate === today) {
                 onToFromChange(today, twentyDaysBefore);
             }
-            setStatus(['In Transit', 'Delivered']);
+            setStatus(['In Transit','Delivered At Hub',
+                'Delivered At Customer']);
         }
     }, [reload]);
 

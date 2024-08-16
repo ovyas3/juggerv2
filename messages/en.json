@@ -47,10 +47,17 @@
     "fetchtrackdetails":"Fetch Track Details",
     "ageing":"Ageing",
     "edit":"Edit ELD",
-    "addHAndlingAgent":"Attach Agent"
+    "addHAndlingAgent":"Attach Agent",
+    "uploadAnnexure":"Upload Annexure",
+    "handlingAgent":"Handling Agent",
+    "logout":"Logout"
   },
   "DRAWER":{
     "shipments":"shipments",
     "contactDashboard":"Contact Dashboard"
+  },
+  "HANDLING_AGENT":{
+    "invitedHA":"Invited Handling Agents",
+    "activeHA":"Active Handling Agents"
   }
 }

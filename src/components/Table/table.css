@@ -130,6 +130,12 @@
 
 }
 
+.upload-annexure-close {
+    position: absolute;
+    top: 0;
+    left:200px;
+  }
+
 .iconheader {}
 
 .inner_iconheader {
@@ -181,7 +187,7 @@
 .body_status {
     padding-right: 10px !important;
     max-width: 150px !important;
-
+    min-width: 130px !important;
 }
 
 .body_pickupdate {
@@ -307,6 +313,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    margin-bottom: 6px;
 }
 
 .status_title_rfd {

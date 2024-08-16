@@ -225,12 +225,17 @@ justify-content:flex-start
   color: #484A57;
 }
 .view_more_agents{
-  background-color: #717cc5;
-  height: 18px;
-  width: 18px;
+  background-color: #313134;
+  height: 16px;
+  width: 16px;
   border-radius: 50%;
-  color: wheat;
+  color: aliceblue;
   text-align: center;
+  font-size: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer
 }
 .handlingAgentColume{
   position: relative;
@@ -244,7 +249,6 @@ justify-content:flex-start
   top: 23px;
   right: 3px;
   color: #fff;
-  padding: 4px;
   border-radius: 4px;
   visibility: hidden;
   opacity: 0;
@@ -253,4 +257,23 @@ justify-content:flex-start
 .handlingAgentColume:hover .list_of_agents{
   visibility: visible;
   opacity: 1;
+}
+.agent_item{
+  padding-top: 2px !important;
+  font-size: 10px;
+  padding-inline: 2px;
+}
+.agent_item:hover{
+  background-color: #bbbbbf;
+  color: #0d0e0f;
+}
+
+.agent_item:first-child:hover {
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+}
+
+.agent_item:last-child:hover {
+  border-bottom-left-radius: 4px;
+  border-bottom-right-radius: 4px;
 }

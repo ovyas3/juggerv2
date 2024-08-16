@@ -605,13 +605,13 @@ export const EditELD = ({ shipmentId, setOpen, getAllShipment }: any) => {
         </div>
     )
 }
-export const HandlingAgentSelection = ({ shipmentId, setOpen, locationId }: any) => {
+export const HandlingAgentSelection = ({ shipmentId, setOpen, locationId, getAllShipment }: any) => {
     const t = useTranslations('ORDERS');
     const [isHovered, setIsHovered] = useState(false);
     const handleMouseEnter = useCallback(() => setIsHovered(true), []);
     const handleMouseLeave = useCallback(() => setIsHovered(false), []);
 
-    const [allListOfHAids, setAllListOfHAids] = useState<{ _id: string, name: string }[]>([]);
+    const [allListOfHAids, setAllListOfHAids] = useState<{ _id: string, parent_name: string }[]>([]);
     const [selectedHAids, setSelectedHAids] = useState(new Set());
     const [originalSelectedHAids, setOriginalSelectedHAids] = useState<Set<any>>(new Set());
     const [newIds, setNewIds] = useState<string[]>([]);
@@ -625,7 +625,9 @@ export const HandlingAgentSelection = ({ shipmentId, setOpen, locationId }: any)
     const getLocationList = async () => {
         try {
             const res = await httpsGet(`${GET_HANDLING_AGENT_LIST}?delivery_locations=${locationId}`);
-            if (res.statusCode === 200) setAllListOfHAids(res?.data);
+            if (res.statusCode === 200) {
+                setAllListOfHAids(res?.data);
+            }
         } catch (error) {
             console.error("Error fetching location list:", error);
         }
@@ -635,7 +637,7 @@ export const HandlingAgentSelection = ({ shipmentId, setOpen, locationId }: any)
         try {
             const res = await httpsGet(`handling_agent/get_rake_shipment_ha?id=${shipmentId}`);
             if (res.statusCode === 200) {
-                const initialSelectedIds = new Set(res?.data[0]?.HA.map((ha: any) => ha._id));
+                const initialSelectedIds = new Set(res?.data[0]?.HA?.map((ha: any) => ha._id));
                 setSelectedHAids(initialSelectedIds);
                 setOriginalSelectedHAids(initialSelectedIds);
             }
@@ -687,17 +689,19 @@ export const HandlingAgentSelection = ({ shipmentId, setOpen, locationId }: any)
 
     const getSelectedItemNames = (selected: any) => {
         return selected.map((id: any) =>
-            allListOfHAids.find(item => item._id === id)?.name
+            allListOfHAids.find((item:any) => item.parent === id)?.parent_name
         ).filter(Boolean).join(', ');
     };
 
     const handleSubmit = async () => {
-        if (newIds.length === 0) { showMessage('Please select HA.', 'error'); }
-        else if (removeIds.length === 0) { showMessage('Please select HA.', 'error'); }
+        if (newIds.length === 0) { showMessage('Please select HA.', 'success'); }
         try {
             const res = await httpsPost(`rake_shipment/assign_edit_ha`, { id: shipmentId, addIds: newIds, removeIds: removeIds });
             if (res.statusCode === 200) {
-                showMessage('HA assigned successfully.', 'success');
+                if(newIds.length === 0) {
+                    showMessage('Handling Agent removed successfully.', 'success');
+                }else{showMessage('Handling Agent successfully.', 'success');}
+                getAllShipment();
                 setOpen(false);
             }
         } catch (error) {
@@ -705,25 +709,22 @@ export const HandlingAgentSelection = ({ shipmentId, setOpen, locationId }: any)
         }
     };
 
-    const ITEM_HEIGHT = 48;
+    const ITEM_HEIGHT = 30;
     const ITEM_PADDING_TOP = 8;
     const MenuProps = {
         PaperProps: {
-            style: {
-                maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-                maxWidth: '100%',
-                minWidth: 'calc(100% - 1400px)',
-            },
+            style: {},
         },
     };
+
 
     return (
         <div style={{ position: 'relative', padding: 24 }}>
             <div style={{ fontSize: 20, color: '#131722', fontWeight: 500 }}>Assign Handling Agent</div>
 
             <div>
-                <FormControl sx={{ width: '100%', marginTop: '36px' }}>
-                    <InputLabel id="demo-multiple-checkbox-label">handling agent</InputLabel>
+                <FormControl sx={{ width: '100%', marginTop: '36px', position:'relative' }}>
+                    <InputLabel id="demo-multiple-checkbox-label">Handling Agent</InputLabel>
                     <Select
                         labelId="demo-multiple-checkbox-label"
                         id="demo-multiple-checkbox"
@@ -735,14 +736,14 @@ export const HandlingAgentSelection = ({ shipmentId, setOpen, locationId }: any)
                         MenuProps={MenuProps}
                     >
                         {allListOfHAids?.map((item: any, index) => (
-                            <MenuItem key={index} value={item._id} sx={{ padding: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', paddingRight: '12px' }}>
+                            <MenuItem key={index} value={item.parent} sx={{ padding: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', paddingRight: '12px' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', padding: 0 }}>
-                                    <Checkbox checked={selectedHAids.has(item._id)} sx={{ '& .MuiSvgIcon-root': { fontSize: 18 } }} />
-                                    <ListItemText primary={item.name} primaryTypographyProps={{ padding: 0, fontSize: '14px', fontFamily: 'Inter, sans-serif' }} />
+                                    <Checkbox checked={selectedHAids.has(item.parent)} sx={{ '& .MuiSvgIcon-root': { fontSize: 18 } }} />
+                                    <ListItemText primary={item.parent_name} primaryTypographyProps={{ padding: 0, fontSize: '14px', fontFamily: 'Inter, sans-serif' }} />
                                 </div>
-                                <div style={{ marginLeft: 42, fontSize: 12, marginTop: -8, color: '#7C7E8C' }}>
-                                    {item.location.map((location: any, locationIndex: any) => (
-                                        <div key={locationIndex}>{location.name}</div>
+                                <div style={{ marginLeft: 42, fontSize: 12,  color: '#7C7E8C'}}>
+                                    {item?.location?.map((location: any, locationIndex: any) => (
+                                        <div key={locationIndex}>{location.parent_name}</div>
                                     ))}
                                 </div>
                             </MenuItem>
