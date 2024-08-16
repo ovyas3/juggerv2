@@ -187,6 +187,7 @@ justify-content:flex-start
   align-items: center;
   color: #fff;
   cursor: pointer;
+  z-index: 1;
 }
 
 .list_of_materials{

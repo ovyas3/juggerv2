@@ -176,7 +176,7 @@
 .overlay-container {
     height: 100vh;
     width: 100vw;
-    background: black;
+    
     opacity: 0.3;
     position: fixed;
     top: 0;
@@ -215,7 +215,7 @@
   .status_container .mui-10hburv-MuiTypography-root{
     font-size: 12px;
   }
-  .box {
+  .map-view-btn-orders {
     height: 35px;
     width: 91px;
     font-size: 12px;
@@ -233,3 +233,72 @@
     border: 1px solid #E9E9EB;
     gap:4px
   }
+  .search{
+    border: 1px solid #E9E9EB;
+    top: 115px;
+    left: 830px;
+    width: 250px;
+    height: 319px;
+    background: #FFFFFF;
+    border-radius: 4px;
+    opacity: 1;
+    z-index: 3000;
+    position: absolute;
+  }
+  .search-container {
+    display: flex;
+    flex-direction: column;
+    padding: 16px 24px;
+    justify-content: center;
+    align-items: center;
+
+}
+.search-label{
+    display: block;
+    text-align: left;
+    color: #42454E;
+    font-size: medium;
+    font-size: 12px;
+    height: 15px;
+    margin-top: 20px;
+}
+.search-group{
+    border: 1px solid #DFE3EB;
+    border-radius: 4px;
+    opacity: 1;
+    width: 200px ;
+    height: 36px;
+    margin-top: 3px;
+    box-sizing: border-box;
+    outline: none;
+    padding-left: 3px;
+}
+.search-action{
+    display: flex;
+    padding:10px;
+}
+
+.search-trigger{
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 32px 0px 32px;
+    align-items: center;
+}
+
+.search-trigger button{
+    width: 80px;
+    height: 36px;
+    border-radius: 4px;
+    border: none;
+    opacity: 1;
+    border: 1px solid #DFE3EB;
+}
+.search-trigger button:first-child{
+    background: #334FFC;
+    color: #FFFFFF;
+}
+.search-trigger button:nth-child(2){
+    margin-left: 25px;
+    background-color: white;
+    color:#0168FF
+}

@@ -329,7 +329,6 @@ function Filters({ onToFromChange, onChangeStatus, onChangeRakeTypes, reload, sh
                     </FormControl>
                 </div>
 
-
                 <div className='status_container' style={{ marginRight:30 }}>
                     <FormControl sx={{
                         width: '180px', margin: 0, padding: 0,
@@ -377,7 +376,7 @@ function Filters({ onToFromChange, onChangeStatus, onChangeRakeTypes, reload, sh
 
                 <div>
                     <motion.div
-                        className="box"
+                        className="map-view-btn-orders"
                         whileHover={{ scale: 0.95 }}
                         whileTap={{ scale: 0.9 }}
                         transition={{ type: "spring", stiffness: 400, damping: 10 }}
@@ -388,18 +387,52 @@ function Filters({ onToFromChange, onChangeStatus, onChangeRakeTypes, reload, sh
                     </motion.div>
                 </div>
 
-                <div style={{backgroundColor:'yellow'}}>
+                <div style={{position: 'relative'}}>
                     <div className="filter-container" onClick={() => setOpenFilterModal(true)}>
                         {/* <FilterAltIcon className="filter-icon" /> */}
                         <img src={filter_icon.src} alt='' />
                     </div>
                 </div>
-
+            
             </div>
 
             {openFilterModal ?
                 <div>
-                    <div className='modal-wrapper'>
+                    <div className='search'>
+                            <div className="search-container">
+                                <div className='search-container-group'>
+                                    <label className='search-label'>e-Demand Number</label>
+                                    <input type="text" className="search-group" onChange={(e) => setFilterEDemand(e.target.value)} value={filterEDemand}/>
+                                </div>
+                                <div className='search-container-group'>
+                                    <label className='search-label'>Destination</label>
+                                    <input className="search-group" onChange={(e) => setFilterDestination(e.target.value)} value={filterDestination}  />
+                                </div>
+                                <div className='search-container-group'>
+                                    <label className='search-label'>Material</label>
+                                    <input className="search-group" onChange={(e) => setFilterMaterial(e.target.value)} value={filterMaterial} />
+                                </div>
+                            </div>
+                            <div className='search-trigger'>
+                                <button onClick={handleSubmit}>
+                                    Submit
+                                </button>
+                                <button onClick={() => clearFilter()}>
+                                    Clear
+                                </button>
+                            </div>
+                    </div>
+                    <div className='overlay-container' onClick={() => setOpenFilterModal(false)} />
+                </div> : <></>
+            }
+
+        </div>
+    );
+}
+
+export default Filters;
+
+ {/* { <div className='modal-wrapper'>
                         <div className='modal-container'>
                             <div className='modal-header'><span className='modal-filter-header'>Advanced Search</span><Image src={closeIcon} alt='' className='close-icon' onClick={() => setOpenFilterModal(false)} /></div>
                             <div className='filters-wrapper'>
@@ -417,14 +450,5 @@ function Filters({ onToFromChange, onChangeStatus, onChangeRakeTypes, reload, sh
 
                             </div>
                         </div>
-                    </div>
-
-                    <div className='overlay-container' onClick={() => setOpenFilterModal(false)} />
-                </div> : <></>
-            }
-
-        </div>
-    );
-}
-
-export default Filters;
+                    </div>  */
+                }
