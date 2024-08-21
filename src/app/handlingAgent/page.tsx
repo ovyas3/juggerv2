@@ -42,7 +42,7 @@ function HandlingAgent() {
     })
     const [count, setCount] = useState(0);
     const t = useTranslations("HANDLING_AGENT")
-    const [selectedHeading, setSelectedHeading] = useState('invitedHA');
+    const [selectedHeading, setSelectedHeading] = useState('activeHA');
     const [refresh, setRefresh] = useState(false);
 
     const [activeSkipAndLimit, setActiveSkipAndLimit] = useState<SkipAndLimit>({
@@ -132,8 +132,8 @@ function HandlingAgent() {
 
                 <div className='handlingAgent_title'>
                     <div className='handlingAgent_title_container'>
-                        <div className={`handlingAgent_heading ${selectedHeading === 'invitedHA' ? 'active' : ''} `} onClick={() => setSelectedHeading('invitedHA')} >{t('invitedHA')}</div>
                         <div className={`handlingAgent_heading ${selectedHeading === 'activeHA' ? 'active' : ''} `} onClick={() => setSelectedHeading('activeHA')}>{t('activeHA')}</div>
+                        <div className={`handlingAgent_heading ${selectedHeading === 'invitedHA' ? 'active' : ''} `} onClick={() => setSelectedHeading('invitedHA')} >{t('invitedHA')}</div>
                     </div>
                     <div
                         className={`refresh_icon ${refresh ? 'reload' : ''} `}

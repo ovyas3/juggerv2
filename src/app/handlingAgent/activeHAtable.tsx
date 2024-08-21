@@ -27,8 +27,8 @@ interface Column {
 const columns: readonly Column[] = [
     { id: 'sno', label: 'S No.', style: 'header_sno' },
     { id: 'name', label: 'Handling Agent Name', style: 'header_name' },
-    { id: 'pan', label: 'PAN Number', style: 'header_pan' },
-    { id: 'email', label: 'Email', style: 'header_email' },
+    // { id: 'pan', label: 'PAN Number', style: 'header_pan' },
+    // { id: 'email', label: 'Email', style: 'header_email' },
     { id: 'mobile', label: 'Mobile', style: 'header_mobile' },
     { id: 'action', label: 'Action', style: 'header_action' },
    
@@ -38,22 +38,23 @@ function contructingData(agentList: any) {
     return agentList.map((
         agent: {
             _id: string,
-             parent_name: string,
+            parent_name: string,
             email_id: string,
             mobile: string,
             agentId: string,
             status: string,
-            pan: string
+            pan: string,
+            name: string,
         }) => {
         return {
             _id: agent?._id ? agent?._id : 'NA',
-            name: agent?.parent_name ? agent?.parent_name  : 'NA',
-            email: agent?.email_id ? agent?.email_id : 'NA',
+            name: agent?.name ? agent?.name  : 'NA',
+            // email: agent?.email_id ? agent?.email_id : 'NA',
             mobile: agent?.mobile ? agent?.mobile : 'NA',
             agentID: agent?.agentId ? agent?.agentId : 'NA',
             verified: agent?.status ? agent?.status.toLowerCase() : 'NA',
             id: agent?.agentId ? agent?.agentId : 'NA',
-            pan: agent?.pan ? agent?.pan : 'NA'
+            // pan: agent?.pan ? agent?.pan : 'NA'
         }
     })
 }
