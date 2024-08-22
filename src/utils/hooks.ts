@@ -1,16 +1,16 @@
 'use client'
-import {useState, useEffect} from 'react'
-import {SeparatedRemarks} from '@/utils/interface'
+import { useState, useEffect } from 'react'
+import { SeparatedRemarks } from '@/utils/interface'
 
 export const useWindowSize = (width: number): Boolean => {
   const [isWide, setIsWide] = useState(true);
-  
+
   useEffect(() => {
     if (window) {
       const handleResize = () => {
         setIsWide(window.innerWidth >= width);
       };
-  
+
       window.addEventListener('resize', handleResize);
       return () => {
         window.removeEventListener('resize', handleResize);
@@ -50,13 +50,13 @@ export const sortArray = (inputArray: Array<Object>, parameter: string = 'pickup
   return sortedArray;
 }
 
-export const  separateLatestObject = (dataArray: Array<Object>) : any => {
+export const separateLatestObject = (dataArray: Array<Object>): any => {
   if (!dataArray || dataArray.length === 0) {
     return { latest: null, rest: [] };
   }
 
   // Sort the array by date in descending order
-  const sortedArray = dataArray.sort((a:any, b:any) => 
+  const sortedArray = dataArray.sort((a: any, b: any) =>
     new Date(b.date).getTime() - new Date(a.date).getTime()
   );
 
@@ -71,27 +71,27 @@ export const  separateLatestObject = (dataArray: Array<Object>) : any => {
 
 export function calculateDaysDifference(demandDate: string | null): number | "NA" {
   if (!demandDate) {
-      return "NA";
+    return "NA";
   }
 
   try {
-      const demand = new Date(demandDate);
-      const today = new Date();
+    const demand = new Date(demandDate);
+    const today = new Date();
 
-      if (isNaN(demand.getTime())) {
-          return "NA";
-      }
-
-      // Set both dates to the start of the day for accurate day calculation
-      demand.setHours(0, 0, 0, 0);
-      today.setHours(0, 0, 0, 0);
-
-      const differenceInTime = Math.abs(today.getTime() - demand.getTime());
-      const differenceInDays = Math.floor(differenceInTime / (1000 * 3600 * 24));
-
-      return differenceInDays;
-  } catch (error) {
+    if (isNaN(demand.getTime())) {
       return "NA";
+    }
+
+    // Set both dates to the start of the day for accurate day calculation
+    demand.setHours(0, 0, 0, 0);
+    today.setHours(0, 0, 0, 0);
+
+    const differenceInTime = Math.abs(today.getTime() - demand.getTime());
+    const differenceInDays = Math.floor(differenceInTime / (1000 * 3600 * 24));
+
+    return differenceInDays;
+  } catch (error) {
+    return "NA";
   }
 }
 
@@ -102,7 +102,8 @@ export function countTracking(arr: any[]) {
 
   // Iterate over each item in the array
   arr.forEach((shipment: any) => {
-    const gps = shipment.trip_tracker?.last_location?.fois || shipment.pickup_location?.geo_point;
+    const gps = shipment.trip_tracker?.last_location?.fois?.coordinates.length > 0 && shipment.trip_tracker?.last_location?.fois ||
+      shipment.trip_tracker?.last_location?.gps.coordinates.length > 0 && shipment.trip_tracker?.last_location?.gps;
     const isTracking = gps && gps.coordinates && gps.coordinates.length > 0;
 
     if (isTracking) {
@@ -126,7 +127,7 @@ const ageingCode = [
   { color: 'red', code: '#E6667B', text: '≥10 days' },
 ];
 
-export function getColorCode(days : any) {
+export function getColorCode(days: any) {
   if (days >= 1 && days <= 2) {
     return ageingCode[0].code;
   } else if (days >= 3 && days <= 6) {
@@ -140,11 +141,11 @@ export function getColorCode(days : any) {
   }
 }
 
-export function getUniqueValues(arr : any) {
+export function getUniqueValues(arr: any) {
   return [...new Set(arr)];
 }
 
-export function getShipmentStatusSummary(shipments:any) {
+export function getShipmentStatusSummary(shipments: any) {
   const summary = {
     total: shipments.length,
     inTransit: 0,
@@ -192,4 +193,36 @@ export function processETAs(dates: any) {
     currentETA: maxTime ? new Date(maxTime).toISOString() : 'NA',
     initialETA: minTime ? new Date(minTime).toISOString() : 'NA'
   };
+}
+
+export function getCaptiveIndianRakes(arr: any[]) {
+  let captiveCount = 0;
+  let indianCount = 0;
+
+  arr.forEach((shipment: any) => {
+    const isCaptive = shipment?.is_captive;
+    if (isCaptive) {
+      captiveCount++;
+    } else {
+      indianCount++;
+    }
+  })
+  return {
+    captive: captiveCount,
+    indian: indianCount
+  }
+}
+
+export function trackingByFoisGpsHook(arr: any[]) {
+  let foiscount = 0;
+  let gpscount = 0;
+  arr.forEach((shipment: any) => {
+    if (shipment.trip_tracker?.last_location?.fois?.coordinates?.length > 0) {
+      foiscount++;
+    } else if (shipment.trip_tracker?.last_location?.gps?.coordinates?.length > 0) {
+      gpscount++;
+    }
+
+  })
+  return { gpscount, foiscount }
 }
