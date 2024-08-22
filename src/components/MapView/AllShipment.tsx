@@ -155,8 +155,11 @@ const ShipmentCard: React.FC<ShipmentCardProps> = ({
   handleShipmentSelection,
   handleNavigation
 }) => {
-  const gps = shipment.trip_tracker?.last_location?.fois?.coordinates.length > 0 && shipment.trip_tracker?.last_location?.fois || shipment.trip_tracker?.last_location?.gps?.coordinates.length > 0 && shipment.trip_tracker?.last_location?.gps;
-  const isTracking = gps && gps.coordinates.length > 0 ? true : false;
+  const gpsFOIS = (shipment.trip_tracker?.last_location?.fois?.coordinates.length > 0
+    && shipment.trip_tracker?.last_location?.fois) // Checking FOIS tracking
+    || (shipment.trip_tracker?.last_location?.gps?.coordinates.length > 0
+      && shipment.trip_tracker?.last_location?.gps); // Checking FOIS tracking
+  const isTracking = gpsFOIS && gpsFOIS.coordinates.length > 0 ? true : false;
 
   const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
     e.stopPropagation();
@@ -177,7 +180,7 @@ const ShipmentCard: React.FC<ShipmentCardProps> = ({
     }
   >
     <div className={isTracking ? 'tracking-indication' : 'non-tracking-indication'}>
-      {isTracking ? 'Tracked' : 'Non Tracked'}
+      {isTracking ? 'Tracking' : 'Non Tracking'}
     </div>
     <CardContent style={{ padding: '20px 20px 24px 20px' }}>
       <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
@@ -303,7 +306,7 @@ const MapLayers = () => {
 
   const [headingFilters, setHeadingFilters] = useState('');
   const [headingColors, setHeadingColors] = useState('');
-  
+
   const [showSearchFNR, setShowSearchFNR] = useState(false)
   const [trackingByFoisGps, setTrackingByFoisGps] = useState<any>({ foiscount: 0, gpscount: 0 });
   const [trackingAvailed, setTrackingAvailed] = useState<any>(false);
@@ -531,8 +534,11 @@ const MapLayers = () => {
     setShowAll(false);
     setShowFiltered(true);
     const filteredWithTracking = filteredShipments.map((shipment) => {
-      const gps = shipment.trip_tracker?.last_location?.fois?.coordinates.length > 0 && shipment.trip_tracker?.last_location?.fois || shipment.trip_tracker?.last_location?.gps?.coordinates.length > 0 && shipment.trip_tracker?.last_location?.gps;
-      const isTracking = gps && gps.coordinates && gps.coordinates.length > 0;
+      const gpsFois = shipment.trip_tracker?.last_location?.fois?.coordinates.length > 0
+        && shipment.trip_tracker?.last_location?.fois
+        || shipment.trip_tracker?.last_location?.gps?.coordinates.length > 0
+        && shipment.trip_tracker?.last_location?.gps;
+      const isTracking = gpsFois && gpsFois.coordinates && gpsFois.coordinates.length > 0;
       return { ...shipment, isTracking }
     }
     )
@@ -589,8 +595,11 @@ const MapLayers = () => {
     setTrackingNonTracking(countTracking(inTransit))
 
     const allShipmentsWithTracking = [...inTransit].map((shipment) => {
-      const gps = shipment.trip_tracker?.last_location?.fois?.coordinates.length > 0 && shipment.trip_tracker?.last_location?.fois || shipment.trip_tracker?.last_location?.gps?.coordinates.length > 0 && shipment.trip_tracker?.last_location?.gps;
-      const isTracking = gps && gps.coordinates && gps.coordinates.length > 0;
+      const gpsFois = shipment.trip_tracker?.last_location?.fois?.coordinates.length > 0
+        && shipment.trip_tracker?.last_location?.fois
+        || shipment.trip_tracker?.last_location?.gps?.coordinates.length > 0
+        && shipment.trip_tracker?.last_location?.gps;
+      const isTracking = gpsFois && gpsFois.coordinates && gpsFois.coordinates.length > 0;
       return { ...shipment, isTracking }
     })
     setOriginalData(allShipmentsWithTracking)
@@ -686,9 +695,12 @@ const MapLayers = () => {
   }
 
   const focusOnShipment = (shipment: any) => {
-    const gps = shipment.trip_tracker?.last_location?.fois?.coordinates.length > 0 && shipment.trip_tracker?.last_location?.fois || shipment.trip_tracker?.last_location?.gps?.coordinates.length > 0 && shipment.trip_tracker?.last_location?.gps;
-    if (map && gps && gps.coordinates.length > 0) {
-      const point = L.latLng(gps.coordinates[1], gps.coordinates[0]);
+    const gpsFois = shipment.trip_tracker?.last_location?.fois?.coordinates.length > 0
+      && shipment.trip_tracker?.last_location?.fois
+      || shipment.trip_tracker?.last_location?.gps?.coordinates.length > 0
+      && shipment.trip_tracker?.last_location?.gps;
+    if (map && gpsFois && gpsFois.coordinates.length > 0) {
+      const point = L.latLng(gpsFois.coordinates[1], gpsFois.coordinates[0]);
       map.flyTo(point, 13, { duration: 1 });
 
       setTimeout(() => {
@@ -964,7 +976,7 @@ const MapLayers = () => {
               </Box>
 
               <Box className="shipment-heads">
-                <div className='shipment-head-fixed'>
+                {/* <div className='shipment-head-fixed'>
                   <div style={{ backgroundColor: '#333333', position: 'relative' }} className='fixedHeadings'>Total {totalCount}
                     <div style={{ position: 'absolute', bottom: '6px' }}>
                       <div style={{ fontSize: '10px', fontWeight: '500', textWrap: 'nowrap', }} >Indian Railway Rakes : {totalCaptive.indian}</div>
@@ -977,7 +989,7 @@ const MapLayers = () => {
                       <div style={{ fontSize: '10px', fontWeight: '500', textWrap: 'nowrap' }}>Captive Rakes : {deliveredCaptive.captive}</div>
                     </div>
                   </div>
-                </div>
+                </div> */}
                 <div className='shipment-head-fixed'>
                   <div style={{ backgroundColor: '#3790CC', position: 'relative', cursor: 'pointer' }} className='fixedHeadings' onClick={(e) => {
                     filterShipments('AVE', e)
@@ -1026,11 +1038,11 @@ const MapLayers = () => {
 
                         <div className='rake_heading_title' style={{ display: hiddenTrackingInfo ? 'flex' : 'none' }} >Tracking Information</div>
                         <div className='rake_head_container' style={{ display: hiddenTrackingInfo ? 'flex' : 'none' }}>
-                          <div className='rake_head indian_rake' onClick={() => { trackingAvailed ? handleTrackingFoisGps('FOIS') : undefined }} style={{ cursor: trackingAvailed ? 'pointer' : 'not-allowed', backgroundColor: trackingTypeSelected.fois ? '#B3A492' : '#EEE7DA' }}>
+                          <div className='rake_head indian_rake' onClick={() => {handleTrackingFoisGps('FOIS')}} style={{ cursor:'pointer', backgroundColor: trackingTypeSelected.fois ? '#B3A492' : '#EEE7DA' }}>
                             <div>Tracking By FOIS</div>
                             <div>{trackingByFoisGps.foiscount}</div>
                           </div>
-                          <div className='rake_head indian_rake' onClick={() => { trackingAvailed ? handleTrackingFoisGps('GPS') : undefined }} style={{ cursor: trackingAvailed ? 'pointer' : 'not-allowed', backgroundColor: trackingTypeSelected.gps ? '#B3A492' : '#EEE7DA' }}>
+                          <div className='rake_head indian_rake' onClick={() => {handleTrackingFoisGps('GPS')}} style={{ cursor: 'pointer', backgroundColor: trackingTypeSelected.gps ? '#B3A492' : '#EEE7DA' }}>
                             <div>Tracking By GPS</div>
                             <div>{trackingByFoisGps.gpscount}</div>
                           </div>
