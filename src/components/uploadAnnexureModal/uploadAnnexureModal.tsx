@@ -379,6 +379,7 @@ const UploadAnnexure: React.FC<PopupProps> = ({
                               </div>
                             </button>
                             {actionsDrop === index && (
+                              <>
                               <div className="action-drop">
                                 {actions.map((item, index) => (
                                   <div
@@ -395,6 +396,9 @@ const UploadAnnexure: React.FC<PopupProps> = ({
                                   </div>
                                 ))}
                               </div>
+                              <div className="overlay-container" onClick={()=>setActionsDrop(-1)}>
+                                </div>
+                                </>
                             )}
                           </div>
                         </TableCell>

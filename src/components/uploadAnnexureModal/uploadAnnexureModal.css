@@ -87,6 +87,16 @@
       width: 28px;
       cursor: pointer;
   }
+
+  .table-wrapper .overlay-container {
+    height: 100vh;
+    width: 100vw;
+    opacity: 0.3;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+}
   
   .table-wrapper .action-drop {
     position: absolute;
