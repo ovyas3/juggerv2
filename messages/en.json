@@ -52,6 +52,14 @@
     "handlingAgent":"Handling Agent",
     "logout":"Logout"
   },
+  "UPLOAD_ANNEXURE":{
+    "SNCKBR_MSG":{
+      "fileLimit":"You can select only maximum of 10 documents at once. Please try again!",
+      "minFiles":"Please select atleast a file to upload",
+      "noteMsg":"Maximum of 10 documents only can be uploaded at once.",
+      "deleteMsg":"Deleted {doc_name} File Successfully"
+    }
+  },
   "DRAWER":{
     "shipments":"shipments",
     "contactDashboard":"Contact Dashboard"
