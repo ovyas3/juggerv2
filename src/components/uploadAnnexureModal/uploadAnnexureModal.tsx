@@ -22,6 +22,7 @@ import { styled } from "@mui/system";
 import { httpsGet, httpsPost } from "@/utils/Communication";
 import "./uploadAnnexureModal.css";
 import { useSnackbar } from "@/hooks/snackBar";
+import { useTranslations } from "next-intl";
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialogContent-root": {
@@ -49,6 +50,7 @@ const UploadAnnexure: React.FC<PopupProps> = ({
   const [actionsDrop, setActionsDrop] = useState(-1);
   const [uploadFile, setUploadFile] = useState([]);
   const fileInputRef = useRef([])
+  const t = useTranslations('UPLOAD_ANNEXURE');
 
   const [annexure, setAnnexure] = useState<any>([]);
 
@@ -57,7 +59,7 @@ const UploadAnnexure: React.FC<PopupProps> = ({
       setUploadFile(event.target.files);
     } else {
       showMessage(
-        "You can select only maximum of 10 documents at once. Please try again!",
+        t('SNCKBR_MSG.fileLimit'),
         "error"
       );
     }
@@ -71,7 +73,8 @@ const UploadAnnexure: React.FC<PopupProps> = ({
 
   const handleUploadRakeDoc = () => {
     if (!uploadFile.length) {
-      showMessage("Please select atleast a file to upload", "error");
+      showMessage(t('SNCKBR_MSG.minFiles')
+      , "error");
     } else {
       const payload = {
         rakeShipmentId: shipmentID,
@@ -97,7 +100,7 @@ const UploadAnnexure: React.FC<PopupProps> = ({
       .then((response) => {
         if (response.statusCode == 200) {
           showMessage(
-            `Deleted ${element.doc_name} File Successfully`,
+            t('SNCKBR_MSG.deleteMsg',{doc_name:element.doc_name}),
             "success"
           );
           getDocData();
@@ -222,7 +225,7 @@ const UploadAnnexure: React.FC<PopupProps> = ({
                 >
                   <b>Note:</b>
                   <span>
-                    Maximum of 10 documents only can be uploaded at once.
+                     {t('SNCKBR_MSG.noteMsg')}
                   </span>
                 </div>
               </div>
