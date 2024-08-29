@@ -17,7 +17,7 @@ function SlideTransition(props: SlideProps) {
 }
 
 const SnackbarContext = createContext<{
-  showMessage: (message: string, severity: AlertProps['severity']) => void;
+  showMessage: (message: string, severity: AlertProps['severity'],duration?:number) => void;
 } | null>(null);
 
 export const useSnackbar = () => {
@@ -36,17 +36,19 @@ export const SnackbarProvider: React.FC<SnackbarProviderProps> = ({ children }) 
   const [state, setState] = useState({
     open: false,
     message: '',
+    duration: 2000,
     severity: 'success' as AlertProps['severity'],
     vertical: 'bottom' as const,
     horizontal: 'center' as const,
   });
 
-  const showMessage = (message: string, severity: AlertProps['severity']) => {
+  const showMessage = (message: string, severity: AlertProps['severity'],duration?:number) => {
     setState({
       ...state,
       open: true,
       message,
       severity,
+      duration: duration ? duration : 2000 
     });
   };
 
@@ -66,7 +68,7 @@ export const SnackbarProvider: React.FC<SnackbarProviderProps> = ({ children }) 
           horizontal: state.horizontal,
         }}
         open={state.open}
-        autoHideDuration={2000}
+        autoHideDuration={state.duration}
         onClose={handleClose}
         TransitionComponent={SlideTransition}
       >
