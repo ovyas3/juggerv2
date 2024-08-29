@@ -49,8 +49,8 @@ const UploadAnnexure: React.FC<PopupProps> = ({
   const { showMessage } = useSnackbar();
   const [actionsDrop, setActionsDrop] = useState(-1);
   const [uploadFile, setUploadFile] = useState([]);
-  const fileInputRef = useRef([])
-  const t = useTranslations('UPLOAD_ANNEXURE');
+  const fileInputRef = useRef([]);
+  const t = useTranslations("UPLOAD_ANNEXURE");
 
   const [annexure, setAnnexure] = useState<any>([]);
 
@@ -58,23 +58,20 @@ const UploadAnnexure: React.FC<PopupProps> = ({
     if (event.target.files.length <= 10) {
       setUploadFile(event.target.files);
     } else {
-      showMessage(
-        t('SNCKBR_MSG.fileLimit'),
-        "error"
-      );
+      showMessage(t("SNCKBR_MSG.fileLimit"), "error",10000);
+      clearInput()
     }
   };
 
   function clearInput() {
     setUploadFile([]);
     //@ts-ignore
-    fileInputRef.current.value = ''
+    fileInputRef.current.value = "";
   }
 
   const handleUploadRakeDoc = () => {
     if (!uploadFile.length) {
-      showMessage(t('SNCKBR_MSG.minFiles')
-      , "error");
+      showMessage(t("SNCKBR_MSG.minFiles"), "error");
     } else {
       const payload = {
         rakeShipmentId: shipmentID,
@@ -100,7 +97,7 @@ const UploadAnnexure: React.FC<PopupProps> = ({
       .then((response) => {
         if (response.statusCode == 200) {
           showMessage(
-            t('SNCKBR_MSG.deleteMsg',{doc_name:element.doc_name}),
+            t("SNCKBR_MSG.deleteMsg", { doc_name: element.doc_name }),
             "success"
           );
           getDocData();
@@ -217,16 +214,12 @@ const UploadAnnexure: React.FC<PopupProps> = ({
                 <div
                   style={{
                     display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "center",
-                    alignItems: "left",
+                    alignItems: "center",
                     fontSize: "12px",
                   }}
                 >
-                  <b>Note:</b>
-                  <span>
-                     {t('SNCKBR_MSG.noteMsg')}
-                  </span>
+                  <b>Note:</b>&nbsp;
+                  <span>{t("SNCKBR_MSG.noteMsg")}</span>
                 </div>
               </div>
               <div>
@@ -252,7 +245,7 @@ const UploadAnnexure: React.FC<PopupProps> = ({
                       <TableCell
                         style={{ background: "whitesmoke", color: "#545454" }}
                       >
-                        Date
+                        Uploaded at
                       </TableCell>
                       <TableCell
                         style={{ background: "whitesmoke", color: "#545454" }}
@@ -262,40 +255,38 @@ const UploadAnnexure: React.FC<PopupProps> = ({
                       <TableCell
                         style={{ background: "whitesmoke", color: "#545454" }}
                       >
-                        Actions
+                        Action
                       </TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
                     {annexure.map((row: any, index: any) => (
-                      <TableRow key={index}>
+                      <TableRow key={index} className="table-row">
                         <TableCell>{index + 1}</TableCell>
                         <TableCell>{row.date}</TableCell>
                         <TableCell>
-                          <div
-                            style={{
-                              width: "300px",
-                              whiteSpace: "nowrap",
-                              overflow: "hidden",
-                              textOverflow: "ellipsis",
-                              position: "relative",
-                            }}
-                          >
-                            {row.doc_name}
-                          </div>
                           <a
                             style={{
                               display: "flex",
                               alignItems: "center",
                               fontWeight: 600,
-                              maxWidth: "fit-content",
                               color: "#20114d",
                               cursor: "pointer",
                               textDecoration: "none",
+                              width:"max-content"
                             }}
                             href={row.doc_link}
                           >
-                            Click here to download
+                            <div
+                              style={{
+                                maxWidth: "300px",
+                                whiteSpace: "nowrap",
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                              }}
+                            >
+                              {row.doc_name}
+                            </div>
                             <img
                               src={DownloadIcon.src}
                               height={16}

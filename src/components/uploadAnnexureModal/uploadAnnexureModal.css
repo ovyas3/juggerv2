@@ -228,5 +228,10 @@
       color: white;
       cursor: pointer;
     }
+
+
+    .table-row:last-child .action-drop {
+      top:-28px;
+    }
     
   
