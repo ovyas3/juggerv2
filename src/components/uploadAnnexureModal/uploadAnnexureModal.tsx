@@ -1,7 +1,6 @@
 "use client";
 
-import dropdownIcon from "../../assets/dropdown-icon.svg";
-import { Box, Input } from "@mui/material";
+import { Box, TextField } from "@mui/material";
 import {
   Table,
   TableBody,
@@ -13,7 +12,7 @@ import {
 } from "@mui/material";
 import timeUtils from "../../utils/timeService";
 import Dialog from "@mui/material/Dialog";
-import React, { useState, useEffect,useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import DownloadIcon from "@/assets/download.svg";
 import DeleteIcon from "@/assets/delete.svg";
 import CloseButtonIcon from "@/assets/close_icon.svg";
@@ -23,6 +22,7 @@ import { styled } from "@mui/system";
 import { httpsGet, httpsPost } from "@/utils/Communication";
 import "./uploadAnnexureModal.css";
 import { useSnackbar } from "@/hooks/snackBar";
+import { useTranslations } from "next-intl";
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialogContent-root": {
@@ -46,58 +46,41 @@ const UploadAnnexure: React.FC<PopupProps> = ({
   shipmentID,
   FNR_No,
 }) => {
-  const [dropdownOpen, setDropdownOpen] = useState(false);
   const { showMessage } = useSnackbar();
-  const [handlingAgents, setHandlingAgents] = useState([]);
-  const [selectedHandlingAgent, setSelectedHandlingAgent] = useState<any>(null);
   const [actionsDrop, setActionsDrop] = useState(-1);
-  const [uploadFile, setUploadFile] = useState(null);
-  const [fileName, setFileName] = useState("");
-  const [index, setIndex] = useState("");
+  const [uploadFile, setUploadFile] = useState([]);
+  const fileInputRef = useRef([]);
+  const t = useTranslations("UPLOAD_ANNEXURE");
 
   const [annexure, setAnnexure] = useState<any>([]);
 
-  const toggleDropdown = () => {
-    setDropdownOpen(!dropdownOpen);
-  };
-
   const handleFileChange = (event: any) => {
-    setUploadFile(event.target.files[0]);
-  };
-
-  const selectHandlingAgent = (option: any) => {
-    setSelectedHandlingAgent(option);
-    setDropdownOpen(false);
+    if (event.target.files.length <= 10) {
+      setUploadFile(event.target.files);
+    } else {
+      showMessage(t("SNCKBR_MSG.fileLimit"), "error",10000);
+      clearInput()
+    }
   };
 
   function clearInput() {
-    setSelectedHandlingAgent("");
-    setIndex("");
-    setFileName("");
-    setUploadFile(null);
+    setUploadFile([]);
+    //@ts-ignore
+    fileInputRef.current.value = "";
   }
 
   const handleUploadRakeDoc = () => {
-    if (!selectedHandlingAgent) {
-      showMessage("Please select a Handling Agent", "error");
-    } else if (!fileName) {
-      showMessage("File Name cannot be empty", "error");
-    } else if (!index) {
-      showMessage("Please give a valid File Index", "error");
-    } else if (!uploadFile) {
-      showMessage("Please select a file to upload", "error");
+    if (!uploadFile.length) {
+      showMessage(t("SNCKBR_MSG.minFiles"), "error");
     } else {
       const payload = {
         rakeShipmentId: shipmentID,
-        docIndex: index,
-        handlingAgent: selectedHandlingAgent._id,
-        docName: fileName.trim(),
         file: uploadFile,
       };
       httpsPost("rake_shipment/upload_rake_annexure", payload, 0, true)
         .then((response) => {
-          showMessage("File Uploaded Succcessfully", "success");
           clearInput();
+          showMessage("File Uploaded Succcessfully", "success");
           getDocData();
         })
         .catch((err) =>
@@ -108,15 +91,13 @@ const UploadAnnexure: React.FC<PopupProps> = ({
 
   const handleDeleteDoc = (element: any) => {
     const payload = {
-      handlingAgent: element.handling_agent._id,
-      rakeShipmentId: shipmentID,
-      docIndex: element.index,
+      raId: element._id,
     };
     httpsPost("rake_shipment/delete_ra_document", payload)
       .then((response) => {
         if (response.statusCode == 200) {
           showMessage(
-            `Deleted ${element.doc_name} File Successfully`,
+            t("SNCKBR_MSG.deleteMsg", { doc_name: element.doc_name }),
             "success"
           );
           getDocData();
@@ -134,38 +115,22 @@ const UploadAnnexure: React.FC<PopupProps> = ({
         if (data) {
           let rakeDocData = data.map((value: any) => {
             return {
-              index: value.doc_index,
               date: value.created_at
                 ? timeUtils.formatDate(value.created_at)
                 : "",
-              handling_agent: value.handling_agent,
-              doc_name: value.docName,
-              doc_link: value.link,
+              doc_name: value.docs_link && value.docs_link.doc_name,
+              doc_link: value.docs_link && value.docs_link.link,
+              _id: value._id,
             };
           });
-          // const sortedDataByIndex = rakeDocData.sort((a: any, b: any) => {
-          //   return a.index - b.index;
-          // });
           setAnnexure(rakeDocData);
         }
       })
       .catch((err) => console.log(err));
   }
 
-  function getHandlingAgents() {
-    httpsGet(`handling_agent/get_rake_shipment_ha?id=${shipmentID}`)
-      .then((response: any) => {
-        const data = response.data;
-        if (data.length) {
-          setHandlingAgents(data[0].HA);
-        }
-      })
-      .catch((err) => {});
-  }
-
   useEffect(() => {
     getDocData();
-    getHandlingAgents();
   }, [shipmentID]);
 
   const actions = [
@@ -215,7 +180,11 @@ const UploadAnnexure: React.FC<PopupProps> = ({
         <Box sx={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
           <div className="upload-annexure">
             <div aria-label="close" onClick={isClose}>
-              <Image src={CloseButtonIcon} className="close-btn" alt="Close Button" />
+              <Image
+                src={CloseButtonIcon}
+                className="close-btn"
+                alt="Close Button"
+              />
             </div>
             <div>
               <h3>Upload Rake Annexure Document</h3>
@@ -224,79 +193,56 @@ const UploadAnnexure: React.FC<PopupProps> = ({
               Shipment FNR: <b>{FNR_No}</b>
             </div>
             <div className="add-wrapper">
-              <div style={{ display: "flex", columnGap: "10px" }}>
-                <div className="custom-select">
-                  <div className="select-input" onClick={toggleDropdown}>
-                    <div className="selected-options">
-                      <span>
-                        {selectedHandlingAgent
-                          ? selectedHandlingAgent.name
-                          : "Handling Agent"}
-                      </span>
-                    </div>
-                    <span className={`arrow ${dropdownOpen ? "open" : ""}`}>
-                      <img
-                        src={dropdownIcon.src}
-                        height="24px"
-                        width="24px"
-                        alt="down-arrow"
-                      />
-                    </span>
-                  </div>
-                  {dropdownOpen && (
-                    <div className="select-dropdown">
-                      <div className="select-options">
-                        {handlingAgents.map((option: any, index) => (
-                          <div
-                            className="option"
-                            key={index}
-                            onClick={() => selectHandlingAgent(option)}
-                            style={{ cursor: "pointer" }}
-                          >
-                            {option.name}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  columnGap: "10px",
+                }}
+              >
                 <div>
-                  <div className="custom-select">
-                    <div className="select-input">
-                      <input
-                        placeholder="File Name"
-                        onChange={(e) => setFileName(e.target.value)}
-                        value={fileName}
-                      />
-                    </div>
-                  </div>
-                </div>
-                <div>
-                  <div>
-                    <input
-                      type="number"
-                      placeholder="Index"
-                      min={1}
-                      value={index}
-                      onChange={(e) => {
-                        setIndex(e.target.value);
-                      }}
-                      className="number-index"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <Input
+                  <TextField
                     type="file"
                     id="fileInput"
                     onChange={handleFileChange}
+                    inputProps={{
+                      multiple: true,
+                      accept:
+                        ".png,.jpg,.jpeg,.gif,.pdf,.doc,.docx,.xls,.xlsx,.txt,.csv",
+                    }}
+                    inputRef={fileInputRef}
                     sx={{
-                      "&.MuiInput-root": {
+                      "& .MuiOutlinedInput-input": {
                         fontSize: "12px",
-                        width: "160px",
+                        padding: "6px 8px 12px 8px",
+                        width: "180px",
                       },
                     }}
                   />
+                </div>
+                <div style={{ display: "flex", alignItems: "center" }}>
+                  <button
+                    style={{
+                      padding: "6px",
+                      color: "#20114d",
+                      background: "whitesmoke",
+                      borderRadius: "6px",
+                      cursor: "pointer",
+                    }}
+                    onClick={() => clearInput()}
+                  >
+                    Clear Selection
+                  </button>
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    fontSize: "12px",
+                  }}
+                >
+                  <b>Note:</b>&nbsp;
+                  <span>{t("SNCKBR_MSG.noteMsg")}</span>
                 </div>
               </div>
               <div>
@@ -306,7 +252,11 @@ const UploadAnnexure: React.FC<PopupProps> = ({
               </div>
             </div>
             <div className="table-wrapper">
-              <TableContainer component={Paper} style={{ maxHeight: "410px" }} className="table-cont">
+              <TableContainer
+                component={Paper}
+                style={{ maxHeight: "410px" }}
+                className="table-cont"
+              >
                 <Table stickyHeader>
                   <TableHead>
                     <TableRow>
@@ -318,12 +268,7 @@ const UploadAnnexure: React.FC<PopupProps> = ({
                       <TableCell
                         style={{ background: "whitesmoke", color: "#545454" }}
                       >
-                        Date
-                      </TableCell>
-                      <TableCell
-                        style={{ background: "whitesmoke", color: "#545454" }}
-                      >
-                        Handling Agent
+                        Uploaded at
                       </TableCell>
                       <TableCell
                         style={{ background: "whitesmoke", color: "#545454" }}
@@ -333,43 +278,45 @@ const UploadAnnexure: React.FC<PopupProps> = ({
                       <TableCell
                         style={{ background: "whitesmoke", color: "#545454" }}
                       >
-                        Actions
+                        Action
                       </TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
                     {annexure.map((row: any, index: any) => (
-                      <TableRow key={index}>
-                        <TableCell>{index+1}</TableCell>
+                      <TableRow key={index} className="table-row">
+                        <TableCell>{index + 1}</TableCell>
                         <TableCell>{row.date}</TableCell>
                         <TableCell>
-                          {row.handling_agent?.name || "N/A"}
-                        </TableCell>
-                        <TableCell>
-                          <div
-                            style={{ display: "flex", alignItems: "center" }}
-                          >
-                            {row.doc_name}-{row.index}
-                          </div>
-                          <div
+                          <a
                             style={{
                               display: "flex",
                               alignItems: "center",
                               fontWeight: 600,
-                              maxWidth: "fit-content",
                               color: "#20114d",
                               cursor: "pointer",
+                              textDecoration: "none",
+                              width:"max-content"
                             }}
-                            onClick={()=>handleDownload(row)}
+                            href={row.doc_link}
                           >
-                            Click here to download
+                            <div
+                              style={{
+                                maxWidth: "300px",
+                                whiteSpace: "nowrap",
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                              }}
+                            >
+                              {row.doc_name}
+                            </div>
                             <img
                               src={DownloadIcon.src}
                               height={16}
                               width={16}
                               style={{ cursor: "pointer" }}
                             />
-                          </div>
+                          </a>
                         </TableCell>
                         <TableCell>
                           <div style={{ position: "relative" }}>
@@ -386,22 +333,31 @@ const UploadAnnexure: React.FC<PopupProps> = ({
                               </div>
                             </button>
                             {actionsDrop === index && (
-                              <div className="action-drop">
-                                {actions.map((item, index) => (
-                                  <div
-                                    className="actions-row"
-                                    key={index}
-                                    onClick={() => {item.fn(row);setActionsDrop(-1)}}
-                                  >
-                                    <img
-                                      src={item.icon}
-                                      height={"16px"}
-                                      width={"16px"}
-                                    />
-                                    {item.name}
-                                  </div>
-                                ))}
-                              </div>
+                              <>
+                                <div className="action-drop">
+                                  {actions.map((item, index) => (
+                                    <div
+                                      className="actions-row"
+                                      key={index}
+                                      onClick={() => {
+                                        item.fn(row);
+                                        setActionsDrop(-1);
+                                      }}
+                                    >
+                                      <img
+                                        src={item.icon}
+                                        height={"16px"}
+                                        width={"16px"}
+                                      />
+                                      {item.name}
+                                    </div>
+                                  ))}
+                                </div>
+                                <div
+                                  className="overlay-container"
+                                  onClick={() => setActionsDrop(-1)}
+                                ></div>
+                              </>
                             )}
                           </div>
                         </TableCell>
