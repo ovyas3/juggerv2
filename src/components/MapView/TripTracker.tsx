@@ -103,6 +103,7 @@ const TripTracker = (params: any) => {
   const [estimatedTrack, setEstimatedTrack] = useState<any>([]);
   const [stations, setStations] = useState<any>([]);
   const [map, setMap] = useState<L.Map | null>(null);
+  const [foisPolyline, setFoisPolyline] = useState<any>([]);
 
   const handleFoisCheck = (e: any) => {
     setShowFoisTracks(e.target.checked);
@@ -188,6 +189,11 @@ const TripTracker = (params: any) => {
     const decodeline = polyline.decode(tripTrackerLine1) || [];
     setEstimatedTrack(decodeline);
     // remove tracks if currentStatus is empty or its misisng geo_point ir if geo_point.coordinates is empty or if its length is less than 2 or if geo_point.coordinates ==[0, 0]
+    
+    const foisPolyline = rakeData && rakeData.fois && rakeData.fois.polyline || '';
+    const foisDecodedCoordinates = polyline.decode(foisPolyline) || [];
+    setFoisPolyline(foisDecodedCoordinates);
+    
     const tracksWithStatus = tracks && tracks.filter((track: any) => {
       if (!track.currentStatus || track.currentStatus === '') {
         return false;
@@ -324,7 +330,7 @@ const TripTracker = (params: any) => {
                     }
                   </Popup>
                 </Marker>}
-                { showFoisTracks &&  trackingLine.length && <Polyline pathOptions={{ color:'red'}} positions={trackingLine} />}
+                { showFoisTracks &&  trackingLine.length && <Polyline pathOptions={{ color:'red'}} positions={foisPolyline || trackingLine} />}
                 { currentLocation && <Marker position={[currentLocation.geo_point.coordinates[1], currentLocation.geo_point.coordinates[0]]} icon={currentTrainLocation}>
                   <Popup>
                       Current Status: {currentLocation.currentStatus.split(/ on /i)[0]}

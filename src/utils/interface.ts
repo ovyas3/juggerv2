@@ -71,8 +71,8 @@ export interface row {
     ELDdate:string,
     ELDtime:string
   },
-  past_etas:any
-
+  past_etas:any,
+  oneRr_date:any,
 }
 
 export interface tagItem {

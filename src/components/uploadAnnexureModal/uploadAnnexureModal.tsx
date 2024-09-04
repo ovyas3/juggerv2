@@ -141,6 +141,29 @@ const UploadAnnexure: React.FC<PopupProps> = ({
     },
   ];
 
+  const handleDownload = (rowData:any) => {
+    // fetch(rowData.doc_link)
+    //   .then(response => response.blob())
+    //   .then(blob => {
+    //     const url = window.URL.createObjectURL(blob);
+    //     const a = document.createElement('a');
+    //     a.style.display = 'none';
+    //     a.href = url;
+    //     a.download = `${rowData.doc_name}-${rowData.index}`;
+    //     document.body.appendChild(a);
+    //     a.click();
+    //     window.URL.revokeObjectURL(url);
+    //   })
+    //   .catch(() => alert('Failed to download file.'));
+    const a = document.createElement('a');
+    a.style.display = 'none';
+    a.href = rowData.doc_link;
+    a.download = `${rowData.docName}-${rowData.doc_index} fvsfdfvsvfevfdvf`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a); 
+  };
+
   function handleActionsMenu(index: number) {
     if (actionsDrop === index) setActionsDrop(-1);
     else setActionsDrop(index);
