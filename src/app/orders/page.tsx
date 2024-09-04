@@ -39,8 +39,14 @@ const getStatusCode = (status: string): string => {
   }
 }
 
-async function totalCount () {
-  const response = await httpsGet('get/status_count');
+async function totalCount (fromDate: string, toDate: string) {
+  const payload:any = {
+    from: fromDate,
+    to: toDate,
+  }
+  console.log("payload", payload);
+  
+  const response = await httpsGet(`get/status_count?from=${payload.from.ts}&to=${payload.to.ts}`);
   return response;
 }
 
@@ -83,7 +89,10 @@ const OrdersPage = () => {
     //totalCount
     const [totalCountrake, setTotalCountrake] = useState<any>([])
 
-
+    const[query, setQuery] = useState<any>({
+      from:'',
+      to:''
+    })
 
   //shipment payload
   const [ShipmentsPayload, setShipmentsPayload] = useState<any>({
@@ -96,12 +105,32 @@ const OrdersPage = () => {
 
   //adding to and from to shipmentpayload
   const handleToFromChange = (to: string, from: string) => {
+    const toEpoch = service.getEpoch(new Date(to));
+    const fromEpoch = service.getEpoch(new Date(from));
+
     setShipmentsPayload((prevState: any) => ({
       ...prevState,
-      to: service.getEpoch(new Date(to)),
-      from: service.getEpoch(new Date(from)),
+      to: toEpoch,
+      from: fromEpoch,
     }));
+
+    setQuery({
+      from: fromEpoch,
+      to: toEpoch
+    });
   };
+
+  useEffect(() => {
+    if (query.from && query.to) {
+      totalCount(query.from, query.to).then((res: any) => {
+        if (res && res.statusCode == 200) {
+          setTotalCountrake(res.data);
+        }
+      }).catch((err) => {
+        console.log(err);
+      });
+    }
+  }, [query]);
 
   //adding limit and skip to shipmentpayload
   const handleSkipLimitChange = (limit: number, skip: number,) => {
@@ -156,16 +185,16 @@ const OrdersPage = () => {
     }
   }
 
-  useEffect(()=>{
-    totalCount().then((res : any)=>{
-        if(res && res.statusCode == 200){
-            setTotalCountrake(res.data)
-        }
+//   useEffect(()=>{
+//     totalCount(ShipmentsPayload.from, ShipmentsPayload.to).then((res : any)=>{
+//         if(res && res.statusCode == 200){
+//             setTotalCountrake(res.data)
+//         }
 
-    }).catch((err)=>{
-        console.log(err)
-    })
-},[])
+//     }).catch((err)=>{
+//         console.log(err)
+//     })
+// },[])
 
   async function getCaptiveRake() {
     const list_captive_rake = await httpsGet(CAPTIVE_RAKE);
@@ -195,6 +224,11 @@ const OrdersPage = () => {
   useEffect(() => {
     if (ShipmentsPayload.from && ShipmentsPayload.to) getAllShipment();
   }, [ShipmentsPayload, triggerShipments])
+
+  const fetchTotalCount = totalCountrake[0]?.totalCount || 0;
+  const inTransitCount = totalCountrake[0]?.statuses?.find((item: any) => item.status === "ITNS")?.count || 0;
+  const deliveredCount = totalCountrake[0]?.statuses?.find((item: any) => item.status === "Delivered")?.count || 0;
+  const inPlantCount = totalCountrake[0]?.statuses?.find((item: any) => item.status === "AVE")?.count || 0;
 
   return (
     <div>
@@ -261,21 +295,21 @@ const OrdersPage = () => {
               <div className='display_status'>
                     <div className='display_status_inner_box'>
                       {/* <div style={{fontSize:20, fontWeight:500}}>{totalCountrake[0]?.totalCount ? totalCountrake[0]?.totalCount : 0}</div> */}
-                      <div style={{fontSize:20, fontWeight:500}}>{getShipmentStatusSummary(allShipment).total}</div>
+                      <div style={{fontSize:20, fontWeight:500}}>{fetchTotalCount}</div>
                       <div style={{fontSize:12, color:'#7C7E8C'}}>Total</div>
                     </div>
                     <div className='display_status_inner_box'>
                       {/* <div style={{fontSize:20, fontWeight:500}}>{totalCountrake[0]?.totalCount ? totalCountrake[0]?.totalCount - ((totalCountrake[0]?.statuses?.find((item: any) => item.status === "ITNS")?.count || 0) + (totalCountrake[0]?.statuses?.find((item: any) => item.status === "Delivered")?.count || 0)) : 0}</div> */}
-                      <div style={{fontSize:20, fontWeight:500}}>{getShipmentStatusSummary(allShipment).inPlant}</div>
+                      <div style={{fontSize:20, fontWeight:500}}>{inPlantCount}</div>
                       <div style={{fontSize:12, color:'#7C7E8C'}}>In Plant</div>
                     </div>
                     <div className='display_status_inner_box'>
                       {/* <div style={{fontSize:20, fontWeight:500}}>{totalCountrake[0]?.statuses?.find((item: any) => item.status === "ITNS")?.count || 0}</div> */}
-                      <div style={{fontSize:20, fontWeight:500}}>{getShipmentStatusSummary(allShipment).inTransit}</div>
+                      <div style={{fontSize:20, fontWeight:500}}>{inTransitCount}</div>
                       <div style={{fontSize:12, color:'#7C7E8C'}}>In Transit</div>
                     </div>
                     <div className='display_status_inner_box'>
-                      <div style={{fontSize:20, fontWeight:500}}>{getShipmentStatusSummary(allShipment).delivered}</div>
+                      <div style={{fontSize:20, fontWeight:500}}>{deliveredCount}</div>
                       <div style={{fontSize:12, color:'#7C7E8C'}}>Delivered</div>
                     </div>
               </div>              
