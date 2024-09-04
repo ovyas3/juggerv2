@@ -895,7 +895,7 @@ const MapLayers = () => {
               flexDirection: 'column',
             }}
             >
-              <Box className="date-range-container-heads">
+              <Box className="date-range-container-heads" style={{width: '345px'}}>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <DatePicker
                     label="From"
@@ -917,7 +917,7 @@ const MapLayers = () => {
                         fontSize: '14px',
                         height: '36px',
                         padding: '8px',
-                        width: '140px',
+                        width: '180px',
                         boxSizing: 'border-box',
                       },
                       '& .MuiOutlinedInput-root': {
@@ -956,7 +956,7 @@ const MapLayers = () => {
                         fontSize: '14px',
                         height: '36px',
                         padding: '8px',
-                        width: '140px',
+                        width: '180px',
                         boxSizing: 'border-box',
                       },
                       '& .MuiOutlinedInput-root': {
