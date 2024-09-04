@@ -89,9 +89,10 @@ const convertArrayToFilteredArray = (inputArray: any) => {
             paid_by: string,
             commodity_desc: any,
             expected_loading_date: any,
-            HA: any
+            HA: any,
+            rr_dates : any,
         }) => {
-        const { edemand_no, FNR, all_FNRs, delivery_location, trip_tracker, others, remarks, unique_code, status, pickup_date, captive_id, is_captive, eta, rr_document, polyline, past_etas, no_of_wagons, received_no_of_wagons, demand_date, paid_by, commodity_desc, expected_loading_date, HA } = item;
+        const { edemand_no, FNR, all_FNRs,rr_dates, delivery_location, trip_tracker, others, remarks, unique_code, status, pickup_date, captive_id, is_captive, eta, rr_document, polyline, past_etas, no_of_wagons, received_no_of_wagons, demand_date, paid_by, commodity_desc, expected_loading_date, HA } = item;
         return {
             _id: item._id,
             edemand: {
@@ -150,7 +151,8 @@ const convertArrayToFilteredArray = (inputArray: any) => {
             expected_loading_date: expected_loading_date && {
                 ELDdate: service.utcToist(expected_loading_date) || 'NA',
                 ELDtime: service.utcToistTime(expected_loading_date) || 'NA'
-            }
+            },
+            oneRr_date: rr_dates && rr_dates.length > 0 ? service.utcToist(rr_dates[0]) : 'NA',
         }
     });
 };
@@ -677,7 +679,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                             <div>
                                                                 {row.pickup_date ? (
                                                                     <>
-                                                                        <div>{value.date}</div>
+                                                                        <div>{row.oneRr_date}</div>
                                                                         {/* <div>{value.pickupTime}</div> */}
                                                                     </>
                                                                 ) : 'NA'}
