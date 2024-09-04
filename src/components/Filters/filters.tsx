@@ -290,10 +290,10 @@ function Filters({ onToFromChange, onChangeStatus, onChangeRakeTypes, reload, sh
                 </div>
 
                 <div className='status_container' style={{marginRight: 40 }}>
-                    <FormControl sx={{  margin: 0, padding: 0 }}>
+                    <FormControl sx={{  margin: 0, padding: 0,  marginTop: '2px' }}>
                         <InputLabel id="demo-multiple-checkbox-label" sx={{
-                            padding: 0, fontSize: 14, marginTop: '-8px',
-                        }}>Status</InputLabel>
+                            padding: 0, fontSize: 14, marginTop: '6px',
+                        }}></InputLabel>
                         <Select
 
                             labelId="demo-multiple-checkbox-label"
@@ -338,7 +338,7 @@ function Filters({ onToFromChange, onChangeStatus, onChangeRakeTypes, reload, sh
                     }}>
                         <InputLabel id="demo-multiple-checkbox-label" sx={{
                             padding: 0, fontSize: 14, marginTop: '-8px',
-                        }}>Rake Type</InputLabel>
+                        }}> </InputLabel>
                         <Select
                             labelId="demo-multiple-checkbox-label"
                             id="demo-multiple-checkbox"
