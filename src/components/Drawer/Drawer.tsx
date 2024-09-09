@@ -15,6 +15,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import fullLogo from '@/assets/Smartruck_hover_logo.svg'
 import HandlingAgentInactive from '@/assets/handling_agent_inactive_icon.svg';
 import handlingAgentActive from '@/assets/handling_agent_active_icon.svg'
+import AssessmentIcon from '@mui/icons-material/Assessment';
 
 function SideDrawer() {
     const [open, setOpen] = useState(false);
@@ -23,6 +24,8 @@ function SideDrawer() {
     const [active, setActive] = useState('orders')
     const router = useRouter();
     const [handleAgent, setHandleAgent] = useState(false);
+    const [etaReport, setEtaReport] = useState(false);
+ 
     const pathName = usePathname();
     const handleRouting = (route: string) => {
         console.log(route)
@@ -46,6 +49,7 @@ function SideDrawer() {
                 transition: 'width 0.2s ease-in'
              }}>
             <div className='img'><Image src={open ? fullLogo : defaultLogo} alt='' style={{ height:'56px', marginLeft:open ? '23px' : '0px'}} /></div>
+            
             <div 
                 className='fnr-icon' onClick={() => handleRouting('orders')} 
                 style={{ 
@@ -78,6 +82,7 @@ function SideDrawer() {
                         Captive Rakes
                 </div>
             </div>
+
             <div 
                 onMouseEnter={() => { setStation(true) }}
                 onMouseLeave={() => { setStation(false) }}
@@ -99,6 +104,7 @@ function SideDrawer() {
                         Station Management
                 </div>
             </div>
+
             <div 
                 onMouseEnter={() => { setHandleAgent(true) }}
                 onMouseLeave={() => { setHandleAgent(false) }}
@@ -119,6 +125,25 @@ function SideDrawer() {
                     style={{ color: handleAgent ? 'black' : 'white' }} >
                         Handling Agent
                 </div>
+            </div>
+
+            <div
+                onMouseEnter={()=>{ setEtaReport(true) }}
+                onMouseLeave={()=>{ setEtaReport(false) }}
+                onClick={() => handleRouting('etaReport')}
+                className='station-code'
+                style={{
+                    width: open ? '190px' : '42px',
+                    justifyContent: open ? 'start' : 'center',
+                    backgroundColor: etaReport === true ? 'white' : '',
+                    cursor: 'pointer'
+                }}
+            >
+                <AssessmentIcon style={{ marginLeft: open ? '9px' : '', color: etaReport ? 'black' : 'white' }}/>
+                <div
+                    className={`${open ? 'fnr_text' : 'fnr_text_none'}`}
+                    style={{ color: etaReport ? 'black' : 'white' }} 
+                >Reports</div>
             </div>
         </div>
     );
