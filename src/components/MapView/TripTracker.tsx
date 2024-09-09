@@ -190,7 +190,7 @@ const TripTracker = (params: any) => {
     setEstimatedTrack(decodeline);
     // remove tracks if currentStatus is empty or its misisng geo_point ir if geo_point.coordinates is empty or if its length is less than 2 or if geo_point.coordinates ==[0, 0]
     
-    const foisPolyline = rakeData && rakeData.fois && rakeData.fois.polyline || '';
+    const foisPolyline = rakeData && rakeData?.trip_tracker && rakeData.trip_tracker?.foisPolyline || '';
     const foisDecodedCoordinates = polyline.decode(foisPolyline) || [];
     setFoisPolyline(foisDecodedCoordinates);
     

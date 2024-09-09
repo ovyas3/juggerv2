@@ -115,7 +115,7 @@ function HandlingAgent() {
             setActiveAgentList(activeOriginalAgentList);
         } else {
             const filteredAgentList = activeOriginalAgentList.filter((agent: any) => {
-                const parentName = agent?.parent_name?.toLowerCase();
+                const parentName = agent?.name?.toLowerCase();
                 return parentName?.includes(targetValue);
             });
             setActiveAgentList(filteredAgentList);

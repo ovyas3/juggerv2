@@ -9,7 +9,7 @@ import { useSnackbar } from '@/hooks/snackBar';
 
 
 
-function StationAdd({ setOpenAddStationModal, getStations, stationPayload }: any) {
+function StationAdd({ setOpenAddStationModal, getStations, stationPayload, editStationPayload, editFlag }: any) {
 
     const { showMessage } = useSnackbar();
     const [allZones, setAllZones] = useState<string[]>([]);
@@ -41,6 +41,33 @@ function StationAdd({ setOpenAddStationModal, getStations, stationPayload }: any
         longitude: '',
         stationCodeId: '',
     })
+
+    useEffect(() => {
+        if (editFlag) {
+            setStationAddObject({
+                stationName: editStationPayload?.stationName,
+                stationCode: editStationPayload?.stationCode,
+                zone: editStationPayload?.zone,
+                state: editStationPayload?.state,
+                latitude: editStationPayload?.location[0],
+                longitude: editStationPayload?.location[1],
+                stationCodeId: '-1',
+            });
+            setStationCode(editStationPayload?.stationCode);
+        }
+        if (!editFlag) {
+            setStationAddObject({
+                stationName: '',
+                stationCode: '',
+                zone: '',
+                state: '',
+                latitude: '',
+                longitude: '',
+                stationCodeId: '',
+            });
+            setStationCode('');
+        }
+    }, [editFlag, editStationPayload]); 
 
     async function getAllZones() {
         await httpsGet('get/zones').then((response) => {
@@ -164,26 +191,55 @@ function StationAdd({ setOpenAddStationModal, getStations, stationPayload }: any
             zone: stationAddObject.zone,
             state: stationAddObject.state
         }
-        try {
-            await httpsPost('add/stations', payload).then((res) => {
-                if(res.statusCode === 200){
-                    getStations({stationPayload});
-                    setOpenAddStationModal(false);
-                    setLongitudeError('');
-                    setLatitudeError('');
-                    setOpenAddStationModal(false); 
-                    setStationAddObject({stationCodeId:'', stationName:'', stationCode:'', zone:'', state:'', latitude:'', longitude:''}); 
-                    setStationCode('') ;
-                    showMessage('Station Added Successfully', 'success');
-                }
-            }).catch((error) => {
-                console.error(error);
-            })
-        } catch (error) {
-            console.log(error)
+        if(!editFlag){
+            try {
+                await httpsPost('add/stations', payload).then((res) => {
+                    if(res.statusCode === 200){
+                        getStations({stationPayload});
+                        setOpenAddStationModal(false);
+                        setLongitudeError('');
+                        setLatitudeError('');
+                        setOpenAddStationModal(false); 
+                        setStationAddObject({stationCodeId:'', stationName:'', stationCode:'', zone:'', state:'', latitude:'', longitude:''}); 
+                        setStationCode('') ;
+                        showMessage('Station Added Successfully', 'success');
+                    }
+                }).catch((error) => {
+                    console.error(error);
+                })
+            } catch (error) {
+                console.log(error)
+            }
         }
-        
-      }
+        if(editFlag){
+            const editPayload = {
+                id: editStationPayload._id,
+                name: stationAddObject.stationName,
+                code: stationAddObject.stationCode,
+                lat: stationAddObject.latitude,
+                long: stationAddObject.longitude,
+                zone: stationAddObject.zone,
+                state: stationAddObject.state
+            }
+            try {
+                await httpsPost('edit/stations', editPayload).then((res) => {
+                    if (res.statusCode === 200) {
+                        getStations({stationPayload});
+                        setOpenAddStationModal(false);
+                        setLongitudeError('');
+                        setLatitudeError('');
+                        setOpenAddStationModal(false); 
+                        setStationAddObject({stationCodeId:'', stationName:'', stationCode:'', zone:'', state:'', latitude:'', longitude:''}); 
+                        setStationCode('') ;
+                        showMessage('Station Added Successfully', 'success');
+                    }
+                })
+            }catch (error) {
+                console.log(error)
+            }
+
+        }
+    }
 
     useEffect(() => {
         getAllZones();
@@ -191,8 +247,8 @@ function StationAdd({ setOpenAddStationModal, getStations, stationPayload }: any
     }, [])
 
     return (
-        <div className='container_station_modal' onClick={(e) => { e.stopPropagation(); setOpenZoneDialogBox(false); setOpenStateDialogBox(false) }}>
-            <div>Add Station</div>
+        <div className='container_station_modal' onClick={(e) => { e.stopPropagation(); setOpenZoneDialogBox(false); setOpenStateDialogBox(false);}}>
+            <div>{editFlag ? 'Edit Station' : 'Add Station'}</div>
             <form>
                 <div>
                     <p>Station Code</p>
@@ -234,12 +290,12 @@ function StationAdd({ setOpenAddStationModal, getStations, stationPayload }: any
                     <div style={{position:'absolute', top:55}} className='stateError'>{stateError}</div>
                 </div>
                 <div>
-                    <p>Latitude</p>
+                    <p>Longitude</p>
                     <input type='number' placeholder='' onChange={(e) => { setStationAddObject({...stationAddObject, latitude:e.target.value}); handleLatitudeChange(e); }} value={stationAddObject.latitude} />
                     <div>{latitudeError}</div>
                 </div>
                 <div>
-                    <p>Longitude</p>
+                    <p>Latitude</p>
                     <input type='number' placeholder='' onChange={(e) => { handleLongitudeChange(e);setStationAddObject({...stationAddObject, longitude:e.target.value}); }} value={stationAddObject.longitude} />
                     <div>{longitudeError}</div>
                 </div>
