@@ -115,7 +115,7 @@ function HandlingAgent() {
             setActiveAgentList(activeOriginalAgentList);
         } else {
             const filteredAgentList = activeOriginalAgentList.filter((agent: any) => {
-                const parentName = agent?.parent_name?.toLowerCase();
+                const parentName = agent?.name?.toLowerCase();
                 return parentName?.includes(targetValue);
             });
             setActiveAgentList(filteredAgentList);
@@ -165,7 +165,8 @@ function HandlingAgent() {
                 </div>
 
                 <div style={{ display: selectedHeading === 'activeHA' ? 'block' : 'none', height: '90%', marginTop:24 }} >
-                    <div className='search_invite'>
+                    <div className='search_invite1'>
+                    <div></div>
                         <div className='search_container'>
                             <div className='dropDown_agentName' >
                                 <div>Agent Name</div>
