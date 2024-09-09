@@ -83,6 +83,7 @@ const OrdersPage = () => {
   const [selected_bound, setSelected_bound] = useState('outbound')
   const [remarksList, setRemarksList] = useState({})
   const [triggerShipments, setTriggerShipments] = useState(false)
+  const [status, setStatus] = useState(['In Transit', 'Delivered At Hub', 'Delivered At Customer']);
 
   const [showRefreash, setShowRefreash] = useState(false)
 
@@ -149,6 +150,7 @@ const OrdersPage = () => {
   }
 
   const handleChangeStatus = (status: string[]) => {
+    setStatus(status);
     setShipmentsPayload((prevState: any) => {
       if (status.length === 0) {
         const { status, ...newState } = prevState;
@@ -215,6 +217,42 @@ const OrdersPage = () => {
       return newState
     });
   }
+
+  const getStatusColor = (statuses: string[], div: string) => {
+    let backgroundColor = '#FFFFFF';
+    let countTextColor = '#42454E';
+    let textTextColor = '#7C7E8C';
+  
+    switch (div) {
+      case 'In Plant':
+        if (statuses.includes('Available eIndent') || statuses.includes('Ready for Departure')) {
+          backgroundColor = '#334FFC1F';
+          countTextColor = '#334FFC'; 
+          textTextColor = '#334FFC'; 
+        }
+        break;
+      case 'In Transit':
+        if (statuses.includes('In Transit')) {
+          backgroundColor = '#FF98001F';
+          countTextColor = '#FF9800'; 
+          textTextColor = '#FF9800'; 
+        }
+        break;
+      case 'Delivered':
+        if (statuses.includes('Delivered At Hub') || statuses.includes('Delivered At Customer')) {
+          backgroundColor = '#18BE8A1F';
+          countTextColor = '#18BE8A'; 
+          textTextColor = '#18BE8A'; 
+        }
+        break;
+      default:
+        backgroundColor = '#FFFFFF';
+        countTextColor = '#42454E';
+        textTextColor = '#7C7E8C';
+    }
+  
+    return { backgroundColor, countTextColor, textTextColor };
+  };
 
   useEffect(() => {
     getCaptiveRake();
@@ -293,24 +331,23 @@ const OrdersPage = () => {
                 </div>
               </div>
               <div className='display_status'>
-                    <div className='display_status_inner_box'>
-                      {/* <div style={{fontSize:20, fontWeight:500}}>{totalCountrake[0]?.totalCount ? totalCountrake[0]?.totalCount : 0}</div> */}
-                      <div style={{fontSize:20, fontWeight:500}}>{fetchTotalCount}</div>
-                      <div style={{fontSize:12, color:'#7C7E8C'}}>Total</div>
+                    <div className='display_status_inner_box' style={{
+                      backgroundColor: (status.includes('Available eIndent') && status.includes('Ready for Departure') && status.includes('In Transit') && status.includes('Delivered At Hub') && status.includes('Delivered At Customer')) ? '#000000' : '#FFFFFF',
+                    }}>
+                      <div style={{fontSize:20, fontWeight:500, color: (status.includes('Available eIndent') && status.includes('Ready for Departure') && status.includes('In Transit') && status.includes('Delivered At Hub') && status.includes('Delivered At Customer')) ? '#FFFFFF' : '#000000'}}>{fetchTotalCount}</div>
+                      <div style={{fontSize:12, color: (status.includes('Available eIndent') && status.includes('Ready for Departure') && status.includes('In Transit') && status.includes('Delivered At Hub') && status.includes('Delivered At Customer')) ? '#FFFFFF' : '#7C7E8C'}}>Total</div>
                     </div>
-                    <div className='display_status_inner_box'>
-                      {/* <div style={{fontSize:20, fontWeight:500}}>{totalCountrake[0]?.totalCount ? totalCountrake[0]?.totalCount - ((totalCountrake[0]?.statuses?.find((item: any) => item.status === "ITNS")?.count || 0) + (totalCountrake[0]?.statuses?.find((item: any) => item.status === "Delivered")?.count || 0)) : 0}</div> */}
-                      <div style={{fontSize:20, fontWeight:500}}>{inPlantCount}</div>
-                      <div style={{fontSize:12, color:'#7C7E8C'}}>In Plant</div>
+                    <div className='display_status_inner_box' style={{backgroundColor: getStatusColor(status, 'In Plant').backgroundColor}}>
+                      <div style={{fontSize:20, fontWeight:500, color: getStatusColor(status, 'In Plant').countTextColor}}>{inPlantCount}</div>
+                      <div style={{fontSize:12, color: getStatusColor(status, 'In Plant').textTextColor}}>In Plant</div>
                     </div>
-                    <div className='display_status_inner_box'>
-                      {/* <div style={{fontSize:20, fontWeight:500}}>{totalCountrake[0]?.statuses?.find((item: any) => item.status === "ITNS")?.count || 0}</div> */}
-                      <div style={{fontSize:20, fontWeight:500}}>{inTransitCount}</div>
-                      <div style={{fontSize:12, color:'#7C7E8C'}}>In Transit</div>
+                    <div className='display_status_inner_box' style={{backgroundColor: getStatusColor(status, 'In Transit').backgroundColor}}>
+                      <div style={{fontSize:20, fontWeight:500, color: getStatusColor(status, 'In Transit').countTextColor}}>{inTransitCount}</div>
+                      <div style={{fontSize:12, color: getStatusColor(status, 'In Transit').textTextColor}}>In Transit</div>
                     </div>
-                    <div className='display_status_inner_box'>
-                      <div style={{fontSize:20, fontWeight:500}}>{deliveredCount}</div>
-                      <div style={{fontSize:12, color:'#7C7E8C'}}>Delivered</div>
+                    <div className='display_status_inner_box' style={{backgroundColor: getStatusColor(status, 'Delivered').backgroundColor}}>
+                      <div style={{fontSize:20, fontWeight:500, color: getStatusColor(status, 'Delivered').countTextColor}}>{deliveredCount}</div>
+                      <div style={{fontSize:12, color: getStatusColor(status, 'Delivered').textTextColor}}>Delivered</div>
                     </div>
               </div>              
               <div className='table'>
