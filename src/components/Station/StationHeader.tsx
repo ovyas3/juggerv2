@@ -13,6 +13,12 @@ import './StationHeader.css'
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import {environment} from '@/environments/env.api';
 
+import EditNoteOutlinedIcon from '@mui/icons-material/EditNoteOutlined';
+import IconButton from '@mui/material/IconButton';
+import Popover from '@mui/material/Popover';
+import { httpsPost } from '@/utils/Communication';
+import { useSnackbar } from '@/hooks/snackBar';
+
 interface Column {
     id: string
     label: string;
@@ -52,11 +58,18 @@ function contructingData(stationList: any) {
 
 
 
-export default function StationHeader({ countStation, allStations, setStationPayload, stationPayload }: any) {
+export default function StationHeader({ countStation, allStations, setStationPayload, stationPayload, stationForEdit }: any) {
 
     const [resultStation, setResultStation] = useState(contructingData([]));
     const [page, setPage] = React.useState(0);
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
+
+
+    const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
+    const [showActionBox, setShowActionBox] = React.useState(-1);
+    const { showMessage } = useSnackbar();
+
+    const handleClickPopoverClose =()=>{setAnchorEl(null);setShowActionBox(-1);}
 
     const handleChangePage = (event: unknown, newPage: number) => {
         setPage(newPage);
@@ -66,6 +79,11 @@ export default function StationHeader({ countStation, allStations, setStationPay
         setRowsPerPage(+event.target.value);
         setPage(0);
     };
+
+    function clickActionBox(e: React.MouseEvent<SVGSVGElement, MouseEvent>, index: number, id: string, locationId: string) {
+        e.stopPropagation();
+        setShowActionBox(prevIndex => (prevIndex === index ? -1 : index));
+    }
 
     useEffect(() => {
         setResultStation(contructingData(allStations))
@@ -117,8 +135,22 @@ export default function StationHeader({ countStation, allStations, setStationPay
                                                         </div>
                                                     )}
                                                     {column.id === 'action' && (
-                                                        <div className='blue-square-station' >
-                                                            <MoreVertIcon style={{ color: 'white', cursor: 'pointer', fontSize: '16px' }} />
+                                                        <div className='blue-square-station'  >
+                                                            <MoreVertIcon style={{ color: 'white', cursor: 'pointer', fontSize: '16px' }}
+                                                             onClick={(e)=>{clickActionBox(e, rowIndex, '', '');setAnchorEl(e.currentTarget as unknown as HTMLButtonElement);}} />
+                                                            <Popover
+                                                                open={showActionBox === rowIndex ? true : false}
+                                                                anchorEl={anchorEl}
+                                                                onClose={handleClickPopoverClose}
+                                                                anchorOrigin={{vertical: 25,horizontal: -130,}}
+                                                            >
+                                                                <div className='action_items_box_StationManagement' >
+                                                                    {/* {row.verified !== 'verified' && <div id='verified' onClick={(e)=>{sendingVerification(row)}}>Verification</div> } */}
+                                                                    {/* {row.verified === 'expired' && <div id='reInvite' onClick={(e)=>{sendingReinvite(row)}} >Re-Invite</div>} */}
+                                                                    <div id='edit' onClick={(e)=>{stationForEdit(row);setAnchorEl(null);setShowActionBox(-1);}} >Edit</div>
+                                                                    {/* <div id='Delete' onClick={(e)=>{}}>Delete</div> */}
+                                                                </div>
+                                                            </Popover>
                                                         </div>
                                                     )}
                                                 </TableCell>

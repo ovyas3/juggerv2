@@ -1,0 +1,40 @@
+.content_container{
+    width: calc(100vw - 70px);
+    height: calc(100vh - 56px);
+    padding: 24px 24px 24px 24px ;    
+}
+.adjustMargin{
+    margin-top: 56px;
+    margin-left: 70px; 
+}
+.adjustMarginMobile {
+    width: 100vw;
+    height: calc(100vh - 56px - 54px);
+} 
+.date_container{
+    display: flex;
+    gap: 16px;
+    margin-top: 12px;
+}
+.report_type{
+    display: flex;
+    align-items: center;
+}
+.report_btn{
+    width: 228px;
+    padding: 12px 26px;
+    font-size: 16px;
+    margin-top: 20px;
+    border: none;
+    border-radius: 6px;
+    background-color: #20124D;
+    color: white;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+}
+.report_btn:hover{
+    scale: 1.05;
+    background-color: #231454;
+}
+
