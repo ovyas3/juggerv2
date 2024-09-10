@@ -616,12 +616,9 @@ export const HandlingAgentSelection = ({ shipmentId, setOpen, locationId, getAll
     const [originalSelectedHAids, setOriginalSelectedHAids] = useState<Set<any>>(new Set());
     const [newIds, setNewIds] = useState<string[]>([]);
     const [removeIds, setRemoveIds] = useState<string[]>([]);
-
-
+    const [toggleForShowAllHA, setToggleForShowAllHA] = useState(true);
 
     const { showMessage } = useSnackbar();
-
-
     const getLocationList = async () => {
         try {
             const res = await httpsGet(`${GET_HANDLING_AGENT_LIST}?delivery_locations=${locationId}`);
@@ -717,6 +714,16 @@ export const HandlingAgentSelection = ({ shipmentId, setOpen, locationId, getAll
         },
     };
 
+    async function bringAllHandlingAgent(){
+        try {
+            const res = toggleForShowAllHA ? await httpsGet(`${GET_HANDLING_AGENT_LIST}?delivery_locations=${locationId}&isAllHA=${toggleForShowAllHA}`) : await httpsGet(`${GET_HANDLING_AGENT_LIST}?delivery_locations=${locationId}`);
+            if (res.statusCode === 200) {
+                setAllListOfHAids(res?.data);
+            }
+        } catch (error) {
+            console.error("Error fetching location list:", error);
+        }
+    }
 
     return (
         <div style={{ position: 'relative', padding: 24 }}>
@@ -752,7 +759,14 @@ export const HandlingAgentSelection = ({ shipmentId, setOpen, locationId, getAll
                 </FormControl>
             </div>
 
-            <div style={{ marginTop: 64, textAlign: 'right' }}>
+            <div style={{ display: 'flex', justifyContent: 'end', marginTop: 12, gap:5, alignItems: 'center' }}>
+                <div style={{ fontSize: 12, color: '#7C7E8C' }}>Show All Handling Agents</div>
+                <div style={{backgroundColor:toggleForShowAllHA ? 'GrayText' : '#E34031', width:'30px', height:'18px', borderRadius:'12px', display:'flex', alignItems:'center', justifyContent:toggleForShowAllHA?'start':'end'}}>
+                    <div onClick={(e)=>{e.stopPropagation(); setToggleForShowAllHA(pre => !pre); bringAllHandlingAgent(); }} style={{backgroundColor:'white', width:'14px', height:'14px', borderRadius:'50%', marginInline:'2px', cursor:'pointer'}}></div>
+                </div>
+            </div>
+
+            <div style={{ marginTop: 50, textAlign: 'right' }}>
                 <Button
                     variant="contained"
                     size='small'
@@ -793,3 +807,79 @@ export const HandlingAgentSelection = ({ shipmentId, setOpen, locationId, getAll
         </div>
     );
 };
+export const MarkPlacement = ({isClose ,shipment}: any) =>{
+   
+    const [currentDate, setCurrentDate] = useState(new Date());
+    const { showMessage } = useSnackbar();
+
+    const handlePlacementDate = async() => {
+        if(!currentDate) {
+            showMessage('Please Select Date', 'error');
+            return;
+        }
+        const payload = {
+            id: shipment._id,
+            placement_time : currentDate
+        }
+       
+      try {
+        const response = await httpsPost('rake_shipment/mark_placement', payload)
+        if(response.statusCode === 200) {
+            isClose(false);
+            showMessage('Placement Marked Successfully', 'success');
+        }
+      } catch (error) {
+        console.log(error)
+      }
+       
+    }
+
+   
+
+
+
+
+    return (
+        <div style={{width:'100vw', height:'100vh', position:'fixed', top:0, left:0 ,zIndex:300, backgroundColor:'rgba(0, 0, 0, 0.5)'}} onClick={(e)=>{e.stopPropagation(); isClose(false);}}>
+            <div style={{width:800, height:500, backgroundColor:'white', position:'absolute', top:'50%', left:'50%', transform:'translate(-50%,-50%)', borderRadius:20, padding:20}} onClick={(e)=>{e.stopPropagation()}}>
+                <div style={{position:'relative', bottom:0, right:0}}>
+                <div style={{display:'flex', justifyContent:'space-between',}}>
+                    <h2>Mark Placement</h2>
+                    <section>edemand No. <span style={{fontWeight:'bold'}}>{shipment.edemand.edemand_no}</span></section>
+                </div>
+
+                <div style={{ marginTop:20, position:'relative'}}>
+                    <div>Fnr No. <span style={{fontWeight:'bold', fontSize:16}}>{shipment?.fnr?.primary}</span></div>
+                    {shipment.fnr.others.length > 1 
+                    && (<div style={{position:'absolute', top:-2, left:160, backgroundColor:'#20124D', color:'white', fontSize:10, height:20, width:20, borderRadius:'50%', display:'flex', justifyContent:'center', alignItems:'center'}}>+{shipment.fnr.others.length-1}</div>)}
+                    {/* <div>{shipment?.fnr?.others.map((item:any, index:any)=>{return(<div key={index} >{item}</div>)})}</div> */}
+                </div>
+
+                <div>
+                    <div style={{marginTop:20}}>Expected Loading Date: <span style={{fontWeight:'bold', fontSize:16}}>{shipment.expected_loading_date.ELDdate}</span></div>
+                </div>
+
+                <div style={{marginTop:20}}>
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                            <DatePicker 
+                                label="Mark Placement" 
+                                format="DD/MM/YYYY"
+                                value={dayjs(currentDate)}
+                                onChange={(newDate) => { 
+                                    if (newDate) {
+                                        setCurrentDate(newDate.toDate());
+                                    }
+                                }}
+                            />
+                    </LocalizationProvider>
+                </div>
+
+                <div style={{display:'flex', gap:20, position:'absolute', bottom:-278, right:0 }}>
+                    <Button onClick={(e)=>{ e.stopPropagation();  isClose(false); }} style={{color:'#E44031', border:'1px solid #E44031', width:100, cursor:'pointer'}}>Cancel</Button>
+                    <Button onClick={(e)=>{e.stopPropagation();  handlePlacementDate(); }} style={{color:'white', backgroundColor:'#E44031',width:100, border:'1px solid #E44031', cursor:'pointer' }}>Placement</Button>
+                </div>
+                </div>
+            </div>
+        </div>
+    );
+}

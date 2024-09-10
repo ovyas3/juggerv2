@@ -49,18 +49,21 @@ import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import EditNoteOutlinedIcon from '@mui/icons-material/EditNoteOutlined';
 import RvHookupIcon from '@mui/icons-material/RvHookup';
 import UploadAnnexure from '../uploadAnnexureModal/uploadAnnexureModal';
+import PublishedWithChangesIcon from '@mui/icons-material/PublishedWithChanges';
 
-import { ActionItem, EditELD, HandlingAgentSelection, PastEta, RemarkComponent, Remarks, Tags} from './tableComp'
+import { ActionItem, EditELD, HandlingAgentSelection, PastEta, RemarkComponent, Remarks, Tags,MarkPlacement} from './tableComp'
 
 const status_class_map: { [key: string]: string } = {
     'OB': 'status_title_In_Plant',
     'AVE': 'status_title_In_Plant',
     'RFD': 'status_title_rfd',
     'ITNS': 'status_title_In_Transit',
-    'Delivered': 'status_title_Delivered'
+    'Delivered': 'status_title_Delivered',
+    'INPL': 'status_title_INPL'
 }
 
 const convertArrayToFilteredArray = (inputArray: any) => {
+    console.log(inputArray)
     return inputArray.map((
         item: {
             is_fois_fetched?: any;
@@ -91,8 +94,9 @@ const convertArrayToFilteredArray = (inputArray: any) => {
             expected_loading_date: any,
             HA: any,
             rr_dates : any,
+            placement_time:any
         }) => {
-        const { edemand_no, FNR, all_FNRs,rr_dates, delivery_location, trip_tracker, others, remarks, unique_code, status, pickup_date, captive_id, is_captive, eta, rr_document, polyline, past_etas, no_of_wagons, received_no_of_wagons, demand_date, paid_by, commodity_desc, expected_loading_date, HA } = item;
+        const { edemand_no, FNR,placement_time, all_FNRs,rr_dates, delivery_location, trip_tracker, others, remarks, unique_code, status, pickup_date, captive_id, is_captive, eta, rr_document, polyline, past_etas, no_of_wagons, received_no_of_wagons, demand_date, paid_by, commodity_desc, expected_loading_date, HA } = item;
         return {
             _id: item._id,
             edemand: {
@@ -152,6 +156,7 @@ const convertArrayToFilteredArray = (inputArray: any) => {
                 ELDdate: service.utcToist(expected_loading_date) || 'NA',
                 ELDtime: service.utcToistTime(expected_loading_date) || 'NA'
             },
+            placement_time: placement_time && service.utcToist(placement_time)|| 'NA',
             oneRr_date: rr_dates && rr_dates.length > 0 ? service.utcToist(rr_dates[0]) : 'NA',
         }
     });
@@ -219,6 +224,9 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
     const [uploadAnnexureShipID,setUploadAnnexureShipID] = useState('')
     const [uploadAnnexureFNR,setUploadAnnexureFNR] = useState('')
 
+    //mark placement
+    const [openMarkPlacement, setOpenMarkPlacement] = useState(false);
+    const [markPlacementId, setMarkPlacementId] = useState({});
 
     const handleRRDoc = (id: any) => {  // for rr documents
         setRRModalOpen(true);
@@ -290,6 +298,12 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
 
     }
 
+    const markPlacementModal = (row : any) =>{
+       setOpenMarkPlacement(true);
+       setMarkPlacementId(row);
+
+    }
+
 
 
     useEffect(() => {
@@ -340,7 +354,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
             { id: 'material', subLabel: '', label: 'Commodities', class: 'material', innerClass: '' },
             { id: 'eld', subLabel: '', label: 'Expected Loading Date', class: 'eld', innerClass: '' },
             // { id: 'aging', label: 'Ageing', class: 'aging', innerClass: '' },
-            { id: 'pickupdate', subLabel: '', label: 'RR Date', class: 'pickupdate', innerClass: 'inner_pickup' },
+            { id: 'pickupdate', subLabel: 'Placement Date', label: 'RR Date', class: 'pickupdate', innerClass: 'inner_pickup' },
             { id: 'status', subLabel: '', label: 'Status', class: 'status', innerClass: 'inner_status' },
             { id: 'currentEta', subLabel: 'Current ETA', label: 'Initial ETA', class: 'currentEta', innerClass: 'inner_eta' },
             // { id: 'deliverDate', label: 'Delivered Date', class: 'deliverDate', innerClass: '' },
@@ -493,6 +507,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                 iconheader: 'body_iconheader',
                                                 eld: 'body_eld',
                                             }
+                                            console.log(row.placement_time, 'placement_time')
                                             return (
                                                 <TableCell key={index} sx={{ fontSize: '12px', color: '#44475B', p: '16px 10px 16px 10px' }}
                                                     className={columnClassNames[item.id]} >
@@ -566,7 +581,15 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                             text={t('uploadAnnexure')}
                                                                             onClick={()=>{handleUploadAnnexureModal(row)}}
                                                                             id="uploadAnnexure"
-                                                                        />
+                                                                            />
+                                                                            {row.status.raw === 'AVE' &&
+                                                                                 <ActionItem
+                                                                                 icon={<PublishedWithChangesIcon style={{ width: "24px", height: '24px', color: '#008001' }} />}
+                                                                                 text={t('markPlacement')}
+                                                                                 onClick={()=>{markPlacementModal(row)}}
+                                                                                 id="markPlacement"
+                                                                             />
+                                                                            }
                                                                         </div>
                                                                     </Popover>
                                                                 </div>
@@ -681,6 +704,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                     <>
                                                                         <div>{row.oneRr_date}</div>
                                                                         {/* <div>{value.pickupTime}</div> */}
+                                                                        <div style={{ marginTop: '16px' }}>{row?.placement_time}</div>
                                                                     </>
                                                                 ) : 'NA'}
                                                             </div>
@@ -816,6 +840,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
             <RRModal isOpen={isRRModalOpen} isClose={() => setRRModalOpen(false)} rrNumbers={rrNumbers} isRRDoc={isRRDoc} />
             {openAnnexureModal && 
                <UploadAnnexure isOpen={openAnnexureModal} isClose={()=> setOpenAnnexureModal(false)} shipmentID={uploadAnnexureShipID} FNR_No={uploadAnnexureFNR}/>}
+            {openMarkPlacement && <MarkPlacement isClose={setOpenMarkPlacement} shipment={markPlacementId} />}
             <Modal
                 open={open}
                 onClose={(e) => { handleClose(e) }}

@@ -18,6 +18,7 @@ import { useSnackbar } from '@/hooks/snackBar';
 import service from '@/utils/timeService';
 import { color } from 'framer-motion';
 import { getShipmentStatusSummary } from '@/utils/hooks'
+import { useRouter } from 'next/navigation';
 
 
 const getStatusCode = (status: string): string => {
@@ -33,22 +34,12 @@ const getStatusCode = (status: string): string => {
     case "Delivered At Customer":
       return 'Delivered'
     case "In Plant":
-      return 'AVE'
+      return 'INPL'
     default:
       return 'All'
   }
 }
 
-async function totalCount (fromDate: string, toDate: string) {
-  const payload:any = {
-    from: fromDate,
-    to: toDate,
-  }
-  console.log("payload", payload);
-  
-  const response = await httpsGet(`get/status_count?from=${payload.from.ts}&to=${payload.to.ts}`);
-  return response;
-}
 
 
 const ageingCode = [
@@ -86,6 +77,7 @@ const OrdersPage = () => {
   const [status, setStatus] = useState(['In Transit', 'Delivered At Hub', 'Delivered At Customer']);
 
   const [showRefreash, setShowRefreash] = useState(false)
+  const route = useRouter();
 
     //totalCount
     const [totalCountrake, setTotalCountrake] = useState<any>([])
@@ -120,6 +112,17 @@ const OrdersPage = () => {
       to: toEpoch
     });
   };
+
+  async function totalCount (fromDate: string, toDate: string) {
+    const payload:any = {
+      from: fromDate,
+      to: toDate,
+    }
+    console.log("payload", payload);
+    
+    const response = await httpsGet(`get/status_count?from=${payload.from.ts}&to=${payload.to.ts}`,0,route );
+    return response;
+  }
 
   useEffect(() => {
     if (query.from && query.to) {
@@ -177,7 +180,7 @@ const OrdersPage = () => {
   // function which bring allshipment 
   async function getAllShipment() {
     // console.log(ShipmentsPayload)
-    const response = await httpsPost(GET_SHIPMENTS, ShipmentsPayload);
+    const response = await httpsPost(GET_SHIPMENTS, ShipmentsPayload,0,false,route );
     if (response.data && response.data.data) {
       setAllShipment(response.data.data)
       setCount(response.data.total)
@@ -199,12 +202,12 @@ const OrdersPage = () => {
 // },[])
 
   async function getCaptiveRake() {
-    const list_captive_rake = await httpsGet(CAPTIVE_RAKE);
+    const list_captive_rake = await httpsGet(CAPTIVE_RAKE,0,route );
     // console.log(list_captive_rake)
     setRakeCaptiveList(list_captive_rake.data)
   }
   async function getRemarksList() {
-    const list_remarks = await httpsGet(REMARKS_LIST);
+    const list_remarks = await httpsGet(REMARKS_LIST,0,route );
     setRemarksList(list_remarks.data.remark_reasons)
   }
 
@@ -225,10 +228,10 @@ const OrdersPage = () => {
   
     switch (div) {
       case 'In Plant':
-        if (statuses.includes('Available eIndent') || statuses.includes('Ready for Departure')) {
-          backgroundColor = '#334FFC1F';
-          countTextColor = '#334FFC'; 
-          textTextColor = '#334FFC'; 
+        if (statuses.includes('Available eIndent') || statuses.includes('Ready for Departure') || statuses.includes('In Plant')) {
+          backgroundColor = '#a3dfe11f';
+          countTextColor = '#134d68'; 
+          textTextColor = '#134d68'; 
         }
         break;
       case 'In Transit':
@@ -266,7 +269,7 @@ const OrdersPage = () => {
   const fetchTotalCount = totalCountrake[0]?.totalCount || 0;
   const inTransitCount = totalCountrake[0]?.statuses?.find((item: any) => item.status === "ITNS")?.count || 0;
   const deliveredCount = totalCountrake[0]?.statuses?.find((item: any) => item.status === "Delivered")?.count || 0;
-  const inPlantCount = totalCountrake[0]?.statuses?.find((item: any) => item.status === "AVE")?.count || 0;
+  const inPlantCount = totalCountrake[0]?.statuses?.find((item: any) => item.status === "INPL")?.count || 0;
 
   return (
     <div>

@@ -39,10 +39,11 @@ function Filters({ onToFromChange, onChangeStatus, onChangeRakeTypes, reload, sh
 
     const names = [
         'Available eIndent',
+        'In Plant',
         'Ready for Departure',
         'In Transit',
         'Delivered At Hub',
-        'Delivered At Customer'
+        'Delivered At Customer',
     ];
 
 
