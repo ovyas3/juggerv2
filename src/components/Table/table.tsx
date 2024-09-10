@@ -63,7 +63,6 @@ const status_class_map: { [key: string]: string } = {
 }
 
 const convertArrayToFilteredArray = (inputArray: any) => {
-    console.log(inputArray)
     return inputArray.map((
         item: {
             is_fois_fetched?: any;
@@ -507,7 +506,6 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                 iconheader: 'body_iconheader',
                                                 eld: 'body_eld',
                                             }
-                                            console.log(row.placement_time, 'placement_time')
                                             return (
                                                 <TableCell key={index} sx={{ fontSize: '12px', color: '#44475B', p: '16px 10px 16px 10px' }}
                                                     className={columnClassNames[item.id]} >
@@ -704,7 +702,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                     <>
                                                                         <div>{row.oneRr_date}</div>
                                                                         {/* <div>{value.pickupTime}</div> */}
-                                                                        <div style={{ marginTop: '16px' }}>{row?.placement_time}</div>
+                                                                        <div style={{ marginTop: '16px' }}>{row.placement_time}</div>
                                                                     </>
                                                                 ) : 'NA'}
                                                             </div>
