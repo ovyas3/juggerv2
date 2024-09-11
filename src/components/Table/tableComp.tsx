@@ -807,7 +807,7 @@ export const HandlingAgentSelection = ({ shipmentId, setOpen, locationId, getAll
         </div>
     );
 };
-export const MarkPlacement = ({isClose ,shipment}: any) =>{
+export const MarkPlacement = ({isClose ,shipment, getAllShipment}: any) =>{
    
     const [currentDate, setCurrentDate] = useState(new Date());
     const { showMessage } = useSnackbar();
@@ -826,6 +826,7 @@ export const MarkPlacement = ({isClose ,shipment}: any) =>{
         const response = await httpsPost('rake_shipment/mark_placement', payload)
         if(response.statusCode === 200) {
             isClose(false);
+            getAllShipment();
             showMessage('Placement Marked Successfully', 'success');
         }
       } catch (error) {
@@ -845,11 +846,11 @@ export const MarkPlacement = ({isClose ,shipment}: any) =>{
                 <div style={{position:'relative', bottom:0, right:0}}>
                 <div style={{display:'flex', justifyContent:'space-between',}}>
                     <h2>Mark Placement</h2>
-                    <section>edemand No. <span style={{fontWeight:'bold'}}>{shipment.edemand.edemand_no}</span></section>
+                    <section>e-Demand No. <span style={{fontWeight:'bold'}}>{shipment.edemand.edemand_no}</span></section>
                 </div>
 
                 <div style={{ marginTop:20, position:'relative'}}>
-                    <div>Fnr No. <span style={{fontWeight:'bold', fontSize:16}}>{shipment?.fnr?.primary}</span></div>
+                    <div>FNR No. <span style={{fontWeight:'bold', fontSize:16}}>{shipment?.fnr?.primary}</span></div>
                     {shipment.fnr.others.length > 1 
                     && (<div style={{position:'absolute', top:-2, left:160, backgroundColor:'#20124D', color:'white', fontSize:10, height:20, width:20, borderRadius:'50%', display:'flex', justifyContent:'center', alignItems:'center'}}>+{shipment.fnr.others.length-1}</div>)}
                     {/* <div>{shipment?.fnr?.others.map((item:any, index:any)=>{return(<div key={index} >{item}</div>)})}</div> */}

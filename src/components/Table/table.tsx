@@ -580,7 +580,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                             onClick={()=>{handleUploadAnnexureModal(row)}}
                                                                             id="uploadAnnexure"
                                                                             />
-                                                                            {row.status.raw === 'AVE' &&
+                                                                            {row.status.raw === 'INPL' &&
                                                                                  <ActionItem
                                                                                  icon={<PublishedWithChangesIcon style={{ width: "24px", height: '24px', color: '#008001' }} />}
                                                                                  text={t('markPlacement')}
@@ -697,15 +697,11 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                             </div>
                                                         )}
                                                         {item.id === 'pickupdate' && (
-                                                            <div>
-                                                                {row.pickup_date ? (
-                                                                    <>
-                                                                        <div>{row.oneRr_date}</div>
-                                                                        {/* <div>{value.pickupTime}</div> */}
-                                                                        <div style={{ marginTop: '16px' }}>{row.placement_time}</div>
-                                                                    </>
-                                                                ) : 'NA'}
-                                                            </div>
+                                                            <>
+                                                                <div>{row.oneRr_date}</div>
+                                                                {row.status.raw === 'INPL' && ( <div style={{ marginTop: '16px' }}>{row.placement_time}</div> )}
+                                                            </>
+                                                            
                                                         )}
                                                         {item.id === 'status' &&
                                                             <div className='status_container'>
@@ -838,7 +834,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
             <RRModal isOpen={isRRModalOpen} isClose={() => setRRModalOpen(false)} rrNumbers={rrNumbers} isRRDoc={isRRDoc} />
             {openAnnexureModal && 
                <UploadAnnexure isOpen={openAnnexureModal} isClose={()=> setOpenAnnexureModal(false)} shipmentID={uploadAnnexureShipID} FNR_No={uploadAnnexureFNR}/>}
-            {openMarkPlacement && <MarkPlacement isClose={setOpenMarkPlacement} shipment={markPlacementId} />}
+            {openMarkPlacement && <MarkPlacement isClose={setOpenMarkPlacement} shipment={markPlacementId} getAllShipment={getAllShipment} />}
             <Modal
                 open={open}
                 onClose={(e) => { handleClose(e) }}
