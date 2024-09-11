@@ -16,7 +16,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { color } from 'framer-motion';
 import './agentTable.css'
 import Popover from '@mui/material/Popover';
-import { httpsPost } from '@/utils/Communication';
+import { httpsGet, httpsPost } from '@/utils/Communication';
 import { useSnackbar } from '@/hooks/snackBar';
 
 interface Column {
@@ -121,6 +121,25 @@ function AgentTable({ agentList, count, setSkipAndLimit,getHandlingAgents }: any
         }
     }
 
+    const deleteInviteHandlingAgent = async (item:any)=>{
+       const invite_id = item._id;
+       try {
+        const response = await httpsGet(`delete/invited_HA?invite_id=${invite_id}`);
+        if (response && response.statusCode == 200) {
+            showMessage('deleted Successfully.', 'success');
+            getHandlingAgents({skipAndLimit: {skip: 0, limit:10 }});
+            setAnchorEl(null);
+            setShowActionBox(-1);
+        }
+        else {
+            showMessage('Something went wrong while deleting.', 'error');
+        }
+       } catch (error) {
+        showMessage('Something went wrong while deleting.', 'error');
+        console.log(error)
+       }
+    }
+
     useEffect(() => {
         const finalResult = contructingData(agentList)
         setResult(finalResult)
@@ -177,7 +196,7 @@ function AgentTable({ agentList, count, setSkipAndLimit,getHandlingAgents }: any
                                                                 <div className='action_items_box_HA' >
                                                                     {row.verified !== 'verified' && <div id='verified' onClick={(e)=>{sendingVerification(row)}}>Verification</div> }
                                                                     {row.verified === 'expired' && <div id='reInvite' onClick={(e)=>{sendingReinvite(row)}} >Re-Invite</div>}
-                                                                    <div id='Delete' onClick={(e)=>{}}>Delete</div>
+                                                                    <div id='Delete' onClick={(e)=>{deleteInviteHandlingAgent(row)}}>Delete</div>
                                                                 </div>
                                                             </Popover>
                                                         </div>

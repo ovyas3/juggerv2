@@ -325,6 +325,16 @@
     align-items: center;
 }
 
+.status_title_INPL{
+    height: 25px;
+    background-color: #a3dfe11f;
+    color: #134d68;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
 .status_resize {
     display: flex;
     flex-direction: row;
