@@ -346,23 +346,23 @@ const OrdersPage = () => {
                       backgroundColor: (status.includes('Available eIndent') && status.includes('Ready for Departure') && status.includes('In Transit') && status.includes('Delivered At Hub') && status.includes('Delivered At Customer')) ? '#000000' : '#FFFFFF',
                     }}>
                       <div style={{fontSize:20, fontWeight:500, color: (status.includes('Available eIndent') && status.includes('Ready for Departure') && status.includes('In Transit') && status.includes('Delivered At Hub') && status.includes('Delivered At Customer')) ? '#FFFFFF' : '#000000'}}>{fetchTotalCount}</div>
-                      <div style={{fontSize:12, color: (status.includes('Available eIndent') && status.includes('Ready for Departure') && status.includes('In Transit') && status.includes('Delivered At Hub') && status.includes('Delivered At Customer')) ? '#FFFFFF' : '#7C7E8C'}}>Total</div>
+                      <div style={{fontSize:12, color: (status.includes('Available eIndent') && status.includes('Ready for Departure') && status.includes('In Transit') && status.includes('Delivered At Hub') && status.includes('Delivered At Customer')) ? '#FFFFFF' : '#7C7E8C'}}>{t('Total')}</div>
                     </div>
                     <div className='display_status_inner_box' style={{backgroundColor: getStatusColor(status, 'AVE').backgroundColor}}>
                       <div style={{fontSize:20, fontWeight:500, color: getStatusColor(status, 'AVE').countTextColor}}>{availableeIndentCount}</div>
-                      <div style={{fontSize:12, color: getStatusColor(status, 'AVE').textTextColor}}>AVE</div>
+                      <div style={{fontSize:12, color: getStatusColor(status, 'AVE').textTextColor}}>{t('eIndent')}</div>
                     </div>
                     <div className='display_status_inner_box' style={{backgroundColor: getStatusColor(status, 'In Plant').backgroundColor}}>
                       <div style={{fontSize:20, fontWeight:500, color: getStatusColor(status, 'In Plant').countTextColor}}>{inPlantCount}</div>
-                      <div style={{fontSize:12, color: getStatusColor(status, 'In Plant').textTextColor}}>In Plant</div>
+                      <div style={{fontSize:12, color: getStatusColor(status, 'In Plant').textTextColor}}>{t('In Plant')}</div>
                     </div>
                     <div className='display_status_inner_box' style={{backgroundColor: getStatusColor(status, 'In Transit').backgroundColor}}>
                       <div style={{fontSize:20, fontWeight:500, color: getStatusColor(status, 'In Transit').countTextColor}}>{inTransitCount}</div>
-                      <div style={{fontSize:12, color: getStatusColor(status, 'In Transit').textTextColor}}>In Transit</div>
+                      <div style={{fontSize:12, color: getStatusColor(status, 'In Transit').textTextColor}}>{t('In Transit')}</div>
                     </div>
                     <div className='display_status_inner_box' style={{backgroundColor: getStatusColor(status, 'Delivered').backgroundColor}}>
                       <div style={{fontSize:20, fontWeight:500, color: getStatusColor(status, 'Delivered').countTextColor}}>{deliveredCount}</div>
-                      <div style={{fontSize:12, color: getStatusColor(status, 'Delivered').textTextColor}}>Delivered</div>
+                      <div style={{fontSize:12, color: getStatusColor(status, 'Delivered').textTextColor}}>{t('Delivered')}</div>
                     </div>
               </div>              
               <div className='table'>
