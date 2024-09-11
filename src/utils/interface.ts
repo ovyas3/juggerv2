@@ -73,7 +73,8 @@ export interface row {
   },
   past_etas:any,
   oneRr_date:any,
-  placement_time:any
+  placement_time:any,
+  intent_no:any
 }
 
 export interface tagItem {

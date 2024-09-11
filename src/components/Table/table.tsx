@@ -93,9 +93,10 @@ const convertArrayToFilteredArray = (inputArray: any) => {
             expected_loading_date: any,
             HA: any,
             rr_dates : any,
-            placement_time:any
+            placement_time:any,
+            intent_no:any
         }) => {
-        const { edemand_no, FNR,placement_time, all_FNRs,rr_dates, delivery_location, trip_tracker, others, remarks, unique_code, status, pickup_date, captive_id, is_captive, eta, rr_document, polyline, past_etas, no_of_wagons, received_no_of_wagons, demand_date, paid_by, commodity_desc, expected_loading_date, HA } = item;
+        const { edemand_no, FNR,placement_time,intent_no, all_FNRs,rr_dates, delivery_location, trip_tracker, others, remarks, unique_code, status, pickup_date, captive_id, is_captive, eta, rr_document, polyline, past_etas, no_of_wagons, received_no_of_wagons, demand_date, paid_by, commodity_desc, expected_loading_date, HA } = item;
         return {
             _id: item._id,
             edemand: {
@@ -157,6 +158,7 @@ const convertArrayToFilteredArray = (inputArray: any) => {
             },
             placement_time: placement_time && service.utcToist(placement_time)|| 'NA',
             oneRr_date: rr_dates && rr_dates.length > 0 ? service.utcToist(rr_dates[0]) : 'NA',
+            intent_no: intent_no && intent_no,
         }
     });
 };
@@ -351,9 +353,9 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
             { id: 'fnr', label: '', subLabel: '', class: 'fnr', innerClass: 'inner_fnr' },
             { id: 'destination', subLabel: 'Paid By', label: 'Destination', class: 'destination', innerClass: '' },
             { id: 'material', subLabel: '', label: 'Commodities', class: 'material', innerClass: '' },
-            { id: 'eld', subLabel: '', label: 'Expected Loading Date', class: 'eld', innerClass: '' },
+            { id: 'eld', subLabel: 'ELD Date', label: 'Placement Date', class: 'eld', innerClass: '' },
             // { id: 'aging', label: 'Ageing', class: 'aging', innerClass: '' },
-            { id: 'pickupdate', subLabel: 'Placement Date', label: 'RR Date', class: 'pickupdate', innerClass: 'inner_pickup' },
+            { id: 'pickupdate', subLabel: '', label: 'RR Date', class: 'pickupdate', innerClass: 'inner_pickup' },
             { id: 'status', subLabel: '', label: 'Status', class: 'status', innerClass: 'inner_status' },
             { id: 'currentEta', subLabel: 'Current ETA', label: 'Initial ETA', class: 'currentEta', innerClass: 'inner_eta' },
             // { id: 'deliverDate', label: 'Delivered Date', class: 'deliverDate', innerClass: '' },
@@ -364,7 +366,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
         ];
 
         if (edemand) {
-            commonColumns.unshift({ id: 'edemand', subLabel: '', label: 'e-Demand', class: 'edemand', innerClass: '' });
+            commonColumns.unshift({ id: 'edemand', subLabel: 'e-Indent', label: 'e-Demand', class: 'edemand', innerClass: '' });
         }
         setColumns(commonColumns);
     }, [edemand, showEdemand,])
@@ -535,13 +537,13 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                                     text={t('attach')}
                                                                                     onClick={handleOpen}
                                                                                     id='attach'
-                                                                                    style={{ gap: '5px' }}
+                                                                                    // style={{ gap: '5px' }}
                                                                                 />
                                                                             )}
                                                                             <ActionItem
                                                                                 icon={<ShareIcon style={{ width: '22px', height: '22px', color: '#3352FF' }} />}
                                                                                 text={t('share')}
-                                                                                style={{ gap: '7px' }}
+                                                                                // style={{ gap: '7px' }}
                                                                             />
                                                                             <ActionItem
                                                                                 icon={<img src={contactIcon.src} alt='' style={{ objectFit: 'contain', height: '24px', width: '24px' }} />}
@@ -580,7 +582,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                             onClick={()=>{handleUploadAnnexureModal(row)}}
                                                                             id="uploadAnnexure"
                                                                             />
-                                                                            {row.status.raw === 'AVE' &&
+                                                                            { (row.placement_time === 'NA' || !row?.intent_no) &&
                                                                                  <ActionItem
                                                                                  icon={<PublishedWithChangesIcon style={{ width: "24px", height: '24px', color: '#008001' }} />}
                                                                                  text={t('markPlacement')}
@@ -699,7 +701,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                         {item.id === 'pickupdate' && (
                                                             <>
                                                                 <div>{row.oneRr_date}</div>
-                                                                {row.status.raw === 'INPL' && ( <div style={{ marginTop: '16px' }}>{row.placement_time}</div> )}
+                                                                {/* {row.status.raw === 'INPL' && ( <div style={{ marginTop: '16px' }}>{row.placement_time}</div> )} */}
                                                             </>
                                                             
                                                         )}
@@ -714,6 +716,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                         {item.id === 'edemand' &&
                                                             <div className='edemand_fois_gpis'>
                                                                 <div style={{ color: row.status.raw === 'AVE' ? parseInt(row.daysAging) > 10 ? 'red' : 'green' : 'black' }}>{value.edemand_no}</div>
+                                                                <div style={{paddingTop: '6px'}}>{row?.intent_no}</div>
                                                                 <div className='no_of_wagons'>
                                                                     <div className='request_wagons'>
                                                                         <div className='request_wagons_logo'>
@@ -782,6 +785,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                         )}
                                                         {item.id === 'eld' && (
                                                             <div>
+                                                                <div style={{marginBottom:20}}>{row.placement_time || 'NA'}</div>
                                                                 <div>{row.expected_loading_date?.ELDdate}</div>
                                                                 {/* <div>{row.expected_loading_date?.ELDtime}</div> */}
                                                             </div>

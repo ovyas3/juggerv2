@@ -410,10 +410,10 @@
 .action_items {
     display: flex;
     align-items: center;
-    gap: 7px;
+    gap: 12px;
     cursor: pointer;
-    padding-inline: 8px;
-    padding-block: 2px;
+    padding-inline: 12px;
+    padding-block: 4px;
 
 }
 

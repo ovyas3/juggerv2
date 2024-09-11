@@ -280,3 +280,46 @@ justify-content:flex-start
 .button_style{
   background-color: aqua;
 }
+.closeContaioner{
+  background-color: white;
+  position: absolute;
+  top: -65px;
+  right: 0;
+  width: 45px;
+  height: 45px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: all 0.7s ease-in-out;
+}
+.closeContaioner:hover{
+  transform: rotate(180deg);
+}
+
+.buttonContaioner{
+  position: absolute;
+  display: flex;
+  bottom: 25px;
+  right: 25px;
+  gap: 20px;
+}
+.buttonMarkPlacement:hover{
+  scale: 0.95;
+}
+.status_edemand_fnr{
+  width: 100%;
+  background-color: #F2F6FF;
+  border-radius: 12px;
+  height: 100px;
+  margin-top: 24px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}

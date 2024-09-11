@@ -51,7 +51,12 @@
     "uploadAnnexure":"Upload Annexure",
     "handlingAgent":"Handling Agent",
     "logout":"Logout",
-    "markPlacement":"Mark Placement"
+    "markPlacement":"Mark Placement",
+    "Total":"Total",
+    "eIndent":"eIndent",
+    "In Plant":"In Plant",
+    "In Transit":"In Transit",
+    "Delivered":"Delivered"
   },
   "UPLOAD_ANNEXURE":{
     "SNCKBR_MSG":{
