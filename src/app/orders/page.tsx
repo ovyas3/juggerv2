@@ -350,7 +350,7 @@ const OrdersPage = () => {
                     </div>
                     <div className='display_status_inner_box' style={{backgroundColor: getStatusColor(status, 'AVE').backgroundColor}}>
                       <div style={{fontSize:20, fontWeight:500, color: getStatusColor(status, 'AVE').countTextColor}}>{availableeIndentCount}</div>
-                      <div style={{fontSize:12, color: getStatusColor(status, 'AVE').textTextColor}}>{t('eIndent')}</div>
+                      <div style={{fontSize:12, color: getStatusColor(status, 'AVE').textTextColor}}>{t('Indent')}</div>
                     </div>
                     <div className='display_status_inner_box' style={{backgroundColor: getStatusColor(status, 'In Plant').backgroundColor}}>
                       <div style={{fontSize:20, fontWeight:500, color: getStatusColor(status, 'In Plant').countTextColor}}>{inPlantCount}</div>
