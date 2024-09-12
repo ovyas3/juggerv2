@@ -53,10 +53,12 @@
     "logout":"Logout",
     "markPlacement":"Mark Placement",
     "Total":"Total",
-    "eIndent":"eIndent",
+    "Indent":"Indent",
     "In Plant":"In Plant",
     "In Transit":"In Transit",
-    "Delivered":"Delivered"
+    "Delivered":"Delivered",
+    "drownOut":"Drown Out Time",
+    "IndentNo":"Indent No"
   },
   "UPLOAD_ANNEXURE":{
     "SNCKBR_MSG":{
