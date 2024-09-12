@@ -50,7 +50,7 @@ import EditNoteOutlinedIcon from '@mui/icons-material/EditNoteOutlined';
 import RvHookupIcon from '@mui/icons-material/RvHookup';
 import UploadAnnexure from '../uploadAnnexureModal/uploadAnnexureModal';
 import PublishedWithChangesIcon from '@mui/icons-material/PublishedWithChanges';
-import UpgradeIcon from '@mui/icons-material/Upgrade';
+import UpdateIcon from '@mui/icons-material/Update';
 
 import { ActionItem, EditELD, HandlingAgentSelection, PastEta, RemarkComponent, Remarks, Tags,MarkPlacement} from './tableComp'
 
@@ -598,7 +598,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                             }
                                                                             {row.status.raw === 'INPL' && (
                                                                                  <ActionItem
-                                                                                 icon={<UpgradeIcon style={{ width: "24px", height: '24px', color: '#0367FF' }} />}
+                                                                                 icon={<UpdateIcon style={{ width: "24px", height: '24px', color: '#0367FF' }} />}
                                                                                  text={t('drownOut')}
                                                                                  onClick={()=>{drownOutDate(row)}}
                                                                                  id="drownOut"

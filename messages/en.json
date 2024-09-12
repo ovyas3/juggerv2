@@ -58,7 +58,11 @@
     "In Transit":"In Transit",
     "Delivered":"Delivered",
     "drownOut":"Drown Out Time",
-    "IndentNo":"Indent No"
+    "IndentNo":"Indent No",
+    "Cancel":"Cancel",
+    "status":"status",
+    "FNRno":"FNR No.",
+    "edemandno":"e-Demand No."
   },
   "UPLOAD_ANNEXURE":{
     "SNCKBR_MSG":{

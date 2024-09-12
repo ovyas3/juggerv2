@@ -812,8 +812,6 @@ export const HandlingAgentSelection = ({ shipmentId, setOpen, locationId, getAll
     );
 };
 export const MarkPlacement = ({isClose ,shipment, getAllShipment, different = 'markplacement'}: any) =>{
-
-    console.log(different, '<---------different')
     const t = useTranslations("ORDERS");
    
     const [currentDate, setCurrentDate] = useState(new Date());
@@ -842,9 +840,14 @@ export const MarkPlacement = ({isClose ,shipment, getAllShipment, different = 'm
             id: shipment._id,
             placement_time : currentDate,
         }
+
+        const payloadWithdrownDate = {
+            id: shipment._id,
+            drawnout_time: currentDate
+        }
        
       try {
-        const response = await httpsPost('rake_shipment/mark_placement', eIndent?payloadWitheident: payload)
+        const response = await httpsPost(different === 'downOut'?'rake_shipment/mark_drawnout':'rake_shipment/mark_placement', different === 'downOut' ?(payloadWithdrownDate):(eIndent?payloadWitheident: payload))
         if(response.statusCode === 200) {
             isClose(false);
             getAllShipment();
@@ -866,15 +869,15 @@ export const MarkPlacement = ({isClose ,shipment, getAllShipment, different = 'm
 
                     <div className="status_edemand_fnr">
                         <div>
-                            <header style={{fontSize:12, color:'#42454E', marginBottom:8}}>status</header>
+                            <header style={{fontSize:12, color:'#42454E', marginBottom:8}}>{t('status')}</header>
                             <text style={{fontSize:16, color:"#42454E", fontWeight:600}}>{shipment.status.name}</text>
                         </div>
                         <div>
-                            <header style={{fontSize:12, color:'#42454E', marginBottom:8}}>FNR No.</header>
+                            <header style={{fontSize:12, color:'#42454E', marginBottom:8}}>{t('FNRno')}</header>
                             <text style={{fontSize:16, color:"#42454E", fontWeight:600}}>{shipment.fnr.primary}</text>
                         </div>
                         <div>
-                            <header style={{fontSize:12, color:'#42454E', marginBottom:8}}>e-Demand No.</header>
+                            <header style={{fontSize:12, color:'#42454E', marginBottom:8}}>{t('edemandno')}</header>
                             <text style={{fontSize:16, color:"#42454E", fontWeight:600}}>{shipment.edemand.edemand_no}</text>
                         </div>
                     </div>
@@ -931,13 +934,19 @@ export const MarkPlacement = ({isClose ,shipment, getAllShipment, different = 'm
                         </div>
                     </div>
 
-                    <div style={{marginTop:24}}>
-                        <header style={{ marginBottom:8, fontSize:12, color:'#42454E'}}>{t('IndentNo')}</header>
-                        <div style={{border:'1px solid #E9E9EB', borderRadius:6,height:40.12, display:'flex', alignItems:'center', paddingLeft:12 }}>
-                            <input onChange={(e)=>{setEIndent(e.target.value)}} type="text" placeholder='Enter Indent No.' style={{fontWeight:600, fontSize:14, color:'#42454E', border:'none',outline:'none', width:'100%'}} />
-                        </div>
-                    </div>
-                        <div style={{marginTop:24 , display:'flex', alignItems:'center', gap:6}}>
+                    {
+                        different !== 'downOut' && (
+                            <div style={{marginTop:24}}>
+                            <header style={{ marginBottom:8, fontSize:12, color:'#42454E'}}>{t('IndentNo')}</header>
+                            <div style={{border:'1px solid #E9E9EB', borderRadius:6,height:40.12, display:'flex', alignItems:'center', paddingLeft:12 }}>
+                                <input onChange={(e)=>{setEIndent(e.target.value)}} type="text" placeholder='Enter Indent No.' style={{fontWeight:600, fontSize:14, color:'#42454E', border:'none',outline:'none', width:'100%'}} />
+                            </div>
+                            </div>
+                        )
+                    }
+                   
+
+                    <div style={{marginTop:24 , display:'flex', alignItems:'center', gap:6}}>
                         <div><input type="checkbox" style={{width:16, height:16}} onChange={()=>{setAvetoInplant(!avetoInplant)}} /></div>
                         {different === 'downOut' && (
                             <text>change status from <span style={{color:'#134D67',fontWeight:600}}>{t('In Plant')}</span> to <span style={{color:'#FF9800',fontWeight:600}}>{t('In Transit')}</span> </text>
@@ -950,7 +959,7 @@ export const MarkPlacement = ({isClose ,shipment, getAllShipment, different = 'm
                     
 
                     <div className="buttonContaioner">
-                        <Button className="buttonMarkPlacement" onClick={(e)=>{ e.stopPropagation();  isClose(false); }} style={{color:'#2862FF', border:'1px solid #2862FF', width:110, cursor:'pointer', fontWeight:'bold', transition:'all 0.5s ease-in-out'}}>Cancel</Button>
+                        <Button className="buttonMarkPlacement" onClick={(e)=>{ e.stopPropagation();  isClose(false); }} style={{color:'#2862FF', border:'1px solid #2862FF', width:110, cursor:'pointer', fontWeight:'bold', transition:'all 0.5s ease-in-out'}}>{t('Cancel')}</Button>
                         <Button className="buttonMarkPlacement" onClick={(e)=>{e.stopPropagation();  handlePlacementDate(); }} style={{color:'white', backgroundColor:'#2862FF',width:110, border:'1px solid #2862FF', cursor:'pointer', fontWeight:'bold',transition:'all 0.5s ease-in-out' }}>{different==='downOut'?'Update':'Placement'}</Button>
                     </div>
 
