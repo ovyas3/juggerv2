@@ -28,6 +28,7 @@
     min-width: 130px !important;
     padding-inline: 20px !important;
     line-height: 20px !important;
+    text-wrap: nowrap !important;
 }
 
 .aging {

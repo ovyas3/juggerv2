@@ -813,7 +813,8 @@ export const HandlingAgentSelection = ({ shipmentId, setOpen, locationId, getAll
 };
 export const MarkPlacement = ({isClose ,shipment, getAllShipment, different = 'markplacement'}: any) =>{
 
-    console.log(shipment)
+    console.log(different, '<---------different')
+    const t = useTranslations("ORDERS");
    
     const [currentDate, setCurrentDate] = useState(new Date());
     const { showMessage } = useSnackbar();
@@ -855,17 +856,12 @@ export const MarkPlacement = ({isClose ,shipment, getAllShipment, different = 'm
        
     }
 
-   
-
-
-
-
     return (
         <div style={{width:'100vw', height:'100vh', position:'fixed', top:0, left:0 ,zIndex:300, backgroundColor:'rgba(0, 0, 0, 0.5)'}} onClick={(e)=>{e.stopPropagation(); isClose(false);}}>
             <div style={{width:800, height:500, backgroundColor:'white', position:'relative', top:'50%', left:'50%', transform:'translate(-50%,-50%)', borderRadius:20, padding:25}} onClick={(e)=>{e.stopPropagation()}}>
              
                     <div style={{display:'flex', justifyContent:'space-between',}}>
-                        <header style={{fontSize:20, color:'#131722', fontWeight:600}}>Mark Placement</header>
+                        <header style={{fontSize:20, color:'#131722', fontWeight:600}}>{different==='downOut'?'Drown Out Time':'Mark Placement'}</header>
                     </div>
 
                     <div className="status_edemand_fnr">
@@ -884,7 +880,7 @@ export const MarkPlacement = ({isClose ,shipment, getAllShipment, different = 'm
                     </div>
 
                     <div style={{marginTop:24}}>
-                        <header style={{ marginBottom:8, fontSize:12, color:'#42454E'}}>Enter Placement Time</header>
+                        <header style={{ marginBottom:8, fontSize:12, color:'#42454E'}}>{different === 'downOut'?'Enter Downout Time':'Enter Placement Time'}</header>
                         <div style={{border:'1px solid #E9E9EB', borderRadius:6, }}>
                             <LocalizationProvider dateAdapter={AdapterDayjs}>
                                 <DateTimePicker
@@ -936,24 +932,26 @@ export const MarkPlacement = ({isClose ,shipment, getAllShipment, different = 'm
                     </div>
 
                     <div style={{marginTop:24}}>
-                        <header style={{ marginBottom:8, fontSize:12, color:'#42454E'}}>eIndent No. (optional)</header>
+                        <header style={{ marginBottom:8, fontSize:12, color:'#42454E'}}>{t('IndentNo')}</header>
                         <div style={{border:'1px solid #E9E9EB', borderRadius:6,height:40.12, display:'flex', alignItems:'center', paddingLeft:12 }}>
-                            <input onChange={(e)=>{setEIndent(e.target.value)}} type="text" placeholder='Enter eIndent No.' style={{fontWeight:600, fontSize:14, color:'#42454E', border:'none',outline:'none', width:'100%'}} />
+                            <input onChange={(e)=>{setEIndent(e.target.value)}} type="text" placeholder='Enter Indent No.' style={{fontWeight:600, fontSize:14, color:'#42454E', border:'none',outline:'none', width:'100%'}} />
                         </div>
                     </div>
-                    {
-                        warraning && 
                         <div style={{marginTop:24 , display:'flex', alignItems:'center', gap:6}}>
                         <div><input type="checkbox" style={{width:16, height:16}} onChange={()=>{setAvetoInplant(!avetoInplant)}} /></div>
-                        {/* <text>change status from <span style={{color:'#576DFD',fontWeight:600}}>available eIndent</span> to <span style={{color:'#134D67',fontWeight:600}}>in-plant</span></text> */}
-                        <text style={{color:'#EB1F52'}}>Changing the Placement Date will update the previous date.</text>
+                        {different === 'downOut' && (
+                            <text>change status from <span style={{color:'#134D67',fontWeight:600}}>{t('In Plant')}</span> to <span style={{color:'#FF9800',fontWeight:600}}>{t('In Transit')}</span> </text>
+                        )}
+                        {different !== 'downOut' && (
+                            <text style={{color:'#EB1F52', fontWeight:'300'}}>Changing the Placement Date will update the previous date.</text>
+                        )}
                     </div>
-                    }
+                    
                     
 
                     <div className="buttonContaioner">
                         <Button className="buttonMarkPlacement" onClick={(e)=>{ e.stopPropagation();  isClose(false); }} style={{color:'#2862FF', border:'1px solid #2862FF', width:110, cursor:'pointer', fontWeight:'bold', transition:'all 0.5s ease-in-out'}}>Cancel</Button>
-                        <Button className="buttonMarkPlacement" onClick={(e)=>{e.stopPropagation();  handlePlacementDate(); }} style={{color:'white', backgroundColor:'#2862FF',width:110, border:'1px solid #2862FF', cursor:'pointer', fontWeight:'bold',transition:'all 0.5s ease-in-out' }}>Placement</Button>
+                        <Button className="buttonMarkPlacement" onClick={(e)=>{e.stopPropagation();  handlePlacementDate(); }} style={{color:'white', backgroundColor:'#2862FF',width:110, border:'1px solid #2862FF', cursor:'pointer', fontWeight:'bold',transition:'all 0.5s ease-in-out' }}>{different==='downOut'?'Update':'Placement'}</Button>
                     </div>
 
                     <div className="closeContaioner">

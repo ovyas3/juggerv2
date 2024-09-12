@@ -50,6 +50,7 @@ import EditNoteOutlinedIcon from '@mui/icons-material/EditNoteOutlined';
 import RvHookupIcon from '@mui/icons-material/RvHookup';
 import UploadAnnexure from '../uploadAnnexureModal/uploadAnnexureModal';
 import PublishedWithChangesIcon from '@mui/icons-material/PublishedWithChanges';
+import UpgradeIcon from '@mui/icons-material/Upgrade';
 
 import { ActionItem, EditELD, HandlingAgentSelection, PastEta, RemarkComponent, Remarks, Tags,MarkPlacement} from './tableComp'
 
@@ -228,6 +229,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
     //mark placement
     const [openMarkPlacement, setOpenMarkPlacement] = useState(false);
     const [markPlacementId, setMarkPlacementId] = useState({});
+    const [downOut, setDownOut] = useState<string | null | undefined>(null);
 
     const handleRRDoc = (id: any) => {  // for rr documents
         setRRModalOpen(true);
@@ -302,10 +304,14 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
     const markPlacementModal = (row : any) =>{
        setOpenMarkPlacement(true);
        setMarkPlacementId(row);
-
+       setDownOut(undefined);
     }
 
-
+    const drownOutDate = (row: any) => {
+        setOpenMarkPlacement(true);
+        setMarkPlacementId(row);
+        setDownOut('downOut');
+    }
 
     useEffect(() => {
         const etaResult = sortArray(allShipments, 'eta', currentETAsorting ? 'dec' : 'asc');
@@ -353,7 +359,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
             { id: 'fnr', label: '', subLabel: '', class: 'fnr', innerClass: 'inner_fnr' },
             { id: 'destination', subLabel: 'Paid By', label: 'Destination', class: 'destination', innerClass: '' },
             { id: 'material', subLabel: '', label: 'Commodities', class: 'material', innerClass: '' },
-            { id: 'eld', subLabel: 'ELD Date', label: 'Placement Date', class: 'eld', innerClass: '' },
+            { id: 'eld', subLabel: 'ELD', label: 'Placement Date', class: 'eld', innerClass: '' },
             // { id: 'aging', label: 'Ageing', class: 'aging', innerClass: '' },
             { id: 'pickupdate', subLabel: '', label: 'RR Date', class: 'pickupdate', innerClass: 'inner_pickup' },
             { id: 'status', subLabel: '', label: 'Status', class: 'status', innerClass: 'inner_status' },
@@ -366,7 +372,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
         ];
 
         if (edemand) {
-            commonColumns.unshift({ id: 'edemand', subLabel: 'e-Indent', label: 'e-Demand', class: 'edemand', innerClass: '' });
+            commonColumns.unshift({ id: 'edemand', subLabel: 'Indent', label: 'e-Demand', class: 'edemand', innerClass: '' });
         }
         setColumns(commonColumns);
     }, [edemand, showEdemand,])
@@ -590,6 +596,14 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                                  id="markPlacement"
                                                                              />
                                                                             }
+                                                                            {row.status.raw === 'INPL' && (
+                                                                                 <ActionItem
+                                                                                 icon={<UpgradeIcon style={{ width: "24px", height: '24px', color: '#0367FF' }} />}
+                                                                                 text={t('drownOut')}
+                                                                                 onClick={()=>{drownOutDate(row)}}
+                                                                                 id="drownOut"
+                                                                             />
+                                                                            )}
                                                                         </div>
                                                                     </Popover>
                                                                 </div>
@@ -838,7 +852,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
             <RRModal isOpen={isRRModalOpen} isClose={() => setRRModalOpen(false)} rrNumbers={rrNumbers} isRRDoc={isRRDoc} />
             {openAnnexureModal && 
                <UploadAnnexure isOpen={openAnnexureModal} isClose={()=> setOpenAnnexureModal(false)} shipmentID={uploadAnnexureShipID} FNR_No={uploadAnnexureFNR}/>}
-            {openMarkPlacement && <MarkPlacement isClose={setOpenMarkPlacement} shipment={markPlacementId} getAllShipment={getAllShipment} />}
+            {openMarkPlacement && <MarkPlacement isClose={setOpenMarkPlacement} shipment={markPlacementId} getAllShipment={getAllShipment} different={downOut} />}
             <Modal
                 open={open}
                 onClose={(e) => { handleClose(e) }}
