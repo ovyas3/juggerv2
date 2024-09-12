@@ -20,13 +20,15 @@ const httpsGet = async (path: string, type: number = 0, router: any = null) => {
     url,
     headers: authorization,
   };
-  try {
-    const response = await axios(config);
-    return response.data;
-  } catch(err) {
-    deleteAllCache();
-    router.push('/');
-  }
+  const response = await axios(config)
+    .then((res) => res)
+    .catch((err) => {
+      if (axios.isAxiosError(err) && err.response?.status === 401) {
+        deleteAllCache();
+        router.push('/');
+      }
+    });
+    return response?.data;
 };
 
 const httpsPost = async (path: string, data: any, type = 0, isFile = false, router: any = null) => {
@@ -55,13 +57,23 @@ const httpsPost = async (path: string, data: any, type = 0, isFile = false, rout
       data,
     };
   }
-  try {
-    const response = await axios(config);
-    return response.data;
-  } catch(err) {
-    deleteAllCache();
-    router.push('/');
-  }
+  // try {
+    const response = await axios(config)
+      .then((res) => res)
+      .catch((err) => {
+        if (axios.isAxiosError(err) && err.response?.status === 401) {
+          deleteAllCache();
+          router.push('/');
+        }
+      });
+    return response?.data || {};
+  // } catch(err) {
+  //   console.log(err, err.message, err.response);
+  //   // if (axios.isAxiosError(err) && err.response?.status === 401) {
+  //   //   deleteAllCache();
+  //   //   router.push('/');
+  //   // }
+  // }
 };
 
 const apiCall = async (config: any) => {
