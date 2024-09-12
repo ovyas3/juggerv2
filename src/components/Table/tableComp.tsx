@@ -47,6 +47,10 @@ import OutlinedInput from '@mui/material/OutlinedInput';
 import InputLabel from '@mui/material/InputLabel';
 import ListItemText from '@mui/material/ListItemText';
 
+import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import { renderTimeViewClock } from '@mui/x-date-pickers/timeViewRenderers';
+
 async function rake_update_id(payload: Object) {
     return await httpsPost(UPDATE_RAKE_CAPTIVE_ID, payload);
 }
@@ -79,7 +83,7 @@ interface RemarksProps {
 }
 
 export const ActionItem = ({ icon, text, onClick, id, style }: any) => (
-    <div className={`action_items `} onClick={onClick} id={id} style={style}>
+    <div className={`action_items `} onClick={onClick} id={id} style={style} >
         <div>{icon}</div>
         <div style={{ fontSize: 12 }}>{text}</div>
     </div>
@@ -616,12 +620,9 @@ export const HandlingAgentSelection = ({ shipmentId, setOpen, locationId, getAll
     const [originalSelectedHAids, setOriginalSelectedHAids] = useState<Set<any>>(new Set());
     const [newIds, setNewIds] = useState<string[]>([]);
     const [removeIds, setRemoveIds] = useState<string[]>([]);
-
-
+    const [toggleForShowAllHA, setToggleForShowAllHA] = useState(true);
 
     const { showMessage } = useSnackbar();
-
-
     const getLocationList = async () => {
         try {
             const res = await httpsGet(`${GET_HANDLING_AGENT_LIST}?delivery_locations=${locationId}`);
@@ -717,6 +718,16 @@ export const HandlingAgentSelection = ({ shipmentId, setOpen, locationId, getAll
         },
     };
 
+    async function bringAllHandlingAgent(){
+        try {
+            const res = toggleForShowAllHA ? await httpsGet(`${GET_HANDLING_AGENT_LIST}?delivery_locations=${locationId}&isAllHA=${toggleForShowAllHA}`) : await httpsGet(`${GET_HANDLING_AGENT_LIST}?delivery_locations=${locationId}`);
+            if (res.statusCode === 200) {
+                setAllListOfHAids(res?.data);
+            }
+        } catch (error) {
+            console.error("Error fetching location list:", error);
+        }
+    }
 
     return (
         <div style={{ position: 'relative', padding: 24 }}>
@@ -752,7 +763,14 @@ export const HandlingAgentSelection = ({ shipmentId, setOpen, locationId, getAll
                 </FormControl>
             </div>
 
-            <div style={{ marginTop: 64, textAlign: 'right' }}>
+            <div style={{ display: 'flex', justifyContent: 'end', marginTop: 12, gap:5, alignItems: 'center' }}>
+                <div style={{ fontSize: 12, color: '#7C7E8C' }}>Show All Handling Agents</div>
+                <div style={{backgroundColor:toggleForShowAllHA ? 'GrayText' : '#E34031', width:'30px', height:'18px', borderRadius:'12px', display:'flex', alignItems:'center', justifyContent:toggleForShowAllHA?'start':'end'}}>
+                    <div onClick={(e)=>{e.stopPropagation(); setToggleForShowAllHA(pre => !pre); bringAllHandlingAgent(); }} style={{backgroundColor:'white', width:'14px', height:'14px', borderRadius:'50%', marginInline:'2px', cursor:'pointer'}}></div>
+                </div>
+            </div>
+
+            <div style={{ marginTop: 50, textAlign: 'right' }}>
                 <Button
                     variant="contained"
                     size='small'
@@ -793,3 +811,155 @@ export const HandlingAgentSelection = ({ shipmentId, setOpen, locationId, getAll
         </div>
     );
 };
+export const MarkPlacement = ({isClose ,shipment, getAllShipment, different = 'markplacement'}: any) =>{
+
+    console.log(shipment)
+   
+    const [currentDate, setCurrentDate] = useState(new Date());
+    const { showMessage } = useSnackbar();
+    const [avetoInplant, setAvetoInplant] = useState(false);
+    const [eIndent, setEIndent] = useState('');
+    const [warraning, setWarraning] = useState(false);
+
+    const handlePlacementDate = async() => {
+        if(!currentDate) {
+            showMessage('Please Select Date', 'error');
+            return;
+        }
+        if(!avetoInplant){
+            showMessage('Please Allow The Condition', 'error');
+            return
+        }
+
+        const payloadWitheident = {
+            id: shipment._id,
+            placement_time : currentDate,
+            intent_no : eIndent
+        }
+
+        const payload = {
+            id: shipment._id,
+            placement_time : currentDate,
+        }
+       
+      try {
+        const response = await httpsPost('rake_shipment/mark_placement', eIndent?payloadWitheident: payload)
+        if(response.statusCode === 200) {
+            isClose(false);
+            getAllShipment();
+            showMessage('Placement Marked Successfully', 'success');
+        }
+      } catch (error) {
+        console.log(error)
+      }
+       
+    }
+
+   
+
+
+
+
+    return (
+        <div style={{width:'100vw', height:'100vh', position:'fixed', top:0, left:0 ,zIndex:300, backgroundColor:'rgba(0, 0, 0, 0.5)'}} onClick={(e)=>{e.stopPropagation(); isClose(false);}}>
+            <div style={{width:800, height:500, backgroundColor:'white', position:'relative', top:'50%', left:'50%', transform:'translate(-50%,-50%)', borderRadius:20, padding:25}} onClick={(e)=>{e.stopPropagation()}}>
+             
+                    <div style={{display:'flex', justifyContent:'space-between',}}>
+                        <header style={{fontSize:20, color:'#131722', fontWeight:600}}>Mark Placement</header>
+                    </div>
+
+                    <div className="status_edemand_fnr">
+                        <div>
+                            <header style={{fontSize:12, color:'#42454E', marginBottom:8}}>status</header>
+                            <text style={{fontSize:16, color:"#42454E", fontWeight:600}}>{shipment.status.name}</text>
+                        </div>
+                        <div>
+                            <header style={{fontSize:12, color:'#42454E', marginBottom:8}}>FNR No.</header>
+                            <text style={{fontSize:16, color:"#42454E", fontWeight:600}}>{shipment.fnr.primary}</text>
+                        </div>
+                        <div>
+                            <header style={{fontSize:12, color:'#42454E', marginBottom:8}}>e-Demand No.</header>
+                            <text style={{fontSize:16, color:"#42454E", fontWeight:600}}>{shipment.edemand.edemand_no}</text>
+                        </div>
+                    </div>
+
+                    <div style={{marginTop:24}}>
+                        <header style={{ marginBottom:8, fontSize:12, color:'#42454E'}}>Enter Placement Time</header>
+                        <div style={{border:'1px solid #E9E9EB', borderRadius:6, }}>
+                            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                <DateTimePicker
+                                value={dayjs(currentDate)}
+                                sx={{
+                                    width: '100%',
+                                    '.MuiInputBase-input': {
+                                        padding:'10px',
+                                        paddingLeft:'40px',
+                                        fontSize: '14px ',
+                                        color:'#42454E',
+                                        fontWeight:600
+                                    },
+                                    '.MuiInputBase-root': {
+
+                                        padding: 0,
+                                        border: 'none',
+                                        '& fieldset': { border: 'none' },
+                                    },
+                                    '& .MuiOutlinedInput-root': {
+                                        '&:hover fieldset': {
+                                            border: 'none',
+                                        },
+                                        '&.Mui-focused fieldset': {
+                                            border: 'none',
+                                        },
+                                    },
+                                    '& .MuiIconButton-root': {
+                                        left: -720,
+                                        position:'relative',
+
+                                    },
+                                }}
+                                viewRenderers={{
+                                    hours: renderTimeViewClock,
+                                    minutes: renderTimeViewClock,
+                                    seconds: renderTimeViewClock,
+                                }}
+                                onChange={(newDate) => { 
+                                    if (newDate) {
+                                        setWarraning(true);
+                                        setCurrentDate(newDate.toDate());
+                                    }
+                                }}
+                                format="DD/MM/YYYY  HH:mm"
+                                />
+                            </LocalizationProvider>
+                        </div>
+                    </div>
+
+                    <div style={{marginTop:24}}>
+                        <header style={{ marginBottom:8, fontSize:12, color:'#42454E'}}>eIndent No. (optional)</header>
+                        <div style={{border:'1px solid #E9E9EB', borderRadius:6,height:40.12, display:'flex', alignItems:'center', paddingLeft:12 }}>
+                            <input onChange={(e)=>{setEIndent(e.target.value)}} type="text" placeholder='Enter eIndent No.' style={{fontWeight:600, fontSize:14, color:'#42454E', border:'none',outline:'none', width:'100%'}} />
+                        </div>
+                    </div>
+                    {
+                        warraning && 
+                        <div style={{marginTop:24 , display:'flex', alignItems:'center', gap:6}}>
+                        <div><input type="checkbox" style={{width:16, height:16}} onChange={()=>{setAvetoInplant(!avetoInplant)}} /></div>
+                        {/* <text>change status from <span style={{color:'#576DFD',fontWeight:600}}>available eIndent</span> to <span style={{color:'#134D67',fontWeight:600}}>in-plant</span></text> */}
+                        <text style={{color:'#EB1F52'}}>Changing the Placement Date will update the previous date.</text>
+                    </div>
+                    }
+                    
+
+                    <div className="buttonContaioner">
+                        <Button className="buttonMarkPlacement" onClick={(e)=>{ e.stopPropagation();  isClose(false); }} style={{color:'#2862FF', border:'1px solid #2862FF', width:110, cursor:'pointer', fontWeight:'bold', transition:'all 0.5s ease-in-out'}}>Cancel</Button>
+                        <Button className="buttonMarkPlacement" onClick={(e)=>{e.stopPropagation();  handlePlacementDate(); }} style={{color:'white', backgroundColor:'#2862FF',width:110, border:'1px solid #2862FF', cursor:'pointer', fontWeight:'bold',transition:'all 0.5s ease-in-out' }}>Placement</Button>
+                    </div>
+
+                    <div className="closeContaioner">
+                    <CloseIcon onClick={(e) => { e.stopPropagation(); isClose(false) }}/>
+                    </div>
+            </div>
+        </div>
+    );
+}

@@ -2,13 +2,15 @@
 import axios from "axios";
 import { environment } from "@/environments/env.api";
 import { getAuth } from "@/services/Authenticator/Auth";
+import { deleteAllCache } from '@/utils/storageService';
+import { redirect, useRouter } from "next/navigation";
 
 const prefix = [
   environment.DEV_API_URL,
   environment.PROD_API_URL_MANHUNTER
 ]
 
-const httpsGet = async (path: string, type: number = 0) => {
+const httpsGet = async (path: string, type: number = 0, router: any = null) => {
   const authorization = {
     Authorization: getAuth(),
   };
@@ -18,11 +20,16 @@ const httpsGet = async (path: string, type: number = 0) => {
     url,
     headers: authorization,
   };
-  const response = await axios(config);
-  return response.data;
+  try {
+    const response = await axios(config);
+    return response.data;
+  } catch(err) {
+    deleteAllCache();
+    router.push('/');
+  }
 };
 
-const httpsPost = async (path: string, data: any, type = 0, isFile = false) => {
+const httpsPost = async (path: string, data: any, type = 0, isFile = false, router: any = null) => {
   const auth = getAuth();
   const authorization = {
     Authorization: auth,
@@ -48,9 +55,13 @@ const httpsPost = async (path: string, data: any, type = 0, isFile = false) => {
       data,
     };
   }
-
-  const response = await axios(config);
-  return response.data;
+  try {
+    const response = await axios(config);
+    return response.data;
+  } catch(err) {
+    deleteAllCache();
+    router.push('/');
+  }
 };
 
 const apiCall = async (config: any) => {

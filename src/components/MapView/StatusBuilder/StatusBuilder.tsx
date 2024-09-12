@@ -5,7 +5,7 @@ export const statusBuilder = (status: string) => {
     'ITNS': 'In Transit',
     'Delivered': 'Delivered',
     'OB': 'In Plant',
-     '': 'In Plant'
+    'INPL': 'In Plant'
   }
   return statusMap[status] || 'In Transit';
 }
