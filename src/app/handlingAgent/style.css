@@ -344,3 +344,9 @@
       transform: rotate(360deg);
     }
   }
+  .search_invite1{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    justify-content: center;
+}
