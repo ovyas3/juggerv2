@@ -16,8 +16,8 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { color } from 'framer-motion';
 import './agentTable.css'
 import Popover from '@mui/material/Popover';
-import { httpsPost } from '@/utils/Communication';
 import { useSnackbar } from '@/hooks/snackBar';
+import { httpsGet, httpsPost } from '@/utils/Communication';
 
 interface Column {
     id: string,
@@ -59,7 +59,7 @@ function contructingData(agentList: any) {
     })
 }
 
-function ActiveAgentList({ activeAgentList, activeCount, setActiveSkipAndLimit,getAllActiveHandlingAgents }: any) {
+function ActiveAgentList({ activeAgentList, activeCount, setActiveSkipAndLimit, getAllActiveHandlingAgents }: any) {
 
     const [page, setPage] = React.useState(0);
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
@@ -81,43 +81,63 @@ function ActiveAgentList({ activeAgentList, activeCount, setActiveSkipAndLimit,g
 
     const handleClickPopoverClose =()=>{setAnchorEl(null);setShowActionBox(-1);}
 
-    const sendingReinvite = async (item:any)=>{
-        const payload = {invite_id : item._id}
+    // const sendingReinvite = async (item:any)=>{
+    //     const payload = {invite_id : item._id}
+    //     try {
+    //         await httpsPost('re_invite/HA', payload).then((res) => {
+    //             if (res && res.statusCode == 200) {
+    //                 showMessage('Invited Successfully.', 'success');
+    //                 setAnchorEl(null);
+    //                 setShowActionBox(-1);
+    //                 getAllActiveHandlingAgents({skipAndLimit: {skip: 0, limit:10 }});
+    //             }
+    //         }).catch((err) => {
+    //             console.log(err)
+    //         })
+    //     } catch (error) {
+    //         console.log(error)
+    //     }
+    // }
+    // const sendingVerification = async (item:any)=>{
+    //     if(item?.verified === 'expired'){
+    //         showMessage('REINVITE is required', 'error');
+    //         return;
+    //     }
+    //     const payload = {invite_id : item._id}
+    //     try {
+    //         await httpsPost('verify/HA', payload).then((res) => {
+    //             if (res && res.statusCode == 200) {
+    //                 showMessage('verified Successfully.', 'success');
+    //                 setAnchorEl(null);
+    //                 setShowActionBox(-1);
+    //                 getAllActiveHandlingAgents({skipAndLimit: {skip: 0, limit:10 }});
+    //             }
+    //         }).catch((err) => {
+    //             console.log(err)
+    //         })
+    //     } catch (error) {
+    //         console.log(error)
+    //     }
+    // }
+    
+    const deleteActiveHandlingAgent = async (row:any) => {
+        const active_id = row._id;
         try {
-            await httpsPost('re_invite/HA', payload).then((res) => {
-                if (res && res.statusCode == 200) {
-                    showMessage('Invited Successfully.', 'success');
-                    setAnchorEl(null);
-                    setShowActionBox(-1);
-                    getAllActiveHandlingAgents({skipAndLimit: {skip: 0, limit:10 }});
-                }
-            }).catch((err) => {
-                console.log(err)
-            })
-        } catch (error) {
+            const response = await httpsGet(`delete/active_HA?active_id=${active_id}`);
+            if (response && response.statusCode === 200) {
+                console.log('response');
+                getAllActiveHandlingAgents({activeSkipAndLimit: { skip: 0, limit:10 }});
+                showMessage('deleted Successfully.', 'success');
+                setAnchorEl(null);
+                setShowActionBox(-1);
+            }
+            else {
+                showMessage('Something went wrong while deleting.', 'error');
+            }
+           } catch (error) {
+            showMessage('Something went wrong while deleting.', 'error');
             console.log(error)
-        }
-    }
-    const sendingVerification = async (item:any)=>{
-        if(item?.verified === 'expired'){
-            showMessage('REINVITE is required', 'error');
-            return;
-        }
-        const payload = {invite_id : item._id}
-        try {
-            await httpsPost('verify/HA', payload).then((res) => {
-                if (res && res.statusCode == 200) {
-                    showMessage('verified Successfully.', 'success');
-                    setAnchorEl(null);
-                    setShowActionBox(-1);
-                    getAllActiveHandlingAgents({skipAndLimit: {skip: 0, limit:10 }});
-                }
-            }).catch((err) => {
-                console.log(err)
-            })
-        } catch (error) {
-            console.log(error)
-        }
+           }
     }
 
     useEffect(() => {
@@ -174,7 +194,7 @@ function ActiveAgentList({ activeAgentList, activeCount, setActiveSkipAndLimit,g
                                                                 anchorOrigin={{vertical: 25,horizontal: -130,}}
                                                             >
                                                                 <div className='action_items_box_HA' >
-                                                                    <div id='Delete' onClick={(e)=>{}}>Delete</div>
+                                                                    <div id='Delete' onClick={(e)=>{deleteActiveHandlingAgent(row)}}>Delete</div>
                                                                 </div>
                                                             </Popover>
                                                         </div>
