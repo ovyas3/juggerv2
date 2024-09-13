@@ -569,17 +569,18 @@ export const EditELD = ({ shipmentId, setOpen, getAllShipment }: any) => {
                     />
                 </LocalizationProvider>
             </div>
-
-            <div style={{ marginTop: 64 }}>
-                <Button
-                    variant="contained"
-                    size='small'
-                    color="secondary"
-                    style={{ textTransform: 'none', backgroundColor: '#3351FF' }}
-                    onClick={handleDateSubmit}
-                >
-                    {t('submit')}
-                </Button>
+            <div style={{display:'flex',justifyContent:'end'}}>
+                <div style={{ marginTop: 64 }}>
+                        <Button
+                            variant="contained"
+                            size='small'
+                            color="secondary"
+                            style={{ textTransform: 'none', backgroundColor: '#3351FF' }}
+                            onClick={handleDateSubmit}
+                        >
+                            {t('submit')}
+                        </Button>
+                </div>
             </div>
             <div
                 style={{
@@ -994,6 +995,7 @@ export const HandlingEdemand = ({ isClose, isOpen, getAllShipment, shipment }: a
     return (
         <Modal
         open={isOpen}
+        onClose={() => isClose(false)} 
         sx={{
           display: 'flex',
           alignItems: 'center',
