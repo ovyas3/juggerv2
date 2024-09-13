@@ -296,9 +296,11 @@
 .search-trigger button:first-child{
     background: #334FFC;
     color: #FFFFFF;
+    cursor: pointer;
 }
 .search-trigger button:nth-child(2){
     margin-left: 25px;
     background-color: white;
-    color:#0168FF
+    color:#0168FF;
+    cursor: pointer;
 }

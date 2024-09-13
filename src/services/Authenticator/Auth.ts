@@ -3,7 +3,7 @@ import { httpsPost } from "@/utils/Communication";
 import { setCookies, getCookie, hasCookie } from "@/utils/storageService";
 
 const authenticate = async (rms_auth: string) => {
-  const authenticated = httpsPost('tms_rms/verify', { rms_auth }).then((res) => {
+  const authenticated = await httpsPost('tms_rms/verify', { rms_auth }).then((res) => {
     const {
       access_token_web,
       default_unit,
@@ -45,7 +45,7 @@ const authenticate = async (rms_auth: string) => {
 
 const checkAuth = async (rms_auth: string)=> {
   console.log('in auth', {rms_auth});
-  if (hasCookie('access_token')) {
+  if (!(rms_auth && rms_auth.length) && hasCookie('access_token')) {
     return true;
   }
   const isAuth = await authenticate(rms_auth);
