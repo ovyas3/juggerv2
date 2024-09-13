@@ -8,6 +8,7 @@ import Checkbox from '@mui/material/Checkbox';
 import { useCallback } from 'react'
 import './table.css'
 import service from '@/utils/timeService';
+import trash from '@/assets/trash_icon.png'
 
 
 import { useTranslations } from 'next-intl';
@@ -970,3 +971,142 @@ export const MarkPlacement = ({isClose ,shipment, getAllShipment, different = 'm
         </div>
     );
 }
+export const HandlingEdemand = ({ isClose, isOpen, getAllShipment, shipment }: any) => {
+    const { showMessage } = useSnackbar();
+        const payload = {
+            rake: shipment._id,
+        }
+        const handleYes = async () => {
+            try {
+              const response = await httpsPost(`rake_shipment/cancel`, payload);
+              if (response?.statusCode === 200) {
+                isClose(false);
+                getAllShipment();
+                showMessage('Removed successfully', 'success');
+              } else {
+                showMessage('Failed to remove', 'error');
+              }
+            } catch (error) {
+              console.log('Error while cancelling:', error);
+              showMessage('An error occurred, please try again', 'error');
+            }
+          };
+    return (
+        <Modal
+        open={isOpen}
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000,
+        }}
+      >
+        <Box
+          onClick={(e) => {
+            e.stopPropagation();
+          }}
+          sx={{
+            backgroundColor: 'white',
+            borderRadius: '12px',
+            minWidth: '325px',
+            height: '286px',
+            position: 'relative',
+            outline: 'none',
+            padding: '32px',
+            textAlign: 'center',
+          }}
+        >
+          <div>
+            <div className="closeContaioner">
+                        <CloseIcon
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                isClose(false);
+                            }}
+                            style={{ cursor: 'pointer' }}
+                        />
+                    </div>
+      
+            <div
+              style={{
+                fontSize: 20,
+                color: '#131722',
+                fontWeight: "SemiBold",
+                textAlign: 'left',
+                marginBottom: '16px',
+                fontFamily:'Plus Jakarta Sans',
+              }}
+            >
+              Cancel e-Demand
+            </div>
+      
+            <div>
+              <img
+                src={trash.src}
+                alt="recycle"
+                style={{
+                  width: '64px',
+                  height: '64px',
+                  marginBottom: '16px',
+                  padding:10
+                }}
+              />
+            </div>
+      
+            <div
+              style={{
+                fontSize: 12,
+                color: '#3C4852',
+                textAlign: 'left',
+                marginBottom: '24px',
+                fontWeight:'600'
+              }}
+            >
+              Are you sure you want to cancel the e-Demand number?
+            </div>
+      
+            <div style={{ display: 'flex',alignItems:'left',gap:'50px',paddingTop:30 }}>
+              <Button
+                variant="contained"
+                style={{
+                  backgroundColor: '#2C4BFF', 
+                  color: '#FFFFFF',
+                  borderRadius: '8px',
+                  width: '150px',
+                  height: '40px',
+                  fontWeight: 600,
+                  fontSize: '14px',
+                  padding:10
+                }}
+                onClick={() => {
+                  handleYes();
+                  isClose(false);
+                }}
+              >
+                Yes
+              </Button>
+              <Button
+                variant="outlined"
+                style={{
+                  borderColor: '#2C4BFF',
+                  color: '#2C4BFF',
+                  borderRadius: '8px',
+                  width: '150px',
+                  height: '40px',
+                  fontWeight: 600,
+                  fontSize: '14px',
+                }}
+                onClick={() => {
+                  isClose(false);
+                }}
+              >
+                No
+              </Button>
+            </div>
+          </div>
+        </Box>
+      </Modal>
+      
+    );
+};
+
