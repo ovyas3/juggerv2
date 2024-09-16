@@ -831,7 +831,7 @@ export const MarkPlacement = ({isClose ,shipment, getAllShipment, different = 'm
         const payloadWitheident = {
             id: shipment._id,
             placement_time : currentDate,
-            intent_no : eIndent
+            indent_no : eIndent
         }
 
         const payload = {
@@ -885,12 +885,14 @@ export const MarkPlacement = ({isClose ,shipment, getAllShipment, different = 'm
                         <div style={{border:'1px solid #E9E9EB', borderRadius:6, }}>
                             <LocalizationProvider dateAdapter={AdapterDayjs}>
                                 <DateTimePicker
+                                open={openStartDatePicker}
+                                onClose={() => {setOpenStartDatePicker(false)}}
                                 value={dayjs(currentDate)}
                                 sx={{
                                     width: '100%',
                                     '.MuiInputBase-input': {
                                         padding:'10px',
-                                        paddingLeft:'40px',
+                                        paddingLeft:'10px',
                                         fontSize: '14px ',
                                         color:'#42454E',
                                         fontWeight:600
@@ -921,7 +923,7 @@ export const MarkPlacement = ({isClose ,shipment, getAllShipment, different = 'm
                                         onClick: () =>{console.log(); setOpenStartDatePicker(!openStartDatePicker)},
                                         fullWidth: true,
                                         InputProps: {
-                                            // endAdornment: null,
+                                            endAdornment: null,
                                         },
                                     },
                                 }}

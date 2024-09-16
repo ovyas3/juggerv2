@@ -95,10 +95,10 @@ const convertArrayToFilteredArray = (inputArray: any) => {
             HA: any,
             rr_dates : any,
             placement_time:any,
-            intent_no:any,
+            indent_no:any,
             drawnout_time:any
         }) => {
-        const { edemand_no, FNR,placement_time,intent_no, drawnout_time, all_FNRs,rr_dates, delivery_location, trip_tracker, others, remarks, unique_code, status, pickup_date, captive_id, is_captive, eta, rr_document, polyline, past_etas, no_of_wagons, received_no_of_wagons, demand_date, paid_by, commodity_desc, expected_loading_date, HA } = item;
+        const { edemand_no, FNR,placement_time,indent_no, drawnout_time, all_FNRs,rr_dates, delivery_location, trip_tracker, others, remarks, unique_code, status, pickup_date, captive_id, is_captive, eta, rr_document, polyline, past_etas, no_of_wagons, received_no_of_wagons, demand_date, paid_by, commodity_desc, expected_loading_date, HA } = item;
         return {
             _id: item._id,
             edemand: {
@@ -160,7 +160,7 @@ const convertArrayToFilteredArray = (inputArray: any) => {
             },
             placement_time: service.utcToist(placement_time)|| 'NA',
             oneRr_date: rr_dates && rr_dates.length > 0 && service.utcToist(rr_dates[0])|| 'NA',
-            intent_no: intent_no && intent_no,
+            intent_no: indent_no && indent_no,
             drawnout_time: drawnout_time && service.utcToist(drawnout_time) || 'NA',
         }
     });
@@ -602,7 +602,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                                  id="markPlacement"
                                                                              />
                                                                             }
-                                                                            {row.status.raw === 'INPL' && (
+                                                                            {row.status.raw === 'INPL' && row.rrDoc && (
                                                                                  <ActionItem
                                                                                  icon={<UpdateIcon style={{ width: "24px", height: '24px', color: '#0367FF' }} />}
                                                                                  text={t('drownOut')}
