@@ -64,16 +64,27 @@ const renderMarkers = (tracking_data: any[], customIcon: Icon): JSX.Element[] =>
 };
 
 const renderRouteStations = (stations: any[], trainIcon: Icon): JSX.Element[] => {
-  if (!Array.isArray(stations)) {
+
+  try {
+    return stations.reduce<JSX.Element[]>((acc, station, index) => {
+      if (!station?.longLat || !Array.isArray(station.longLat) || station.longLat.length < 2) {
+        console.error(`Invalid longLat for station at index ${index}`, station);
+        return acc;
+      }
+      acc.push(
+        <Marker key={index} position={[station.longLat[1], station.longLat[0]]} icon={trainIcon}>
+          <Popup>
+            Station Name: {station.name}
+          </Popup>
+        </Marker>
+      );
+  
+      return acc;
+    }, []);
+  } catch (error) {
+    console.error(error);
     return [];
   }
-  return stations.map((station, index) => (
-    <Marker key={index} position={[station.longLat[1], station.longLat[0]]} icon={trainIcon}>
-      <Popup>
-        Station Name: {station.name}
-      </Popup>
-    </Marker>
-  ));
 };
 
 
