@@ -62,7 +62,8 @@
     "Cancel":"Cancel",
     "status":"status",
     "FNRno":"FNR No.",
-    "edemandno":"e-Demand No."
+    "edemandno":"e-Demand No.",
+    "cancel":"Cancel"
   },
   "UPLOAD_ANNEXURE":{
     "SNCKBR_MSG":{

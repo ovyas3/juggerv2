@@ -51,8 +51,8 @@ import RvHookupIcon from '@mui/icons-material/RvHookup';
 import UploadAnnexure from '../uploadAnnexureModal/uploadAnnexureModal';
 import PublishedWithChangesIcon from '@mui/icons-material/PublishedWithChanges';
 import UpdateIcon from '@mui/icons-material/Update';
-
-import { ActionItem, EditELD, HandlingAgentSelection, PastEta, RemarkComponent, Remarks, Tags,MarkPlacement} from './tableComp'
+import trash from '@/assets/trash_icon.png'
+import { ActionItem, EditELD, HandlingAgentSelection, PastEta, RemarkComponent, Remarks, Tags,MarkPlacement,HandlingEdemand} from './tableComp'
 
 const status_class_map: { [key: string]: string } = {
     'OB': 'status_title_In_Plant',
@@ -205,7 +205,13 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
     const [isOverflowing, setIsOverflowing] = useState(false);
 
     const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
-
+    const [cancelShipID,setCancelShipId] = useState<any>('')
+    const [cancel,setCancel] = React.useState(false);
+    const handleCancel = (row:any) => {
+        setCancelShipId(row);
+        setCancel(true);
+    }
+    const handleCloseCancel = (e:any) =>{e.stopPropagation();setCancel(false)}
     //getting row id to pass it to tag element
     const [rowId, setRowID] = useState('')
     const [response, setResponse] = useState([])
@@ -604,6 +610,14 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                                  id="drownOut"
                                                                              />
                                                                             )}
+                                                                            {row.status.raw == 'AVE' && (
+                                                                            <ActionItem
+                                                                            icon={<img src={trash.src} style={{ width: "24px", height: '24px'}} />}
+                                                                            text={t('cancel')}
+                                                                            onClick={()=>{handleCancel(row)}}
+                                                                             id="cancel"
+                                                                            />
+                                                                            )}
                                                                         </div>
                                                                     </Popover>
                                                                 </div>
@@ -856,6 +870,8 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
             {openAnnexureModal && 
                <UploadAnnexure isOpen={openAnnexureModal} isClose={()=> setOpenAnnexureModal(false)} shipmentID={uploadAnnexureShipID} FNR_No={uploadAnnexureFNR}/>}
             {openMarkPlacement && <MarkPlacement isClose={setOpenMarkPlacement} shipment={markPlacementId} getAllShipment={getAllShipment} different={downOut} />}
+            {cancel && 
+             <HandlingEdemand isOpen={cancel} isClose={()=> setCancel(false)} shipment={cancelShipID} getAllShipment={getAllShipment}/>}
             <Modal
                 open={open}
                 onClose={(e) => { handleClose(e) }}
