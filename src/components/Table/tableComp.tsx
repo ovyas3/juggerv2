@@ -617,7 +617,7 @@ export const HandlingAgentSelection = ({ shipmentId, setOpen, locationId, getAll
     const handleMouseEnter = useCallback(() => setIsHovered(true), []);
     const handleMouseLeave = useCallback(() => setIsHovered(false), []);
 
-    const [allListOfHAids, setAllListOfHAids] = useState<{ _id: string, parent_name: string }[]>([]);
+    const [allListOfHAids, setAllListOfHAids] = useState<{ _id: string, parent_name: string, name: string }[]>([]);
     const [selectedHAids, setSelectedHAids] = useState(new Set());
     const [originalSelectedHAids, setOriginalSelectedHAids] = useState<Set<any>>(new Set());
     const [newIds, setNewIds] = useState<string[]>([]);
@@ -752,12 +752,7 @@ export const HandlingAgentSelection = ({ shipmentId, setOpen, locationId, getAll
                             <MenuItem key={index} value={item.parent} sx={{ padding: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', paddingRight: '12px' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', padding: 0 }}>
                                     <Checkbox checked={selectedHAids.has(item.parent)} sx={{ '& .MuiSvgIcon-root': { fontSize: 18 } }} />
-                                    <ListItemText primary={item.parent_name} primaryTypographyProps={{ padding: 0, fontSize: '14px', fontFamily: 'Inter, sans-serif' }} />
-                                </div>
-                                <div style={{ marginLeft: 42, fontSize: 12,  color: '#7C7E8C'}}>
-                                    {item?.location?.map((location: any, locationIndex: any) => (
-                                        <div key={locationIndex}>{location.parent_name}</div>
-                                    ))}
+                                    <ListItemText primary={item.parent_name + ' - ' + item.name} primaryTypographyProps={{ padding: 0, fontSize: '14px', fontFamily: 'Inter, sans-serif' }} />
                                 </div>
                             </MenuItem>
                         ))}
