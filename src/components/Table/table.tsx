@@ -95,9 +95,10 @@ const convertArrayToFilteredArray = (inputArray: any) => {
             HA: any,
             rr_dates : any,
             placement_time:any,
-            intent_no:any
+            intent_no:any,
+            drawnout_time:any
         }) => {
-        const { edemand_no, FNR,placement_time,intent_no, all_FNRs,rr_dates, delivery_location, trip_tracker, others, remarks, unique_code, status, pickup_date, captive_id, is_captive, eta, rr_document, polyline, past_etas, no_of_wagons, received_no_of_wagons, demand_date, paid_by, commodity_desc, expected_loading_date, HA } = item;
+        const { edemand_no, FNR,placement_time,intent_no, drawnout_time, all_FNRs,rr_dates, delivery_location, trip_tracker, others, remarks, unique_code, status, pickup_date, captive_id, is_captive, eta, rr_document, polyline, past_etas, no_of_wagons, received_no_of_wagons, demand_date, paid_by, commodity_desc, expected_loading_date, HA } = item;
         return {
             _id: item._id,
             edemand: {
@@ -153,13 +154,14 @@ const convertArrayToFilteredArray = (inputArray: any) => {
             daysAging: calculateDaysDifference(demand_date),
             paid_by: paid_by ? paid_by : 'NA',
             commodity_desc: commodity_desc && commodity_desc,
-            expected_loading_date: expected_loading_date && {
+            expected_loading_date:{
                 ELDdate: service.utcToist(expected_loading_date) || 'NA',
                 ELDtime: service.utcToistTime(expected_loading_date) || 'NA'
             },
-            placement_time: placement_time && service.utcToist(placement_time)|| 'NA',
-            oneRr_date: rr_dates && rr_dates.length > 0 ? service.utcToist(rr_dates[0]) : 'NA',
+            placement_time: service.utcToist(placement_time)|| 'NA',
+            oneRr_date: rr_dates && rr_dates.length > 0 && service.utcToist(rr_dates[0])|| 'NA',
             intent_no: intent_no && intent_no,
+            drawnout_time: drawnout_time && service.utcToist(drawnout_time) || 'NA',
         }
     });
 };
@@ -360,11 +362,9 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
             { id: 'destination', subLabel: 'Paid By', label: 'Destination', class: 'destination', innerClass: '' },
             { id: 'material', subLabel: '', label: 'Commodities', class: 'material', innerClass: '' },
             { id: 'eld', subLabel: 'ELD', label: 'Placement Date', class: 'eld', innerClass: '' },
-            // { id: 'aging', label: 'Ageing', class: 'aging', innerClass: '' },
-            { id: 'pickupdate', subLabel: '', label: 'RR Date', class: 'pickupdate', innerClass: 'inner_pickup' },
+            { id: 'pickupdate', subLabel: 'Drawn Out Time', label: 'RR Date', class: 'pickupdate', innerClass: 'inner_pickup' },
             { id: 'status', subLabel: '', label: 'Status', class: 'status', innerClass: 'inner_status' },
             { id: 'currentEta', subLabel: 'Current ETA', label: 'Initial ETA', class: 'currentEta', innerClass: 'inner_eta' },
-            // { id: 'deliverDate', label: 'Delivered Date', class: 'deliverDate', innerClass: '' },
             { id: 'remarks', subLabel: '', label: 'Remarks', class: 'remarks', innerClass: '' },
             { id: 'handlingAgent', subLabel: '', label: 'Handling Agent', class: 'handlingAgent', innerClass: '' },
             { id: 'action', subLabel: '', label: 'Action', class: 'action', innerClass: '' },
@@ -713,11 +713,12 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                             </div>
                                                         )}
                                                         {item.id === 'pickupdate' && (
-                                                            <>
-                                                                <div>{row.oneRr_date}</div>
-                                                                {/* {row.status.raw === 'INPL' && ( <div style={{ marginTop: '16px' }}>{row.placement_time}</div> )} */}
-                                                            </>
-                                                            
+                                                            row.oneRr_date === 'NA' && row.drawnout_time === 'NA' ? 'NA' : (
+                                                            <div>
+                                                                <div style={{marginBottom:16}}>{row?.oneRr_date}</div>
+                                                                <div>{row?.drawnout_time}</div>
+                                                            </div>
+                                                            )
                                                         )}
                                                         {item.id === 'status' &&
                                                             <div className='status_container'>
@@ -797,13 +798,15 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                 </div>
                                                             </div>
                                                         )}
-                                                        {item.id === 'eld' && (
-                                                            <div>
-                                                                <div style={{marginBottom:20}}>{row.placement_time || 'NA'}</div>
-                                                                <div>{row.expected_loading_date?.ELDdate}</div>
-                                                                {/* <div>{row.expected_loading_date?.ELDtime}</div> */}
-                                                            </div>
-                                                        )}
+                                                        {item.id === 'eld' &&   (
+                                                            row.expected_loading_date.ELDdate === 'NA' && row.placement_time === 'NA' ? 'NA' : (
+                                                                <div>
+                                                                       <div style={{marginBottom:16}}>{row.placement_time}</div>
+                                                                       <div>{row.expected_loading_date.ELDdate}</div>
+                                                                </div>
+                                                            )
+                                                        )                             
+                                                        }
                                                         {item.id === 'handlingAgent' && (
                                                             <div className='handlingAgentColume'>
                                                                 <div style={{ textWrap: 'nowrap' }}>{row.handlingAgent[0] ? row.handlingAgent[0] : "NA"}</div>

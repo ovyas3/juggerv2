@@ -819,6 +819,7 @@ export const MarkPlacement = ({isClose ,shipment, getAllShipment, different = 'm
     const [avetoInplant, setAvetoInplant] = useState(false);
     const [eIndent, setEIndent] = useState('');
     const [warraning, setWarraning] = useState(false);
+    const [openStartDatePicker, setOpenStartDatePicker] = useState(false);
 
     const handlePlacementDate = async() => {
         if(!currentDate) {
@@ -864,7 +865,7 @@ export const MarkPlacement = ({isClose ,shipment, getAllShipment, different = 'm
             <div style={{width:800, height:500, backgroundColor:'white', position:'relative', top:'50%', left:'50%', transform:'translate(-50%,-50%)', borderRadius:20, padding:25}} onClick={(e)=>{e.stopPropagation()}}>
              
                     <div style={{display:'flex', justifyContent:'space-between',}}>
-                        <header style={{fontSize:20, color:'#131722', fontWeight:600}}>{different==='downOut'?'Drown Out Time':'Mark Placement'}</header>
+                        <header style={{fontSize:20, color:'#131722', fontWeight:600}}>{different==='downOut'?'Drawn Out Time':'Mark Placement'}</header>
                     </div>
 
                     <div className="status_edemand_fnr">
@@ -883,7 +884,7 @@ export const MarkPlacement = ({isClose ,shipment, getAllShipment, different = 'm
                     </div>
 
                     <div style={{marginTop:24}}>
-                        <header style={{ marginBottom:8, fontSize:12, color:'#42454E'}}>{different === 'downOut'?'Enter Downout Time':'Enter Placement Time'}</header>
+                        <header style={{ marginBottom:8, fontSize:12, color:'#42454E'}}>{different === 'downOut'?'Enter Drawn Out Time':'Enter Placement Time'}</header>
                         <div style={{border:'1px solid #E9E9EB', borderRadius:6, }}>
                             <LocalizationProvider dateAdapter={AdapterDayjs}>
                                 <DateTimePicker
@@ -915,6 +916,16 @@ export const MarkPlacement = ({isClose ,shipment, getAllShipment, different = 'm
                                         left: -720,
                                         position:'relative',
 
+                                    },
+                                }}
+                                slotProps={{
+                                    textField: {
+                                        // placeholder: formatDate(startDate),
+                                        onClick: () =>{console.log(); setOpenStartDatePicker(!openStartDatePicker)},
+                                        fullWidth: true,
+                                        InputProps: {
+                                            // endAdornment: null,
+                                        },
                                     },
                                 }}
                                 viewRenderers={{
