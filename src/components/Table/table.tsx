@@ -411,7 +411,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
         <div className='target' >
             <Paper sx={{ width: '100%', overflow: 'hidden', boxShadow: 'none', paddingTop:4.5 }}>
                 <TableContainer sx={{
-                    border: '1px solid #E9E9EB', borderRadius: '8px', maxHeight: 'calc(80vh - 90px)',
+                    border: '1px solid #E9E9EB', borderRadius: '8px', maxHeight: 'calc(85vh - 90px)',
                     overflowY: 'scroll',
                     '&::-webkit-scrollbar': {
                         display: 'none',
