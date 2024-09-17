@@ -323,3 +323,11 @@ input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
+.fileUploadContainer{
+  margin-top: 24px;
+  /* background-color: aqua; */
+  height: 200px;
+  border: 1.5px dashed #5481FF;
+  border-radius: 12px;
+  
+}

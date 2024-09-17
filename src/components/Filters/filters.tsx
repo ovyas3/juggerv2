@@ -290,7 +290,7 @@ function Filters({ onToFromChange, onChangeStatus, onChangeRakeTypes, reload, sh
                     </div>
                 </div>
 
-                <div className='status_container' style={{marginRight: 40 }}>
+                {/* <div className='status_container' style={{marginRight: 40 }}>
                     <FormControl sx={{  margin: 0, padding: 0,  marginTop: '2px' }}>
                         <InputLabel id="demo-multiple-checkbox-label" sx={{
                             padding: 0, fontSize: 14, marginTop: '6px',
@@ -328,7 +328,7 @@ function Filters({ onToFromChange, onChangeStatus, onChangeRakeTypes, reload, sh
                             ))}
                         </Select>
                     </FormControl>
-                </div>
+                </div> */}
 
                 <div className='status_container' style={{ marginRight:30 }}>
                     <FormControl sx={{
@@ -432,24 +432,3 @@ function Filters({ onToFromChange, onChangeStatus, onChangeRakeTypes, reload, sh
 }
 
 export default Filters;
-
- {/* { <div className='modal-wrapper'>
-                        <div className='modal-container'>
-                            <div className='modal-header'><span className='modal-filter-header'>Advanced Search</span><Image src={closeIcon} alt='' className='close-icon' onClick={() => setOpenFilterModal(false)} /></div>
-                            <div className='filters-wrapper'>
-                                <input placeholder='e-Demand Number' onChange={(e) => setFilterEDemand(e.target.value)} value={filterEDemand} />
-                                <input placeholder='Destination' onChange={(e) => setFilterDestination(e.target.value)} value={filterDestination} />
-                                <input placeholder='Material' onChange={(e) => setFilterMaterial(e.target.value)} value={filterMaterial} />
-                            </div>
-                            <div className='filter-modal-footer'>
-                                <button onClick={() => clearFilter()}>
-                                    Clear Filter
-                                </button>
-                                <button onClick={handleSubmit}>
-                                    Search
-                                </button>
-
-                            </div>
-                        </div>
-                    </div>  */
-                }

@@ -919,7 +919,6 @@ export const MarkPlacement = ({isClose ,shipment, getAllShipment, different = 'm
                                 }}
                                 slotProps={{
                                     textField: {
-                                        // placeholder: formatDate(startDate),
                                         onClick: () =>{console.log(); setOpenStartDatePicker(!openStartDatePicker)},
                                         fullWidth: true,
                                         InputProps: {
@@ -959,14 +958,12 @@ export const MarkPlacement = ({isClose ,shipment, getAllShipment, different = 'm
                     <div style={{marginTop:24 , display:'flex', alignItems:'center', gap:6}}>
                         <div><input type="checkbox" style={{width:16, height:16}} onChange={()=>{setAvetoInplant(!avetoInplant)}} /></div>
                         {different === 'downOut' && (
-                            <text>change status from <span style={{color:'#134D67',fontWeight:600}}>{t('In Plant')}</span> to <span style={{color:'#FF9800',fontWeight:600}}>{t('In Transit')}</span> </text>
+                            <text>Change status from <span style={{color:'#134D67',fontWeight:600}}>{t('In Plant')}</span> to <span style={{color:'#FF9800',fontWeight:600}}>{t('In Transit')}</span> </text>
                         )}
                         {different !== 'downOut' && (
                             <text style={{color:'#EB1F52', fontWeight:'300'}}>Changing the Placement Date will update the previous date.</text>
                         )}
                     </div>
-                    
-                    
 
                     <div className="buttonContaioner">
                         <Button className="buttonMarkPlacement" onClick={(e)=>{ e.stopPropagation();  isClose(false); }} style={{color:'#2862FF', border:'1px solid #2862FF', width:110, cursor:'pointer', fontWeight:'bold', transition:'all 0.5s ease-in-out'}}>{t('Cancel')}</Button>
@@ -1119,4 +1116,44 @@ export const HandlingEdemand = ({ isClose, isOpen, getAllShipment, shipment }: a
       
     );
 };
+
+export const UploadWagonSheet = ({isClose, shipment}:any) => {
+    const t = useTranslations('ORDERS');
+    return (
+    <div style={{width:'100vw', height:'100vh', position:'fixed', top:0, left:0 ,zIndex:300, backgroundColor:'rgba(0, 0, 0, 0.5)'}} onClick={(e)=>{e.stopPropagation(); isClose(false);}}>
+        <div style={{width:800, height:500, backgroundColor:'white', position:'relative', top:'50%', left:'50%', transform:'translate(-50%,-50%)', borderRadius:20, padding:25}} onClick={(e)=>{e.stopPropagation()}}>
+
+            <div style={{display:'flex', justifyContent:'space-between',}}>
+                <header style={{fontSize:20, color:'#131722', fontWeight:600}}>{t('uploadWagonSheet')}</header>
+            </div>
+
+            <div className="status_edemand_fnr">
+                <div>
+                    <header style={{fontSize:12, color:'#42454E', marginBottom:8}}>{t('status')}</header>
+                    <text style={{fontSize:16, color:"#42454E", fontWeight:600}}>{shipment.status.name}</text>
+                </div>
+                <div>
+                    <header style={{fontSize:12, color:'#42454E', marginBottom:8}}>{t('FNRno')}</header>
+                    <text style={{fontSize:16, color:"#42454E", fontWeight:600}}>{shipment.fnr.primary}</text>
+                </div>
+                <div>
+                    <header style={{fontSize:12, color:'#42454E', marginBottom:8}}>{t('edemandno')}</header>
+                    <text style={{fontSize:16, color:"#42454E", fontWeight:600}}>{shipment.edemand.edemand_no}</text>
+                </div>
+            </div>
+
+            <div className="fileUploadContainer">
+                <input type="file" accept=".csv" name="Browse and Upload"/>
+            </div>
+
+
+            <div className="buttonContaioner">
+                <Button className="buttonMarkPlacement" onClick={(e)=>{ e.stopPropagation(); isClose(false); }} style={{color:'#2862FF', border:'1px solid #2862FF', width:110, cursor:'pointer', fontWeight:'bold', transition:'all 0.5s ease-in-out'}}>{t('Cancel')}</Button>
+                <Button className="buttonMarkPlacement" onClick={(e)=>{e.stopPropagation(); }} style={{color:'white', backgroundColor:'#2862FF',width:110, border:'1px solid #2862FF', cursor:'pointer', fontWeight:'bold',transition:'all 0.5s ease-in-out' }}>{t('upload')}</Button>
+            </div>    
+            <div className="closeContaioner"><CloseIcon onClick={(e) => { e.stopPropagation(); isClose(false) }}/></div>
+        </div>
+    </div>
+    )
+}
 

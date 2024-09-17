@@ -60,10 +60,12 @@
     "drownOut":"Drawn Out Time",
     "IndentNo":"Indent No",
     "Cancel":"Cancel",
-    "status":"status",
+    "status":"Status",
     "FNRno":"FNR No.",
     "edemandno":"e-Demand No.",
-    "cancel":"Cancel"
+    "cancel":"Cancel",
+    "uploadWagonSheet":"Upload Wagon Sheet",
+    "upload":"Upload"
   },
   "UPLOAD_ANNEXURE":{
     "SNCKBR_MSG":{
