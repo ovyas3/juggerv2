@@ -155,13 +155,13 @@ const convertArrayToFilteredArray = (inputArray: any) => {
             paid_by: paid_by ? paid_by : 'NA',
             commodity_desc: commodity_desc && commodity_desc,
             expected_loading_date:{
-                ELDdate: service.utcToist(expected_loading_date) || 'NA',
+                ELDdate: service.utcToist(expected_loading_date, 'dd-MM-yyyy hh:mm') || 'NA',
                 ELDtime: service.utcToistTime(expected_loading_date) || 'NA'
             },
-            placement_time: service.utcToist(placement_time)|| 'NA',
-            oneRr_date: rr_dates && rr_dates.length > 0 && service.utcToist(rr_dates[0])|| 'NA',
+            placement_time: service.utcToist(placement_time, 'dd-MM-yyyy hh:mm')|| 'NA',
+            oneRr_date: rr_dates && rr_dates.length > 0 && service.utcToist(rr_dates[0], 'dd-MM-yyyy hh:mm')|| 'NA',
             intent_no: indent_no && indent_no,
-            drawnout_time: drawnout_time && service.utcToist(drawnout_time) || 'NA',
+            drawnout_time: drawnout_time && service.utcToist(drawnout_time, 'dd-MM-yyyy hh:mm') || 'NA',
         }
     });
 };
@@ -367,7 +367,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
             { id: 'fnr', label: '', subLabel: '', class: 'fnr', innerClass: 'inner_fnr' },
             { id: 'destination', subLabel: 'Paid By', label: 'Destination', class: 'destination', innerClass: '' },
             { id: 'material', subLabel: '', label: 'Commodities', class: 'material', innerClass: '' },
-            { id: 'eld', subLabel: 'ELD', label: 'Placement Date', class: 'eld', innerClass: '' },
+            { id: 'eld', subLabel: 'Expected Loading Date', label: 'Placement Date', class: 'eld', innerClass: '' },
             { id: 'pickupdate', subLabel: 'Drawn Out Time', label: 'RR Date', class: 'pickupdate', innerClass: 'inner_pickup' },
             { id: 'status', subLabel: '', label: 'Status', class: 'status', innerClass: 'inner_status' },
             { id: 'currentEta', subLabel: 'Current ETA', label: 'Initial ETA', class: 'currentEta', innerClass: 'inner_eta' },

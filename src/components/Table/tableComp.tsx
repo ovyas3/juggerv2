@@ -917,6 +917,7 @@ export const MarkPlacement = ({isClose ,shipment, getAllShipment, different = 'm
 
                                     },
                                 }}
+                                ampm={false}
                                 slotProps={{
                                     textField: {
                                         // placeholder: formatDate(startDate),
