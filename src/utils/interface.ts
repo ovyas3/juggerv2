@@ -75,7 +75,8 @@ export interface row {
   oneRr_date:any,
   placement_time:any,
   intent_no:any,
-  drawnout_time:any
+  drawnout_time:any,
+  demand_date:any,
 }
 
 export interface tagItem {

@@ -323,3 +323,40 @@ input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
+.fileUploadContainer{
+  margin-top: 24px;
+  /* background-color: aqua; */
+  height: 200px;
+  border: 1.5px dashed #5481FF;
+  border-radius: 12px;
+}
+.fileUpload{
+  /* background-color: #42454E; */
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 12px;
+  cursor: pointer
+}
+#input-file{
+  display: hidden;
+}
+.fileUploadContent{
+  display: flex;
+  flex-direction:column;
+  justify-content: center;
+  width: 50%;
+}
+.sampleFile{
+  color: #5481FF;
+  font-weight:600;
+  font-size: 12px;
+  cursor: pointer;
+  margin-top: 8px;
+}
+.sampleFile:hover{
+  text-decoration: underline;
+
+}

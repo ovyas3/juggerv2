@@ -52,7 +52,8 @@ import UploadAnnexure from '../uploadAnnexureModal/uploadAnnexureModal';
 import PublishedWithChangesIcon from '@mui/icons-material/PublishedWithChanges';
 import UpdateIcon from '@mui/icons-material/Update';
 import trash from '@/assets/trash_icon.png'
-import { ActionItem, EditELD, HandlingAgentSelection, PastEta, RemarkComponent, Remarks, Tags,MarkPlacement,HandlingEdemand} from './tableComp'
+import DriveFolderUploadIcon from '@mui/icons-material/DriveFolderUpload';
+import { ActionItem, EditELD, HandlingAgentSelection, PastEta, RemarkComponent, Remarks, Tags,MarkPlacement,HandlingEdemand, UploadWagonSheet} from './tableComp'
 
 const status_class_map: { [key: string]: string } = {
     'OB': 'status_title_In_Plant',
@@ -96,7 +97,7 @@ const convertArrayToFilteredArray = (inputArray: any) => {
             rr_dates : any,
             placement_time:any,
             indent_no:any,
-            drawnout_time:any
+            drawnout_time:any,
         }) => {
         const { edemand_no, FNR,placement_time,indent_no, drawnout_time, all_FNRs,rr_dates, delivery_location, trip_tracker, others, remarks, unique_code, status, pickup_date, captive_id, is_captive, eta, rr_document, polyline, past_etas, no_of_wagons, received_no_of_wagons, demand_date, paid_by, commodity_desc, expected_loading_date, HA } = item;
         return {
@@ -161,6 +162,7 @@ const convertArrayToFilteredArray = (inputArray: any) => {
             placement_time: service.utcToist(placement_time, 'dd-MM-yyyy hh:mm')|| 'NA',
             oneRr_date: rr_dates && rr_dates.length > 0 && service.utcToist(rr_dates[0], 'dd-MM-yyyy hh:mm')|| 'NA',
             intent_no: indent_no && indent_no,
+            demand_date:demand_date && service.utcToist(demand_date, 'dd-MM-yyyy hh:mm') || 'NA',
             drawnout_time: drawnout_time && service.utcToist(drawnout_time, 'dd-MM-yyyy hh:mm') || 'NA',
         }
     });
@@ -238,6 +240,10 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
     const [openMarkPlacement, setOpenMarkPlacement] = useState(false);
     const [markPlacementId, setMarkPlacementId] = useState({});
     const [downOut, setDownOut] = useState<string | null | undefined>(null);
+
+    //upload wagon Sheet
+    const [openUploadWagonSheet, setOpenUploadWagonSheet] = useState(false);
+    const [uploadWagonSheetId, setUploadWagonSheetId] = useState({});
 
     const handleRRDoc = (id: any) => {  // for rr documents
         setRRModalOpen(true);
@@ -321,6 +327,11 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
         setDownOut('downOut');
     }
 
+    const uploadWagonSheet = (row: any) => {
+        setOpenUploadWagonSheet(true);
+        setUploadWagonSheetId(row);
+    }
+
     useEffect(() => {
         const etaResult = sortArray(allShipments, 'eta', currentETAsorting ? 'dec' : 'asc');
         const resData = convertArrayToFilteredArray(etaResult)
@@ -367,7 +378,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
             { id: 'fnr', label: '', subLabel: '', class: 'fnr', innerClass: 'inner_fnr' },
             { id: 'destination', subLabel: 'Paid By', label: 'Destination', class: 'destination', innerClass: '' },
             { id: 'material', subLabel: '', label: 'Commodities', class: 'material', innerClass: '' },
-            { id: 'eld', subLabel: 'Expected Loading Date', label: 'Placement Date', class: 'eld', innerClass: '' },
+            { id: 'eld', subLabel: 'Exp. Loading Date', label: 'Indent Date', class: 'eld', innerClass: '' },
             { id: 'pickupdate', subLabel: 'Drawn Out Time', label: 'RR Date', class: 'pickupdate', innerClass: 'inner_pickup' },
             { id: 'status', subLabel: '', label: 'Status', class: 'status', innerClass: 'inner_status' },
             { id: 'currentEta', subLabel: 'Current ETA', label: 'Initial ETA', class: 'currentEta', innerClass: 'inner_eta' },
@@ -398,9 +409,9 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
 
     return (
         <div className='target' >
-            <Paper sx={{ width: '100%', overflow: 'hidden', boxShadow: 'none' }}>
+            <Paper sx={{ width: '100%', overflow: 'hidden', boxShadow: 'none', paddingTop:4.5 }}>
                 <TableContainer sx={{
-                    border: '1px solid #E9E9EB', borderRadius: '8px', maxHeight: 'calc(80vh - 100px)',
+                    border: '1px solid #E9E9EB', borderRadius: '8px', maxHeight: 'calc(85vh - 90px)',
                     overflowY: 'scroll',
                     '&::-webkit-scrollbar': {
                         display: 'none',
@@ -434,6 +445,9 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                         </div>
                                                         : <></>
                                                 }
+                                                {column.id === 'eld' && (
+                                                    <div>Placement Date</div>
+                                                )}
                                                 {
                                                     column.id === 'fnr' ?
                                                         <div>
@@ -521,7 +535,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                 eld: 'body_eld',
                                             }
                                             return (
-                                                <TableCell key={index} sx={{ fontSize: '12px', color: '#44475B', p: '16px 10px 16px 10px' }}
+                                                <TableCell key={index} sx={{ fontSize: '12px', color: '#44475B', p: '6px 5px 6px 5px' }}
                                                     className={columnClassNames[item.id]} >
                                                     <div>
                                                         {(typeof value) === 'object' ? '' : value}
@@ -610,6 +624,12 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                                  id="drownOut"
                                                                              />
                                                                             )}
+                                                                                <ActionItem
+                                                                                    icon={<DriveFolderUploadIcon style={{ width: "24px", height: '24px', color:'#185519'}} />}
+                                                                                    text={t('uploadWagonSheet')}
+                                                                                    onClick={()=>{uploadWagonSheet(row)}}
+                                                                                    id='uploadWagonSheet'
+                                                                                />
                                                                             {row.status.raw == 'AVE' && (
                                                                             <ActionItem
                                                                             icon={<img src={trash.src} style={{ width: "24px", height: '24px'}} />}
@@ -627,9 +647,6 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                             <div className='fnr_container'>
                                                                 <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                                                                     <div>Primary</div>
-                                                                    {/* {(row.status.name === 'AVE') && 
-                                                                        <div className='aging_dot' style={{backgroundColor:`${getColorCode(row.daysAging)}`}} ></div>
-                                                                    } */}
                                                                 </div>
                                                                 <div className='fnr_inner_data'>
                                                                     <Link target="_blank"
@@ -815,8 +832,9 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                         {item.id === 'eld' &&   (
                                                             row.expected_loading_date.ELDdate === 'NA' && row.placement_time === 'NA' ? 'NA' : (
                                                                 <div>
-                                                                       <div style={{marginBottom:16}}>{row.placement_time}</div>
-                                                                       <div>{row.expected_loading_date.ELDdate}</div>
+                                                                    <div>{row.demand_date}</div>
+                                                                    <div style={{marginBlock:4}}>{row.expected_loading_date.ELDdate}</div>
+                                                                    <div>{row.placement_time}</div>
                                                                 </div>
                                                             )
                                                         )                             
@@ -863,13 +881,14 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                     onPageChange={handleChangePage}
                     onRowsPerPageChange={handleChangeRowsPerPage}
                     labelRowsPerPage="Shipments per page:"
-                    sx={{ height: 40, overflowY: 'hidden', position: 'absolute', top: '139px', right: '12px' }}
+                    sx={{ height: 40, overflowY: 'hidden', position: 'absolute', top: '115px', right: '12px' }}
                 />
             </Paper>
             <RRModal isOpen={isRRModalOpen} isClose={() => setRRModalOpen(false)} rrNumbers={rrNumbers} isRRDoc={isRRDoc} />
             {openAnnexureModal && 
                <UploadAnnexure isOpen={openAnnexureModal} isClose={()=> setOpenAnnexureModal(false)} shipmentID={uploadAnnexureShipID} FNR_No={uploadAnnexureFNR}/>}
             {openMarkPlacement && <MarkPlacement isClose={setOpenMarkPlacement} shipment={markPlacementId} getAllShipment={getAllShipment} different={downOut} />}
+            {openUploadWagonSheet && <UploadWagonSheet isClose={setOpenUploadWagonSheet} shipment={uploadWagonSheetId} />  }
             {cancel && 
              <HandlingEdemand isOpen={cancel} isClose={()=> setCancel(false)} shipment={cancelShipID} getAllShipment={getAllShipment}/>}
             <Modal

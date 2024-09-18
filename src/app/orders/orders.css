@@ -182,7 +182,7 @@
     flex-direction: column;
 }
 .display_status{
-    margin-block: 15px;
+    /* margin-block: 15px; */
     display: flex;
     flex-direction: row;
     gap: 16px;
