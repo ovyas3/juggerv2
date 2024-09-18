@@ -833,8 +833,8 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                             row.expected_loading_date.ELDdate === 'NA' && row.placement_time === 'NA' ? 'NA' : (
                                                                 <div>
                                                                     <div>{row.demand_date}</div>
-                                                                    <div style={{marginBlock:6}}>{row.placement_time}</div>
-                                                                    <div>{row.expected_loading_date.ELDdate}</div>
+                                                                    <div style={{marginBlock:4}}>{row.expected_loading_date.ELDdate}</div>
+                                                                    <div>{row.placement_time}</div>
                                                                 </div>
                                                             )
                                                         )                             

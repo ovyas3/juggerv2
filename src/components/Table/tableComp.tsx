@@ -51,6 +51,7 @@ import ListItemText from '@mui/material/ListItemText';
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { renderTimeViewClock } from '@mui/x-date-pickers/timeViewRenderers';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 
 async function rake_update_id(payload: Object) {
     return await httpsPost(UPDATE_RAKE_CAPTIVE_ID, payload);
@@ -497,13 +498,16 @@ export const EditELD = ({ shipmentId, setOpen, getAllShipment }: any) => {
     const handleMouseLeave = useCallback(() => setIsHovered(false), []);
     const [openDatePicker, setOpenDatePicker] = useState(false);
     const [selectDate, setSelectDate] = useState(new Date());
+    const [openStartDatePicker, setOpenStartDatePicker] = useState(false);
+    const [currentDate, setCurrentDate] = useState(new Date());
+
 
     const handleDatePickerToggle = () => {
         setOpenDatePicker((prev) => !prev);
     };
 
     const handleDateSubmit = async () => {
-        const dateObject = new Date(selectDate);
+        const dateObject = new Date(currentDate);
         const epochTimestamp = dateObject.getTime();
         const payload = {
             id: shipmentId,
@@ -529,7 +533,7 @@ export const EditELD = ({ shipmentId, setOpen, getAllShipment }: any) => {
         <div style={{ position: 'relative', padding: 24 }}>
             <div>Add Expected Loading Date</div>
 
-            <div style={{ marginTop: '24px' }}>
+            {/* <div style={{ marginTop: '24px' }}>
                 <div style={{ fontSize: 10, color: '#7C7E8C', paddingBottom: '4px' }}>Select Expected Loading Date</div>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                     <DatePicker
@@ -568,7 +572,70 @@ export const EditELD = ({ shipmentId, setOpen, getAllShipment }: any) => {
                         value={dayjs(selectDate)}
                     />
                 </LocalizationProvider>
-            </div>
+            </div> */}
+            <div style={{marginTop:24}}>
+                        <header style={{ marginBottom:8, fontSize:12, color:'#42454E'}}>Select Expected Loading Date</header>
+                        <div style={{border:'1px solid #E9E9EB', borderRadius:6, }}>
+                            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                <DateTimePicker
+                                open={openStartDatePicker}
+                                onClose={() => {setOpenStartDatePicker(false)}}
+                                value={dayjs(currentDate)}
+                                sx={{
+                                    width: '100%',
+                                    '.MuiInputBase-input': {
+                                        padding:'10px',
+                                        paddingLeft:'10px',
+                                        fontSize: '14px ',
+                                        color:'#42454E',
+                                        fontWeight:600
+                                    },
+                                    '.MuiInputBase-root': {
+
+                                        padding: 0,
+                                        border: 'none',
+                                        '& fieldset': { border: 'none' },
+                                    },
+                                    '& .MuiOutlinedInput-root': {
+                                        '&:hover fieldset': {
+                                            border: 'none',
+                                        },
+                                        '&.Mui-focused fieldset': {
+                                            border: 'none',
+                                        },
+                                    },
+                                    '& .MuiIconButton-root': {
+                                        left: -720,
+                                        position:'relative',
+
+                                    },
+                                }}
+                                ampm={false}
+                                slotProps={{
+                                    textField: {
+                                        onClick: () =>{console.log(); setOpenStartDatePicker(!openStartDatePicker)},
+                                        fullWidth: true,
+                                        InputProps: {
+                                            endAdornment: null,
+                                        },
+                                    },
+                                }}
+                                viewRenderers={{
+                                    hours: renderTimeViewClock,
+                                    minutes: renderTimeViewClock,
+                                    seconds: renderTimeViewClock,
+                                }}
+                                onChange={(newDate) => { 
+                                    if (newDate) {
+                                        
+                                        setCurrentDate(newDate.toDate());
+                                    }
+                                }}
+                                format="DD/MM/YYYY  HH:mm"
+                                />
+                            </LocalizationProvider>
+                        </div>
+                    </div>
             <div style={{display:'flex',justifyContent:'end'}}>
                 <div style={{ marginTop: 64 }}>
                         <Button
@@ -1119,7 +1186,32 @@ export const HandlingEdemand = ({ isClose, isOpen, getAllShipment, shipment }: a
 };
 
 export const UploadWagonSheet = ({isClose, shipment}:any) => {
+
     const t = useTranslations('ORDERS');
+    const [fileName, setFileName] = useState('Drag and Drop to upload the file here');
+    const [uploadFile, setUploadFile] = useState<any>({});
+    const { showMessage } = useSnackbar();
+
+    const uploadWagonSheet = async () => {
+        const payload = {
+            _id: shipment._id,
+            edemand_no: shipment.edemand.edemand_no,
+            file:uploadFile
+        }
+            await httpsPost('wagon_sheet/upload', payload, 0, true).then((response: any) => {
+                console.log(response)
+                if(response.statusCode === 200) {
+                    isClose(false);
+                    setFileName('Drag and Drop to upload the file here');
+                    setUploadFile({});
+                    showMessage('File Uploaded Succcessfully', 'success');
+                }
+                if (Object.keys(response).length === 0) {
+                    showMessage('Something went wrong, Please try again', 'error')
+                }
+            }).catch((err)=> {console.log('hello fuckers'); console.log(err); showMessage('Something went wrong, Please try again', 'error')}) 
+    }
+
     return (
     <div style={{width:'100vw', height:'100vh', position:'fixed', top:0, left:0 ,zIndex:300, backgroundColor:'rgba(0, 0, 0, 0.5)'}} onClick={(e)=>{e.stopPropagation(); isClose(false);}}>
         <div style={{width:800, height:500, backgroundColor:'white', position:'relative', top:'50%', left:'50%', transform:'translate(-50%,-50%)', borderRadius:20, padding:25}} onClick={(e)=>{e.stopPropagation()}}>
@@ -1144,13 +1236,24 @@ export const UploadWagonSheet = ({isClose, shipment}:any) => {
             </div>
 
             <div className="fileUploadContainer">
-                <input type="file" accept=".csv" name="Browse and Upload"/>
+                <label htmlFor="input-file" className="fileUpload">
+                <input type="file" accept=".csv" id="input-file" hidden onChange={(e)=>{  if (e.target.files) {setFileName(e.target.files[0].name); setUploadFile(e.target.files[0]) }}} />
+                    <div className="fileUploadContent">
+                        <div style={{textAlign:'center'}}><CloudUploadIcon style={{width:30, height:30, color:'#5481FF'}}  /></div>
+                        <header style={{color:'#71747A', fontSize:12, marginBottom:10,textAlign:'center'}}>{fileName}</header>
+                        <div style={{display:'flex', justifyContent:'center', alignItems:'center', marginBottom:8}}><div style={{width:135, height:36 , borderRadius:4, backgroundColor:'#42454E', color:'white', textAlign:'center', alignContent:'center', fontSize:12}}>Browse and Upload</div></div>
+                        <p style={{color:'#71747A', fontSize:12,textAlign:'center'}}>Only <span style={{color:'#131722', fontWeight:600}}>CSV</span> file format will be accepted</p>
+                    </div>
+                </label>
+            </div>
+            <div>
+                <p className="sampleFile" onClick={(e)=>{e.stopPropagation();  window.open('https://docs.google.com/spreadsheets/d/1ZM3AnXF3zI1Rc98b4J890JAcpWaxOrS0ZSgHjAZaBPk/edit?gid=0#gid=0', '_blank'); } } >Download Sample File</p>
             </div>
 
 
             <div className="buttonContaioner">
-                <Button className="buttonMarkPlacement" onClick={(e)=>{ e.stopPropagation(); isClose(false); }} style={{color:'#2862FF', border:'1px solid #2862FF', width:110, cursor:'pointer', fontWeight:'bold', transition:'all 0.5s ease-in-out'}}>{t('Cancel')}</Button>
-                <Button className="buttonMarkPlacement" onClick={(e)=>{e.stopPropagation(); }} style={{color:'white', backgroundColor:'#2862FF',width:110, border:'1px solid #2862FF', cursor:'pointer', fontWeight:'bold',transition:'all 0.5s ease-in-out' }}>{t('upload')}</Button>
+                <Button className="buttonMarkPlacement" onClick={(e)=>{ e.stopPropagation(); isClose(false); uploadFile({}); setFileName('Drag and Drop to upload the file here'); }} style={{color:'#2862FF', border:'1px solid #2862FF', width:110, cursor:'pointer', fontWeight:'bold', transition:'all 0.5s ease-in-out'}}>{t('Cancel')}</Button>
+                <Button className="buttonMarkPlacement" onClick={(e)=>{e.stopPropagation(); uploadWagonSheet(); }} style={{color:'white', backgroundColor:'#2862FF',width:110, border:'1px solid #2862FF', cursor:'pointer', fontWeight:'bold',transition:'all 0.5s ease-in-out' }}>{t('upload')}</Button>
             </div>    
             <div className="closeContaioner"><CloseIcon onClick={(e) => { e.stopPropagation(); isClose(false) }}/></div>
         </div>
