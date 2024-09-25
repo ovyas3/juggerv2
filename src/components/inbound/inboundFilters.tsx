@@ -84,8 +84,6 @@ function InboundFilters() {
     setRakeArray(rakeArray);
   }, [captiveRake, indianRake]);
 
-  console.log(startDate,'--------ghjkjhgfdfghj----------', endDate);
-
   return (
     <div id="inboundFiltersContainer">
       <div id="inboundFilters">

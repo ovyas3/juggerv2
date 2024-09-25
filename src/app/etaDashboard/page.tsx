@@ -22,6 +22,7 @@ function EtaDashboard() {
   const t = useTranslations("ETADASHBOARD");
   const [openModalDelay, setOpenModalDelay] = useState(false);
   const [providedShipments, setProvidedShipments] = useState([]);
+  const [headingForModel, setHeadingForModel] = useState("");
 
   const [early, setEarly] = useState({
     count: 0,
@@ -93,8 +94,8 @@ function EtaDashboard() {
                 <span style={{fontWeight:'600'}}><CountUp duration={1.5} end={early.count+late.count+ontime.count+zeroToEight.count+eightToSixteen.count+sixteenToTwentyFour.count+twentyfourTofourtyeight.count}/></span>
               </header>
             </div>
-            <div id="reload">
-              {/* <RefreshIcon /> */}
+            <div id="reload" style={{cursor:'pointer'}} onClick={() => {getDelayShipments(); showMessage("Refreshed", "success")}}>
+              <RefreshIcon />
             </div>
           </section>
           <section id="etaDisplayContainer">
@@ -102,7 +103,7 @@ function EtaDashboard() {
               <header className="delayedheader" style={{ color: "#E76E81" }}>
                 {t("delayedBy48hrs")}
               </header>
-              <div className="delayInfo redBackground" onClick={() => {setOpenModalDelay(true); setProvidedShipments(early.shipments)}}>
+              <div className="delayInfo redBackground" onClick={() => {setOpenModalDelay(true); setProvidedShipments(early.shipments); setHeadingForModel('Delayed by 48 Hrs')}}>
                 <div className="delayInfoDigit" style={{ color: "#E76E81" }}><CountUp end={late.count} duration={1.5} /></div>
               </div>
             </div>
@@ -110,7 +111,7 @@ function EtaDashboard() {
               <header className="delayedheader">
                 {t("delayedby24-28hrs")}
               </header>
-              <div className="delayInfo" onClick={() => {setOpenModalDelay(true); setProvidedShipments(ontime.shipments)}}>
+              <div className="delayInfo" onClick={() => {setOpenModalDelay(true); setProvidedShipments(ontime.shipments); setHeadingForModel('Delayed by 24-28 Hrs')}}>
                 <div className="delayInfoDigit"><CountUp end={twentyfourTofourtyeight.count} duration={1.5} /></div>
               </div>
             </div>
@@ -118,31 +119,31 @@ function EtaDashboard() {
               <header className="delayedheader">
                 {t("delayedby16-24hrs")}
               </header>
-              <div className="delayInfo" onClick={() => {setOpenModalDelay(true); setProvidedShipments(sixteenToTwentyFour.shipments)}}>
+              <div className="delayInfo" onClick={() => {setOpenModalDelay(true); setProvidedShipments(sixteenToTwentyFour.shipments); setHeadingForModel('Delayed by 16-24 Hrs')}}>
                 <div className="delayInfoDigit"><CountUp end={sixteenToTwentyFour.count} duration={1.5} /></div>
               </div>
             </div>
             <div>
               <header className="delayedheader">{t("delayedby8-16hrs")}</header>
-              <div className="delayInfo" onClick={() => {setOpenModalDelay(true); setProvidedShipments(eightToSixteen.shipments)}}>
+              <div className="delayInfo" onClick={() => {setOpenModalDelay(true); setProvidedShipments(eightToSixteen.shipments); setHeadingForModel('Delayed by 8-16 Hrs')}}>
                 <div className="delayInfoDigit"><CountUp end={eightToSixteen.count} duration={1.5} /></div>
               </div>
             </div>
             <div>
               <header className="delayedheader">{t("delayedby0-8hrs")}</header>
-              <div className="delayInfo" onClick={() => {setOpenModalDelay(true); setProvidedShipments(zeroToEight.shipments)}}>
+              <div className="delayInfo" onClick={() => {setOpenModalDelay(true); setProvidedShipments(zeroToEight.shipments); setHeadingForModel('Delayed by 0-8 Hrs')}}>
                 <div className="delayInfoDigit"><CountUp end={zeroToEight.count} duration={1.5} /></div>
               </div>
             </div>
             <div>
               <header className="delayedheader" style={{color:'#40BE8A'}}>{t("ontime")}</header>
-              <div className="delayInfo greenBackground" onClick={() => {setOpenModalDelay(true); setProvidedShipments(ontime.shipments)}}>
+              <div className="delayInfo greenBackground" onClick={() => {setOpenModalDelay(true); setProvidedShipments(ontime.shipments); setHeadingForModel('On Time') }}>
                 <div className="delayInfoDigit" style={{color:'#40BE8A'}}><CountUp end={ontime.count} duration={1.5} /></div>
               </div>
             </div>
             <div>
               <header className="delayedheader" style={{color:'#40BE8A'}}>{t("early")}</header>
-              <div className="delayInfo greenBackground" onClick={() => {setOpenModalDelay(true); setProvidedShipments(early.shipments)}}>
+              <div className="delayInfo greenBackground" onClick={() => {setOpenModalDelay(true); setProvidedShipments(early.shipments) ; setHeadingForModel('Early')}}>
                 <div className="delayInfoDigit" style={{color:'#40BE8A'}}><CountUp end={early.count} duration={1.5}/></div>
               </div>
             </div>
@@ -150,7 +151,7 @@ function EtaDashboard() {
         </div>
       </div>
 
-      {openModalDelay && (<EtaDashboardModal providedShipments={providedShipments} setOpenModalDelay={setOpenModalDelay} />)}
+      {openModalDelay && (<EtaDashboardModal providedShipments={providedShipments} setOpenModalDelay={setOpenModalDelay} headingForModel={headingForModel}/>)}
 
       {mobile ? (
         <SideDrawer />
