@@ -102,17 +102,17 @@
     font-weight: 500;
 }
 
-.coming-soon {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 80%;
+.inboundContainer {
+    /* display: flex; */
+    /* justify-content: center; */
+    /* align-items: center; */
+    height: calc(100vh - 136px);
     width: 100%;
-    font-size: 42px;
+    /* font-size: 42px; */
     font-family: 'Inter', sans-serif;
-    font-weight: 600;
+    /* font-weight: 600;
     color: #42454E;
-    animation: fadeInOut 2s infinite;
+    animation: fadeInOut 2s infinite; */
 }
 
 @keyframes fadeInOut {
