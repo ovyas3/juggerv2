@@ -16,6 +16,7 @@ import fullLogo from '@/assets/Smartruck_hover_logo.svg'
 import HandlingAgentInactive from '@/assets/handling_agent_inactive_icon.svg';
 import handlingAgentActive from '@/assets/handling_agent_active_icon.svg'
 import AssessmentIcon from '@mui/icons-material/Assessment';
+import AllInboxIcon from '@mui/icons-material/AllInbox';
 
 function SideDrawer() {
     const [open, setOpen] = useState(false);
@@ -25,6 +26,7 @@ function SideDrawer() {
     const router = useRouter();
     const [handleAgent, setHandleAgent] = useState(false);
     const [etaReport, setEtaReport] = useState(false);
+    const [dashboard, setDashboard] = useState(false);
  
     const pathName = usePathname();
     const handleRouting = (route: string) => {
@@ -144,6 +146,25 @@ function SideDrawer() {
                     className={`${open ? 'fnr_text' : 'fnr_text_none'}`}
                     style={{ color: etaReport ? 'black' : 'white' }} 
                 >Reports</div>
+            </div>
+
+            <div
+                onMouseEnter={()=>{ setDashboard(true) }}
+                onMouseLeave={()=>{ setDashboard(false) }}
+                onClick={() => handleRouting('etaDashboard')}
+                className='station-code'
+                style={{
+                    width: open ? '190px' : '42px',
+                    justifyContent: open ? 'start' : 'center',
+                    backgroundColor: dashboard === true ? 'white' : '',
+                    cursor: 'pointer'
+                }}
+            >
+                <AllInboxIcon style={{ marginLeft: open ? '9px' : '', color: dashboard ? 'black' : 'white' }}/>
+                <div
+                    className={`${open ? 'fnr_text' : 'fnr_text_none'}`}
+                    style={{ color: dashboard ? 'black' : 'white' }} 
+                >Dashboard</div>
             </div>
         </div>
     );

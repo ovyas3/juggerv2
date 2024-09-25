@@ -233,7 +233,7 @@ function Filters({ onToFromChange, onChangeStatus, onChangeRakeTypes, reload, sh
                                     }}
                                     value={dayjs(startDate)}
                                     onChange={(newDate) => { handleStartDateChange(newDate) }}
-                                    disabled={disableStartDate}
+                                    // disabled={disableStartDate}
                                 />
                             </LocalizationProvider>
                         </div>

@@ -82,5 +82,15 @@
   "HANDLING_AGENT":{
     "invitedHA":"Invited Handling Agents",
     "activeHA":"Active Handling Agents"
+  },
+  "ETADASHBOARD":{
+    "enheading":"En-Route ETA Delays : ",
+    "delayedBy48hrs":"Delayed by >48 Hrs",
+    "delayedby24-28hrs":"Delayed by 24-28 Hrs",
+    "delayedby16-24hrs":"Delayed by 16-24 Hrs",
+    "delayedby8-16hrs":"Delayed by 8-16 Hrs",
+    "delayedby0-8hrs":"Delayed by 0-8 Hrs",
+    "ontime":"On Time",
+    "early":"Early"
   }
 }

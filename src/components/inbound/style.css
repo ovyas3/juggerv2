@@ -1,0 +1,72 @@
+/* ---------------filters--------------- */
+#inboundFiltersContainer {
+  margin-top: 18px;
+}
+#inboundFilters {
+  display: flex;
+  gap: 16px;
+  position: relative;
+  overflow-y: hidden;
+}
+#from-date {
+  height: 36px;
+  width: 132px;
+  border: 1px solid #e9e9eb;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  padding-left: 8px;
+}
+#calenderBox {
+  height: 16px;
+  width: 16px;
+  margin-bottom: 4px;
+}
+#from-date-box {
+  flex: 1;
+  margin-top: 6px;
+  margin-left: 10px;
+}
+#from-date-text {
+  font-size: 10px;
+  color: #44475b;
+}
+#rakeType {
+  height: 36px;
+  width: 180px;
+  border: 1px solid #e9e9eb;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  font-size: 10px;
+  justify-content: space-between;
+  gap: 4px;
+  padding-inline: 4px;
+}
+.status_text {
+  background-color: #F0F3F9;
+  width: 90px;
+  height: 28px;
+  text-align: center;
+  align-content: center;
+  border-radius: 4px;
+  cursor: pointer;
+}
+#map-view-btn-orders{
+  color: #44475b;
+  font-size: 12px;
+  width: 100px;
+  height: 36px;
+  border: 1px solid #e9e9eb;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center !important;
+  justify-content: center;
+  gap: 4px;
+}
+#map-view-btn-header{}
+
+/* ----------------table--------------- */
+
+/* -----------------Dashboard---------------- */

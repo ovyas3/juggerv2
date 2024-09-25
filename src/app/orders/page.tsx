@@ -19,6 +19,9 @@ import service from '@/utils/timeService';
 import { color } from 'framer-motion';
 import { getShipmentStatusSummary } from '@/utils/hooks'
 import { useRouter } from 'next/navigation';
+import Inbound from './inbound';
+import CountUp from 'react-countup';
+
 
 
 const getStatusCode = (status: string): string => {
@@ -398,62 +401,36 @@ const OrdersPage = () => {
             </div>
 
             <div className='filter_aging_table_display' style={{display:selected_bound==='inbound'?'none':'block'}}>
-              <div className='filters_aging'>
 
+              <div className='filters_aging'>
                 <div className='filters' style={{ overflowX: 'auto', maxWidth: '87%' }}>
                   <Filters onToFromChange={handleToFromChange} onChangeStatus={handleChangeStatus} onChangeRakeTypes={handleChangeRakeType} reload={reload} getShipments={getAllShipment} shipmentsPayloadSetter={setShipmentsPayload} setTriggerShipments={setTriggerShipments} triggerShipments={triggerShipments} />
                 </div>
-
                 <div className='display_status'>
                     <div className='display_status_inner_box' style={{
                       backgroundColor: (status.includes('AVE') && status.includes('ITNS')  && status.includes('Delivered')  && status.includes('INPL') ) ? '#000000' : '#FFFFFF',
                     }} onClick={()=>{changeStatusByDashBoard('total')}}>
-                      <div style={{fontSize:20, fontWeight:500, color: (status.includes('AVE') && status.includes('ITNS')  && status.includes('Delivered')  && status.includes('INPL') )? '#FFFFFF' : '#000000'}}>{fetchTotalCount}</div>
+                      <div style={{fontSize:20, fontWeight:500, color: (status.includes('AVE') && status.includes('ITNS')  && status.includes('Delivered')  && status.includes('INPL') )? '#FFFFFF' : '#000000'}}><CountUp duration={1.5} end={fetchTotalCount}/></div>
                       <div style={{fontSize:12, color: (status.includes('Available eIndent') && status.includes('Ready for Departure') && status.includes('In Transit') && status.includes('Delivered At Hub') && status.includes('Delivered At Customer')) ? '#FFFFFF' : '#7C7E8C'}}>{t('Total')}</div>
                     </div>
                     <div className='display_status_inner_box' style={{cursor:'pointer', backgroundColor: getStatusColor(status, 'AVE').backgroundColor}} onClick={()=>{changeStatusByDashBoard('AVE')}}>
-                      <div style={{fontSize:20, fontWeight:500, color: getStatusColor(status, 'AVE').countTextColor}}>{availableeIndentCount}</div>
+                      <div style={{fontSize:20, fontWeight:500, color: getStatusColor(status, 'AVE').countTextColor}}><CountUp duration={1.5} end={availableeIndentCount}/></div>
                       <div style={{fontSize:12, color: getStatusColor(status, 'AVE').textTextColor}}>{t('Indent')}</div>
                     </div>
                     <div className='display_status_inner_box' style={{cursor:'pointer',backgroundColor: getStatusColor(status, 'In Plant').backgroundColor}} onClick={()=>{changeStatusByDashBoard('INPL')}}>
-                      <div style={{fontSize:20, fontWeight:500, color: getStatusColor(status, 'In Plant').countTextColor}}>{inPlantCount}</div>
+                      <div style={{fontSize:20, fontWeight:500, color: getStatusColor(status, 'In Plant').countTextColor}}><CountUp duration={1.5} end={inPlantCount}/></div>
                       <div style={{fontSize:12, color: getStatusColor(status, 'In Plant').textTextColor}}>{t('In Plant')}</div>
                     </div>
                     <div className='display_status_inner_box' style={{cursor:'pointer',backgroundColor: getStatusColor(status, 'In Transit').backgroundColor}} onClick={()=>{changeStatusByDashBoard('ITNS')}}>
-                      <div style={{fontSize:20, fontWeight:500, color: getStatusColor(status, 'In Transit').countTextColor}}>{inTransitCount}</div>
+                      <div style={{fontSize:20, fontWeight:500, color: getStatusColor(status, 'In Transit').countTextColor}}><CountUp duration={1.5} end={inTransitCount}/></div>
                       <div style={{fontSize:12, color: getStatusColor(status, 'In Transit').textTextColor}}>{t('In Transit')}</div>
                     </div>
                     <div className='display_status_inner_box' style={{cursor:'pointer',backgroundColor: getStatusColor(status, 'Delivered').backgroundColor}} onClick={()=>{changeStatusByDashBoard('Delivered')}}>
-                      <div style={{fontSize:20, fontWeight:500, color: getStatusColor(status, 'Delivered').countTextColor}}>{deliveredCount}</div>
+                      <div style={{fontSize:20, fontWeight:500, color: getStatusColor(status, 'Delivered').countTextColor}}><CountUp duration={1.5} end={deliveredCount}/></div>
                       <div style={{fontSize:12, color: getStatusColor(status, 'Delivered').textTextColor}}>{t('Delivered')}</div>
                     </div>
-              </div> 
+                </div> 
               </div>
-
-              {/* <div className='display_status'>
-                    <div className='display_status_inner_box' style={{
-                      backgroundColor: (status.includes('AVE') && status.includes('ITNS')  && status.includes('Delivered')  && status.includes('INPL') ) ? '#000000' : '#FFFFFF',
-                    }}>
-                      <div style={{fontSize:20, fontWeight:500, color: (status.includes('AVE') && status.includes('ITNS')  && status.includes('Delivered')  && status.includes('INPL') )? '#FFFFFF' : '#000000'}}>{fetchTotalCount}</div>
-                      <div style={{fontSize:12, color: (status.includes('Available eIndent') && status.includes('Ready for Departure') && status.includes('In Transit') && status.includes('Delivered At Hub') && status.includes('Delivered At Customer')) ? '#FFFFFF' : '#7C7E8C'}}>{t('Total')}</div>
-                    </div>
-                    <div className='display_status_inner_box' style={{cursor:'pointer', backgroundColor: getStatusColor(status, 'AVE').backgroundColor}} onClick={()=>{changeStatusByDashBoard('AVE')}}>
-                      <div style={{fontSize:20, fontWeight:500, color: getStatusColor(status, 'AVE').countTextColor}}>{availableeIndentCount}</div>
-                      <div style={{fontSize:12, color: getStatusColor(status, 'AVE').textTextColor}}>{t('Indent')}</div>
-                    </div>
-                    <div className='display_status_inner_box' style={{cursor:'pointer',backgroundColor: getStatusColor(status, 'In Plant').backgroundColor}} onClick={()=>{changeStatusByDashBoard('INPL')}}>
-                      <div style={{fontSize:20, fontWeight:500, color: getStatusColor(status, 'In Plant').countTextColor}}>{inPlantCount}</div>
-                      <div style={{fontSize:12, color: getStatusColor(status, 'In Plant').textTextColor}}>{t('In Plant')}</div>
-                    </div>
-                    <div className='display_status_inner_box' style={{cursor:'pointer',backgroundColor: getStatusColor(status, 'In Transit').backgroundColor}} onClick={()=>{changeStatusByDashBoard('ITNS')}}>
-                      <div style={{fontSize:20, fontWeight:500, color: getStatusColor(status, 'In Transit').countTextColor}}>{inTransitCount}</div>
-                      <div style={{fontSize:12, color: getStatusColor(status, 'In Transit').textTextColor}}>{t('In Transit')}</div>
-                    </div>
-                    <div className='display_status_inner_box' style={{cursor:'pointer',backgroundColor: getStatusColor(status, 'Delivered').backgroundColor}} onClick={()=>{changeStatusByDashBoard('Delivered')}}>
-                      <div style={{fontSize:20, fontWeight:500, color: getStatusColor(status, 'Delivered').countTextColor}}>{deliveredCount}</div>
-                      <div style={{fontSize:12, color: getStatusColor(status, 'Delivered').textTextColor}}>{t('Delivered')}</div>
-                    </div>
-              </div>   */}
 
               <div className='table'>
                 <TableData 
@@ -470,9 +447,10 @@ const OrdersPage = () => {
               </div>
             </div>
 
-            {selected_bound === 'inbound' ?
-              <div className='coming-soon'>COMING SOON !!!</div>
-              : <></>
+            {selected_bound === 'inbound' &&
+              <div className='inboundContainer'>
+                <Inbound/>
+              </div>
             }
           </div>
         </div>
