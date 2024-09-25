@@ -53,7 +53,8 @@ import PublishedWithChangesIcon from '@mui/icons-material/PublishedWithChanges';
 import UpdateIcon from '@mui/icons-material/Update';
 import trash from '@/assets/trash_icon.png'
 import DriveFolderUploadIcon from '@mui/icons-material/DriveFolderUpload';
-import { ActionItem, EditELD, HandlingAgentSelection, PastEta, RemarkComponent, Remarks, Tags,MarkPlacement,HandlingEdemand, UploadWagonSheet} from './tableComp'
+import { ActionItem, EditELD, HandlingAgentSelection, PastEta, RemarkComponent, Remarks, Tags,MarkPlacement,HandlingEdemand, UploadWagonSheet, HandlingETA} from './tableComp'
+import SettingsIcon from '@mui/icons-material/Settings';
 
 const status_class_map: { [key: string]: string } = {
     'OB': 'status_title_In_Plant',
@@ -205,7 +206,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
     const [fnr, setFnr] = useState('')
     const textRef = useRef<HTMLDivElement>(null);
     const [isOverflowing, setIsOverflowing] = useState(false);
-
+    const[openEtaModel,setOpenEtaModal] = useState<boolean>(false)
     const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
     const [cancelShipID,setCancelShipId] = useState<any>('')
     const [cancel,setCancel] = React.useState(false);
@@ -235,7 +236,8 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
     const [currentETAsorting, setCurrentETAsorting] = useState(false)
     const [uploadAnnexureShipID,setUploadAnnexureShipID] = useState('')
     const [uploadAnnexureFNR,setUploadAnnexureFNR] = useState('')
-
+    const[updateEtaShipID,setUpdateEtaShipID] = useState('');
+    const[differenceETA,setDifferenceETA] = useState<any>();
     //mark placement
     const [openMarkPlacement, setOpenMarkPlacement] = useState(false);
     const [markPlacementId, setMarkPlacementId] = useState({});
@@ -259,7 +261,12 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
         setUploadAnnexureShipID(element._id)
         setOpenAnnexureModal(true);
     }
-
+    const handleUpdateEta = (row:any) => {        
+        const difference = allShipments.filter((shipment: any) => shipment._id === row._id)[0].preferred_difference_eta
+        setDifferenceETA(difference);
+        setUpdateEtaShipID(row)
+        setOpenEtaModal(true);
+    }
     const handleChangeByFnr = (changeFnr: string) => {
         if (changeFnr.length === 11) {
             setSettingFnrChange(changeFnr)
@@ -638,6 +645,12 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                              id="cancel"
                                                                             />
                                                                             )}
+                                                                             <ActionItem
+                                                                                icon={<SettingsIcon style={{ width: "24px", height: '24px'}} />}
+                                                                                text={t('preferedEta')}
+                                                                                onClick={()=>{handleUpdateEta(row)}}
+                                                                                id="updateEta"
+                                                                            />                                     
                                                                         </div>
                                                                     </Popover>
                                                                 </div>
@@ -891,6 +904,8 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
             {openUploadWagonSheet && <UploadWagonSheet isClose={setOpenUploadWagonSheet} shipment={uploadWagonSheetId} />  }
             {cancel && 
              <HandlingEdemand isOpen={cancel} isClose={()=> setCancel(false)} shipment={cancelShipID} getAllShipment={getAllShipment}/>}
+             {openEtaModel && 
+             <HandlingETA isOpen={openEtaModel} isClose={()=> setOpenEtaModal(false)} shipment={updateEtaShipID} getAllShipment={getAllShipment} difference={differenceETA} />}
             <Modal
                 open={open}
                 onClose={(e) => { handleClose(e) }}
