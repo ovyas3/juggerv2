@@ -1,18 +1,213 @@
-import './style.css';
-import CloseIcon from '@mui/icons-material/Close';
+import { httpsPost } from "@/utils/Communication";
+import "./style.css";
+import CloseIcon from "@mui/icons-material/Close";
+import { useEffect, useState } from "react";
 
+import Paper from "@mui/material/Paper";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TablePagination from "@mui/material/TablePagination";
+import TableRow from "@mui/material/TableRow";
+import service from '@/utils/timeService';
 
-function EtaDashboardModal ({providedShipments, setOpenModalDelay}:any){
-   
-    return(
-    <div style={{width:'100vw', height:'100vh', position:'fixed', top:0, left:0 ,zIndex:300, backgroundColor:'rgba(0, 0, 0, 0.5)'}} onClick={(e)=>{e.stopPropagation(); setOpenModalDelay(false);}}>
-        <div style={{display:'flex',justifyContent:'center', alignItems:'center', width:'80vw', minWidth:1200, height:650, backgroundColor:'white', position:'relative', top:'50%', left:'50%', transform:'translate(-50%,-50%)', borderRadius:20, padding:25}} onClick={(e)=>{e.stopPropagation()}}>
-           <div style={{fontSize:'48px', fontWeight:'bold'}}>COMING SOON !!!</div>
-           <div className="closeContaioner"><CloseIcon onClick={(e) => { e.stopPropagation(); setOpenModalDelay(false) }}/></div>
-        </div>
-    </div>
-       
+interface Column {
+  id: string;
+  label: string;
+  style: string;
+}
+
+const columns: readonly Column[] = [
+  { id: "sno", label: "S No.", style: "header_sno" },
+  { id: "edemand", label: "e-Demand", style: "header_edemand" },
+  { id: "fnr", label: "FNR", style: "header_fnr" },
+  { id: "destination", label: "Destination", style: "header_destination" },
+  { id: "rrDate", label: "RR Date", style: "header_rrDate" },
+  { id: "initialEta", label: "Initial ETA", style: "header_initialEta" },
+  { id: "currentEta", label: "Current ETA", style: "header_finalEta" },
+  { id: "drawnOut", label: "Drawn Out Time", style: "header_drawnOut" },
+  { id: "delay", label: "Delay", style: "header_delay" },
+  { id: "remarks", label: "Remarks", style: "header_remarks" },
+];
+
+function contructingData(shipment: any) {
+  return shipment.map(
+    (shipment: {
+      _id: string;
+      edemand_no: string;
+      FNR: string;
+      delivery_location: {
+        code: string,
+        name: string,
+        state: string,
+      };
+      rr_date: string;
+      initial_eta: string;
+      current_eta: string;
+      delay: string;
+      remarks: [{
+        date: string,
+        remark: string,
+        user: string,
+        _id: string
+      }];
+      drawn_out_time: string;
+      eta: string;
+      rr_document: [{
+        _id: string,
+        rr_no: string,
+        rr_date: string
+      }];
+    }) => {
+      return {
+        _id:shipment?._id ? shipment?._id : 'NA',
+        edemand: shipment?.edemand_no ? shipment?.edemand_no : 'NA',
+        fnr: shipment?.FNR ? shipment?.FNR : 'NA',
+        destination: shipment?.delivery_location ? shipment?.delivery_location : 'NA',
+        rrDate: shipment?.rr_document[0]?.rr_date ? service.utcToist(shipment?.rr_document[0]?.rr_date) : 'NA',
+        initialEta: shipment?.initial_eta ? service.utcToist(shipment?.initial_eta) : 'NA',
+        currentEta: shipment?.eta ? service.utcToist(shipment?.eta) : 'NA',
+        delay: shipment?.delay ? shipment?.delay : 'NA',
+        remarks: shipment?.remarks ? shipment?.remarks[0]?.remark || 'NA' : 'NA',
+        drawnOut: shipment?.drawn_out_time ? shipment?.drawn_out_time : 'NA',
+      };
+    }
+  );
+}
+
+function EtaDashboardModal({
+  providedShipments,
+  setOpenModalDelay,
+  headingForModel,
+}: any) {
+  const [allShipments, setAllShipments] = useState([]);
+
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+
+  const handleChangePage = (event: unknown, newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setRowsPerPage(+event.target.value);
+    setPage(0);
+  };
+
+  async function getDelayShipments() {
+    const payload = { ids: providedShipments };
+    const response = await httpsPost(
+      "eta_dashboard/details",
+      payload,
+      0,
+      false
     );
+    if (response.statusCode === 200) setAllShipments(contructingData(response.data));
+  }
+  useEffect(() => {
+    getDelayShipments();
+  }, []);
+
+  console.log(allShipments);
+
+  return (
+    <div
+      style={{
+        width: "100vw",
+        height: "100vh",
+        position: "fixed",
+        top: 0,
+        left: 0,
+        zIndex: 300,
+        backgroundColor: "rgba(0, 0, 0, 0.5)",
+      }}
+      onClick={(e) => {
+        e.stopPropagation();
+        setOpenModalDelay(false);
+      }}
+    >
+      <div
+        style={{
+          width: "80vw",
+          minWidth: 1200,
+          height: 650,
+          backgroundColor: "white",
+          position: "relative",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%,-50%)",
+          borderRadius: 20,
+          padding: 25,
+        }}
+        onClick={(e) => {
+          e.stopPropagation();
+        }}
+      >
+        <div style={{ fontSize: "20px", fontWeight: "500" }}>
+          {headingForModel}
+        </div>
+        <div id="tableContainer" style={{width: '100%', height: '95%', display: 'flex', flexDirection: 'column', paddingTop: 24 }}>
+          <Paper sx={{ width: "100%", position: "relative",  height: '100%', display: 'flex', flexDirection: 'column', boxShadow: 'none'}}>
+            <TableContainer sx={{ overflow: 'auto', borderRadius: '4px', border: '1px solid #E9E9EB' }}>
+              <Table stickyHeader aria-label="sticky table">
+                <TableHead>
+                  <TableRow>
+                    {columns.map((column) => (
+                      <TableCell key={column.id} className={column.style}  style={{ textAlign: 'center', padding: '8px 0px 8px 0px', fontSize: 12, fontWeight: 600, color: '#484A57', wordWrap:'break-word' }}>
+                        {column.label}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {allShipments.map((row:any, rowIndex) => {
+                      return (
+                        <TableRow
+                          hover
+                          role="checkbox"
+                          tabIndex={-1}
+                          key={rowIndex}
+                        >
+                          {columns.map((column) => {
+                            const value = row[column.id];
+                            return (
+                              <TableCell key={column.id} sx={{ textAlign: 'center', fontSize:12}}>
+                                {typeof value !== 'object' && value}
+                                {column.id === 'sno' && (<div>{rowIndex + 1 + page * rowsPerPage}.</div>)}
+                                {column.id === 'destination' && (
+                                    <>
+                                        <div>{row.destination.code}</div>
+                                        <div>{row.destination.name}</div>
+                                        <div>{row.destination.state}</div>
+                                    </>
+                                )}
+                              </TableCell>
+                            );
+                          })}
+                        </TableRow>
+                      );
+                    })}
+                </TableBody>
+              </Table>
+            </TableContainer>
+            
+          </Paper>
+        </div>
+        <div className="closeContaioner">
+          <CloseIcon
+            onClick={(e) => {
+              e.stopPropagation();
+              setOpenModalDelay(false);
+            }}
+          />
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default EtaDashboardModal;

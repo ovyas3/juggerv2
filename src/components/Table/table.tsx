@@ -608,22 +608,22 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                             onClick={()=>{handleUploadAnnexureModal(row)}}
                                                                             id="uploadAnnexure"
                                                                             />
-                                                                            { (row.placement_time === 'NA' || !row?.intent_no) &&
+                                                                            {/* { (row.placement_time === 'NA' || !row?.intent_no) && */}
                                                                                  <ActionItem
                                                                                  icon={<PublishedWithChangesIcon style={{ width: "24px", height: '24px', color: '#008001' }} />}
                                                                                  text={t('markPlacement')}
                                                                                  onClick={()=>{markPlacementModal(row)}}
                                                                                  id="markPlacement"
                                                                              />
-                                                                            }
-                                                                            {row.status.raw === 'INPL' && row.rrDoc && (
+                                                                            {/* } */}
+                                                                            {/* {row.status.raw === 'INPL' && row.rrDoc && ( */}
                                                                                  <ActionItem
                                                                                  icon={<UpdateIcon style={{ width: "24px", height: '24px', color: '#0367FF' }} />}
                                                                                  text={t('drownOut')}
                                                                                  onClick={()=>{drownOutDate(row)}}
                                                                                  id="drownOut"
                                                                              />
-                                                                            )}
+                                                                            {/* )} */}
                                                                                 <ActionItem
                                                                                     icon={<DriveFolderUploadIcon style={{ width: "24px", height: '24px', color:'#185519'}} />}
                                                                                     text={t('uploadWagonSheet')}
