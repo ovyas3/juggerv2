@@ -66,9 +66,18 @@ function contructingData(shipment: any) {
         edemand: shipment?.edemand_no ? shipment?.edemand_no : 'NA',
         fnr: shipment?.FNR ? shipment?.FNR : 'NA',
         destination: shipment?.delivery_location ? shipment?.delivery_location : 'NA',
-        rrDate: shipment?.rr_document[0]?.rr_date ? service.utcToist(shipment?.rr_document[0]?.rr_date) : 'NA',
-        initialEta: shipment?.initial_eta ? service.utcToist(shipment?.initial_eta) : 'NA',
-        currentEta: shipment?.eta ? service.utcToist(shipment?.eta) : 'NA',
+        rrDate: { 
+          date: shipment?.rr_document[0]?.rr_date ? service.utcToist(shipment?.rr_document[0]?.rr_date) : 'NA',
+          time: shipment?.rr_document[0]?.rr_date ? service.utcToistTime(shipment?.rr_document[0]?.rr_date) : 'NA' ,
+        },
+        initialEta: {
+          date:shipment?.initial_eta ? service.utcToist(shipment?.initial_eta) : 'NA',
+          time: shipment?.initial_eta ? service.utcToistTime(shipment?.initial_eta) : 'NA',
+        },
+        currentEta: {
+          date:shipment?.eta ? service.utcToist(shipment?.eta) : 'NA',
+          time: shipment?.eta ? service.utcToistTime(shipment?.eta) : 'NA',
+        },
         delay: shipment?.delay ? shipment?.delay : 'NA',
         remarks: shipment?.remarks ? shipment?.remarks[0]?.remark || 'NA' : 'NA',
         drawnOut: shipment?.drawn_out_time ? shipment?.drawn_out_time : 'NA',
@@ -87,16 +96,7 @@ function EtaDashboardModal({
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
-  const handleChangePage = (event: unknown, newPage: number) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setRowsPerPage(+event.target.value);
-    setPage(0);
-  };
+  
 
   async function getDelayShipments() {
     const payload = { ids: providedShipments };
@@ -111,8 +111,6 @@ function EtaDashboardModal({
   useEffect(() => {
     getDelayShipments();
   }, []);
-
-  console.log(allShipments);
 
   return (
     <div
@@ -180,10 +178,28 @@ function EtaDashboardModal({
                                 {column.id === 'sno' && (<div>{rowIndex + 1 + page * rowsPerPage}.</div>)}
                                 {column.id === 'destination' && (
                                     <>
-                                        <div>{row.destination.code}</div>
-                                        <div>{row.destination.name}</div>
-                                        <div>{row.destination.state}</div>
+                                      <div>{row.destination.code}</div>
+                                      <div>{row.destination.name}</div>
+                                      <div>{row.destination.state}</div>
                                     </>
+                                )}
+                              {column.id === 'rrDate' && ( row.rrDate.date !== 'NA' && row.rrDate.time !== 'NA' ?
+                                  <div>
+                                    <div>{row.rrDate.date}</div>
+                                    <div>{row.rrDate.time}</div>
+                                  </div> : 'NA'
+                                )}
+                                {column.id === 'initialEta' && ( row.initialEta.date !== 'NA' && row.initialEta.time !== 'NA' ?
+                                  <>
+                                    <div>{row.initialEta.date}</div>
+                                    <div>{row.initialEta.time}</div>
+                                  </> : 'NA'
+                                )}
+                                {column.id === 'currentEta' && ( row.currentEta.date !== 'NA' && row.currentEta.time !== 'NA' ?
+                                  <>
+                                    <div>{row.currentEta.date}</div>
+                                    <div>{row.currentEta.time}</div>
+                                  </> : 'NA'
                                 )}
                               </TableCell>
                             );
