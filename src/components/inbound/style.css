@@ -151,7 +151,8 @@
 #logoContainer{
   position: relative;
   display: flex;
-  gap:5px
+  gap:5px;
+  font-size: 12px;
 }
 #noOfWagons{
   position: absolute;
