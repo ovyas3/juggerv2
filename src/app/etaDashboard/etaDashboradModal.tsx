@@ -87,16 +87,7 @@ function EtaDashboardModal({
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
-  const handleChangePage = (event: unknown, newPage: number) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setRowsPerPage(+event.target.value);
-    setPage(0);
-  };
+  
 
   async function getDelayShipments() {
     const payload = { ids: providedShipments };
@@ -111,8 +102,6 @@ function EtaDashboardModal({
   useEffect(() => {
     getDelayShipments();
   }, []);
-
-  console.log(allShipments);
 
   return (
     <div
