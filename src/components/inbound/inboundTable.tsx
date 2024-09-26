@@ -103,11 +103,11 @@ function contructingData(shipment: any) {
         Status: {
             raw:shipment?.status ? shipment?.status : "NA",
         },
-        InitialETA:
-          shipment?.past_etas.length > 0
-            ? service.utcToist(shipment?.past_etas[0].eta)
-            : "NA",
-        remarks: shipment?.remarks[0] ? shipment?.remarks[0] : "NA",
+        InitialETA: {
+            date:  shipment?.past_etas.length > 0 ? service.utcToist(shipment?.past_etas[0]?.eta): "NA",
+            time:shipment?.demand_date? service.utcToistTime(shipment?.past_etas[0]?.eta) : "NA",
+        },
+        remarks: { remark: shipment?.remarks[0] ? shipment?.remarks[0] : "NA",},
         HandlingAgent: shipment?.HA[0] ? shipment?.HA : "NA",
         paidBy: shipment?.paid_by ? shipment?.paid_by : "NA",
         expLoadingDate: {
@@ -216,7 +216,7 @@ function InboundTable({ allShipment, count, setInBoundPayload }: any) {
                               return (
                                 <TableCell
                                   key={column.id}
-                                  sx={{ fontSize: 12, padding:'4px 0px 4px 0px', paddingLeft:'10px' }}
+                                  sx={{ fontSize: '12px !important', padding:'4px 0px 4px 0px', paddingLeft:'10px' }}
                                 >
                                   {typeof value !== "object" && value}
                                   {column.id === 'pickupLocation' && (
@@ -231,14 +231,14 @@ function InboundTable({ allShipment, count, setInBoundPayload }: any) {
                                   )}
                                   {column.id === "expLoadingDate" && ( row.expLoadingDate.date  !== 'NA' && row.expLoadingDate.time !== 'NA' ?
                                     <>
-                                        <div>{row.expLoadingDate?.date}</div>
-                                        <div>{row.expLoadingDate?.time}</div>
+                                        <div style={{fontSize:12}}>{row.expLoadingDate?.date}</div>
+                                        <div style={{fontSize:12}}>{row.expLoadingDate?.time}</div>
                                     </> : 'NA'
                                   )}
                                   {column.id === "IndentDate" && ( row.IndentDate.date  !== 'NA' && row.IndentDate.time !== 'NA' ?
                                     <>
-                                        <div>{row.IndentDate?.date}</div>
-                                        <div>{row.IndentDate?.time}</div>
+                                        <div style={{fontSize:12}}>{row.IndentDate?.date}</div>
+                                        <div style={{fontSize:12}}>{row.IndentDate?.time}</div>
                                     </> : 'NA'
                                   )}
                                   {column.id === 'Status' && (
@@ -248,11 +248,11 @@ function InboundTable({ allShipment, count, setInBoundPayload }: any) {
                                   )}
                                   {column.id === 'edemand' && (
                                       <>
-                                        <div style={{marginTop:8}}>{row.edemand.edemand}</div>
+                                        <div style={{marginTop:8, fontSize:12}}>{row.edemand.edemand}</div>
                                         <div>
                                             <div id="logoContainer">
                                                 <div><Image src={wagonIcon.src} alt="noOfWagons" height={24} width={24} /></div>
-                                                <div style={{marginTop:4}}>{row.no_of_wagons}</div>
+                                                <div style={{marginTop:4, fontSize:12}}>{row.no_of_wagons}</div>
                                                 <ArrowDownwardIcon id='ArrowDownwardIcon' style={{ fontSize: '11px' }} />
                                                 <p id='noOfWagons'>Number of Wagons</p>
                                             </div>
@@ -261,10 +261,11 @@ function InboundTable({ allShipment, count, setInBoundPayload }: any) {
                                   )}
                                   {column.id === 'fnr' && (
                                     <>  
-                                        <div>Primary</div>
+                                        <div style={{fontSize:12}}>Primary</div>
                                         <Link target="_blank"
                                             href={"/tracker?unique_code=" + row.unique_code}
                                             onClick={(e) => { e.stopPropagation() }}
+                                            style={{fontSize:12}}
                                         >{row.fnr.primary}</Link>
                                         <div>
                                             {row.is_captive && <Image src={captiveRakeIndicator.src} alt="captiveRakeIndicator" height={24} width={24} />}
@@ -273,10 +274,22 @@ function InboundTable({ allShipment, count, setInBoundPayload }: any) {
                                   )}
                                   {column.id === 'Commodities' && (
                                     <>
-                                        <div>{row.Commodities.commodity}</div>
-                                        <div style={{marginTop:8, color: '#71747A'}}>{row.Commodities.Stock}</div>
+                                        <div style={{fontSize:12}}>{row.Commodities.commodity}</div>
+                                        <div style={{marginTop:8, color: '#71747A', fontSize:12}}>{row.Commodities.Stock}</div>
                                     </>
                                   )}
+                                  {column.id === 'InitialETA' && ( row.InitialETA.date  !== 'NA' && row.InitialETA.time !== 'NA' ?
+                                    <>
+                                        <div style={{fontSize:12}}>{row.InitialETA.date}</div>
+                                        <div style={{fontSize:12}}>{row.InitialETA.time}</div>
+                                    </> : 'NA'
+                                  )}
+                                  {column.id === 'remarks' && (
+                                    <>
+                                        <div style={{fontSize:12}}>{row.remarks.remark}</div>
+                                    </>
+                                  )}
+
                                 </TableCell>
                               );
                             })}
