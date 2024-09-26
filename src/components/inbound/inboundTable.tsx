@@ -36,12 +36,6 @@ const columns: readonly Column[] = [
   { id: "Status", label: "Status", style: "header_Status" },
   { id: "InitialETA", label: "Initial ETA", style: "header_Initialeta" },
   { id: "remarks", label: "Remarks", style: "header_remarks" },
-  {
-    id: "HandlingAgent",
-    label: "Handling Agent",
-    style: "header_HandlingAgent",
-  },
-  //   { id: "Action", label: "Action", style: "header_Action" },
 ];
 
 function contructingData(shipment: any) {
