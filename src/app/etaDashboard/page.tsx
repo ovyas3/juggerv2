@@ -103,7 +103,7 @@ function EtaDashboard() {
               <header className="delayedheader" style={{ color: "#E76E81" }}>
                 {t("delayedBy48hrs")}
               </header>
-              <div className="delayInfo redBackground" onClick={() => {setOpenModalDelay(true); setProvidedShipments(late.shipments); setHeadingForModel('Delayed by 48 Hrs')}}>
+              <div className="delayInfo redBackground" onClick={() => {setOpenModalDelay(true); setProvidedShipments(late.shipments); setHeadingForModel('Delayed by >48 Hrs')}}>
                 <div className="delayInfoDigit" style={{ color: "#E76E81" }}><CountUp end={late.count} duration={1.5} /></div>
               </div>
             </div>
