@@ -134,7 +134,7 @@ function InboundDashboard({setInBoundPayload, countInbound}:any) {
       }}
       >
         <div style={{ fontSize: 20, fontWeight: 500 }}><CountUp end={countInbound.Delivered} duration={1.2}/></div>
-        <div style={{ fontSize: 12 }}>{'Arrived'}</div>
+        <div style={{ fontSize: 12 }}>{t("Delivered")}</div>
       </div>
     </div>
   );
