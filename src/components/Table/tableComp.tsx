@@ -1218,15 +1218,24 @@ export const UploadWagonSheet = ({isClose, shipment, setOpenUploadFile, ordersUp
             showMessage('Please upload the wagon sheet', 'error');
             return;
         }
-        const payload = {
-            _id: shipment._id,
-            edemand_no: shipment.edemand.edemand_no,
-            file:uploadFile
+        let payload = {};
+        if(ordersUpload === 'wagonSheet') {
+            payload = {
+                _id: shipment._id,
+                edemand_no: shipment.edemand.edemand_no,
+                file:uploadFile
+            }
+        }else{
+            payload = {
+                file:uploadFile
+            }
         }
+        
+        
+        if(ordersUpload === 'wagonSheet') {
             await httpsPost('wagon_sheet/upload', payload, 0, true).then((response: any) => {
-                console.log(response)
                 if(response.statusCode === 200) {
-                    isClose(false);
+                    isClose(false); 
                     setFileName('Drag and Drop to upload the file here');
                     setUploadFile({});
                     showMessage('File Uploaded Succcessfully', 'success');
@@ -1235,6 +1244,19 @@ export const UploadWagonSheet = ({isClose, shipment, setOpenUploadFile, ordersUp
             }).catch((err)=> {
                 console.log(err); showMessage(err.message, 'error')
             }) 
+        }else{
+            await httpsPost('shipment/bulkUpload', payload, 0, true).then((response: any) => {
+                if(response.statusCode === 200) {
+                    setOpenUploadFile(false);
+                    setFileName('Drag and Drop to upload the file here');
+                    setUploadFile({});
+                    showMessage('File Uploaded Succcessfully', 'success');
+                }
+            }).catch((err) => {
+                console.log(err); showMessage(err.message, 'error')
+            })
+        }
+           
     }
 
     return (
