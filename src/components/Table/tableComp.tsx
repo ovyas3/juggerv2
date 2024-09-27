@@ -896,9 +896,6 @@ export const MarkPlacement = ({isClose ,shipment, getAllShipment, different = 'm
         }
 
         const data = new Date(currentDate);
-
-        // console.log(service.utcToistTime(data.toUTCString()));
-
         const payloadWitheident = {
             id: shipment._id,
             placement_time : new Date (data.toUTCString()),
