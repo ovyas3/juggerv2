@@ -1185,7 +1185,7 @@ export const HandlingEdemand = ({ isClose, isOpen, getAllShipment, shipment }: a
       
     );
 };
-export const UploadWagonSheet = ({isClose, shipment}:any) => {
+export const UploadWagonSheet = ({isClose, shipment, setOpenUploadFile, ordersUpload='wagonSheet'}:any) => {
 
     const t = useTranslations('ORDERS');
     const [fileName, setFileName] = useState('Drag and Drop to upload the file here');
@@ -1238,29 +1238,33 @@ export const UploadWagonSheet = ({isClose, shipment}:any) => {
     }
 
     return (
-    <div style={{width:'100vw', height:'100vh', position:'fixed', top:0, left:0 ,zIndex:300, backgroundColor:'rgba(0, 0, 0, 0.5)'}} onClick={(e)=>{e.stopPropagation(); isClose(false);}}>
+    <div style={{width:'100vw', height:'100vh', position:'fixed', top:0, left:0 ,zIndex:300, backgroundColor:'rgba(0, 0, 0, 0.5)'}} onClick={(e)=>{e.stopPropagation(); ordersUpload === 'wagonSheet' ? isClose(false) : setOpenUploadFile(false);}}>
         <div style={{width:800, height:500, backgroundColor:'white', position:'relative', top:'50%', left:'50%', transform:'translate(-50%,-50%)', borderRadius:20, padding:25}} onClick={(e)=>{e.stopPropagation()}}>
 
             <div style={{display:'flex', justifyContent:'space-between',}}>
-                <header style={{fontSize:20, color:'#131722', fontWeight:600}}>{t('uploadWagonSheet')}</header>
+                <header style={{fontSize:20, color:'#131722', fontWeight:600}}>{ ordersUpload === 'wagonSheet' ? t('uploadWagonSheet') : t('bulkUoploadShipmnent')  }</header>
             </div>
 
-            <div className="status_edemand_fnr">
+            <div className="status_edemand_fnr" style={{display:ordersUpload === 'ordersUpload' ? 'none' : 'flex' }}>
                 <div>
                     <header style={{fontSize:12, color:'#42454E', marginBottom:8}}>{t('status')}</header>
-                    <text style={{fontSize:16, color:"#42454E", fontWeight:600}}>{shipment.status.name}</text>
+                    <text style={{fontSize:16, color:"#42454E", fontWeight:600}}>{shipment?.status?.name}</text>
                 </div>
                 <div>
                     <header style={{fontSize:12, color:'#42454E', marginBottom:8}}>{t('FNRno')}</header>
-                    <text style={{fontSize:16, color:"#42454E", fontWeight:600}}>{shipment.fnr.primary}</text>
+                    <text style={{fontSize:16, color:"#42454E", fontWeight:600}}>{shipment?.fnr?.primary}</text>
                 </div>
                 <div>
                     <header style={{fontSize:12, color:'#42454E', marginBottom:8}}>{t('edemandno')}</header>
-                    <text style={{fontSize:16, color:"#42454E", fontWeight:600}}>{shipment.edemand.edemand_no}</text>
+                    <text style={{fontSize:16, color:"#42454E", fontWeight:600}}>{shipment?.edemand?.edemand_no}</text>
                 </div>
             </div>
 
             <div 
+                style={{
+                    marginTop:ordersUpload === 'ordersUpload' ? 20  : '',
+                    height:ordersUpload === 'ordersUpload' ? 300 : '',    
+                }}
                 className="fileUploadContainer"
                 onDragOver={handleDragOver}
                 onDrop={handleDrop}
@@ -1275,7 +1279,7 @@ export const UploadWagonSheet = ({isClose, shipment}:any) => {
                     </div>
                 </label>
             </div>
-            <div>
+            <div style={{display:ordersUpload === 'ordersUpload' ? 'none' : 'flex' }}>
                 <p className="sampleFile" onClick={(e)=>{e.stopPropagation();  window.open('https://docs.google.com/spreadsheets/d/1ZM3AnXF3zI1Rc98b4J890JAcpWaxOrS0ZSgHjAZaBPk/edit?gid=0#gid=0', '_blank'); } } >Download Sample File</p>
             </div>
 
@@ -1284,7 +1288,7 @@ export const UploadWagonSheet = ({isClose, shipment}:any) => {
                 <Button className="buttonMarkPlacement" onClick={(e)=>{ e.stopPropagation(); setUploadFile({}); setFileName('Drag and Drop to upload the file here'); }} style={{color:'#2862FF', border:'1px solid #2862FF', width:110, cursor:'pointer', fontWeight:'bold', transition:'all 0.5s ease-in-out'}}>{t('clear')}</Button>
                 <Button className="buttonMarkPlacement" onClick={(e)=>{e.stopPropagation(); uploadWagonSheet(); }} style={{color:'white', backgroundColor:'#2862FF',width:110, border:'1px solid #2862FF', cursor:'pointer', fontWeight:'bold',transition:'all 0.5s ease-in-out' }}>{t('upload')}</Button>
             </div>    
-            <div className="closeContaioner"><CloseIcon onClick={(e) => { e.stopPropagation(); isClose(false) }}/></div>
+            <div className="closeContaioner"><CloseIcon onClick={(e) => { e.stopPropagation(); ordersUpload === 'ordersUpload' ? setOpenUploadFile(false) : isClose(false) }}/></div>
         </div>
     </div>
     )

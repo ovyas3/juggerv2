@@ -21,6 +21,11 @@ import { getShipmentStatusSummary } from '@/utils/hooks'
 import { useRouter } from 'next/navigation';
 import Inbound from './inbound';
 import CountUp from 'react-countup';
+import Image from 'next/image';
+import uploadIcon from '@/assets/uploadIcon.svg';
+import { motion } from 'framer-motion';
+import { UploadWagonSheet } from '@/components/Table/tableComp';
+
 
 
 
@@ -345,6 +350,8 @@ const OrdersPage = () => {
   const inPlantCount = totalCountrake[0]?.statuses?.find((item: any) => item.status === "INPL")?.count || 0;
   const availableeIndentCount = totalCountrake[0]?.statuses?.find((item: any) => item.status === "AVE")?.count || 0;
 
+  const [openUploadFile, setOpenUploadFile] = useState(false);
+
   return (
     <div>
       <div className='orderContainer'>
@@ -379,7 +386,17 @@ const OrdersPage = () => {
                   <div className='mobile_outbound'>{t('outbound')}</div>
                 </div>
               }
-              <div className='ageing_reload'>
+              <div id='uploadFile_refreash'>
+                <motion.div id='uploadButton'
+                   whileHover={{ scale: 0.95 }}
+                   whileTap={{ scale: 0.9 }}
+                   transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                   onClick={() => setOpenUploadFile(true)}
+                >
+                  <div><Image src={uploadIcon.src} height={24} width={24} alt='upload' /></div>
+                  <div>{t('uploadFile')}</div>
+                </motion.div>
+                <div className='ageing_reload'>
                 <div className='input_fnr_reload'>
                   <div className={`reload ${reload ? 'loading' : ''}`} onClick={() => {
                     showMessage('Refresh Successfully', 'success')
@@ -397,6 +414,7 @@ const OrdersPage = () => {
                   </div>
                   <div className='refreash_reload' style={{ opacity: showRefreash ? 1 : 0 }}>refresh filters</div>
                 </div>
+              </div>
               </div>
             </div>
 
@@ -455,6 +473,11 @@ const OrdersPage = () => {
           </div>
         </div>
       </div>
+
+      { openUploadFile && <UploadWagonSheet setOpenUploadFile={setOpenUploadFile} ordersUpload={'ordersUpload'} />}
+      
+    
+
       {mobile ? <SideDrawer /> : <div className="bottom_bar">
         <MobileDrawer />
       </div>}

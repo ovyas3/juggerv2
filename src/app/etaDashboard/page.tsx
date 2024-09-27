@@ -52,8 +52,14 @@ function EtaDashboard() {
     count: 0,
     shipments:[]
   })
-
-
+  const [stabled_shipments, setStabled_shipments] = useState([]);
+ 
+  async function getStableShipments(){
+    const response = await httpsGet('get/stable_shipments');
+    if(response.statusCode === 200) {
+      setStabled_shipments(response?.data?.stabled_shipments);
+    }
+  }
 
   async function getDelayShipments(){
     const response = await httpsGet('rake_shipment/en_route_eta_dashboard');
@@ -70,6 +76,7 @@ function EtaDashboard() {
   }
   useEffect(()=>{
     getDelayShipments();
+    getStableShipments();
   },[])
 
   return (
@@ -149,6 +156,36 @@ function EtaDashboard() {
             </div>
           </section>
         </div>
+
+        <div id="enRoutesEtaDelay" style={{marginTop:'20px'}}>
+          <section id="heading_reload">
+            <div id="heading">
+              {/* <div id="logoContainer"></div> */}
+              <header>
+                {t("stableShipments")}
+                <span style={{fontWeight:'600'}}><CountUp duration={1.5} end={stabled_shipments.length}/></span>
+              </header>
+            </div>
+            <div id="reload" style={{cursor:'pointer'}} onClick={() => {
+              getStableShipments();
+              showMessage("Refreshed", "success")
+              }}>
+              <RefreshIcon />
+            </div>
+          </section>
+          <section id="etaDisplayContainer">
+            <div className="delayedBox">
+              <header className="delayedheader" style={{ color: "#E76E81" }}>
+                {t("stableFor48hrs")}
+              </header>
+              <div className="delayInfo redBackground" onClick={() => {setOpenModalDelay(true); setProvidedShipments(stabled_shipments); setHeadingForModel(t('stableFor48hrs'))}}>
+                <div className="delayInfoDigit" style={{ color: "#E76E81" }}><CountUp end={stabled_shipments.length} duration={1.5} /></div>
+              </div>
+            </div>
+           
+          </section>
+        </div>
+        
       </div>
 
       {openModalDelay && (<EtaDashboardModal providedShipments={providedShipments} setOpenModalDelay={setOpenModalDelay} headingForModel={headingForModel}/>)}
