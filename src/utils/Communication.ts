@@ -65,8 +65,9 @@ const httpsPost = async (path: string, data: any, type = 0, isFile = false, rout
           deleteAllCache();
           router.push('/');
         }
+        return err.response.data 
       });
-    return response?.data || {};
+    return response?.data || response;
   // } catch(err) {
   //   console.log(err, err.message, err.response);
   //   // if (axios.isAxiosError(err) && err.response?.status === 401) {
