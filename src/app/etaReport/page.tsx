@@ -23,6 +23,8 @@ function Report() {
   const [toDate, setToDate] = React.useState(-1);
 
   const handleChange = (event: SelectChangeEvent) => {
+    setFromDate(-1);
+    setToDate(-1);
     setReportType(event.target.value);
   };
 
@@ -32,13 +34,17 @@ function Report() {
         showMessage("Please select from and to date", "error");
         return;
       }
-      if(fromDate > toDate) {
+      if (fromDate > toDate) {
         showMessage("From date should be less than to date", "error");
         return;
       }
-      const response = await httpsGet(
-        `reports/eta?from=${fromDate}&to=${toDate}`
-      );
+      let url = "";
+      if (reportType === "ETA") {
+        url = `reports/eta?from=${fromDate}&to=${toDate}`;
+      } else if (reportType === "MIS") {
+        url = `reports/mis?from=${fromDate}&to=${toDate}`;
+      }
+      const response = await httpsGet(url);
       if (response.statusCode === 200) {
         console.log("response", response.data.link);
         window.open(response.data.link, "_blank");
@@ -73,6 +79,7 @@ function Report() {
                 onChange={handleChange}
               >
                 <MenuItem value={"ETA"}>ETA</MenuItem>
+                <MenuItem value={"MIS"}>MIS</MenuItem>
               </Select>
             </FormControl>
           </div>
@@ -80,6 +87,46 @@ function Report() {
         {reportType === "ETA" && (
           <>
             <div style={{ marginTop: "40px" }}>Invoice Generated Date</div>
+            <div className="date_container">
+              <div>
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DatePicker
+                    label="From"
+                    sx={{}}
+                    format="DD/MM/YYYY"
+                    onChange={(newDate) => {
+                      if (newDate) {
+                        const epochTime = newDate.valueOf();
+                        setFromDate(epochTime);
+                      }
+                    }}
+                    disableFuture={true}
+                  />
+                </LocalizationProvider>
+              </div>
+
+              <div>
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DatePicker
+                    label="To"
+                    format="DD/MM/YYYY"
+                    onChange={(newDate) => {
+                      if (newDate) {
+                        const epochTime = newDate.valueOf();
+                        setToDate(epochTime);
+                      }
+                    }}
+                    disableFuture={true}
+                  />
+                </LocalizationProvider>
+              </div>
+            </div>
+          </>
+        )}
+
+        {reportType === "MIS" && (
+          <>
+            <div style={{ marginTop: "40px",fontWeight: "bold" }}>E-Demand Date</div>
             <div className="date_container">
               <div>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
