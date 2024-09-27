@@ -903,12 +903,12 @@ export const MarkPlacement = ({isClose ,shipment, getAllShipment, different = 'm
 
         const payload = {
             id: shipment._id,
-            placement_time : currentDate,
+            placement_time : currentDate
         }
 
         const payloadWithdrownDate = {
             id: shipment._id,
-            drawnout_time: currentDate
+            drawnout_time: currentDate,
         }
        
       try {

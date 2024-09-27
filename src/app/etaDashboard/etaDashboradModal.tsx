@@ -53,7 +53,7 @@ function contructingData(shipment: any) {
         user: string,
         _id: string
       }];
-      drawn_out_time: string;
+      drawnout_time: string;
       eta: string;
       rr_document: [{
         _id: string,
@@ -80,7 +80,10 @@ function contructingData(shipment: any) {
         },
         delay: shipment?.delay ? shipment?.delay : 'NA',
         remarks: shipment?.remarks ? shipment?.remarks[0]?.remark || 'NA' : 'NA',
-        drawnOut: shipment?.drawn_out_time ? shipment?.drawn_out_time : 'NA',
+        drawnOut: {
+          date: shipment?.drawnout_time ? service.utcToist(shipment?.drawnout_time) : 'NA',
+          time: shipment?.drawnout_time ? service.utcToistTime(shipment?.drawnout_time) : 'NA',
+        },
       };
     }
   );
@@ -200,6 +203,11 @@ function EtaDashboardModal({
                                     <div>{row.currentEta.date}</div>
                                     <div>{row.currentEta.time}</div>
                                   </> : 'NA'
+                                )}
+                                {column.id === 'drawnOut' && ( row.drawnOut.date !== 'NA' && row.drawnOut.time !== 'NA' ?
+                                  <>
+                                    <div>{row.drawnOut.date}</div><div>{row.drawnOut.time}</div>
+                                  </>: 'NA'
                                 )}
                               </TableCell>
                             );
