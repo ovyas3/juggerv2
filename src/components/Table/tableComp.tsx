@@ -895,20 +895,21 @@ export const MarkPlacement = ({isClose ,shipment, getAllShipment, different = 'm
             return
         }
 
+        const data = new Date(currentDate);
         const payloadWitheident = {
             id: shipment._id,
-            placement_time : currentDate,
+            placement_time : new Date (data.toUTCString()),
             indent_no : eIndent
         }
 
         const payload = {
             id: shipment._id,
-            placement_time : currentDate
+            placement_time : new Date (data.toUTCString()),
         }
 
         const payloadWithdrownDate = {
             id: shipment._id,
-            drawnout_time: currentDate,
+            drawnout_time: new Date (data.toUTCString()),
         }
        
       try {
