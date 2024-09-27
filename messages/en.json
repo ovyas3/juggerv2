@@ -65,7 +65,8 @@
     "edemandno":"e-Demand No.",
     "cancel":"Cancel",
     "uploadWagonSheet":"Upload Wagon Sheet",
-    "upload":"Upload"
+    "upload":"Upload",
+    "clear":"Clear"
   },
   "UPLOAD_ANNEXURE":{
     "SNCKBR_MSG":{
