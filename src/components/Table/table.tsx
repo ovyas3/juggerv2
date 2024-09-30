@@ -157,14 +157,14 @@ const convertArrayToFilteredArray = (inputArray: any) => {
             paid_by: paid_by ? paid_by : 'NA',
             commodity_desc: commodity_desc && commodity_desc,
             expected_loading_date:{
-                ELDdate: service.utcToist(expected_loading_date, 'dd-MM-yyyy hh:mm') || 'NA',
+                ELDdate: service.utcToist(expected_loading_date, 'dd-MM-yyyy HH:mm') || 'NA',
                 ELDtime: service.utcToistTime(expected_loading_date) || 'NA'
             },
-            placement_time: service.utcToist(placement_time, 'dd-MM-yyyy hh:mm')|| 'NA',
-            oneRr_date: rr_dates && rr_dates.length > 0 && service.utcToist(rr_dates[0], 'dd-MM-yyyy hh:mm')|| 'NA',
+            placement_time: service.utcToist(placement_time, 'dd-MM-yyyy HH:mm')|| 'NA',
+            oneRr_date: rr_dates && rr_dates.length > 0 && service.utcToist(rr_dates[0], 'dd-MM-yyyy HH:mm')|| 'NA',
             intent_no: indent_no && indent_no,
-            demand_date:demand_date && service.utcToist(demand_date, 'dd-MM-yyyy hh:mm') || 'NA',
-            drawnout_time: drawnout_time && service.utcToist(drawnout_time, 'dd-MM-yyyy hh:mm') || 'NA',
+            demand_date:demand_date && service.utcToist(demand_date, 'dd-MM-yyyy HH:mm') || 'NA',
+            drawnout_time: drawnout_time && service.utcToist(drawnout_time, 'dd-MM-yyyy HH:mm') || 'NA',
         }
     });
 };
@@ -615,22 +615,22 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                             onClick={()=>{handleUploadAnnexureModal(row)}}
                                                                             id="uploadAnnexure"
                                                                             />
-                                                                            { (row.placement_time === 'NA' || !row?.intent_no) &&
+                                                                            {/* { (row.placement_time === 'NA' || !row?.intent_no) && */}
                                                                                  <ActionItem
                                                                                  icon={<PublishedWithChangesIcon style={{ width: "24px", height: '24px', color: '#008001' }} />}
                                                                                  text={t('markPlacement')}
                                                                                  onClick={()=>{markPlacementModal(row)}}
                                                                                  id="markPlacement"
                                                                              />
-                                                                            }
-                                                                            {row.status.raw === 'INPL' && row.rrDoc && (
+                                                                            {/* } */}
+                                                                            {/* {row.status.raw === 'INPL' && row.rrDoc && ( */}
                                                                                  <ActionItem
                                                                                  icon={<UpdateIcon style={{ width: "24px", height: '24px', color: '#0367FF' }} />}
                                                                                  text={t('drownOut')}
                                                                                  onClick={()=>{drownOutDate(row)}}
                                                                                  id="drownOut"
                                                                              />
-                                                                            )}
+                                                                            {/* )} */}
                                                                                 <ActionItem
                                                                                     icon={<DriveFolderUploadIcon style={{ width: "24px", height: '24px', color:'#185519'}} />}
                                                                                     text={t('uploadWagonSheet')}

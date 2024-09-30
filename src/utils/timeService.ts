@@ -8,10 +8,10 @@ const utcToist = (utc: string, format: string = 'dd-MM-yyyy') => {
   return date;
 }
 
-const utcToistTime = (utc:string, format = 'hh:mm a') => {
+const utcToistTime = (utc:string, format = 'HH:mm') => {
   const date = DateTime.fromJSDate(new Date(utc)).setZone('Asia/Calcutta').toFormat(format);
   if (date === 'Invalid DateTime') {
-    return 'N/A';
+    return 'NA';
   }
   return date;
 }

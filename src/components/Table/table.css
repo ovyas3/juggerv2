@@ -197,6 +197,7 @@
 
 .body_remarks {
     padding-inline: 20px !important;
+    min-width: 160px !important;
 }
 
 .body_action {

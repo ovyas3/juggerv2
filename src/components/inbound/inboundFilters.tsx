@@ -27,7 +27,7 @@ const formatDate = (date: any) => {
   return t;
 };
 
-function InboundFilters() {
+function InboundFilters({setInBoundPayload}:any) {
   const [openStartDatePicker, setOpenStartDatePicker] = useState(false);
   const [openEndDatePicker, setOpenEndDatePicker] = useState(false);
   const today = new Date();
@@ -84,7 +84,14 @@ function InboundFilters() {
     setRakeArray(rakeArray);
   }, [captiveRake, indianRake]);
 
-  console.log(startDate,'--------ghjkjhgfdfghj----------', endDate);
+  useEffect(() => {
+    setInBoundPayload((prevPayload: any) => ({
+      ...prevPayload,
+      from: startDate,
+      to: endDate,
+      rake_types: rakeArray,
+    }));
+  }, [startDate, endDate, rakeArray,]);
 
   return (
     <div id="inboundFiltersContainer">
@@ -202,7 +209,7 @@ function InboundFilters() {
           </div>
         </div>
 
-        <div id="rakeType">
+        {/* <div id="rakeType">
           <motion.section
             animate={{
               scale: captiveRake ? 0.95 : 1,
@@ -216,7 +223,7 @@ function InboundFilters() {
             }}
             className="status_text"
             style={{
-              backgroundColor: captiveRake ? "#161D6F" : "#F0F3F9",
+              backgroundColor: captiveRake ? "#21114D" : "#F0F3F9",
               color: captiveRake ? "#F0F3F9" : "#21114D",
             }}
           >
@@ -235,15 +242,15 @@ function InboundFilters() {
             }}
             className="status_text"
             style={{
-              backgroundColor: indianRake ? "#161D6F" : "#F0F3F9",
+              backgroundColor: indianRake ? "#21114D" : "#F0F3F9",
               color: indianRake ? "#F0F3F9" : "#21114D",
             }}
           >
             Indian Railway Rakes
           </motion.section>
-        </div>
+        </div> */}
 
-        <div>
+        {/* <div>
           <motion.div
             id="map-view-btn-orders"
             whileHover={{ scale: 0.95 }}
@@ -257,24 +264,24 @@ function InboundFilters() {
 
             <div id="map-view-btn-header">Map View</div>
           </motion.div>
-        </div>
+        </div> */}
 
-        <div style={{ position: "relative" }}>
+        {/* <div style={{ position: "relative" }}>
           <div
             className="filter-container"
             onClick={() => setOpenFilterModal(!openFilterModal)}
           >
             <FilterAltIcon className="filter-icon" />
           </div>
-        </div>
+        </div> */}
       </div>
 
 
-      {openFilterModal && (
+      {/* {openFilterModal && (
        <div >
             fghjjhjgdhchdgcd
        </div>
-        )}
+        )} */}
     </div>
   );
 }

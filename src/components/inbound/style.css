@@ -1,7 +1,5 @@
 /* ---------------filters--------------- */
-#inboundFiltersContainer {
-  margin-top: 18px;
-}
+#inboundFiltersContainer {}
 #inboundFilters {
   display: flex;
   gap: 16px;
@@ -51,6 +49,7 @@
   align-content: center;
   border-radius: 4px;
   cursor: pointer;
+  font-weight: 900;
 }
 #map-view-btn-orders{
   color: #44475b;
@@ -67,6 +66,120 @@
 }
 #map-view-btn-header{}
 
+#filtersAndDashboard{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 18px;
+}
+#inboundDashboardForStatus{
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
 /* ----------------table--------------- */
+.header_edemand{
+  /* background-color:aquamarine !important; */
+  min-width: 120px !important;
+}
+.header_fnr{
+  /* background-color: blueviolet !important; */
+  min-width: 100px !important;
+}
+.header_Commodities{
+  /* background-color: brown !important; */
+  min-width: 120px !important;
+}
+.header_pickupLocation{
+  /* background-color: burlywood !important; */
+  min-width: 150px !important;
+  width: 250px !important;
+}
+.header_IndentDate{
+  /* background-color: cadetblue !important; */
+  min-width: 100px !important;
+}
+.header_Status{
+  /* background-color: chartreuse !important; */
+  min-width: 120px !important;
+}
+.header_Initialeta{
+  /* background-color: chocolate !important; */
+  min-width: 100px !important;
+}
+.header_remarks{
+  /* background-color: coral !important; */
+  min-width: 130px !important;
+}
+.header_HandlingAgent{
+  /* background-color: cornflowerblue !important; */
+  min-width: 120px !important;
+}
+.header_expLoadingDate{
+  /* background-color: thistle !important; */
+  min-width: 125px !important;
+}
+#pickupLocationInfo{
+  color:#838592;
+  font-size: 12px;
+  margin-bottom: 8px;
+}
+#paidBy{
+  font-weight: 500;
+  font-size: 12px;
+  color: black;
+}
+.transitStatusRaw{
+  background-color: #F7EBE0;
+  height: 24px;
+  align-content: center;
+  font-weight: 500;
+  font-size: 12px;
+  color: #F69805;
+  text-align: center;
+}
+.deliveredStatusraw{
+  background-color: #E6F7F2;
+  height: 24px;
+  align-content: center;
+  font-weight: 500;
+  font-size: 12px;
+  color: #18BE8A;
+  text-align: center;
+}
+#logoContainer{
+  position: relative;
+  display: flex;
+  gap:5px;
+  font-size: 12px;
+}
+#noOfWagons{
+  position: absolute;
+  background-color: #334FFC;
+  color: white;
+  text-wrap: nowrap;
+  width: 106px;
+  height: 20px;
+  text-align: center;
+  font-size: 10px;
+  padding-block: 2px;
+  border-radius: 4px;
+  top: 80%;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+#logoContainer:hover #noOfWagons{
+  opacity: 1;
+  visibility: visible;
+}
+#ArrowDownwardIcon{
+  /* background-color: #334FFC; */
+  position: absolute;
+  top: 5px;
+  left: 7px;
+  color: #334FFC;
+}
 
 /* -----------------Dashboard---------------- */

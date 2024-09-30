@@ -894,20 +894,21 @@ export const MarkPlacement = ({isClose ,shipment, getAllShipment, different = 'm
             return
         }
 
+        const data = new Date(currentDate);
         const payloadWitheident = {
             id: shipment._id,
-            placement_time : currentDate,
+            placement_time : new Date (data.toUTCString()),
             indent_no : eIndent
         }
 
         const payload = {
             id: shipment._id,
-            placement_time : currentDate,
+            placement_time : new Date (data.toUTCString()),
         }
 
         const payloadWithdrownDate = {
             id: shipment._id,
-            drawnout_time: currentDate
+            drawnout_time: new Date (data.toUTCString()),
         }
        
       try {
@@ -1183,7 +1184,6 @@ export const HandlingEdemand = ({ isClose, isOpen, getAllShipment, shipment }: a
       
     );
 };
-
 export const UploadWagonSheet = ({isClose, shipment}:any) => {
 
     const t = useTranslations('ORDERS');
@@ -1191,7 +1191,32 @@ export const UploadWagonSheet = ({isClose, shipment}:any) => {
     const [uploadFile, setUploadFile] = useState<any>({});
     const { showMessage } = useSnackbar();
 
+    const handleDragOver = (e:any) => {
+        e.preventDefault();
+        e.stopPropagation();
+      };
+    
+      const handleDrop = (e :any) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+            if(e.dataTransfer.files[0].name.split('.').pop() !== 'csv') {
+                showMessage('Please upload only csv file', 'error');
+                setUploadFile({});
+                setFileName('Drag and Drop to upload the file here');
+                return;
+            }
+            setUploadFile(e.dataTransfer.files[0]);
+            setFileName(e.dataTransfer.files[0].name);
+            e.dataTransfer.clearData();
+        }
+      };
+
     const uploadWagonSheet = async () => {
+        if(fileName === 'Drag and Drop to upload the file here') {
+            showMessage('Please upload the wagon sheet', 'error');
+            return;
+        }
         const payload = {
             _id: shipment._id,
             edemand_no: shipment.edemand.edemand_no,
@@ -1205,10 +1230,10 @@ export const UploadWagonSheet = ({isClose, shipment}:any) => {
                     setUploadFile({});
                     showMessage('File Uploaded Succcessfully', 'success');
                 }
-                if (Object.keys(response).length === 0) {
-                    showMessage('Something went wrong, Please try again', 'error')
-                }
-            }).catch((err)=> {console.log('hello fuckers'); console.log(err); showMessage('Something went wrong, Please try again', 'error')}) 
+                else showMessage(response.message, 'error')
+            }).catch((err)=> {
+                console.log(err); showMessage(err.message, 'error')
+            }) 
     }
 
     return (
@@ -1234,7 +1259,11 @@ export const UploadWagonSheet = ({isClose, shipment}:any) => {
                 </div>
             </div>
 
-            <div className="fileUploadContainer">
+            <div 
+                className="fileUploadContainer"
+                onDragOver={handleDragOver}
+                onDrop={handleDrop}
+            >
                 <label htmlFor="input-file" className="fileUpload">
                 <input type="file" accept=".csv" id="input-file" hidden onChange={(e)=>{  if (e.target.files) {setFileName(e.target.files[0].name); setUploadFile(e.target.files[0]) }}} />
                     <div className="fileUploadContent">
@@ -1251,7 +1280,7 @@ export const UploadWagonSheet = ({isClose, shipment}:any) => {
 
 
             <div className="buttonContaioner">
-                <Button className="buttonMarkPlacement" onClick={(e)=>{ e.stopPropagation(); isClose(false); uploadFile({}); setFileName('Drag and Drop to upload the file here'); }} style={{color:'#2862FF', border:'1px solid #2862FF', width:110, cursor:'pointer', fontWeight:'bold', transition:'all 0.5s ease-in-out'}}>{t('Cancel')}</Button>
+                <Button className="buttonMarkPlacement" onClick={(e)=>{ e.stopPropagation(); setUploadFile({}); setFileName('Drag and Drop to upload the file here'); }} style={{color:'#2862FF', border:'1px solid #2862FF', width:110, cursor:'pointer', fontWeight:'bold', transition:'all 0.5s ease-in-out'}}>{t('clear')}</Button>
                 <Button className="buttonMarkPlacement" onClick={(e)=>{e.stopPropagation(); uploadWagonSheet(); }} style={{color:'white', backgroundColor:'#2862FF',width:110, border:'1px solid #2862FF', cursor:'pointer', fontWeight:'bold',transition:'all 0.5s ease-in-out' }}>{t('upload')}</Button>
             </div>    
             <div className="closeContaioner"><CloseIcon onClick={(e) => { e.stopPropagation(); isClose(false) }}/></div>
