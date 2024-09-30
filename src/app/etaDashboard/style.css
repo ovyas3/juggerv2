@@ -137,3 +137,7 @@
 .header_finalEta{
   min-width: 100px !important;
 }
+.header_lastUpdated{
+  text-wrap: nowrap;
+  min-width: 100px !important;
+}

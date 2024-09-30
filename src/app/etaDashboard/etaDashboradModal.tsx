@@ -28,9 +28,25 @@ const columns: readonly Column[] = [
   { id: "initialEta", label: "Initial ETA", style: "header_initialEta" },
   { id: "currentEta", label: "Current ETA", style: "header_finalEta" },
   { id: "drawnOut", label: "Drawn Out Time", style: "header_drawnOut" },
+  { id: "lastUpdated", label: "Last Updated", style: "header_lastUpdated" },
   { id: "delay", label: "Delay", style: "header_delay" },
   { id: "remarks", label: "Remarks", style: "header_remarks" },
 ];
+
+function getDelayTime(time: string): string {
+  if (!time) return "NA";
+  const currentDate = new Date();
+  const inputDate = new Date(time);
+  const diff = currentDate.getTime() - inputDate.getTime();  
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+  let result = "";
+  if (days > 0) result += `${days}d `;
+  if (hours > 0) result += `${hours}h `;
+  if (minutes > 0) result += `${minutes}m`;
+  return result.trim() || "0m";
+}
 
 function contructingData(shipment: any) {
   return shipment.map(
@@ -60,6 +76,7 @@ function contructingData(shipment: any) {
         rr_no: string,
         rr_date: string
       }];
+      fois_last_updated: string;
     }) => {
       return {
         _id:shipment?._id ? shipment?._id : 'NA',
@@ -84,6 +101,9 @@ function contructingData(shipment: any) {
           date: shipment?.drawnout_time ? service.utcToist(shipment?.drawnout_time) : 'NA',
           time: shipment?.drawnout_time ? service.utcToistTime(shipment?.drawnout_time) : 'NA',
         },
+        lastUpdated:{
+          date : shipment?.fois_last_updated ? getDelayTime(shipment?.fois_last_updated) : 'NA',
+        }
       };
     }
   );
@@ -176,7 +196,7 @@ function EtaDashboardModal({
                           {columns.map((column) => {
                             const value = row[column.id];
                             return (
-                              <TableCell key={column.id} sx={{ textAlign: 'center', fontSize:12}}>
+                              <TableCell key={column.id} sx={{ textAlign: 'center', fontSize:12, maxWidth: 150}}>
                                 {typeof value !== 'object' && value}
                                 {column.id === 'sno' && (<div>{rowIndex + 1 + page * rowsPerPage}.</div>)}
                                 {column.id === 'destination' && (
@@ -207,6 +227,11 @@ function EtaDashboardModal({
                                 {column.id === 'drawnOut' && ( row.drawnOut.date !== 'NA' && row.drawnOut.time !== 'NA' ?
                                   <>
                                     <div>{row.drawnOut.date}</div><div>{row.drawnOut.time}</div>
+                                  </>: 'NA'
+                                )}
+                                {column.id === 'lastUpdated' && ( row.lastUpdated.date !== 'NA' ?
+                                  <>
+                                    <div>{row.lastUpdated.date}</div>
                                   </>: 'NA'
                                 )}
                               </TableCell>

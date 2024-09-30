@@ -1214,10 +1214,18 @@ export const UploadWagonSheet = ({isClose, shipment, setOpenUploadFile, ordersUp
       };
 
     const uploadWagonSheet = async () => {
-        if(fileName === 'Drag and Drop to upload the file here') {
-            showMessage('Please upload the wagon sheet', 'error');
-            return;
+        if(ordersUpload === 'wagonSheet') {
+            if(fileName === 'Drag and Drop to upload the file here') {
+                showMessage('Please upload the wagon sheet', 'error');
+                return;
+            }
+        }else{
+            if(fileName === 'Drag and Drop to upload the file here') {
+                showMessage('Please upload the bulk shipment sheet', 'error');
+                return;
+            }
         }
+        
         let payload = {};
         if(ordersUpload === 'wagonSheet') {
             payload = {
@@ -1301,8 +1309,11 @@ export const UploadWagonSheet = ({isClose, shipment, setOpenUploadFile, ordersUp
                     </div>
                 </label>
             </div>
-            <div style={{display:ordersUpload === 'ordersUpload' ? 'none' : 'flex' }}>
-                <p className="sampleFile" onClick={(e)=>{e.stopPropagation();  window.open('https://docs.google.com/spreadsheets/d/1ZM3AnXF3zI1Rc98b4J890JAcpWaxOrS0ZSgHjAZaBPk/edit?gid=0#gid=0', '_blank'); } } >Download Sample File</p>
+            <div>
+                { ordersUpload === 'ordersUpload' ? 
+                    <p className="sampleFile" onClick={(e)=>{e.stopPropagation();  window.open('https://docs.google.com/spreadsheets/d/1HricqWNkOdQCn1BorMxkW60dWd5RuFpXG6S4gzlbQyE/edit?usp=sharing', '_blank'); } } >Download Sample File</p>
+                    :<p className="sampleFile" onClick={(e)=>{e.stopPropagation();  window.open('https://docs.google.com/spreadsheets/d/1ZM3AnXF3zI1Rc98b4J890JAcpWaxOrS0ZSgHjAZaBPk/edit?gid=0#gid=0', '_blank'); } } >Download Sample File</p>
+                }
             </div>
 
 
