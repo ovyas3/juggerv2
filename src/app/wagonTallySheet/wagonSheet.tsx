@@ -559,12 +559,12 @@ function WagonTallySheet() {
                                     >
                                       {text('uploadWagonTallySheet')}
                                     </div>
-                                    <div className="action-popover-wagon" onClick={(e)=>{uploadRakeSheet(e, rowIndex)}} >
+                                    {/* <div className="action-popover-wagon" onClick={(e)=>{uploadRakeSheet(e, rowIndex)}} >
                                       {text('rakeHandlingSheet')}
                                     </div>
                                     <div className="action-popover-wagon">
                                       {text('assignPlanttoWagon')}
-                                    </div>
+                                    </div> */}
                                   </Popover>
                                 </div>
                               )}
