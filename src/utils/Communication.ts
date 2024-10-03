@@ -24,8 +24,14 @@ const httpsGet = async (path: string, type: number = 0, router: any = null) => {
     .then((res) => res)
     .catch((err) => {
       if (axios.isAxiosError(err) && err.response?.status === 401) {
+        const router = useRouter()
+        const fromRms = Boolean(localStorage.getItem('isRmsLogin'))
         deleteAllCache();
-        router.push('/');
+        if(fromRms) {
+          router.push('/signin')
+        } else {
+          router.push('https://etms.instavans.com/login');
+        }
       }
     });
     return response?.data;
@@ -62,8 +68,14 @@ const httpsPost = async (path: string, data: any, type = 0, isFile = false, rout
       .then((res) => res)
       .catch((err) => {
         if (axios.isAxiosError(err) && err.response?.status === 401) {
+          const router = useRouter()
+          const fromRms = Boolean(localStorage.getItem('isRmsLogin'))
           deleteAllCache();
-          router.push('/');
+          if(fromRms) {
+            router.push('/signin')
+          } else {
+            router.push('https://etms.instavans.com/login');
+          }
         }
         return err.response.data 
       });
