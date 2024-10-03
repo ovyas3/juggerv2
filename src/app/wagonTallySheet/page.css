@@ -1,36 +1,174 @@
+#pageInsideContent {
+  height: calc(100vh - 56px);
+  width: calc(100vw - 70px);
+  margin-top: 56px;
+  margin-left: 70px;
+}
+.wagon-wrapper {
+  height: 100%;
+}
+
 .wagon-tally-container {
-    display: flex;
+  display: flex;
 }
 
-.wagon-tally-container .wagon-wrapper {
-    margin: 56px 0 0 70px;
-    width: calc(100vw - 70px);
+.search-container {
+  padding-top: 20px;
+  padding-bottom: 20px;
+  display: flex;
+  justify-content: center;
+  height: 82px;
 }
 
-.wagon-tally-container .wagon-wrapper .search-container {
-    display: flex;
-    justify-content: center;
-    width: 100%;
-    margin-top: 20px;
+.input-wrapper {
+  width: 328px;
+  border-radius: 6px;
+  border: 1px solid #e9eef2;
+  background: var(--Primary, #fff);
+  padding-block: 8px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding-left: 16px;
 }
 
-.wagon-tally-container .wagon-wrapper .search-container .input-wrapper {
-  width: 360px;
+.icon {
+  height: 24px;
+  width: 24px;
+}
+.input {
+  border: none;
+}
+#actionIconContaioner {
+  display: flex;
+  justify-content: center;
+}
+#actionIcon {
+  background-color: #3351ff;
+  height: 24px;
+  width: 24px;
+  border-radius: 4px;
+}
+.action-popover-wagon {
+  font-size: 12px;
+  font-weight: 500;
+  padding: 8px 16px;
+  cursor: pointer;
+}
+.action-popover-wagon:hover {
+  background-color: rgb(233, 229, 229);
+}
+
+/* ------------ Rake Handling Sheet ------------ */
+#headerForRakeHandlingSheet {
+  color: #3c4852;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+  text-transform: capitalize;
+}
+#scrollAreaforRakeSheet {
+  overflow-y: scroll;
+  max-height: 550px;
+  scroll-behavior: smooth;
+  margin-top: 24px;
+}
+#firstSectionofRakeSheet {
+  display: flex;
+  gap: 50px;
+  margin-bottom: 24px;
+}
+.headerForRakeSection {
+  font-size: 12px;
+  font-weight: 400;
+  color: #3c4852;
+  margin-bottom: 8px;
+}
+.inputForRakeSection {
+  border: 1px solid #dfe3eb;
+  width: 156px;
+  height: 36px;
+  border-radius: 4px;
+  outline: none;
+  padding-inline: 8px;
+}
+.millDetails_dropDown {
+  width: 156px;
+  height: 36px;
+  border: 1px solid #dfe3eb;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-inline: 8px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  margin-top: 8px;
   position: relative;
 }
-
-.wagon-tally-container .wagon-wrapper .search-container .input-wrapper .icon {
-  position: absolute;
-  top:8px;
-  left:16px;
+.expandMoreIcon_millDetails {
+  height: 24px;
+  width: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
+.headerForRakeSection_millDetails {
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  text-transform: capitalize;
+  color: #3c4852;
+}
+#hookSelectionContainer {
+  margin-bottom: 36px;
+  display: flex;
+  flex-wrap: wrap;
+  gap:36px;
+}
+.headerForMillDetails_hooks {
+  color: #3c4852;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  text-transform: capitalize;
+  width: 156px;
+  margin-bottom: 5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 
-.wagon-tally-container .wagon-wrapper .search-container .input-wrapper .input{
-  height: 40px;
-  width: 360px;
-  padding: 4px 16px 4px 56px;
+}
+.removeAddicons{
+  color: white;
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+.inputForMillDetails_hooks {
+  border: 1px solid #dfe3eb;
+  width: 156px;
+  height: 36px;
   border-radius: 6px;
-  border: 1px solid #E9EEF2;
   outline: none;
-  color: #71747A;
+  padding-inline: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  align-content: center;
+  margin-top: 8px;
+}
+.loadingTimeContainer{
+  font-size: 12px;
+  font-weight: 400;
+  color: #3C4852;
+  margin-top: 20px;
+}
+#lastSection{
+  display: flex;
+  gap:20px
 }
