@@ -11,9 +11,7 @@ export function middleware(request: NextRequest) {
   }
   if (!currentUser && token && redirect) {
     return NextResponse.next()
-  } else if (!currentUser && !token && pathname !== '/') {
-    return NextResponse.redirect(new URL('/', request.nextUrl.origin));
-  }
+  } 
   else if (!currentUser && !token && pathname === '/') {
     return NextResponse.next()
   }
