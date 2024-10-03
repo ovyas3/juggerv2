@@ -97,5 +97,29 @@
     "early":"Early",
     "stableShipments":"Stable Shipments : ",
     "stableFor48hrs":"Stable Shipments"
+  },
+  "WAGONTALLYSHEET":{
+    "uploadWagonTallySheet":"Upload Wagon Tally Sheet",
+    "rakeHandlingSheet":"Rake Handling Sheet",
+    "assignPlanttoWagon":"Assign Plant to Wagon",
+    "rakeArrivalAtStation":"Rake Arrival At Serving Station",
+    "rakeArrivalAtPlant":"Rake Arrival At Plant",
+    "bpRelease":"B/P Release",
+    "wagonPlacedAtLoadingPoint":"Wagons Placed At Loading Point",
+    "mill":"Mill",
+    "loadingstarttime":"Loading Start Time",
+    "loadingEndTime":"Loading End Time",
+    "loadRakeFormation":"Load Rake Formation",
+    "rakeRelease":"Rake Release",
+    "rlylocoReporting":"Rly Loco Reporting",
+    "eot":"EOT",
+    "apReady":"A.P. Ready",
+    "drawnOut":"Drawn-out",
+    "railmill":"Rail Mill",
+    "plateMill":"Plate Mill",
+    "semis":"Semis Yard",
+    "barMill":"Bar Mill",
+    "cementPlant":"Cement Plant",
+    "steel":"steel"
   }
 }

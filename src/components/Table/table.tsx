@@ -156,7 +156,7 @@ const convertArrayToFilteredArray = (inputArray: any) => {
             paid_by: paid_by ? paid_by : 'NA',
             commodity_desc: commodity_desc && commodity_desc,
             expected_loading_date:{
-                ELDdate: service.utcToist(expected_loading_date, 'dd-MM-yyyy HH:mm') || 'NA',
+                ELDdate: service.utcToist(expected_loading_date, 'dd-MM-yyyy') || 'NA',
                 ELDtime: service.utcToistTime(expected_loading_date) || 'NA'
             },
             placement_time: service.utcToist(placement_time, 'dd-MM-yyyy HH:mm')|| 'NA',
@@ -833,7 +833,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                             row.expected_loading_date.ELDdate === 'NA' && row.placement_time === 'NA' ? 'NA' : (
                                                                 <div>
                                                                     <div>{row.demand_date}</div>
-                                                                    <div style={{marginBlock:4}}>{row.expected_loading_date.ELDdate}</div>
+                                                                    <div style={{marginBlock:4}}>{row.expected_loading_date.ELDdate} {row.expected_loading_date.ELDtime === '05:30' ? '11:59': row.expected_loading_date.ELDtime} </div>
                                                                     <div>{row.placement_time}</div>
                                                                 </div>
                                                             )
