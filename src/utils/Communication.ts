@@ -6,7 +6,7 @@ import { deleteAllCache } from '@/utils/storageService';
 import { redirect, useRouter } from "next/navigation";
 
 const prefix = [
-  environment.DEV_API_URL,
+  environment.PROD_API_URL,
   environment.PROD_API_URL_MANHUNTER
 ]
 

@@ -120,6 +120,10 @@
     "semis":"Semis Yard",
     "barMill":"Bar Mill",
     "cementPlant":"Cement Plant",
-    "steel":"steel"
+    "steel":"steel",
+    "edemand":"e-Demand : ",
+    "rakeNo":"Rake No : ",
+    "tottalWagons":"Total Wagons : "
   }
 }
+

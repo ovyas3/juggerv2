@@ -216,155 +216,156 @@ function WagonTallySheet() {
       exp_loading: "29-10-2024T21:10:23:00",
       drawn_in: "29-10-2024T21:10:23:00",
     },
-    //   {
-    //     indent: 122222,
-    //     edemand: 222222,
-    //     plant: 1111,
-    //     exp_loading: "29-10-2024T21:10:23:00",
-    //     drawn_in: "29-10-2024T21:10:23:00",
-    //   },
-    //   {
-    //     indent: 122222,
-    //     edemand: 222222,
-    //     plant: 1111,
-    //     exp_loading: "29-10-2024T21:10:23:00",
-    //     drawn_in: "29-10-2024T21:10:23:00",
-    //   },
-    //   {
-    //     indent: 122222,
-    //     edemand: 222222,
-    //     plant: 1111,
-    //     exp_loading: "29-10-2024T21:10:23:00",
-    //     drawn_in: "29-10-2024T21:10:23:00",
-    //   },
-    //   {
-    //     indent: 122222,
-    //     edemand: 222222,
-    //     plant: 1111,
-    //     exp_loading: "29-10-2024T21:10:23:00",
-    //     drawn_in: "29-10-2024T21:10:23:00",
-    //   },
-    //   {
-    //     indent: 122222,
-    //     edemand: 222222,
-    //     plant: 1111,
-    //     exp_loading: "29-10-2024T21:10:23:00",
-    //     drawn_in: "29-10-2024T21:10:23:00",
-    //   },
+      {
+        indent: 122222,
+        edemand: 222222,
+        plant: 1111,
+        exp_loading: "29-10-2024T21:10:23:00",
+        drawn_in: "29-10-2024T21:10:23:00",
+      },
+      {
+        indent: 122222,
+        edemand: 222222,
+        plant: 1111,
+        exp_loading: "29-10-2024T21:10:23:00",
+        drawn_in: "29-10-2024T21:10:23:00",
+      },
+      {
+        indent: 122222,
+        edemand: 222222,
+        plant: 1111,
+        exp_loading: "29-10-2024T21:10:23:00",
+        drawn_in: "29-10-2024T21:10:23:00",
+      },
+      {
+        indent: 122222,
+        edemand: 222222,
+        plant: 1111,
+        exp_loading: "29-10-2024T21:10:23:00",
+        drawn_in: "29-10-2024T21:10:23:00",
+      },
+      {
+        indent: 122222,
+        edemand: 222222,
+        plant: 1111,
+        exp_loading: "29-10-2024T21:10:23:00",
+        drawn_in: "29-10-2024T21:10:23:00",
+      },
 
-    //   {
-    //     indent: 122222,
-    //     edemand: 222222,
-    //     plant: 1111,
-    //     exp_loading: "29-10-2024T21:10:23:00",
-    //     drawn_in: "29-10-2024T21:10:23:00",
-    //   },
-    //   {
-    //     indent: 122222,
-    //     edemand: 222222,
-    //     plant: 1111,
-    //     exp_loading: "29-10-2024T21:10:23:00",
-    //     drawn_in: "29-10-2024T21:10:23:00",
-    //   },
-    //   {
-    //     indent: 122222,
-    //     edemand: 222222,
-    //     plant: 1111,
-    //     exp_loading: "29-10-2024T21:10:23:00",
-    //     drawn_in: "29-10-2024T21:10:23:00",
-    //   },
-    //   {
-    //     indent: 122222,
-    //     edemand: 222222,
-    //     plant: 1111,
-    //     exp_loading: "29-10-2024T21:10:23:00",
-    //     drawn_in: "29-10-2024T21:10:23:00",
-    //   },
-    //   {
-    //     indent: 122222,
-    //     edemand: 222222,
-    //     plant: 1111,
-    //     exp_loading: "29-10-2024T21:10:23:00",
-    //     drawn_in: "29-10-2024T21:10:23:00",
-    //   },
-    //   {
-    //     indent: 122222,
-    //     edemand: 222222,
-    //     plant: 1111,
-    //     exp_loading: "29-10-2024T21:10:23:00",
-    //     drawn_in: "29-10-2024T21:10:23:00",
-    //   },
-    //   {
-    //     indent: 122222,
-    //     edemand: 222222,
-    //     plant: 1111,
-    //     exp_loading: "29-10-2024T21:10:23:00",
-    //     drawn_in: "29-10-2024T21:10:23:00",
-    //   },
-    //   {
-    //     indent: 122222,
-    //     edemand: 222222,
-    //     plant: 1111,
-    //     exp_loading: "29-10-2024T21:10:23:00",
-    //     drawn_in: "29-10-2024T21:10:23:00",
-    //   },
-    //   {
-    //     indent: 122222,
-    //     edemand: 222222,
-    //     plant: 1111,
-    //     exp_loading: "29-10-2024T21:10:23:00",
-    //     drawn_in: "29-10-2024T21:10:23:00",
-    //   },
-    //   {
-    //     indent: 122222,
-    //     edemand: 222222,
-    //     plant: 1111,
-    //     exp_loading: "29-10-2024T21:10:23:00",
-    //     drawn_in: "29-10-2024T21:10:23:00",
-    //   },
-    //   {
-    //     indent: 122222,
-    //     edemand: 222222,
-    //     plant: 1111,
-    //     exp_loading: "29-10-2024T21:10:23:00",
-    //     drawn_in: "29-10-2024T21:10:23:00",
-    //   },
+      {
+        indent: 122222,
+        edemand: 222222,
+        plant: 1111,
+        exp_loading: "29-10-2024T21:10:23:00",
+        drawn_in: "29-10-2024T21:10:23:00",
+      },
+      {
+        indent: 122222,
+        edemand: 222222,
+        plant: 1111,
+        exp_loading: "29-10-2024T21:10:23:00",
+        drawn_in: "29-10-2024T21:10:23:00",
+      },
+      {
+        indent: 122222,
+        edemand: 222222,
+        plant: 1111,
+        exp_loading: "29-10-2024T21:10:23:00",
+        drawn_in: "29-10-2024T21:10:23:00",
+      },
+      {
+        indent: 122222,
+        edemand: 222222,
+        plant: 1111,
+        exp_loading: "29-10-2024T21:10:23:00",
+        drawn_in: "29-10-2024T21:10:23:00",
+      },
+      {
+        indent: 122222,
+        edemand: 222222,
+        plant: 1111,
+        exp_loading: "29-10-2024T21:10:23:00",
+        drawn_in: "29-10-2024T21:10:23:00",
+      },
+      {
+        indent: 122222,
+        edemand: 222222,
+        plant: 1111,
+        exp_loading: "29-10-2024T21:10:23:00",
+        drawn_in: "29-10-2024T21:10:23:00",
+      },
+      {
+        indent: 122222,
+        edemand: 222222,
+        plant: 1111,
+        exp_loading: "29-10-2024T21:10:23:00",
+        drawn_in: "29-10-2024T21:10:23:00",
+      },
+      {
+        indent: 122222,
+        edemand: 222222,
+        plant: 1111,
+        exp_loading: "29-10-2024T21:10:23:00",
+        drawn_in: "29-10-2024T21:10:23:00",
+      },
+      {
+        indent: 122222,
+        edemand: 222222,
+        plant: 1111,
+        exp_loading: "29-10-2024T21:10:23:00",
+        drawn_in: "29-10-2024T21:10:23:00",
+      },
+      {
+        indent: 122222,
+        edemand: 222222,
+        plant: 1111,
+        exp_loading: "29-10-2024T21:10:23:00",
+        drawn_in: "29-10-2024T21:10:23:00",
+      },
+      {
+        indent: 122222,
+        edemand: 222222,
+        plant: 1111,
+        exp_loading: "29-10-2024T21:10:23:00",
+        drawn_in: "29-10-2024T21:10:23:00",
+      },
 
-    //   {
-    //     indent: 122222,
-    //     edemand: 222222,
-    //     plant: 1111,
-    //     exp_loading: "29-10-2024T21:10:23:00",
-    //     drawn_in: "29-10-2024T21:10:23:00",
-    //   },
+      {
+        indent: 122222,
+        edemand: 222222,
+        plant: 1111,
+        exp_loading: "29-10-2024T21:10:23:00",
+        drawn_in: "29-10-2024T21:10:23:00",
+      },
 
-    //   {
-    //     indent: 122222,
-    //     edemand: 222222,
-    //     plant: 1111,
-    //     exp_loading: "29-10-2024T21:10:23:00",
-    //     drawn_in: "29-10-2024T21:10:23:00",
-    //   },
-    //   {
-    //     indent: 122222,
-    //     edemand: 222222,
-    //     plant: 1111,
-    //     exp_loading: "29-10-2024T21:10:23:00",
-    //     drawn_in: "29-10-2024T21:10:23:00",
-    //   },
+      {
+        indent: 122222,
+        edemand: 222222,
+        plant: 1111,
+        exp_loading: "29-10-2024T21:10:23:00",
+        drawn_in: "29-10-2024T21:10:23:00",
+      },
+      {
+        indent: 122222,
+        edemand: 222222,
+        plant: 1111,
+        exp_loading: "29-10-2024T21:10:23:00",
+        drawn_in: "29-10-2024T21:10:23:00",
+      },
 
-    //   {
-    //     indent: 122222,
-    //     edemand: 222222,
-    //     plant: 1111,
-    //     exp_loading: "29-10-2024T21:10:23:00",
-    //     drawn_in: "29-10-2024T21:10:23:00",
-    //   },
+      {
+        indent: 122222,
+        edemand: 222222,
+        plant: 1111,
+        exp_loading: "29-10-2024T21:10:23:00",
+        drawn_in: "29-10-2024T21:10:23:00",
+      },
   ];
 
   return (
     <div>
       <div className="wagon-wrapper">
+
         <div className="search-container">
           <div className="input-wrapper">
             <Image src={searchIcon} alt="" className="icon"></Image>
@@ -375,7 +376,7 @@ function WagonTallySheet() {
         <div
           style={{
             width: "100%",
-            height: "calc(100% - 110px )",
+            height: "calc(100vh - 160px)",
             display: "flex",
             flexDirection: "column",
             paddingTop: 10,
@@ -559,12 +560,12 @@ function WagonTallySheet() {
                                     >
                                       {text('uploadWagonTallySheet')}
                                     </div>
-                                    {/* <div className="action-popover-wagon" onClick={(e)=>{uploadRakeSheet(e, rowIndex)}} >
+                                    <div className="action-popover-wagon" onClick={(e)=>{uploadRakeSheet(e, rowIndex)}} >
                                       {text('rakeHandlingSheet')}
                                     </div>
                                     <div className="action-popover-wagon">
                                       {text('assignPlanttoWagon')}
-                                    </div> */}
+                                    </div>
                                   </Popover>
                                 </div>
                               )}

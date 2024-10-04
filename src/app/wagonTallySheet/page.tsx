@@ -11,8 +11,8 @@ import WagonAssignSheet from './wagonAssignSheet'
 
 const Page = () => {
   const mobile = useWindowSize(500);
-  const [showWagonSheet, setShowWagonSheet] = useState(true);
-  const [showAssignWagon, setShowAssignWagon] = useState(false);
+  const [showWagonSheet, setShowWagonSheet] = useState(false);
+  const [showAssignWagon, setShowAssignWagon] = useState(true);
   return (
     <div className="wagon-tally-container">
       <Header title={"Wagon Tally Sheet"} isMapHelper={false} />
