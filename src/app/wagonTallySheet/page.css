@@ -172,3 +172,36 @@
   display: flex;
   gap:20px
 }
+/* ------------ assign wagon Sheet ------------ */
+#assign-wagon-details{
+  margin-inline: 24px;
+  display: flex;
+  gap:24px;
+  margin-top: 30px;
+}
+.subtile-assign-wagon-details{
+  font-size: 12px;
+  font-weight: 400;
+}
+#rail{
+  margin-top: 41px;
+  display: flex;
+  overflow-x: auto; 
+  white-space: nowrap; 
+  max-width: 100%;
+}
+#rail::-webkit-scrollbar {
+  display: none; 
+}
+#rail > div {
+  flex-shrink: 0; 
+}
+#railEngine{
+  height: 48px;
+  width: 189px;
+}
+.eachWagonOfAssignWagon{
+  height: 48px;
+  width: 189px;
+  display: flex;
+}

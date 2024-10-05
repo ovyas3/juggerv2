@@ -141,3 +141,12 @@
   text-wrap: nowrap;
   min-width: 100px !important;
 }
+.header_lastLocation{
+  text-wrap: nowrap;
+  min-width: 100px !important;
+
+}
+.header_remarks{
+  text-wrap: nowrap;
+  min-width: 100px !important;
+}
