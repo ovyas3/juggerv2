@@ -99,7 +99,7 @@
     "stableFor48hrs":"Stable Shipments"
   },
   "WAGONTALLYSHEET":{
-    "uploadWagonTallySheet":"Upload Wagon Tally Sheet",
+    "uploadWagonTallySheet":"Upload Wagon Sheet",
     "rakeHandlingSheet":"Rake Handling Sheet",
     "assignPlanttoWagon":"Assign Plant to Wagon",
     "rakeArrivalAtStation":"Rake Arrival At Serving Station",
@@ -123,7 +123,13 @@
     "steel":"steel",
     "edemand":"e-Demand : ",
     "rakeNo":"Rake No : ",
-    "tottalWagons":"Total Wagons : "
+    "tottalWagons":"Total Wagons : ",
+    "in-plant-Dashboard":"In-Plant Dashboard",
+    "markPlacemantTime":"Mark Placement Time",
+    "drawnInTime":"Drawn In Time",
+    "assignButton":"ASSIGN To PLANT",
+    "AssignToMill":"Assign To Mill",
+    "selectAllwagons":"Select All Wagons"
   }
 }
 

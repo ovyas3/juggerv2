@@ -17,6 +17,7 @@ import HandlingAgentInactive from '@/assets/handling_agent_inactive_icon.svg';
 import handlingAgentActive from '@/assets/handling_agent_active_icon.svg'
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import AllInboxIcon from '@mui/icons-material/AllInbox';
+import WarehouseIcon from '@mui/icons-material/Warehouse';
 
 function SideDrawer() {
     const [open, setOpen] = useState(false);
@@ -27,6 +28,7 @@ function SideDrawer() {
     const [handleAgent, setHandleAgent] = useState(false);
     const [etaReport, setEtaReport] = useState(false);
     const [dashboard, setDashboard] = useState(false);
+    const [inPlantWagonDashboard, setInPlantWagonDashboard] = useState(false);
  
     const pathName = usePathname();
     const handleRouting = (route: string) => {
@@ -166,6 +168,27 @@ function SideDrawer() {
                     style={{ color: dashboard ? 'black' : 'white' }} 
                 >Dashboard</div>
             </div>
+
+            {/* <div
+                 onMouseEnter={()=>{ setInPlantWagonDashboard(true) }}
+                 onMouseLeave={()=>{ setInPlantWagonDashboard(false) }}
+                 onClick={() => handleRouting('inPlantDashboard')}
+                 className='station-code'
+                 style={{
+                     width: open ? '190px' : '42px',
+                     justifyContent: open ? 'start' : 'center',
+                     backgroundColor: inPlantWagonDashboard === true ? 'white' : '',
+                     cursor: 'pointer'
+                 }}
+            >
+                <WarehouseIcon style={{ marginLeft: open ? '9px' : '', color: inPlantWagonDashboard ? 'black' : 'white' }}/>
+                <div
+                    className={`${open ? 'fnr_text' : 'fnr_text_none'}`}
+                    style={{ color: inPlantWagonDashboard ? 'black' : 'white' }} 
+                >In-Plant Dashboard</div>
+            </div>
+             */}
+
         </div>
     );
 

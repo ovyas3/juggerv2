@@ -27,6 +27,7 @@ import Typography from "@mui/material/Typography";
 import {UploadWagonSheet} from '@/components/Table/tableComp';
 import { useTranslations } from 'next-intl';
 import RakeHandlingSheet from "./rakeHandlingSheet";
+import { MarkPlacement } from "@/app/inPlantDashboard/actionComponents";
 
 
 interface Column {
@@ -58,14 +59,18 @@ function contructingData(shipment: any) {
       no_of_wagons: number;
       status: string;
       edemand_no: string;
+      placement_time: any;
+      drawnin_time: any;
+      FNR: string;
+      received_no_of_wagons:any;
 
       indent: string;
       plant: string;
-      placementTime: any;
-      drawnIn: any;
     }) => {
       return {
         id: shipment?._id && shipment._id,
+        status: shipment?.status ? shipment?.status : "NA",
+        fnr: shipment?.FNR ? shipment?.FNR : "NA",
         indent: {
           indent_no: shipment?.indent ? shipment?.indent : "NA",
         },
@@ -85,27 +90,27 @@ function contructingData(shipment: any) {
         },
         total_wagons: {
           numberTotal: shipment?.no_of_wagons ? shipment?.no_of_wagons : "NA",
+          received_no_of_wagons: shipment?.received_no_of_wagons ? shipment?.received_no_of_wagons : "NA",
         },
         placement_time: {
-          date: shipment?.placementTime
-            ? service.utcToist(shipment?.placementTime)
+          date: shipment?.placement_time
+            ? service.utcToist(shipment?.placement_time)
             : "NA",
-          time: shipment?.placementTime
-            ? service.utcToistTime(shipment?.placementTime)
+          time: shipment?.placement_time
+            ? service.utcToistTime(shipment?.placement_time)
             : "NA",
         },
         drawn_in: {
-          date: shipment?.drawnIn ? service.utcToist(shipment?.drawnIn) : "NA",
-          time: shipment?.drawnIn
-            ? service.utcToistTime(shipment?.drawnIn)
+          date: shipment?.drawnin_time ? service.utcToist(shipment?.drawnin_time) : "NA",
+          time: shipment?.drawnin_time
+            ? service.utcToistTime(shipment?.drawnin_time)
             : "NA",
         },
       };
     }
   );
 }
-
-function WagonTallySheet() {
+function WagonTallySheet({setShowAssignWagon, setShowWagonSheet, setShipmentForWagonSheet}:any) {
 
   const text = useTranslations('WAGONTALLYSHEET');
   const [allWagonsList, setAllWagonsList] = useState([]);
@@ -124,6 +129,12 @@ function WagonTallySheet() {
   const [uploadShipmentwagon, setuploadShipmentwagon] = useState({});
   const [rakeHandlingSheetData, setRakeHandlingSheetData] = useState({});
 
+  const [openMarkPlacementTimeModal, setOpenMarkPlacementTimeModal] = useState(false);
+  const [shipmentforPlacementTime, setShipmentforPlacementTime] = useState({});
+
+  const [openDrawnInTimeModal, setOpenDrawnInTimeModal] = useState(false);
+  const [shipmentforDrawnInTime, setShipmentforDrawnInTime] = useState({});
+
   // api calling
   async function getWagonDetails() {
     try {
@@ -131,7 +142,6 @@ function WagonTallySheet() {
         "rake_shipment/wagon_tally_details",
         payloadForWagons
       );
-      console.log(response.data);
       setAllWagonsList(response.data.data);
       setTotalCount(response.data.totalCount);
     } catch (error) {
@@ -149,12 +159,31 @@ function WagonTallySheet() {
     e.stopPropagation();
     setShowActionBox((prevIndex) => (prevIndex === index ? -1 : index));
   }
+  const assignPlantToWagon = (event: any, row: any) => {
+    setShowAssignWagon(true);
+    setShipmentForWagonSheet(row);
+    setShowActionBox(-1);
+    setAnchorEl(null);
+    setShowWagonSheet(false);
+  }
+  const drawnInTime = (event: any, row: any) => {
+    setOpenDrawnInTimeModal(true);
+    setShipmentforDrawnInTime(row);
+    setShowActionBox(-1);
+    setAnchorEl(null);
+  }
   const uploadWagonSheet = (event: any, row: any) => {
     setOpenUploadWagonSheetModal(true);
     setuploadShipmentwagon(row);
     setShowActionBox(-1);
     setAnchorEl(null);
   };
+  const markPlacementTime = (event: any, row: any) => {
+    setOpenMarkPlacementTimeModal(true);
+    setShipmentforPlacementTime(row);
+    setShowActionBox(-1);
+    setAnchorEl(null);
+  }
   const uploadRakeSheet = (event: any, row: any) => {
     setOpenRakeHandlingSheet(true);
     setRakeHandlingSheetData(row);
@@ -397,7 +426,7 @@ function WagonTallySheet() {
               rowsPerPageOptions={[5, 10, 25, 50, 100]}
               component="div"
               count={totalCount}
-              rowsPerPage={10}
+              rowsPerPage={rowsPerPage}
               page={page}
               onPageChange={handleChangePage}
               onRowsPerPageChange={handleChangeRowsPerPage}
@@ -487,7 +516,7 @@ function WagonTallySheet() {
                                       {row.exp_loading.date}
                                     </div>
                                     <div style={{ fontSize: 12 }}>
-                                      {row.exp_loading.time}
+                                      {row.exp_loading.time === '05:30'? '23:59': row.exp_loading.time}
                                     </div>
                                   </>
                                 ) : (
@@ -554,16 +583,22 @@ function WagonTallySheet() {
                                   >
                                     <div
                                       onClick={(e) =>
-                                        uploadWagonSheet(e, rowIndex)
+                                        uploadWagonSheet(e, row)
                                       }
                                       className="action-popover-wagon"
                                     >
                                       {text('uploadWagonTallySheet')}
                                     </div>
-                                    <div className="action-popover-wagon" onClick={(e)=>{uploadRakeSheet(e, rowIndex)}} >
-                                      {text('rakeHandlingSheet')}
+                                    <div className="action-popover-wagon" onClick={(e)=>{markPlacementTime(e, row)}} >
+                                      {text('markPlacemantTime')}
                                     </div>
-                                    <div className="action-popover-wagon">
+                                    <div className="action-popover-wagon" onClick={(e) => {drawnInTime(e, row)}} >
+                                      {text('drawnInTime')}
+                                    </div>
+                                    {/* <div className="action-popover-wagon" onClick={(e)=>{uploadRakeSheet(e, row)}} >
+                                      {text('rakeHandlingSheet')}
+                                    </div> */}
+                                    <div className="action-popover-wagon" onClick={(e)=>{assignPlantToWagon(e, row)}}>
                                       {text('assignPlanttoWagon')}
                                     </div>
                                   </Popover>
@@ -582,7 +617,9 @@ function WagonTallySheet() {
         </div>
       </div>
       {openUploadWagonSheetmodal && <UploadWagonSheet isClose={setOpenUploadWagonSheetModal} shipment={uploadShipmentwagon}  />}
-      {openRakeHandlingSheet && <RakeHandlingSheet isClose={setOpenRakeHandlingSheet} shipment={uploadShipmentwagon}  />}
+      {openRakeHandlingSheet && <RakeHandlingSheet isClose={setOpenRakeHandlingSheet} shipment={rakeHandlingSheetData}  />}
+      {openMarkPlacementTimeModal && <MarkPlacement isClose={setOpenMarkPlacementTimeModal} shipment={shipmentforPlacementTime} getWagonDetails={getWagonDetails} />}
+      {openDrawnInTimeModal && <MarkPlacement isClose={setOpenDrawnInTimeModal} shipment={shipmentforDrawnInTime} different='drawnInTimeFromInplantDashboard' getWagonDetails={getWagonDetails} />}
     </div>
   );
 }

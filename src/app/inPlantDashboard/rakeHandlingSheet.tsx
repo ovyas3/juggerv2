@@ -30,6 +30,8 @@ function RakeHandlingSheet({ isClose, shipment }: any) {
         },
     ]);
 
+    console.log(shipment);
+
     function addMillDetails() {
         const newMill = {
             major_id:millDetails.length+1,
