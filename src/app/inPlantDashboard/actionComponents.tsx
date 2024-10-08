@@ -10,6 +10,10 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import dayjs from "dayjs";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { renderTimeViewClock } from "@mui/x-date-pickers/timeViewRenderers";
+import "./actionComponents.css";
+import CheckRoundedIcon from "@mui/icons-material/CheckRounded";
+
+
 
 export const MarkPlacement = ({
   isClose,
@@ -287,8 +291,63 @@ export const MarkPlacement = ({
     </div>
   );
 };
-export const AssignToMill = ({ isClose, shipment }: any) => {
+export const AssignToMill = ({ isClose, wagonsData, plants, shipmentForWagonSheet, wagonDetails }: any) => {
   const text = useTranslations("WAGONTALLYSHEET");
+  const [wagonsNewDate, setWagonsNewDate] = useState<any>([]);
+  const [SelectedPlant, setSelectedPlant] = useState<any>({});
+
+  const calculateMaxHeight = (numberOfWagons: number) => {
+    const wagonHeight = 50;
+    const gap = 8;
+    const maxHeight = (numberOfWagons / 3) * (wagonHeight + gap);
+    return maxHeight;
+  };
+
+  const assignWagonsToSelectedPlant = (
+    event: any,
+    wagons: any,
+    index: number
+  ) => {
+    console.log(wagons, index);
+
+    setWagonsNewDate((prevWagons: any) => {
+      let newWagons = [...prevWagons];
+      if (newWagons[index].plant_assigned) {
+        const { plant_assigned, ...rest } = newWagons[index];
+        newWagons[index] = rest;
+      } else {
+        newWagons[index].plant_assigned = SelectedPlant._id;
+      }
+      return newWagons;
+    });
+  };
+
+  const submitAssignToMill = async () => {
+    const filteredWagons = wagonsNewDate.filter((wagon:any) => wagon.plant_assigned);
+    const payload = {
+      wagons: filteredWagons.map((wagon:any) => wagon._id),
+      shipment: shipmentForWagonSheet.id,
+      plant: SelectedPlant._id,
+    };
+    console.log(payload);
+    try {
+        const response = await httpsPost('assign_wagon_to_plant', payload);
+        if(response.statusCode === 200) {
+            wagonDetails();
+            isClose(false);
+        }
+    } catch (error) {
+        console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    setWagonsNewDate(wagonsData);
+    setSelectedPlant(plants[0]);
+  }, []);
+
+  console.log(wagonsNewDate)
+
   return (
     <div
       style={{
@@ -307,7 +366,7 @@ export const AssignToMill = ({ isClose, shipment }: any) => {
     >
       <div
         style={{
-          width: 1000,
+          width: 954,
           height: 650,
           backgroundColor: "white",
           position: "relative",
@@ -323,17 +382,104 @@ export const AssignToMill = ({ isClose, shipment }: any) => {
       >
         <header id="headerForAssignToMill">{text("AssignToMill")}</header>
         <div id="scrollAreaForAssignToMill">
-          <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 4,
+              marginBottom: 16,
+            }}
+          >
             <div>
-              <input
-                type="radio"
-                style={{ marginTop: 5, color: "black", width: 16, height: 16 }}
-              />
+              <input type="radio" style={{ marginTop: 5 }} checked={true} />
             </div>
-            <div>{text("selectAllwagons")}</div>
+            <div style={{ fontSize: 12, fontWeight: "400" }}>
+              {text("selectAllwagons")}
+            </div>
+          </div>
+
+          <div
+            id="wagonContainerForAssignToMill"
+            style={{ maxHeight: calculateMaxHeight(wagonsNewDate.length) }}
+          >
+            {wagonsNewDate.map((wagons: any, index: number) => {
+              return (
+                <div key={index} className="wagonAssignToMillConatiner">
+                  <div
+                    className="wagonsAssignToMillImageSelectorConatainer"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      assignWagonsToSelectedPlant(e, wagons, index);
+                    }}
+                  >
+                    {wagons?.plant_assigned && (
+                      <div className="wagonsAssigntoMillCheckedIcon">
+                        <CheckRoundedIcon
+                          style={{
+                            color: "white",
+                            height: "100%",
+                            width: "100%",
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                          }}
+                        />
+                      </div>
+                    )}
+                    <div className="wagonsAssignToMillImageSelector"></div>
+                  </div>
+                  <div id="wagonsAssignToMillTextArea">
+                    <header id="wagonsAssignToMillNumber">
+                      {wagons?.w_no || "XXXXXXX"}
+                    </header>
+                    <header id="wagonsAssignToMilltype">
+                      {wagons?.type || "XXXXXXX"}
+                    </header>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          <div style={{ marginTop: 24 }}>Select a mill</div>
+          <div id="plantSelectorContainer">
+            {plants.map((plant: any, index: any) => {
+              return (
+                <div
+                  key={index}
+                  id="plantMillSelector"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedPlant(plants[index]);
+                  }}
+                  style={{
+                    backgroundColor:
+                      plant?._id === SelectedPlant?._id ? "#3351FF" : "",
+                    color: plant?._id === SelectedPlant?._id ? "white" : "",
+                    border:
+                      plant?._id === SelectedPlant?._id
+                        ? "1px solid #3351FF"
+                        : "",
+                  }}
+                >
+                  <div
+                    id="plantRadioButton"
+                    style={{
+                      border:
+                        plant?._id === SelectedPlant?._id
+                          ? "1px solid white"
+                          : "",
+                    }}
+                  >
+                    <div id="plantRadioButtonInside"></div>
+                  </div>
+                  <div>{plant?.name || "XXXX"}</div>
+                </div>
+              );
+            })}
           </div>
         </div>
-        
+
         <div className="buttonContaioner">
           <Button
             className="buttonMarkPlacement"
@@ -356,6 +502,7 @@ export const AssignToMill = ({ isClose, shipment }: any) => {
             className="buttonMarkPlacement"
             onClick={(e) => {
               e.stopPropagation();
+              submitAssignToMill();
             }}
             style={{
               color: "white",

@@ -11,43 +11,26 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { httpsGet } from "@/utils/Communication";
 import { AssignToMill } from "./actionComponents";
 
- // const rail = [
-  //   { wagon_no: 21160760078, millType: "Rail", track: "Track 1" },
-  //   { wagon_no: 21160760078, millType: "Rail", track: "Track 2" },
-  //   { wagon_no: 21160760078, millType: "Rail", track: "Track 3" },
-  //   { wagon_no: 19140451439, millType: "Rail", track: "Track 4" },
-  //   { wagon_no: 19140451439, millType: "Rail", track: "Track 5" },
-  //   { wagon_no: 19140451439, millType: "Rail", track: "Track 6" },
-  //   { wagon_no: 24140451490, millType: "Rail", track: "Track 7" },
-  //   { wagon_no: 24140451490, millType: "Rail", track: "Track 8" },
-  //   { wagon_no: 24140451490, millType: "Rail", track: "Track 9" },
-  //   { wagon_no: 24140451490, millType: "Rail", track: "Track 10" },
-  //   { wagon_no: 24140451490, millType: "Rail", track: "Track 11" },
-  //   { wagon_no: 67123948512, millType: "Rail", track: "Track 12" },
-  //   { wagon_no: 83940271645, millType: "Rail", track: "Track 13" },
-  //   { wagon_no: 19283746520, millType: "Rail", track: "Track 14" },
-  //   { wagon_no: 60593827451, millType: "Rail", track: "Track 15" },
-  //   { wagon_no: 38472016539, millType: "Rail", track: "Track 16" },
-  //   { wagon_no: 75120483962, millType: "Rail", track: "Track 17" },
-  //   { wagon_no: 29834710562, millType: "Rail", track: "Track 18" },
-  //   { wagon_no: 47261830957, millType: "Rail", track: "Track 19" },
-  //   { wagon_no: 93048561728, millType: "Rail", track: "Track 20" },
-  // ];
-
 function WagonAssignSheet({shipmentForWagonSheet, setShowWagonSheet,setShowAssignWagon,setShipmentForWagonSheet}:any) {
+
   const text = useTranslations("WAGONTALLYSHEET");
   const [openAssignToPlantModal, setOpenAssignToPlantModal] = useState(false);
+  const [wagonsData, setWagonsData] = useState([]);
+  const [plants, setPlants] = useState([]);
  
   // api calling 
   const wagonDetails = async() =>{
     try {
       const response = await httpsGet(`get_wagon_details_by_shipment?id=${shipmentForWagonSheet.id}`)
-      console.log(response);
+      console.log(response)
+      setWagonsData(response.wagonData);
+      setPlants(response.plants);
     } catch (error) {
       console.log(error);
     }
   }
 
+  //useEffect hooks
   useEffect(() => {
     wagonDetails(); 
   }, [])
@@ -114,7 +97,7 @@ function WagonAssignSheet({shipmentForWagonSheet, setShowWagonSheet,setShowAssig
         <div id='assign-button' onClick={(e)=>{e.stopPropagation(); setOpenAssignToPlantModal(true)}} >{text("assignButton")}</div>
       </div>
 
-      {openAssignToPlantModal && <AssignToMill isClose={setOpenAssignToPlantModal}/>}
+      {openAssignToPlantModal && <AssignToMill wagonDetails={wagonDetails} isClose={setOpenAssignToPlantModal} wagonsData={wagonsData} plants={plants} shipmentForWagonSheet={shipmentForWagonSheet}/>}
 
     </div>
   );
