@@ -13,8 +13,8 @@ import WagonAssignSheet from './wagonAssignSheet'
 const Page = () => {
   const mobile = useWindowSize(500);
   const text = useTranslations("WAGONTALLYSHEET");
-  const [showWagonSheet, setShowWagonSheet] = useState(false);
-  const [showAssignWagon, setShowAssignWagon] = useState(true);
+  const [showWagonSheet, setShowWagonSheet] = useState(true);
+  const [showAssignWagon, setShowAssignWagon] = useState(false);
   const [shipmentForWagonSheet, setShipmentForWagonSheet] = useState({});
   return (
     <div className="wagon-tally-container">
