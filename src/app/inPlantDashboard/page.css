@@ -18,6 +18,20 @@
   display: flex;
   justify-content: center;
   height: 82px;
+  padding-inline: 24px;
+  align-items: center;
+  flex-direction: row;
+}
+
+#search-container-assign {
+  padding-top: 20px;
+  padding-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  height: 82px;
+  padding-inline: 24px;
+  align-items: center;
+  flex-direction: row;
 }
 
 .input-wrapper {
@@ -38,6 +52,8 @@
 }
 .input {
   border: none;
+  outline: none;
+  width: 80%;
 }
 #actionIconContaioner {
   display: flex;
@@ -184,7 +200,7 @@
   font-weight: 400;
 }
 #rail{
-  margin-top: 41px;
+  margin-top: 16px;
   display: flex;
   overflow-x: auto; 
   white-space: nowrap; 
@@ -201,7 +217,47 @@
   width: 189px;
 }
 .eachWagonOfAssignWagon{
-  height: 48px;
+  height: 100px;
   width: 189px;
   display: flex;
+  position: relative;
+  border-bottom: 1px solid #dfe3eb;
+  align-items: end;
+  background-color: #3351ff;
+}
+#wagon-number-rail{
+  position: absolute;
+  font-size: 10px;
+  font-weight: 400;
+  color: #3C4852;
+  top:0px;
+  left: 0px;
+}
+#assign-button-container{
+  padding-left: 24px;
+  margin-top: 42px;
+}
+#assign-button{
+  background-color: #3351FF1F;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 10px;
+  color: #3351FF;
+  height: 32px;
+  width: 127px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+#assign-button:hover{
+  background-color: #3351FF;
+  color: white;
+}
+#headerForAssignToMill{
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 16px;
 }

@@ -937,15 +937,15 @@ export const MarkPlacement = ({isClose ,shipment, getAllShipment, different = 'm
                     <div className="status_edemand_fnr">
                         <div>
                             <header style={{fontSize:12, color:'#42454E', marginBottom:8}}>{t('status')}</header>
-                            <text style={{fontSize:16, color:"#42454E", fontWeight:600}}>{shipment.status.name}</text>
+                            <text style={{fontSize:16, color:"#42454E", fontWeight:600}}>{shipment?.status?.name}</text>
                         </div>
                         <div>
                             <header style={{fontSize:12, color:'#42454E', marginBottom:8}}>{t('FNRno')}</header>
-                            <text style={{fontSize:16, color:"#42454E", fontWeight:600}}>{shipment.fnr.primary}</text>
+                            <text style={{fontSize:16, color:"#42454E", fontWeight:600}}>{shipment?.fnr?.primary}</text>
                         </div>
                         <div>
                             <header style={{fontSize:12, color:'#42454E', marginBottom:8}}>{t('edemandno')}</header>
-                            <text style={{fontSize:16, color:"#42454E", fontWeight:600}}>{shipment.edemand.edemand_no}</text>
+                            <text style={{fontSize:16, color:"#42454E", fontWeight:600}}>{shipment?.edemand?.edemand_no}</text>
                         </div>
                     </div>
 
@@ -1230,7 +1230,7 @@ export const UploadWagonSheet = ({isClose, shipment, setOpenUploadFile, ordersUp
         let payload = {};
         if(ordersUpload === 'wagonSheet') {
             payload = {
-                _id: shipment._id,
+                _id: shipment._id || shipment.id,
                 edemand_no: shipment.edemand.edemand_no,
                 file:uploadFile
             }
@@ -1267,6 +1267,7 @@ export const UploadWagonSheet = ({isClose, shipment, setOpenUploadFile, ordersUp
         }
            
     }
+    console.log(shipment)
 
     return (
     <div style={{width:'100vw', height:'100vh', position:'fixed', top:0, left:0 ,zIndex:300, backgroundColor:'rgba(0, 0, 0, 0.5)'}} onClick={(e)=>{e.stopPropagation(); ordersUpload === 'wagonSheet' ? isClose(false) : setOpenUploadFile(false);}}>
@@ -1279,15 +1280,15 @@ export const UploadWagonSheet = ({isClose, shipment, setOpenUploadFile, ordersUp
             <div className="status_edemand_fnr" style={{display:ordersUpload === 'ordersUpload' ? 'none' : 'flex' }}>
                 <div>
                     <header style={{fontSize:12, color:'#42454E', marginBottom:8}}>{t('status')}</header>
-                    <text style={{fontSize:16, color:"#42454E", fontWeight:600}}>{shipment?.status?.name}</text>
+                    <text style={{fontSize:16, color:"#42454E", fontWeight:600}}>{shipment?.status?.name || shipment?.status}</text>
                 </div>
                 <div>
                     <header style={{fontSize:12, color:'#42454E', marginBottom:8}}>{t('FNRno')}</header>
-                    <text style={{fontSize:16, color:"#42454E", fontWeight:600}}>{shipment?.fnr?.primary}</text>
+                    <text style={{fontSize:16, color:"#42454E", fontWeight:600}}>{shipment?.fnr?.primary || shipment?.fnr}</text>
                 </div>
                 <div>
                     <header style={{fontSize:12, color:'#42454E', marginBottom:8}}>{t('edemandno')}</header>
-                    <text style={{fontSize:16, color:"#42454E", fontWeight:600}}>{shipment?.edemand?.edemand_no}</text>
+                    <text style={{fontSize:16, color:"#42454E", fontWeight:600}}>{shipment?.edemand?.edemand_no || shipment?.edemand?.edemand}</text>
                 </div>
             </div>
 
