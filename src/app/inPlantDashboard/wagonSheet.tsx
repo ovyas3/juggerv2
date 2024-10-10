@@ -9,6 +9,9 @@ import MobileDrawer from "@/components/Drawer/mobile_drawer";
 import "./page.css";
 import Image from "next/image";
 import searchIcon from "@/assets/search_wagon.svg";
+import wagonIcon from "@/assets/captive_rakes_no_wagons.svg";
+import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
+import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import {
   Paper,
   Table,
@@ -99,6 +102,9 @@ function contructingData(shipment: any) {
         },
         total_wagons: {
           numberTotal: shipment?.no_of_wagons ? shipment?.no_of_wagons : "NA",
+          requested_no_of_wagons: shipment?.no_of_wagons
+            ? shipment?.no_of_wagons
+            : "NA",
           received_no_of_wagons: shipment?.received_no_of_wagons
             ? shipment?.received_no_of_wagons
             : "NA",
@@ -195,6 +201,7 @@ function WagonTallySheet({
     setShipmentforAssignWagonToplant(row);
     setShowActionBox(-1);
     setAnchorEl(null);
+    // setShowWagonSheet(false);
     // setShowWagonSheet(false);
   };
   const drawnInTime = (event: any, row: any) => {
