@@ -10,14 +10,25 @@ import { useRouter } from "next/navigation";
 import { handleAuthentication } from "@/services/Authenticator/Auth";
 import showPassword from "@/assets/show_password.svg";
 import hidePassword from "@/assets/hide_password.svg";
+import { useSnackbar } from "@/hooks/snackBar";
 
 const signin = () => {
+  const { showMessage } = useSnackbar();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter();
   const [hidePasswordFlag, setHidePasswordFlag] = useState(true);
 
   const handleLogin = () => {
+    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    console.log(emailPattern.test(email));
+    if (!email.length || !password.length) {
+      showMessage("Please fill all the fields.", "error");
+      return;
+    } else if (!emailPattern.test(email)) {
+      showMessage("Please enter a valid Email.", "error");
+      return;
+    }
     httpsPost("shipper_user/signin", { email_id: email, password, from: "web" })
       .then(async (response: any) => {
         if (response.statusCode === 200) {
@@ -30,6 +41,8 @@ const signin = () => {
             router.push("/orders");
           } else {
           }
+        } else {
+          showMessage(response.message, "error");
         }
       })
       .catch((err) => {});
