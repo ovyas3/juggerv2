@@ -620,14 +620,14 @@ function WagonTallySheet({
                                       {/* <div className="action-popover-wagon" onClick={(e)=>{uploadRakeSheet(e, row)}} >
                                       {text('rakeHandlingSheet')}
                                     </div> */}
-                                      <div
+                                      {/* <div
                                         className="action-popover-wagon"
                                         onClick={(e) => {
                                           assignPlantToWagon(e, row);
                                         }}
                                       >
                                         {text("assignWagonToPlant")}
-                                      </div>
+                                      </div> */}
                                     </Popover>
                                   </div>
                                 )}
