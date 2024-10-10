@@ -476,223 +476,154 @@ function WagonTallySheet({
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {contructingData(allWagonsList).map(
-                    (row: any, rowIndex: any) => {
-                      return (
-                        <TableRow
-                          hover
-                          role="checkbox"
-                          tabIndex={-1}
-                          key={rowIndex}
-                        >
-                          {columns.map((column) => {
-                            const value = row[column.id];
-                            return (
-                              <TableCell
-                                key={column.id}
-                                sx={{
-                                  textAlign: "center",
-                                  paddingInline: "10px",
-                                  fontSize: 12,
-                                }}
-                              >
-                                {typeof value !== "object" && value}
-                                {column.id === "sno" && (
+                  {contructingData(allWagonsList).map((row: any, rowIndex: any) => {
+                    return (
+                      <TableRow
+                        hover
+                        role="checkbox"
+                        tabIndex={-1}
+                        key={rowIndex}
+                      >
+                        {columns.map((column) => {
+                          const value = row[column.id];
+                          return (
+                            <TableCell
+                              key={column.id}
+                              sx={{
+                                textAlign: "center",
+                                paddingInline: "10px",
+                                fontSize: 12,
+                              }}
+                            >
+                              {typeof value !== "object" && value}
+                              {column.id === "sno" && (
+                                <div style={{ fontSize: 12 }}>
+                                  {rowIndex + 1 + page * rowsPerPage}.
+                                </div>
+                              )}
+                              {column.id === "indent" && (
+                                <>
                                   <div style={{ fontSize: 12 }}>
-                                    {rowIndex + 1 + page * rowsPerPage}.
+                                    {row.indent.indent_no}
                                   </div>
-                                )}
-                                {column.id === "indent" && (
+                                </>
+                              )}
+                              {column.id === "edemand" && (
+                                <>
+                                  <div style={{ fontSize: 12 }}>
+                                    {row.edemand.edemand_no}
+                                  </div>
+                                </>
+                              )}
+                              {column.id === "plant" && (
+                                <>
+                                  <div style={{ fontSize: 12 }}>
+                                    {row.plant.plant_name}
+                                  </div>
+                                </>
+                              )}
+                              {column.id === "exp_loading" &&
+                                (row.exp_loading.date !== "NA" &&
+                                row.exp_loading.time !== "NA" ? (
                                   <>
                                     <div style={{ fontSize: 12 }}>
-                                      {row.indent.indent_no}
+                                      {row.exp_loading.date}
+                                    </div>
+                                    <div style={{ fontSize: 12 }}>
+                                      {row.exp_loading.time === '05:30'? '23:59': row.exp_loading.time}
                                     </div>
                                   </>
-                                )}
-                                {column.id === "edemand" && (
+                                ) : (
+                                  "NA"
+                                ))}
+                              {column.id === "total_wagons" && (
+                                <>
+                                  <div style={{ fontSize: 12 }}>
+                                    {row.total_wagons.numberTotal}
+                                  </div>
+                                </>
+                              )}
+                              {column.id === "placement_time" &&
+                                (row.placement_time.date !== "NA" &&
+                                row.placement_time.time !== "NA" ? (
                                   <>
                                     <div style={{ fontSize: 12 }}>
-                                      {row.edemand.edemand_no}
+                                      {row.placement_time.date}
+                                    </div>
+                                    <div style={{ fontSize: 12 }}>
+                                      {row.placement_time.time}
                                     </div>
                                   </>
-                                )}
-                                {column.id === "plant" && (
+                                ) : (
+                                  "NA"
+                                ))}
+                              {column.id === "drawn_in" &&
+                                (row.drawn_in.date !== "NA" &&
+                                row.drawn_in.time !== "NA" ? (
                                   <>
                                     <div style={{ fontSize: 12 }}>
-                                      {row.plant.plant_name}
+                                      {row.drawn_in.date}
+                                    </div>
+                                    <div style={{ fontSize: 12 }}>
+                                      {row.drawn_in.time}
                                     </div>
                                   </>
-                                )}
-                                {column.id === "exp_loading" &&
-                                  (row.exp_loading.date !== "NA" &&
-                                  row.exp_loading.time !== "NA" ? (
-                                    <>
-                                      <div style={{ fontSize: 12 }}>
-                                        {row.exp_loading.date}
-                                      </div>
-                                      <div style={{ fontSize: 12 }}>
-                                        {row.exp_loading.time === "05:30"
-                                          ? "23:59"
-                                          : row.exp_loading.time}
-                                      </div>
-                                    </>
-                                  ) : (
-                                    "NA"
-                                  ))}
-                                {column.id === "total_wagons" && (
-                                  <>
-                                    <div className="no_of_wagons_cont">
-                                      <div className="no_of_wagons_wrap">
-                                      <div className="request_wagons">
-                                        <div className="request_wagons_logo">
-                                          <img
-                                            src={wagonIcon.src}
-                                            alt=""
-                                            className="request_image"
-                                          />
-                                          <ArrowUpwardIcon
-                                            className="ArrowUpwardIcon"
-                                            style={{ fontSize: "11px" }}
-                                          />
-                                        </div>
-                                        <div>
-                                          {
-                                            row.total_wagons
-                                              .requested_no_of_wagons
-                                          }
-                                        </div>
-                                        <div className="hover_req">
-                                          Wagons requested
-                                        </div>
-                                      </div>
-                                      <div className="divider_wagons"></div>
-                                      <div className="received_wagons">
-                                        <div className="request_wagons_logo">
-                                          <img
-                                            src={wagonIcon.src}
-                                            alt=""
-                                            className="request_image"
-                                          />
-                                          <ArrowDownwardIcon
-                                            className="ArrowDownwardIcon"
-                                            style={{ fontSize: "11px" }}
-                                          />
-                                        </div>
-                                        <div>
-                                          {
-                                            row.total_wagons
-                                              .received_no_of_wagons
-                                          }
-                                        </div>
-                                        <div className="hover_rece">
-                                          Wagons received
-                                        </div>
-                                      </div>
-                                    </div>
-                                    </div>
-                                  </>
-                                )}
-                                {column.id === "placement_time" &&
-                                  (row.placement_time.date !== "NA" &&
-                                  row.placement_time.time !== "NA" ? (
-                                    <>
-                                      <div style={{ fontSize: 12 }}>
-                                        {row.placement_time.date}
-                                      </div>
-                                      <div style={{ fontSize: 12 }}>
-                                        {row.placement_time.time}
-                                      </div>
-                                    </>
-                                  ) : (
-                                    "NA"
-                                  ))}
-                                {column.id === "drawn_in" &&
-                                  (row.drawn_in.date !== "NA" &&
-                                  row.drawn_in.time !== "NA" ? (
-                                    <>
-                                      <div style={{ fontSize: 12 }}>
-                                        {row.drawn_in.date}
-                                      </div>
-                                      <div style={{ fontSize: 12 }}>
-                                        {row.drawn_in.time}
-                                      </div>
-                                    </>
-                                  ) : (
-                                    "NA"
-                                  ))}
-                                {column.id === "action" && (
-                                  <div id="actionIconContaioner">
+                                ) : (
+                                  "NA"
+                                ))}
+                              {column.id === "action" && (
+                                <div id="actionIconContaioner">
+                                  <div
+                                    id="actionIcon"
+                                    onClick={(e: any) => {
+                                      clickActionBox(e, rowIndex, "", "");
+                                      setAnchorEl(
+                                        e.currentTarget as unknown as HTMLButtonElement
+                                      );
+                                    }}
+                                  >
+                                    <MoreHorizIcon style={{ color: "white" }} />
+                                  </div>
+                                  <Popover
+                                    open={
+                                      showActionBox === rowIndex ? true : false
+                                    }
+                                    anchorEl={anchorEl}
+                                    onClose={handleCloseAction}
+                                    anchorOrigin={{
+                                      vertical: 35,
+                                      horizontal: -150,
+                                    }}
+                                  >
                                     <div
-                                      id="actionIcon"
-                                      onClick={(e: any) => {
-                                        clickActionBox(e, rowIndex, "", "");
-                                        setAnchorEl(
-                                          e.currentTarget as unknown as HTMLButtonElement
-                                        );
-                                      }}
-                                    >
-                                      <MoreHorizIcon
-                                        style={{ color: "white" }}
-                                      />
-                                    </div>
-                                    <Popover
-                                      open={
-                                        showActionBox === rowIndex
-                                          ? true
-                                          : false
+                                      onClick={(e) =>
+                                        uploadWagonSheet(e, row)
                                       }
-                                      anchorEl={anchorEl}
-                                      onClose={handleCloseAction}
-                                      anchorOrigin={{
-                                        vertical: 35,
-                                        horizontal: -150,
-                                      }}
+                                      className="action-popover-wagon"
                                     >
-                                      <div
-                                        onClick={(e) =>
-                                          uploadWagonSheet(e, row)
-                                        }
-                                        className="action-popover-wagon"
-                                      >
-                                        {text("uploadWagonTallySheet")}
-                                      </div>
-                                      <div
-                                        className="action-popover-wagon"
-                                        onClick={(e) => {
-                                          markPlacementTime(e, row);
-                                        }}
-                                      >
-                                        {text("markPlacemantTime")}
-                                      </div>
-                                      <div
-                                        className="action-popover-wagon"
-                                        onClick={(e) => {
-                                          drawnInTime(e, row);
-                                        }}
-                                      >
-                                        {text("drawnInTime")}
-                                      </div>
-                                      {/* <div className="action-popover-wagon" onClick={(e)=>{uploadRakeSheet(e, row)}} >
+                                      {text('uploadWagonTallySheet')}
+                                    </div>
+                                    <div className="action-popover-wagon" onClick={(e)=>{markPlacementTime(e, row)}} >
+                                      {text('markPlacemantTime')}
+                                    </div>
+                                    <div className="action-popover-wagon" onClick={(e) => {drawnInTime(e, row)}} >
+                                      {text('drawnInTime')}
+                                    </div>
+                                    <div className="action-popover-wagon" onClick={(e)=>{uploadRakeSheet(e, row)}} >
                                       {text('rakeHandlingSheet')}
-                                    </div> */}
-                                      <div
-                                        className="action-popover-wagon"
-                                        onClick={(e) => {
-                                          assignPlantToWagon(e, row);
-                                        }}
-                                      >
-                                        {text("assignPlanttoWagon")}
-                                      </div>
-                                    </Popover>
-                                  </div>
-                                )}
-                              </TableCell>
-                            );
-                          })}
-                        </TableRow>
-                      );
-                    }
-                  )}
+                                    </div>
+                                    <div className="action-popover-wagon" onClick={(e)=>{assignPlantToWagon(e, row)}}>
+                                      {text('assignPlanttoWagon')}
+                                    </div>
+                                  </Popover>
+                                </div>
+                              )}
+                            </TableCell>
+                          );
+                        })}
+                      </TableRow>
+                    );
+                  })}
                 </TableBody>
               </Table>
             </TableContainer>
