@@ -12,7 +12,12 @@ import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { renderTimeViewClock } from "@mui/x-date-pickers/timeViewRenderers";
 import "./actionComponents.css";
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded";
-
+import Image from "next/image";
+import BOST from "@/assets/BOST Final 1.png";
+import BFNV from "@/assets/BFNV final 1.png";
+import BOBRN from "@/assets/BOBRN final 1.png";
+import BRNA from "@/assets/BRNA 1.png";
+import BRN229 from "@/assets/BRN 23.png";
 
 export const MarkPlacement = ({
   isClose,
@@ -290,12 +295,10 @@ export const MarkPlacement = ({
     </div>
   );
 };
+
 export const AssignToMill = ({
   isClose,
-  //   wagonsData,
-  //   plants,
   shipmentForWagonSheet,
-  //   wagonDetails,
   getWagonDetails,
 }: any) => {
   const showMessage = useSnackbar();
@@ -305,16 +308,18 @@ export const AssignToMill = ({
   const [plants, setPlants] = useState<any>([]);
   const [SelectedPlant, setSelectedPlant] = useState<any>({});
 
-  const wagonDetails = async() =>{
+  const wagonDetails = async () => {
     try {
-      const response = await httpsGet(`get_wagon_details_by_shipment?id=${shipmentForWagonSheet.id}`)
-      console.log(response)
+      const response = await httpsGet(
+        `get_wagon_details_by_shipment?id=${shipmentForWagonSheet.id}`
+      );
+      console.log(response);
       setOriginalWagonDetails(response.wagonData);
       setPlants(response.plants);
     } catch (error) {
       console.log(error);
     }
-  }
+  };
 
   const calculateMaxHeight = (numberOfWagons: number) => {
     const wagonHeight = 50;
@@ -340,7 +345,6 @@ export const AssignToMill = ({
       );
       return;
     }
-
     setWagonsNewDate((prevWagons: any) => {
       let newWagons = [...prevWagons];
       if (newWagons[index].plant_assigned) {
@@ -364,15 +368,19 @@ export const AssignToMill = ({
             wagons: [],
             plant: plantId,
           };
-          // if (item.plant_assigned?.short_code) {
-          //     plantEntry.plant_code = item.plant_assigned.short_code;
-          // }
+          if (item.plant_assigned) {
+            plantEntry.plant_code =
+              item?.plant_assigned?.location?.reference ||
+              item?.plant_code ||
+              "NA";
+          }
           acc.push(plantEntry);
         }
         plantEntry.wagons.push(item._id);
       }
       return acc;
     }, []);
+
     payload = {
       shipment: shipmentForWagonSheet.id,
       assigned_data: assignedData,
@@ -382,6 +390,7 @@ export const AssignToMill = ({
       if (response.statusCode === 200) {
         wagonDetails();
         showMessage.showMessage("Assigned successfully", "success");
+        getWagonDetails();
       }
     } catch (error) {
       console.log(error);
@@ -390,12 +399,34 @@ export const AssignToMill = ({
 
   useEffect(() => {
     wagonDetails();
-  },[])
+  }, []);
 
   useEffect(() => {
     setWagonsNewDate(originalWagonDetails);
     setSelectedPlant(plants[0]);
   }, [originalWagonDetails]);
+
+  function wagonImage(wagonImage: any) {
+    switch (wagonImage) {
+      case "BOST":
+        return BOST;
+        break;
+      case "BFNV":
+        return BFNV;
+        break;
+      case "BOBRN":
+        return BOBRN;
+        break;
+      case "BRNA":
+        return BRNA;
+        break;
+      case "BRN22.9":
+        return BRN229;
+        break;
+      default:
+        return BOST;
+    }
+  }
 
   return (
     <div
@@ -458,7 +489,7 @@ export const AssignToMill = ({
         </div>
 
         <div id="scrollAreaForAssignToMill">
-          <div
+          {/* <div
             style={{
               display: "flex",
               alignItems: "center",
@@ -477,7 +508,7 @@ export const AssignToMill = ({
             <div style={{ fontSize: 12, fontWeight: "400" }}>
               {text("selectAllwagons")}
             </div>
-          </div>
+          </div> */}
 
           <div
             id="wagonContainerForAssignToMill"
@@ -519,7 +550,17 @@ export const AssignToMill = ({
                         />
                       </div>
                     )}
-                    <div className="wagonsAssignToMillImageSelector"></div>
+                    <div className="wagonsAssignToMillImageSelector">
+                      <div style={{width:40, height:17}} >
+                        <Image
+                          src={wagonImage(wagons?.wagon_type?.name).src}
+                          alt=""
+                          width={40}
+                          height={17}
+                          style={{ objectFit: "contain" }}
+                        />
+                      </div>
+                    </div>
                   </div>
                   <div id="wagonsAssignToMillTextArea">
                     <header id="wagonsAssignToMillAssignedPlantName">

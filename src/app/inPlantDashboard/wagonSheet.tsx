@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, use } from "react";
 import Header from "@/components/Header/header";
 import MobileHeader from "@/components/Header/mobileHeader";
 import { useWindowSize } from "@/utils/hooks";
@@ -35,6 +35,7 @@ import {
   AddIndentNumber,
   AssignToMill,
 } from "@/app/inPlantDashboard/actionComponents";
+import captiveRakeIndicator from "@/assets/captive_rakes.svg";
 
 interface Column {
   id: string;
@@ -45,7 +46,7 @@ const columns: readonly Column[] = [
   { id: "sno", label: "SI No.", style: "header_sno" },
   { id: "indent", label: "Indent No.", style: "header_indent" },
   { id: "edemand", label: "e-demand no.", style: "header_edemand" },
-  { id: "plant", label: "Plant", style: "header_plant" },
+  { id: "plant_codes", label: "Plant", style: "header_plant" },
   { id: "status", label: "Status", style: "header_status" },
   { id: "exp_loading", label: "Expected Loading", style: "header_exp_loading" },
   { id: "total_wagons", label: "Total Wagons", style: "header_total_wagons" },
@@ -71,8 +72,8 @@ function contructingData(shipment: any) {
       FNR: string;
       received_no_of_wagons: any;
       indent_no: string;
-
-      plant: string;
+      plant_codes: any;
+      is_captive: any;
     }) => {
       return {
         id: shipment?._id && shipment._id,
@@ -88,9 +89,6 @@ function contructingData(shipment: any) {
         },
         edemand: {
           edemand_no: shipment?.edemand_no ? shipment?.edemand_no : "NA",
-        },
-        plant: {
-          plant_name: shipment?.plant ? shipment?.plant : "NA",
         },
         exp_loading: {
           date: shipment?.expected_loading_date
@@ -125,6 +123,12 @@ function contructingData(shipment: any) {
             ? service.utcToistTime(shipment?.drawnin_time)
             : "NA",
         },
+        plant_codes: {
+          plant_codes: shipment?.plant_codes
+            ? shipment?.plant_codes.filter((item: any) => item !== "NA")
+            : "NA",
+        },
+        is_captive: shipment?.is_captive ? shipment?.is_captive : false,
       };
     }
   );
@@ -138,8 +142,9 @@ function WagonTallySheet({
   const [allWagonsList, setAllWagonsList] = useState([]);
   const [totalCount, setTotalCount] = useState(0);
   const [page, setPage] = useState(0);
+  const [indentNo, setIndentNo] = useState("");
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [payloadForWagons, setPayloadForWagons] = useState({
+  const [payloadForWagons, setPayloadForWagons] = useState<any>({
     skip: 0,
     limit: 10,
     status: ["AVE", "INPL"],
@@ -267,182 +272,38 @@ function WagonTallySheet({
     });
   }, [page, rowsPerPage]);
 
-  const result = [
-    {
-      indent: "122jhgf222",
-      edemand: 222222,
-      plant: 1111,
-      exp_loading: "29-10-2024T21:10:23:00",
-      drawn_in: "29-10-2024T21:10:23:00",
-    },
-    {
-      indent: "sdfvdfvdfsdfsfvdf",
-      edemand: 222222,
-      plant: 1111,
-      exp_loading: "29-10-2024T21:10:23:00",
-      drawn_in: "29-10-2024T21:10:23:00",
-    },
-    {
-      indent: "sdfvfdvfdvfdsvsvfvghwd hde ehfwef we f gwefwghfgw  ewf",
-      edemand: 222222,
-      plant: 1111,
-      exp_loading: "29-10-2024T21:10:23:00",
-      drawn_in: "29-10-2024T21:10:23:00",
-    },
-    {
-      indent: 122222,
-      edemand: 222222,
-      plant: 1111,
-      exp_loading: "29-10-2024T21:10:23:00",
-      drawn_in: "29-10-2024T21:10:23:00",
-    },
-    {
-      indent: 122222,
-      edemand: 222222,
-      plant: 1111,
-      exp_loading: "29-10-2024T21:10:23:00",
-      drawn_in: "29-10-2024T21:10:23:00",
-    },
-    {
-      indent: 122222,
-      edemand: 222222,
-      plant: 1111,
-      exp_loading: "29-10-2024T21:10:23:00",
-      drawn_in: "29-10-2024T21:10:23:00",
-    },
-    {
-      indent: 122222,
-      edemand: 222222,
-      plant: 1111,
-      exp_loading: "29-10-2024T21:10:23:00",
-      drawn_in: "29-10-2024T21:10:23:00",
-    },
-    {
-      indent: 122222,
-      edemand: 222222,
-      plant: 1111,
-      exp_loading: "29-10-2024T21:10:23:00",
-      drawn_in: "29-10-2024T21:10:23:00",
-    },
-
-    {
-      indent: 122222,
-      edemand: 222222,
-      plant: 1111,
-      exp_loading: "29-10-2024T21:10:23:00",
-      drawn_in: "29-10-2024T21:10:23:00",
-    },
-    {
-      indent: 122222,
-      edemand: 222222,
-      plant: 1111,
-      exp_loading: "29-10-2024T21:10:23:00",
-      drawn_in: "29-10-2024T21:10:23:00",
-    },
-    {
-      indent: 122222,
-      edemand: 222222,
-      plant: 1111,
-      exp_loading: "29-10-2024T21:10:23:00",
-      drawn_in: "29-10-2024T21:10:23:00",
-    },
-    {
-      indent: 122222,
-      edemand: 222222,
-      plant: 1111,
-      exp_loading: "29-10-2024T21:10:23:00",
-      drawn_in: "29-10-2024T21:10:23:00",
-    },
-    {
-      indent: 122222,
-      edemand: 222222,
-      plant: 1111,
-      exp_loading: "29-10-2024T21:10:23:00",
-      drawn_in: "29-10-2024T21:10:23:00",
-    },
-    {
-      indent: 122222,
-      edemand: 222222,
-      plant: 1111,
-      exp_loading: "29-10-2024T21:10:23:00",
-      drawn_in: "29-10-2024T21:10:23:00",
-    },
-    {
-      indent: 122222,
-      edemand: 222222,
-      plant: 1111,
-      exp_loading: "29-10-2024T21:10:23:00",
-      drawn_in: "29-10-2024T21:10:23:00",
-    },
-    {
-      indent: 122222,
-      edemand: 222222,
-      plant: 1111,
-      exp_loading: "29-10-2024T21:10:23:00",
-      drawn_in: "29-10-2024T21:10:23:00",
-    },
-    {
-      indent: 122222,
-      edemand: 222222,
-      plant: 1111,
-      exp_loading: "29-10-2024T21:10:23:00",
-      drawn_in: "29-10-2024T21:10:23:00",
-    },
-    {
-      indent: 122222,
-      edemand: 222222,
-      plant: 1111,
-      exp_loading: "29-10-2024T21:10:23:00",
-      drawn_in: "29-10-2024T21:10:23:00",
-    },
-    {
-      indent: 122222,
-      edemand: 222222,
-      plant: 1111,
-      exp_loading: "29-10-2024T21:10:23:00",
-      drawn_in: "29-10-2024T21:10:23:00",
-    },
-
-    {
-      indent: 122222,
-      edemand: 222222,
-      plant: 1111,
-      exp_loading: "29-10-2024T21:10:23:00",
-      drawn_in: "29-10-2024T21:10:23:00",
-    },
-
-    {
-      indent: 122222,
-      edemand: 222222,
-      plant: 1111,
-      exp_loading: "29-10-2024T21:10:23:00",
-      drawn_in: "29-10-2024T21:10:23:00",
-    },
-    {
-      indent: 122222,
-      edemand: 222222,
-      plant: 1111,
-      exp_loading: "29-10-2024T21:10:23:00",
-      drawn_in: "29-10-2024T21:10:23:00",
-    },
-
-    {
-      indent: 122222,
-      edemand: 222222,
-      plant: 1111,
-      exp_loading: "29-10-2024T21:10:23:00",
-      drawn_in: "29-10-2024T21:10:23:00",
-    },
-  ];
+  useEffect(() => {
+    if (!indentNo) {
+      setPayloadForWagons((pre: any) => {
+        const { indent_no, ...rest } = pre;
+        return rest;
+      });
+    }
+  }, [indentNo]);
 
   return (
     <div>
       <div className="wagon-wrapper">
         <div className="search-container">
-          {/* <div className="input-wrapper">
-            <Image src={searchIcon} alt="" className="icon"></Image>
-            <input className="input" placeholder="Search by Indent no." />
-          </div> */}
+          <div className="input-wrapper">
+            <Image
+              src={searchIcon}
+              alt=""
+              className="icon"
+              onClick={() => {
+                setPayloadForWagons({
+                  ...payloadForWagons,
+                  indent_no: indentNo,
+                });
+              }}
+              style={{ cursor: "pointer" }}
+            ></Image>
+            <input
+              className="input"
+              placeholder="Search by Indent no."
+              onChange={(e) => setIndentNo(e.target.value)}
+            />
+          </div>
         </div>
 
         <div
@@ -554,8 +415,25 @@ function WagonTallySheet({
                                 )}
                                 {column.id === "edemand" && (
                                   <>
-                                    <div style={{ fontSize: 12 }}>
-                                      {row.edemand.edemand_no}
+                                    <div style={{}}>
+                                      <div style={{ fontSize: 12 }}>
+                                        {row.edemand.edemand_no}
+                                      </div>
+                                      {row.is_captive && (
+                                        <div
+                                          style={{
+                                            height: 24,
+                                            // paddingLeft: 38,
+                                          }}
+                                        >
+                                          <Image
+                                            src={captiveRakeIndicator.src}
+                                            alt=""
+                                            height={24}
+                                            width={24}
+                                          />
+                                        </div>
+                                      )}
                                     </div>
                                   </>
                                 )}
@@ -584,8 +462,80 @@ function WagonTallySheet({
                                   ))}
                                 {column.id === "total_wagons" && (
                                   <>
-                                    <div style={{ fontSize: 12 }}>
-                                      {row.total_wagons.numberTotal}
+                                    <div
+                                      style={{
+                                        paddingLeft: 20,
+                                        fontSize: 12,
+                                        marginTop: -9,
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                      }}
+                                    >
+                                      <div className="no_of_wagons">
+                                        <div className="request_wagons">
+                                          <div className="request_wagons_logo">
+                                            <Image
+                                              src={wagonIcon.src}
+                                              alt=""
+                                              className="request_image"
+                                              height={11}
+                                              width={11}
+                                            />
+                                            <ArrowUpwardIcon
+                                              className="ArrowUpwardIcon"
+                                              style={{ fontSize: "11px" }}
+                                            />
+                                          </div>
+                                          <div
+                                            style={{
+                                              width: 30,
+                                              textAlign: "left",
+                                            }}
+                                          >
+                                            {
+                                              row.total_wagons
+                                                .requested_no_of_wagons
+                                            }
+                                          </div>
+                                          <div className="hover_req">
+                                            Wagons requested
+                                          </div>
+                                        </div>
+                                        <div
+                                          className="divider_wagons"
+                                          style={{ marginLeft: -10 }}
+                                        ></div>
+                                        <div className="received_wagons">
+                                          <div className="request_wagons_logo">
+                                            <Image
+                                              src={wagonIcon.src}
+                                              alt=""
+                                              className="request_image"
+                                              height={11}
+                                              width={11}
+                                            />
+                                            <ArrowDownwardIcon
+                                              className="ArrowDownwardIcon"
+                                              style={{ fontSize: "11px" }}
+                                            />
+                                          </div>
+                                          <div
+                                            style={{
+                                              textAlign: "left",
+                                              width: 30,
+                                            }}
+                                          >
+                                            {
+                                              row.total_wagons
+                                                .received_no_of_wagons
+                                            }
+                                          </div>
+                                          <div className="hover_rece">
+                                            Wagons received
+                                          </div>
+                                        </div>
+                                      </div>
                                     </div>
                                   </>
                                 )}
@@ -676,10 +626,54 @@ function WagonTallySheet({
                                           assignPlantToWagon(e, row);
                                         }}
                                       >
-                                        {text("assignPlanttoWagon")}
+                                        {text("assignWagonToPlant")}
                                       </div>
                                     </Popover>
                                   </div>
+                                )}
+                                {column.id === "plant_codes" && (
+                                  <>
+                                    <div>
+                                      {typeof row?.plant_codes?.plant_codes ===
+                                        "object" &&
+                                      row?.plant_codes?.plant_codes.length ? (
+                                        <div>
+                                          {row?.plant_codes?.plant_codes
+                                            .slice(0, 2)
+                                            .map((plant: any, index: any) => (
+                                              <div key={index}>{plant}</div>
+                                            ))}
+                                          {row?.plant_codes?.plant_codes
+                                            .length > 3 && (
+                                            <div className="more-plants">
+                                              <span style={{color:'#DFE3EB'}}>
+                                                +
+                                                {row?.plant_codes?.plant_codes
+                                                  .length - 3}{" "}
+                                                more
+                                              </span>
+                                              <div className="hidden-plants">
+                                                {row?.plant_codes?.plant_codes
+                                                  .slice(2)
+                                                  .map(
+                                                    (
+                                                      plant: any,
+                                                      index: any
+                                                    ) => (
+                                                      <div key={index}>
+                                                        {plant}
+                                                      </div>
+                                                    )
+                                                  )}
+                                              </div>
+                                            </div>
+                                          )}
+                                        </div>
+                                      ) : (
+                                        "N/A"
+                                      )}
+                                    </div>
+                                  </>
                                 )}
                               </TableCell>
                             );

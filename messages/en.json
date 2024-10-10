@@ -101,7 +101,7 @@
   "WAGONTALLYSHEET":{
     "uploadWagonTallySheet":"Upload Wagon Sheet",
     "rakeHandlingSheet":"Rake Handling Sheet",
-    "assignPlanttoWagon":"Assign Plant to Wagon",
+    "assignWagonToPlant":"Assign Wagon to Plant",
     "rakeArrivalAtStation":"Rake Arrival At Serving Station",
     "rakeArrivalAtPlant":"Rake Arrival At Plant",
     "bpRelease":"B/P Release",

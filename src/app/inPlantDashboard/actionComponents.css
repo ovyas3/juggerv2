@@ -32,6 +32,9 @@
     border: 1px solid #B7BAC3;
     background-color: #F8F9FD;
     cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 .wagonsAssigntoMillCheckedIcon{
     height: 14px;
