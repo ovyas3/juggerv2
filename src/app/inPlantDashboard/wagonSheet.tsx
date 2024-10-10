@@ -9,6 +9,9 @@ import MobileDrawer from "@/components/Drawer/mobile_drawer";
 import "./page.css";
 import Image from "next/image";
 import searchIcon from "@/assets/search_wagon.svg";
+import wagonIcon from "@/assets/captive_rakes_no_wagons.svg";
+import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
+import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import {
   Paper,
   Table,
@@ -24,11 +27,10 @@ import { httpsPost } from "@/utils/Communication";
 import service from "@/utils/timeService";
 import Popover from "@mui/material/Popover";
 import Typography from "@mui/material/Typography";
-import {UploadWagonSheet} from '@/components/Table/tableComp';
-import { useTranslations } from 'next-intl';
+import { UploadWagonSheet } from "@/components/Table/tableComp";
+import { useTranslations } from "next-intl";
 import RakeHandlingSheet from "./rakeHandlingSheet";
 import { MarkPlacement } from "@/app/inPlantDashboard/actionComponents";
-
 
 interface Column {
   id: string;
@@ -62,7 +64,7 @@ function contructingData(shipment: any) {
       placement_time: any;
       drawnin_time: any;
       FNR: string;
-      received_no_of_wagons:any;
+      received_no_of_wagons: any;
 
       indent: string;
       plant: string;
@@ -89,8 +91,12 @@ function contructingData(shipment: any) {
             : "NA",
         },
         total_wagons: {
-          numberTotal: shipment?.no_of_wagons ? shipment?.no_of_wagons : "NA",
-          received_no_of_wagons: shipment?.received_no_of_wagons ? shipment?.received_no_of_wagons : "NA",
+          requested_no_of_wagons: shipment?.no_of_wagons
+            ? shipment?.no_of_wagons
+            : "NA",
+          received_no_of_wagons: shipment?.received_no_of_wagons
+            ? shipment?.received_no_of_wagons
+            : "NA",
         },
         placement_time: {
           date: shipment?.placement_time
@@ -101,7 +107,9 @@ function contructingData(shipment: any) {
             : "NA",
         },
         drawn_in: {
-          date: shipment?.drawnin_time ? service.utcToist(shipment?.drawnin_time) : "NA",
+          date: shipment?.drawnin_time
+            ? service.utcToist(shipment?.drawnin_time)
+            : "NA",
           time: shipment?.drawnin_time
             ? service.utcToistTime(shipment?.drawnin_time)
             : "NA",
@@ -110,9 +118,12 @@ function contructingData(shipment: any) {
     }
   );
 }
-function WagonTallySheet({setShowAssignWagon, setShowWagonSheet, setShipmentForWagonSheet}:any) {
-
-  const text = useTranslations('WAGONTALLYSHEET');
+function WagonTallySheet({
+  setShowAssignWagon,
+  setShowWagonSheet,
+  setShipmentForWagonSheet,
+}: any) {
+  const text = useTranslations("WAGONTALLYSHEET");
   const [allWagonsList, setAllWagonsList] = useState([]);
   const [totalCount, setTotalCount] = useState(0);
   const [page, setPage] = useState(0);
@@ -121,15 +132,19 @@ function WagonTallySheet({setShowAssignWagon, setShowWagonSheet, setShipmentForW
     skip: 0,
     limit: 10,
   });
-  const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
+  const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(
+    null
+  );
   const openAction = Boolean(anchorEl);
   const [showActionBox, setShowActionBox] = React.useState(-1);
-  const [openUploadWagonSheetmodal, setOpenUploadWagonSheetModal] = useState(false);
+  const [openUploadWagonSheetmodal, setOpenUploadWagonSheetModal] =
+    useState(false);
   const [openRakeHandlingSheet, setOpenRakeHandlingSheet] = useState(false);
   const [uploadShipmentwagon, setuploadShipmentwagon] = useState({});
   const [rakeHandlingSheetData, setRakeHandlingSheetData] = useState({});
 
-  const [openMarkPlacementTimeModal, setOpenMarkPlacementTimeModal] = useState(false);
+  const [openMarkPlacementTimeModal, setOpenMarkPlacementTimeModal] =
+    useState(false);
   const [shipmentforPlacementTime, setShipmentforPlacementTime] = useState({});
 
   const [openDrawnInTimeModal, setOpenDrawnInTimeModal] = useState(false);
@@ -165,13 +180,13 @@ function WagonTallySheet({setShowAssignWagon, setShowWagonSheet, setShipmentForW
     setShowActionBox(-1);
     setAnchorEl(null);
     setShowWagonSheet(false);
-  }
+  };
   const drawnInTime = (event: any, row: any) => {
     setOpenDrawnInTimeModal(true);
     setShipmentforDrawnInTime(row);
     setShowActionBox(-1);
     setAnchorEl(null);
-  }
+  };
   const uploadWagonSheet = (event: any, row: any) => {
     setOpenUploadWagonSheetModal(true);
     setuploadShipmentwagon(row);
@@ -183,13 +198,13 @@ function WagonTallySheet({setShowAssignWagon, setShowWagonSheet, setShipmentForW
     setShipmentforPlacementTime(row);
     setShowActionBox(-1);
     setAnchorEl(null);
-  }
+  };
   const uploadRakeSheet = (event: any, row: any) => {
     setOpenRakeHandlingSheet(true);
     setRakeHandlingSheetData(row);
     setShowActionBox(-1);
     setAnchorEl(null);
-  }
+  };
   function handleClickAction(event: any) {
     setAnchorEl(event?.currentTarget);
   }
@@ -245,156 +260,155 @@ function WagonTallySheet({setShowAssignWagon, setShowWagonSheet, setShipmentForW
       exp_loading: "29-10-2024T21:10:23:00",
       drawn_in: "29-10-2024T21:10:23:00",
     },
-      {
-        indent: 122222,
-        edemand: 222222,
-        plant: 1111,
-        exp_loading: "29-10-2024T21:10:23:00",
-        drawn_in: "29-10-2024T21:10:23:00",
-      },
-      {
-        indent: 122222,
-        edemand: 222222,
-        plant: 1111,
-        exp_loading: "29-10-2024T21:10:23:00",
-        drawn_in: "29-10-2024T21:10:23:00",
-      },
-      {
-        indent: 122222,
-        edemand: 222222,
-        plant: 1111,
-        exp_loading: "29-10-2024T21:10:23:00",
-        drawn_in: "29-10-2024T21:10:23:00",
-      },
-      {
-        indent: 122222,
-        edemand: 222222,
-        plant: 1111,
-        exp_loading: "29-10-2024T21:10:23:00",
-        drawn_in: "29-10-2024T21:10:23:00",
-      },
-      {
-        indent: 122222,
-        edemand: 222222,
-        plant: 1111,
-        exp_loading: "29-10-2024T21:10:23:00",
-        drawn_in: "29-10-2024T21:10:23:00",
-      },
+    {
+      indent: 122222,
+      edemand: 222222,
+      plant: 1111,
+      exp_loading: "29-10-2024T21:10:23:00",
+      drawn_in: "29-10-2024T21:10:23:00",
+    },
+    {
+      indent: 122222,
+      edemand: 222222,
+      plant: 1111,
+      exp_loading: "29-10-2024T21:10:23:00",
+      drawn_in: "29-10-2024T21:10:23:00",
+    },
+    {
+      indent: 122222,
+      edemand: 222222,
+      plant: 1111,
+      exp_loading: "29-10-2024T21:10:23:00",
+      drawn_in: "29-10-2024T21:10:23:00",
+    },
+    {
+      indent: 122222,
+      edemand: 222222,
+      plant: 1111,
+      exp_loading: "29-10-2024T21:10:23:00",
+      drawn_in: "29-10-2024T21:10:23:00",
+    },
+    {
+      indent: 122222,
+      edemand: 222222,
+      plant: 1111,
+      exp_loading: "29-10-2024T21:10:23:00",
+      drawn_in: "29-10-2024T21:10:23:00",
+    },
 
-      {
-        indent: 122222,
-        edemand: 222222,
-        plant: 1111,
-        exp_loading: "29-10-2024T21:10:23:00",
-        drawn_in: "29-10-2024T21:10:23:00",
-      },
-      {
-        indent: 122222,
-        edemand: 222222,
-        plant: 1111,
-        exp_loading: "29-10-2024T21:10:23:00",
-        drawn_in: "29-10-2024T21:10:23:00",
-      },
-      {
-        indent: 122222,
-        edemand: 222222,
-        plant: 1111,
-        exp_loading: "29-10-2024T21:10:23:00",
-        drawn_in: "29-10-2024T21:10:23:00",
-      },
-      {
-        indent: 122222,
-        edemand: 222222,
-        plant: 1111,
-        exp_loading: "29-10-2024T21:10:23:00",
-        drawn_in: "29-10-2024T21:10:23:00",
-      },
-      {
-        indent: 122222,
-        edemand: 222222,
-        plant: 1111,
-        exp_loading: "29-10-2024T21:10:23:00",
-        drawn_in: "29-10-2024T21:10:23:00",
-      },
-      {
-        indent: 122222,
-        edemand: 222222,
-        plant: 1111,
-        exp_loading: "29-10-2024T21:10:23:00",
-        drawn_in: "29-10-2024T21:10:23:00",
-      },
-      {
-        indent: 122222,
-        edemand: 222222,
-        plant: 1111,
-        exp_loading: "29-10-2024T21:10:23:00",
-        drawn_in: "29-10-2024T21:10:23:00",
-      },
-      {
-        indent: 122222,
-        edemand: 222222,
-        plant: 1111,
-        exp_loading: "29-10-2024T21:10:23:00",
-        drawn_in: "29-10-2024T21:10:23:00",
-      },
-      {
-        indent: 122222,
-        edemand: 222222,
-        plant: 1111,
-        exp_loading: "29-10-2024T21:10:23:00",
-        drawn_in: "29-10-2024T21:10:23:00",
-      },
-      {
-        indent: 122222,
-        edemand: 222222,
-        plant: 1111,
-        exp_loading: "29-10-2024T21:10:23:00",
-        drawn_in: "29-10-2024T21:10:23:00",
-      },
-      {
-        indent: 122222,
-        edemand: 222222,
-        plant: 1111,
-        exp_loading: "29-10-2024T21:10:23:00",
-        drawn_in: "29-10-2024T21:10:23:00",
-      },
+    {
+      indent: 122222,
+      edemand: 222222,
+      plant: 1111,
+      exp_loading: "29-10-2024T21:10:23:00",
+      drawn_in: "29-10-2024T21:10:23:00",
+    },
+    {
+      indent: 122222,
+      edemand: 222222,
+      plant: 1111,
+      exp_loading: "29-10-2024T21:10:23:00",
+      drawn_in: "29-10-2024T21:10:23:00",
+    },
+    {
+      indent: 122222,
+      edemand: 222222,
+      plant: 1111,
+      exp_loading: "29-10-2024T21:10:23:00",
+      drawn_in: "29-10-2024T21:10:23:00",
+    },
+    {
+      indent: 122222,
+      edemand: 222222,
+      plant: 1111,
+      exp_loading: "29-10-2024T21:10:23:00",
+      drawn_in: "29-10-2024T21:10:23:00",
+    },
+    {
+      indent: 122222,
+      edemand: 222222,
+      plant: 1111,
+      exp_loading: "29-10-2024T21:10:23:00",
+      drawn_in: "29-10-2024T21:10:23:00",
+    },
+    {
+      indent: 122222,
+      edemand: 222222,
+      plant: 1111,
+      exp_loading: "29-10-2024T21:10:23:00",
+      drawn_in: "29-10-2024T21:10:23:00",
+    },
+    {
+      indent: 122222,
+      edemand: 222222,
+      plant: 1111,
+      exp_loading: "29-10-2024T21:10:23:00",
+      drawn_in: "29-10-2024T21:10:23:00",
+    },
+    {
+      indent: 122222,
+      edemand: 222222,
+      plant: 1111,
+      exp_loading: "29-10-2024T21:10:23:00",
+      drawn_in: "29-10-2024T21:10:23:00",
+    },
+    {
+      indent: 122222,
+      edemand: 222222,
+      plant: 1111,
+      exp_loading: "29-10-2024T21:10:23:00",
+      drawn_in: "29-10-2024T21:10:23:00",
+    },
+    {
+      indent: 122222,
+      edemand: 222222,
+      plant: 1111,
+      exp_loading: "29-10-2024T21:10:23:00",
+      drawn_in: "29-10-2024T21:10:23:00",
+    },
+    {
+      indent: 122222,
+      edemand: 222222,
+      plant: 1111,
+      exp_loading: "29-10-2024T21:10:23:00",
+      drawn_in: "29-10-2024T21:10:23:00",
+    },
 
-      {
-        indent: 122222,
-        edemand: 222222,
-        plant: 1111,
-        exp_loading: "29-10-2024T21:10:23:00",
-        drawn_in: "29-10-2024T21:10:23:00",
-      },
+    {
+      indent: 122222,
+      edemand: 222222,
+      plant: 1111,
+      exp_loading: "29-10-2024T21:10:23:00",
+      drawn_in: "29-10-2024T21:10:23:00",
+    },
 
-      {
-        indent: 122222,
-        edemand: 222222,
-        plant: 1111,
-        exp_loading: "29-10-2024T21:10:23:00",
-        drawn_in: "29-10-2024T21:10:23:00",
-      },
-      {
-        indent: 122222,
-        edemand: 222222,
-        plant: 1111,
-        exp_loading: "29-10-2024T21:10:23:00",
-        drawn_in: "29-10-2024T21:10:23:00",
-      },
+    {
+      indent: 122222,
+      edemand: 222222,
+      plant: 1111,
+      exp_loading: "29-10-2024T21:10:23:00",
+      drawn_in: "29-10-2024T21:10:23:00",
+    },
+    {
+      indent: 122222,
+      edemand: 222222,
+      plant: 1111,
+      exp_loading: "29-10-2024T21:10:23:00",
+      drawn_in: "29-10-2024T21:10:23:00",
+    },
 
-      {
-        indent: 122222,
-        edemand: 222222,
-        plant: 1111,
-        exp_loading: "29-10-2024T21:10:23:00",
-        drawn_in: "29-10-2024T21:10:23:00",
-      },
+    {
+      indent: 122222,
+      edemand: 222222,
+      plant: 1111,
+      exp_loading: "29-10-2024T21:10:23:00",
+      drawn_in: "29-10-2024T21:10:23:00",
+    },
   ];
 
   return (
     <div>
       <div className="wagon-wrapper">
-
         <div className="search-container">
           <div className="input-wrapper">
             <Image src={searchIcon} alt="" className="icon"></Image>
@@ -616,10 +630,33 @@ function WagonTallySheet({setShowAssignWagon, setShowWagonSheet, setShipmentForW
           </Paper>
         </div>
       </div>
-      {openUploadWagonSheetmodal && <UploadWagonSheet isClose={setOpenUploadWagonSheetModal} shipment={uploadShipmentwagon}  />}
-      {openRakeHandlingSheet && <RakeHandlingSheet isClose={setOpenRakeHandlingSheet} shipment={rakeHandlingSheetData}  />}
-      {openMarkPlacementTimeModal && <MarkPlacement isClose={setOpenMarkPlacementTimeModal} shipment={shipmentforPlacementTime} getWagonDetails={getWagonDetails} />}
-      {openDrawnInTimeModal && <MarkPlacement isClose={setOpenDrawnInTimeModal} shipment={shipmentforDrawnInTime} different='drawnInTimeFromInplantDashboard' getWagonDetails={getWagonDetails} />}
+      {openUploadWagonSheetmodal && (
+        <UploadWagonSheet
+          isClose={setOpenUploadWagonSheetModal}
+          shipment={uploadShipmentwagon}
+        />
+      )}
+      {openRakeHandlingSheet && (
+        <RakeHandlingSheet
+          isClose={setOpenRakeHandlingSheet}
+          shipment={rakeHandlingSheetData}
+        />
+      )}
+      {openMarkPlacementTimeModal && (
+        <MarkPlacement
+          isClose={setOpenMarkPlacementTimeModal}
+          shipment={shipmentforPlacementTime}
+          getWagonDetails={getWagonDetails}
+        />
+      )}
+      {openDrawnInTimeModal && (
+        <MarkPlacement
+          isClose={setOpenDrawnInTimeModal}
+          shipment={shipmentforDrawnInTime}
+          different="drawnInTimeFromInplantDashboard"
+          getWagonDetails={getWagonDetails}
+        />
+      )}
     </div>
   );
 }

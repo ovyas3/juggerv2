@@ -68,6 +68,9 @@ const httpsPost = async (path: string, data: any, type = 0, isFile = false, rout
       .then((res) => res)
       .catch((err) => {
         if (axios.isAxiosError(err) && err.response?.status === 401) {
+          if(url.includes('shipper_user/signin')) {
+            return err.response.data 
+          }
           const router = useRouter()
           const fromRms = Boolean(localStorage.getItem('isRmsLogin'))
           deleteAllCache();
@@ -76,6 +79,7 @@ const httpsPost = async (path: string, data: any, type = 0, isFile = false, rout
           } else {
             router.push('https://etms.instavans.com/login');
           }
+
         }
         return err.response.data 
       });
