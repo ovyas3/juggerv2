@@ -1186,7 +1186,7 @@ export const HandlingEdemand = ({ isClose, isOpen, getAllShipment, shipment }: a
       
     );
 };
-export const UploadWagonSheet = ({isClose, shipment, setOpenUploadFile, ordersUpload='wagonSheet'}:any) => {
+export const UploadWagonSheet = ({getWagonDetails,isClose, shipment, setOpenUploadFile, ordersUpload='wagonSheet'}:any) => {
 
     const t = useTranslations('ORDERS');
     const [fileName, setFileName] = useState('Drag and Drop to upload the file here');
@@ -1248,6 +1248,7 @@ export const UploadWagonSheet = ({isClose, shipment, setOpenUploadFile, ordersUp
                     setFileName('Drag and Drop to upload the file here');
                     setUploadFile({});
                     showMessage('File Uploaded Succcessfully', 'success');
+                    getWagonDetails();
                 }
                 else showMessage(response.message, 'error')
             }).catch((err)=> {
@@ -1280,7 +1281,7 @@ export const UploadWagonSheet = ({isClose, shipment, setOpenUploadFile, ordersUp
             <div className="status_edemand_fnr" style={{display:ordersUpload === 'ordersUpload' ? 'none' : 'flex' }}>
                 <div>
                     <header style={{fontSize:12, color:'#42454E', marginBottom:8}}>{t('status')}</header>
-                    <text style={{fontSize:16, color:"#42454E", fontWeight:600}}>{shipment?.status?.name || shipment?.status}</text>
+                    <text style={{fontSize:16, color:"#42454E", fontWeight:600}}>{shipment?.status?.name || shipment?.status?.statusLabel}</text>
                 </div>
                 <div>
                     <header style={{fontSize:12, color:'#42454E', marginBottom:8}}>{t('FNRno')}</header>

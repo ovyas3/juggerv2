@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, use } from "react";
 import Header from "@/components/Header/header";
 import MobileHeader from "@/components/Header/mobileHeader";
 import { useWindowSize } from "@/utils/hooks";
@@ -30,7 +30,12 @@ import Typography from "@mui/material/Typography";
 import { UploadWagonSheet } from "@/components/Table/tableComp";
 import { useTranslations } from "next-intl";
 import RakeHandlingSheet from "./rakeHandlingSheet";
-import { MarkPlacement } from "@/app/inPlantDashboard/actionComponents";
+import {
+  MarkPlacement,
+  AddIndentNumber,
+  AssignToMill,
+} from "@/app/inPlantDashboard/actionComponents";
+import captiveRakeIndicator from "@/assets/captive_rakes.svg";
 
 interface Column {
   id: string;
@@ -41,7 +46,8 @@ const columns: readonly Column[] = [
   { id: "sno", label: "SI No.", style: "header_sno" },
   { id: "indent", label: "Indent No.", style: "header_indent" },
   { id: "edemand", label: "e-demand no.", style: "header_edemand" },
-  { id: "plant", label: "Plant", style: "header_plant" },
+  { id: "plant_codes", label: "Plant", style: "header_plant" },
+  { id: "status", label: "Status", style: "header_status" },
   { id: "exp_loading", label: "Expected Loading", style: "header_exp_loading" },
   { id: "total_wagons", label: "Total Wagons", style: "header_total_wagons" },
   {
@@ -65,22 +71,24 @@ function contructingData(shipment: any) {
       drawnin_time: any;
       FNR: string;
       received_no_of_wagons: any;
-
-      indent: string;
-      plant: string;
+      indent_no: string;
+      plant_codes: any;
+      is_captive: any;
     }) => {
       return {
         id: shipment?._id && shipment._id,
-        status: shipment?.status ? shipment?.status : "NA",
+        status: {
+          raw: shipment?.status ? shipment?.status : "NA",
+          statusLabel: shipment?.status
+            ? getStatusLabel(shipment?.status)
+            : "NA",
+        },
         fnr: shipment?.FNR ? shipment?.FNR : "NA",
         indent: {
-          indent_no: shipment?.indent ? shipment?.indent : "NA",
+          indent_no: shipment?.indent_no ? shipment?.indent_no : "NA",
         },
         edemand: {
           edemand_no: shipment?.edemand_no ? shipment?.edemand_no : "NA",
-        },
-        plant: {
-          plant_name: shipment?.plant ? shipment?.plant : "NA",
         },
         exp_loading: {
           date: shipment?.expected_loading_date
@@ -91,6 +99,7 @@ function contructingData(shipment: any) {
             : "NA",
         },
         total_wagons: {
+          numberTotal: shipment?.no_of_wagons ? shipment?.no_of_wagons : "NA",
           requested_no_of_wagons: shipment?.no_of_wagons
             ? shipment?.no_of_wagons
             : "NA",
@@ -114,6 +123,12 @@ function contructingData(shipment: any) {
             ? service.utcToistTime(shipment?.drawnin_time)
             : "NA",
         },
+        plant_codes: {
+          plant_codes: shipment?.plant_codes
+            ? shipment?.plant_codes.filter((item: any) => item !== "NA")
+            : "NA",
+        },
+        is_captive: shipment?.is_captive ? shipment?.is_captive : false,
       };
     }
   );
@@ -127,10 +142,12 @@ function WagonTallySheet({
   const [allWagonsList, setAllWagonsList] = useState([]);
   const [totalCount, setTotalCount] = useState(0);
   const [page, setPage] = useState(0);
+  const [indentNo, setIndentNo] = useState("");
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [payloadForWagons, setPayloadForWagons] = useState({
+  const [payloadForWagons, setPayloadForWagons] = useState<any>({
     skip: 0,
     limit: 10,
+    status: ["AVE", "INPL"],
   });
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(
     null
@@ -149,6 +166,14 @@ function WagonTallySheet({
 
   const [openDrawnInTimeModal, setOpenDrawnInTimeModal] = useState(false);
   const [shipmentforDrawnInTime, setShipmentforDrawnInTime] = useState({});
+
+  const [openAddIndentModal, setOpenAddIndentModal] = useState(false);
+  const [shipmentforAddIndent, setShipmentforAddIndent] = useState({});
+
+  const [openAssignWagonToplantModal, setOpenAssignWagonToplantModal] =
+    useState(false);
+  const [shipmentforAssignWagonToplant, setShipmentforAssignWagonToplant] =
+    useState({});
 
   // api calling
   async function getWagonDetails() {
@@ -175,11 +200,14 @@ function WagonTallySheet({
     setShowActionBox((prevIndex) => (prevIndex === index ? -1 : index));
   }
   const assignPlantToWagon = (event: any, row: any) => {
-    setShowAssignWagon(true);
-    setShipmentForWagonSheet(row);
+    // setShowAssignWagon(true);
+    // setShipmentForWagonSheet(row);
+    setOpenAssignWagonToplantModal(true);
+    setShipmentforAssignWagonToplant(row);
     setShowActionBox(-1);
     setAnchorEl(null);
-    setShowWagonSheet(false);
+    // setShowWagonSheet(false);
+    // setShowWagonSheet(false);
   };
   const drawnInTime = (event: any, row: any) => {
     setOpenDrawnInTimeModal(true);
@@ -202,6 +230,12 @@ function WagonTallySheet({
   const uploadRakeSheet = (event: any, row: any) => {
     setOpenRakeHandlingSheet(true);
     setRakeHandlingSheetData(row);
+    setShowActionBox(-1);
+    setAnchorEl(null);
+  };
+  const AddIndentNumberOnWagonSheet = (event: any, row: any) => {
+    setOpenAddIndentModal(true);
+    setShipmentforAddIndent(row);
     setShowActionBox(-1);
     setAnchorEl(null);
   };
@@ -238,181 +272,37 @@ function WagonTallySheet({
     });
   }, [page, rowsPerPage]);
 
-  const result = [
-    {
-      indent: "122jhgf222",
-      edemand: 222222,
-      plant: 1111,
-      exp_loading: "29-10-2024T21:10:23:00",
-      drawn_in: "29-10-2024T21:10:23:00",
-    },
-    {
-      indent: "sdfvdfvdfsdfsfvdf",
-      edemand: 222222,
-      plant: 1111,
-      exp_loading: "29-10-2024T21:10:23:00",
-      drawn_in: "29-10-2024T21:10:23:00",
-    },
-    {
-      indent: "sdfvfdvfdvfdsvsvfvghwd hde ehfwef we f gwefwghfgw  ewf",
-      edemand: 222222,
-      plant: 1111,
-      exp_loading: "29-10-2024T21:10:23:00",
-      drawn_in: "29-10-2024T21:10:23:00",
-    },
-    {
-      indent: 122222,
-      edemand: 222222,
-      plant: 1111,
-      exp_loading: "29-10-2024T21:10:23:00",
-      drawn_in: "29-10-2024T21:10:23:00",
-    },
-    {
-      indent: 122222,
-      edemand: 222222,
-      plant: 1111,
-      exp_loading: "29-10-2024T21:10:23:00",
-      drawn_in: "29-10-2024T21:10:23:00",
-    },
-    {
-      indent: 122222,
-      edemand: 222222,
-      plant: 1111,
-      exp_loading: "29-10-2024T21:10:23:00",
-      drawn_in: "29-10-2024T21:10:23:00",
-    },
-    {
-      indent: 122222,
-      edemand: 222222,
-      plant: 1111,
-      exp_loading: "29-10-2024T21:10:23:00",
-      drawn_in: "29-10-2024T21:10:23:00",
-    },
-    {
-      indent: 122222,
-      edemand: 222222,
-      plant: 1111,
-      exp_loading: "29-10-2024T21:10:23:00",
-      drawn_in: "29-10-2024T21:10:23:00",
-    },
-
-    {
-      indent: 122222,
-      edemand: 222222,
-      plant: 1111,
-      exp_loading: "29-10-2024T21:10:23:00",
-      drawn_in: "29-10-2024T21:10:23:00",
-    },
-    {
-      indent: 122222,
-      edemand: 222222,
-      plant: 1111,
-      exp_loading: "29-10-2024T21:10:23:00",
-      drawn_in: "29-10-2024T21:10:23:00",
-    },
-    {
-      indent: 122222,
-      edemand: 222222,
-      plant: 1111,
-      exp_loading: "29-10-2024T21:10:23:00",
-      drawn_in: "29-10-2024T21:10:23:00",
-    },
-    {
-      indent: 122222,
-      edemand: 222222,
-      plant: 1111,
-      exp_loading: "29-10-2024T21:10:23:00",
-      drawn_in: "29-10-2024T21:10:23:00",
-    },
-    {
-      indent: 122222,
-      edemand: 222222,
-      plant: 1111,
-      exp_loading: "29-10-2024T21:10:23:00",
-      drawn_in: "29-10-2024T21:10:23:00",
-    },
-    {
-      indent: 122222,
-      edemand: 222222,
-      plant: 1111,
-      exp_loading: "29-10-2024T21:10:23:00",
-      drawn_in: "29-10-2024T21:10:23:00",
-    },
-    {
-      indent: 122222,
-      edemand: 222222,
-      plant: 1111,
-      exp_loading: "29-10-2024T21:10:23:00",
-      drawn_in: "29-10-2024T21:10:23:00",
-    },
-    {
-      indent: 122222,
-      edemand: 222222,
-      plant: 1111,
-      exp_loading: "29-10-2024T21:10:23:00",
-      drawn_in: "29-10-2024T21:10:23:00",
-    },
-    {
-      indent: 122222,
-      edemand: 222222,
-      plant: 1111,
-      exp_loading: "29-10-2024T21:10:23:00",
-      drawn_in: "29-10-2024T21:10:23:00",
-    },
-    {
-      indent: 122222,
-      edemand: 222222,
-      plant: 1111,
-      exp_loading: "29-10-2024T21:10:23:00",
-      drawn_in: "29-10-2024T21:10:23:00",
-    },
-    {
-      indent: 122222,
-      edemand: 222222,
-      plant: 1111,
-      exp_loading: "29-10-2024T21:10:23:00",
-      drawn_in: "29-10-2024T21:10:23:00",
-    },
-
-    {
-      indent: 122222,
-      edemand: 222222,
-      plant: 1111,
-      exp_loading: "29-10-2024T21:10:23:00",
-      drawn_in: "29-10-2024T21:10:23:00",
-    },
-
-    {
-      indent: 122222,
-      edemand: 222222,
-      plant: 1111,
-      exp_loading: "29-10-2024T21:10:23:00",
-      drawn_in: "29-10-2024T21:10:23:00",
-    },
-    {
-      indent: 122222,
-      edemand: 222222,
-      plant: 1111,
-      exp_loading: "29-10-2024T21:10:23:00",
-      drawn_in: "29-10-2024T21:10:23:00",
-    },
-
-    {
-      indent: 122222,
-      edemand: 222222,
-      plant: 1111,
-      exp_loading: "29-10-2024T21:10:23:00",
-      drawn_in: "29-10-2024T21:10:23:00",
-    },
-  ];
+  useEffect(() => {
+    if (!indentNo) {
+      setPayloadForWagons((pre: any) => {
+        const { indent_no, ...rest } = pre;
+        return rest;
+      });
+    }
+  }, [indentNo]);
 
   return (
     <div>
       <div className="wagon-wrapper">
         <div className="search-container">
           <div className="input-wrapper">
-            <Image src={searchIcon} alt="" className="icon"></Image>
-            <input className="input" placeholder="Search by Indent no." />
+            <Image
+              src={searchIcon}
+              alt=""
+              className="icon"
+              onClick={() => {
+                setPayloadForWagons({
+                  ...payloadForWagons,
+                  indent_no: indentNo,
+                });
+              }}
+              style={{ cursor: "pointer" }}
+            ></Image>
+            <input
+              className="input"
+              placeholder="Search by Indent no."
+              onChange={(e) => setIndentNo(e.target.value)}
+            />
           </div>
         </div>
 
@@ -476,154 +366,322 @@ function WagonTallySheet({
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {contructingData(allWagonsList).map((row: any, rowIndex: any) => {
-                    return (
-                      <TableRow
-                        hover
-                        role="checkbox"
-                        tabIndex={-1}
-                        key={rowIndex}
-                      >
-                        {columns.map((column) => {
-                          const value = row[column.id];
-                          return (
-                            <TableCell
-                              key={column.id}
-                              sx={{
-                                textAlign: "center",
-                                paddingInline: "10px",
-                                fontSize: 12,
-                              }}
-                            >
-                              {typeof value !== "object" && value}
-                              {column.id === "sno" && (
-                                <div style={{ fontSize: 12 }}>
-                                  {rowIndex + 1 + page * rowsPerPage}.
-                                </div>
-                              )}
-                              {column.id === "indent" && (
-                                <>
-                                  <div style={{ fontSize: 12 }}>
-                                    {row.indent.indent_no}
-                                  </div>
-                                </>
-                              )}
-                              {column.id === "edemand" && (
-                                <>
-                                  <div style={{ fontSize: 12 }}>
-                                    {row.edemand.edemand_no}
-                                  </div>
-                                </>
-                              )}
-                              {column.id === "plant" && (
-                                <>
-                                  <div style={{ fontSize: 12 }}>
-                                    {row.plant.plant_name}
-                                  </div>
-                                </>
-                              )}
-                              {column.id === "exp_loading" &&
-                                (row.exp_loading.date !== "NA" &&
-                                row.exp_loading.time !== "NA" ? (
+                  {contructingData(allWagonsList).map(
+                    (row: any, rowIndex: any) => {
+                      return (
+                        <TableRow
+                          hover
+                          role="checkbox"
+                          tabIndex={-1}
+                          key={rowIndex}
+                        >
+                          {columns.map((column) => {
+                            const value = row[column.id];
+                            return (
+                              <TableCell
+                                key={column.id}
+                                sx={{
+                                  textAlign: "center",
+                                  paddingInline: "10px",
+                                  fontSize: 12,
+                                }}
+                              >
+                                {typeof value !== "object" && value}
+                                {column.id === "status" && (
                                   <>
-                                    <div style={{ fontSize: 12 }}>
-                                      {row.exp_loading.date}
-                                    </div>
-                                    <div style={{ fontSize: 12 }}>
-                                      {row.exp_loading.time === '05:30'? '23:59': row.exp_loading.time}
-                                    </div>
-                                  </>
-                                ) : (
-                                  "NA"
-                                ))}
-                              {column.id === "total_wagons" && (
-                                <>
-                                  <div style={{ fontSize: 12 }}>
-                                    {row.total_wagons.numberTotal}
-                                  </div>
-                                </>
-                              )}
-                              {column.id === "placement_time" &&
-                                (row.placement_time.date !== "NA" &&
-                                row.placement_time.time !== "NA" ? (
-                                  <>
-                                    <div style={{ fontSize: 12 }}>
-                                      {row.placement_time.date}
-                                    </div>
-                                    <div style={{ fontSize: 12 }}>
-                                      {row.placement_time.time}
-                                    </div>
-                                  </>
-                                ) : (
-                                  "NA"
-                                ))}
-                              {column.id === "drawn_in" &&
-                                (row.drawn_in.date !== "NA" &&
-                                row.drawn_in.time !== "NA" ? (
-                                  <>
-                                    <div style={{ fontSize: 12 }}>
-                                      {row.drawn_in.date}
-                                    </div>
-                                    <div style={{ fontSize: 12 }}>
-                                      {row.drawn_in.time}
-                                    </div>
-                                  </>
-                                ) : (
-                                  "NA"
-                                ))}
-                              {column.id === "action" && (
-                                <div id="actionIconContaioner">
-                                  <div
-                                    id="actionIcon"
-                                    onClick={(e: any) => {
-                                      clickActionBox(e, rowIndex, "", "");
-                                      setAnchorEl(
-                                        e.currentTarget as unknown as HTMLButtonElement
-                                      );
-                                    }}
-                                  >
-                                    <MoreHorizIcon style={{ color: "white" }} />
-                                  </div>
-                                  <Popover
-                                    open={
-                                      showActionBox === rowIndex ? true : false
-                                    }
-                                    anchorEl={anchorEl}
-                                    onClose={handleCloseAction}
-                                    anchorOrigin={{
-                                      vertical: 35,
-                                      horizontal: -150,
-                                    }}
-                                  >
                                     <div
-                                      onClick={(e) =>
-                                        uploadWagonSheet(e, row)
-                                      }
-                                      className="action-popover-wagon"
+                                      style={{ whiteSpace: "nowrap" }}
+                                      className={`${
+                                        row.status.raw === "AVE"
+                                          ? "aveStatus"
+                                          : "inplStatus"
+                                      }`}
                                     >
-                                      {text('uploadWagonTallySheet')}
+                                      {row.status.statusLabel}
                                     </div>
-                                    <div className="action-popover-wagon" onClick={(e)=>{markPlacementTime(e, row)}} >
+                                  </>
+                                )}
+                                {column.id === "sno" && (
+                                  <div style={{ fontSize: 12 }}>
+                                    {rowIndex + 1 + page * rowsPerPage}.
+                                  </div>
+                                )}
+                                {column.id === "indent" && (
+                                  <>
+                                    <div style={{ fontSize: 12 }}>
+                                      {row.indent.indent_no}
+                                    </div>
+                                  </>
+                                )}
+                                {column.id === "edemand" && (
+                                  <>
+                                    <div style={{}}>
+                                      <div style={{ fontSize: 12 }}>
+                                        {row.edemand.edemand_no}
+                                      </div>
+                                      {row.is_captive && (
+                                        <div
+                                          style={{
+                                            height: 24,
+                                            // paddingLeft: 38,
+                                          }}
+                                        >
+                                          <Image
+                                            src={captiveRakeIndicator.src}
+                                            alt=""
+                                            height={24}
+                                            width={24}
+                                          />
+                                        </div>
+                                      )}
+                                    </div>
+                                  </>
+                                )}
+                                {column.id === "plant" && (
+                                  <>
+                                    <div style={{ fontSize: 12 }}>
+                                      {row.plant.plant_name}
+                                    </div>
+                                  </>
+                                )}
+                                {column.id === "exp_loading" &&
+                                  (row.exp_loading.date !== "NA" &&
+                                  row.exp_loading.time !== "NA" ? (
+                                    <>
+                                      <div style={{ fontSize: 12 }}>
+                                        {row.exp_loading.date}
+                                      </div>
+                                      <div style={{ fontSize: 12 }}>
+                                        {row.exp_loading.time === "05:30"
+                                          ? "23:59"
+                                          : row.exp_loading.time}
+                                      </div>
+                                    </>
+                                  ) : (
+                                    "NA"
+                                  ))}
+                                {column.id === "total_wagons" && (
+                                  <>
+                                    <div
+                                      style={{
+                                        paddingLeft: 20,
+                                        fontSize: 12,
+                                        marginTop: -9,
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                      }}
+                                    >
+                                      <div className="no_of_wagons">
+                                        <div className="request_wagons">
+                                          <div className="request_wagons_logo">
+                                            <Image
+                                              src={wagonIcon.src}
+                                              alt=""
+                                              className="request_image"
+                                              height={11}
+                                              width={11}
+                                            />
+                                            <ArrowUpwardIcon
+                                              className="ArrowUpwardIcon"
+                                              style={{ fontSize: "11px" }}
+                                            />
+                                          </div>
+                                          <div
+                                            style={{
+                                              width: 30,
+                                              textAlign: "left",
+                                            }}
+                                          >
+                                            {
+                                              row.total_wagons
+                                                .requested_no_of_wagons
+                                            }
+                                          </div>
+                                          <div className="hover_req">
+                                            Wagons requested
+                                          </div>
+                                        </div>
+                                        <div
+                                          className="divider_wagons"
+                                          style={{ marginLeft: -10 }}
+                                        ></div>
+                                        <div className="received_wagons">
+                                          <div className="request_wagons_logo">
+                                            <Image
+                                              src={wagonIcon.src}
+                                              alt=""
+                                              className="request_image"
+                                              height={11}
+                                              width={11}
+                                            />
+                                            <ArrowDownwardIcon
+                                              className="ArrowDownwardIcon"
+                                              style={{ fontSize: "11px" }}
+                                            />
+                                          </div>
+                                          <div
+                                            style={{
+                                              textAlign: "left",
+                                              width: 30,
+                                            }}
+                                          >
+                                            {
+                                              row.total_wagons
+                                                .received_no_of_wagons
+                                            }
+                                          </div>
+                                          <div className="hover_rece">
+                                            Wagons received
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </>
+                                )}
+                                {column.id === "placement_time" &&
+                                  (row.placement_time.date !== "NA" &&
+                                  row.placement_time.time !== "NA" ? (
+                                    <>
+                                      <div style={{ fontSize: 12 }}>
+                                        {row.placement_time.date}
+                                      </div>
+                                      <div style={{ fontSize: 12 }}>
+                                        {row.placement_time.time}
+                                      </div>
+                                    </>
+                                  ) : (
+                                    "NA"
+                                  ))}
+                                {column.id === "drawn_in" &&
+                                  (row.drawn_in.date !== "NA" &&
+                                  row.drawn_in.time !== "NA" ? (
+                                    <>
+                                      <div style={{ fontSize: 12 }}>
+                                        {row.drawn_in.date}
+                                      </div>
+                                      <div style={{ fontSize: 12 }}>
+                                        {row.drawn_in.time}
+                                      </div>
+                                    </>
+                                  ) : (
+                                    "NA"
+                                  ))}
+                                {column.id === "action" && (
+                                  <div id="actionIconContaioner">
+                                    <div
+                                      id="actionIcon"
+                                      onClick={(e: any) => {
+                                        clickActionBox(e, rowIndex, "", "");
+                                        setAnchorEl(
+                                          e.currentTarget as unknown as HTMLButtonElement
+                                        );
+                                      }}
+                                    >
+                                      <MoreHorizIcon
+                                        style={{ color: "white" }}
+                                      />
+                                    </div>
+                                    <Popover
+                                      open={
+                                        showActionBox === rowIndex
+                                          ? true
+                                          : false
+                                      }
+                                      anchorEl={anchorEl}
+                                      onClose={handleCloseAction}
+                                      anchorOrigin={{
+                                        vertical: 35,
+                                        horizontal: -150,
+                                      }}
+                                    >
+                                      <div
+                                        className="action-popover-wagon"
+                                        onClick={(e) => {
+                                          AddIndentNumberOnWagonSheet(e, row);
+                                        }}
+                                      >
+                                        {text("indentNumber")}
+                                      </div>
+                                      <div
+                                        onClick={(e) =>
+                                          uploadWagonSheet(e, row)
+                                        }
+                                        className="action-popover-wagon"
+                                      >
+                                        {text("uploadWagonTallySheet")}
+                                      </div>
+                                      {/* <div className="action-popover-wagon" onClick={(e)=>{markPlacementTime(e, row)}} >
                                       {text('markPlacemantTime')}
                                     </div>
                                     <div className="action-popover-wagon" onClick={(e) => {drawnInTime(e, row)}} >
                                       {text('drawnInTime')}
-                                    </div>
-                                    <div className="action-popover-wagon" onClick={(e)=>{uploadRakeSheet(e, row)}} >
+                                    </div> */}
+                                      {/* <div className="action-popover-wagon" onClick={(e)=>{uploadRakeSheet(e, row)}} >
                                       {text('rakeHandlingSheet')}
+                                    </div> */}
+                                      {/* <div
+                                        className="action-popover-wagon"
+                                        onClick={(e) => {
+                                          assignPlantToWagon(e, row);
+                                        }}
+                                      >
+                                        {text("assignWagonToPlant")}
+                                      </div> */}
+                                    </Popover>
+                                  </div>
+                                )}
+                                {column.id === "plant_codes" && (
+                                  <>
+                                    <div>
+                                      {typeof row?.plant_codes?.plant_codes ===
+                                        "object" &&
+                                      row?.plant_codes?.plant_codes.length ? (
+                                        <div>
+                                          {row?.plant_codes?.plant_codes
+                                            .slice(0, 2)
+                                            .map((plant: any, index: any) => (
+                                              <div key={index}>{plant}</div>
+                                            ))}
+                                          {row?.plant_codes?.plant_codes
+                                            .length > 3 && (
+                                            <div className="more-plants">
+                                              <span style={{color:'#DFE3EB'}}>
+                                                +
+                                                {row?.plant_codes?.plant_codes
+                                                  .length - 3}{" "}
+                                                more
+                                              </span>
+                                              <div className="hidden-plants">
+                                                {row?.plant_codes?.plant_codes
+                                                  .slice(2)
+                                                  .map(
+                                                    (
+                                                      plant: any,
+                                                      index: any
+                                                    ) => (
+                                                      <div key={index}>
+                                                        {plant}
+                                                      </div>
+                                                    )
+                                                  )}
+                                              </div>
+                                            </div>
+                                          )}
+                                        </div>
+                                      ) : (
+                                        "N/A"
+                                      )}
                                     </div>
-                                    <div className="action-popover-wagon" onClick={(e)=>{assignPlantToWagon(e, row)}}>
-                                      {text('assignPlanttoWagon')}
-                                    </div>
-                                  </Popover>
-                                </div>
-                              )}
-                            </TableCell>
-                          );
-                        })}
-                      </TableRow>
-                    );
-                  })}
+                                  </>
+                                )}
+                              </TableCell>
+                            );
+                          })}
+                        </TableRow>
+                      );
+                    }
+                  )}
                 </TableBody>
               </Table>
             </TableContainer>
@@ -634,6 +692,7 @@ function WagonTallySheet({
         <UploadWagonSheet
           isClose={setOpenUploadWagonSheetModal}
           shipment={uploadShipmentwagon}
+          getWagonDetails={getWagonDetails}
         />
       )}
       {openRakeHandlingSheet && (
@@ -657,8 +716,38 @@ function WagonTallySheet({
           getWagonDetails={getWagonDetails}
         />
       )}
+      {openAddIndentModal && (
+        <AddIndentNumber
+          isClose={setOpenAddIndentModal}
+          shipment={shipmentforAddIndent}
+          getWagonDetails={getWagonDetails}
+        />
+      )}
+      {openAssignWagonToplantModal && (
+        <AssignToMill
+          isClose={setOpenAssignWagonToplantModal}
+          getWagonDetails={getWagonDetails}
+          shipmentForWagonSheet={shipmentforAssignWagonToplant}
+        />
+      )}
     </div>
   );
 }
 
 export default WagonTallySheet;
+
+function getStatusLabel(status: string) {
+  switch (status) {
+    case "INPL":
+      return "In Plant";
+      break;
+    case "AVE":
+      return "Available Indent";
+      break;
+    case "Received":
+      return "Received";
+      break;
+    default:
+      return status;
+  }
+}

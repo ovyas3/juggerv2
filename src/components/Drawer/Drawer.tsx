@@ -169,7 +169,7 @@ function SideDrawer() {
                 >Dashboard</div>
             </div>
 
-            {/* <div
+            <div
                  onMouseEnter={()=>{ setInPlantWagonDashboard(true) }}
                  onMouseLeave={()=>{ setInPlantWagonDashboard(false) }}
                  onClick={() => handleRouting('inPlantDashboard')}
@@ -186,7 +186,7 @@ function SideDrawer() {
                     className={`${open ? 'fnr_text' : 'fnr_text_none'}`}
                     style={{ color: inPlantWagonDashboard ? 'black' : 'white' }} 
                 >In-Plant Dashboard</div>
-            </div> */}
+            </div>
             
 
         </div>

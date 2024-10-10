@@ -104,15 +104,15 @@ function WagonAssignSheet({shipmentForWagonSheet, setShowWagonSheet,setShowAssig
 }
 export default WagonAssignSheet;
 
-function wagonPic(wagon_no: number) {
-  if (wagon_no.toString().substring(0, 3) === "211") {
-    return blueWagon;
-  }
-  else if (wagon_no.toString().substring(0, 3) === "191") {
-    return BRN_wagon;
-  }
-  else if (wagon_no.toString().substring(0, 3) === "241") {
-    return BFNV_wagon;
-  }
-  return BFNS_wagon;
-}
+// function wagonPic(wagon_no: number) {
+//   if (wagon_no.toString().substring(0, 3) === "211") {
+//     return blueWagon;
+//   }
+//   else if (wagon_no.toString().substring(0, 3) === "191") {
+//     return BRN_wagon;
+//   }
+//   else if (wagon_no.toString().substring(0, 3) === "241") {
+//     return BFNV_wagon;
+//   }
+//   return BFNS_wagon;
+// }
