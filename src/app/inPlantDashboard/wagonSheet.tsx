@@ -692,6 +692,7 @@ function WagonTallySheet({
         <UploadWagonSheet
           isClose={setOpenUploadWagonSheetModal}
           shipment={uploadShipmentwagon}
+          getWagonDetails={getWagonDetails}
         />
       )}
       {openRakeHandlingSheet && (
