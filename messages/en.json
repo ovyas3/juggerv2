@@ -124,12 +124,20 @@
     "edemand":"e-Demand : ",
     "rakeNo":"Rake No : ",
     "tottalWagons":"Total Wagons : ",
-    "in-plant-Dashboard":"In-Plant Dashboard",
+    "in-plant-Dashboard":"Available Orders & Inplant Rakes",
     "markPlacemantTime":"Mark Placement Time",
     "drawnInTime":"Drawn In Time",
     "assignButton":"ASSIGN To PLANT",
     "AssignToMill":"Assign To Mill",
-    "selectAllwagons":"Select All Wagons"
+    "selectAllwagons":"Select All Wagons",
+    "status":"Status",
+    "FNRno":"FNR No.",
+    "edemandno":"e-Demand No.",
+    "indentNumber":"Add Indent Number",
+    "Cancel":"Cancel",
+    "update":"Update",
+    "IndentNo":"Indent No."
+
   }
 }
 

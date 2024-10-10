@@ -14,7 +14,6 @@ import "./actionComponents.css";
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded";
 
 
-
 export const MarkPlacement = ({
   isClose,
   shipment,
@@ -291,15 +290,36 @@ export const MarkPlacement = ({
     </div>
   );
 };
-export const AssignToMill = ({ isClose, wagonsData, plants, shipmentForWagonSheet, wagonDetails }: any) => {
+export const AssignToMill = ({
+  isClose,
+  //   wagonsData,
+  //   plants,
+  shipmentForWagonSheet,
+  //   wagonDetails,
+  getWagonDetails,
+}: any) => {
+  const showMessage = useSnackbar();
   const text = useTranslations("WAGONTALLYSHEET");
+  const [originalWagonDetails, setOriginalWagonDetails] = useState<any>([]);
   const [wagonsNewDate, setWagonsNewDate] = useState<any>([]);
+  const [plants, setPlants] = useState<any>([]);
   const [SelectedPlant, setSelectedPlant] = useState<any>({});
+
+  const wagonDetails = async() =>{
+    try {
+      const response = await httpsGet(`get_wagon_details_by_shipment?id=${shipmentForWagonSheet.id}`)
+      console.log(response)
+      setOriginalWagonDetails(response.wagonData);
+      setPlants(response.plants);
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   const calculateMaxHeight = (numberOfWagons: number) => {
     const wagonHeight = 50;
     const gap = 8;
-    const maxHeight = (numberOfWagons / 3) * (wagonHeight + gap);
+    const maxHeight = (numberOfWagons / 4) * (wagonHeight + gap);
     return maxHeight;
   };
 
@@ -308,7 +328,18 @@ export const AssignToMill = ({ isClose, wagonsData, plants, shipmentForWagonShee
     wagons: any,
     index: number
   ) => {
-    console.log(wagons, index);
+    if (
+      wagons.plant_assigned &&
+      wagons.plant_assigned._id !== SelectedPlant._id
+    ) {
+      showMessage.showMessage(
+        `Wagon already assigned to ${
+          wagons?.plant_assigned?.name || "different plant"
+        }`,
+        "error"
+      );
+      return;
+    }
 
     setWagonsNewDate((prevWagons: any) => {
       let newWagons = [...prevWagons];
@@ -316,37 +347,55 @@ export const AssignToMill = ({ isClose, wagonsData, plants, shipmentForWagonShee
         const { plant_assigned, ...rest } = newWagons[index];
         newWagons[index] = rest;
       } else {
-        newWagons[index].plant_assigned = SelectedPlant._id;
+        newWagons[index].plant_assigned = SelectedPlant;
       }
       return newWagons;
     });
   };
 
   const submitAssignToMill = async () => {
-    const filteredWagons = wagonsNewDate.filter((wagon:any) => wagon.plant_assigned);
-    const payload = {
-      wagons: filteredWagons.map((wagon:any) => wagon._id),
-      shipment: shipmentForWagonSheet.id,
-      plant: SelectedPlant._id,
-    };
-    console.log(payload);
-    try {
-        const response = await httpsPost('assign_wagon_to_plant', payload);
-        if(response.statusCode === 200) {
-            wagonDetails();
-            isClose(false);
+    let payload = {};
+    const assignedData = wagonsNewDate.reduce((acc: any, item: any) => {
+      const plantId = item.plant_assigned?._id;
+      if (plantId) {
+        let plantEntry = acc.find((entry: any) => entry.plant === plantId);
+        if (!plantEntry) {
+          plantEntry = {
+            wagons: [],
+            plant: plantId,
+          };
+          // if (item.plant_assigned?.short_code) {
+          //     plantEntry.plant_code = item.plant_assigned.short_code;
+          // }
+          acc.push(plantEntry);
         }
+        plantEntry.wagons.push(item._id);
+      }
+      return acc;
+    }, []);
+    payload = {
+      shipment: shipmentForWagonSheet.id,
+      assigned_data: assignedData,
+    };
+    try {
+      const response = await httpsPost("assign_wagon_to_plant", payload);
+      if (response.statusCode === 200) {
+        wagonDetails();
+        showMessage.showMessage("Assigned successfully", "success");
+      }
     } catch (error) {
-        console.log(error);
+      console.log(error);
     }
   };
 
   useEffect(() => {
-    setWagonsNewDate(wagonsData);
-    setSelectedPlant(plants[0]);
-  }, []);
+    wagonDetails();
+  },[])
 
-  console.log(wagonsNewDate)
+  useEffect(() => {
+    setWagonsNewDate(originalWagonDetails);
+    setSelectedPlant(plants[0]);
+  }, [originalWagonDetails]);
 
   return (
     <div
@@ -381,17 +430,49 @@ export const AssignToMill = ({ isClose, wagonsData, plants, shipmentForWagonShee
         }}
       >
         <header id="headerForAssignToMill">{text("AssignToMill")}</header>
+        <div className="status_edemand_fnr" style={{ marginBottom: 16 }}>
+          <div>
+            <header style={{ fontSize: 12, color: "#42454E", marginBottom: 8 }}>
+              {text("status")}
+            </header>
+            <text style={{ fontSize: 16, color: "#42454E", fontWeight: 600 }}>
+              {shipmentForWagonSheet?.status.statusLabel}
+            </text>
+          </div>
+          <div>
+            <header style={{ fontSize: 12, color: "#42454E", marginBottom: 8 }}>
+              {text("FNRno")}
+            </header>
+            <text style={{ fontSize: 16, color: "#42454E", fontWeight: 600 }}>
+              {shipmentForWagonSheet?.fnr}
+            </text>
+          </div>
+          <div>
+            <header style={{ fontSize: 12, color: "#42454E", marginBottom: 8 }}>
+              {text("edemandno")}
+            </header>
+            <text style={{ fontSize: 16, color: "#42454E", fontWeight: 600 }}>
+              {shipmentForWagonSheet?.edemand?.edemand_no}
+            </text>
+          </div>
+        </div>
+
         <div id="scrollAreaForAssignToMill">
           <div
             style={{
               display: "flex",
               alignItems: "center",
               gap: 4,
-              marginBottom: 16,
+              marginBottom: 4,
             }}
           >
             <div>
-              <input type="radio" style={{ marginTop: 5 }} checked={true} />
+              <input
+                type="radio"
+                style={{ marginTop: 5 }}
+                checked={true}
+                disabled
+              />
             </div>
             <div style={{ fontSize: 12, fontWeight: "400" }}>
               {text("selectAllwagons")}
@@ -413,7 +494,19 @@ export const AssignToMill = ({ isClose, wagonsData, plants, shipmentForWagonShee
                     }}
                   >
                     {wagons?.plant_assigned && (
-                      <div className="wagonsAssigntoMillCheckedIcon">
+                      <div
+                        className="wagonsAssigntoMillCheckedIcon"
+                        style={{
+                          backgroundColor:
+                            wagons?.plant_assigned?._id === SelectedPlant?._id
+                              ? "black"
+                              : "#D2D2D2",
+                          cursor:
+                            wagons?.plant_assigned?._id !== SelectedPlant?._id
+                              ? "not-allowed"
+                              : "pointer",
+                        }}
+                      >
                         <CheckRoundedIcon
                           style={{
                             color: "white",
@@ -429,11 +522,14 @@ export const AssignToMill = ({ isClose, wagonsData, plants, shipmentForWagonShee
                     <div className="wagonsAssignToMillImageSelector"></div>
                   </div>
                   <div id="wagonsAssignToMillTextArea">
+                    <header id="wagonsAssignToMillAssignedPlantName">
+                      {wagons?.plant_assigned?.name || ""}
+                    </header>
                     <header id="wagonsAssignToMillNumber">
                       {wagons?.w_no || "XXXXXXX"}
                     </header>
                     <header id="wagonsAssignToMilltype">
-                      {wagons?.type || "XXXXXXX"}
+                      {wagons?.wagon_type?.name || "XXXXXXX"}
                     </header>
                   </div>
                 </div>
@@ -480,6 +576,8 @@ export const AssignToMill = ({ isClose, wagonsData, plants, shipmentForWagonShee
           </div>
         </div>
 
+        <div id="dividerForAssignToMill"></div>
+
         <div className="buttonContaioner">
           <Button
             className="buttonMarkPlacement"
@@ -515,6 +613,184 @@ export const AssignToMill = ({ isClose, wagonsData, plants, shipmentForWagonShee
             }}
           >
             Assign
+          </Button>
+        </div>
+
+        <div className="closeContaioner">
+          <CloseIcon
+            onClick={(e) => {
+              e.stopPropagation();
+              isClose(false);
+            }}
+          />
+        </div>
+      </div>
+    </div>
+  );
+};
+export const AddIndentNumber = ({
+  isClose,
+  shipment,
+  different = "markplacement",
+  getWagonDetails,
+}: any) => {
+  const text = useTranslations("WAGONTALLYSHEET");
+  const [indentNumber, setIndentNumber] = useState<null | string>(null);
+  const showMessage = useSnackbar();
+
+  async function updateIndentNumber() {
+    if (!indentNumber) {
+      showMessage.showMessage("Please enter indent number", "error");
+      return;
+    }
+    const payload = {
+      id: shipment?.id,
+      indent_no: indentNumber,
+    };
+
+    try {
+      const response = await httpsPost("rake_shipment/add_indent_no", payload);
+      if (response?.statusCode === 200) {
+        getWagonDetails();
+        isClose(false);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  return (
+    <div
+      style={{
+        width: "100vw",
+        height: "100vh",
+        position: "fixed",
+        top: 0,
+        left: 0,
+        zIndex: 300,
+        backgroundColor: "rgba(0, 0, 0, 0.5)",
+      }}
+      onClick={(e) => {
+        e.stopPropagation();
+        isClose(false);
+      }}
+    >
+      <div
+        style={{
+          width: 800,
+          height: 500,
+          backgroundColor: "white",
+          position: "relative",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%,-50%)",
+          borderRadius: 20,
+          padding: 25,
+        }}
+        onClick={(e) => {
+          e.stopPropagation();
+        }}
+      >
+        <div style={{ display: "flex", justifyContent: "space-between" }}>
+          <header style={{ fontSize: 20, color: "#131722", fontWeight: 600 }}>
+            {text("indentNumber")}
+          </header>
+        </div>
+
+        <div className="status_edemand_fnr" style={{ marginBottom: 16 }}>
+          <div>
+            <header style={{ fontSize: 12, color: "#42454E", marginBottom: 8 }}>
+              {text("status")}
+            </header>
+            <text style={{ fontSize: 16, color: "#42454E", fontWeight: 600 }}>
+              {shipment?.status.statusLabel}
+            </text>
+          </div>
+          <div>
+            <header style={{ fontSize: 12, color: "#42454E", marginBottom: 8 }}>
+              {text("FNRno")}
+            </header>
+            <text style={{ fontSize: 16, color: "#42454E", fontWeight: 600 }}>
+              {shipment?.fnr}
+            </text>
+          </div>
+          <div>
+            <header style={{ fontSize: 12, color: "#42454E", marginBottom: 8 }}>
+              {text("edemandno")}
+            </header>
+            <text style={{ fontSize: 16, color: "#42454E", fontWeight: 600 }}>
+              {shipment?.edemand?.edemand_no}
+            </text>
+          </div>
+        </div>
+
+        <div style={{ marginTop: 24 }}>
+          <header style={{ marginBottom: 8, fontSize: 12, color: "#42454E" }}>
+            {text("IndentNo")}
+          </header>
+          <div
+            style={{
+              border: "1px solid #E9E9EB",
+              borderRadius: 6,
+              height: 40.12,
+              display: "flex",
+              alignItems: "center",
+              paddingLeft: 12,
+            }}
+          >
+            <input
+              onChange={(e) => {
+                setIndentNumber(e.target.value);
+              }}
+              type="text"
+              placeholder="Enter Indent No."
+              style={{
+                fontWeight: 600,
+                fontSize: 14,
+                color: "#42454E",
+                border: "none",
+                outline: "none",
+                width: "100%",
+              }}
+            />
+          </div>
+        </div>
+
+        <div className="buttonContaioner">
+          <Button
+            className="buttonMarkPlacement"
+            onClick={(e) => {
+              e.stopPropagation();
+              isClose(false);
+            }}
+            style={{
+              color: "#2862FF",
+              border: "1px solid #2862FF",
+              width: 110,
+              cursor: "pointer",
+              fontWeight: "bold",
+              transition: "all 0.5s ease-in-out",
+            }}
+          >
+            {text("Cancel")}
+          </Button>
+          <Button
+            className="buttonMarkPlacement"
+            onClick={(e) => {
+              e.stopPropagation();
+              updateIndentNumber();
+            }}
+            style={{
+              color: "white",
+              backgroundColor: "#2862FF",
+              width: 110,
+              border: "1px solid #2862FF",
+              cursor: "pointer",
+              fontWeight: "bold",
+              transition: "all 0.5s ease-in-out",
+            }}
+          >
+            {text("update")}
           </Button>
         </div>
 

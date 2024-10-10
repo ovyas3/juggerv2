@@ -45,7 +45,6 @@
   gap: 16px;
   padding-left: 16px;
 }
-
 .icon {
   height: 24px;
   width: 24px;
@@ -73,6 +72,25 @@
 }
 .action-popover-wagon:hover {
   background-color: rgb(233, 229, 229);
+}
+.aveStatus{
+  background-color: #E6EAFF !important;
+  color: #536AFE !important;
+  height: 28px;
+  padding-inline: 8px;
+  border-radius: 4px;
+  align-content: center;
+}
+.inplStatus{
+  background-color: #F4FCFC !important;
+  color: #174D68 !important;
+  height: 28px;
+  padding-inline: 8px;
+  border-radius: 4px;
+  align-content: center;
+}
+.header_drawnin{
+  min-width: 100px
 }
 
 /* ------------ Rake Handling Sheet ------------ */

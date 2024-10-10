@@ -1280,7 +1280,7 @@ export const UploadWagonSheet = ({isClose, shipment, setOpenUploadFile, ordersUp
             <div className="status_edemand_fnr" style={{display:ordersUpload === 'ordersUpload' ? 'none' : 'flex' }}>
                 <div>
                     <header style={{fontSize:12, color:'#42454E', marginBottom:8}}>{t('status')}</header>
-                    <text style={{fontSize:16, color:"#42454E", fontWeight:600}}>{shipment?.status?.name || shipment?.status}</text>
+                    <text style={{fontSize:16, color:"#42454E", fontWeight:600}}>{shipment?.status?.name || shipment?.status?.statusLabel}</text>
                 </div>
                 <div>
                     <header style={{fontSize:12, color:'#42454E', marginBottom:8}}>{t('FNRno')}</header>
