@@ -64,6 +64,7 @@ const RRModal: React.FC<PopupProps> = ({ isOpen, isClose, rrNumbers, isRRDoc }) 
         consigneeName: data && data.consignee && data.consignee.name ? data.consignee.name : 'N/A',
         consigneeAddress: data && data.consignee && data.consignee.address ? data.consignee.address : 'N/A',
         GST: data && data.other_charges && data.other_charges.GST ? data.other_charges.GST.toLocaleString('en-IN') : 'N/A',
+        s3_link: data?.s3_link,
       };
   
       const tableData = data && data.wagon_details ? 
@@ -163,7 +164,9 @@ const RRModal: React.FC<PopupProps> = ({ isOpen, isClose, rrNumbers, isRRDoc }) 
                 <div className="rrmodal-content-right-body">
                   <div className="rrmodal-content-upper-item">
                      <h4 className="rrmodal-content-upper-item-heading">RR No.</h4>
-                     <p className="rrmodal-content-upper-item-value">{ rrDetails.rrNo }</p>
+                     <p className="rrmodal-content-upper-item-value">
+                     <a href={rrDetails.s3_link} target="_blank" rel="noopener noreferrer">{rrDetails.rrNo} </a>
+                     </p>
                   </div>
                   <div className="rrmodal-content-upper-item">
                     <h4 className="rrmodal-content-upper-item-heading">RR Date</h4>
