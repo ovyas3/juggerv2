@@ -38,13 +38,6 @@ function WagonAssignSheet({
     }
   };
 
-  const calculateMaxHeight = (numberOfWagons: number) => {
-    const wagonHeight = 50;
-    const gap = 8;
-    const maxHeight = (numberOfWagons / 4) * (wagonHeight + gap);
-    return maxHeight;
-  };
-
   const assignWagonsToSelectedPlant = (
     event: any,
     wagons: any,
