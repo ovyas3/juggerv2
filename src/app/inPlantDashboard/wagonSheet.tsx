@@ -1,11 +1,5 @@
 "use client";
-
-import React, { useState, useEffect, use } from "react";
-import Header from "@/components/Header/header";
-import MobileHeader from "@/components/Header/mobileHeader";
-import { useWindowSize } from "@/utils/hooks";
-import SideDrawer from "@/components/Drawer/Drawer";
-import MobileDrawer from "@/components/Drawer/mobile_drawer";
+import React, { useState, useEffect } from "react";
 import "./page.css";
 import Image from "next/image";
 import searchIcon from "@/assets/search_wagon.svg";
@@ -26,7 +20,6 @@ import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import { httpsPost } from "@/utils/Communication";
 import service from "@/utils/timeService";
 import Popover from "@mui/material/Popover";
-import Typography from "@mui/material/Typography";
 import { UploadWagonSheet } from "@/components/Table/tableComp";
 import { useTranslations } from "next-intl";
 import RakeHandlingSheet from "./rakeHandlingSheet";
@@ -37,7 +30,6 @@ import {
 } from "@/app/inPlantDashboard/actionComponents";
 import captiveRakeIndicator from "@/assets/captive_rakes.svg";
 import SourceOutlinedIcon from "@mui/icons-material/SourceOutlined";
-import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
 
 interface Column {
   id: string;
