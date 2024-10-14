@@ -168,90 +168,19 @@ function WagonAssignSheet({
         </div>
         <div>
           <header style={{ fontSize: 12, color: "#42454E", marginBottom: 8 }}>
-            {text("rakeNo")}
-          </header>
-          <text style={{ fontSize: 16, color: "#42454E", fontWeight: 600 }}>
-            {shipmentForWagonSheet.rake?.rake_no || "XXXXXXXX"}
-          </text>
-        </div>
-        <div>
-          <header style={{ fontSize: 12, color: "#42454E", marginBottom: 8 }}>
             {text("receivedWagons")}
           </header>
           <text style={{ fontSize: 16, color: "#42454E", fontWeight: 600 }}>
             {shipmentForWagonSheet?.total_wagons?.received_no_of_wagons || "XX"}
           </text>
         </div>
+        <div id='wagons-assign-notassigned'>
+          <div>{text('assignedWagons')}<span style={{ color: "#3351FF", fontWeight: 600 }}>({wagonsNewData.filter((wagons: any) => (wagons.plant_assigned)).length || 0})</span></div>
+          <div>{text('notAssignedWagons')}<span style={{ color: "red", fontWeight: 600 }}>({wagonsNewData.filter((wagons: any) => (!wagons.plant_assigned)).length || 0})</span></div>
+        </div>
       </div>
 
-      <div id="assign-wagon-container">
-        <div id="assign-wagon-container-box-selection">
-          {wagonsNewData.map((wagons: any, index: number) => {
-            return (
-              <div key={index} className="wagonAssignToMillConatiner"
-                style={{opacity: wagons.is_sick ? 0.4 : 1, cursor: wagons.is_sick ? "not-allowed" : "pointer"}}
-              >
-                <div
-                  className="wagonsAssignToMillImageSelectorConatainer"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if(!wagons.is_sick) {assignWagonsToSelectedPlant(e, wagons, index);}
-                  }}
-                  style={{ cursor: wagons.is_sick ? "not-allowed" : "pointer" }}
-                >
-                  {wagons?.plant_assigned && (
-                    <div
-                      className="wagonsAssigntoMillCheckedIcon"
-                      style={{
-                        backgroundColor:
-                          wagons?.plant_assigned?._id === SelectedPlant?._id
-                            ? "black"
-                            : "#D2D2D2",
-                        cursor:
-                          wagons?.plant_assigned?._id !== SelectedPlant?._id || wagons.is_sick
-                            ? "not-allowed"
-                            : "pointer",
-                      }}
-                    >
-                      <CheckRoundedIcon
-                        style={{
-                          color: "white",
-                          height: "100%",
-                          width: "100%",
-                          display: "flex",
-                          justifyContent: "center",
-                          alignItems: "center",
-                        }}
-                      />
-                    </div>
-                  )}
-                  <div className="wagonsAssignToMillImageSelector">
-                    <div style={{ width: 40, height: 17 }}>
-                      <Image
-                        src={wagonImage(wagons?.wagon_type?.name).src}
-                        alt=""
-                        width={40}
-                        height={17}
-                        style={{ objectFit: "contain" }}
-                      />
-                    </div>
-                  </div>
-                </div>
-                <div id="wagonsAssignToMillTextArea">
-                  <header id="wagonsAssignToMillAssignedPlantName">
-                    {wagons?.plant_assigned?.name || ""}
-                  </header>
-                  <header id="wagonsAssignToMillNumber">
-                    {wagons?.w_no || "XXXXXXX"}
-                  </header>
-                  <header id="wagonsAssignToMilltype">
-                    {wagons?.wagon_type?.name || "XXXXXXX"}
-                  </header>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+      <div id="assign-wagon-container" >
         <div>
           <div style={{ marginTop: 8 }}>Select a mill</div>
           <div id="plantSelectorContainer">
@@ -308,7 +237,82 @@ function WagonAssignSheet({
             })}
           </div>
         </div>
-        <div className="buttonContaioner">
+        <div id="assign-wagon-container-box-selection" >
+          {wagonsNewData.map((wagons: any, index: number) => {
+            return (
+              <div
+                key={index}
+                className="wagonAssignToMillConatiner"
+                style={{
+                  opacity: wagons.is_sick ? 0.4 : 1,
+                  cursor: wagons.is_sick ? "not-allowed" : "pointer",
+                }}
+              >
+                <div
+                  className="wagonsAssignToMillImageSelectorConatainer"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (!wagons.is_sick) {
+                      assignWagonsToSelectedPlant(e, wagons, index);
+                    }
+                  }}
+                  style={{ cursor: wagons.is_sick ? "not-allowed" : "pointer" }}
+                >
+                  {wagons?.plant_assigned && (
+                    <div
+                      className="wagonsAssigntoMillCheckedIcon"
+                      style={{
+                        backgroundColor:
+                          wagons?.plant_assigned?._id === SelectedPlant?._id
+                            ? "black"
+                            : "#D2D2D2",
+                        cursor:
+                          wagons?.plant_assigned?._id !== SelectedPlant?._id ||
+                          wagons.is_sick
+                            ? "not-allowed"
+                            : "pointer",
+                      }}
+                    >
+                      <CheckRoundedIcon
+                        style={{
+                          color: "white",
+                          height: "100%",
+                          width: "100%",
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                        }}
+                      />
+                    </div>
+                  )}
+                  <div className="wagonsAssignToMillImageSelector">
+                    <div style={{ width: 40, height: 17 }}>
+                      <Image
+                        src={wagonImage(wagons?.wagon_type?.name).src}
+                        alt=""
+                        width={40}
+                        height={17}
+                        style={{ objectFit: "contain" }}
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div id="wagonsAssignToMillTextArea">
+                  <header id="wagonsAssignToMillAssignedPlantName">
+                    {wagons?.plant_assigned?.name || ""}
+                  </header>
+                  <header id="wagonsAssignToMillNumber">
+                    {wagons?.w_no || "XXXXXXX"}
+                  </header>
+                  <header id="wagonsAssignToMilltype">
+                    {wagons?.wagon_type?.name || "XXXXXXX"}
+                  </header>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        <div id="buttonContaioner" style={{ textAlign: "right", marginTop: 8,  }}>
           <Button
             className="buttonMarkPlacement"
             onClick={(e: any) => {

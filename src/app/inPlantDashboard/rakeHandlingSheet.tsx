@@ -6,7 +6,7 @@ import Popover from "@mui/material/Popover";
 import RemoveIcon from "@mui/icons-material/Remove";
 import AddIcon from "@mui/icons-material/Add";
 import { httpsGet, httpsPost } from "@/utils/Communication";
-
+import { useSnackbar } from "@/hooks/snackBar";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import dayjs from "dayjs";
@@ -28,13 +28,15 @@ const events_names = {
 };
 
 function RakeHandlingSheet({ isClose, shipment }: any) {
+
+  const showMessage = useSnackbar();
   const text = useTranslations("WAGONTALLYSHEET");
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(
     null
   );
-  // const openAction = Boolean(anchorEl);
+  
   const [showActionBox, setShowActionBox] = React.useState(-1);
-  const [rakeHandlingSheetData, setRakeHandlingSheetData] = useState({});
+  const [rakeHandlingSheetData, setRakeHandlingSheetData] = useState<any>([]);
   const [previousData, setPreviousData] = useState([]);
   const [millDetails, setMillDetails] = useState([
     {
@@ -48,34 +50,43 @@ function RakeHandlingSheet({ isClose, shipment }: any) {
       ],
     },
   ]);
-
+  const [rakeArrivalAtStationObject, setRakeArrivalAtStationObject] = useState<any>({});
   const [rakeArrivalAtStationDate, setRakeArrivalAtStationDate] = useState<Date | null>(null);
   const [openRakeArrivalAtServingStation, setOpenRakeArrivalAtServingStation] = useState(false);
 
+  const [rakeArrivalAtPlantObject, setRakeArrivalAtPlantObject] = useState<any>({});
   const [rakeArrivalAtPlantDate, setRakeArrivalAtPlantDate] = useState<Date | null>(null);
   const [openRakeArrivalAtPlant, setOpenRakeArrivalAtPlant] = useState(false);
 
+  const [bpReleaseObject, setBpReleaseObject] = useState<any>({});
   const [bpReleaseDate, setBpReleaseDate] = useState<Date | null>(null);
   const [openBpRelease, setOpenBpRelease] = useState(false);
 
+  const [wagonPlacedAtLoadingPointObject, setWagonPlacedAtLoadingPointObject] = useState<any>({});
   const [wagonPlacedAtLoadingPointDate, setWagonPlacedAtLoadingPointDate] = useState<Date | null>(null);
   const [openWagonPlacedAtLoadingPoint, setOpenWagonPlacedAtLoadingPoint] = useState(false);
 
+  const [loadRakeFormationObject, setLoadRakeFormationObject] = useState<any>({});
   const [loadRakeFormationDate, setLoadRakeFormationDate] = useState<Date | null>(null);
   const [openLoadRakeFormation, setOpenLoadRakeFormation] = useState(false);
 
+  const [rakeReleaseObject, setRakeReleaseObject] = useState<any>({});
   const [rakeReleaseDate, setRakeReleaseDate] = useState<Date | null>(null);
   const [openRakeRelease, setOpenRakeRelease] = useState(false);
 
+  const [rlylocoReportingObject, setRlylocoReportingObject] = useState<any>({});
   const [rlylocoReportingDate, setRlylocoReportingDate] = useState<Date | null>(null);
   const [openRlylocoReporting, setOpenRlylocoReporting] = useState(false);
 
+  const [eotObject, setEotObject] = useState<any>({});
   const [eotDate, setEotDate] = useState<Date | null>(null);
   const [openEot, setOpenEot] = useState(false);
 
+  const [apReadyObject, setApReadyObject] = useState<any>({});
   const [apReadyDate, setApReadyDate] = useState<Date | null>(null);
   const [openApReady, setOpenApReady] = useState(false);
 
+  const [drawnOutObject, setDrawnOutObject] = useState<any>({});
   const [drawnOutDate, setDrawnOutDate] = useState<Date | null>(null);
   const [openDrawnOut, setOpenDrawnOut] = useState(false);
 
@@ -154,11 +165,102 @@ function RakeHandlingSheet({ isClose, shipment }: any) {
     if (rakeArrivalAtStationDate) {
       payload.events.push({
         shipment : shipment.id,
-        event_name: "RakeArrivalAtStation",
+        event_name: events_names.rakeArrivalAtStation,
         event_datetime: rakeArrivalAtStationDate,
         FNR:shipment.fnr,
-        
+        id:rakeArrivalAtStationObject?._id,
       })
+    }
+    if(rakeArrivalAtPlantDate){
+      payload.events.push({
+        shipment : shipment.id,
+        event_name: events_names.rakeArrivalAtPlant,
+        event_datetime: rakeArrivalAtPlantDate,
+        FNR:shipment.fnr,
+        id:rakeArrivalAtPlantObject?._id,
+      })
+    }
+    if(bpReleaseDate){
+      payload.events.push({
+        shipment : shipment.id,
+        event_name: events_names.bpRelease,
+        event_datetime: bpReleaseDate,
+        FNR:shipment.fnr,
+        id:bpReleaseObject?._id,
+      })
+    }
+    if(wagonPlacedAtLoadingPointDate){
+      payload.events.push({
+        shipment : shipment.id,
+        event_name: events_names.wagonPlacedAtLoadingPoint,
+        event_datetime: wagonPlacedAtLoadingPointDate,
+        FNR:shipment.fnr,
+        id:wagonPlacedAtLoadingPointObject?._id,
+      })
+    }
+    if(loadRakeFormationDate){
+      payload.events.push({
+        shipment : shipment.id,
+        event_name: events_names.loadRakeFormation,
+        event_datetime: loadRakeFormationDate,
+        FNR:shipment.fnr,
+        id:loadRakeFormationObject?._id,
+      })
+    }
+    if(rakeReleaseDate){
+      payload.events.push({
+        shipment : shipment.id,
+        event_name: events_names.rakeRelease,
+        event_datetime: rakeReleaseDate,
+        FNR:shipment.fnr,
+        id:rakeReleaseObject?._id,
+      })
+    }
+    if(rlylocoReportingDate){
+      payload.events.push({
+        shipment : shipment.id,
+        event_name: events_names.rlylocoReporting,
+        event_datetime: rlylocoReportingDate,
+        FNR:shipment.fnr,
+        id:rlylocoReportingObject?._id,
+      })
+    }
+    if(eotDate){
+      payload.events.push({
+        shipment : shipment.id,
+        event_name: events_names.eot,
+        event_datetime: eotDate,
+        FNR:shipment.fnr,
+        id:eotObject?._id,
+      })
+    }
+    if(apReadyDate){
+      payload.events.push({
+        shipment : shipment.id,
+        event_name: events_names.apReady,
+        event_datetime: apReadyDate,
+        FNR:shipment.fnr,
+        id:apReadyObject?._id,
+      })
+    }
+    if(drawnOutDate){
+      payload.events.push({
+        shipment : shipment.id,
+        event_name: events_names.drawnOut,
+        event_datetime: drawnOutDate,
+        FNR:shipment.fnr,
+        id:drawnOutObject?._id,
+      })
+    }
+    console.log(payload);
+    try {
+      const response = await httpsPost(`rake_event/add`,payload);
+      if(response.statusCode === 200){
+        showMessage.showMessage("Rake Handling Sheet Added Successfully", "success");
+        isClose(false);
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -169,12 +271,6 @@ function RakeHandlingSheet({ isClose, shipment }: any) {
         `rake_event_by_shipment/get?id=${shipment.id}`
       );
       setRakeHandlingSheetData(response?.data);
-      if(response?.data){
-        setPreviousData(response?.data);
-        response?.data.filter((data:any) => data.event_name === "RakeArrivalAtStation").map((data:any) => {
-          setRakeArrivalAtStationDate(new Date(data?.event_timestamp))
-        })
-      }
     } catch (error) {
       console.log(error);
     }
@@ -184,6 +280,39 @@ function RakeHandlingSheet({ isClose, shipment }: any) {
   useEffect(() => {
     getRakeHandlingSheetData();
   }, []);
+
+  useEffect(()=>{
+    setRakeArrivalAtStationDate((rakeHandlingSheetData.filter((data: any) => { return data.event_name === events_names.rakeArrivalAtStation })[0] as any)?.event_timestamp)
+    setRakeArrivalAtStationObject(rakeHandlingSheetData.filter((data:any)=>{return data.event_name === events_names.rakeArrivalAtStation})[0])
+
+    setRakeArrivalAtPlantDate((rakeHandlingSheetData.filter((data: any) => { return data.event_name === events_names.rakeArrivalAtPlant })[0] as any)?.event_timestamp)
+    setRakeArrivalAtPlantObject(rakeHandlingSheetData.filter((data:any)=>{return data.event_name === events_names.rakeArrivalAtPlant})[0])
+
+    setBpReleaseDate((rakeHandlingSheetData.filter((data: any) => { return data.event_name === events_names.bpRelease })[0] as any)?.event_timestamp)
+    setBpReleaseObject(rakeHandlingSheetData.filter((data:any)=>{return data.event_name === events_names.bpRelease})[0])
+
+    setWagonPlacedAtLoadingPointDate((rakeHandlingSheetData.filter((data: any) => { return data.event_name === events_names.wagonPlacedAtLoadingPoint })[0] as any)?.event_timestamp)
+    setWagonPlacedAtLoadingPointObject(rakeHandlingSheetData.filter((data:any)=>{return data.event_name === events_names.wagonPlacedAtLoadingPoint})[0])
+
+    setLoadRakeFormationDate((rakeHandlingSheetData.filter((data: any) => { return data.event_name === events_names.loadRakeFormation })[0] as any)?.event_timestamp)
+    setLoadRakeFormationObject(rakeHandlingSheetData.filter((data:any)=>{return data.event_name === events_names.loadRakeFormation})[0])
+
+    setRakeReleaseDate((rakeHandlingSheetData.filter((data: any) => { return data.event_name === events_names.rakeRelease })[0] as any)?.event_timestamp)
+    setRakeReleaseObject(rakeHandlingSheetData.filter((data:any)=>{return data.event_name === events_names.rakeRelease})[0])
+
+    setRlylocoReportingDate((rakeHandlingSheetData.filter((data: any) => { return data.event_name === events_names.rlylocoReporting })[0] as any)?.event_timestamp)
+    setRlylocoReportingObject(rakeHandlingSheetData.filter((data:any)=>{return data.event_name === events_names.rlylocoReporting})[0])
+
+    setEotDate((rakeHandlingSheetData.filter((data: any) => { return data.event_name === events_names.eot })[0] as any)?.event_timestamp)
+    setEotObject(rakeHandlingSheetData.filter((data:any)=>{return data.event_name === events_names.eot})[0])
+
+    setApReadyDate((rakeHandlingSheetData.filter((data: any) => { return data.event_name === events_names.apReady })[0] as any)?.event_timestamp)
+    setApReadyObject(rakeHandlingSheetData.filter((data:any)=>{return data.event_name === events_names.apReady})[0])
+
+    setDrawnOutDate((rakeHandlingSheetData.filter((data: any) => { return data.event_name === events_names.drawnOut })[0] as any)?.event_timestamp)
+    setDrawnOutObject(rakeHandlingSheetData.filter((data:any)=>{return data.event_name === events_names.drawnOut})[0])
+
+  },[rakeHandlingSheetData])
 
   return (
     <div
@@ -437,7 +566,6 @@ function RakeHandlingSheet({ isClose, shipment }: any) {
                 {text("wagonPlacedAtLoadingPoint")}
               </header>
               <div className="inputForRakeSection">
-
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <DateTimePicker
                     open={openWagonPlacedAtLoadingPoint}
@@ -495,6 +623,75 @@ function RakeHandlingSheet({ isClose, shipment }: any) {
                     onChange={(newDate) => {
                       if (newDate) {
                         setWagonPlacedAtLoadingPointDate(newDate.toDate());
+                      }
+                    }}
+                    format="DD/MM/YYYY  HH:mm"
+                  />
+                </LocalizationProvider>
+              </div>
+            </div>
+            <div>
+              <header className="headerForRakeSection">
+                {text("loadRakeFormation")}
+              </header>
+              <div className="inputForRakeSection">
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DateTimePicker
+                    open={openLoadRakeFormation}
+                    onClose={() => {
+                        setOpenLoadRakeFormation(false);
+                    }}
+                    value={loadRakeFormationDate ? dayjs(loadRakeFormationDate) : null}
+                    sx={{
+                      width: "100%",
+                      height:'100%',
+                    
+                      ".MuiInputBase-input": {
+                        
+                        padding: "7px",
+                        
+                        paddingLeft: "11px",
+                        fontSize: "14px ",
+                        color: "#42454E",
+                      },
+                      ".MuiInputBase-root": {
+                        padding: 0,
+                        border: "none",
+                        "& fieldset": { border: "none" },
+                      },
+                      "& .MuiOutlinedInput-root": {
+                        "&:hover fieldset": {
+                          border: "none",
+                        },
+                        "&.Mui-focused fieldset": {
+                          border: "none",
+                        },
+                      },
+                      "& .MuiIconButton-root": {
+                        position: "relative",
+                      },
+                    }}
+                    ampm={false}
+                    slotProps={{
+                      textField: {
+                        onClick: () => {
+                          console.log();
+                          setOpenLoadRakeFormation(!openLoadRakeFormation);
+                        },
+                        fullWidth: true,
+                        InputProps: {
+                          endAdornment: null,
+                        },
+                      },
+                    }}
+                    viewRenderers={{
+                      hours: renderTimeViewClock,
+                      minutes: renderTimeViewClock,
+                      seconds: renderTimeViewClock,
+                    }}
+                    onChange={(newDate) => {
+                      if (newDate) {
+                        setLoadRakeFormationDate(newDate.toDate());
                       }
                     }}
                     format="DD/MM/YYYY  HH:mm"
@@ -706,7 +903,7 @@ function RakeHandlingSheet({ isClose, shipment }: any) {
             }}
           ></div>
           <div id="lastSection">
-            <div>
+            {/* <div>
               <header className="headerForRakeSection">
                 {text("loadRakeFormation")}
               </header>
@@ -774,7 +971,7 @@ function RakeHandlingSheet({ isClose, shipment }: any) {
                   />
                 </LocalizationProvider>
               </div>
-            </div>
+            </div> */}
             <div>
               <header className="headerForRakeSection">
                 {text("rakeRelease")}
@@ -1118,6 +1315,7 @@ function RakeHandlingSheet({ isClose, shipment }: any) {
                 </LocalizationProvider>
               </div>
             </div>
+
           </div>
         </div>
         <div className="buttonContaioner">
