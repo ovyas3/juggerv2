@@ -2,7 +2,6 @@ import Button from "@mui/material/Button";
 import CloseIcon from "@mui/icons-material/Close";
 import { useTranslations } from "next-intl";
 import React, { useState, useEffect } from "react";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Popover from "@mui/material/Popover";
 import RemoveIcon from "@mui/icons-material/Remove";
 import AddIcon from "@mui/icons-material/Add";
@@ -10,19 +9,10 @@ import { httpsGet, httpsPost } from "@/utils/Communication";
 
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
-import RvHookupIcon from "@mui/icons-material/RvHookup";
-import Autocomplete from "@mui/material/Autocomplete";
 
-import OutlinedInput from "@mui/material/OutlinedInput";
-import InputLabel from "@mui/material/InputLabel";
-import ListItemText from "@mui/material/ListItemText";
-
-import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { renderTimeViewClock } from "@mui/x-date-pickers/timeViewRenderers";
-import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 
 const events_names = {
   rakeArrivalAtStation: "Rake Arrival At Serving Station",
@@ -42,12 +32,8 @@ function RakeHandlingSheet({ isClose, shipment }: any) {
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(
     null
   );
-  const openAction = Boolean(anchorEl);
+  // const openAction = Boolean(anchorEl);
   const [showActionBox, setShowActionBox] = React.useState(-1);
-  const [openUploadWagonSheetmodal, setOpenUploadWagonSheetModal] =
-    useState(false);
-  const [openRakeHandlingSheet, setOpenRakeHandlingSheet] = useState(false);
-  const [uploadShipmentwagon, setuploadShipmentwagon] = useState({});
   const [rakeHandlingSheetData, setRakeHandlingSheetData] = useState({});
   const [previousData, setPreviousData] = useState([]);
   const [millDetails, setMillDetails] = useState([
@@ -174,13 +160,6 @@ function RakeHandlingSheet({ isClose, shipment }: any) {
         
       })
     }
-    console.log(payload);
-    // try {
-    //   const response = await httpsPost("rake_event/add", payload);
-    //   console.log(response);
-    // } catch (error) {
-    //   console.log(error);
-    // }
   };
 
   // api calling
