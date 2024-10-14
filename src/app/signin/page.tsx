@@ -12,7 +12,7 @@ import showPassword from "@/assets/show_password.svg";
 import hidePassword from "@/assets/hide_password.svg";
 import { useSnackbar } from "@/hooks/snackBar";
 
-const signin = () => {
+const Signin = () => {
   const { showMessage } = useSnackbar();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -112,4 +112,4 @@ const signin = () => {
   );
 };
 
-export default signin;
+export default Signin;
