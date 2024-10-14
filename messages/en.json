@@ -137,9 +137,13 @@
     "Cancel":"Cancel",
     "update":"Update",
     "IndentNo":"Indent No.",
-    "assignWagonSheet":"Assign Wagon To Plant",
-    "assignHooksToWagon":"Assign Hooks To Wagon"
-
+    "assignWagonSheet":"Assign Wagon To Loading Shop",
+    "assignHooksToWagon":"Assign Hooks To Wagon",
+    "total":"Total",
+    "indent":"Indent",
+    "inplant":"In Plant",
+    "assignedWagons":"Assigned Wagons",
+    "notAssignedWagons":"Not Assigned Wagons"
   }
 }
 

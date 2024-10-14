@@ -173,6 +173,10 @@ function WagonTallySheet({
   const [shipmentforAssignWagonToplant, setShipmentforAssignWagonToplant] =
     useState({});
 
+  const [inplantTotal, setInplantTotal] = useState(0);
+  const [indentTotal, setIndentTotal] = useState(0);
+  const [statusCondition, setStatusCondition] = useState(["AVE", "INPL"]);
+
   // api calling
   async function getWagonDetails() {
     try {
@@ -181,7 +185,9 @@ function WagonTallySheet({
         payloadForWagons
       );
       setAllWagonsList(response.data.data);
-      setTotalCount(response.data.totalCount);
+      setTotalCount(response.data.count.totalCount);
+      setInplantTotal(response.data.count.totalInPlant);
+      setIndentTotal(response.data.count.totalAVE)
     } catch (error) {
       console.log(error);
     }
@@ -253,6 +259,73 @@ function WagonTallySheet({
     setRowsPerPage(+event.target.value);
     setPage(0);
   };
+  const handleStatusClick = (status:string) => {
+    switch (status) {
+      case "total":
+        setPayloadForWagons((prev :any)=>{
+          let newState = {...prev}
+          if(newState.status.length > 0){
+            newState.status = [];
+            setStatusCondition(newState.status);
+          }else{
+            newState.status = ["AVE", "INPL"];
+            setStatusCondition(newState.status);
+          }
+          return newState;
+        })
+        break;
+      case "indent":
+        setPayloadForWagons((prev :any)=>{
+          let newState = {...prev};
+          if(!newState.status.includes('AVE')){
+            newState.status = [...newState.status, 'AVE'];
+            setStatusCondition(newState.status);
+          }else{
+            newState.status = newState.status.filter((item: string) => item !== 'AVE');
+            setStatusCondition(newState.status);
+          }
+          return newState;
+        })
+        break;  
+      case "inplant":
+        setPayloadForWagons((prevState: any) => {
+          let newState = { ...prevState };
+          if(!newState.status.includes('INPL')){
+            newState.status = [...newState.status, 'INPL'];
+            setStatusCondition(newState.status);
+          }else{
+            newState.status = newState.status.filter((item: string) => item !== 'INPL');
+            setStatusCondition(newState.status);
+          }
+          return newState;
+        });
+        break;
+    }
+  }
+  const getColorForStatus = (status:any) => {
+    let bgColor = 'white';
+    let textColor = 'black';
+    switch (status) {
+      case "AVE":
+        if(statusCondition.includes('AVE')){
+          bgColor = '#E6EAFF';
+          textColor = "#536AFE";
+        }
+        break;
+      case "INPL":
+        if(statusCondition.includes('INPL')){
+          bgColor = '#F4FCFC';
+          textColor = "#174D68";
+        }
+        break;
+      case "total":
+        if(statusCondition.includes('AVE') && statusCondition.includes('INPL')){
+          bgColor = '#000000';
+          textColor = 'white';
+        }
+    }
+    return { bgColor, textColor };
+  }
 
   // useEffect
   useEffect(() => {
@@ -281,7 +354,8 @@ function WagonTallySheet({
   return (
     <div>
       <div className="wagon-wrapper">
-        <div className="search-container">
+        <div id="search-container">
+          <div></div>
           <div className="input-wrapper">
             <Image
               src={searchIcon}
@@ -300,6 +374,20 @@ function WagonTallySheet({
               placeholder="Search by Indent no."
               onChange={(e) => setIndentNo(e.target.value)}
             />
+          </div>
+          <div id="status-display">
+            <div className="status-display-boxes" style={{backgroundColor: getColorForStatus('total').bgColor, color:getColorForStatus('total').textColor }} onClick={()=>{handleStatusClick("total")}}>
+              <div style={{fontSize:"16px"}} >{inplantTotal + indentTotal}</div>
+              <div>{text("total")}</div>
+            </div>
+            <div className="status-display-boxes" style={{backgroundColor: getColorForStatus('AVE').bgColor, color:getColorForStatus('AVE').textColor }} onClick={()=>{handleStatusClick("indent")}}>
+              <div style={{fontSize:"16px"}}>{indentTotal}</div>
+              <div>{text("indent")}</div>
+            </div>
+            <div className="status-display-boxes" style={{backgroundColor: getColorForStatus('INPL').bgColor, color:getColorForStatus('INPL').textColor }} onClick={()=>{handleStatusClick("inplant")}}>
+              <div style={{fontSize:"16px"}}>{inplantTotal}</div>
+              <div>{text("inplant")}</div>
+            </div>
           </div>
         </div>
 
@@ -644,21 +732,24 @@ function WagonTallySheet({
                                       >
                                         {text("drawnInTime")}
                                       </div> */}
-                                      {row.wagon_data_uploaded && <div
-                                        className="action-popover-wagon"
-                                        onClick={(e) => {
-                                          assignPlantToWagon(e, row);
-                                        }}
-                                      >
-                                        {text("assignWagonToPlant")}
-                                      </div>}
-                                      { row.wagon_data_uploaded && <div
-                                        className="action-popover-wagon"
-                                        onClick={(e) => {
-                                        }}
-                                      >
-                                        {text("assignHooksToWagon")}
-                                      </div>}
+                                      {row.wagon_data_uploaded && (
+                                        <div
+                                          className="action-popover-wagon"
+                                          onClick={(e) => {
+                                            assignPlantToWagon(e, row);
+                                          }}
+                                        >
+                                          {text("assignWagonToPlant")}
+                                        </div>
+                                      )}
+                                      {row.wagon_data_uploaded && (
+                                        <div
+                                          className="action-popover-wagon"
+                                          onClick={(e) => {}}
+                                        >
+                                          {text("assignHooksToWagon")}
+                                        </div>
+                                      )}
                                     </Popover>
                                   </div>
                                 )}

@@ -10,6 +10,11 @@ const prefix = [
   environment.PROD_API_URL_MANHUNTER
 ]
 
+const parent = [
+  environment.DEV_ETMS,
+  environment.PROD_SMART
+]
+
 const httpsGet = async (path: string, type: number = 0, router: any = null) => {
   const authorization = {
     Authorization: getAuth(),
@@ -30,7 +35,11 @@ const httpsGet = async (path: string, type: number = 0, router: any = null) => {
         if(fromRms) {
           router.push('/signin')
         } else {
-          router.push('https://etms.instavans.com/login');
+          if(prefix[0].includes('dev')){
+            router.push(`${parent[0]}/login`);
+          }else{
+            router.push(`${parent[1]}/login`);
+          }
         }
       }
     });
@@ -77,9 +86,12 @@ const httpsPost = async (path: string, data: any, type = 0, isFile = false, rout
           if(fromRms) {
             router.push('/signin')
           } else {
-            router.push('https://etms.instavans.com/login');
+            if(prefix[0].includes('dev')){
+              router.push(`${parent[0]}/login`);
+            }else{
+              router.push(`${parent[1]}/login`);
+            }
           }
-
         }
         return err.response.data 
       });

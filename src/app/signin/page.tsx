@@ -55,12 +55,12 @@ const Signin = () => {
 
         <div className="header">
           <div className="heading">Sign in</div>
-          <div className="new-user">
+          {/* <div className="new-user">
             New user?
             <span style={{ color: "#3351FF", cursor: "pointer" }}>
               &nbsp;Create an account
             </span>
-          </div>
+          </div> */}
         </div>
         <div className="main-content">
           <div className="input-content">
@@ -98,7 +98,7 @@ const Signin = () => {
             )}
           </div>
         </div>
-        <div className="forgot-password">Forgot Password?</div>
+        {/* <div className="forgot-password">Forgot Password?</div> */}
 
         <div className="footer">
           <div>
