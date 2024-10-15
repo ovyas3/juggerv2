@@ -1,0 +1,120 @@
+.signin {
+    background-image: url('../../assets/SignIn.png');
+    height: 100vh;
+    width: 100vw;
+    background-size: cover;
+    position: relative;
+}
+
+.signin .content {
+    height: 640px;
+    width: 472px;
+    background: white;
+    border-radius: 8px;
+    position: absolute;
+    top: calc((100vh - 640px)/2);
+    right: calc(((100vw / 2) - 472px) / 2);
+    padding: 40px 56px;
+}
+
+.signin .content .header {
+    margin-top: 60px;
+    display: flex;
+    flex-direction: column;
+    row-gap: 16px;
+}
+
+.signin .content .header .heading {
+    font-size: 36px;
+    font-weight: bold;
+}
+
+.signin .content .header .new-user {
+    font-size: 12px;
+    color: #7A8B94;
+}
+
+.signin .content .main-content {
+    margin-top: 42px;
+    display: flex;
+    row-gap: 20px;
+    flex-direction: column;
+}
+
+.signin .content .main-content .input-content {
+    display: flex;
+    flex-direction: column;
+    row-gap: 8px;
+    position: relative;
+}
+
+.signin .content .main-content .input-content .icon {
+    position: absolute;
+    bottom: 16px;
+    right: 16px;
+    cursor: pointer;
+}
+
+.signin .content .main-content .input-content .input-header {
+    color: #7A8B94;
+    font-size: 13px;
+    font-style: normal;
+    font-weight: 400;
+}
+
+.signin .content .main-content .input-content .input {
+    font-size: 13px;
+    padding: 10px 12px;
+    height: 48px;
+    border-radius: 6px;
+    border: 1px solid rgba(54, 64, 73, 0.12);
+    outline: none;
+    color: #3C4852;
+}
+
+.signin .content .main-content .input-content .password {
+    padding-right: 48px;
+}
+
+
+.signin .content .forgot-password {
+    color: #18BE8A;
+    margin-top: 8px;
+    text-align: right;
+    font-size: 10px;
+    cursor: pointer;
+}
+
+.signin .content .footer {
+    margin-top: 108px;
+}
+
+.signin .content .login-btn {
+    display: flex;
+    width: 360px;
+    height: 48px;
+    padding: 10px 12px;
+    justify-content: center;
+    align-items: center;
+    border-radius: 6px;
+    border: 1px solid rgba(54, 64, 73, 0.12);
+    background: #3351FF;
+    color: #FFFFFF;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+@media screen and (max-width:1024px) {
+    .signin .content {
+        right: calc((100vw - 472px) / 2)
+    }
+}
+
+
+@media screen and (max-height:800px) {
+    .signin .content {
+        transform: scale(0.8);
+    }
+}

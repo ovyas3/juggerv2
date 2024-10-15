@@ -562,8 +562,8 @@ const MapLayers = () => {
     };
     setIsTracking(0)
     const shipments = await httpsPost('/shipment_map_view', payload);
-    const inTransit = shipments.filter((shipment: any) => (shipment.status !== 'Delivered' && shipment.status !== ''));
-    const idle = shipments.filter((shipment: any) => (shipment.status === 'AVE' || shipment.status === ''));
+    const inTransit = shipments.filter((shipment: any) => (shipment.status === 'ITNS' ));
+    const idle = shipments.filter((shipment: any) => (shipment.status === 'INPL'));
     const delivered = shipments.filter((shipment: any) => (shipment.status === 'Delivered'));
     setTotalCount(shipments.length);
     setInTransitCount(inTransit.length);

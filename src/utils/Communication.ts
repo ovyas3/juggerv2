@@ -10,6 +10,11 @@ const prefix = [
   environment.PROD_API_URL_MANHUNTER
 ]
 
+const parent = [
+  environment.DEV_ETMS,
+  environment.PROD_SMART
+]
+
 const httpsGet = async (path: string, type: number = 0, router: any = null) => {
   const authorization = {
     Authorization: getAuth(),
@@ -24,8 +29,18 @@ const httpsGet = async (path: string, type: number = 0, router: any = null) => {
     .then((res) => res)
     .catch((err) => {
       if (axios.isAxiosError(err) && err.response?.status === 401) {
+        const router = useRouter()
+        const fromRms = Boolean(localStorage.getItem('isRmsLogin'))
         deleteAllCache();
-        router.push('/');
+        if(fromRms) {
+          router.push('/signin')
+        } else {
+          if(prefix[0].includes('dev')){
+            router.push(`${parent[0]}/login`);
+          }else{
+            router.push(`${parent[1]}/login`);
+          }
+        }
       }
     });
     return response?.data;
@@ -62,8 +77,21 @@ const httpsPost = async (path: string, data: any, type = 0, isFile = false, rout
       .then((res) => res)
       .catch((err) => {
         if (axios.isAxiosError(err) && err.response?.status === 401) {
+          if(url.includes('shipper_user/signin')) {
+            return err.response.data 
+          }
+          const router = useRouter()
+          const fromRms = Boolean(localStorage.getItem('isRmsLogin'))
           deleteAllCache();
-          router.push('/');
+          if(fromRms) {
+            router.push('/signin')
+          } else {
+            if(prefix[0].includes('dev')){
+              router.push(`${parent[0]}/login`);
+            }else{
+              router.push(`${parent[1]}/login`);
+            }
+          }
         }
         return err.response.data 
       });

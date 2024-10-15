@@ -101,7 +101,11 @@ const convertArrayToFilteredArray = (inputArray: any) => {
             drawnout_time:any,
         }) => {
         const { edemand_no, FNR,placement_time,indent_no, drawnout_time, all_FNRs,rr_dates, delivery_location, trip_tracker, others, remarks, unique_code, status, pickup_date, captive_id, is_captive, eta, rr_document, polyline, past_etas, no_of_wagons, received_no_of_wagons, demand_date, paid_by, commodity_desc, expected_loading_date, HA } = item;
+        let newDemandDate = new Date(demand_date);
+        newDemandDate.setHours(newDemandDate.getHours() - 5);
+        newDemandDate.setMinutes(newDemandDate.getMinutes() - 30);
         return {
+           
             _id: item._id,
             edemand: {
                 edemand_no: edemand_no || 'NA',
@@ -157,13 +161,13 @@ const convertArrayToFilteredArray = (inputArray: any) => {
             paid_by: paid_by ? paid_by : 'NA',
             commodity_desc: commodity_desc && commodity_desc,
             expected_loading_date:{
-                ELDdate: service.utcToist(expected_loading_date, 'dd-MM-yyyy HH:mm') || 'NA',
+                ELDdate: service.utcToist(expected_loading_date, 'dd-MM-yyyy') || 'NA',
                 ELDtime: service.utcToistTime(expected_loading_date) || 'NA'
             },
             placement_time: service.utcToist(placement_time, 'dd-MM-yyyy HH:mm')|| 'NA',
             oneRr_date: rr_dates && rr_dates.length > 0 && service.utcToist(rr_dates[0], 'dd-MM-yyyy HH:mm')|| 'NA',
             intent_no: indent_no && indent_no,
-            demand_date:demand_date && service.utcToist(demand_date, 'dd-MM-yyyy HH:mm') || 'NA',
+            demand_date:demand_date && service.utcToist(newDemandDate.toISOString(), 'dd-MM-yyyy HH:mm') || 'NA',
             drawnout_time: drawnout_time && service.utcToist(drawnout_time, 'dd-MM-yyyy HH:mm') || 'NA',
         }
     });
@@ -846,7 +850,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                             row.expected_loading_date.ELDdate === 'NA' && row.placement_time === 'NA' ? 'NA' : (
                                                                 <div>
                                                                     <div>{row.demand_date}</div>
-                                                                    <div style={{marginBlock:4}}>{row.expected_loading_date.ELDdate}</div>
+                                                                    <div style={{marginBlock:4}}>{row.expected_loading_date.ELDdate} {row.expected_loading_date.ELDtime === '05:30' ? '23:59': row.expected_loading_date.ELDtime} </div>
                                                                     <div>{row.placement_time}</div>
                                                                 </div>
                                                             )

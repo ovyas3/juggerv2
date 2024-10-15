@@ -33,8 +33,13 @@ export default function AccountMenu() {
 
   const handleLogout = () => {
     console.log('logout');
+    const fromRms = Boolean(localStorage.getItem('isRmsLogin'))
     deleteAllCache();
-    router.push('/');
+    if(fromRms) {
+      router.push('/signin')
+    } else {
+      router.push('https://etms.instavans.com/login');
+    }
   }
 
   const createProfileName = (name: string) => {
