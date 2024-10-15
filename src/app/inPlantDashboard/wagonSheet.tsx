@@ -1,11 +1,5 @@
 "use client";
-
-import React, { useState, useEffect, use } from "react";
-import Header from "@/components/Header/header";
-import MobileHeader from "@/components/Header/mobileHeader";
-import { useWindowSize } from "@/utils/hooks";
-import SideDrawer from "@/components/Drawer/Drawer";
-import MobileDrawer from "@/components/Drawer/mobile_drawer";
+import React, { useState, useEffect } from "react";
 import "./page.css";
 import Image from "next/image";
 import searchIcon from "@/assets/search_wagon.svg";
@@ -26,7 +20,6 @@ import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import { httpsPost } from "@/utils/Communication";
 import service from "@/utils/timeService";
 import Popover from "@mui/material/Popover";
-import Typography from "@mui/material/Typography";
 import { UploadWagonSheet } from "@/components/Table/tableComp";
 import { useTranslations } from "next-intl";
 import RakeHandlingSheet from "./rakeHandlingSheet";
@@ -36,6 +29,7 @@ import {
   AssignToMill,
 } from "@/app/inPlantDashboard/actionComponents";
 import captiveRakeIndicator from "@/assets/captive_rakes.svg";
+import SourceOutlinedIcon from "@mui/icons-material/SourceOutlined";
 
 interface Column {
   id: string;
@@ -74,61 +68,65 @@ function contructingData(shipment: any) {
       indent_no: string;
       plant_codes: any;
       is_captive: any;
+      wagon_data_uploaded: any;
     }) => {
       return {
         id: shipment?._id && shipment._id,
         status: {
-          raw: shipment?.status ? shipment?.status : "NA",
+          raw: shipment?.status ? shipment?.status : "--",
           statusLabel: shipment?.status
             ? getStatusLabel(shipment?.status)
-            : "NA",
+            : "--",
         },
-        fnr: shipment?.FNR ? shipment?.FNR : "NA",
+        fnr: shipment?.FNR ? shipment?.FNR : "--",
         indent: {
-          indent_no: shipment?.indent_no ? shipment?.indent_no : "NA",
+          indent_no: shipment?.indent_no ? shipment?.indent_no : "--",
         },
         edemand: {
-          edemand_no: shipment?.edemand_no ? shipment?.edemand_no : "NA",
+          edemand_no: shipment?.edemand_no ? shipment?.edemand_no : "--",
         },
         exp_loading: {
           date: shipment?.expected_loading_date
             ? service.utcToist(shipment?.expected_loading_date)
-            : "NA",
+            : "--",
           time: shipment?.expected_loading_date
             ? service.utcToistTime(shipment?.expected_loading_date)
-            : "NA",
+            : "--",
         },
         total_wagons: {
-          numberTotal: shipment?.no_of_wagons ? shipment?.no_of_wagons : "NA",
+          numberTotal: shipment?.no_of_wagons ? shipment?.no_of_wagons : "--",
           requested_no_of_wagons: shipment?.no_of_wagons
             ? shipment?.no_of_wagons
-            : "NA",
+            : "--",
           received_no_of_wagons: shipment?.received_no_of_wagons
             ? shipment?.received_no_of_wagons
-            : "NA",
+            : "--",
         },
         placement_time: {
           date: shipment?.placement_time
             ? service.utcToist(shipment?.placement_time)
-            : "NA",
+            : "--",
           time: shipment?.placement_time
             ? service.utcToistTime(shipment?.placement_time)
-            : "NA",
+            : "--",
         },
         drawn_in: {
           date: shipment?.drawnin_time
             ? service.utcToist(shipment?.drawnin_time)
-            : "NA",
+            : "--",
           time: shipment?.drawnin_time
             ? service.utcToistTime(shipment?.drawnin_time)
-            : "NA",
+            : "--",
         },
         plant_codes: {
           plant_codes: shipment?.plant_codes
-            ? shipment?.plant_codes.filter((item: any) => item !== "NA")
-            : "NA",
+            ? shipment?.plant_codes.filter((item: any) => item !== "--")
+            : "--",
         },
         is_captive: shipment?.is_captive ? shipment?.is_captive : false,
+        wagon_data_uploaded: shipment?.wagon_data_uploaded
+          ? shipment?.wagon_data_uploaded
+          : false,
       };
     }
   );
@@ -175,6 +173,10 @@ function WagonTallySheet({
   const [shipmentforAssignWagonToplant, setShipmentforAssignWagonToplant] =
     useState({});
 
+  const [inplantTotal, setInplantTotal] = useState(0);
+  const [indentTotal, setIndentTotal] = useState(0);
+  const [statusCondition, setStatusCondition] = useState(["AVE", "INPL"]);
+
   // api calling
   async function getWagonDetails() {
     try {
@@ -183,7 +185,9 @@ function WagonTallySheet({
         payloadForWagons
       );
       setAllWagonsList(response.data.data);
-      setTotalCount(response.data.totalCount);
+      setTotalCount(response.data.count.totalCount);
+      setInplantTotal(response.data.count.totalInPlant);
+      setIndentTotal(response.data.count.totalAVE)
     } catch (error) {
       console.log(error);
     }
@@ -200,14 +204,13 @@ function WagonTallySheet({
     setShowActionBox((prevIndex) => (prevIndex === index ? -1 : index));
   }
   const assignPlantToWagon = (event: any, row: any) => {
-    // setShowAssignWagon(true);
-    // setShipmentForWagonSheet(row);
-    setOpenAssignWagonToplantModal(true);
-    setShipmentforAssignWagonToplant(row);
+    setShowAssignWagon(true);
+    setShipmentForWagonSheet(row);
+    // setOpenAssignWagonToplantModal(true);
+    // setShipmentforAssignWagonToplant(row);
     setShowActionBox(-1);
     setAnchorEl(null);
-    // setShowWagonSheet(false);
-    // setShowWagonSheet(false);
+    setShowWagonSheet(false);
   };
   const drawnInTime = (event: any, row: any) => {
     setOpenDrawnInTimeModal(true);
@@ -256,6 +259,73 @@ function WagonTallySheet({
     setRowsPerPage(+event.target.value);
     setPage(0);
   };
+  const handleStatusClick = (status:string) => {
+    switch (status) {
+      case "total":
+        setPayloadForWagons((prev :any)=>{
+          let newState = {...prev}
+          if(newState.status.length > 0){
+            newState.status = [];
+            setStatusCondition(newState.status);
+          }else{
+            newState.status = ["AVE", "INPL"];
+            setStatusCondition(newState.status);
+          }
+          return newState;
+        })
+        break;
+      case "indent":
+        setPayloadForWagons((prev :any)=>{
+          let newState = {...prev};
+          if(!newState.status.includes('AVE')){
+            newState.status = [...newState.status, 'AVE'];
+            setStatusCondition(newState.status);
+          }else{
+            newState.status = newState.status.filter((item: string) => item !== 'AVE');
+            setStatusCondition(newState.status);
+          }
+          return newState;
+        })
+        break;  
+      case "inplant":
+        setPayloadForWagons((prevState: any) => {
+          let newState = { ...prevState };
+          if(!newState.status.includes('INPL')){
+            newState.status = [...newState.status, 'INPL'];
+            setStatusCondition(newState.status);
+          }else{
+            newState.status = newState.status.filter((item: string) => item !== 'INPL');
+            setStatusCondition(newState.status);
+          }
+          return newState;
+        });
+        break;
+    }
+  }
+  const getColorForStatus = (status:any) => {
+    let bgColor = 'white';
+    let textColor = 'black';
+    switch (status) {
+      case "AVE":
+        if(statusCondition.includes('AVE')){
+          bgColor = '#E6EAFF';
+          textColor = "#536AFE";
+        }
+        break;
+      case "INPL":
+        if(statusCondition.includes('INPL')){
+          bgColor = '#F4FCFC';
+          textColor = "#174D68";
+        }
+        break;
+      case "total":
+        if(statusCondition.includes('AVE') && statusCondition.includes('INPL')){
+          bgColor = '#000000';
+          textColor = 'white';
+        }
+    }
+    return { bgColor, textColor };
+  }
 
   // useEffect
   useEffect(() => {
@@ -284,7 +354,8 @@ function WagonTallySheet({
   return (
     <div>
       <div className="wagon-wrapper">
-        <div className="search-container">
+        <div id="search-container">
+          <div></div>
           <div className="input-wrapper">
             <Image
               src={searchIcon}
@@ -303,6 +374,20 @@ function WagonTallySheet({
               placeholder="Search by Indent no."
               onChange={(e) => setIndentNo(e.target.value)}
             />
+          </div>
+          <div id="status-display">
+            <div className="status-display-boxes" style={{backgroundColor: getColorForStatus('total').bgColor, color:getColorForStatus('total').textColor }} onClick={()=>{handleStatusClick("total")}}>
+              <div style={{fontSize:"16px"}} >{inplantTotal + indentTotal}</div>
+              <div>{text("total")}</div>
+            </div>
+            <div className="status-display-boxes" style={{backgroundColor: getColorForStatus('AVE').bgColor, color:getColorForStatus('AVE').textColor }} onClick={()=>{handleStatusClick("indent")}}>
+              <div style={{fontSize:"16px"}}>{indentTotal}</div>
+              <div>{text("indent")}</div>
+            </div>
+            <div className="status-display-boxes" style={{backgroundColor: getColorForStatus('INPL').bgColor, color:getColorForStatus('INPL').textColor }} onClick={()=>{handleStatusClick("inplant")}}>
+              <div style={{fontSize:"16px"}}>{inplantTotal}</div>
+              <div>{text("inplant")}</div>
+            </div>
           </div>
         </div>
 
@@ -415,15 +500,14 @@ function WagonTallySheet({
                                 )}
                                 {column.id === "edemand" && (
                                   <>
-                                    <div style={{}}>
-                                      <div style={{ fontSize: 12 }}>
-                                        {row.edemand.edemand_no}
-                                      </div>
+                                    <div style={{ fontSize: 12 }}>
+                                      {row.edemand.edemand_no}
+                                    </div>
+                                    <div id="captive-rake-indicator-wagon-indicator">
                                       {row.is_captive && (
                                         <div
                                           style={{
                                             height: 24,
-                                            // paddingLeft: 38,
                                           }}
                                         >
                                           <Image
@@ -432,6 +516,19 @@ function WagonTallySheet({
                                             height={24}
                                             width={24}
                                           />
+                                        </div>
+                                      )}
+                                      {row.wagon_data_uploaded && (
+                                        <div
+                                          className="SourceOutlinedIcon"
+                                          style={{ position: "relative" }}
+                                        >
+                                          <SourceOutlinedIcon
+                                            style={{ fontSize: 23 }}
+                                          />
+                                          <div className="wagons-uploaded-wagonSheet">
+                                            Wagons Uploaded
+                                          </div>
                                         </div>
                                       )}
                                     </div>
@@ -445,8 +542,8 @@ function WagonTallySheet({
                                   </>
                                 )}
                                 {column.id === "exp_loading" &&
-                                  (row.exp_loading.date !== "NA" &&
-                                  row.exp_loading.time !== "NA" ? (
+                                  (row.exp_loading.date !== "--" &&
+                                  row.exp_loading.time !== "--" ? (
                                     <>
                                       <div style={{ fontSize: 12 }}>
                                         {row.exp_loading.date}
@@ -458,7 +555,7 @@ function WagonTallySheet({
                                       </div>
                                     </>
                                   ) : (
-                                    "NA"
+                                    "--"
                                   ))}
                                 {column.id === "total_wagons" && (
                                   <>
@@ -540,8 +637,8 @@ function WagonTallySheet({
                                   </>
                                 )}
                                 {column.id === "placement_time" &&
-                                  (row.placement_time.date !== "NA" &&
-                                  row.placement_time.time !== "NA" ? (
+                                  (row.placement_time.date !== "--" &&
+                                  row.placement_time.time !== "--" ? (
                                     <>
                                       <div style={{ fontSize: 12 }}>
                                         {row.placement_time.date}
@@ -551,11 +648,11 @@ function WagonTallySheet({
                                       </div>
                                     </>
                                   ) : (
-                                    "NA"
+                                    "--"
                                   ))}
                                 {column.id === "drawn_in" &&
-                                  (row.drawn_in.date !== "NA" &&
-                                  row.drawn_in.time !== "NA" ? (
+                                  (row.drawn_in.date !== "--" &&
+                                  row.drawn_in.time !== "--" ? (
                                     <>
                                       <div style={{ fontSize: 12 }}>
                                         {row.drawn_in.date}
@@ -565,7 +662,7 @@ function WagonTallySheet({
                                       </div>
                                     </>
                                   ) : (
-                                    "NA"
+                                    "--"
                                   ))}
                                 {column.id === "action" && (
                                   <div id="actionIconContaioner">
@@ -604,6 +701,14 @@ function WagonTallySheet({
                                         {text("indentNumber")}
                                       </div>
                                       <div
+                                        className="action-popover-wagon"
+                                        onClick={(e) => {
+                                          uploadRakeSheet(e, row);
+                                        }}
+                                      >
+                                        {text("rakeHandlingSheet")}
+                                      </div>
+                                      <div
                                         onClick={(e) =>
                                           uploadWagonSheet(e, row)
                                         }
@@ -611,23 +716,40 @@ function WagonTallySheet({
                                       >
                                         {text("uploadWagonTallySheet")}
                                       </div>
-                                      {/* <div className="action-popover-wagon" onClick={(e)=>{markPlacementTime(e, row)}} >
-                                      {text('markPlacemantTime')}
-                                    </div>
-                                    <div className="action-popover-wagon" onClick={(e) => {drawnInTime(e, row)}} >
-                                      {text('drawnInTime')}
-                                    </div> */}
-                                      {/* <div className="action-popover-wagon" onClick={(e)=>{uploadRakeSheet(e, row)}} >
-                                      {text('rakeHandlingSheet')}
-                                    </div> */}
                                       {/* <div
                                         className="action-popover-wagon"
                                         onClick={(e) => {
-                                          assignPlantToWagon(e, row);
+                                          markPlacementTime(e, row);
                                         }}
                                       >
-                                        {text("assignWagonToPlant")}
+                                        {text("markPlacemantTime")}
                                       </div> */}
+                                      {/* <div
+                                        className="action-popover-wagon"
+                                        onClick={(e) => {
+                                          drawnInTime(e, row);
+                                        }}
+                                      >
+                                        {text("drawnInTime")}
+                                      </div> */}
+                                      {row.wagon_data_uploaded && (
+                                        <div
+                                          className="action-popover-wagon"
+                                          onClick={(e) => {
+                                            assignPlantToWagon(e, row);
+                                          }}
+                                        >
+                                          {text("assignWagonToPlant")}
+                                        </div>
+                                      )}
+                                      {row.wagon_data_uploaded && (
+                                        <div
+                                          className="action-popover-wagon"
+                                          onClick={(e) => {}}
+                                        >
+                                          {text("assignHooksToWagon")}
+                                        </div>
+                                      )}
                                     </Popover>
                                   </div>
                                 )}
@@ -644,12 +766,14 @@ function WagonTallySheet({
                                               <div key={index}>{plant}</div>
                                             ))}
                                           {row?.plant_codes?.plant_codes
-                                            .length > 3 && (
+                                            .length > 2 && (
                                             <div className="more-plants">
-                                              <span style={{color:'#DFE3EB'}}>
+                                              <span
+                                                style={{ color: "#AB886D" }}
+                                              >
                                                 +
                                                 {row?.plant_codes?.plant_codes
-                                                  .length - 3}{" "}
+                                                  .length - 2}{" "}
                                                 more
                                               </span>
                                               <div className="hidden-plants">
@@ -670,7 +794,7 @@ function WagonTallySheet({
                                           )}
                                         </div>
                                       ) : (
-                                        "N/A"
+                                        "--"
                                       )}
                                     </div>
                                   </>

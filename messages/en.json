@@ -123,7 +123,7 @@
     "steel":"steel",
     "edemand":"e-Demand : ",
     "rakeNo":"Rake No : ",
-    "tottalWagons":"Total Wagons : ",
+    "receivedWagons":"Received Wagons : ",
     "in-plant-Dashboard":"Available Orders & Inplant Rakes",
     "wagonTallySheet": "Wagon Tally Sheet",
     "markPlacemantTime":"Mark Placement Time",
@@ -137,8 +137,14 @@
     "indentNumber":"Add Indent Number",
     "Cancel":"Cancel",
     "update":"Update",
-    "IndentNo":"Indent No."
-
+    "IndentNo":"Indent No.",
+    "assignWagonSheet":"Assign Wagon To Loading Shop",
+    "assignHooksToWagon":"Assign Hooks To Wagon",
+    "total":"Total",
+    "indent":"Indent",
+    "inplant":"In Plant",
+    "assignedWagons":"Assigned Wagons",
+    "notAssignedWagons":"Not Assigned Wagons"
   }
 }
 

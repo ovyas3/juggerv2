@@ -672,7 +672,6 @@ export const AssignToMill = ({
 export const AddIndentNumber = ({
   isClose,
   shipment,
-  different = "markplacement",
   getWagonDetails,
 }: any) => {
   const text = useTranslations("WAGONTALLYSHEET");
