@@ -66,7 +66,8 @@
     "cancel":"Cancel",
     "uploadWagonSheet":"Upload Wagon Sheet",
     "upload":"Upload",
-    "clear":"Clear"
+    "clear":"Clear",
+    "preferedEta" : "Prefered ETA"
   },
   "UPLOAD_ANNEXURE":{
     "SNCKBR_MSG":{
