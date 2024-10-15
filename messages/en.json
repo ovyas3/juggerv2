@@ -125,6 +125,7 @@
     "rakeNo":"Rake No : ",
     "receivedWagons":"Received Wagons : ",
     "in-plant-Dashboard":"Available Orders & Inplant Rakes",
+    "wagonTallySheet": "Wagon Tally Sheet",
     "markPlacemantTime":"Mark Placement Time",
     "drawnInTime":"Drawn In Time",
     "assignButton":"ASSIGN To PLANT",
