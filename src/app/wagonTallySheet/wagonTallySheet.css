@@ -1,0 +1,490 @@
+.wagon-tally-container {
+  position: relative;
+  display: flex;
+  scrollbar-width: 0px;
+  -ms-overflow-style: none;
+  
+  &::-webkit-scrollbar { 
+    display: none;
+  }
+}
+
+.wagon-tally-sheet-main{
+  height: calc(100vh - 56px);
+  width: calc(100vw - 70px);
+  margin-top: 56px;
+  margin-left: 70px;
+  font-family: 'Inter', sans-serif;
+}
+
+.wagon-tally-sheet-header{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 16px 0px;
+  width: 100%;
+}
+
+.wagon-tally-sheet-search-input{
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 28%;
+}
+
+.search-wagon-input{
+  width: 100%;
+  height: 40px;
+  border: 1px solid #DFE3EB;
+  padding: 6px 12px 6px 42px;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #3C4852;
+}
+
+.search-wagon-input:focus{
+  outline: none;
+}
+
+.search-wagon-input::placeholder{
+  color: #71747A;
+  font-size: 12px;
+}
+
+.search-wagon-icon{
+  position: absolute;
+  left: 10px;
+}
+
+.wagon-tally-sheet-body{
+  width: 100%;
+  height: calc(100% - 100px);
+}
+
+.wagon-tally-sheet-body-header{
+  display: flex;
+  width: 100%;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 16px;
+  padding: 0px 24px;
+}
+
+.wagon-tally-sheet-tabs{
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.wagon-tally-sheet-body-header-contents{
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.wagon-tally-sheet-body-header-contents-label{
+  font-size: 14px;
+  color: #3C4852;
+  font-weight: 500;
+  margin: 0;
+}
+
+.wagon-tally-sheet-body-header-contents-value{
+  font-size: 16px;
+  color: #3C4852;
+  font-weight: 600;
+  padding-left: 6px;
+  margin: 0;
+}
+
+.wagon-tally-sheet-body-content{
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  scrollbar-width: 0px;
+  -ms-overflow-style: none;
+
+  &::-webkit-scrollbar { 
+    display: none;
+  }
+}
+
+.wagon-tally-sheet-body-content-train{
+  width: 100%;
+  /* overflow-x: auto; */
+  overflow: hidden;
+  display: flex;
+  margin-top: 16px;
+  margin-bottom: 16px;
+  padding: 0px 0px 0px 24px;
+  scrollbar-width: 0px;
+  -ms-overflow-style: none;
+
+  &::-webkit-scrollbar { 
+    display: none;
+  }
+}
+
+.wagon-connector-icon{
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  transform: translateY(-2px);
+}
+
+.wagon-tally-sheet-body-content-wagon-details{
+  display: flex;
+  width: 97%;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  border-radius: 8px;
+  background-color: #F2F6FF;
+  margin: 24px;
+}
+
+.wagon-tally-sheet-body-content-wagon-details-container{
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px;
+}
+
+.wagon-tally-sheet-body-content-wagon-details-container:first-child{
+  border-bottom: 1px solid #DBE2FF;
+}
+
+.wagon-tally-sheet-body-content-wagon-details-contents{
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.wagon-tally-sheet-body-content-wagon-details-content{
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 6px;
+  padding-right: 72px;
+}
+
+.wagon-tally-sheet-body-content-wagon-details-content-down{
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 6px;
+  padding-right: 24px;
+}
+
+.wagon-tally-sheet-body-content-wagon-details-content-label{
+  font-size: 12px;
+  color: #3C4852;
+  font-weight: 500;
+  margin: 0;
+}
+
+.wagon-tally-sheet-body-content-wagon-details-content-value{
+  font-size: 14px;
+  color: #3C4852;
+  font-weight: 600;
+  margin: 0;
+}
+
+.wagon-tally-sheet-body-content-wagon-details-content-radio{
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 12px;
+}
+
+.wagon-tally-sheet-body-content-wagon-details-content-radio-label{
+  font-size: 12px;
+  color: #3C4852;
+  font-weight: 600;
+  margin: 0;
+  padding-left: 2px;
+}
+
+.wagon-tally-sheet-body-content-wagon-details-content-radio-content{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.wagon-tally-sheet-body-content-wagon-details-photo{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  border-radius: 6px;
+  border: 1px solid #DBE2FF;
+  padding: 4px 8px;
+  transition: all 0.3s ease;
+}
+
+.wagon-tally-sheet-body-content-wagon-details-photo:hover{
+  border: 1px solid #3C4852;
+  transform: scale(1.01);
+  cursor: pointer;
+}
+
+.wagon-tally-sheet-body-content-wagon-details-content-date-time{
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 4px;
+  background-color: #FFFFFF;
+  border: 1px solid #DFE3EB;
+  border-radius: 6px;
+  padding: 8px 12px;
+}
+
+.wagon-tally-sheet-body-content-wagon-details-content-date{
+  font-size: 14px;
+  color: #3C4852;
+  font-weight: 600;
+}
+
+.wagon-tally-sheet-body-content-wagon-details-content-time{
+  font-size: 12px;
+  color: #3C4852;
+  font-weight: 500;
+}
+
+.wagon-tally-sheet-body-content-materials-details{
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  border-radius: 8px;
+}
+
+.wagon-tally-sheet-body-content-materials-details-header{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0px 24px;
+}
+
+.wagon-tally-sheet-body-content-materials-details-header-title{
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 16px;
+  color: #3C4852;
+  font-weight: 700;
+}
+
+.wagon-tally-sheet-body-content-materials-details-body{
+  display: flex;
+  margin-top: 24px;
+  padding-left: 24px;
+  gap: 24px;
+  height: calc(100% - 20px);
+  overflow-y: auto;
+  flex-wrap: wrap;
+}
+
+.wagon-tally-sheet-body-content-materials-details-body-content{
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap:6px;
+}
+
+.wagon-tally-sheet-body-content-materials-details-body-content-label{
+  font-size: 12px;
+  color: #3C4852;
+  font-weight: 500;
+  margin: 0;
+}
+
+.wagon-tally-sheet-body-content-materials-details-body-content-input-container{
+  position: relative;
+}
+
+.wagon-tally-sheet-body-content-materials-details-body-content-input{
+  width: 170px;
+  height: 40px;
+  border: 1px solid #DFE3EB;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #3C4852;
+}
+
+.wagon-tally-sheet-body-content-materials-details-body-content-input:focus{
+  outline: none;
+}
+
+.wagon-tally-sheet-body-content-materials-details-body-content-input::placeholder{
+  color: #71747A;
+  font-size: 12px;
+}
+
+.wagon-tally-sheet-body-content-materials-details-body-content-input-unit{
+  background-color: #F2F6FF;
+  position: absolute;
+  right: 5px;
+  top: 6px;
+  height: 28px;
+  padding: 6px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #42454E;
+  font-size: 12px;
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+.wagon-tally-sheet-body-content-materials-details-body-content-input-icon{
+  position: absolute;
+  right: 8px;
+  top: 12px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.wagon-tally-sheet-footer{
+  position: sticky;
+  bottom: 0;
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 24px;
+  box-shadow: 0px -2px 8px 0px #0000000F;
+}
+
+.wagon-tally-sheet-footer-button-clear{
+  background-color: #FFFFFF;
+  border: 1px solid #3351FF;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 14px;
+  color: #3351FF;
+  font-weight: 700;
+  transition: all 0.3s ease;
+}
+
+.wagon-tally-sheet-footer-button-clear:hover{
+  transform: translateY(-2px);
+  box-shadow: 0px 4px 8px rgba(51, 81, 255, 0.2);
+  cursor: pointer;
+}
+
+.wagon-tally-sheet-footer-button-save{
+  background-color: #3351FF;
+  border: 1px solid #3351FF;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 14px;
+  color: #FFFFFF;
+  font-weight: 700;
+  transition: all 0.3s ease;
+}
+
+.wagon-tally-sheet-footer-button-save:hover{
+  transform: translateY(-2px);
+  box-shadow: 0px 4px 8px rgba(51, 81, 255, 0.2);
+  cursor: pointer;
+}
+
+/* Base styles for the scrollbar container */
+#scrollbar {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 40%;
+  height: 12px; /* Smaller, sleeker scrollbar height */
+  background: linear-gradient(90deg, #d3d3d3, #e0e0e0); /* Lighter gradient track */
+  border-radius: 5px;
+  outline: none;
+  margin: 0 auto;
+  position: relative;
+  transition: background 0.3s ease;
+}
+
+/* Thumb (handle) of the scrollbar */
+#scrollbar::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 40px; /* Thumb size */
+  height: 40px;
+  background: url('../../assets/Train_engine-locomotive.png') no-repeat center;
+  background-size: contain;
+  border: none;
+  cursor: pointer;
+  position: relative;
+  top: -16px; /* Adjusted to center thumb over track */
+  
+  /* Updated styling for the modern look */
+  border-radius: 50%;
+  background-color: #fff; /* White background for contrast */
+  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.15); /* Softer shadow */
+}
+
+/* Firefox thumb styling */
+#scrollbar::-moz-range-thumb {
+  width: 40px;
+  height: 40px;
+  background: url('../../assets/Train_engine-locomotive.png') no-repeat center;
+  background-size: contain;
+  border: none;
+  cursor: pointer;
+  position: relative;
+  top: -16px; /* Same vertical adjustment for Firefox */
+  
+  border-radius: 50%;
+  background-color: #fff;
+  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.15); /* Softer shadow */
+}
+
+/* Track customization for Webkit */
+#scrollbar::-webkit-slider-runnable-track {
+  background-color: #b0b0b0; /* Lighter track color */
+  height: 8px; /* Thin track */
+  border-radius: 5px;
+}
+
+/* Track customization for Mozilla */
+#scrollbar::-moz-range-progress {
+  background-color: #6C7A89; /* Darker filled portion */
+}
+
+#scrollbar::-moz-range-track {
+  background-color: #b0b0b0;
+  height: 8px;
+  border-radius: 5px;
+}
+
+/* Thumb hover effect */
+#scrollbar:hover::-webkit-slider-thumb {
+  background-color: #f0f0f0; /* Slightly lighter on hover */
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.25); /* Deeper shadow */
+  transform: scale(1.05); /* Subtle enlargement */
+}
+
+#scrollbar:hover::-moz-range-thumb {
+  background-color: #f0f0f0;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.25);
+  transform: scale(1.05);
+}
+
+/* Focus state for accessibility */
+#scrollbar:focus::-webkit-slider-thumb {
+  outline: 2px solid #6C7A89; /* Outline for focused state */
+}
+
+#scrollbar:focus::-moz-range-thumb {
+  outline: 2px solid #6C7A89;
+}
