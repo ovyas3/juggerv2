@@ -67,6 +67,7 @@
     "uploadWagonSheet":"Upload Wagon Sheet",
     "upload":"Upload",
     "clear":"Clear",
+    "preferedEta" : "Prefered ETA",
     "uploadFile":"Upload File",
     "bulkUoploadShipmnent":"Bulk Upload Shipments"
   },
