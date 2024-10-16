@@ -16,6 +16,7 @@ import fullLogo from '@/assets/Smartruck_hover_logo.svg'
 import HandlingAgentInactive from '@/assets/handling_agent_inactive_icon.svg';
 import handlingAgentActive from '@/assets/handling_agent_active_icon.svg'
 import AssessmentIcon from '@mui/icons-material/Assessment';
+import SettingsIcon from '@mui/icons-material/Settings';
 import AllInboxIcon from '@mui/icons-material/AllInbox';
 import WarehouseIcon from '@mui/icons-material/Warehouse';
 
@@ -28,6 +29,7 @@ function SideDrawer() {
     const [handleAgent, setHandleAgent] = useState(false);
     const [etaReport, setEtaReport] = useState(false);
     const [dashboard, setDashboard] = useState(false);
+    const  [setting,setSetting] = useState(false)
     const [inPlantWagonDashboard, setInPlantWagonDashboard] = useState(false);
  
     const pathName = usePathname();
@@ -148,6 +150,24 @@ function SideDrawer() {
                     className={`${open ? 'fnr_text' : 'fnr_text_none'}`}
                     style={{ color: etaReport ? 'black' : 'white' }} 
                 >Reports</div>
+            </div>
+            <div
+                onMouseEnter={()=>{ setSetting(true) }}
+                onMouseLeave={()=>{ setSetting(false) }}
+                onClick={() => handleRouting('tools')}
+                className='station-code'
+                style={{
+                    width: open ? '190px' : '42px',
+                    justifyContent: open ? 'start' : 'center',
+                    backgroundColor: setting === true ? 'white' : '',
+                    cursor: 'pointer'
+                }}
+            >
+                <SettingsIcon style={{ marginLeft: open ? '9px' : '', color: setting ? 'black' : 'white' }}/>
+                <div 
+                    className={`${open ? 'fnr_text' : 'fnr_text_none'}`}
+                    style={{ color: setting ? 'black' : 'white' }} 
+                    >Settings</div>
             </div>
 
             <div
