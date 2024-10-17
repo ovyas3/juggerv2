@@ -10,7 +10,6 @@ import './table.css'
 import service from '@/utils/timeService';
 import trash from '@/assets/trash_icon.png'
 
-
 import { useTranslations } from 'next-intl';
 
 
@@ -1329,4 +1328,135 @@ export const UploadWagonSheet = ({getWagonDetails,isClose, shipment, setOpenUplo
     </div>
     )
 }
+export const HandlingETA = ({ isClose, isOpen, shipment, getAllShipment, difference}: any) => {
+    
+    const { showMessage } = useSnackbar();
+    const [time, setTime] = React.useState('');
+    
+    useEffect(() => {
+        if (difference) {
+            setTime(difference || '');
+        }
+    }, [difference]);
+
+
+
+    const handleChange = (event: SelectChangeEvent) => {
+        setTime(event.target.value);
+    };
+    const payload = {
+        id:shipment._id,
+        preferred_eta: time
+    }
+    console.log(time,"time");
+    
+   const handleSubmit = async()=>{
+    try {
+        const response = await httpsPost(`rake_shipment/preferred_difference_eta`, payload);
+        if (response?.statusCode === 200) {
+            showMessage(' Updated Successfully',"success");
+          isClose(false);
+          getAllShipment();
+        }
+      } catch (error) {
+        console.log('Error:', error);
+        showMessage('An error occurred, please try again', 'error');
+      }
+    };
+    return (
+        <div>
+        <Modal
+          open={isOpen}
+          onClose={() => isClose(false)}
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+          }}
+        >
+          <Box
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
+            sx={{
+              backgroundColor: 'white',
+              borderRadius: '12px',
+              minWidth: '340px',
+              maxWidth: '400px',
+              padding: '25px',
+              position: 'relative',
+              outline: 'none',
+              textAlign: 'left',
+              height:'320px'
+            }}
+          >
+            <div className="closeContaioner">
+                        <CloseIcon
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                isClose(false);
+                            }}
+                            style={{ cursor: 'pointer' }}
+                        />
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        <div style={{ color: '#131722', fontSize: '20px', fontWeight: 500, marginBottom: '24px' }}>
+                            Update ETA
+                        </div>
+                        <div style={{marginBottom:'18px'}} >
+                            <span>Shipment FNR: <span style={{fontWeight:500}}>{shipment.fnr.primary}</span></span>
+                        </div>
+                       
+                    </div>
+
+                    <div style={{ color: '#42454E', fontSize: '14px' }}>
+                        <span>Preferred Difference in ETA</span>
+                       </div>
+            
+            <FormControl fullWidth>
+              <Select
+                value={time}
+                onChange={handleChange}
+                displayEmpty
+                sx={{
+                  borderRadius: '4px',
+                  height: '36px',
+                  backgroundColor: '#ffff',
+                  marginTop: '10px',
+                  border:'1px solid #E9E9EB',
+                }}
+              >
+                <MenuItem value={15}>15 min</MenuItem>
+                <MenuItem value={30}>30 min</MenuItem>
+                <MenuItem value={45}>45 min</MenuItem>
+                <MenuItem value={60}>1 hr</MenuItem>
+              </Select>
+            </FormControl>
+            
+            <div style={{ marginTop: '77px' }}>
+              <button
+                style={{
+                  background: '#3351FF',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '4px',
+                  width: '100%',
+                  height: '40px',
+                  fontSize: '14px',
+                  fontWeight: 'bold',
+                  cursor: 'pointer',
+                }}
+                onClick={handleSubmit}
+              >
+                UPDATE
+              </button>
+            </div>
+          </Box>
+        </Modal>
+      </div>
+      
+    )
+};
+
 

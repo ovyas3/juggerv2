@@ -236,14 +236,14 @@
   .search{
     border: 1px solid #E9E9EB;
     top: 115px;
-    left: 830px;
     width: 250px;
-    height: 319px;
+    height: 315px;
     background: #FFFFFF;
     border-radius: 4px;
     opacity: 1;
     z-index: 3000;
     position: absolute;
+    right: 510px;
   }
   .search-container {
     display: flex;

@@ -398,7 +398,7 @@ function Filters({ onToFromChange, onChangeStatus, onChangeRakeTypes, reload, sh
             </div>
 
             {openFilterModal ?
-                <div>
+                <div style={{ display: 'flex', justifyContent: 'right' }}>
                     <div className='search'>
                             <div className="search-container">
                                 <div className='search-container-group'>

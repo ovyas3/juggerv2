@@ -98,7 +98,7 @@ export const TripTrackerNavbar = (props: any) => {
                       ...statusStyle
                     }
                   }>
-                  {statusBuilder(statusText)}
+                  {statusText}
                   </Box>
                   </Grid>
                   </Grid>
