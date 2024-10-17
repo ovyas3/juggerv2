@@ -1,0 +1,183 @@
+#pageInsideContent{
+    height: calc(100vh - 56px);
+    width: calc(100vw - 70px);
+    margin-top: 56px;
+    margin-left: 70px;
+}
+#search-container-assign{
+    display: flex;
+    justify-content: space-between;
+    margin-inline: 24px;
+    padding-block: 16px;
+}
+#filtersForHooksAssignToLoadingShop{
+    margin-inline: 24px;
+    display: flex;
+    gap:12px;
+    margin-top: 20px;
+}
+#selectAPlant{
+    position: relative;
+}
+#selectAPlantLabel{
+    font-size: small;
+}
+#dropdownForPlantsMaincontainer{
+    font-size: 12px;
+    font-weight: 400;
+    margin-top: 4px;
+    height: 40px;
+    width: 156px;
+    border-radius: 6px;
+    border: 1px solid #E9EEF2;
+    text-align: center;
+    align-content: center;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    gap: 6px;
+    padding-left: 10px;
+    padding-right: 2px;
+}
+#dropdownListForplants{
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+    border: 1px solid #E9EEF2;
+    margin-top: 8px;
+    font-size: 12px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+    width: 156px;
+}
+
+.dropdownListForPlantsEachItem{
+    padding-inline: 10px;
+    padding-block: 6px;
+}
+.dropdownListForPlantsEachItem:hover{
+    background-color: #E9EEF2;
+    cursor: pointer;
+}
+#wagonListContainer{
+    /* background-color: greenyellow; */
+}
+.wagonAssignToMillConatiner{
+    height: 50px;
+    width: 145px;
+    /* background-color: burlyswood; */
+    display: flex;
+    gap:8px
+}
+.wagonsAssignToMillImageSelectorConatainer{
+    height: 100%;
+    width: 55px;
+    display: flex;
+    justify-content: end;
+    align-items: end;
+    position: relative;
+}
+.wagonsAssigntoMillCheckedIcon{
+    height: 14px;
+    width: 14px;
+    border-radius: 50%;
+    position: absolute;
+    top:3px;
+    left: 1px;
+}
+.wagonsAssignToMillImageSelector{
+    height: 40px;
+    width: 48px;
+    border-radius: 6px;
+    border: 1px solid #B7BAC3;
+    background-color: #F8F9FD;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+#wagonsAssignToMillTextArea{
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    justify-content: center;
+    position: relative;
+    width: 80px;
+}
+#wagonsAssignToMillAssignedPlantName{
+    font-size: 9px;
+    font-weight: 400;
+    color: #3D4852;
+    text-wrap: nowrap;
+    overflow-x: visible;
+}
+#wagonsAssignToMillNumber{
+    font-size: 12px;
+    font-weight: 600;
+}
+#wagonsAssignToMilltype{
+    font-size: 10px;
+    font-weight: 400;
+}
+#wagonListContainer{
+    margin-top: 24px;
+    margin-inline: 24px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); 
+    grid-template-rows: repeat(auto-fill,minmax(50px, auto)); 
+    grid-auto-rows: minmax(50px, auto);
+    grid-auto-flow: column; 
+    column-gap: 32px;
+    row-gap: 20px;
+    max-height: calc(100vh - 460px);
+    overflow-y: scroll;
+    scroll-behavior: smooth;
+    padding-bottom: 16px;
+    /* background-color: tomato; */
+  }
+#hooksFilter{
+    position: relative;
+}
+#dropdownListForHooks{
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+    border: 1px solid #E9EEF2;
+    margin-top: 8px;
+    font-size: 12px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+    width: 156px;
+}
+#addButtonContainerForHooks{
+    display: flex;
+    justify-content:end;
+    padding: 6px;
+    
+}
+#addButtonForHooks{
+    background-color: #DADFF9;
+    width:fit-content;
+    color: #3856FE;
+    padding: 6px 12px;
+    font-weight: 600;
+    border-radius: 4px;
+    cursor: pointer;
+}
+#status-for-assign-sheet{
+    /* width: 100%; */
+    margin-inline: 24px;
+    background-color: #F2F6FF;
+    /* background-color: tomato !important; */
+    border-radius: 12px;
+    height: 60px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    /* padding-inline: 24px; */
+    position: relative;
+  }

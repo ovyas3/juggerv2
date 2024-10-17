@@ -1,0 +1,653 @@
+#inside-content-assign {
+    height: calc(100vh - 56px);
+    width: calc(100vw - 70px);
+    margin-top: 56px;
+    margin-left: 70px;
+  }
+  .wagon-wrapper {
+    height: 100%;
+  }
+  
+  .wagon-tally-container {
+    display: flex;
+  }
+  
+  #search-container {
+    padding-top: 20px;
+    padding-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    height: 82px;
+    padding-inline: 24px;
+    align-items: center;
+    flex-direction: row;
+  }
+  
+  #status-display{
+    display: flex;
+    gap: 16px;
+  }
+  
+  .status-display-boxes{
+    height: 42px;
+    /* background-color: yellow; */
+    font-size: 12px;
+    font-weight: 400;
+    border-radius: 6px;
+    width: 60px;  
+    border: 1px solid #e9eef2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-direction: column;
+  }
+  
+  #search-container-assign {
+    /* padding-top: 20px; */
+    /* padding-bottom: 20px; */
+    display: flex;
+    justify-content: space-between;
+    /* height: 82px; */
+    padding-inline: 24px;
+    /* align-items: center; */
+    flex-direction: row;
+    /* background-color: thistle; */
+    padding-block: 10px;
+    align-items: start;
+  }
+  
+  .input-wrapper {
+    width: 328px;
+    border-radius: 6px;
+    border: 1px solid #e9eef2;
+    background: var(--Primary, #fff);
+    padding-block: 8px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding-left: 16px;
+  }
+  .icon {
+    height: 24px;
+    width: 24px;
+  }
+  .input {
+    border: none;
+    outline: none;
+    width: 80%;
+  }
+  #actionIconContaioner {
+    display: flex;
+    justify-content: center;
+  }
+  #actionIcon {
+    background-color: #3351ff;
+    height: 24px;
+    width: 24px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  .action-popover-wagon {
+    font-size: 12px;
+    font-weight: 500;
+    padding: 8px 16px;
+    cursor: pointer;
+  }
+  .action-popover-wagon:hover {
+    background-color: rgb(233, 229, 229);
+  }
+  .aveStatus{
+    background-color: #E6EAFF !important;
+    color: #536AFE !important;
+    height: 28px;
+    padding-inline: 8px;
+    border-radius: 4px;
+    align-content: center;
+  }
+  .inplStatus{
+    background-color: #F4FCFC !important;
+    color: #174D68 !important;
+    height: 28px;
+    padding-inline: 8px;
+    border-radius: 4px;
+    align-content: center;
+  }
+  .header_drawnin{
+    min-width: 100px
+  }
+  .wagonIconInWagonSheet{
+    height: 20px;
+    width: 20px;
+  }
+  .more-plants {
+    position: relative;
+    cursor: pointer;
+    display: inline-block;
+  }
+  
+  .hidden-plants {
+    /* display: none; */
+    visibility: hidden;
+    position: absolute;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding-inline: 8px;
+    padding-block: 4px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 1;
+    top:0px;
+    right: -50px;
+    transition: all 0.3s ease;
+  }
+  
+  .more-plants:hover .hidden-plants {
+    visibility: visible;
+  }
+  
+  /* ------------ Rake Handling Sheet ------------ */
+  #headerForRakeHandlingSheet {
+    color: #3c4852;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
+    text-transform: capitalize;
+  }
+  #scrollAreaforRakeSheet {
+    overflow-y: scroll;
+    max-height: 550px;
+    scroll-behavior: smooth;
+    margin-top: 24px;
+  }
+  #firstSectionofRakeSheet {
+    display: flex;
+    gap: 50px;
+    margin-bottom: 24px;
+  }
+  .headerForRakeSection {
+    font-size: 12px;
+    font-weight: 400;
+    color: #3c4852;
+    margin-bottom: 8px;
+  }
+  .inputForRakeSection {
+    border: 1px solid #dfe3eb;
+    width: 156px;
+    height: 36px;
+    border-radius: 4px;
+    outline: none;
+    padding-inline: 8px;
+  }
+  .millDetails_dropDown {
+    width: 156px;
+    height: 36px;
+    border: 1px solid #dfe3eb;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-inline: 8px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    margin-top: 8px;
+    position: relative;
+  }
+  .expandMoreIcon_millDetails {
+    height: 24px;
+    width: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .headerForRakeSection_millDetails {
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    text-transform: capitalize;
+    color: #3c4852;
+  }
+  #hookSelectionContainer {
+    margin-bottom: 36px;
+    display: flex;
+    flex-wrap: wrap;
+    gap:36px;
+  }
+  .headerForMillDetails_hooks {
+    color: #3c4852;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    text-transform: capitalize;
+    width: 156px;
+    margin-bottom: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  
+  }
+  
+  .no_of_wagons_cont {
+    margin-top: 8px !important;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .no_of_wagons_wrap {
+    column-gap: 8px;
+    display: flex;
+  }
+  
+  .request_wagons {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 3px;
+    position: relative;
+  }
+  
+  .request_wagons_logo {
+    height: 25px;
+    width: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+  }
+  
+  .request_wagons:hover .hover_req {
+    opacity: 1;
+    visibility: visible;
+  }
+  
+  .request_image {
+    height: 100%;
+    width: 100%;
+  }
+  
+  .ArrowUpwardIcon {
+    color: #00B275;
+    position: absolute;
+    top: 6px
+  }
+  
+  .divider_wagons {
+    height: 16px;
+    width: 1px;
+    background-color: #E9E9EB;
+    margin-inline: 4px;
+  }
+  
+  .ArrowDownwardIcon {
+    color: #334FFC;
+    position: absolute;
+    top: 6px
+  }
+  
+  .hover_req {
+    position: absolute;
+    background-color: #00B275;
+    color: white;
+    text-wrap: nowrap;
+    width: 106px;
+    height: 20px;
+    text-align: center;
+    font-size: 10px;
+    padding-block: 2px;
+    border-radius: 4px;
+    top: 100%;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+  }
+  
+  .received_wagons {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 3px;
+    position: relative;
+  }
+  
+  .hover_rece {
+    position: absolute;
+    background-color: #314FFC;
+    color: white;
+    text-wrap: nowrap;
+    width: 106px;
+    height: 20px;
+    text-align: center;
+    font-size: 10px;
+    padding-block: 2px;
+    border-radius: 4px;
+    top: 100%;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+  }
+  
+  .received_wagons:hover .hover_rece {
+    opacity: 1;
+    visibility: visible;
+  }
+  
+  .removeAddicons{
+    color: white;
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+  .inputForMillDetails_hooks {
+    border: 1px solid #dfe3eb;
+    width: 156px;
+    height: 36px;
+    border-radius: 6px;
+    outline: none;
+    padding-inline: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    align-content: center;
+    margin-top: 8px;
+  }
+  .loadingTimeContainer{
+    font-size: 12px;
+    font-weight: 400;
+    color: #3C4852;
+    margin-top: 20px;
+  }
+  #lastSection{
+    display: flex;
+    gap:20px
+  }
+  /* ------------ assign wagon Sheet ------------ */
+  #assign-wagon-details{
+    margin-inline: 24px;
+    display: flex;
+    gap:24px;
+    margin-top: 30px;
+  }
+  .subtile-assign-wagon-details{
+    font-size: 12px;
+    font-weight: 400;
+  }
+  #rail{
+    margin-top: 16px;
+    display: flex;
+    overflow-x: auto; 
+    white-space: nowrap; 
+    max-width: 100%;
+  }
+  #rail::-webkit-scrollbar {
+    display: none; 
+  }
+  #rail > div {
+    flex-shrink: 0; 
+  }
+  #railEngine{
+    height: 48px;
+    width: 189px;
+  }
+  .eachWagonOfAssignWagon{
+    height: 100px;
+    width: 189px;
+    display: flex;
+    position: relative;
+    border-bottom: 1px solid #dfe3eb;
+    align-items: end;
+    background-color: #3351ff;
+  }
+  #wagon-number-rail{
+    position: absolute;
+    font-size: 10px;
+    font-weight: 400;
+    color: #3C4852;
+    top:0px;
+    left: 0px;
+  }
+  #assign-button-container{
+    padding-left: 24px;
+    margin-top: 42px;
+  }
+  #assign-button{
+    background-color: #3351FF1F;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 10px;
+    color: #3351FF;
+    height: 32px;
+    width: 127px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  #assign-button:hover{
+    background-color: #3351FF;
+    color: white;
+  }
+  #headerForAssignToMill{
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 16px;
+  }
+  #status-for-assign-sheet{
+    /* width: 100%; */
+    margin-inline: 24px;
+    background-color: #F2F6FF;
+    /* background-color: tomato !important; */
+    border-radius: 12px;
+    height: 60px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    /* padding-inline: 24px; */
+    position: relative;
+  }
+  #wagons-assign-notassigned{
+    position: absolute;
+    bottom: -18px;
+    right: 0px;
+    font-size: small;
+    display: flex;
+    gap:16px;
+    font-size: 12px;
+  }
+  #assign-wagon-container{
+    /* background-color: #00B275; */
+    height: calc(100vh - 330px);
+    margin-inline: 24px;
+    margin-top: 16px;
+  }
+  #assign-wagon-container-box-selection-container{
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); 
+    grid-template-rows: repeat(auto-fill,minmax(50px, auto)); 
+    grid-auto-rows: minmax(50px, auto);
+    grid-auto-flow: column; 
+    column-gap: 32px;
+    row-gap: 20px;
+    max-height: calc(100vh - 460px);
+    overflow-y: scroll;
+    scroll-behavior: smooth;
+    padding-bottom: 16px;
+    /* background-color: tomato; */
+  }
+  #captive-rake-indicator-wagon-indicator{
+    /* background-color: #00B275; */
+    display: flex;
+    margin-bottom: -5px;
+    gap:10px;
+    justify-content: center;
+  }
+  .wagons-uploaded-wagonSheet{
+    position: absolute;
+    top: 21px;
+    right: -64px;
+    /* cursor: pointer; */
+    color: #3C4852;
+    font-size: 9px;
+    font-weight: 400;
+    background-color: #3C4852;
+    color: white;
+    text-wrap: nowrap;
+    border-radius: 4px;
+    padding-inline: 6px;
+    padding-block: 2px;
+    opacity: 0;
+    transition: all 0.3s ease;
+  }
+  .SourceOutlinedIcon:hover .wagons-uploaded-wagonSheet{
+    opacity: 1;
+  }
+  /* ------------- wagon assign sheet 2 ---------- */
+  #wagon-locomotion-engine{
+    /* background-color: white; */
+    height: 85px;
+    width: 190px !important;
+    align-content: end;
+  }
+  #connecting-chain{
+    width: 8px;
+    /* background-color: wheat; */
+    display: flex;
+    align-items: end;
+    padding-bottom: 5px;
+  }
+  #wagon-no-assign-container{
+    position: absolute;
+    top:30px;
+  }
+  #wagon-plant-name-assign-container{
+    position: absolute;
+    top: 8px;
+    font-size: 8px;
+    font-weight: 400;
+    color: #3351FF;
+    background-color: #3351FF1F;
+    padding-inline: 6px;
+    padding-block: 3px;
+    border-radius: 2px;
+  
+  }
+
+  #scrollAreaForAssignToMill{
+    overflow-y: scroll;
+    max-height: 375px;
+    scroll-behavior: smooth;
+}
+#wagonContainerForAssignToMill{
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    gap: 8px 48px;
+    min-height: 225px;
+}
+.wagonAssignToMillConatiner{
+    height: 50px;
+    width: 145px;
+    /* background-color: burlyswood; */
+    display: flex;
+    gap:8px
+}
+.wagonsAssignToMillImageSelectorConatainer{
+    height: 100%;
+    width: 55px;
+    display: flex;
+    justify-content: end;
+    align-items: end;
+    position: relative;
+}
+.wagonsAssignToMillImageSelector{
+    height: 40px;
+    width: 48px;
+    border-radius: 6px;
+    border: 1px solid #B7BAC3;
+    background-color: #F8F9FD;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.wagonsAssigntoMillCheckedIcon{
+    height: 14px;
+    width: 14px;
+    border-radius: 50%;
+    position: absolute;
+    top:3px;
+    left: 1px;
+}
+#wagonsAssignToMillTextArea{
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    justify-content: center;
+    position: relative;
+    width: 80px;
+}
+#wagonsAssignToMillAssignedPlantName{
+    font-size: 9px;
+    font-weight: 400;
+    color: #3D4852;
+    text-wrap: nowrap;
+    overflow-x: visible;
+}
+#wagonsAssignToMillNumber{
+    font-size: 12px;
+    font-weight: 600;
+}
+#wagonsAssignToMilltype{
+    font-size: 10px;
+    font-weight: 400;
+}
+
+#plantSelectorContainer{
+    /* background-color: #B7BAC3; */
+    margin-top: 10px;
+    display: flex;
+    gap:16px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+}
+#plantMillSelector{
+    border: 1px solid #B7BAC3;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 12px;
+    flex-wrap: wrap;
+    height: 36px;
+    border-radius: 8px;
+    padding-inline: 10px;
+    gap : 4px;
+    cursor: pointer;
+}
+#plantRadioButton{
+    height: 16px;
+    width: 16px;
+    border-radius: 50%;
+    border: 1px solid #3D4852;
+    display: flex;
+    justify-content: center;
+    align-items: center;   
+}
+#plantRadioButtonInside{
+    height: 10px;
+    width: 10px;
+    border-radius: 50%;
+    background-color: white;
+}
+#dividerForAssignToMill{
+    width: 100%;
+    box-shadow: 0 -4px 6px -2px rgba(0, 0, 0, 0.1);
+    height: 10px;
+}

@@ -68,7 +68,9 @@
     "upload":"Upload",
     "clear":"Clear",
     "uploadFile":"Upload File",
-    "bulkUoploadShipmnent":"Bulk Upload Shipments"
+    "bulkUoploadShipmnent":"Bulk Upload Shipments",
+    "viewRRDoc":"View Documents",
+    "cancelled":"Cancel"
   },
   "UPLOAD_ANNEXURE":{
     "SNCKBR_MSG":{
@@ -101,9 +103,11 @@
   "WAGONTALLYSHEET":{
     "uploadWagonTallySheet":"Upload Wagon Sheet",
     "rakeHandlingSheet":"Rake Handling Sheet",
-    "assignWagonToPlant":"Assign Wagon to Plant",
+    "assignWagonToPlant":"Assign Wagon to Loading Shop",
     "rakeArrivalAtStation":"Rake Arrival At Serving Station",
-    "rakeArrivalAtPlant":"Rake Arrival At Plant",
+    "stabled":"Stabled",
+    "placementTime":"Placement Time",
+    "gate-in":"Gate-In",
     "bpRelease":"B/P Release",
     "wagonPlacedAtLoadingPoint":"Wagons Placed At Loading Point",
     "mill":"Mill",
@@ -123,7 +127,7 @@
     "steel":"steel",
     "edemand":"e-Demand : ",
     "rakeNo":"Rake No : ",
-    "receivedWagons":"Received Wagons : ",
+    "receivedWagons":"Received Wagons",
     "in-plant-Dashboard":"Available Orders & Inplant Rakes",
     "markPlacemantTime":"Mark Placement Time",
     "drawnInTime":"Drawn In Time",
@@ -142,8 +146,12 @@
     "total":"Total",
     "indent":"Indent",
     "inplant":"In Plant",
-    "assignedWagons":"Assigned Wagons",
-    "notAssignedWagons":"Not Assigned Wagons"
+    "assignedWagons":"Assigned Wagons - ",
+    "notAssignedWagons":"Not Assigned Wagons - ",
+    "sickWagons":"Sick Wagons - ",
+    "assignsHooksToLoadingShop":"Assigns Hooks To Loading Shop",
+    "selectAplant":"Assign Plant",
+    "assignHooks":"Assign Hooks"
   }
 }
 

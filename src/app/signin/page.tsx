@@ -38,8 +38,7 @@ const Signin = () => {
             response.data
           );
           if (signedIn) {
-            router.push("/orders");
-          } else {
+            router.push("/inPlantDashboard");
           }
         } else {
           showMessage(response.message, "error");

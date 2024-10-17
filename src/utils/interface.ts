@@ -77,6 +77,12 @@ export interface row {
   intent_no:any,
   drawnout_time:any,
   demand_date:any,
+  captive:{
+    name:string,
+  },
+  fois_updated_at:{
+    date:string,
+  }
 }
 
 export interface tagItem {

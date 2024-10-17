@@ -16,6 +16,8 @@ import { renderTimeViewClock } from "@mui/x-date-pickers/timeViewRenderers";
 
 const events_names = {
   rakeArrivalAtStation: "Rake Arrival At Serving Station",
+  stabled: "Stabled",
+  placementTime: "Placement Time",
   rakeArrivalAtPlant: "Rake Arrival At Plant",
   bpRelease: "B/P Release",
   wagonPlacedAtLoadingPoint: "Wagons Placed At Loading Point",
@@ -53,6 +55,14 @@ function RakeHandlingSheet({ isClose, shipment }: any) {
   const [rakeArrivalAtStationObject, setRakeArrivalAtStationObject] = useState<any>({});
   const [rakeArrivalAtStationDate, setRakeArrivalAtStationDate] = useState<Date | null>(null);
   const [openRakeArrivalAtServingStation, setOpenRakeArrivalAtServingStation] = useState(false);
+
+  const [stabled, setStabled] = useState<any>({});
+  const [stabledDate, setStabledDate] = useState<Date | null>(null);
+  const [openStabled, setOpenStabled] = useState(false);
+
+  const [placementTime, setPlacementTime] = useState<any>({});
+  const [placementTimeDate, setPlacementTimeDate] = useState<Date | null>(null);
+  const [openPlacementTime, setOpenPlacementTime] = useState(false);
 
   const [rakeArrivalAtPlantObject, setRakeArrivalAtPlantObject] = useState<any>({});
   const [rakeArrivalAtPlantDate, setRakeArrivalAtPlantDate] = useState<Date | null>(null);
@@ -171,6 +181,24 @@ function RakeHandlingSheet({ isClose, shipment }: any) {
         id:rakeArrivalAtStationObject?._id,
       })
     }
+    if(stabledDate){
+      payload.events.push({
+        shipment : shipment.id,
+        event_name: events_names.stabled,
+        event_datetime: stabledDate,
+        FNR:shipment.fnr,
+        id:stabled?._id,
+      })
+    }
+    if(placementTimeDate){
+      payload.events.push({
+        shipment : shipment.id,
+        event_name: events_names.placementTime,
+        event_datetime: placementTimeDate,
+        FNR:shipment.fnr,
+        id:placementTime?._id,
+      })
+    }
     if(rakeArrivalAtPlantDate){
       payload.events.push({
         shipment : shipment.id,
@@ -284,6 +312,12 @@ function RakeHandlingSheet({ isClose, shipment }: any) {
   useEffect(()=>{
     setRakeArrivalAtStationDate((rakeHandlingSheetData.filter((data: any) => { return data.event_name === events_names.rakeArrivalAtStation })[0] as any)?.event_timestamp)
     setRakeArrivalAtStationObject(rakeHandlingSheetData.filter((data:any)=>{return data.event_name === events_names.rakeArrivalAtStation})[0])
+
+    setStabledDate((rakeHandlingSheetData.filter((data: any) => { return data.event_name === events_names.stabled })[0] as any)?.event_timestamp);
+    setStabled(rakeHandlingSheetData.filter((data:any)=>{return data.event_name === events_names.stabled})[0]);
+
+    setPlacementTimeDate((rakeHandlingSheetData.filter((data: any) => { return data.event_name === events_names.placementTime })[0] as any)?.event_timestamp)
+    setPlacementTime(rakeHandlingSheetData.filter((data:any)=>{return data.event_name === events_names.placementTime})[0])
 
     setRakeArrivalAtPlantDate((rakeHandlingSheetData.filter((data: any) => { return data.event_name === events_names.rakeArrivalAtPlant })[0] as any)?.event_timestamp)
     setRakeArrivalAtPlantObject(rakeHandlingSheetData.filter((data:any)=>{return data.event_name === events_names.rakeArrivalAtPlant})[0])
@@ -425,7 +459,149 @@ function RakeHandlingSheet({ isClose, shipment }: any) {
             </div>
             <div>
               <header className="headerForRakeSection">
-                {text("rakeArrivalAtPlant")}
+                {text("stabled")}
+              </header>
+              <div className="inputForRakeSection">
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DateTimePicker
+                    open={openStabled}
+                    onClose={() => {
+                      setOpenStabled(false);
+                    }}
+                    // value={dayjs(rakeArrivalAtStationDate)}
+                    value={stabledDate ? dayjs(stabledDate) : null}
+                    sx={{
+                      width: "100%",
+                      height:'100%',
+                    
+                      ".MuiInputBase-input": {
+                        
+                        padding: "7px",
+                        
+                        paddingLeft: "11px",
+                        fontSize: "14px ",
+                        color: "#42454E",
+                      },
+                      ".MuiInputBase-root": {
+                        padding: 0,
+                        border: "none",
+                        "& fieldset": { border: "none" },
+                      },
+                      "& .MuiOutlinedInput-root": {
+                        "&:hover fieldset": {
+                          border: "none",
+                        },
+                        "&.Mui-focused fieldset": {
+                          border: "none",
+                        },
+                      },
+                      "& .MuiIconButton-root": {
+                        position: "relative",
+                      },
+                    }}
+                    ampm={false}
+                    slotProps={{
+                      textField: {
+                        onClick: () => {
+                          console.log();
+                          setOpenStabled(!openStabled);
+                        },
+                        fullWidth: true,
+                        InputProps: {
+                          endAdornment: null,
+                        },
+                      },
+                    }}
+                    viewRenderers={{
+                      hours: renderTimeViewClock,
+                      minutes: renderTimeViewClock,
+                      seconds: renderTimeViewClock,
+                    }}
+                    onChange={(newDate) => {
+                      if (newDate) {
+                        setStabledDate(newDate.toDate());
+                      }
+                    }}
+                    format="DD/MM/YYYY  HH:mm"
+                  />
+                </LocalizationProvider>
+              </div>
+            </div>
+            {/* --------------------------------- */}
+             <div>
+              <header className="headerForRakeSection">
+                {text("placementTime")}
+              </header>
+              <div className="inputForRakeSection">
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DateTimePicker
+                    open={openPlacementTime}
+                    onClose={() => {
+                      setOpenPlacementTime(false);
+                    }}
+                    // value={dayjs(rakeArrivalAtStationDate)}
+                    value={placementTimeDate ? dayjs(placementTimeDate) : null}
+                    sx={{
+                      width: "100%",
+                      height:'100%',
+                    
+                      ".MuiInputBase-input": {
+                        
+                        padding: "7px",
+                        
+                        paddingLeft: "11px",
+                        fontSize: "14px ",
+                        color: "#42454E",
+                      },
+                      ".MuiInputBase-root": {
+                        padding: 0,
+                        border: "none",
+                        "& fieldset": { border: "none" },
+                      },
+                      "& .MuiOutlinedInput-root": {
+                        "&:hover fieldset": {
+                          border: "none",
+                        },
+                        "&.Mui-focused fieldset": {
+                          border: "none",
+                        },
+                      },
+                      "& .MuiIconButton-root": {
+                        position: "relative",
+                      },
+                    }}
+                    ampm={false}
+                    slotProps={{
+                      textField: {
+                        onClick: () => {
+                          console.log();
+                          setOpenPlacementTime(!openPlacementTime);
+                        },
+                        fullWidth: true,
+                        InputProps: {
+                          endAdornment: null,
+                        },
+                      },
+                    }}
+                    viewRenderers={{
+                      hours: renderTimeViewClock,
+                      minutes: renderTimeViewClock,
+                      seconds: renderTimeViewClock,
+                    }}
+                    onChange={(newDate) => {
+                      if (newDate) {
+                        setPlacementTimeDate(newDate.toDate());
+                      }
+                    }}
+                    format="DD/MM/YYYY  HH:mm"
+                  />
+                </LocalizationProvider>
+              </div>
+            </div>
+            {/* --------------------------------- */}
+            <div>
+              <header className="headerForRakeSection">
+                {text("gate-in")}
               </header>
               <div className="inputForRakeSection">
               <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -630,7 +806,7 @@ function RakeHandlingSheet({ isClose, shipment }: any) {
                 </LocalizationProvider>
               </div>
             </div>
-            <div>
+            {/* <div>
               <header className="headerForRakeSection">
                 {text("loadRakeFormation")}
               </header>
@@ -698,7 +874,7 @@ function RakeHandlingSheet({ isClose, shipment }: any) {
                   />
                 </LocalizationProvider>
               </div>
-            </div>
+            </div> */}
           </div>
 
           {millDetails.map((item, index): any => {
@@ -718,10 +894,7 @@ function RakeHandlingSheet({ isClose, shipment }: any) {
                     }}
                   >
                     <div>{item.mill}</div>
-                    {/* <div className="expandMoreIcon_millDetails">
-                                            <ExpandMoreIcon />
-                                        </div> */}
-                    <Popover
+                    {/* <Popover
                       open={showActionBox === index ? true : false}
                       anchorEl={anchorEl}
                       onClose={handleCloseAction}
@@ -778,7 +951,7 @@ function RakeHandlingSheet({ isClose, shipment }: any) {
                       >
                         {text("steel")}
                       </div>
-                    </Popover>
+                    </Popover> */}
                   </div>
                 </div>
 
@@ -903,7 +1076,7 @@ function RakeHandlingSheet({ isClose, shipment }: any) {
             }}
           ></div>
           <div id="lastSection">
-            {/* <div>
+            <div>
               <header className="headerForRakeSection">
                 {text("loadRakeFormation")}
               </header>
@@ -971,7 +1144,7 @@ function RakeHandlingSheet({ isClose, shipment }: any) {
                   />
                 </LocalizationProvider>
               </div>
-            </div> */}
+            </div>
             <div>
               <header className="headerForRakeSection">
                 {text("rakeRelease")}

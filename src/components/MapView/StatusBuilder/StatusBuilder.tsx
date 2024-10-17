@@ -1,6 +1,6 @@
 export const statusBuilder = (status: string) => {
   const statusMap: { [key: string]: string } = {
-    'AVE': 'Available eIndent',
+    'AVE': 'Open Indent',
     'RFD': 'Ready for Departure',
     'ITNS': 'In Transit',
     'Delivered': 'Delivered',

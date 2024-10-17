@@ -98,47 +98,52 @@ const convertArrayToFilteredArray = (inputArray: any) => {
             placement_time:any,
             indent_no:any,
             drawnout_time:any,
+            captive:any,
+            fois_updated_at:any,
         }) => {
-        const { edemand_no, FNR,placement_time,indent_no, drawnout_time, all_FNRs,rr_dates, delivery_location, trip_tracker, others, remarks, unique_code, status, pickup_date, captive_id, is_captive, eta, rr_document, polyline, past_etas, no_of_wagons, received_no_of_wagons, demand_date, paid_by, commodity_desc, expected_loading_date, HA } = item;
+        const { edemand_no,captive,fois_updated_at, FNR,placement_time,indent_no, drawnout_time, all_FNRs,rr_dates, delivery_location, trip_tracker, others, remarks, unique_code, status, pickup_date, captive_id, is_captive, eta, rr_document, polyline, past_etas, no_of_wagons, received_no_of_wagons, demand_date, paid_by, commodity_desc, expected_loading_date, HA } = item;
         let newDemandDate = new Date(demand_date);
         newDemandDate.setHours(newDemandDate.getHours() - 5);
         newDemandDate.setMinutes(newDemandDate.getMinutes() - 30);
+
+        let newRRDate = new Date(rr_dates[0]);
+        newRRDate.setHours(newRRDate.getHours() - 5);
+        newRRDate.setMinutes(newRRDate.getMinutes() - 30);
         return {
            
             _id: item._id,
             edemand: {
-                edemand_no: edemand_no || 'NA',
+                edemand_no: edemand_no || '--',
             },
             fnr: {
                 primary: FNR,
-                others: all_FNRs || 'NA',
+                others: all_FNRs || '--',
                 unique_code,
             },
             destination: {
-                locationId: delivery_location?._id ?? 'NA',
-                name: delivery_location?.name ?? 'NA',
-                code: delivery_location?.code ?? 'NA'
+                locationId: delivery_location?._id ?? '--',
+                name: delivery_location?.name ?? '--',
+                code: delivery_location?.code ?? '--'
             },
             material: {
-                name: others.demandedCommodity || 'NA',
+                name: others.demandedCommodity || '--',
             },
             pickupdate: {
-                date: service.utcToist(pickup_date) || 'NA',
-                pickupTime: service.utcToistTime(pickup_date) || 'NA'
+                date: service.utcToist(pickup_date) || '--',
+                pickupTime: service.utcToistTime(pickup_date) || '--'
             },
             status: {
                 name: statusBuilder(status),
                 code: ( status === "OB" || status === "") ? null : (trip_tracker && trip_tracker[0]?.fois_last_location) || '',
-                // code: trip_tracker[0]?.fois_last_location || '',
                 raw: status,
             },
             currentEta: {
-                date: service.utcToist(eta) || 'NA',
-                etaTime: service.utcToistTime(eta) || 'NA'
+                date: service.utcToist(eta) || '--',
+                etaTime: service.utcToistTime(eta) || '--'
             },
-            remarks: remarks.length === 0 ? "NA" : {
-                latest: separateLatestObject(remarks).latest?.remark || "NA",
-                rest: separateLatestObject(remarks)?.rest || "NA"
+            remarks: remarks.length === 0 ? "--" : {
+                latest: separateLatestObject(remarks).latest?.remark || "--",
+                rest: separateLatestObject(remarks)?.rest || "--"
             },
             handlingAgent: HA ? HA : [],
             action: null,
@@ -152,22 +157,28 @@ const convertArrayToFilteredArray = (inputArray: any) => {
             eta: eta,
             pickup_date: pickup_date,
             rrDoc: rr_document && rr_document.length > 0 ? true : false,
-            past_etas: past_etas ? processETAs(past_etas) : 'NA',
-            received_no_of_wagons: received_no_of_wagons ? received_no_of_wagons : 'NA',
-            no_of_wagons: no_of_wagons ? no_of_wagons : 'NA',
+            past_etas: past_etas ? processETAs(past_etas) : '--',
+            received_no_of_wagons: received_no_of_wagons ? received_no_of_wagons : '--',
+            no_of_wagons: no_of_wagons ? no_of_wagons : '--',
             is_captive: is_captive && is_captive,
             daysAging: calculateDaysDifference(demand_date),
-            paid_by: paid_by ? paid_by : 'NA',
+            paid_by: paid_by ? paid_by : '--',
             commodity_desc: commodity_desc && commodity_desc,
             expected_loading_date:{
-                ELDdate: service.utcToist(expected_loading_date, 'dd-MM-yyyy') || 'NA',
-                ELDtime: service.utcToistTime(expected_loading_date) || 'NA'
+                ELDdate: service.utcToist(expected_loading_date, 'dd-MMM') || '--',
+                ELDtime: service.utcToistTime(expected_loading_date) || '--'
             },
-            placement_time: service.utcToist(placement_time, 'dd-MM-yyyy HH:mm')|| 'NA',
-            oneRr_date: rr_dates && rr_dates.length > 0 && service.utcToist(rr_dates[0], 'dd-MM-yyyy HH:mm')|| 'NA',
+            placement_time: service.utcToist(placement_time, 'dd-MMM HH:mm')|| '--',
+            oneRr_date: rr_dates && rr_dates.length > 0 && service.utcToist(newRRDate.toISOString(), 'dd-MMM HH:mm')|| '--',
             intent_no: indent_no && indent_no,
-            demand_date:demand_date && service.utcToist(newDemandDate.toISOString(), 'dd-MM-yyyy HH:mm') || 'NA',
-            drawnout_time: drawnout_time && service.utcToist(drawnout_time, 'dd-MM-yyyy HH:mm') || 'NA',
+            demand_date:demand_date && service.utcToist(newDemandDate.toISOString(), 'dd-MMM HH:mm') || '--',
+            drawnout_time: drawnout_time && service.utcToist(drawnout_time, 'dd-MMM HH:mm') || '--',
+            captive: {
+                name: captive?.name || '--',
+            },
+            fois_updated_at:{
+                date: service.utcToist(fois_updated_at) || '--',
+            }
         }
     });
 };
@@ -384,8 +395,8 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
             { id: 'material', subLabel: '', label: 'Commodities', class: 'material', innerClass: '' },
             { id: 'eld', subLabel: 'Exp. Loading Date', label: 'Indent Date', class: 'eld', innerClass: '' },
             { id: 'pickupdate', subLabel: 'Drawn Out Time', label: 'RR Date', class: 'pickupdate', innerClass: 'inner_pickup' },
-            { id: 'status', subLabel: '', label: 'Status', class: 'status', innerClass: 'inner_status' },
             { id: 'currentEta', subLabel: 'Current ETA', label: 'Initial ETA', class: 'currentEta', innerClass: 'inner_eta' },
+            { id: 'status', subLabel: '', label: 'Status', class: 'status', innerClass: 'inner_status' },
             { id: 'remarks', subLabel: '', label: 'Remarks', class: 'remarks', innerClass: '' },
             { id: 'handlingAgent', subLabel: '', label: 'Handling Agent', class: 'handlingAgent', innerClass: '' },
             { id: 'action', subLabel: '', label: 'Action', class: 'action', innerClass: '' },
@@ -412,17 +423,32 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
     }, [textRef, response]);
 
     return (
-        <div className='target' >
-            <Paper sx={{ width: '100%', overflow: 'hidden', boxShadow: 'none', paddingTop:4.5 }}>
-                <TableContainer sx={{
-                    border: '1px solid #E9E9EB', borderRadius: '8px', maxHeight: 'calc(85vh - 90px)',
-                    overflowY: 'scroll',
-                    '&::-webkit-scrollbar': {
-                        display: 'none',
-                    },
-                    scrollbarWidth: 'none',
-                    '-ms-overflow-style': 'none',
-                }}>
+        <div 
+        style={{
+            width: "100%",
+            height: "calc(100vh - 200px)",
+            display: "flex",
+            flexDirection: "column",
+            paddingTop:'25px'
+          }}
+        >
+            <Paper 
+            sx={{
+                position: "relative",
+                width: "100%",
+                height: "100%",
+                display: "flex",
+                flexDirection: "column",
+                boxShadow: "none",
+              }}
+            >
+                <TableContainer 
+                sx={{
+                    overflow: "auto",
+                    borderRadius: "4px",
+                    border: "1px solid #E9E9EB",
+                  }}
+                >
                     <Table stickyHeader aria-label="sticky table">
                         <TableHead>
                             <TableRow>
@@ -430,7 +456,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                     return (
                                         <TableCell
                                             key={column.id}
-                                            style={{ fontSize: 12, fontWeight: 'bold', color: '#484A57', padding: '0px 0px 0px 0px' }}
+                                            style={{ fontSize: 12, fontWeight: 'bold', color: '#484A57', padding: '4px 0px 4px 20px' }}
                                             className={column.class}
                                         >
                                             <div className={column.innerClass}>
@@ -452,6 +478,9 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                 {column.id === 'eld' && (
                                                     <div>Placement Date</div>
                                                 )}
+                                                {column.id === 'pickupdate' && (
+                                                    <div>Last <span style={{color:'red'}}>FOIS</span> Ping</div>
+                                                )}
                                                 {
                                                     column.id === 'fnr' ?
                                                         <div>
@@ -466,7 +495,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                         </div>
                                                         : <></>
                                                 }
-                                                {column.id === 'pickupdate' &&
+                                                {/* {column.id === 'pickupdate' &&
                                                     <div style={{
                                                         transform: pickupSorting ? 'rotate(180deg)' : 'rotate(0deg)',
                                                         transformOrigin: 'center center',
@@ -482,8 +511,8 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                             style={{ color: 'darkgrey' }}
                                                         />
                                                     </div>
-                                                }
-                                                {column.id === 'currentEta' &&
+                                                } */}
+                                                {/* {column.id === 'currentEta' &&
                                                     <div style={{ position: 'absolute', top: 10, left: 90 }}>
                                                         <div style={{
                                                             transform: currentETAsorting ? 'rotate(180deg)' : 'rotate(0deg)',
@@ -501,7 +530,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                             />
                                                         </div>
                                                     </div>
-                                                }
+                                                } */}
 
                                             </div>
 
@@ -514,8 +543,8 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                             {response.map((row: row, firstindex: number) => {
                                 return (
                                     <TableRow hover key={firstindex}
-                                        onClick={(e: any) => { handleRRDoc(row._id) }}
-                                        sx={{ cursor: 'pointer' }}
+                                        // onClick={(e: any) => { handleRRDoc(row._id) }}
+                                        // sx={{ cursor: 'pointer' }}
                                     >
                                         {columns.map((item, index) => {
                                             // @ts-ignore
@@ -539,7 +568,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                 eld: 'body_eld',
                                             }
                                             return (
-                                                <TableCell key={index} sx={{ fontSize: '12px', color: '#44475B', p: '6px 5px 6px 5px' }}
+                                                <TableCell key={index} sx={{ fontSize: '12px', color: '#44475B', p: '4px 0px 4px 20px' }}
                                                     className={columnClassNames[item.id]} >
                                                     <div>
                                                         {(typeof value) === 'object' ? '' : value}
@@ -612,7 +641,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                             onClick={()=>{handleUploadAnnexureModal(row)}}
                                                                             id="uploadAnnexure"
                                                                             />
-                                                                            {/* { (row.placement_time === 'NA' || !row?.intent_no) && */}
+                                                                            {/* { (row.placement_time === '--' || !row?.intent_no) && */}
                                                                                  <ActionItem
                                                                                  icon={<PublishedWithChangesIcon style={{ width: "24px", height: '24px', color: '#008001' }} />}
                                                                                  text={t('markPlacement')}
@@ -649,9 +678,15 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                         )}
                                                         {item.id === 'fnr' &&
                                                             <div className='fnr_container'>
-                                                                <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                                                                {/* <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                                                                     <div>Primary</div>
-                                                                </div>
+                                                                </div> */}
+                                                                {/* <div className='status_container'>
+                                                                    <div className={`status_resize ${status_class_map[row.status.raw]}`}>
+                                                                        <div>{row.status.name}</div>
+                                                                    </div>
+                                                                <div>{row.status.code}</div>
+                                                                </div> */}
                                                                 <div className='fnr_inner_data'>
                                                                     <Link target="_blank"
                                                                         href={"/tracker?unique_code=" + value.unique_code}
@@ -683,38 +718,31 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                     </div>
                                                                 </div>
                                                                 <div className='fnr_logos'>
-
                                                                     {row.rrDoc &&
-                                                                        (<div style={{ height: 25, width: 25 }}>
+                                                                        (<div className='rrDocIcon-ordersPage' style={{ height: 25, width: 25, cursor: 'pointer'}} onClick={(e: any) => { handleRRDoc(row._id) }}>
                                                                             <img
                                                                                 src={row.rrDoc ? rrDocumentIcon.src : ''}
                                                                                 style={{ height: '100%', width: '100%' }}
                                                                                 alt=''
                                                                             />
+                                                                            <div className='viewRRDoc'>{t('viewRRDoc')}</div>
                                                                         </div>)
                                                                     }
                                                                     {row.is_captive &&
-                                                                        <div style={{ height: 25, width: 25 }}>
+                                                                        <div style={{ height: 25, width: 25 }} className='captiveIcon-orderspage'>
                                                                             <img
                                                                                 src={row.is_captive ? captiveRakeIndicator.src : ''}
                                                                                 style={{ height: '100%', width: '100%' }}
                                                                                 alt=''
                                                                             />
+                                                                            <div className='captiveName'>{row.captive.name}</div>
                                                                         </div>
                                                                     }
                                                                 </div>
                                                             </div>
                                                         }
                                                         {item.id === 'destination' && (
-                                                            <div
-                                                            // style={{
-                                                            //     position: 'relative',
-                                                            //     right: '5px',
-                                                            //     width: '160px',
-                                                            //     height: '70px',
-                                                            //     overflow: 'hidden',
-                                                            // }}
-                                                            >
+                                                            <div>
                                                                 <div
                                                                     style={{
                                                                         position: 'relative',
@@ -724,7 +752,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                     }}
                                                                 >
                                                                     <Tooltip
-                                                                        title={isOverflowing ? `(${value.code} ${value.name !== 'NA' ? value.name : value.code})` : ' '}
+                                                                        title={isOverflowing ? `(${value.code} ${value.name !== '--' ? value.name : value.code})` : ' '}
                                                                         disableHoverListener={!isOverflowing}
                                                                     >
                                                                         <div
@@ -737,10 +765,11 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                                 textOverflow: 'ellipsis',
                                                                                 whiteSpace: 'pre-wrap',
                                                                                 height: '100%',
-                                                                                cursor: isOverflowing ? 'pointer' : 'default'
+                                                                                cursor: isOverflowing ? 'pointer' : 'default',
+                                                                                fontSize:10
                                                                             }}
                                                                         >
-                                                                            {value.code} {value.name !== 'NA' ? value.name : value.code}
+                                                                            {value.code} {value.name !== '--' ? value.name : value.code}
                                                                         </div>
                                                                     </Tooltip>
                                                                 </div>
@@ -748,10 +777,11 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                             </div>
                                                         )}
                                                         {item.id === 'pickupdate' && (
-                                                            row.oneRr_date === 'NA' && row.drawnout_time === 'NA' ? 'NA' : (
+                                                            row.oneRr_date === '--' && row.drawnout_time === '--' ? '--' : (
                                                             <div>
-                                                                <div style={{marginBottom:16}}>{row?.oneRr_date}</div>
-                                                                <div>{row?.drawnout_time}</div>
+                                                                <div>{row?.oneRr_date}</div>
+                                                                <div style={{marginBlock: '4px'}}>{row?.drawnout_time}</div>
+                                                                <div>{row?.fois_updated_at.date}</div>
                                                             </div>
                                                             )
                                                         )}
@@ -760,13 +790,13 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                 <div className={`status_resize ${status_class_map[value.raw]}`}>
                                                                     <div>{value.name}</div>
                                                                 </div>
-                                                                <div>{value.code}</div>
+                                                                {value.code ? <div className='status_code'>{value.code}</div> : <div className='status_code' style={{textAlign:'center'}}>Status will update soon</div>}
                                                             </div>
                                                         }
                                                         {item.id === 'edemand' &&
                                                             <div className='edemand_fois_gpis'>
                                                                 <div style={{ color: row.status.raw === 'AVE' ? parseInt(row.daysAging) > 10 ? 'red' : 'green' : 'black' }}>{value.edemand_no}</div>
-                                                                <div style={{paddingTop: '6px'}}>{row?.intent_no}</div>
+                                                                {row?.intent_no && <div style={{paddingTop: '6px'}}>{row?.intent_no}</div>}
                                                                 <div className='no_of_wagons'>
                                                                     <div className='request_wagons'>
                                                                         <div className='request_wagons_logo'>
@@ -794,26 +824,20 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                 </div>}
                                                             </div>
                                                         }
-                                                        {item.id === 'currentEta' && (
-                                                            <div>
-                                                                {row.past_etas.initialETA === 'NA' && row.past_etas.currentETA === 'NA' ?
-                                                                    'NA' : <div>
-                                                                        {row.past_etas.initialETA !== 'NA' ? <div>
-                                                                            <div>{service.utcToist(row.past_etas.initialETA)}</div>
-                                                                        </div> : <div>NA</div>}
-                                                                        {row.past_etas.currentETA !== 'NA' ? <div style={{ marginTop: 16 }}>
-                                                                            <div >{service.utcToist(row.past_etas.currentETA)}</div>
-                                                                        </div> : <div style={{ marginTop: 16 }}>NA</div>}
-                                                                    </div>
-                                                                }
-                                                            </div>
+                                                        {item.id === 'currentEta' && ( 
+                                                            row.past_etas.initialETA === '--' && row.past_etas.currentETA === '--' ? '--' : (
+                                                                <div>
+                                                                    <div>{service.utcToist(row.past_etas.initialETA)}</div>
+                                                                    <div style={{ marginTop: 12 }}>{service.utcToist(row.past_etas.currentETA)}</div>
+                                                                </div>
+                                                            )
                                                         )}
                                                         {item.id === 'remarks' && (
                                                             <RemarkComponent row={row} firstIndex={firstindex} />
                                                         )}
                                                         {item.id === 'material' && row.commodity_desc && (
                                                             <div>
-                                                                <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+                                                                <div style={{ display: 'flex', gap: 4, alignItems: 'center', fontSize:10 }}>
                                                                     <div style={{ textWrap: 'nowrap' }}>{value.name}</div>
                                                                     {getUniqueValues(row.commodity_desc).length > 1 &&
                                                                         <div className='view_more_materials'>
@@ -829,12 +853,12 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                     }
                                                                 </div>
                                                                 <div className='material_items'>
-                                                                    <div style={{ color: '#7C7E8C', marginTop: '5px' }}>{row.commodity_desc[0]}</div>
+                                                                    <div style={{ color: '#7C7E8C', marginTop: '4px', fontSize:10 }}>{row.commodity_desc[0]}</div>
                                                                 </div>
                                                             </div>
                                                         )}
                                                         {item.id === 'eld' &&   (
-                                                            row.expected_loading_date.ELDdate === 'NA' && row.placement_time === 'NA' ? 'NA' : (
+                                                            row.expected_loading_date.ELDdate === '--' && row.placement_time === '--' ? '--' : (
                                                                 <div>
                                                                     <div>{row.demand_date}</div>
                                                                     <div style={{marginBlock:4}}>{row.expected_loading_date.ELDdate} {row.expected_loading_date.ELDtime === '05:30' ? '23:59': row.expected_loading_date.ELDtime} </div>
@@ -845,8 +869,8 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                         }
                                                         {item.id === 'handlingAgent' && (
                                                             <div className='handlingAgentColume'>
-                                                                <div style={{ textWrap: 'nowrap' }}>{row.handlingAgent[0] ? row.handlingAgent[0] : "NA"}</div>
-                                                                {row.handlingAgent.length > 1 && <div className='view_more_agents'><div>+{row.handlingAgent.length - 1}</div></div>}
+                                                                <div>{row.handlingAgent[0] ? row.handlingAgent[0] : "--"}</div>
+                                                                {/* {row.handlingAgent.length > 1 && <div className='view_more_agents'><div>+{row.handlingAgent.length - 1}</div></div>}
                                                                 {row.handlingAgent.length > 1 &&
                                                                     <div className='list_of_agents'>
                                                                         {Array.isArray(row.handlingAgent) &&
@@ -857,8 +881,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                             })
                                                                         }
                                                                     </div>
-                                                                }
-
+                                                                } */}
                                                             </div>
                                                         )}
                                                     </div>
@@ -885,7 +908,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                     onPageChange={handleChangePage}
                     onRowsPerPageChange={handleChangeRowsPerPage}
                     labelRowsPerPage="Shipments per page:"
-                    sx={{ height: 40, overflowY: 'hidden', position: 'absolute', top: '115px', right: '12px' }}
+                    sx={{ height: 40, overflowY: 'hidden', position: 'absolute', top: '-37px', right: '-9px' }}
                 />
             </Paper>
             <RRModal isOpen={isRRModalOpen} isClose={() => setRRModalOpen(false)} rrNumbers={rrNumbers} isRRDoc={isRRDoc} />

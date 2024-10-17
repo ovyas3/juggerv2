@@ -13,15 +13,11 @@ import WagonAssignSheet from './wagonAssignSheet'
 const Page = () => {
   const mobile = useWindowSize(500);
   const text = useTranslations("WAGONTALLYSHEET");
-  const [showWagonSheet, setShowWagonSheet] = useState(true);
-  const [showAssignWagon, setShowAssignWagon] = useState(false);
-  const [shipmentForWagonSheet, setShipmentForWagonSheet] = useState({});
   return (
     <div className="wagon-tally-container">
       <Header title={text('in-plant-Dashboard')} isMapHelper={false} />
       <div id="pageInsideContent">
-        {showWagonSheet && <WagonTallySheet setShowAssignWagon={setShowAssignWagon} setShowWagonSheet={setShowWagonSheet} setShipmentForWagonSheet={setShipmentForWagonSheet} />}
-        {showAssignWagon && <WagonAssignSheet shipmentForWagonSheet={shipmentForWagonSheet} setShowWagonSheet={setShowWagonSheet} setShowAssignWagon={setShowAssignWagon} setShipmentForWagonSheet={setShipmentForWagonSheet}/>}
+        <WagonTallySheet/>
       </div>
       <SideDrawer />
     </div>
