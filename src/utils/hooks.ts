@@ -171,8 +171,8 @@ export function getShipmentStatusSummary(shipments: any) {
 export function processETAs(dates: any) {
   if (!dates || dates.length === 0) {
     return {
-      currentETA: 'NA',
-      initialETA: 'NA'
+      currentETA: '--',
+      initialETA: '--'
     };
   }
 
@@ -190,8 +190,8 @@ export function processETAs(dates: any) {
   const minTime = Math.min(...dateTimes);
 
   return {
-    currentETA: maxTime ? new Date(maxTime).toISOString() : 'NA',
-    initialETA: minTime ? new Date(minTime).toISOString() : 'NA'
+    currentETA: maxTime ? new Date(maxTime).toISOString() : '--',
+    initialETA: minTime ? new Date(minTime).toISOString() : '--'
   };
 }
 

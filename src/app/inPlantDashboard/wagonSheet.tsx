@@ -30,6 +30,8 @@ import {
 } from "@/app/inPlantDashboard/actionComponents";
 import captiveRakeIndicator from "@/assets/captive_rakes.svg";
 import SourceOutlinedIcon from "@mui/icons-material/SourceOutlined";
+import { redirect, useRouter, useParams } from "next/navigation";
+
 
 interface Column {
   id: string;
@@ -37,9 +39,9 @@ interface Column {
   style: string;
 }
 const columns: readonly Column[] = [
-  { id: "sno", label: "SI No.", style: "header_sno" },
-  { id: "indent", label: "Indent No.", style: "header_indent" },
-  { id: "edemand", label: "e-demand no.", style: "header_edemand" },
+  { id: "sno", label: "SI No", style: "header_sno" },
+  { id: "indent", label: "Indent No", style: "header_indent" },
+  { id: "edemand", label: "e-Demand No", style: "header_edemand" },
   { id: "plant_codes", label: "Plant", style: "header_plant" },
   { id: "status", label: "Status", style: "header_status" },
   { id: "exp_loading", label: "Expected Loading", style: "header_exp_loading" },
@@ -120,7 +122,7 @@ function contructingData(shipment: any) {
         },
         plant_codes: {
           plant_codes: shipment?.plant_codes
-            ? shipment?.plant_codes.filter((item: any) => item !== "--")
+            ? shipment?.plant_codes.filter((item: any) => item !== "NA")
             : "--",
         },
         is_captive: shipment?.is_captive ? shipment?.is_captive : false,
@@ -132,9 +134,6 @@ function contructingData(shipment: any) {
   );
 }
 function WagonTallySheet({
-  setShowAssignWagon,
-  setShowWagonSheet,
-  setShipmentForWagonSheet,
 }: any) {
   const text = useTranslations("WAGONTALLYSHEET");
   const [allWagonsList, setAllWagonsList] = useState([]);
@@ -150,6 +149,8 @@ function WagonTallySheet({
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(
     null
   );
+  const router = useRouter();
+
   const openAction = Boolean(anchorEl);
   const [showActionBox, setShowActionBox] = React.useState(-1);
   const [openUploadWagonSheetmodal, setOpenUploadWagonSheetModal] =
@@ -176,6 +177,7 @@ function WagonTallySheet({
   const [inplantTotal, setInplantTotal] = useState(0);
   const [indentTotal, setIndentTotal] = useState(0);
   const [statusCondition, setStatusCondition] = useState(["AVE", "INPL"]);
+  const [activeCount, setActiveCount] = useState<any>(0);
 
   // api calling
   async function getWagonDetails() {
@@ -188,6 +190,7 @@ function WagonTallySheet({
       setTotalCount(response.data.count.totalCount);
       setInplantTotal(response.data.count.totalInPlant);
       setIndentTotal(response.data.count.totalAVE)
+      setActiveCount(response.data?.count?.count)
     } catch (error) {
       console.log(error);
     }
@@ -204,13 +207,14 @@ function WagonTallySheet({
     setShowActionBox((prevIndex) => (prevIndex === index ? -1 : index));
   }
   const assignPlantToWagon = (event: any, row: any) => {
-    setShowAssignWagon(true);
-    setShipmentForWagonSheet(row);
+    router.push(`/inPlantDashboard/wagonAssignSheet?shipmentId=${row?.id}`);
+    // setShowAssignWagon(true);
+    // setShipmentForWagonSheet(row);
     // setOpenAssignWagonToplantModal(true);
     // setShipmentforAssignWagonToplant(row);
     setShowActionBox(-1);
     setAnchorEl(null);
-    setShowWagonSheet(false);
+    // setShowWagonSheet(false);
   };
   const drawnInTime = (event: any, row: any) => {
     setOpenDrawnInTimeModal(true);
@@ -242,6 +246,11 @@ function WagonTallySheet({
     setShowActionBox(-1);
     setAnchorEl(null);
   };
+  const assignHooksToLoadingShop = (event: any, row: any) => {
+    router.push(`/inPlantDashboard/assignHooksToLoadingShop?shipmentId=${row?.id}`);
+    setShowActionBox(-1);
+    setAnchorEl(null);
+  }
   function handleClickAction(event: any) {
     setAnchorEl(event?.currentTarget);
   }
@@ -377,7 +386,7 @@ function WagonTallySheet({
           </div>
           <div id="status-display">
             <div className="status-display-boxes" style={{backgroundColor: getColorForStatus('total').bgColor, color:getColorForStatus('total').textColor }} onClick={()=>{handleStatusClick("total")}}>
-              <div style={{fontSize:"16px"}} >{inplantTotal + indentTotal}</div>
+              <div style={{fontSize:"16px"}} >{totalCount}</div>
               <div>{text("total")}</div>
             </div>
             <div className="status-display-boxes" style={{backgroundColor: getColorForStatus('AVE').bgColor, color:getColorForStatus('AVE').textColor }} onClick={()=>{handleStatusClick("indent")}}>
@@ -414,7 +423,7 @@ function WagonTallySheet({
             <TablePagination
               rowsPerPageOptions={[5, 10, 25, 50, 100]}
               component="div"
-              count={totalCount}
+              count={activeCount}
               rowsPerPage={rowsPerPage}
               page={page}
               onPageChange={handleChangePage}
@@ -701,21 +710,41 @@ function WagonTallySheet({
                                         {text("indentNumber")}
                                       </div>
                                       <div
+                                        onClick={(e) =>
+                                          uploadWagonSheet(e, row)
+                                        }
+                                        className="action-popover-wagon"
+                                        >
+                                        {text("uploadWagonTallySheet")}
+                                      </div>
+                                      {/* <div
                                         className="action-popover-wagon"
                                         onClick={(e) => {
                                           uploadRakeSheet(e, row);
                                         }}
                                       >
                                         {text("rakeHandlingSheet")}
-                                      </div>
-                                      <div
-                                        onClick={(e) =>
-                                          uploadWagonSheet(e, row)
-                                        }
+                                      </div> */}
+                                      {row.wagon_data_uploaded && (
+                                        <div
                                         className="action-popover-wagon"
-                                      >
-                                        {text("uploadWagonTallySheet")}
-                                      </div>
+                                        onClick={(e) => {
+                                          assignPlantToWagon(e, row);
+                                        }}
+                                        >
+                                          {text("assignWagonToPlant")}
+                                        </div>
+                                      )}
+                                      {/* {row.plant_codes.plant_codes.length > 0 && (
+                                           <div
+                                           className="action-popover-wagon"
+                                           onClick={(e) => {
+                                             assignHooksToLoadingShop(e, row);
+                                           }}
+                                           >
+                                             {text("assignsHooksToLoadingShop")}
+                                           </div>
+                                      )} */}
                                       {/* <div
                                         className="action-popover-wagon"
                                         onClick={(e) => {
@@ -732,24 +761,14 @@ function WagonTallySheet({
                                       >
                                         {text("drawnInTime")}
                                       </div> */}
-                                      {row.wagon_data_uploaded && (
-                                        <div
-                                          className="action-popover-wagon"
-                                          onClick={(e) => {
-                                            assignPlantToWagon(e, row);
-                                          }}
-                                        >
-                                          {text("assignWagonToPlant")}
-                                        </div>
-                                      )}
-                                      {row.wagon_data_uploaded && (
+                                      {/* {row.wagon_data_uploaded && (
                                         <div
                                           className="action-popover-wagon"
                                           onClick={(e) => {}}
                                         >
                                           {text("assignHooksToWagon")}
                                         </div>
-                                      )}
+                                      )} */}
                                     </Popover>
                                   </div>
                                 )}
