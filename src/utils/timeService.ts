@@ -1,9 +1,9 @@
 import { DateTime } from 'luxon';
 
-const utcToist = (utc: string, format: string = 'dd-MM-yyyy') => {
+const utcToist = (utc: string, format: string = 'dd-MMM-yy') => {
   const date = DateTime.fromJSDate(new Date(utc)).setZone('Asia/Calcutta').toFormat(format);
   if (date === 'Invalid DateTime') {
-    return 'NA';
+    return '--';
   }
   return date;
 }
@@ -11,7 +11,7 @@ const utcToist = (utc: string, format: string = 'dd-MM-yyyy') => {
 const utcToistTime = (utc:string, format = 'HH:mm') => {
   const date = DateTime.fromJSDate(new Date(utc)).setZone('Asia/Calcutta').toFormat(format);
   if (date === 'Invalid DateTime') {
-    return 'NA';
+    return '--';
   }
   return date;
 }

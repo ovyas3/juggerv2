@@ -349,6 +349,7 @@ const OrdersPage = () => {
   const deliveredCount = totalCountrake[0]?.statuses?.find((item: any) => item.status === "Delivered")?.count || 0;
   const inPlantCount = totalCountrake[0]?.statuses?.find((item: any) => item.status === "INPL")?.count || 0;
   const availableeIndentCount = totalCountrake[0]?.statuses?.find((item: any) => item.status === "AVE")?.count || 0;
+  const cancelledCount = totalCountrake[0]?.statuses?.find((item: any) => item.status === "CNCL")?.count || 0;
 
   const [openUploadFile, setOpenUploadFile] = useState(false);
 
@@ -443,9 +444,13 @@ const OrdersPage = () => {
                       <div style={{fontSize:20, fontWeight:500, color: getStatusColor(status, 'In Transit').countTextColor}}><CountUp duration={1.5} end={inTransitCount}/></div>
                       <div style={{fontSize:12, color: getStatusColor(status, 'In Transit').textTextColor}}>{t('In Transit')}</div>
                     </div>
-                    <div className='display_status_inner_box' style={{cursor:'pointer',backgroundColor: getStatusColor(status, 'Delivered').backgroundColor}} onClick={()=>{changeStatusByDashBoard('Delivered')}}>
+                    <div className='display_status_inner_box' style={{cursor:'pointer',backgroundColor: getStatusColor(status, 'Delivered').backgroundColor,}} onClick={()=>{changeStatusByDashBoard('Delivered')}}>
                       <div style={{fontSize:20, fontWeight:500, color: getStatusColor(status, 'Delivered').countTextColor}}><CountUp duration={1.5} end={deliveredCount}/></div>
                       <div style={{fontSize:12, color: getStatusColor(status, 'Delivered').textTextColor}}>{t('Delivered')}</div>
+                    </div>
+                    <div className='display_status_inner_box' style={{cursor:'pointer', backgroundColor:'#FFE3E3', borderColor:'#FFE3E3'}}>
+                      <div style={{fontSize:20, fontWeight:500, color:'#C62E2E' }}><CountUp duration={1.5} end={cancelledCount}/></div>
+                      <div style={{fontSize:12, color: '#C62E2E'}}>{t('cancelled')}</div>
                     </div>
                 </div> 
               </div>

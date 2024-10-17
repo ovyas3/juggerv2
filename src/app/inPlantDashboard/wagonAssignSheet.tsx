@@ -11,6 +11,10 @@ import BOBRN from "@/assets/BOBRN final 1.png";
 import BRNA from "@/assets/BRNA 1.png";
 import BRN229 from "@/assets/BRN 23.png";
 import Button from "@mui/material/Button";
+import locomotive from "@/assets/Train_engine-removebg-preview 1.png";
+import chain01 from "@/assets/chain 1.png";
+import chain02 from "@/assets/chain 2.png"
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 
 function WagonAssignSheet({
   shipmentForWagonSheet,
@@ -124,6 +128,28 @@ function WagonAssignSheet({
     wagonDetails();
   }, []);
 
+  const initialItems = [
+    { id: "1", content: "Item 1" },
+    { id: "2", content: "Item 2" },
+    { id: "3", content: "Item 3" },
+    { id: "4", content: "Item 4" },
+  ];
+
+  const [items, setItems] = useState(initialItems);
+
+  // Handle when an item is dropped
+  const handleOnDragEnd = (result: any) => {
+    console.log(result);
+    if (!result.destination) return;
+    const updatedItems = Array.from(wagonsNewData);
+    const [movedItem] = updatedItems.splice(result.source.index, 1);
+    updatedItems.splice(result.destination.index, 0, movedItem);
+    // setItems(updatedItems);
+    setWagonsNewData(updatedItems);
+  };
+
+  console.log(wagonsNewData);
+
   return (
     <div className="wagon-wrapper">
       <div id="search-container-assign">
@@ -174,10 +200,99 @@ function WagonAssignSheet({
             {shipmentForWagonSheet?.total_wagons?.received_no_of_wagons || "XX"}
           </text>
         </div>
-        <div id='wagons-assign-notassigned'>
-          <div>{text('assignedWagons')}<span style={{ color: "#3351FF", fontWeight: 600 }}>({wagonsNewData.filter((wagons: any) => (wagons.plant_assigned)).length || 0})</span></div>
-          <div>{text('notAssignedWagons')}<span style={{ color: "red", fontWeight: 600 }}>({wagonsNewData.filter((wagons: any) => (!wagons.plant_assigned)).length || 0})</span></div>
+        <div id="wagons-assign-notassigned">
+          <div>
+            {text("assignedWagons")}
+            <span style={{ color: "#3351FF", fontWeight: 600 }}>
+              (
+              {wagonsNewData.filter((wagons: any) => wagons.plant_assigned)
+                .length || 0}
+              )
+            </span>
+          </div>
+          <div>
+            {text("notAssignedWagons")}
+            <span style={{ color: "red", fontWeight: 600 }}>
+              (
+              {wagonsNewData.filter((wagons: any) => !wagons.plant_assigned)
+                .length || 0}
+              )
+            </span>
+          </div>
         </div>
+      </div>
+
+      <div style={{ marginTop:'10px'}}>
+        <DragDropContext onDragEnd={handleOnDragEnd}>
+          <Droppable droppableId="items" direction="horizontal">
+            {(provided) => (
+              <div
+                {...provided.droppableProps}
+                ref={provided.innerRef}
+                style={{
+                  display: "flex",
+                  paddingBlock:'16px',
+                  backgroundColor:'transparent',
+                  overflowX: "auto",
+                  marginInline:'24px',
+                }}
+              >
+                <div id="wagon-locomotion-engine">
+                  <div>
+                    <Image
+                      src={locomotive.src}
+                      alt="locomotive"
+                      width={190}
+                      height={48}
+                      style={{ display: "block" }}
+                    />
+                  </div>
+                </div>
+                {wagonsNewData.map((wagon: any, index: any) => (
+                  <Draggable
+                    key={wagon._id}
+                    draggableId={wagon._id}
+                    index={index}
+                  >
+                    {(provided) => (
+                      <div
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
+                        style={{
+                          alignContent: "end",
+                          fontSize:10,
+                          position:'relative',
+                          ...provided.draggableProps.style,
+                        }}
+                      >
+                        <div id='wagon-no-assign-container'>{wagon.w_no}</div>
+                        {wagon.plant_assigned && <div id='wagon-plant-name-assign-container'>{wagon.plant_assigned?.name}</div>}
+                        <div style={{ display: "flex" }}>
+                          <div
+                            style={{
+                              width: wagonImage(wagon.wagon_type.name)
+                                .imageWidth,
+                              height: wagonImage(wagon.wagon_type.name)
+                                .imageHeight,
+                            }}
+                          >
+                            <Image src={wagonImage(wagon.wagon_type.name).image.src} alt='' width={wagonImage(wagon.wagon_type.name).imageWidth} height={wagonImage(wagon.wagon_type.name).imageHeight} />
+                          </div>
+                          <div id="connecting-chain">
+                            <div><Image src={chain01.src} alt="chain01" height={5} width={4} /></div>
+                            <div><Image src={chain02.src} alt="chain02" height={5} width={4}/></div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </Draggable>
+                ))}
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
+        </DragDropContext>
       </div>
 
       <div id="assign-wagon-container" >
@@ -288,7 +403,7 @@ function WagonAssignSheet({
                   <div className="wagonsAssignToMillImageSelector">
                     <div style={{ width: 40, height: 17 }}>
                       <Image
-                        src={wagonImage(wagons?.wagon_type?.name).src}
+                        src={wagonImage(wagons?.wagon_type?.name).image.src}
                         alt=""
                         width={40}
                         height={17}
@@ -341,21 +456,21 @@ export default WagonAssignSheet;
 function wagonImage(wagonImage: any) {
   switch (wagonImage) {
     case "BOST":
-      return BOST;
+      return { image: BOST, imageWidth: 97, imageHeight: 40 };
       break;
     case "BFNV":
-      return BFNV;
+      return { image: BFNV, imageWidth: 101, imageHeight: 36 };
       break;
     case "BOBRN":
-      return BOBRN;
+      return { image: BOBRN, imageWidth: 97, imageHeight: 40 };
       break;
     case "BRNA":
-      return BRNA;
+      return { image: BRNA, imageWidth: 97, imageHeight: 40 };
       break;
     case "BRN22.9":
-      return BRN229;
+      return { image: BRN229, imageWidth: 127, imageHeight: 30 };
       break;
     default:
-      return BOST;
+      return { image: BOST, imageWidth: 97, imageHeight: 40 };
   }
 }
