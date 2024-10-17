@@ -474,84 +474,69 @@
   box-shadow: 0px 4px 8px rgba(51, 81, 255, 0.2);
   cursor: pointer;
 }
-
 /* Base styles for the scrollbar container */
 #scrollbar {
   -webkit-appearance: none;
   appearance: none;
-  width: 100%;
-  padding: 0px 24px;
+  width: 96%;
   height: 6px; /* Smaller, sleeker scrollbar height */
   border-radius: 5px;
   outline: none;
   margin: 0 auto;
   position: relative;
-  transition: background 0.3s ease;
+  transition: background 0.2s ease;
+}
+
+/* Track style for completed range using CSS variable */
+#scrollbar::-webkit-slider-runnable-track {
+  height: 8px; /* Track height */
+  border-radius: 5px;
+  background: linear-gradient(to right, #42454E var(--completed-range), #F0F3F8 var(--completed-range)); /* Background gradient based on completed range */
+}
+
+/* Mozilla track (completed range color for Firefox) */
+#scrollbar::-moz-range-track {
+  height: 8px; /* Track height */
+  border-radius: 5px;
+  background: linear-gradient(to right, #42454E var(--completed-range), #F0F3F8 var(--completed-range)); /* Same gradient for Firefox */
 }
 
 /* Thumb (handle) of the scrollbar */
 #scrollbar::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 40px; /* Thumb size */
-  height: 40px;
+  width: 36px; /* Reduced Thumb width */
+  height: 36px; /* Reduced Thumb height */
   background: url('../../assets/slider.svg') no-repeat center;
   background-size: contain;
   border: none;
   cursor: pointer;
   position: relative;
-  top: -13px;
+  top: -12px; /* Adjusted to center the thumb */
 }
 
 /* Firefox thumb styling */
 #scrollbar::-moz-range-thumb {
-  width: 40px;
-  height: 40px;
+  width: 36px; /* Reduced Thumb width */
+  height: 36px; /* Reduced Thumb height */
   background: url('../../assets/slider.svg') no-repeat center;
   background-size: contain;
   border: none;
   cursor: pointer;
   position: relative;
-  top: -13px; 
-}
-
-/* Webkit track (completed range color for Chrome, Safari, Edge) */
-#scrollbar::-webkit-slider-runnable-track {
-  height: 8px; /* Track height */
-  background: linear-gradient(90deg, #42454E var(--completed-range, 0%), #F0F3F8 var(--completed-range, 0%)); /* Gradient based on completion */
-  border-radius: 5px;
-}
-
-/* Mozilla track (completed range color for Firefox) */
-#scrollbar::-moz-range-progress {
-  background-color: #42454E; /* Completed range color */
-  height: 8px; /* Track height */
-  border-radius: 5px;
-}
-
-#scrollbar::-moz-range-track {
-  background-color: #F0F3F8; /* Uncompleted range color */
-  height: 8px;
-  border-radius: 5px;
+  top: -12px; /* Adjusted to center the thumb */
 }
 
 /* Thumb hover effect */
-#scrollbar:hover::-webkit-slider-thumb {
+#scrollbar:hover::-webkit-slider-thumb,
+#scrollbar:focus::-webkit-slider-thumb,
+#scrollbar:hover::-moz-range-thumb,
+#scrollbar:focus::-moz-range-thumb {
   transform: scale(1.05); /* Subtle enlargement */
 }
 
-#scrollbar:hover::-moz-range-thumb {
-  transform: scale(1.05);
-}
 
-/* Focus state for accessibility */
-#scrollbar:focus::-webkit-slider-thumb {
-  transform: scale(1.05);
-}
 
-#scrollbar:focus::-moz-range-thumb {
-  transform: scale(1.05);
-}
 
 .camera-dialog-styles{
   font-family: 'Plus Jakarta Sans', sans-serif;

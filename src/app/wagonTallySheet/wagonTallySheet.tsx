@@ -201,7 +201,8 @@ const WagonTallySheet: React.FC = () => {
   const [isSick, setIsSick] = useState<Boolean>(false);
   const [wagonCapturedImages, setWagonCapturedImages] = useState<(string | null)[]>([]);
   const [materialCapturedImages, setMaterialCapturedImages] = useState<(string | null)[]>([]);
-  const [train, setTrain] = useState<Mill[]>([]);
+  const [train, setTrain] = useState<Mill[] | null>(null);
+  const [scrollValue, setScrollValue] = useState(0);
   const [formValues, setFormValues] = useState<{ batchId: string, material: string, materialCode: string, grade: string, width: string, thick: string, length: string, pieces: string, lineItem: string, pgiWeight: string, actualWeight: string, images: (string | null)[] }[]>([
     {
       batchId: '',
@@ -219,65 +220,25 @@ const WagonTallySheet: React.FC = () => {
     }
   ]);
 
-  useEffect(() =>{
+  useEffect(() => {
     setTrain([
-      {
-        millName: "Plate Mill",
-        millId: "1",
-        wagons: generateRandomWagons(4),
-      },
-      {
-        millName: "Rail Mill",
-        millId: "2",
-        wagons: generateRandomWagons(4),
-      },
-      {
-        millName: "Bar Mill",
-        millId: "3",
-        wagons: generateRandomWagons(4),
-      },
-      {
-        millName: "Plate Mill",
-        millId: "4",
-        wagons: generateRandomWagons(4), 
-      },
-      {
-        millName: "Plate Mill",
-        millId: "4",
-        wagons: generateRandomWagons(4), 
-      },
-      {
-        millName: "Plate Mill",
-        millId: "4",
-        wagons: generateRandomWagons(4), 
-      },
-      {
-        millName: "Plate Mill",
-        millId: "4",
-        wagons: generateRandomWagons(4), 
-      },
-      {
-        millName: "Plate Mill",
-        millId: "4",
-        wagons: generateRandomWagons(4), 
-      },
-      {
-        millName: "Plate Mill",
-        millId: "4",
-        wagons: generateRandomWagons(4), 
-      },
-      {
-        millName: "Plate Mill",
-        millId: "4",
-        wagons: generateRandomWagons(4), 
-      },
-      {
-        millName: "Plate Mill",
-        millId: "4",
-        wagons: generateRandomWagons(4), 
-      },
+      { millName: "Plate Mill", millId: "1", wagons: generateRandomWagons(4) },
+      { millName: "Plate Mill", millId: "1", wagons: generateRandomWagons(4) },
+      { millName: "Plate Mill", millId: "1", wagons: generateRandomWagons(4) },
+      { millName: "Plate Mill", millId: "1", wagons: generateRandomWagons(4) },
+      { millName: "Plate Mill", millId: "1", wagons: generateRandomWagons(4) },
+      { millName: "Plate Mill", millId: "1", wagons: generateRandomWagons(4) },
+      { millName: "Plate Mill", millId: "1", wagons: generateRandomWagons(4) },
+      { millName: "Plate Mill", millId: "1", wagons: generateRandomWagons(4) },
+      { millName: "Plate Mill", millId: "1", wagons: generateRandomWagons(4) },
+      { millName: "Plate Mill", millId: "1", wagons: generateRandomWagons(4) },
+      { millName: "Plate Mill", millId: "1", wagons: generateRandomWagons(4) },
     ]);
   }, []);
+
+  const handleScrollbarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setScrollValue(Number(event.target.value));
+  };
   
   // State to store all date values separately
   const [dates, setDates] = useState({
@@ -444,38 +405,62 @@ const WagonTallySheet: React.FC = () => {
 
   useEffect(() => {
     const trainElement = document.getElementById('train');
-    const scrollbarElement = document.getElementById('scrollbar') as HTMLInputElement;
-    
+    const scrollbarElement = document.getElementById('scrollbar');
+
     if (trainElement && scrollbarElement) {
+      const scrollbarInputElement = scrollbarElement as HTMLInputElement;
+
+      // Update scrollbar max value based on the scrollable content width
       const updateScrollbarMax = () => {
-        scrollbarElement.max = String(trainElement.scrollWidth - trainElement.clientWidth);
+        const maxScrollable = trainElement.scrollWidth - trainElement.clientWidth;
+        scrollbarInputElement.max = String(maxScrollable);
       };
-      updateScrollbarMax();
-      const observer = new MutationObserver(updateScrollbarMax);
-      observer.observe(trainElement, { childList: true });
-    
+
+      // Set the initial scrollbar value based on train's scroll position
+      const initializeScrollbar = () => {
+        updateScrollbarMax();
+        scrollbarInputElement.value = String(trainElement.scrollLeft); // Set initial scroll position
+        const percentageCompleted = (trainElement.scrollLeft / Number(scrollbarInputElement.max)) * 100;
+        scrollbarInputElement.style.setProperty('--completed-range', `${percentageCompleted}%`);
+      };
+
+      // Handle input change (scrollbar moves train)
       const handleInput = () => {
-        trainElement.scrollLeft = Number(scrollbarElement.value);
-        const percentageCompleted = (Number(scrollbarElement.value) / Number(scrollbarElement.max)) * 100;
-        scrollbarElement.style.setProperty('--completed-range', `${percentageCompleted}%`);
+        trainElement.scrollLeft = Number(scrollbarInputElement.value);
+        const percentageCompleted = (Number(scrollbarInputElement.value) / Number(scrollbarInputElement.max)) * 100;
+        scrollbarInputElement.style.setProperty('--completed-range', `${percentageCompleted}%`);
       };
-      scrollbarElement.addEventListener('input', handleInput);
-    
+
+      // Handle train scroll (train scroll moves scrollbar)
       const handleScroll = () => {
-        scrollbarElement.value = String(trainElement.scrollLeft);
-        const percentageCompleted = (trainElement.scrollLeft / Number(scrollbarElement.max)) * 100;
-        scrollbarElement.style.setProperty('--completed-range', `${percentageCompleted}%`);
+        scrollbarInputElement.value = String(trainElement.scrollLeft);
+        const percentageCompleted = (trainElement.scrollLeft / Number(scrollbarInputElement.max)) * 100;
+        scrollbarInputElement.style.setProperty('--completed-range', `${percentageCompleted}%`);
       };
+
+      // Initialize scrollbar on load
+      initializeScrollbar();
+
+      // MutationObserver to handle dynamic changes to the train content
+      const observer = new MutationObserver(initializeScrollbar);
+      observer.observe(trainElement, { childList: true, subtree: true });
+
+      // Add event listeners
+      scrollbarInputElement.addEventListener('input', handleInput);
       trainElement.addEventListener('scroll', handleScroll);
-    
-      // Clean up the event listeners and the observer when the component unmounts
+
+      // Add resize event listener to adjust scrollbar on screen resize
+      window.addEventListener('resize', updateScrollbarMax);
+
+      // Clean up listeners and observers
       return () => {
-        scrollbarElement.removeEventListener('input', handleInput);
+        scrollbarInputElement.removeEventListener('input', handleInput);
         trainElement.removeEventListener('scroll', handleScroll);
+        window.removeEventListener('resize', updateScrollbarMax);
         observer.disconnect();
       };
     }
-  }, []);
+  }, [train]);
 
   const handleWagonOpen = () => setOpenWagonPhotos(true);
   const handleWagonClose = () => setOpenWagonPhotos(false);
@@ -500,6 +485,7 @@ const WagonTallySheet: React.FC = () => {
             <input 
               className="search-wagon-input"
               type="text" 
+              value={searchTerm}
               placeholder="Search by wagon number"
               onChange={e => setSearchTerm(e.target.value)}
             />
@@ -526,8 +512,8 @@ const WagonTallySheet: React.FC = () => {
             {selectedTab === 0 && 
             <>
               <div className="wagon-tally-sheet-body-content-train" id="train">
-              <TrainContainer>
-                {train.flatMap((mill, millIndex, millArray) => (
+              <TrainContainer id="train">
+                {train ? train.flatMap((mill, millIndex, millArray) => (
                   mill.wagons
                     .filter(wagon => wagon.wagonNumber.includes(searchTerm))
                     .map((wagon, wagonIndex) => {
@@ -546,11 +532,20 @@ const WagonTallySheet: React.FC = () => {
                         </WagonContainer>
                       )
                     })
-                ))}
+                )) : <div>
+                  {/* Loading... */}
+                    </div>}
                 <Image src={TrainImage} alt="Train engine" style={{borderBottom: '1px solid #D0D1D3', marginLeft: '-1px'}} />
               </TrainContainer>
               </div>
-              <input type="range" id="scrollbar" min="0" max="100" value="0" />
+              <input
+                type="range"
+                id="scrollbar"
+                min="0"
+                max="100"
+                value={scrollValue}
+                onChange={handleScrollbarChange} // Attach the onChange handler here
+              />
               <div className="wagon-tally-sheet-body-content-wagon-details">
                 <div className="wagon-tally-sheet-body-content-wagon-details-container">
                   <div className="wagon-tally-sheet-body-content-wagon-details-contents">
