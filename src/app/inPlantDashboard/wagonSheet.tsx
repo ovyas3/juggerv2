@@ -32,7 +32,6 @@ import captiveRakeIndicator from "@/assets/captive_rakes.svg";
 import SourceOutlinedIcon from "@mui/icons-material/SourceOutlined";
 import { redirect, useRouter, useParams } from "next/navigation";
 
-
 interface Column {
   id: string;
   label: string;
@@ -42,7 +41,7 @@ const columns: readonly Column[] = [
   { id: "sno", label: "SI No", style: "header_sno" },
   { id: "indent", label: "Indent No", style: "header_indent" },
   { id: "edemand", label: "e-Demand No", style: "header_edemand" },
-  { id: "plant_codes", label: "Plant", style: "header_plant" },
+  { id: "plant_codes", label: "Loading Shop", style: "header_plant" },
   { id: "status", label: "Status", style: "header_status" },
   { id: "exp_loading", label: "Expected Loading", style: "header_exp_loading" },
   { id: "total_wagons", label: "Total Wagons", style: "header_total_wagons" },
@@ -71,6 +70,11 @@ function contructingData(shipment: any) {
       plant_codes: any;
       is_captive: any;
       wagon_data_uploaded: any;
+      plants_assigned: [{
+        _id: string;
+        name: string;
+        shipper: string;
+      }];
     }) => {
       return {
         id: shipment?._id && shipment._id,
@@ -129,12 +133,12 @@ function contructingData(shipment: any) {
         wagon_data_uploaded: shipment?.wagon_data_uploaded
           ? shipment?.wagon_data_uploaded
           : false,
+        plants_assigned: shipment?.plants_assigned ? shipment?.plants_assigned.map((item: any) => item.name) : [],
       };
     }
   );
 }
-function WagonTallySheet({
-}: any) {
+function WagonTallySheet({}: any) {
   const text = useTranslations("WAGONTALLYSHEET");
   const [allWagonsList, setAllWagonsList] = useState([]);
   const [totalCount, setTotalCount] = useState(0);
@@ -189,8 +193,8 @@ function WagonTallySheet({
       setAllWagonsList(response.data.data);
       setTotalCount(response.data.count.totalCount);
       setInplantTotal(response.data.count.totalInPlant);
-      setIndentTotal(response.data.count.totalAVE)
-      setActiveCount(response.data?.count?.count)
+      setIndentTotal(response.data.count.totalAVE);
+      setActiveCount(response.data?.count?.count);
     } catch (error) {
       console.log(error);
     }
@@ -247,10 +251,12 @@ function WagonTallySheet({
     setAnchorEl(null);
   };
   const assignHooksToLoadingShop = (event: any, row: any) => {
-    router.push(`/inPlantDashboard/assignHooksToLoadingShop?shipmentId=${row?.id}`);
+    router.push(
+      `/inPlantDashboard/assignHooksToLoadingShop?shipmentId=${row?.id}`
+    );
     setShowActionBox(-1);
     setAnchorEl(null);
-  }
+  };
   function handleClickAction(event: any) {
     setAnchorEl(event?.currentTarget);
   }
@@ -268,73 +274,80 @@ function WagonTallySheet({
     setRowsPerPage(+event.target.value);
     setPage(0);
   };
-  const handleStatusClick = (status:string) => {
+  const handleStatusClick = (status: string) => {
     switch (status) {
       case "total":
-        setPayloadForWagons((prev :any)=>{
-          let newState = {...prev}
-          if(newState.status.length > 0){
+        setPayloadForWagons((prev: any) => {
+          let newState = { ...prev };
+          if (newState.status.length > 0) {
             newState.status = [];
             setStatusCondition(newState.status);
-          }else{
+          } else {
             newState.status = ["AVE", "INPL"];
             setStatusCondition(newState.status);
           }
           return newState;
-        })
+        });
         break;
       case "indent":
-        setPayloadForWagons((prev :any)=>{
-          let newState = {...prev};
-          if(!newState.status.includes('AVE')){
-            newState.status = [...newState.status, 'AVE'];
+        setPayloadForWagons((prev: any) => {
+          let newState = { ...prev };
+          if (!newState.status.includes("AVE")) {
+            newState.status = [...newState.status, "AVE"];
             setStatusCondition(newState.status);
-          }else{
-            newState.status = newState.status.filter((item: string) => item !== 'AVE');
+          } else {
+            newState.status = newState.status.filter(
+              (item: string) => item !== "AVE"
+            );
             setStatusCondition(newState.status);
           }
           return newState;
-        })
-        break;  
+        });
+        break;
       case "inplant":
         setPayloadForWagons((prevState: any) => {
           let newState = { ...prevState };
-          if(!newState.status.includes('INPL')){
-            newState.status = [...newState.status, 'INPL'];
+          if (!newState.status.includes("INPL")) {
+            newState.status = [...newState.status, "INPL"];
             setStatusCondition(newState.status);
-          }else{
-            newState.status = newState.status.filter((item: string) => item !== 'INPL');
+          } else {
+            newState.status = newState.status.filter(
+              (item: string) => item !== "INPL"
+            );
             setStatusCondition(newState.status);
           }
           return newState;
         });
         break;
     }
-  }
-  const getColorForStatus = (status:any) => {
-    let bgColor = 'white';
-    let textColor = 'black';
+  };
+  const getColorForStatus = (status: any) => {
+    let bgColor = "white";
+    let textColor = "black";
     switch (status) {
       case "AVE":
-        if(statusCondition.includes('AVE')){
-          bgColor = '#E6EAFF';
+        if (statusCondition.includes("AVE")) {
+          bgColor = "#E6EAFF";
           textColor = "#536AFE";
         }
         break;
       case "INPL":
-        if(statusCondition.includes('INPL')){
-          bgColor = '#F4FCFC';
+        if (statusCondition.includes("INPL")) {
+          bgColor = "#F4FCFC";
           textColor = "#174D68";
         }
         break;
       case "total":
-        if(statusCondition.includes('AVE') && statusCondition.includes('INPL')){
-          bgColor = '#000000';
-          textColor = 'white';
+        if (
+          statusCondition.includes("AVE") &&
+          statusCondition.includes("INPL")
+        ) {
+          bgColor = "#000000";
+          textColor = "white";
         }
     }
     return { bgColor, textColor };
-  }
+  };
 
   // useEffect
   useEffect(() => {
@@ -385,16 +398,43 @@ function WagonTallySheet({
             />
           </div>
           <div id="status-display">
-            <div className="status-display-boxes" style={{backgroundColor: getColorForStatus('total').bgColor, color:getColorForStatus('total').textColor }} onClick={()=>{handleStatusClick("total")}}>
-              <div style={{fontSize:"16px"}} >{totalCount}</div>
+            <div
+              className="status-display-boxes"
+              style={{
+                backgroundColor: getColorForStatus("total").bgColor,
+                color: getColorForStatus("total").textColor,
+              }}
+              onClick={() => {
+                handleStatusClick("total");
+              }}
+            >
+              <div style={{ fontSize: "16px" }}>{totalCount}</div>
               <div>{text("total")}</div>
             </div>
-            <div className="status-display-boxes" style={{backgroundColor: getColorForStatus('AVE').bgColor, color:getColorForStatus('AVE').textColor }} onClick={()=>{handleStatusClick("indent")}}>
-              <div style={{fontSize:"16px"}}>{indentTotal}</div>
+            <div
+              className="status-display-boxes"
+              style={{
+                backgroundColor: getColorForStatus("AVE").bgColor,
+                color: getColorForStatus("AVE").textColor,
+              }}
+              onClick={() => {
+                handleStatusClick("indent");
+              }}
+            >
+              <div style={{ fontSize: "16px" }}>{indentTotal}</div>
               <div>{text("indent")}</div>
             </div>
-            <div className="status-display-boxes" style={{backgroundColor: getColorForStatus('INPL').bgColor, color:getColorForStatus('INPL').textColor }} onClick={()=>{handleStatusClick("inplant")}}>
-              <div style={{fontSize:"16px"}}>{inplantTotal}</div>
+            <div
+              className="status-display-boxes"
+              style={{
+                backgroundColor: getColorForStatus("INPL").bgColor,
+                color: getColorForStatus("INPL").textColor,
+              }}
+              onClick={() => {
+                handleStatusClick("inplant");
+              }}
+            >
+              <div style={{ fontSize: "16px" }}>{inplantTotal}</div>
               <div>{text("inplant")}</div>
             </div>
           </div>
@@ -471,6 +511,7 @@ function WagonTallySheet({
                         >
                           {columns.map((column) => {
                             const value = row[column.id];
+                            console.log(row.plants_assigned)
                             return (
                               <TableCell
                                 key={column.id}
@@ -714,36 +755,37 @@ function WagonTallySheet({
                                           uploadWagonSheet(e, row)
                                         }
                                         className="action-popover-wagon"
-                                        >
+                                      >
                                         {text("uploadWagonTallySheet")}
                                       </div>
-                                      {/* <div
+                                      <div
                                         className="action-popover-wagon"
                                         onClick={(e) => {
                                           uploadRakeSheet(e, row);
                                         }}
                                       >
                                         {text("rakeHandlingSheet")}
-                                      </div> */}
+                                      </div>
                                       {row.wagon_data_uploaded && (
                                         <div
-                                        className="action-popover-wagon"
-                                        onClick={(e) => {
-                                          assignPlantToWagon(e, row);
-                                        }}
+                                          className="action-popover-wagon"
+                                          onClick={(e) => {
+                                            assignPlantToWagon(e, row);
+                                          }}
                                         >
                                           {text("assignWagonToPlant")}
                                         </div>
                                       )}
-                                      {/* {row.plant_codes.plant_codes.length > 0 && (
-                                           <div
-                                           className="action-popover-wagon"
-                                           onClick={(e) => {
-                                             assignHooksToLoadingShop(e, row);
-                                           }}
-                                           >
-                                             {text("assignsHooksToLoadingShop")}
-                                           </div>
+                                      {/* {row.plant_codes.plant_codes.length >
+                                        0 && (
+                                        <div
+                                          className="action-popover-wagon"
+                                          onClick={(e) => {
+                                            assignHooksToLoadingShop(e, row);
+                                          }}
+                                        >
+                                          {text("assignsHooksToLoadingShop")}
+                                        </div>
                                       )} */}
                                       {/* <div
                                         className="action-popover-wagon"
@@ -774,29 +816,28 @@ function WagonTallySheet({
                                 )}
                                 {column.id === "plant_codes" && (
                                   <>
-                                    <div>
-                                      {typeof row?.plant_codes?.plant_codes ===
-                                        "object" &&
-                                      row?.plant_codes?.plant_codes.length ? (
+                                    <div style={{ fontSize: 10, textWrap:'nowrap' }}>
+                                      {
+                                      row?.plants_assigned.length ? (
                                         <div>
-                                          {row?.plant_codes?.plant_codes
+                                          {row?.plants_assigned
                                             .slice(0, 2)
                                             .map((plant: any, index: any) => (
                                               <div key={index}>{plant}</div>
                                             ))}
-                                          {row?.plant_codes?.plant_codes
+                                          {row?.plants_assigned
                                             .length > 2 && (
                                             <div className="more-plants">
                                               <span
                                                 style={{ color: "#AB886D" }}
                                               >
                                                 +
-                                                {row?.plant_codes?.plant_codes
+                                                {row?.plants_assigned
                                                   .length - 2}{" "}
                                                 more
                                               </span>
                                               <div className="hidden-plants">
-                                                {row?.plant_codes?.plant_codes
+                                                {row?.plants_assigned
                                                   .slice(2)
                                                   .map(
                                                     (
@@ -842,6 +883,7 @@ function WagonTallySheet({
         <RakeHandlingSheet
           isClose={setOpenRakeHandlingSheet}
           shipment={rakeHandlingSheetData}
+          getWagonDetails={getWagonDetails}
         />
       )}
       {openMarkPlacementTimeModal && (

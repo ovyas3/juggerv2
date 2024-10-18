@@ -6,26 +6,108 @@ import { httpsPost, httpsGet } from "@/utils/Communication";
 import SideDrawer from "@/components/Drawer/Drawer";
 import "./style.css";
 import { useTranslations } from "next-intl";
-import { useParams, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
-import CheckRoundedIcon from "@mui/icons-material/CheckRounded";
 import Image from "next/image";
 import { useSnackbar } from "@/hooks/snackBar";
-
+import RemoveIcon from "@mui/icons-material/Remove";
 
 import BOST from "@/assets/BOST Final 1.png";
 import BFNV from "@/assets/BFNV final 1.png";
 import BOBRN from "@/assets/BOBRN final 1.png";
 import BRNA from "@/assets/BRNA 1.png";
 import BRN229 from "@/assets/BRN 23.png";
-import Button from "@mui/material/Button";
-import locomotive from "@/assets/Train_engine-removebg-preview 1.png";
-import chain01 from "@/assets/chain 1.png";
-import chain02 from "@/assets/chain 2.png";
+import { Suspense } from "react";
+import Loader from "@/components/Loading/WithBackDrop";
 
 function AssignHooksToLoadingShop() {
+  return (
+    <Suspense fallback={<Loader />}>
+      <AssignHooksToLoadingShopContent />
+    </Suspense>
+  );
+}
+
+export default AssignHooksToLoadingShop;
+
+function wagonImage(wagonImage: any) {
+  switch (wagonImage) {
+    case "BOST":
+      return { image: BOST, imageWidth: 97, imageHeight: 40 };
+      break;
+    case "BFNV":
+      return { image: BFNV, imageWidth: 101, imageHeight: 36 };
+      break;
+    case "BOBRN":
+      return { image: BOBRN, imageWidth: 97, imageHeight: 40 };
+      break;
+    case "BRNA":
+      return { image: BRNA, imageWidth: 97, imageHeight: 40 };
+      break;
+    case "BRN22.9":
+      return { image: BRN229, imageWidth: 127, imageHeight: 30 };
+      break;
+    default:
+      return { image: BOST, imageWidth: 97, imageHeight: 40 };
+  }
+}
+
+function arePlantRecordsEqual(arr1: any[], arr2: any[]): boolean {
+  // Check if arrays have the same length
+  if (arr1.length !== arr2.length) {
+    return false;
+  }
+
+  // Compare each object in the array
+  for (let i = 0; i < arr1.length; i++) {
+    const record1 = arr1[i];
+    const record2 = arr2[i];
+
+    // Compare plant objects
+    if (
+      record1.plant._id !== record2.plant._id ||
+      record1.plant.name !== record2.plant.name ||
+      record1.plant.shipper !== record2.plant.shipper
+    ) {
+      return false;
+    }
+
+    // Compare other properties
+    if (
+      record1.count !== record2.count ||
+      record1.hooks_assigned !== record2.hooks_assigned
+    ) {
+      return false;
+    }
+
+    // Compare hooksRecords (assuming order matters)
+    if (record1.hooksRecords.length !== record2.hooksRecords.length) {
+      return false;
+    }
+
+    for (let j = 0; j < record1.hooksRecords.length; j++) {
+      if (
+        record1.hooksRecords[j].hookNumber !==
+        record2.hooksRecords[j].hookNumber
+      ) {
+        return false;
+      }
+      if (
+        record1.hooksRecords[j].wagonsList.length !==
+        record2.hooksRecords[j].wagonsList.length
+      ) {
+        return false;
+      }
+      // Further comparison for wagonsList can be done here if needed
+    }
+  }
+
+  return true;
+}
+
+function AssignHooksToLoadingShopContent() {
   const text = useTranslations("WAGONTALLYSHEET");
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -52,7 +134,7 @@ function AssignHooksToLoadingShop() {
       const response = await httpsGet(
         `get_assigned_loading_shops?shipment=${id}`
       );
-      setAllPlants(response.data);
+      setAllPlants(response?.data);
     } catch (error) {
       console.log(error);
     }
@@ -65,8 +147,8 @@ function AssignHooksToLoadingShop() {
     if (payload.plant) {
       try {
         const response = await httpsPost(`get_wagons_by_hooks`, payload);
-        setWagonListAssignToPlant(response.data.wagonData);
-        setShipmentData(response.data.shipmentData);
+        setWagonListAssignToPlant(response?.data?.wagonData);
+        setShipmentData(response?.data?.shipmentData);
       } catch (error) {
         console.log(error);
       }
@@ -78,7 +160,7 @@ function AssignHooksToLoadingShop() {
       shipment: id,
       plant_assigned: selectedPlant?.plant?._id,
       hook_no: 2,
-      wagons: ['670919b4068631c0c5c7d57f'],
+      wagons: ["670919b4068631c0c5c7d57f"],
     };
     // try {
     //     const response = await httpsPost(`assign_hook_to_plant`, payload);
@@ -88,19 +170,25 @@ function AssignHooksToLoadingShop() {
     // }
   };
 
-
   //local functions
-  const handleSelectionOfPlant = (event: any, plantObject:any, index:number ) => {
-      if(!arePlantRecordsEqual(originalHooksList,hookManagement)){
-        showMessage.showMessage(`Please assign hooks to ${selectedPlant?.plant?.name} first`, "error");
-        return;
-      }
-      event.stopPropagation();
-      setOpenPlantDropDown(false);
-      setOpenHooksDropdown(false);
-      setSelectedPlant(plantObject);
-      setSelectedHook(plantObject?.hooksRecords[0]?.hookNumber);
-  }
+  const handleSelectionOfPlant = (
+    event: any,
+    plantObject: any,
+    index: number
+  ) => {
+    if (!arePlantRecordsEqual(originalHooksList, hookManagement)) {
+      showMessage.showMessage(
+        `Please assign hooks to ${selectedPlant?.plant?.name} first`,
+        "error"
+      );
+      return;
+    }
+    event.stopPropagation();
+    setOpenPlantDropDown(false);
+    setOpenHooksDropdown(false);
+    setSelectedPlant(plantObject);
+    setSelectedHook(plantObject?.hooksRecords[0]?.hookNumber);
+  };
   const assignHooksToSelectedWagon = (e: any, wagons: any, index: number) => {
     e.stopPropagation();
 
@@ -112,13 +200,15 @@ function AssignHooksToLoadingShop() {
     // })
 
     setWorkingWagonsList((prevWagons: any) => {
-      
       const newWagons = [...prevWagons];
       if (newWagons[index].hook_no === selectedHook) {
         delete newWagons[index].hook_no;
       } else {
-        if(newWagons[index].hook_no){
-          showMessage.showMessage(`wagon is already assigned to hook ${newWagons[index].hook_no}`, "error");
+        if (newWagons[index].hook_no) {
+          showMessage.showMessage(
+            `wagon is already assigned to hook ${newWagons[index].hook_no}`,
+            "error"
+          );
           return newWagons;
         }
         newWagons[index].hook_no = selectedHook;
@@ -126,56 +216,71 @@ function AssignHooksToLoadingShop() {
       return newWagons;
     });
 
-     //hookManagement 
-     setHookManagement((prevHookManagement: any)=>{
+    //hookManagement
+    setHookManagement((prevHookManagement: any) => {
       const newHookManagement = [...prevHookManagement];
-      newHookManagement.map((plantObject:any)=>{
-        if(plantObject?.plant?._id === selectedPlant?.plant?._id){
-          plantObject.hooksRecords.map((hookObject:any)=>{
-            if(hookObject.hookNumber === selectedHook){
+      newHookManagement.map((plantObject: any) => {
+        if (plantObject?.plant?._id === selectedPlant?.plant?._id) {
+          plantObject.hooksRecords.map((hookObject: any) => {
+            if (hookObject.hookNumber === selectedHook) {
               hookObject.wagonsList = [...hookObject.wagonsList, wagons._id];
             }
-          })
+          });
         }
-      })
+      });
       return newHookManagement;
-     })
+    });
   };
-  const handleAssignHooksToSelectedHook = (event:any, hook:any, index:number) => {
+  const handleAssignHooksToSelectedHook = (
+    event: any,
+    hook: any,
+    index: number
+  ) => {
     event.stopPropagation();
     setOpenHooksDropdown(false);
     setSelectedHook(hook?.hookNumber);
-  }
+  };
   const addNewHooksToSelectedPlant = () => {
-    // console.log('0987654321',selectedPlant.hooksRecords[selectedPlant.hooksRecords.length-1]) 
-    if(selectedPlant.hooksRecords[selectedPlant.hooksRecords.length-1]?.wagonsList?.length === 0){
-      showMessage.showMessage(`Please select wagons for hook ${selectedPlant.hooksRecords[selectedPlant.hooksRecords.length-1]?.hookNumber} `, "error");
+    // console.log('0987654321',selectedPlant.hooksRecords[selectedPlant.hooksRecords.length-1])
+    if (
+      selectedPlant.hooksRecords[selectedPlant.hooksRecords.length - 1]
+        ?.wagonsList?.length === 0
+    ) {
+      showMessage.showMessage(
+        `Please select wagons for hook ${
+          selectedPlant.hooksRecords[selectedPlant.hooksRecords.length - 1]
+            ?.hookNumber
+        } `,
+        "error"
+      );
       return;
     }
-    console.log(workingWagonsList)
+    console.log(workingWagonsList);
     // if(workingWagonsList.filter((wagon:any)=> wagon.hook_no)){
     //   showMessage.showMessage(`All Wagons are assigned`, "error");
     //   return;
     // }
-    const allHaveHookNo = workingWagonsList.every((item:any) => item.hasOwnProperty('hook_no'));
+    const allHaveHookNo = workingWagonsList.every((item: any) =>
+      item.hasOwnProperty("hook_no")
+    );
     if (allHaveHookNo) {
       showMessage.showMessage(`All Wagons are assigned`, "error");
       return;
-  }
+    }
 
     setHookManagement((prevHookManagement: any) => {
       const newHookManagement = [...prevHookManagement];
-      newHookManagement.map((plantObject:any)=>{
-        if(plantObject?.plant?._id === selectedPlant?.plant?._id){
+      newHookManagement.map((plantObject: any) => {
+        if (plantObject?.plant?._id === selectedPlant?.plant?._id) {
           plantObject.hooksRecords = [
             ...plantObject.hooksRecords,
-            { hookNumber: plantObject.hooksRecords.length+1, wagonsList: [] },
-          ]
+            { hookNumber: plantObject.hooksRecords.length + 1, wagonsList: [] },
+          ];
         }
-      })
+      });
       return newHookManagement;
     });
-  }
+  };
 
   useEffect(() => {
     getAssignLoadingShop();
@@ -188,14 +293,14 @@ function AssignHooksToLoadingShop() {
   useEffect(() => {
     setWorkingWagonsList(wagonListAssignToPlant);
 
-    setHookManagement((previous:any)=>{
+    setHookManagement((previous: any) => {
       const newHookManagement = [...previous];
       // console.log(newHookManagement)
       // console.log(wagonListAssignToPlant)
 
       // wagonListAssignToPlant.map((plantObject:any)=>{
       //   if(plantObject.hook_no){
-          
+
       //     newHookManagement.map((hookObject:any)=>{
       //       if(hookObject.hooksRecords.filter((hook:any)=>{hook.hookNumber === plantObject.hook_no})){
       //         hookObject.hooksRecords.map((hook:any)=>{
@@ -206,12 +311,14 @@ function AssignHooksToLoadingShop() {
       //   }
       // })
 
-      wagonListAssignToPlant.map((plantObject:any)=>{
-        if(plantObject.hook_no){
+      wagonListAssignToPlant.map((plantObject: any) => {
+        if (plantObject.hook_no) {
           let hookExists = false;
 
           newHookManagement.map((hookObject: any) => {
-            const hookRecord = hookObject.hooksRecords.find((hook: any) => hook.hookNumber === plantObject.hook_no);
+            const hookRecord = hookObject.hooksRecords.find(
+              (hook: any) => hook.hookNumber === plantObject.hook_no
+            );
             if (hookRecord) {
               // Hook number exists, push plantObject._id to wagonsList
               hookRecord.wagonsList.push(plantObject._id);
@@ -223,39 +330,31 @@ function AssignHooksToLoadingShop() {
             newHookManagement.map((hookObject: any) => {
               hookObject.hooksRecords.push({
                 hookNumber: plantObject.hook_no,
-                wagonsList: [plantObject._id]
+                wagonsList: [plantObject._id],
               });
             });
           }
-
         }
-      })
+      });
 
       return newHookManagement;
-    })
-
+    });
   }, [wagonListAssignToPlant]);
 
-  useEffect(()=>{
+  useEffect(() => {
     setHookManagement(() => {
-      return allPlants.map((item: any, index:number) => ({
+      return allPlants.map((item: any, index: number) => ({
         ...item,
-        hooksRecords: [
-          { hookNumber: 1, wagonsList: [] },
-        ],
+        hooksRecords: [{ hookNumber: 1, wagonsList: [] }],
       }));
     });
-    setOriginalHooksList(()=>{
-      return allPlants.map((item: any, index:number) => ({
+    setOriginalHooksList(() => {
+      return allPlants.map((item: any, index: number) => ({
         ...item,
-        hooksRecords: [
-          { hookNumber: 1, wagonsList: [] },
-        ],
+        hooksRecords: [{ hookNumber: 1, wagonsList: [] }],
       }));
-    })
-  },[allPlants])
-
-
+    });
+  }, [allPlants]);
 
   // console.log('hookManagement---->>>>',hookManagement)
   // console.log('workingWagonsList---->>>>',workingWagonsList)
@@ -271,7 +370,6 @@ function AssignHooksToLoadingShop() {
     >
       <Header title={text("in-plant-Dashboard")} isMapHelper={false} />
       <div id="pageInsideContent">
-
         <div id="search-container-assign">
           <div
             style={{ cursor: "pointer" }}
@@ -353,16 +451,17 @@ function AssignHooksToLoadingShop() {
                 setOpenPlantDropDown(!openPlantDropDown);
               }}
             >
-              <div>{selectedPlant?.plant?.name || 'Select Mill'}</div>
+              <div>{selectedPlant?.plant?.name || "Select Mill"}</div>
               <ArrowDropDownIcon />
             </div>
             {openPlantDropDown && (
               <div id="dropdownListForplants">
                 {hookManagement?.map((eachPlant: any, index: number) => {
-
                   return (
                     <div
-                      onClick={(e) => {handleSelectionOfPlant(e, eachPlant, index)}}
+                      onClick={(e) => {
+                        handleSelectionOfPlant(e, eachPlant, index);
+                      }}
                       key={index}
                       className="dropdownListForPlantsEachItem"
                     >
@@ -376,29 +475,56 @@ function AssignHooksToLoadingShop() {
 
           <div id="hooksFilter">
             <label id="selectAPlantLabel">{text("assignHooks")}</label>
-            <div id="dropdownForPlantsMaincontainer"
-              onClick={(e)=>{
+            <div
+              id="dropdownForPlantsMaincontainer"
+              onClick={(e) => {
                 e.stopPropagation();
                 setOpenHooksDropdown(!openHooksDropdown);
               }}
             >
-              <div>{selectedHook ? `Hook ${selectedHook}` : 'Select Hook'}</div>
+              <div>{selectedHook ? `Hook ${selectedHook}` : "Select Hook"}</div>
               <ArrowDropDownIcon />
             </div>
             {openHooksDropdown && (
               <div id="dropdownListForHooks">
-                {selectedPlant?.hooksRecords.map((eachhook: any, index: number)=>{
-                  return(
-                    <div key={index} className="dropdownListForPlantsEachItem" onClick={(e)=>{handleAssignHooksToSelectedHook(e, eachhook, index)}} >Hook {eachhook.hookNumber}</div>
-                  );
-                })}
-                <div id='addButtonContainerForHooks'>
-                  <div id='addButtonForHooks' onClick={(e)=>{e.stopPropagation(); addNewHooksToSelectedPlant();}}>ADD</div>
+                {selectedPlant?.hooksRecords.map(
+                  (eachhook: any, index: number) => {
+                    return (
+                      <div
+                        key={index}
+                        className="dropdownListForPlantsEachItem"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleAssignHooksToSelectedHook(e, eachhook, index);
+                        }}
+                      >
+                        <div>Hook {eachhook.hookNumber}</div>
+                        {index === selectedPlant?.hooksRecords.length - 1 && (
+                          <div className="removeIcon-container-loading-shop">
+                            <RemoveIcon
+                              style={{ fontSize: 20, color: "white" }}
+                            />
+                          </div>
+                        )}
+                        {/* <div className="removeIcon-container-loading-shop"  ><RemoveIcon style={{fontSize: 20, color:'white'}}/></div> */}
+                      </div>
+                    );
+                  }
+                )}
+                <div id="addButtonContainerForHooks">
+                  <div
+                    id="addButtonForHooks"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      addNewHooksToSelectedPlant();
+                    }}
+                  >
+                    ADD
+                  </div>
                 </div>
               </div>
             )}
           </div>
-
         </div>
 
         <div id="wagonListContainer">
@@ -425,18 +551,21 @@ function AssignHooksToLoadingShop() {
                   // }}
                 >
                   {wagons?.hook_no && (
-                      <div
-                        className="wagonsAssigntoMillCheckedIcon"
-                        style={{
-                          backgroundColor: wagons?.hook_no === selectedHook?'black':'lightgrey',
-                          color:'white',
-                          fontSize:'10px',
-                          display:'flex',
-                          justifyContent:'center',
-                          alignItems:'center'
-                        }}
-                      >
-                        {/* <CheckRoundedIcon
+                    <div
+                      className="wagonsAssigntoMillCheckedIcon"
+                      style={{
+                        backgroundColor:
+                          wagons?.hook_no === selectedHook
+                            ? "black"
+                            : "lightgrey",
+                        color: "white",
+                        fontSize: "10px",
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      {/* <CheckRoundedIcon
                           style={{
                             color: "white",
                             height: "100%",
@@ -446,9 +575,9 @@ function AssignHooksToLoadingShop() {
                             alignItems: "center",
                           }}
                         /> */}
-                        <div>{wagons?.hook_no}</div>
-                      </div>
-                    )}
+                      <div>{wagons?.hook_no}</div>
+                    </div>
+                  )}
                   <div className="wagonsAssignToMillImageSelector">
                     <div style={{ width: 40, height: 17 }}>
                       <Image
@@ -477,75 +606,28 @@ function AssignHooksToLoadingShop() {
           })}
         </div>
 
-        <div onClick={handleAssignHooks}>Submiot</div>
+        <div
+          style={{ marginInline: 24, display: "flex", justifyContent: "end" }}
+        >
+          <div
+            style={{
+              cursor: "pointer",
+              width: "fit-content",
+              borderRadius: 6,
+              paddingInline: 24,
+              paddingBlock: 12,
+              backgroundColor: "#3351FF",
+              fontSize: 14,
+              color: "white",
+              textTransform: "uppercase",
+            }}
+            onClick={handleAssignHooks}
+          >
+            ASSIGN
+          </div>
+        </div>
       </div>
       <SideDrawer />
     </div>
   );
-}
-
-export default AssignHooksToLoadingShop;
-
-function wagonImage(wagonImage: any) {
-  switch (wagonImage) {
-    case "BOST":
-      return { image: BOST, imageWidth: 97, imageHeight: 40 };
-      break;
-    case "BFNV":
-      return { image: BFNV, imageWidth: 101, imageHeight: 36 };
-      break;
-    case "BOBRN":
-      return { image: BOBRN, imageWidth: 97, imageHeight: 40 };
-      break;
-    case "BRNA":
-      return { image: BRNA, imageWidth: 97, imageHeight: 40 };
-      break;
-    case "BRN22.9":
-      return { image: BRN229, imageWidth: 127, imageHeight: 30 };
-      break;
-    default:
-      return { image: BOST, imageWidth: 97, imageHeight: 40 };
-  }
-}
-
-function arePlantRecordsEqual(arr1: any[], arr2: any[]): boolean {
-  // Check if arrays have the same length
-  if (arr1.length !== arr2.length) {
-      return false;
-  }
-
-  // Compare each object in the array
-  for (let i = 0; i < arr1.length; i++) {
-      const record1 = arr1[i];
-      const record2 = arr2[i];
-
-      // Compare plant objects
-      if (record1.plant._id !== record2.plant._id ||
-          record1.plant.name !== record2.plant.name ||
-          record1.plant.shipper !== record2.plant.shipper) {
-          return false;
-      }
-
-      // Compare other properties
-      if (record1.count !== record2.count || record1.hooks_assigned !== record2.hooks_assigned) {
-          return false;
-      }
-
-      // Compare hooksRecords (assuming order matters)
-      if (record1.hooksRecords.length !== record2.hooksRecords.length) {
-          return false;
-      }
-
-      for (let j = 0; j < record1.hooksRecords.length; j++) {
-          if (record1.hooksRecords[j].hookNumber !== record2.hooksRecords[j].hookNumber) {
-              return false;
-          }
-          if (record1.hooksRecords[j].wagonsList.length !== record2.hooksRecords[j].wagonsList.length) {
-              return false;
-          }
-          // Further comparison for wagonsList can be done here if needed
-      }
-  }
-
-  return true;
 }
