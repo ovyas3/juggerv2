@@ -183,8 +183,8 @@ const PhotoCaptureComponent: React.FC<PhotoCaptureComponentProps> = ({ label, on
                   src={capturedImage}
                   alt="Captured"
                   className="captured-image"
-                  width={640}
-                  height={480}
+                  width={560}
+                  height={340}
                 />
                 <div className='camera-buttons-container'>
                   <div 

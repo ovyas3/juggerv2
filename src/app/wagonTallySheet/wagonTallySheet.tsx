@@ -12,7 +12,6 @@ import BFNV from '@/assets/BFNV.png';
 import BOXN from '@/assets/BOXN.png';
 import BRN_22_9 from '@/assets/BRN_22.9.png';
 import ArrowRight from '@/assets/arrow_right_rounded.svg';
-import Camera from '@/assets/camera.svg';
 import Minus from '@/assets/minus.svg';
 import Plus from '@/assets/plus.svg';
 import CloseButtonIcon from "@/assets/close_icon.svg";
@@ -82,7 +81,7 @@ const WagonContainer = styled('div')`
   align-items: flex-end;
   border-bottom: 1px solid #D0D1D3;
   gap: 6px;
-  margin-right: -9px;
+  margin-right: -4.5px;
   transition: all 0.3s ease;
   border-bottom: '1px solid #D0D1D3';
   
@@ -105,15 +104,22 @@ const TrainContainer = styled('div')`
 
 const WagonIndex = styled('div')<{ isSelected: boolean }>`
   position: absolute;
-  top: 5px;
-  left: -60px;
+  top: 100%;
+  left: 50%;
   color: ${props => props.isSelected ? '#FFFFFF' : '#71747A'};
-  background-color: ${props => props.isSelected ? '#007BFF' : 'transparent'};
+  background-color: ${props => props.isSelected ? '#3351FF' : 'transparent'};
   font-family: 'Plus Jakarta Sans', sans-serif;
-  font-size: 12px;
+  font-size: 10px;
   font-weight: 600;
-  padding: 2px 4px;
+  margin-top: 2px;
+  padding: 4px;
+  width: 22px; 
+  height: 22px;
   border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: translate(-50%, 0);
 `;
 
 const WagonNumber = styled('div')`
@@ -121,8 +127,8 @@ const WagonNumber = styled('div')`
   top: -50px;
   left: 34px;
   transform: translateX(-50%);
+  font-family: 'Inter', sans-serif;
   color: #3C4852;
-  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 8px;
   font-weight: 400;
 `;
@@ -188,6 +194,9 @@ type Mill = {
   wagons: Wagon[];
 };
 
+interface Props {
+  isSick: boolean;
+}
 
 const WagonTallySheet: React.FC = () => {
   const { showMessage } = useSnackbar();
@@ -198,7 +207,7 @@ const WagonTallySheet: React.FC = () => {
   const [selectedTab, setSelectedTab] = useState<number>(0);
   const [selectedWagon, setSelectedWagon] = useState<number | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [isSick, setIsSick] = useState<Boolean>(false);
+  const [isSick, setIsSick] = useState<boolean>(false);
   const [wagonCapturedImages, setWagonCapturedImages] = useState<(string | null)[]>([]);
   const [materialCapturedImages, setMaterialCapturedImages] = useState<(string | null)[]>([]);
   const [train, setTrain] = useState<Mill[] | null>(null);
@@ -526,9 +535,7 @@ const WagonTallySheet: React.FC = () => {
                           </Track>
                           <Image src={getWagonImage(wagon.wagonType)} alt={wagon.wagonType} />
                           {globalWagonIndex !== totalWagons - 1 && <Image src={WagonConnector} alt="Wagon connector" className="wagon-connector-icon" />}
-                          <Track>
-                            <WagonIndex isSelected={globalWagonIndex === selectedWagon}>{globalWagonIndex + 1}</WagonIndex>
-                          </Track>
+                          <WagonIndex isSelected={globalWagonIndex === selectedWagon}>{globalWagonIndex + 1}</WagonIndex>
                         </WagonContainer>
                       )
                     })
@@ -622,6 +629,7 @@ const WagonTallySheet: React.FC = () => {
                       onChange={(newDate) => handleDateChange("loadingReadinessTime", newDate!)}
                       open={openPickers.loadingReadinessTime}
                       onToggle={() => togglePicker("loadingReadinessTime")}
+                      disabled={isSick}
                     />
                     <CustomDateTimePicker
                       label="Material Loading Start Time"
@@ -629,6 +637,7 @@ const WagonTallySheet: React.FC = () => {
                       onChange={(newDate) => handleDateChange("loadingStartTime", newDate!)}
                       open={openPickers.loadingStartTime}
                       onToggle={() => togglePicker("loadingStartTime")}
+                      disabled={isSick}
                     />
                     <CustomDateTimePicker
                       label="Material Loading End Time"
@@ -636,6 +645,7 @@ const WagonTallySheet: React.FC = () => {
                       onChange={(newDate) => handleDateChange("loadingEndTime", newDate!)}
                       open={openPickers.loadingEndTime}
                       onToggle={() => togglePicker("loadingEndTime")}
+                      disabled={isSick}
                     />
                     <CustomDateTimePicker
                       label="Packing Start Time"
@@ -643,6 +653,7 @@ const WagonTallySheet: React.FC = () => {
                       onChange={(newDate) => handleDateChange("packingStartTime", newDate!)}
                       open={openPickers.packingStartTime}
                       onToggle={() => togglePicker("packingStartTime")}
+                      disabled={isSick}
                     />
                     <CustomDateTimePicker
                       label="Welding & Stepping Start Time"
@@ -650,6 +661,7 @@ const WagonTallySheet: React.FC = () => {
                       onChange={(newDate) => handleDateChange("weldingStartTime", newDate!)}
                       open={openPickers.weldingStartTime}
                       onToggle={() => togglePicker("weldingStartTime")}
+                      disabled={isSick}
                     />
                     <CustomDateTimePicker
                       label="Welding & Stepping End Time"
@@ -657,6 +669,7 @@ const WagonTallySheet: React.FC = () => {
                       onChange={(newDate) => handleDateChange("weldingEndTime", newDate!)}
                       open={openPickers.weldingEndTime}
                       onToggle={() => togglePicker("weldingEndTime")}
+                      disabled={isSick}
                     />
                     <CustomDateTimePicker
                       label="Packing End Time"
@@ -664,6 +677,7 @@ const WagonTallySheet: React.FC = () => {
                       onChange={(newDate) => handleDateChange("packingEndTime", newDate!)}
                       open={openPickers.packingEndTime}
                       onToggle={() => togglePicker("packingEndTime")}
+                      disabled={isSick}
                     />
                   </div>
                 </div>

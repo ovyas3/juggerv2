@@ -3,11 +3,11 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import dayjs from "dayjs";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { renderTimeViewClock } from "@mui/x-date-pickers/timeViewRenderers";
-import React, { useState } from "react";
+import React from "react";
 import './wagonTallySheet.css';
 
 // Styles for the DateTimePicker
-const dateTimePickerStyles = {
+const dateTimePickerStyles = (disabled: boolean) => ({
   width: "100%",
   ".MuiInputBase-input": {
     padding: "4px 8px",
@@ -15,6 +15,7 @@ const dateTimePickerStyles = {
     fontSize: "12px ",
     color: "#42454E",
     fontWeight: 600,
+    cursor: disabled ? "not-allowed" : "default",
   },
   ".MuiInputBase-root": {
     padding: 0,
@@ -33,7 +34,7 @@ const dateTimePickerStyles = {
     left: -720,
     position: "relative",
   },
-};
+});
 
 // Custom DateTimePicker component
 type CustomDateTimePickerProps = {
@@ -42,9 +43,10 @@ type CustomDateTimePickerProps = {
   onChange: (date: Date | null) => void;
   open: boolean;
   onToggle: () => void;
+  disabled: boolean;
 };
 
-const CustomDateTimePicker: React.FC<CustomDateTimePickerProps> = ({ label, value, onChange, open, onToggle }) => (
+const CustomDateTimePicker: React.FC<CustomDateTimePickerProps> = ({ label, value, onChange, open, onToggle, disabled }) => (
   <div className="wagon-tally-sheet-body-content-wagon-details-content-down">
     <p className="wagon-tally-sheet-body-content-wagon-details-content-label">{label}</p>
     <div className="wagon-tally-sheet-body-content-wagon-details-content-date-time">
@@ -53,8 +55,9 @@ const CustomDateTimePicker: React.FC<CustomDateTimePickerProps> = ({ label, valu
           open={open}
           onClose={onToggle}
           value={dayjs(value)}
-          sx={dateTimePickerStyles}
+          sx={dateTimePickerStyles(disabled)}
           ampm={false}
+          disabled={disabled}
           slotProps={{
             textField: {
               onClick: onToggle,
