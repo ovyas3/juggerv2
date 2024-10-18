@@ -717,14 +717,14 @@ function WagonTallySheet({
                                         >
                                         {text("uploadWagonTallySheet")}
                                       </div>
-                                      {/* <div
+                                      <div
                                         className="action-popover-wagon"
                                         onClick={(e) => {
                                           uploadRakeSheet(e, row);
                                         }}
                                       >
                                         {text("rakeHandlingSheet")}
-                                      </div> */}
+                                      </div>
                                       {row.wagon_data_uploaded && (
                                         <div
                                         className="action-popover-wagon"
@@ -735,7 +735,7 @@ function WagonTallySheet({
                                           {text("assignWagonToPlant")}
                                         </div>
                                       )}
-                                      {/* {row.plant_codes.plant_codes.length > 0 && (
+                                      {row.plant_codes.plant_codes.length > 0 && (
                                            <div
                                            className="action-popover-wagon"
                                            onClick={(e) => {
@@ -744,7 +744,7 @@ function WagonTallySheet({
                                            >
                                              {text("assignsHooksToLoadingShop")}
                                            </div>
-                                      )} */}
+                                      )}
                                       {/* <div
                                         className="action-popover-wagon"
                                         onClick={(e) => {
@@ -842,6 +842,7 @@ function WagonTallySheet({
         <RakeHandlingSheet
           isClose={setOpenRakeHandlingSheet}
           shipment={rakeHandlingSheetData}
+          getWagonDetails={getWagonDetails}
         />
       )}
       {openMarkPlacementTimeModal && (

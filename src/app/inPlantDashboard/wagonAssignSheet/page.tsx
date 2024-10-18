@@ -46,8 +46,8 @@ function WagonAssignSheet({
   const wagonDetails = async () => {
     try {
       const response = await httpsGet(`get_wagon_details_by_shipment?id=${id}`);
-      setOriginalWagonDetails(response.wagonData);
-      setShipmentData(response.shipmentData);
+      setOriginalWagonDetails(response?.wagonData);
+      setShipmentData(response?.shipmentData);
     } catch (error) {
       console.log(error);
     }
@@ -57,7 +57,7 @@ function WagonAssignSheet({
     try {
       const response = await httpsGet(`shipper_constants/get_mills`);
       if (response.statusCode === 200) {
-        setPlants(response.data);
+        setPlants(response?.data);
       }
     } catch (error) {
       console.log(error);
