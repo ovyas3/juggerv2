@@ -1185,7 +1185,7 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
                 >
                   <div className="millDetails-dashboard">
                     <div style={{ width: "200px" }}>
-                      plant:{" "}
+                      Loading Shop:{" "}
                       <span
                         style={{
                           color: "black",
@@ -1197,7 +1197,7 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
                       </span>
                     </div>
                     <div style={{ width: "200px" }}>
-                      no. of wagons assigned:{" "}
+                      No. of Wagons Assigned:{" "}
                       <span
                         style={{
                           color: "black",
@@ -1209,7 +1209,7 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
                       </span>
                     </div>
                     <div style={{ width: "200px" }}>
-                      available wagons:{" "}
+                      Available Wagons:{" "}
                       <span
                         style={{
                           color: "black",
