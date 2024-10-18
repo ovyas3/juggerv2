@@ -6,7 +6,6 @@ import { renderTimeViewClock } from "@mui/x-date-pickers/timeViewRenderers";
 import React from "react";
 import './wagonTallySheet.css';
 
-// Styles for the DateTimePicker
 const dateTimePickerStyles = (disabled: boolean) => ({
   width: "100%",
   ".MuiInputBase-input": {
@@ -36,7 +35,6 @@ const dateTimePickerStyles = (disabled: boolean) => ({
   },
 });
 
-// Custom DateTimePicker component
 type CustomDateTimePickerProps = {
   label: string;
   value: Date;
