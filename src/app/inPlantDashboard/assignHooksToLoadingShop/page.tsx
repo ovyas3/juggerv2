@@ -176,13 +176,6 @@ function AssignHooksToLoadingShopContent() {
     plantObject: any,
     index: number
   ) => {
-    if (!arePlantRecordsEqual(originalHooksList, hookManagement)) {
-      showMessage.showMessage(
-        `Please assign hooks to ${selectedPlant?.plant?.name} first`,
-        "error"
-      );
-      return;
-    }
     event.stopPropagation();
     setOpenPlantDropDown(false);
     setOpenHooksDropdown(false);
@@ -241,7 +234,6 @@ function AssignHooksToLoadingShopContent() {
     setSelectedHook(hook?.hookNumber);
   };
   const addNewHooksToSelectedPlant = () => {
-    // console.log('0987654321',selectedPlant.hooksRecords[selectedPlant.hooksRecords.length-1])
     if (
       selectedPlant.hooksRecords[selectedPlant.hooksRecords.length - 1]
         ?.wagonsList?.length === 0
@@ -255,11 +247,6 @@ function AssignHooksToLoadingShopContent() {
       );
       return;
     }
-    console.log(workingWagonsList);
-    // if(workingWagonsList.filter((wagon:any)=> wagon.hook_no)){
-    //   showMessage.showMessage(`All Wagons are assigned`, "error");
-    //   return;
-    // }
     const allHaveHookNo = workingWagonsList.every((item: any) =>
       item.hasOwnProperty("hook_no")
     );
@@ -295,22 +282,6 @@ function AssignHooksToLoadingShopContent() {
 
     setHookManagement((previous: any) => {
       const newHookManagement = [...previous];
-      // console.log(newHookManagement)
-      // console.log(wagonListAssignToPlant)
-
-      // wagonListAssignToPlant.map((plantObject:any)=>{
-      //   if(plantObject.hook_no){
-
-      //     newHookManagement.map((hookObject:any)=>{
-      //       if(hookObject.hooksRecords.filter((hook:any)=>{hook.hookNumber === plantObject.hook_no})){
-      //         hookObject.hooksRecords.map((hook:any)=>{
-      //           hook.wagonsList.push(plantObject._id);
-      //         })
-      //       }
-      //     })
-      //   }
-      // })
-
       wagonListAssignToPlant.map((plantObject: any) => {
         if (plantObject.hook_no) {
           let hookExists = false;
@@ -342,22 +313,20 @@ function AssignHooksToLoadingShopContent() {
   }, [wagonListAssignToPlant]);
 
   useEffect(() => {
-    setHookManagement(() => {
-      return allPlants.map((item: any, index: number) => ({
+    if (allPlants.length > 0) {
+      const updatedPlants = allPlants.map((item: any) => ({
         ...item,
         hooksRecords: [{ hookNumber: 1, wagonsList: [] }],
       }));
-    });
-    setOriginalHooksList(() => {
-      return allPlants.map((item: any, index: number) => ({
-        ...item,
-        hooksRecords: [{ hookNumber: 1, wagonsList: [] }],
-      }));
-    });
-  }, [allPlants]);
 
-  // console.log('hookManagement---->>>>',hookManagement)
-  // console.log('workingWagonsList---->>>>',workingWagonsList)
+      setHookManagement(updatedPlants);
+      setOriginalHooksList(updatedPlants);
+
+      const firstPlant = updatedPlants[0];
+      setSelectedPlant(firstPlant);
+      setSelectedHook(firstPlant?.hooksRecords[0]?.hookNumber);
+    }
+  }, [allPlants]);
 
   return (
     <div
@@ -389,7 +358,7 @@ function AssignHooksToLoadingShopContent() {
               {text("status")}
             </header>
             <text style={{ fontSize: 16, color: "#42454E", fontWeight: 600 }}>
-              {shipmentData?.status || "XXXXX"}
+              {shipmentData?.status || ""}
             </text>
           </div>
           <div>
@@ -397,7 +366,7 @@ function AssignHooksToLoadingShopContent() {
               {text("FNRno")}
             </header>
             <text style={{ fontSize: 16, color: "#42454E", fontWeight: 600 }}>
-              {shipmentData?.FNR || "XXXXX"}
+              {shipmentData?.FNR || ""}
             </text>
           </div>
           <div>
@@ -405,7 +374,7 @@ function AssignHooksToLoadingShopContent() {
               {text("edemandno")}
             </header>
             <text style={{ fontSize: 16, color: "#42454E", fontWeight: 600 }}>
-              {shipmentData?.edemand_no || "XXXXX"}
+              {shipmentData?.edemand_no || ""}
             </text>
           </div>
           <div>
@@ -413,7 +382,7 @@ function AssignHooksToLoadingShopContent() {
               {text("receivedWagons")}
             </header>
             <text style={{ fontSize: 16, color: "#42454E", fontWeight: 600 }}>
-              {shipmentData?.received_no_of_wagons || "XX"}
+              {shipmentData?.received_no_of_wagons || ""}
             </text>
           </div>
           {/* <div id="wagons-assign-notassigned">
