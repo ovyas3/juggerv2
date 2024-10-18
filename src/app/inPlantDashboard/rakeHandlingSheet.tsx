@@ -43,8 +43,7 @@ const eventCodes = {
   drawnOut: "DRO",
 };
 
-
-function RakeHandlingSheet({ isClose, shipment }: any) {
+function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
   const showMessage = useSnackbar();
   const text = useTranslations("WAGONTALLYSHEET");
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(
@@ -130,6 +129,7 @@ function RakeHandlingSheet({ isClose, shipment }: any) {
   const [drawnOutDate, setDrawnOutDate] = useState<Date | null>(null);
   const [openDrawnOut, setOpenDrawnOut] = useState(false);
 
+
   function addMillDetails() {
     const newMill = {
       major_id: millDetails.length + 1,
@@ -182,14 +182,14 @@ function RakeHandlingSheet({ isClose, shipment }: any) {
     index: number,
     hookIndex: number
   ) {
-    setWorkingPlant((prevMillDetails:any) => {
+    setWorkingPlant((prevMillDetails: any) => {
       const updatedMillDetails = [...prevMillDetails];
       updatedMillDetails[index].hooks.splice(hookIndex, 1);
       return updatedMillDetails;
     });
   }
   function addHookInMillDetails(event: any, index: number) {
-    setWorkingPlant((prevMillDetails:any) => {
+    setWorkingPlant((prevMillDetails: any) => {
       const updatedMillDetails = [...prevMillDetails];
       updatedMillDetails[index].hooks.push({
         hook_no: updatedMillDetails[index].hooks.length + 1,
@@ -198,32 +198,52 @@ function RakeHandlingSheet({ isClose, shipment }: any) {
       return updatedMillDetails;
     });
   }
-  const inputHooksForplants = (event :any, plantIndex: number, hookIndex: number) => {
-
+  const inputHooksForplants = (
+    event: any,
+    plantIndex: number,
+    hookIndex: number
+  ) => {
     const value = parseInt(event.target.value, 10);
-    console.log(value)
-    setWorkingPlant((previousState:any)=>{
+    console.log(value);
+    setWorkingPlant((previousState: any) => {
       const updatedMillDetails = [...previousState];
-      updatedMillDetails[plantIndex].hooks[hookIndex].count = value;
+      updatedMillDetails[plantIndex].hooks[hookIndex].no_of_wagons = value;
       return updatedMillDetails;
-    })
-  }
+    });
+  };
   const submitRakeHandlingSheet = async () => {
     let payload = {
       events: [] as any,
       shipment: shipment.id,
       hooks: [] as any,
     };
-    workingPlant.forEach((plant:any) => {
-      console.log(plant)
-      plant.hooks.forEach((hook:any) => {
-        payload.hooks.push({
-          plant: plant.plant._id,
-          hook_no: hook.hook_no,
-          no_of_wagons: hook.count,
-        });
+    for (const plant of workingPlant) {
+      if( (plant.count -  plant.hooks.reduce((acc: any, hook: any) => acc + hook.no_of_wagons,0) || 0) < 0 ){
+        showMessage.showMessage(`wagons numbers exceed in ${plant.plant.name}`,'error');
+        return;
+      }
+      for (const hook of plant.hooks) {
+        if (hook.no_of_wagons === 0) {
+          showMessage.showMessage(
+            `Please fill the wagon count for hook ${hook.hook_no} in ${plant.plant.name}`,
+            "error"
+          );
+          return;
+        }
+      }
+    }
+    workingPlant.forEach((plant: any) => {
+      console.log(plant);
+      plant.hooks.forEach((hook: any) => {
+        if (hook.no_of_wagons > 0) {
+          payload.hooks.push({
+            plant: plant.plant._id,
+            hook_no: hook.hook_no,
+            no_of_wagons: hook.no_of_wagons,
+          });
+        }
       });
-    })
+    });
     if (rakeArrivalAtStationDate) {
       payload.events.push({
         shipment: shipment.id,
@@ -344,7 +364,7 @@ function RakeHandlingSheet({ isClose, shipment }: any) {
         id: drawnOutObject?._id,
       });
     }
-    console.log(payload);
+    console.log("playload------->", payload);
     try {
       const response = await httpsPost(`rake_event/add`, payload);
       if (response.statusCode === 200) {
@@ -353,6 +373,7 @@ function RakeHandlingSheet({ isClose, shipment }: any) {
           "success"
         );
         isClose(false);
+        getWagonDetails();
       }
     } catch (error) {
       console.log(error);
@@ -390,6 +411,23 @@ function RakeHandlingSheet({ isClose, shipment }: any) {
       console.log(error);
     }
   };
+  const addFirstHookToMillDetails = async (event: any, index: any) => {
+    setWorkingPlant((prev: any) => {
+      let newState = [...prev];
+      newState[index].hooks.push({
+        hook_no: 1,
+        no_of_wagons: 0,
+      });
+      return newState;
+    });
+  };
+  const removeLastHookFromMillDetails = async (event: any, index: any) => {
+    setWorkingPlant((prev: any) => {
+      let newState = [...prev];
+      newState[index].hooks.pop();
+      return newState;
+    });
+  };
 
   // useEffect
   useEffect(() => {
@@ -400,14 +438,14 @@ function RakeHandlingSheet({ isClose, shipment }: any) {
   useEffect(() => {
     setWorkingPlant((prev: any) => {
       let newState = plants;
-      newState.map((plant: any) => {
-        if (plant.hooks.length === 0) {
-          plant.hooks.push({
-            hook_no: 1,
-            count: 0,
-          });
-        }
-      });
+      // newState.map((plant: any) => {
+      //   if (plant.hooks.length === 0) {
+      //     plant.hooks.push({
+      //       hook_no: 1,
+      //       no_of_wagons: 0,
+      //     });
+      //   }
+      // });
       return newState;
     });
   }, [plants]);
@@ -1121,128 +1159,202 @@ function RakeHandlingSheet({ isClose, shipment }: any) {
           ></div>
 
           {workingPlant.map((item: any, index: any) => {
+            let avaiableWagons =
+              item.count -
+              (item.hooks.reduce(
+                (acc: any, hook: any) => acc + hook.no_of_wagons,
+                0
+              ) || 0);
             return (
               <div key={index}>
-                <div className="millDetails-dashboard">
-                  <div style={{ width: "200px" }}>
-                    plant:{" "}
-                    <span
-                      style={{
-                        color: "black",
-                        fontSize: "12px",
-                        fontWeight: 600,
-                      }}
-                    >
-                      {item.plant.name}
-                    </span>
+                <div
+                  style={{
+                    backgroundColor:
+                      item.count -
+                        (item.hooks.reduce(
+                          (acc: any, hook: any) => acc + hook.no_of_wagons,
+                          0
+                        ) || 0) >=
+                      0
+                        ? "white"
+                        : "#FCE3E3",
+                    paddingBlock: "0.5px",
+                    paddingInline: "16px",
+                    borderRadius: "12px",
+                  }}
+                >
+                  <div className="millDetails-dashboard">
+                    <div style={{ width: "200px" }}>
+                      plant:{" "}
+                      <span
+                        style={{
+                          color: "black",
+                          fontSize: "12px",
+                          fontWeight: 600,
+                        }}
+                      >
+                        {item.plant.name}
+                      </span>
+                    </div>
+                    <div style={{ width: "200px" }}>
+                      no. of wagons assigned:{" "}
+                      <span
+                        style={{
+                          color: "black",
+                          fontSize: "12px",
+                          fontWeight: 600,
+                        }}
+                      >
+                        {item.count}
+                      </span>
+                    </div>
+                    <div style={{ width: "200px" }}>
+                      available wagons:{" "}
+                      <span
+                        style={{
+                          color: "black",
+                          fontSize: "12px",
+                          fontWeight: 600,
+                        }}
+                      >
+                        {item.count -
+                          (item.hooks.reduce(
+                            (acc: any, hook: any) => acc + hook.no_of_wagons,
+                            0
+                          ) || 0)}
+                      </span>
+                    </div>
                   </div>
-                  <div style={{ width: "200px" }}>
-                    no. of wagons assigned:{" "}
-                    <span
-                      style={{
-                        color: "black",
-                        fontSize: "12px",
-                        fontWeight: 600,
-                      }}
-                    >
-                      {item.count}
-                    </span>
-                  </div>
-                  <div style={{ width: "200px" }}>
-                    available wagons:{" "}
-                    <span
-                      style={{
-                        color: "black",
-                        fontSize: "12px",
-                        fontWeight: 600,
-                      }}
-                    >
-                      {item.count - (item.hooks.reduce((acc:any, hook:any) => acc + hook.count, 0) || 0)}
-                    </span>
-                  </div>
-                </div>
 
-                <div id="hookSelectionContainer">
-                  {item.hooks.map((hookItem: any, hookIndex: number) => {
-                    return (
-                      <div key={hookIndex}>
-                        <div>
-                          <div className="headerForMillDetails_hooks">
-                            <header>{hookIndex + 1} Hook</header>
-                            <div style={{ display: "flex", gap: 8 }}>
-                              {hookIndex !== 0 ? (
-                                <div
-                                  onClick={(e) => {
-                                    removeHookFromMillDetails(
-                                      e,
-                                      index,
-                                      hookIndex
-                                    );
-                                  }}
-                                  className="removeAddicons"
-                                  style={{ backgroundColor: "#E24D65" }}
-                                >
-                                  <RemoveIcon
-                                    style={{ height: 20, width: 20 }}
-                                  />
-                                </div>
-                              ) : (
-                                <div style={{ height: 20, width: 20 }}></div>
-                              )}
-                              {item.hooks.length - 1 === hookIndex && (
-                                <div
-                                  onClick={(e) => {
-                                    addHookInMillDetails(e, index);
-                                  }}
-                                  className="removeAddicons"
-                                  style={{ backgroundColor: "#596FFF" }}
-                                >
-                                  <AddIcon style={{ height: 20, width: 20 }} />
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                          <input className="inputForRakeSection" type="number" value={hookItem.count} onChange={(e)=>{inputHooksForplants(e, index, hookIndex)}} />
-                        </div>
-                        <div className="loadingTimeContainer">
-                          <div>{text("loadingstarttime")}</div>
-                          <div style={{ marginTop: 6 }}>--</div>
-                        </div>
-                        <div className="loadingTimeContainer">
-                          <div>{text("loadingEndTime")}</div>
-                          <div style={{ marginTop: 6 }}>--</div>
-                        </div>
+                  {item.hooks.length === 0 && (
+                    <div
+                      className="addFirstHook"
+                      onClick={(e) => {
+                        addFirstHookToMillDetails(e, index);
+                      }}
+                    >
+                      <div className="addIcon-for-addFirstHook">ADD</div>
+                    </div>
+                  )}
+                  {/* {item.hooks.length === 1 && (
+                    <div
+                      className="addFirstHook"
+                      onClick={(e) => {
+                        removeLastHookFromMillDetails(e, index);
+                      }}
+                    >
+                      <div
+                        className="addIcon-for-addFirstHook"
+                        style={{ backgroundColor: "#E24D65" }}
+                      >
+                        REMOVE
                       </div>
-                    );
-                  })}
+                    </div>
+                  )} */}
+
+                  <div id="hookSelectionContainer">
+                    {item.hooks.map((hookItem: any, hookIndex: number) => {
+                      return (
+                        <div key={hookIndex}>
+                          <div>
+                            <div className="headerForMillDetails_hooks">
+                              <header>{hookIndex + 1} Hook</header>
+                              <div style={{ display: "flex", gap: 8 }}>
+                                {
+                                // hookIndex !== 0 ? 
+                                (
+                                  <div
+                                    onClick={(e) => {
+                                      hookIndex !== 0 &&
+                                      removeHookFromMillDetails(
+                                        e,
+                                        index,
+                                        hookIndex
+                                      );
+                                      hookIndex === 0 &&
+                                      removeLastHookFromMillDetails(e, index);
+                                    }}
+                                    className="removeAddicons"
+                                    style={{ backgroundColor: "#E24D65" }}
+                                  >
+                                    <RemoveIcon
+                                      style={{ height: 20, width: 20 }}
+                                    />
+                                  </div>
+                                )
+                                //  : (
+                                //   <div style={{ height: 20, width: 20 }}></div>
+                                // )
+                                }
+                                {item.hooks.length - 1 === hookIndex &&
+                                  (item.hooks.reduce(
+                                    (acc: any, hook: any) =>
+                                      acc + hook.no_of_wagons,
+                                    0
+                                  ) || 0) < item.count && (
+                                    <div
+                                      onClick={(e) => {
+                                        addHookInMillDetails(e, index);
+                                      }}
+                                      className="removeAddicons"
+                                      style={{ backgroundColor: "#596FFF" }}
+                                    >
+                                      <AddIcon
+                                        style={{ height: 20, width: 20 }}
+                                      />
+                                    </div>
+                                  )}
+                              </div>
+                            </div>
+                            <input
+                              className="inputForRakeSection"
+                              type="number"
+                              value={
+                                hookItem.no_of_wagons === null ||
+                                hookItem.no_of_wagons === undefined
+                                  ? "0"
+                                  : String(hookItem.no_of_wagons)
+                              }
+                              onChange={(e) => {
+                                let value = e.target.value;
+                                value = value.replace(/^0+(?=\d)/, "");
+                                if (value === "") {
+                                  value = "0";
+                                }
+                                inputHooksForplants(
+                                  {
+                                    target: {
+                                      value: Math.max(0, Number(value)),
+                                    },
+                                  },
+                                  index,
+                                  hookIndex
+                                );
+                              }}
+                              min="0"
+                            />
+                          </div>
+                          <div className="loadingTimeContainer">
+                            <div>{text("loadingstarttime")}</div>
+                            <div style={{ marginTop: 6 }}>--</div>
+                          </div>
+                          <div className="loadingTimeContainer">
+                            <div>{text("loadingEndTime")}</div>
+                            <div style={{ marginTop: 6 }}>--</div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
 
-                {/* {millDetails.length === 1 ||
-                index === millDetails.length - 1 ? null : (
-                  <Button
-                    onClick={(e: any) => {
-                      e.stopPropagation();
-                      removeMillDetails(index);
-                    }}
-                    style={{
-                      fontSize: 14,
-                      width: 107,
-                      backgroundColor: "#E24D65",
-                      color: "white",
-                      borderRadius: "6px",
-                      fontWeight: "700",
-                    }}
-                  >
-                    cancel
-                  </Button>
-                )} */}
                 {workingPlant.length === 1 ||
                 index === workingPlant.length - 1 ? null : (
                   <div
                     style={{
                       borderBottom: "1px solid #E0E0E0",
                       width: "100%",
-                      marginTop: 24,
+                      marginTop: 16,
                       marginBottom: 16,
                     }}
                   ></div>

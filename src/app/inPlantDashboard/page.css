@@ -213,7 +213,7 @@
   color: #3c4852;
 }
 #hookSelectionContainer {
-  margin-bottom: 36px;
+  margin-bottom: 16px;
   display: flex;
   flex-wrap: wrap;
   gap:36px;
@@ -548,5 +548,18 @@
   padding-inline: 6px;
   padding-block: 3px;
   border-radius: 2px;
-
+}
+.addFirstHook{
+  font-size: 12px;
+  font-weight: 500;
+  color: white;
+  margin-bottom: 12px;
+}
+.addIcon-for-addFirstHook{
+  background-color: #314FFC;
+  width: fit-content;
+  padding-inline: 12px;
+  padding-block: 4px;
+  border-radius: 6px;
+  cursor: pointer;
 }

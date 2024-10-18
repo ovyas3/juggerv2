@@ -13,6 +13,7 @@ import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded";
 import Image from "next/image";
 import { useSnackbar } from "@/hooks/snackBar";
+import RemoveIcon from '@mui/icons-material/Remove';
 
 
 import BOST from "@/assets/BOST Final 1.png";
@@ -389,7 +390,11 @@ function AssignHooksToLoadingShop() {
               <div id="dropdownListForHooks">
                 {selectedPlant?.hooksRecords.map((eachhook: any, index: number)=>{
                   return(
-                    <div key={index} className="dropdownListForPlantsEachItem" onClick={(e)=>{handleAssignHooksToSelectedHook(e, eachhook, index)}} >Hook {eachhook.hookNumber}</div>
+                    <div key={index} className="dropdownListForPlantsEachItem" onClick={(e)=>{ e.stopPropagation(); handleAssignHooksToSelectedHook(e, eachhook, index)}}>
+                      <div >Hook {eachhook.hookNumber}</div>
+                      {index === selectedPlant?.hooksRecords.length-1 && <div className="removeIcon-container-loading-shop"  ><RemoveIcon style={{fontSize: 20, color:'white'}}/></div>}
+                      {/* <div className="removeIcon-container-loading-shop"  ><RemoveIcon style={{fontSize: 20, color:'white'}}/></div> */}
+                    </div>
                   );
                 })}
                 <div id='addButtonContainerForHooks'>
@@ -477,7 +482,10 @@ function AssignHooksToLoadingShop() {
           })}
         </div>
 
-        <div onClick={handleAssignHooks}>Submiot</div>
+        <div style={{marginInline:24, display:'flex', justifyContent:'end'}}>
+          <div style={{cursor:'pointer',width:'fit-content',borderRadius:6,paddingInline:24, paddingBlock:12, backgroundColor:'#3351FF',fontSize:14,color:'white', textTransform:'uppercase'}} onClick={handleAssignHooks}>ASSIGN</div>
+        </div>
+        
       </div>
       <SideDrawer />
     </div>

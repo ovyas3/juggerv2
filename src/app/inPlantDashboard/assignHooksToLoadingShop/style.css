@@ -56,6 +56,9 @@
 .dropdownListForPlantsEachItem{
     padding-inline: 10px;
     padding-block: 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 .dropdownListForPlantsEachItem:hover{
     background-color: #E9EEF2;
@@ -181,3 +184,13 @@
     /* padding-inline: 24px; */
     position: relative;
   }
+.removeIcon-container-loading-shop{
+    background-color: #E24D65;
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer
+}
