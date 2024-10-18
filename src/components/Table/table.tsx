@@ -106,6 +106,7 @@ const convertArrayToFilteredArray = (inputArray: any) => {
         let newDemandDate = new Date(demand_date);
         newDemandDate.setHours(newDemandDate.getHours() - 5);
         newDemandDate.setMinutes(newDemandDate.getMinutes() - 30);
+        let fois_updated_at_date = trip_tracker && trip_tracker[0].fois_updated_at ? trip_tracker[0].fois_updated_at : null;
 
         let newRRDate = new Date(rr_dates[0]);
         newRRDate.setHours(newRRDate.getHours() - 5);
@@ -178,7 +179,7 @@ const convertArrayToFilteredArray = (inputArray: any) => {
                 name: captive?.name || '--',
             },
             fois_updated_at:{
-                date: service.utcToist(fois_updated_at) || '--',
+                date: service.utcToist(fois_updated_at_date, 'dd-MMM HH:mm') || '--',
             }
         }
     });
@@ -761,7 +762,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                         position: 'relative',
                                                                         right: '0px',
                                                                         overflow: 'hidden',
-                                                                        color: '#7C7E8C'
+                                                                        color: '#07004D'
                                                                     }}
                                                                 >
                                                                     <Tooltip
@@ -779,14 +780,14 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                                 whiteSpace: 'pre-wrap',
                                                                                 height: '100%',
                                                                                 cursor: isOverflowing ? 'pointer' : 'default',
-                                                                                fontSize:10
+                                                                                fontSize: 12
                                                                             }}
                                                                         >
                                                                             {value.code} {value.name !== '--' ? value.name : value.code}
                                                                         </div>
                                                                     </Tooltip>
                                                                 </div>
-                                                                <div style={{ marginTop: '6px', color: '#07004D' }}>{row.paid_by}</div>
+                                                                <div style={{ marginTop: '6px', color: '#7C7E8C', fontSize: 10 }}>{row.paid_by}</div>
                                                             </div>
                                                         )}
                                                         {item.id === 'pickupdate' && (

@@ -629,9 +629,9 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
       <div
         style={{
           minWidth: 900,
-          minHeight: 700,
+          minHeight: 650,
           maxWidth: 1100,
-          maxHeight: 700,
+          maxHeight: 650,
           backgroundColor: "white",
           position: "relative",
           top: "50%",
