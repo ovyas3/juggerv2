@@ -52,7 +52,7 @@ function AssignHooksToLoadingShop() {
       const response = await httpsGet(
         `get_assigned_loading_shops?shipment=${id}`
       );
-      setAllPlants(response.data);
+      setAllPlants(response?.data);
     } catch (error) {
       console.log(error);
     }
@@ -65,8 +65,8 @@ function AssignHooksToLoadingShop() {
     if (payload.plant) {
       try {
         const response = await httpsPost(`get_wagons_by_hooks`, payload);
-        setWagonListAssignToPlant(response.data.wagonData);
-        setShipmentData(response.data.shipmentData);
+        setWagonListAssignToPlant(response?.data?.wagonData);
+        setShipmentData(response?.data?.shipmentData);
       } catch (error) {
         console.log(error);
       }

@@ -366,7 +366,18 @@
 }
 #lastSection{
   display: flex;
-  gap:20px
+  row-gap: 20px;
+  column-gap: 50px;
+  flex-wrap: wrap;
+}
+.millDetails-dashboard{
+  display: flex;
+  font-size: 12px;
+  font-weight: 400;
+  gap: 10px;
+  margin-top: 16px;
+  color:#71747A;
+  margin-bottom: 16px;
 }
 /* ------------ assign wagon Sheet ------------ */
 #assign-wagon-details{
