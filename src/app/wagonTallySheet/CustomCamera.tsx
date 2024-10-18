@@ -145,7 +145,7 @@ const PhotoCaptureComponent: React.FC<PhotoCaptureComponentProps> = ({ label, on
 
 
   useEffect(() => {
-    switchCamera(); // Automatically switch to the rear camera on component mount
+    switchCamera(); 
 
     return () => {
       if (mediaStreamRef.current) {
@@ -224,7 +224,7 @@ const PhotoCaptureComponent: React.FC<PhotoCaptureComponentProps> = ({ label, on
                         paddingTop: '2px',
                         gap: '2px'
                     }}>
-                      <p>Switch Camera</p>
+                      Switch Camera
                     </div>}>
                     <div onClick={switchCamera} className='switch-button' title="Switch Camera">
                       <Image src={CameraRotate} alt="Switch Camera" />
@@ -246,7 +246,7 @@ const PhotoCaptureComponent: React.FC<PhotoCaptureComponentProps> = ({ label, on
                         paddingTop: '2px',
                         gap: '2px'
                     }}>
-                      <p>Capture Image</p>
+                      Capture Image
                     </div>}>
                     <div onClick={capturePhoto} className="capturing-button">
                       <div className="outer-circle">
@@ -272,7 +272,7 @@ const PhotoCaptureComponent: React.FC<PhotoCaptureComponentProps> = ({ label, on
                         paddingTop: '2px',
                         gap: '2px'
                     }}>
-                      <p>{isFlashOn ? "Turn Flash Off" : "Turn Flash On"}</p>
+                      {isFlashOn ? "Turn Flash Off" : "Turn Flash On"}
                     </div>}>
                     <div onClick={toggleFlash} className='switch-button' title={isFlashOn ? "Turn Flash Off" : "Turn Flash On"}>
                       <Image src={isFlashOn ? LightningSlash : Lightning} alt={isFlashOn ? "Turn Flash Off" : "Turn Flash On"} />
