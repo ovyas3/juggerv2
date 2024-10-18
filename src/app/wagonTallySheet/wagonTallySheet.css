@@ -132,7 +132,7 @@
 
 .wagon-connector-icon{
   position: absolute;
-  right: 0;
+  right: -4%;
   bottom: 0;
   transform: translateY(-2px);
 }
@@ -200,19 +200,19 @@
   justify-content: flex-start;
   align-items: flex-start;
   gap: 6px;
-  padding-right: 72px;
+  padding-right: 64px;
 
   @media screen and (max-width: 1024px){
-    padding-right: 48px;
+    padding-right: 36px;
     
   }
 
   @media screen and (max-width: 866px){
-    padding-right: 32px;
+    padding-right: 20px;
   }
 
   @media screen and (max-width: 776px){
-    padding-right: 24px;
+    padding-right: 12px;
   }
 }
 
@@ -344,6 +344,18 @@
   display: flex;
   padding-bottom: 24px;
   flex-wrap: wrap;
+
+  @media screen and (max-width: 1024px){
+    gap: 12px;
+  }
+
+  @media screen and (max-width: 866px){
+    gap: 16px;
+  }
+
+  @media screen and (max-width: 776px){
+    gap: 10px;
+  }
 }
 
 .wagon-tally-sheet-body-content-materials-details-body-content{
@@ -484,6 +496,7 @@
   outline: none;
   margin: 0 auto;
   position: relative;
+  background: #F0F3F8; 
   transition: background 0.2s ease;
 }
 
@@ -507,8 +520,9 @@
   appearance: none;
   width: 36px; /* Reduced Thumb width */
   height: 36px; /* Reduced Thumb height */
-  background: url('../../assets/slider.svg') no-repeat center;
-  background-size: contain;
+  font-family: 'Arial', sans-serif;
+  background: url('../../assets/slider.svg') no-repeat center !important;
+  background-size: contain !important;
   border: none;
   cursor: pointer;
   position: relative;
@@ -519,8 +533,10 @@
 #scrollbar::-moz-range-thumb {
   width: 36px; /* Reduced Thumb width */
   height: 36px; /* Reduced Thumb height */
-  background: url('../../assets/slider.svg') no-repeat center;
-  background-size: contain;
+  font-family: 'Arial', sans-serif;
+  background: url('../../assets/slider.svg') no-repeat center !important;
+  background-size: contain !important;
+  transform: translateZ(0);
   border: none;
   cursor: pointer;
   position: relative;
@@ -535,18 +551,30 @@
   transform: scale(1.05); /* Subtle enlargement */
 }
 
-
-
-
 .camera-dialog-styles{
   font-family: 'Plus Jakarta Sans', sans-serif;
 }
 
 .camera-dialog-styles .MuiDialog-container .MuiDialog-paper{
   border-radius: 12px !important;
-  max-width: 82vw !important;
-  min-height: 60vh !important;
+  width: 82vw !important;
+  height: 56vh !important;
   overflow-y: unset;
+
+  @media screen and (max-width: 1024px){
+    width: 90vw !important;
+    height: 42vh !important;
+  }
+
+  @media screen and (max-width: 866px){
+    width: 90vw !important;
+    height: 48vh !important;
+  }
+
+  @media screen and (max-width: 776px){
+    width: 98vw !important;
+    height: 55vh !important;
+  }
 }
 
 .camera-dialog-styles .camera-dialog-container {
@@ -565,18 +593,44 @@
 }
 
 .captured-image {
-  border-radius: 8px;
   width: 100%;
-  max-height: 500px;
+  height: auto; /* Maintain aspect ratio */
+  border-radius: 8px;
+  object-fit: cover;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+
+  @media screen and (max-width: 1024px) {
+    height: auto; /* Maintain aspect ratio */
+  }
+
+  @media screen and (max-width: 866px) {
+    height: auto; /* Maintain aspect ratio */
+  }
+
+  @media screen and (max-width: 776px) {
+    height: auto; /* Maintain aspect ratio */
+  }
 }
 
 .webcam-view {
-  width: 50vw;
-  height: 50vh;
+  width: 100%;
+  height: 40vh;
   border-radius: 8px;
   background-color: #000;
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
   object-fit: cover;
+
+  @media screen and (max-width: 1024px){
+    height: 30vh;    
+  }
+
+  @media screen and (max-width: 866px){
+    height: 35vh;    
+  }
+
+  @media screen and (max-width: 776px){
+    height: 40vh;    
+  }
 }
 
 .save-button {
@@ -726,13 +780,30 @@
   width: 32vw !important;
   height: 60vh !important;
   overflow-y: unset;
+
+  @media screen and (max-width: 1024px){
+    width: 48vw !important;
+    height: 40vh !important;
+    overflow-y: unset;
+  }
+
+  @media screen and (max-width: 866px){
+    width: 56vw !important;
+    height: 40vh !important;
+    overflow-y: unset;
+  }
+
+  @media screen and (max-width: 776px){
+    width: 60vw !important;
+    height: 50vh !important;
+    overflow-y: unset;
+  }
 }
 
 .photos-album-dialog-styles .photos-album-dialog-container {
   position: relative;
   display: inline-block;
   border-radius: 12px !important;
-
   overflow-y: unset;
 }
 
@@ -755,6 +826,18 @@
 .photos-album-dialog-albums{
   height: calc(59vh - 100px);
   overflow-y: auto;
+
+  @media screen and (max-width: 1024px){
+    height: calc(39vh - 100px);
+  }
+
+  @media screen and (max-width: 866px){
+    height: calc(39vh - 100px);
+  }
+
+  @media screen and (max-width: 776px){
+    height: calc(49vh - 100px);
+  }
 }
 
 .photos-album-dialog-album {

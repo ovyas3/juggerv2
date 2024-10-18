@@ -69,6 +69,51 @@ import { statusBuilder } from "./StatusBuilder/StatusBuilder";
 import Image from "next/image";
 import TripTracker from './TripTracker';
 
+import SearchIcon from '@/assets/search_icon.svg';
+import { useSnackbar } from '@/hooks/snackBar';
+import Tooltip from "@mui/material/Tooltip";
+import { TooltipProps } from "@mui/material/Tooltip";
+import { styled } from '@mui/material/styles';
+
+//Custom Tooltip
+
+interface StyledTooltipProps extends TooltipProps {
+  className?: string;
+}
+
+const CustomTooltip = styled(({ className, ...props }: StyledTooltipProps) => (
+  <Tooltip 
+    {...props} 
+    classes={{ popper: className }} 
+    PopperProps={{
+      popperOptions: {
+        modifiers: [
+          {
+            name: 'offset',
+            options: {
+              offset: [14, -10], 
+            },
+          },
+        ],
+      },
+    }}
+  />
+))({
+  '& .MuiTooltip-tooltip': {
+    backgroundColor: '#000',
+    color: '#fff',
+    width: '100px',
+    height: '24px',
+    boxShadow: '0px 0px 2px rgba(0,0,0,0.1)',
+    fontSize: '8px',
+    fontFamily: '"Inter", sans-serif',
+  },
+  '& .MuiTooltip-arrow': {
+    color: '#000',
+  },
+});
+
+
 // Custom Icons
 const customIcon = L.icon({
   iconUrl: "assets/train_on_map_icon_idle.svg",
@@ -153,7 +198,7 @@ const ShipmentCard: React.FC<ShipmentCardProps> = ({
   index,
   shipment,
   handleShipmentSelection,
-  handleNavigation
+  handleNavigation,
 }) => {
   const gpsFOIS = (shipment.trip_tracker?.last_location?.fois?.coordinates.length > 0
     && shipment.trip_tracker?.last_location?.fois) // Checking FOIS tracking
@@ -228,7 +273,25 @@ const ShipmentCard: React.FC<ShipmentCardProps> = ({
             justifyContent: 'flex-end',
             alignItems: 'flex-start',
           }}>
-            {shipment.is_captive && <div><img src={captiveRakeIndicator.src} /></div>}
+            <CustomTooltip 
+              arrow 
+              title={
+                <div 
+                  style={{
+                    display: 'flex', 
+                    width: '100%',
+                    flexDirection: 'row', 
+                    justifyContent: 'center',
+                    fontSize: '10px',
+                    fontFamily: '"Inter", sans-serif',
+                    fontWeight: 600,
+                    paddingTop: '2px',
+                    gap: '2px'
+                }}>
+                  {shipment.captive_id && shipment.captive_id.name ? shipment.captive_id.name : 'N/A'}
+                </div>}>
+                {shipment.is_captive && <div><Image src={captiveRakeIndicator.src || ''} alt='CR icon' width={24} height={24}/></div>}
+            </CustomTooltip>
           </Grid>
         </Grid>
       </Typography>
@@ -261,6 +324,7 @@ interface rakeType {
 
 // Main Component for Map Layers
 const MapLayers = () => {
+  const { showMessage } = useSnackbar();
   const mobile = !useMediaQuery("(min-width:800px)");
   const isMobile = useWindowSize(600);
   const [map, setMap] = useState<L.Map | null>(null);
@@ -315,20 +379,93 @@ const MapLayers = () => {
   const [originalData, setOriginalData] = useState<any[]>([]);
   const [hiddenTrackingInfo, setHiddenTrackingInfo] = useState<any>(false);
 
+  const [crLabelName, setCrLabelName] = useState('');
+  const [fnrTerm, setFnrTerm] = useState('');
+  const [crNames, setCrNames] = useState<any[]>([]);
+  const [inputCRValue, setInputCRValue] = useState('');
+  const [selectedCR, setSelectedCR] = useState('');
+  const [isCROpen, setIsCROpen] = useState(false);
+  const [filteredCROptions, setFilteredCrOptions] = useState<any[]>([]);
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const fetchNames = async () => {
+      const names = await httpsGet('get/captive_rakes_names');
+      if(names.data && names.data.length > 0) {
+        setCrNames(names.data);
+        setFilteredCrOptions(names.data);
+      } else {
+        setCrNames([]);
+        setFilteredCrOptions([]);
+      }
+    };
+    fetchNames();
+  }, []); 
+  
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+    setInputCRValue(value);
+    setFilteredCrOptions(
+      crNames.filter((crName) => crName.name.toLowerCase().includes(value.toLowerCase()))
+    );
+  };
+
+  const handleOptionClick = (option: any) => {
+    setInputCRValue(option.name);
+    setSelectedCR(option._id);
+    getShipments("", option._id);
+    setIsCROpen(false);
+  };
+
+  const handleClickOutside = (event: MouseEvent) => {
+    if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      setIsCROpen(false);
+    }
+  };
+
+  const handleFNRChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const fnr = event.target.value;
+    setFnrTerm(fnr);
+    if(fnr.length === 11 || fnr.length === 0) {
+      setFnrTerm(fnr);
+      getShipments("", "");
+    }
+  };
+
+  const handleFNRSearch = () => {
+    if(fnrTerm.length === 0) {
+      showMessage('Please enter FNR number', 'error');
+    } else if (fnrTerm.length <= 10) {
+      showMessage('Please enter valid FNR number', 'error');
+    } else if (fnrTerm.length === 11) {
+      getShipments(fnrTerm, "");
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
   const handleNavigation = (unique_code: string) => {
     setTimeout(() => {
       router.push(`/tracker?unique_code=${unique_code}`);
     }, 0);
   };
 
-
-  const filterTypes = ["FNR No.", "Dest. Code"]
+  const filterTypes = ["FNR No.", "Dest. Code", "CR Names"];
 
   function handleChange(event: any) {
     const type = event.target.value
     if (type !== selectedType) {
       setSelectedType(event.target.value)
       setSearchInput('')
+      setFnrTerm('')
+      setInputCRValue('')
+      setSelectedCR('')
+      getShipments("", "");
     }
   }
 
@@ -555,11 +692,20 @@ const MapLayers = () => {
     setSelectedToDate(date);
   };
 
-  const getShipments = async () => {
-    const payload = {
-      from: service.getEpoch(selectedFromDate),
-      to: service.getEpoch(selectedToDate),
+  const getShipments = async (fnr: string ,selectedCRID: string) => {
+    let payload: any = {
+      from: selectedFromDate ? service.millies(selectedFromDate.format()) : null,
+      to: selectedToDate ? service.millies(selectedToDate.format()) : null,
     };
+
+    if(fnr.length === 11) {
+      payload['fnr'] = fnr;
+    }
+
+    if(selectedCRID) {
+      payload['captive'] = selectedCRID;
+    }
+
     setIsTracking(0)
     const shipments = await httpsPost('/shipment_map_view', payload);
     const inTransit = shipments.filter((shipment: any) => (shipment.status === 'ITNS' ));
@@ -621,7 +767,7 @@ const MapLayers = () => {
 
   useEffect(() => {
     if (selectedFromDate && selectedToDate) {
-      getShipments();
+      getShipments("","");
     }
   }, [selectedFromDate, selectedToDate]);
 
@@ -1060,7 +1206,7 @@ const MapLayers = () => {
                         value={selectedType}
                         className='status_select'
                         onChange={handleChange}
-                        style={{ height: '28px', background: 'lightgray', width: "105px" }}
+                        style={{ height: '28px', background: 'lightgray', width: "105px", zIndex: '2' }}
                         sx={{
                           '&.MuiPaper-root': {
                             border: '1px solid black'
@@ -1087,7 +1233,45 @@ const MapLayers = () => {
                             <ListItemText primary={name} primaryTypographyProps={{ fontSize: '12px', fontFamily: 'Inter, sans-serif' }} />
                           </MenuItem>
                         ))}
-                      </Select><input placeholder="search" value={searchInput} onInput={handleSearchInput} className='search-input' />
+                      </Select>
+                      {selectedType === "CR Names" ? (
+                        <div className="dropdown-container" ref={dropdownRef}>
+                        <input
+                          type="text"
+                          value={inputCRValue}
+                          onChange={handleInputChange}
+                          placeholder="Search"
+                          onFocus={() => setIsCROpen(true)}
+                          className="dropdown-input"
+                        />
+                        {isCROpen && (
+                          <div className="dropdown-menu">
+                            {filteredCROptions.length > 0 ? (
+                              filteredCROptions.map((option, index) => (
+                                <div
+                                  key={index}
+                                  onClick={() => handleOptionClick(option)}
+                                  className="dropdown-option"
+                                >
+                                  {option.name}
+                                </div>
+                              ))
+                            ) : (
+                              <div className="dropdown-no-options">No options found</div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                      ) : selectedType === "FNR No." ? (
+                        <div className='search-input-container'>
+                          <input placeholder="Search" value={fnrTerm} onInput={handleFNRChange} className='search-input' />
+                          <Image src={SearchIcon} alt="" className='search-icon' onClick={handleFNRSearch} />
+                        </div>
+                      ) : (
+                        <div className='search-input-container'>
+                          <input placeholder="Search" value={searchInput} onInput={handleSearchInput} className='search-input' />
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -1098,13 +1282,13 @@ const MapLayers = () => {
                   return <ShipmentCard key={index} index={index} shipment={shipment} handleShipmentSelection={handleShipmentSelection} handleNavigation={handleNavigation} />
                 })}
                 {showAll && !showSearched && !showRakeTypeFiltered && allShipments.map((shipment, index) => {
-                  return <ShipmentCard key={index} index={index} shipment={shipment} handleShipmentSelection={handleShipmentSelection} handleNavigation={handleNavigation} />
+                  return <ShipmentCard key={index} index={index} shipment={shipment} handleShipmentSelection={handleShipmentSelection} handleNavigation={handleNavigation}/>
                 })}
                 {showSearched && !showRakeTypeFiltered && searcedShipments.map((shipment, index) => {
-                  return <ShipmentCard key={index} index={index} shipment={shipment} handleShipmentSelection={handleShipmentSelection} handleNavigation={handleNavigation} />
+                  return <ShipmentCard key={index} index={index} shipment={shipment} handleShipmentSelection={handleShipmentSelection} handleNavigation={handleNavigation}/>
                 })}
                 {showRakeTypeFiltered && rakeTypeFilteredShipments.map((shipment, index) => {
-                  return <ShipmentCard key={index} index={index} shipment={shipment} handleShipmentSelection={handleShipmentSelection} handleNavigation={handleNavigation} />
+                  return <ShipmentCard key={index} index={index} shipment={shipment} handleShipmentSelection={handleShipmentSelection} handleNavigation={handleNavigation}/>
                 })}
               </Box>
             </Box>
