@@ -17,21 +17,44 @@ import chain01 from "@/assets/chain 1.png";
 import chain02 from "@/assets/chain 2.png";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import "./style.css";
-import {
-  redirect,
-  useParams,
-  useRouter,
-  useSearchParams,
-} from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Header from "@/components/Header/header";
 import SideDrawer from "@/components/Drawer/Drawer";
+import { Suspense } from "react";
+import Loader from "@/components/Loading/WithBackDrop";
 
-function WagonAssignSheet({
-  shipmentForWagonSheet,
-  setShowWagonSheet,
-  setShowAssignWagon,
-  setShipmentForWagonSheet,
-}: any) {
+function WagonAssignSheet() {
+  return (
+    <Suspense fallback={<Loader />}>
+      <WagonAssignSheetContent />
+    </Suspense>
+  );
+}
+export default WagonAssignSheet;
+
+function wagonImage(wagonImage: any) {
+  switch (wagonImage) {
+    case "BOST":
+      return { image: BOST, imageWidth: 97, imageHeight: 40 };
+      break;
+    case "BFNV":
+      return { image: BFNV, imageWidth: 101, imageHeight: 36 };
+      break;
+    case "BOBRN":
+      return { image: BOBRN, imageWidth: 97, imageHeight: 40 };
+      break;
+    case "BRNA":
+      return { image: BRNA, imageWidth: 97, imageHeight: 40 };
+      break;
+    case "BRN22.9":
+      return { image: BRN229, imageWidth: 127, imageHeight: 30 };
+      break;
+    default:
+      return { image: BOST, imageWidth: 97, imageHeight: 40 };
+  }
+}
+
+function WagonAssignSheetContent() {
   const showMessage = useSnackbar();
   const text = useTranslations("WAGONTALLYSHEET");
   const [originalWagonDetails, setOriginalWagonDetails] = useState<any>([]);
@@ -503,27 +526,4 @@ function WagonAssignSheet({
       <SideDrawer />
     </div>
   );
-}
-export default WagonAssignSheet;
-
-function wagonImage(wagonImage: any) {
-  switch (wagonImage) {
-    case "BOST":
-      return { image: BOST, imageWidth: 97, imageHeight: 40 };
-      break;
-    case "BFNV":
-      return { image: BFNV, imageWidth: 101, imageHeight: 36 };
-      break;
-    case "BOBRN":
-      return { image: BOBRN, imageWidth: 97, imageHeight: 40 };
-      break;
-    case "BRNA":
-      return { image: BRNA, imageWidth: 97, imageHeight: 40 };
-      break;
-    case "BRN22.9":
-      return { image: BRN229, imageWidth: 127, imageHeight: 30 };
-      break;
-    default:
-      return { image: BOST, imageWidth: 97, imageHeight: 40 };
-  }
 }
