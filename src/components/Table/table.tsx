@@ -33,7 +33,7 @@ import GPIS from '@/assets/gps_icon.svg'
 
 import attach_icon from '@/assets/attach_icon.svg'
 import rrDocumentIcon from '@/assets/rr_document_icon.svg'
-import ShareIcon from '@mui/icons-material/Share';
+import CopyAllIcon from '@mui/icons-material/CopyAll';
 import fetchTrackDetailsIcon from '@/assets/polylines_icon.svg'
 import contactIcon from '@/assets/inactive_contact_dashboard+icon.svg'
 import BookmarkAddOutlinedIcon from '@mui/icons-material/BookmarkAddOutlined';
@@ -55,6 +55,7 @@ import trash from '@/assets/trash_icon.png'
 import DriveFolderUploadIcon from '@mui/icons-material/DriveFolderUpload';
 import { ActionItem, EditELD, HandlingAgentSelection, PastEta, RemarkComponent, Remarks, Tags,MarkPlacement,HandlingEdemand, UploadWagonSheet, HandlingETA} from './tableComp'
 import SettingsIcon from '@mui/icons-material/Settings';
+import { environment } from '@/environments/env.api';
 
 const status_class_map: { [key: string]: string } = {
     'OB': 'status_title_In_Plant',
@@ -65,7 +66,7 @@ const status_class_map: { [key: string]: string } = {
     'INPL': 'status_title_INPL'
 }
 
-const convertArrayToFilteredArray = (inputArray: any) => {
+const convertArrayToFilteredArray = (inputArray: any, shipmentPayloads: any) => {
     return inputArray.map((
         item: {
             is_fois_fetched?: any;
@@ -114,6 +115,8 @@ const convertArrayToFilteredArray = (inputArray: any) => {
         return {
            
             _id: item._id,
+            from: shipmentPayloads.from,
+            to: shipmentPayloads.to,
             edemand: {
                 edemand_no: edemand_no || '--',
             },
@@ -189,7 +192,7 @@ const convertArrayToFilteredArray = (inputArray: any) => {
 
 
 // Main component
-export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, count, onFnrChange, reload, remarksList, setTriggerShipments, triggerShipments, getAllShipment }: any) {
+export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, count, onFnrChange, reload, remarksList, setTriggerShipments, triggerShipments, getAllShipment, ShipmentsPayload }: any) {
 
     //language controller
     const t = useTranslations("ORDERS")
@@ -292,10 +295,10 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
             if (!changeFnr) onFnrChange(changeFnr);
             setSettingFnrChange(changeFnr)
             if (changeFnr === '') {
-                const resData = convertArrayToFilteredArray(allShipments)
+                const resData = convertArrayToFilteredArray(allShipments, ShipmentsPayload)
                 setResponse(resData)
             } else {
-                const resData = convertArrayToFilteredArray(allShipments)
+                const resData = convertArrayToFilteredArray(allShipments, ShipmentsPayload)
                 const filteredData = resData.filter((item: { fnr: { primary: string | string[]; }; }) => item.fnr.primary.includes(changeFnr));
                 setResponse(filteredData)
             }
@@ -357,14 +360,14 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
 
     useEffect(() => {
         const etaResult = sortArray(allShipments, 'eta', currentETAsorting ? 'dec' : 'asc');
-        const resData = convertArrayToFilteredArray(etaResult)
+        const resData = convertArrayToFilteredArray(etaResult, ShipmentsPayload)
         setResponse(resData)
     }, [currentETAsorting])
 
     useEffect(() => {
         const pickupResult = sortArray(allShipments, 'pickup_date', pickupSorting ? 'dec' : 'asc');
         const etaResult = sortArray(allShipments, 'eta', currentETAsorting ? 'dec' : 'asc');
-        const resData = convertArrayToFilteredArray(pickupResult)
+        const resData = convertArrayToFilteredArray(pickupResult, ShipmentsPayload)
         setResponse(resData)
         if (settingFnrChange.length) {
             setSettingFnrChange(settingFnrChange)
@@ -429,6 +432,57 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
             setIsOverflowing(numberOfLines > 5);
         }
     }, [textRef, response]);
+
+    const generateTemplate = (rowData: any) => {
+        const currentETA = service.utcToist(rowData.past_etas.currentETA , 'dd-MMM HH:mm') || '--';
+        const initialETA = service.utcToist(rowData.past_etas.initialETA , 'dd-MMM HH:mm') || '--';
+        const from = service.utcToist(rowData.from , 'dd-MMM HH:mm') || '--';
+        const to = service.utcToist(rowData.to , 'dd-MMM HH:mm') || '--';
+        return `*Shipment Details:*\n
+        From: ${from}\n
+        To: ${to}\n
+        Indent #: ${rowData.intent_no}\n
+        e-Demand #: ${rowData.edemand.edemand_no}\n
+        Rake: ${rowData.is_captive ? 'Captive Rake' : 'Indian Railway Rake'}\n
+        Rake Name: ${rowData.captive.name? rowData.captive.name : 'N/A'}\n
+        Destination: ${rowData.destination.code} ${rowData.destination.name}\n
+        Commodity: ${rowData.material.name}\n
+        Indent Date: ${rowData.demand_date}\n
+        ELD: ${rowData.expected_loading_date.ELDdate} ${rowData.expected_loading_date.ELDtime}\n
+        Placement Date: ${rowData.placement_time}\n
+        Pickup Date: ${rowData.pickupdate.date} ${rowData.pickupdate.pickupTime}\n
+        RR Date: ${rowData.oneRr_date}\n
+        Drawn Out Time: ${rowData.drawnout_time}\n
+        Last FOIS Ping: ${rowData.fois_updated_at.date}\n
+        Initial ETA: ${currentETA}\n
+        Current ETA: ${initialETA}\n
+        Status: ${rowData.status.name}\n
+        Current Status Code: ${rowData.status.code}\n
+        Triptracker URL: ${environment.PROD_BASE_URL}tracker?unique_code=${rowData.fnr.unique_code}\n
+        Remarks: ${rowData.remarks}`;
+    };
+
+    // const shareViaWhatsApp = (rowData: any) => {
+    //     const message = generateTemplate(rowData);
+    //     const encodedMessage = encodeURIComponent(message);
+    //     const whatsappURL = `https://wa.me/?text=${encodedMessage}`;
+    //     window.open(whatsappURL, '_blank');
+    // };
+
+    const copyToClipboard = (text: string) => {
+        navigator.clipboard.writeText(text)
+          .then(() => {
+            showMessage('Text copied to clipboard successfully!', 'success')
+          })
+          .catch((err) => {
+            console.error("Could not copy text: ", err);
+          });
+    };
+
+    const copyRowDataToClipboard = (rowData: any) => {
+        const message = generateTemplate(rowData);
+        copyToClipboard(message);
+    };
 
     return (
         <div 
@@ -608,9 +662,11 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                                 />
                                                                             )}
                                                                             <ActionItem
-                                                                                icon={<ShareIcon style={{ width: '22px', height: '22px', color: '#3352FF' }} />}
-                                                                                text={t('share')}
-                                                                                // style={{ gap: '7px' }}
+                                                                                icon={<CopyAllIcon style={{ width: '22px', height: '22px', color: '#3352FF' }} />}
+                                                                                text={t('copyToClipboard')}
+                                                                                onClick={() => {
+                                                                                    copyRowDataToClipboard(row)
+                                                                                }}
                                                                             />
                                                                             <ActionItem
                                                                                 icon={<img src={contactIcon.src} alt='' style={{ objectFit: 'contain', height: '24px', width: '24px' }} />}
