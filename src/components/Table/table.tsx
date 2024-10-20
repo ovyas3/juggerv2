@@ -436,29 +436,23 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
     const generateTemplate = (rowData: any) => {
         const currentETA = service.utcToist(rowData.past_etas.currentETA , 'dd-MMM HH:mm') || '--';
         const initialETA = service.utcToist(rowData.past_etas.initialETA , 'dd-MMM HH:mm') || '--';
-        const from = service.utcToist(rowData.from , 'dd-MMM HH:mm') || '--';
-        const to = service.utcToist(rowData.to , 'dd-MMM HH:mm') || '--';
-        return `*Shipment Details:*\n
-        From: ${from}\n
-        To: ${to}\n
-        Indent #: ${rowData.intent_no}\n
-        e-Demand #: ${rowData.edemand.edemand_no}\n
-        Rake: ${rowData.is_captive ? 'Captive Rake' : 'Indian Railway Rake'}\n
-        Rake Name: ${rowData.captive.name? rowData.captive.name : 'N/A'}\n
-        Destination: ${rowData.destination.code} ${rowData.destination.name}\n
-        Commodity: ${rowData.material.name}\n
-        Indent Date: ${rowData.demand_date}\n
-        ELD: ${rowData.expected_loading_date.ELDdate} ${rowData.expected_loading_date.ELDtime}\n
-        Placement Date: ${rowData.placement_time}\n
-        Pickup Date: ${rowData.pickupdate.date} ${rowData.pickupdate.pickupTime}\n
-        RR Date: ${rowData.oneRr_date}\n
-        Drawn Out Time: ${rowData.drawnout_time}\n
-        Last FOIS Ping: ${rowData.fois_updated_at.date}\n
-        Initial ETA: ${currentETA}\n
-        Current ETA: ${initialETA}\n
-        Status: ${rowData.status.name}\n
-        Current Status Code: ${rowData.status.code}\n
-        Triptracker URL: ${environment.PROD_BASE_URL}tracker?unique_code=${rowData.fnr.unique_code}\n
+        return `*Shipment Details:*
+        Indent #: ${rowData.intent_no}
+        Rake: ${rowData.is_captive ? rowData.captive.name + '(Captive Rake)' : 'Indian Railway Rake'}
+        Destination: ${rowData.destination.code} ${rowData.destination.name}
+        Commodity: ${rowData.material.name}
+        Indent Date: ${rowData.demand_date}
+        ELD: ${rowData.expected_loading_date.ELDdate} ${rowData.expected_loading_date.ELDtime}
+        Placement Date: ${rowData.placement_time}
+        Pickup Date: ${rowData.pickupdate.date} ${rowData.pickupdate.pickupTime}
+        RR Date: ${rowData.oneRr_date}
+        Drawn Out Time: ${rowData.drawnout_time}
+        Last FOIS Ping: ${rowData.fois_updated_at.date}
+        Initial ETA: ${initialETA}
+        Current ETA: ${currentETA}
+        Status: ${rowData.status.name}
+        Current Status Code: ${rowData.status.code}
+        Triptracker URL: ${environment.PROD_BASE_URL}tracker?unique_code=${rowData.fnr.unique_code}
         Remarks: ${rowData.remarks}`;
     };
 
