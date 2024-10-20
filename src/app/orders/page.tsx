@@ -466,7 +466,9 @@ const OrdersPage = () => {
                   getAllShipment={getAllShipment} 
                   setTriggerShipments={setTriggerShipments} 
                   triggerShipments={triggerShipments} 
-                  remarksList={remarksList} />
+                  remarksList={remarksList} 
+                  ShipmentsPayload={ShipmentsPayload}
+                  />
               </div>
             </div>
 
