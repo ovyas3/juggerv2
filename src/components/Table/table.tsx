@@ -63,7 +63,8 @@ const status_class_map: { [key: string]: string } = {
     'RFD': 'status_title_rfd',
     'ITNS': 'status_title_In_Transit',
     'Delivered': 'status_title_Delivered',
-    'INPL': 'status_title_INPL'
+    'INPL': 'status_title_INPL',
+    "stabled": 'status_title_stabled'
 }
 
 const convertArrayToFilteredArray = (inputArray: any, shipmentPayloads: any) => {
@@ -112,6 +113,10 @@ const convertArrayToFilteredArray = (inputArray: any, shipmentPayloads: any) => 
         let newRRDate = new Date(rr_dates[0]);
         newRRDate.setHours(newRRDate.getHours() - 5);
         newRRDate.setMinutes(newRRDate.getMinutes() - 30);
+        let statusName = trip_tracker && trip_tracker[0]?.fois_last_location 
+            ? trip_tracker[0]?.fois_last_location.toLowerCase().includes("stabled") 
+                ? "Stabled" 
+                : statusBuilder(status) : statusBuilder(status);
         return {
            
             _id: item._id,
@@ -138,9 +143,9 @@ const convertArrayToFilteredArray = (inputArray: any, shipmentPayloads: any) => 
                 pickupTime: service.utcToistTime(pickup_date) || '--'
             },
             status: {
-                name: statusBuilder(status),
+                name: statusName,
                 code: ( status === "OB" || status === "") ? null : (trip_tracker && trip_tracker[0]?.fois_last_location) || '',
-                raw: status,
+                raw: statusName === 'Stabled' ? 'stabled' : status
             },
             currentEta: {
                 date: service.utcToist(eta) || '--',
