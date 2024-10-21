@@ -37,6 +37,8 @@ const getStatusCode = (status: string): string => {
       return "RFD"
     case "In Transit":
       return "ITNS"
+    case "Stabled":
+      return "ITNS"
     case "Delivered At Hub":
       return 'Delivered'
     case "Delivered At Customer":

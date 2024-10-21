@@ -423,6 +423,16 @@
     align-items: center;
 }
 
+.status_title_stabled {
+    height: 25px;
+    /* width: 72px; */
+    background-color: #f5f3ff;
+    color: #7c3aed;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .status_body {
     font-size: 12px;
     min-width: 140px !important;

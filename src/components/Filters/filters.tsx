@@ -48,12 +48,13 @@ function Filters({ onToFromChange, onChangeStatus, onChangeRakeTypes, reload, sh
 
 
     const rakeTypes = [
+        'All',
         'Captive Rakes',
         'Indian Railway Rakes'
     ];
 
     const [status, setStatus] = useState(['In Transit', 'Delivered At Hub', 'Delivered At Customer']);
-    const [rakeType, setRakeType] = useState(['Captive Rakes', 'Indian Railway Rakes'])
+    const [rakeType, setRakeType] = useState(['All', 'Captive Rakes', 'Indian Railway Rakes'])
     const [openStartDatePicker, setOpenStartDatePicker] = useState(false);
     const [openEndDatePicker, setOpenEndDatePicker] = useState(false);
 
@@ -67,15 +68,36 @@ function Filters({ onToFromChange, onChangeStatus, onChangeRakeTypes, reload, sh
         onChangeStatus(typeof value === 'string' ? value.split(',') : value,)
     };
 
-    const handleChangeRakeType = (event: any) => {
+    const handleChangeRakeType = (event: SelectChangeEvent<string[]>) => {
         const {
             target: { value },
         } = event;
-        setRakeType(
-            typeof value === 'string' ? value.split(',') : value,
-        );
-        onChangeRakeTypes(typeof value === 'string' ? value.split(',') : value,)
+        const selectedValues = typeof value === 'string' ? value.split(',') : value;
+        if (selectedValues.includes('All')) {
+            if (rakeType.includes('All')) {
+                setRakeType([]);
+                onChangeRakeTypes([]);
+            } else {
+                setRakeType(rakeTypes);
+                onChangeRakeTypes(rakeTypes);
+            }
+        } else {
+            const filteredValues = selectedValues.filter((item) => item !== 'All');
+            if (filteredValues.length === 0) {
+                setRakeType([]);
+                onChangeRakeTypes([]);
+            } else {
+                if (rakeType.includes('All')) {
+                    setRakeType(filteredValues);
+                    onChangeRakeTypes(filteredValues);
+                } else {
+                    setRakeType(filteredValues);
+                    onChangeRakeTypes(filteredValues);
+                }
+            }
+        }
     };
+
 
 
 
