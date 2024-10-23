@@ -52,12 +52,14 @@ import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { renderTimeViewClock } from '@mui/x-date-pickers/timeViewRenderers';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 
-async function rake_update_id(payload: Object) {
-    return await httpsPost(UPDATE_RAKE_CAPTIVE_ID, payload);
+import { useRouter } from "next/navigation";
+
+async function rake_update_id(payload: Object, router: any) {
+    return await httpsPost(UPDATE_RAKE_CAPTIVE_ID, payload, router);
 }
 
-async function remake_update_By_Id(payload: object) {
-    const response = await httpsPost(REMARKS_UPDATE_ID, payload);
+async function remake_update_By_Id(payload: object, router: any) {
+    const response = await httpsPost(REMARKS_UPDATE_ID, payload, router);
     return response;
 }
 
@@ -90,6 +92,7 @@ export const ActionItem = ({ icon, text, onClick, id, style }: any) => (
     </div>
 );
 export function Remarks({ shipmentId, setOpen, remarksList, getAllShipment }: RemarksProps) {
+    const router = useRouter();
     const [others, setOthers] = useState('');
     const t = useTranslations('ORDERS');
     const placeholder = 'Select a remark';
@@ -131,7 +134,7 @@ export function Remarks({ shipmentId, setOpen, remarksList, getAllShipment }: Re
             ]
         };
 
-        const response = remake_update_By_Id(remarkObject);
+        const response = remake_update_By_Id(remarkObject, router);
         response.then((res: any) => {
             if (res.statusCode === 200) {
                 showMessage('Remark Updated', 'success');
@@ -260,7 +263,7 @@ export function Remarks({ shipmentId, setOpen, remarksList, getAllShipment }: Re
     )
 }
 export function Tags({ rakeCaptiveList, shipmentId, setOpen, setShowActionBox }: any) {
-
+    const router = useRouter();
     const placeHolder = 'Select One';
     const [item, setItem] = useState(placeHolder)
     const [itemId, setItemID] = useState(null)
@@ -294,7 +297,7 @@ export function Tags({ rakeCaptiveList, shipmentId, setOpen, setShowActionBox }:
         };
 
         if (updatedObject.captiveId) {
-            rake_update_id(updatedObject).then((res: any) => {
+            rake_update_id(updatedObject, router).then((res: any) => {
                 if (res === null) showMessage('Captive Rake Updated Successfully.', 'success');
                 setOpen(false);
             }).catch((err: any) => {
@@ -437,7 +440,6 @@ export const PastEta = ({ row, firstIndex }: any) => {
     };
 
     const open = Boolean(anchorEl);
-    console.log(row.past_etas, 'row.past_etas')
     return (
         <Box>
             <Typography
@@ -488,7 +490,7 @@ export const PastEta = ({ row, firstIndex }: any) => {
     );
 };
 export const EditELD = ({ shipmentId, setOpen, getAllShipment }: any) => {
-
+    const router = useRouter();
     const t = useTranslations('ORDERS');
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [isHovered, setIsHovered] = useState(false);
@@ -517,7 +519,7 @@ export const EditELD = ({ shipmentId, setOpen, getAllShipment }: any) => {
             return;
         }
         try {
-            const res = await httpsPost(UPDATE_ELD, payload)
+            const res = await httpsPost(UPDATE_ELD, payload, router)
             if (res.statusCode === 200) {
                 showMessage('Expected Loading Date Updated Successfully.', 'success');
                 setOpen(false);
@@ -679,6 +681,7 @@ export const EditELD = ({ shipmentId, setOpen, getAllShipment }: any) => {
     )
 }
 export const HandlingAgentSelection = ({ shipmentId, setOpen, locationId, getAllShipment }: any) => {
+    const router = useRouter();
     const t = useTranslations('ORDERS');
     const [isHovered, setIsHovered] = useState(false);
     const handleMouseEnter = useCallback(() => setIsHovered(true), []);
@@ -694,7 +697,7 @@ export const HandlingAgentSelection = ({ shipmentId, setOpen, locationId, getAll
     const { showMessage } = useSnackbar();
     const getLocationList = async () => {
         try {
-            const res = await httpsGet(`${GET_HANDLING_AGENT_LIST}?delivery_locations=${locationId}`);
+            const res = await httpsGet(`${GET_HANDLING_AGENT_LIST}?delivery_locations=${locationId}`, 0, router);
             if (res.statusCode === 200) {
                 setAllListOfHAids(res?.data);
             }
@@ -705,7 +708,7 @@ export const HandlingAgentSelection = ({ shipmentId, setOpen, locationId, getAll
 
     const getRakeShipmentHA = async () => {
         try {
-            const res = await httpsGet(`handling_agent/get_rake_shipment_ha?id=${shipmentId}`);
+            const res = await httpsGet(`handling_agent/get_rake_shipment_ha?id=${shipmentId}`, 0, router);
             if (res.statusCode === 200) {
                 const initialSelectedIds = new Set(res?.data[0]?.HA?.map((ha: any) => ha._id));
                 setSelectedHAids(initialSelectedIds);
@@ -766,7 +769,7 @@ export const HandlingAgentSelection = ({ shipmentId, setOpen, locationId, getAll
     const handleSubmit = async () => {
         if (newIds.length === 0) { showMessage('Please select HA.', 'success'); }
         try {
-            const res = await httpsPost(`rake_shipment/assign_edit_ha`, { id: shipmentId, addIds: newIds, removeIds: removeIds });
+            const res = await httpsPost(`rake_shipment/assign_edit_ha`, { id: shipmentId, addIds: newIds, removeIds: removeIds }, router);
             if (res.statusCode === 200) {
                 if(newIds.length === 0) {
                     showMessage('Handling Agent removed successfully.', 'success');
@@ -789,7 +792,7 @@ export const HandlingAgentSelection = ({ shipmentId, setOpen, locationId, getAll
 
     async function bringAllHandlingAgent(){
         try {
-            const res = toggleForShowAllHA ? await httpsGet(`${GET_HANDLING_AGENT_LIST}?delivery_locations=${locationId}&isAllHA=${toggleForShowAllHA}`) : await httpsGet(`${GET_HANDLING_AGENT_LIST}?delivery_locations=${locationId}`);
+            const res = toggleForShowAllHA ? await httpsGet(`${GET_HANDLING_AGENT_LIST}?delivery_locations=${locationId}&isAllHA=${toggleForShowAllHA}`, 0, router) : await httpsGet(`${GET_HANDLING_AGENT_LIST}?delivery_locations=${locationId}`, 0, router);
             if (res.statusCode === 200) {
                 setAllListOfHAids(res?.data);
             }
@@ -877,7 +880,7 @@ export const HandlingAgentSelection = ({ shipmentId, setOpen, locationId, getAll
 };
 export const MarkPlacement = ({isClose ,shipment, getAllShipment, different = 'markplacement'}: any) =>{
     const t = useTranslations("ORDERS");
-   
+    const router = useRouter();
     const [currentDate, setCurrentDate] = useState(new Date());
     const { showMessage } = useSnackbar();
     const [avetoInplant, setAvetoInplant] = useState(false);
@@ -913,7 +916,7 @@ export const MarkPlacement = ({isClose ,shipment, getAllShipment, different = 'm
         }
        
       try {
-        const response = await httpsPost(different === 'downOut'?'rake_shipment/mark_drawnout':'rake_shipment/mark_placement', different === 'downOut' ?(payloadWithdrownDate):(eIndent?payloadWitheident: payload))
+        const response = await httpsPost(different === 'downOut'?'rake_shipment/mark_drawnout':'rake_shipment/mark_placement', different === 'downOut' ?(payloadWithdrownDate):(eIndent?payloadWitheident: payload), router)
         if(response.statusCode === 200) {
             isClose(false);
             getAllShipment();
@@ -988,7 +991,7 @@ export const MarkPlacement = ({isClose ,shipment, getAllShipment, different = 'm
                                 ampm={false}
                                 slotProps={{
                                     textField: {
-                                        onClick: () =>{console.log(); setOpenStartDatePicker(!openStartDatePicker)},
+                                        onClick: () =>{setOpenStartDatePicker(!openStartDatePicker)},
                                         fullWidth: true,
                                         InputProps: {
                                             endAdornment: null,
@@ -1047,13 +1050,14 @@ export const MarkPlacement = ({isClose ,shipment, getAllShipment, different = 'm
     );
 }
 export const HandlingEdemand = ({ isClose, isOpen, getAllShipment, shipment }: any) => {
+    const router = useRouter();
     const { showMessage } = useSnackbar();
         const payload = {
             rake: shipment._id,
         }
         const handleYes = async () => {
             try {
-              const response = await httpsPost(`rake_shipment/cancel`, payload);
+              const response = await httpsPost(`rake_shipment/cancel`, payload, router);
               if (response?.statusCode === 200) {
                 isClose(false);
                 getAllShipment();
@@ -1186,7 +1190,7 @@ export const HandlingEdemand = ({ isClose, isOpen, getAllShipment, shipment }: a
     );
 };
 export const UploadWagonSheet = ({getWagonDetails,isClose, shipment, setOpenUploadFile, ordersUpload='wagonSheet'}:any) => {
-
+    const router = useRouter();
     const t = useTranslations('ORDERS');
     const [fileName, setFileName] = useState('Drag and Drop to upload the file here');
     const [uploadFile, setUploadFile] = useState<any>({});
@@ -1241,7 +1245,7 @@ export const UploadWagonSheet = ({getWagonDetails,isClose, shipment, setOpenUplo
         
         
         if(ordersUpload === 'wagonSheet') {
-            await httpsPost('wagon_sheet/upload', payload, 0, true).then((response: any) => {
+            await httpsPost('wagon_sheet/upload', payload, router, 0, true).then((response: any) => {
                 if(response.statusCode === 200) {
                     isClose(false); 
                     setFileName('Drag and Drop to upload the file here');
@@ -1254,7 +1258,7 @@ export const UploadWagonSheet = ({getWagonDetails,isClose, shipment, setOpenUplo
                 console.log(err); showMessage(err.message, 'error')
             }) 
         }else{
-            await httpsPost('shipment/bulkUpload', payload, 0, true).then((response: any) => {
+            await httpsPost('shipment/bulkUpload', payload, router, 0, true).then((response: any) => {
                 if(response.statusCode === 200) {
                     setOpenUploadFile(false);
                     setFileName('Drag and Drop to upload the file here');
@@ -1267,7 +1271,6 @@ export const UploadWagonSheet = ({getWagonDetails,isClose, shipment, setOpenUplo
         }
            
     }
-    console.log(shipment)
 
     return (
     <div style={{width:'100vw', height:'100vh', position:'fixed', top:0, left:0 ,zIndex:300, backgroundColor:'rgba(0, 0, 0, 0.5)'}} onClick={(e)=>{e.stopPropagation(); ordersUpload === 'wagonSheet' ? isClose(false) : setOpenUploadFile(false);}}>
@@ -1329,7 +1332,7 @@ export const UploadWagonSheet = ({getWagonDetails,isClose, shipment, setOpenUplo
     )
 }
 export const HandlingETA = ({ isClose, isOpen, shipment, getAllShipment, difference}: any) => {
-    
+    const router = useRouter();
     const { showMessage } = useSnackbar();
     const [time, setTime] = React.useState('');
     
@@ -1348,11 +1351,10 @@ export const HandlingETA = ({ isClose, isOpen, shipment, getAllShipment, differe
         id:shipment._id,
         preferred_eta: time
     }
-    console.log(time,"time");
     
    const handleSubmit = async()=>{
     try {
-        const response = await httpsPost(`rake_shipment/preferred_difference_eta`, payload);
+        const response = await httpsPost(`rake_shipment/preferred_difference_eta`, payload, router);
         if (response?.statusCode === 200) {
             showMessage(' Updated Successfully',"success");
           isClose(false);

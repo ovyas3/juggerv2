@@ -11,15 +11,18 @@ import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import { httpsGet, httpsPost } from "@/utils/Communication";
+import { useRouter } from "next/navigation";
+import { ThreeCircles } from "react-loader-spinner";
 
 function Settings() {
+    const router = useRouter();
     const { showMessage } = useSnackbar();
     const mobile = useWindowSize(500);
     const [time, setTime] = useState("");
     useEffect(() => {
         const fetchPreviousTime = async () => {
             try {
-                const response = await httpsGet('get/preferred/difference');
+                const response = await httpsGet('get/preferred/difference', 0, router);
                 if (response?.statusCode === 200 && response?.data?.preferred_difference_eta) {
                     setTime(response.data.preferred_difference_eta);
                 } else {
@@ -41,19 +44,17 @@ function Settings() {
         const payload = {
             preferred_eta: time,
         };
-        console.log(time);
         
         try {
-            const response = await httpsPost(`rake_shipment/preferred_eta`, payload);
+            const response = await httpsPost(`rake_shipment/preferred_eta`, payload, router);
             if (response?.statusCode === 200) {
                 showMessage(' Updated Successfully',"success");
             }
         } catch (error) {
             console.log('Error:', error);
             showMessage('An error occurred, please try again', 'error');
-        }
+          }
     };
-
     return (
         <div>
             <div style={{ display: 'flex', flexDirection: 'column', margin: '90px' }}>

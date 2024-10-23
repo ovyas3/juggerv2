@@ -17,6 +17,7 @@ import { useTranslations } from 'next-intl';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import { useSnackbar } from '@/hooks/snackBar';
 import ActiveAgentList from '@/app/handlingAgent/activeHAtable';
+import { useRouter } from 'next/navigation';
 
 interface SkipAndLimit {
     skip: number,
@@ -30,7 +31,7 @@ async function inviteAgent({ payload }: any) {
 
 
 function HandlingAgent() {
-
+    const router = useRouter();
     const { showMessage } = useSnackbar();
     const [agentList, setAgentList] = useState([]);
     const [originalAgentList, setOriginalAgentList] = useState([]);
@@ -61,20 +62,20 @@ function HandlingAgent() {
 
     async function getHandlingAgents({ skipAndLimit }: { skipAndLimit: SkipAndLimit }) {
         try {
-            const response = await httpsGet(`get/invited/handling_agent?skip=${skipAndLimit.skip}&limit=${skipAndLimit.limit}`)
+            const response = await httpsGet(`get/invited/handling_agent?skip=${skipAndLimit.skip}&limit=${skipAndLimit.limit}`, 0, router)
                 .then((response) => {
                     setCount(response?.data?.count);
                     setAgentList(response?.data?.data);
                     setOriginalAgentList(response?.data?.data);
                 })
         } catch (error) {
-            console.log(error)
-        }
+            console.log(error);
+          } 
     }
 
     async function getAllActiveHandlingAgents({ activeSkipAndLimit }: { activeSkipAndLimit: SkipAndLimit }) {
         try {
-            await httpsGet(`get/associatedHAs?limit=${activeSkipAndLimit.limit}&skip=${activeSkipAndLimit.skip}`).then((response) => {
+            await httpsGet(`get/associatedHAs?limit=${activeSkipAndLimit.limit}&skip=${activeSkipAndLimit.skip}`, 0, router).then((response) => {
                 setActiveCount(response?.data?.count);
                 setActiveAgentList(response?.data?.data);
                 setActiveOriginalAgentList(response?.data?.data);
@@ -82,8 +83,8 @@ function HandlingAgent() {
                 console.log(error);
             })
         } catch (error) {
-            console.log(error)
-        }
+            console.log(error);
+          }
     }
 
     useEffect(() => {
@@ -92,7 +93,7 @@ function HandlingAgent() {
     }, [skipAndLimit])
 
     useEffect(() => {
-        if(activeSkipAndLimit.limit>0)
+        if(activeSkipAndLimit.limit > 0)
         getAllActiveHandlingAgents({ activeSkipAndLimit });
     }, [activeSkipAndLimit])
 

@@ -1,8 +1,9 @@
-#inside-content-assign {
+#inside-content-assign-wagon {
     height: calc(100vh - 56px);
     width: calc(100vw - 70px);
     margin-top: 56px;
     margin-left: 70px;
+    position: relative;
   }
   .wagon-wrapper {
     height: 100%;
@@ -43,18 +44,20 @@
     flex-direction: column;
   }
   
-  #search-container-assign {
-    /* padding-top: 20px; */
-    /* padding-bottom: 20px; */
+  #search-container-assign-wagon {
+    padding-top: 24px;
     display: flex;
-    justify-content: space-between;
-    /* height: 82px; */
-    padding-inline: 24px;
-    /* align-items: center; */
+    justify-content: flex-start;
+    padding: 24px 24px 0px 24px;
     flex-direction: row;
-    /* background-color: thistle; */
-    padding-block: 10px;
     align-items: start;
+  }
+
+  .search-container-assign-title{
+    font-size: 20px;
+    font-weight: 600;
+    color: #000;
+    padding-left: 24px;
   }
   
   .input-wrapper {
@@ -157,7 +160,7 @@
   }
   #scrollAreaforRakeSheet {
     overflow-y: scroll;
-    max-height: 550px;
+    max-height: 500px;
     scroll-behavior: smooth;
     margin-top: 24px;
   }
@@ -400,7 +403,7 @@
     display: flex;
     position: relative;
     border-bottom: 1px solid #dfe3eb;
-    align-items: end;
+    align-items: flex-end;
     background-color: #3351ff;
   }
   #wagon-number-rail{
@@ -439,35 +442,94 @@
     font-weight: 600;
     margin-bottom: 16px;
   }
-  #status-for-assign-sheet{
-    /* width: 100%; */
-    margin-inline: 24px;
-    background-color: #F2F6FF;
-    /* background-color: tomato !important; */
+
+  .shipment-details-container{
+    width: 96%;
+    margin: 24px 24px 0px 24px;
+    padding: 0px 0px 16px 0px;
+    border-bottom: 1px solid #e9eef2;
+  }
+
+  .train-shipment-container {
+    display: flex;
+    background-color: transparent;
+    margin: 0px 24px;
+    padding-bottom: 16px;
+    overflow-x: auto;
+    width: 100%;
+    scrollbar-width: thin; 
+    scrollbar-color: #888 #f1f1f1; 
+  }
+  
+  .train-shipment-container::-webkit-scrollbar {
+    height: 8px; 
+  }
+  
+  .train-shipment-container::-webkit-scrollbar-track {
+    background: #f1f1f1; 
+  }
+  
+  .train-shipment-container::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
+  }
+  
+  .train-shipment-container::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
+
+  #status-for-assign-sheet-wagon{
     border-radius: 12px;
+    width: 50%;
     height: 60px;
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
     align-items: center;
-    /* padding-inline: 24px; */
     position: relative;
+
+    @media screen and (max-width: 1024px) {
+      width: 60%;
+    }
+
+    @media screen and (max-width: 882px) {
+      width: 70%;
+    }
+
+    @media screen and (max-width: 768px) {
+      width: 90%;
+    }
   }
-  #wagons-assign-notassigned{
-    position: absolute;
-    bottom: -18px;
-    right: 0px;
+  #wagons-assign-notassigned-wagon{
     font-size: small;
     display: flex;
     gap:16px;
     font-size: 12px;
   }
-  #assign-wagon-container{
-    /* background-color: #00B275; */
-    height: calc(100vh - 330px);
+
+  #assign-wagon-container-wagon{
     margin-inline: 24px;
     margin-top: 16px;
+    margin-bottom: 24px;
+
+    @media screen and (max-width: 1024px) {
+      margin-bottom: 28px;
+    }
+
+    @media screen and (max-width: 882px) {
+      margin-bottom: 32px;
+    }
+
+    @media screen and (max-width: 768px) {
+      margin-bottom: 36px;
+    }
   }
-  #assign-wagon-container-box-selection-container{
+  .assign-wagon-container-title{
+    font-size: 16px;
+    font-weight: 600;
+    color: #3C4852;
+    margin-bottom: 12px;
+  }
+  #assign-wagon-container-box-selection-container-wagon{
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); 
     grid-template-rows: repeat(auto-fill,minmax(50px, auto)); 
@@ -475,7 +537,7 @@
     grid-auto-flow: column; 
     column-gap: 32px;
     row-gap: 20px;
-    max-height: calc(100vh - 460px);
+    max-height: calc(100vh - 500px);
     overflow-y: scroll;
     scroll-behavior: smooth;
     padding-bottom: 16px;
@@ -513,13 +575,13 @@
     /* background-color: white; */
     height: 85px;
     width: 190px !important;
-    align-content: end;
+    align-content: flex-end;
   }
   #connecting-chain{
     width: 8px;
     /* background-color: wheat; */
     display: flex;
-    align-items: end;
+    align-items: flex-end;
     padding-bottom: 5px;
   }
   #wagon-no-assign-container{
@@ -551,22 +613,22 @@
     gap: 8px 48px;
     min-height: 225px;
 }
-.wagonAssignToMillConatiner{
+.wagonAssignToMillContainerWagon{
     height: 50px;
     width: 145px;
     /* background-color: burlyswood; */
     display: flex;
-    gap:8px
+    gap: 8px;
 }
-.wagonsAssignToMillImageSelectorConatainer{
+.wagonsAssignToMillImageSelectorContainerWagon{
     height: 100%;
     width: 55px;
     display: flex;
-    justify-content: end;
-    align-items: end;
+    justify-content: flex-end;
+    align-items: flex-end;
     position: relative;
 }
-.wagonsAssignToMillImageSelector{
+.wagonsAssignToMillImageSelectorWagon{
     height: 40px;
     width: 48px;
     border-radius: 6px;
@@ -577,7 +639,7 @@
     justify-content: center;
     align-items: center;
 }
-.wagonsAssigntoMillCheckedIcon{
+.wagonsAssigntoMillCheckedIconWagon{
     height: 14px;
     width: 14px;
     border-radius: 50%;
@@ -585,7 +647,7 @@
     top:3px;
     left: 1px;
 }
-#wagonsAssignToMillTextArea{
+#wagonsAssignToMillTextAreaWagon{
     margin-top: 10px;
     display: flex;
     flex-direction: column;
@@ -594,23 +656,25 @@
     position: relative;
     width: 80px;
 }
-#wagonsAssignToMillAssignedPlantName{
-    font-size: 9px;
+#wagonsAssignToMillAssignedPlantNameWagon{
+    font-size: 8px;
     font-weight: 400;
-    color: #3D4852;
+    color: #3C4852;
     text-wrap: nowrap;
     overflow-x: visible;
 }
-#wagonsAssignToMillNumber{
+#wagonsAssignToMillNumberWagon{
     font-size: 12px;
     font-weight: 600;
+    color: #3C4852;
 }
-#wagonsAssignToMilltype{
-    font-size: 10px;
+#wagonsAssignToMilltypeWagon{
+    font-size: 8px;
     font-weight: 400;
+    color: #3C4852;
 }
 
-#plantSelectorContainer{
+#plantSelectorContainerWagon{
     /* background-color: #B7BAC3; */
     margin-top: 10px;
     display: flex;
@@ -618,7 +682,7 @@
     flex-wrap: wrap;
     margin-bottom: 16px;
 }
-#plantMillSelector{
+#plantMillSelectorWagon{
     border: 1px solid #B7BAC3;
     display: flex;
     justify-content: center;
@@ -631,7 +695,7 @@
     gap : 4px;
     cursor: pointer;
 }
-#plantRadioButton{
+#plantRadioButtonWagon{
     height: 16px;
     width: 16px;
     border-radius: 50%;
@@ -640,14 +704,48 @@
     justify-content: center;
     align-items: center;   
 }
-#plantRadioButtonInside{
+#plantRadioButtonInsideWagon{
     height: 10px;
     width: 10px;
     border-radius: 50%;
-    background-color: white;
+    /* background-color: white; */
 }
 #dividerForAssignToMill{
     width: 100%;
     box-shadow: 0 -4px 6px -2px rgba(0, 0, 0, 0.1);
     height: 10px;
+}
+
+#buttonContainerWagon{
+  position: sticky;
+  bottom: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 24px;
+  box-shadow: 0px -2px 8px 0px #0000000F;
+}
+
+.wagons-assign-not-assigned-content{
+  display: flex;
+  gap: 6px;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+
+.wagons-assign-not-assigned-content-header{
+  font-size: 12px;
+  font-weight: 400;
+  color: #3C4852;
+  margin: 0;
+}
+
+.wagons-assign-not-assigned-content-value{
+  font-size: 14px;
+  font-weight: 600;
+  color: #3C4852;
+  margin: 0;
 }

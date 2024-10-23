@@ -2,14 +2,33 @@
     height: calc(100vh - 56px);
     width: calc(100vw - 70px);
     margin-top: 56px;
+    overflow: hidden;
     margin-left: 70px;
+    position: relative;
 }
-#search-container-assign{
+#search-container-assign-hooks{
+    padding-top: 24px;
     display: flex;
-    justify-content: space-between;
-    margin-inline: 24px;
-    padding-block: 16px;
+    justify-content: flex-start;
+    padding: 24px 24px 0px 24px;
+    flex-direction: row;
+    align-items: start;
 }
+
+.search-container-assign-title{
+    font-size: 20px;
+    font-weight: 600;
+    color: #000;
+    padding-left: 24px;
+}
+
+.shipment-details-container{
+    width: 96%;
+    margin: 24px 24px 0px 24px;
+    padding: 0px 0px 16px 0px;
+    border-bottom: 1px solid #e9eef2;
+  }
+
 #filtersForHooksAssignToLoadingShop{
     margin-inline: 24px;
     display: flex;
@@ -64,9 +83,6 @@
     background-color: #E9EEF2;
     cursor: pointer;
 }
-#wagonListContainer{
-    /* background-color: greenyellow; */
-}
 .wagonAssignToMillConatiner{
     height: 50px;
     width: 145px;
@@ -78,8 +94,8 @@
     height: 100%;
     width: 55px;
     display: flex;
-    justify-content: end;
-    align-items: end;
+    justify-content: flex-end;
+    align-items: flex-end;
     position: relative;
 }
 .wagonsAssigntoMillCheckedIcon{
@@ -135,11 +151,10 @@
     grid-auto-flow: column; 
     column-gap: 32px;
     row-gap: 20px;
-    max-height: calc(100vh - 460px);
+    max-height: calc(100vh - 380px);
     overflow-y: scroll;
     scroll-behavior: smooth;
     padding-bottom: 16px;
-    /* background-color: tomato; */
   }
 #hooksFilter{
     position: relative;
@@ -171,19 +186,27 @@
     border-radius: 4px;
     cursor: pointer;
 }
-#status-for-assign-sheet{
-    /* width: 100%; */
-    margin-inline: 24px;
-    background-color: #F2F6FF;
-    /* background-color: tomato !important; */
+#status-for-assign-sheet-hooks{
     border-radius: 12px;
+    width: 50%;
     height: 60px;
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
     align-items: center;
-    /* padding-inline: 24px; */
     position: relative;
-  }
+
+    @media screen and (max-width: 1024px) {
+      width: 60%;
+    }
+
+    @media screen and (max-width: 882px) {
+      width: 70%;
+    }
+
+    @media screen and (max-width: 768px) {
+      width: 90%;
+    }
+}
 .removeIcon-container-loading-shop{
     background-color: #E24D65;
     height: 20px;
@@ -193,4 +216,86 @@
     justify-content: center;
     align-items: center;
     cursor: pointer
+}
+
+.confirm-dialog-styles{
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.confirm-dialog-styles .MuiDialog-container .MuiDialog-paper{
+  border-radius: 12px !important;
+  width: 40vw !important;
+  height: 20vh !important;
+  overflow-y: unset;
+}
+
+.confirm-dialog-styles .confirm-dialog-container {
+  position: relative;
+  display: inline-block;
+  border-radius: 12px !important;
+  overflow-y: unset;
+}
+
+.confirm-dialog-styles .confirm-close-icon {
+  position: absolute;
+  top: -40px;
+  right: -2px;
+  cursor: pointer;
+  z-index: 1000;
+}
+
+.confirm-dialog-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+}
+
+.confirm-dialog-buttons-container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+    padding: 0 16px;
+}
+
+.confirm-dialog-buttons-container .confirm-button{
+    background-color: #3856FE;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.confirm-dialog-buttons-container .cancel-button{
+    background-color: #fff;
+    color: #3D4852;
+    border: 1px solid #3D4852;
+    padding: 8px 16px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.confirm-dialog-buttons-container .confirm-button:hover{
+    background-color: #2B3DBF;
+    cursor: pointer;
+}
+
+.confirm-dialog-buttons-container .cancel-button:hover{
+    background-color: #E9EEF2;
+    cursor: pointer;
+}
+
+#buttonContainerHooks{
+    position: sticky;
+    bottom: 0;
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 24px;
+    box-shadow: 0px -2px 8px 0px #0000000F;
 }

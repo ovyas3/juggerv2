@@ -13,10 +13,11 @@ import "./style.css";
 import CountUp from 'react-countup';
 import { delay } from "framer-motion";
 import EtaDashboardModal from "./etaDashboradModal";
+import { useRouter } from "next/navigation";
 
 
 function EtaDashboard() {
-
+  const router = useRouter();
   const { showMessage } = useSnackbar();
   const mobile = useWindowSize(500);
   const t = useTranslations("ETADASHBOARD");
@@ -55,24 +56,31 @@ function EtaDashboard() {
   const [stabled_shipments, setStabled_shipments] = useState([]);
  
   async function getStableShipments(){
-    const response = await httpsGet('get/stable_shipments');
-    if(response.statusCode === 200) {
-      setStabled_shipments(response?.data?.stabled_shipments);
-    }
+    try{
+      const response = await httpsGet('get/stable_shipments', 0, router);
+      if(response.statusCode === 200) {
+        setStabled_shipments(response?.data?.stabled_shipments);
+      }
+    } catch (error) {
+      console.log(error);
+    } 
   }
 
   async function getDelayShipments(){
-    const response = await httpsGet('rake_shipment/en_route_eta_dashboard');
-    if(response.statusCode === 200) {
-      console.log(response.data)
-      setEarly(response.data.early);
-      setLate(response.data.late);
-      setOntime(response.data.on_time);
-      setZeroToEight(response.data['0_8']);
-      setEightToSixteen(response.data['8_16']);
-      setSixteenToTwentyFour(response.data['16_24']);
-      setTwentyfourTofourtyeight(response.data['24_48']);
-    }
+    try{
+      const response = await httpsGet('rake_shipment/en_route_eta_dashboard', 0, router);
+      if(response.statusCode === 200) {
+        setEarly(response.data.early);
+        setLate(response.data.late);
+        setOntime(response.data.on_time);
+        setZeroToEight(response.data['0_8']);
+        setEightToSixteen(response.data['8_16']);
+        setSixteenToTwentyFour(response.data['16_24']);
+        setTwentyfourTofourtyeight(response.data['24_48']);
+      }
+    } catch (error) {
+      console.log(error);
+    } 
   }
   useEffect(()=>{
     getDelayShipments();

@@ -13,12 +13,14 @@ import dayjs from "dayjs";
 
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { renderTimeViewClock } from "@mui/x-date-pickers/timeViewRenderers";
+import { ThreeCircles } from "react-loader-spinner";
+import { useRouter } from "next/navigation";
 
 const events_names = {
   rakeArrivalAtStation: "Rake Arrival At Serving Station",
   stabled: "Stabled",
   placementTime: "Placement Time",
-  rakeArrivalAtPlant: "gate-in",
+  // rakeArrivalAtPlant: "gate-in",
   bpRelease: "B/P Release",
   wagonPlacedAtLoadingPoint: "Wagons Placed At Loading Point",
   loadRakeFormation: "Load Rake Formation",
@@ -32,7 +34,7 @@ const eventCodes = {
   rakeArrivalAtStation: "RAS",
   stabled: "STB",
   placementTime: "PLT",
-  rakeArrivalAtPlant: "GIN",
+  // rakeArrivalAtPlant: "GIN",
   bpRelease: "BPR",
   wagonPlacedAtLoadingPoint: "WLP",
   loadRakeFormation: "LRF",
@@ -44,8 +46,10 @@ const eventCodes = {
 };
 
 function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
+  const router = useRouter(); 
   const showMessage = useSnackbar();
   const text = useTranslations("WAGONTALLYSHEET");
+  const [loading, setLoading] = useState(false);
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(
     null
   );
@@ -204,7 +208,6 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
     hookIndex: number
   ) => {
     const value = parseInt(event.target.value, 10);
-    console.log(value);
     setWorkingPlant((previousState: any) => {
       const updatedMillDetails = [...previousState];
       updatedMillDetails[plantIndex].hooks[hookIndex].no_of_wagons = value;
@@ -217,31 +220,27 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
       shipment: shipment.id,
       hooks: [] as any,
     };
-    for (const plant of workingPlant) {
-      if( (plant.count -  plant.hooks.reduce((acc: any, hook: any) => acc + hook.no_of_wagons,0) || 0) < 0 ){
-        showMessage.showMessage(`wagons numbers exceed in ${plant.plant.name}`,'error');
-        return;
-      }
-      for (const hook of plant.hooks) {
-        if (hook.no_of_wagons === 0) {
-          showMessage.showMessage(
-            `Please fill the wagon count for hook ${hook.hook_no} in ${plant.plant.name}`,
-            "error"
-          );
-          return;
-        }
-      }
-    }
+    // for (const plant of workingPlant) {
+    //   if( (plant.count -  plant.hooks.reduce((acc: any, hook: any) => acc + hook.no_of_wagons,0) || 0) < 0 ){
+    //     showMessage.showMessage(`wagons numbers exceed in ${plant.plant.name}`,'error');
+    //     return;
+    //   }
+    //   for (const hook of plant.hooks) {
+    //     if (hook.no_of_wagons === 0) {
+    //       showMessage.showMessage(
+    //         `Please fill the wagon count for hook ${hook.hook_no} in ${plant.plant.name}`,
+    //         "error"
+    //       );
+    //       return;
+    //     }
+    //   }
+    // }
     workingPlant.forEach((plant: any) => {
-      console.log(plant);
       plant.hooks.forEach((hook: any) => {
-        if (hook.no_of_wagons > 0) {
-          payload.hooks.push({
-            plant: plant.plant._id,
-            hook_no: hook.hook_no,
-            no_of_wagons: hook.no_of_wagons,
-          });
-        }
+        payload.hooks.push({
+          plant: plant.plant._id,
+          hook_no: hook.hook_no,
+        });
       });
     });
     if (rakeArrivalAtStationDate) {
@@ -272,16 +271,6 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
         event_datetime: placementTimeDate,
         FNR: shipment.fnr,
         id: placementTime?._id,
-      });
-    }
-    if (rakeArrivalAtPlantDate) {
-      payload.events.push({
-        shipment: shipment.id,
-        event_name: events_names.rakeArrivalAtPlant,
-        event_code: eventCodes.rakeArrivalAtPlant,
-        event_datetime: rakeArrivalAtPlantDate,
-        FNR: shipment.fnr,
-        id: rakeArrivalAtPlantObject?._id,
       });
     }
     if (bpReleaseDate) {
@@ -364,9 +353,9 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
         id: drawnOutObject?._id,
       });
     }
-    console.log("playload------->", payload);
     try {
-      const response = await httpsPost(`rake_event/add`, payload);
+      setLoading(true);
+      const response = await httpsPost(`rake_event/add`, payload, router);
       if (response.statusCode === 200) {
         showMessage.showMessage(
           "Rake Handling Sheet Added Successfully",
@@ -376,19 +365,26 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
         getWagonDetails();
       }
     } catch (error) {
+      setLoading(false);
       console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
 
   // api calling
   const getRakeHandlingSheetData = async () => {
     try {
+      setLoading(true);
       const response = await httpsGet(
-        `rake_event_by_shipment/get?id=${shipment.id}`
+        `rake_event_by_shipment/get?id=${shipment.id}`, 0, router
       );
       setRakeHandlingSheetData(response?.data);
     } catch (error) {
+      setLoading(false);
       console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
   // const plantDetails = async () => {
@@ -403,12 +399,16 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
   // };
   const plantDetails = async () => {
     try {
+      setLoading(true);
       const response = await httpsGet(
-        `get_assigned_loading_shops?shipment=${shipment.id}`
+        `get_assigned_loading_shops?shipment=${shipment.id}`, 0, router
       );
       setPlants(response.data);
     } catch (error) {
+      setLoading(false);
       console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
   const addFirstHookToMillDetails = async (event: any, index: any) => {
@@ -416,7 +416,6 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
       let newState = [...prev];
       newState[index].hooks.push({
         hook_no: 1,
-        no_of_wagons: 0,
       });
       return newState;
     });
@@ -438,19 +437,9 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
   useEffect(() => {
     setWorkingPlant((prev: any) => {
       let newState = plants;
-      // newState.map((plant: any) => {
-      //   if (plant.hooks.length === 0) {
-      //     plant.hooks.push({
-      //       hook_no: 1,
-      //       no_of_wagons: 0,
-      //     });
-      //   }
-      // });
       return newState;
     });
   }, [plants]);
-
-  console.log(workingPlant);
 
   useEffect(() => {
     setRakeArrivalAtStationDate(
@@ -491,20 +480,7 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
         return data.event_name === events_names.placementTime;
       })[0]
     );
-
-    setRakeArrivalAtPlantDate(
-      (
-        rakeHandlingSheetData.filter((data: any) => {
-          return data.event_name === events_names.rakeArrivalAtPlant;
-        })[0] as any
-      )?.event_timestamp
-    );
-    setRakeArrivalAtPlantObject(
-      rakeHandlingSheetData.filter((data: any) => {
-        return data.event_name === events_names.rakeArrivalAtPlant;
-      })[0]
-    );
-
+    
     setBpReleaseDate(
       (
         rakeHandlingSheetData.filter((data: any) => {
@@ -609,6 +585,22 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
       })[0]
     );
   }, [rakeHandlingSheetData]);
+
+  if (loading) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <ThreeCircles
+          visible={true}
+          height="100"
+          width="100"
+          color="#20114d"
+          ariaLabel="three-circles-loading"
+          wrapperStyle={{}}
+          wrapperClass=""
+        />
+      </div>
+    );
+  }
 
   return (
     <div
@@ -864,7 +856,7 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
               </div>
             </div>
             {/* --------------------------------- */}
-            <div>
+            {/* <div>
               <header className="headerForRakeSection">
                 {text("gate-in")}
               </header>
@@ -935,7 +927,7 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
                   />
                 </LocalizationProvider>
               </div>
-            </div>
+            </div> */}
             <div>
               <header className="headerForRakeSection">
                 {text("bpRelease")}
@@ -1169,15 +1161,15 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
               <div key={index}>
                 <div
                   style={{
-                    backgroundColor:
-                      item.count -
-                        (item.hooks.reduce(
-                          (acc: any, hook: any) => acc + hook.no_of_wagons,
-                          0
-                        ) || 0) >=
-                      0
-                        ? "white"
-                        : "#FCE3E3",
+                    // backgroundColor:
+                    //   item.count -
+                    //     (item.hooks.reduce(
+                    //       (acc: any, hook: any) => acc + hook.no_of_wagons,
+                    //       0
+                    //     ) || 0) >=
+                    //   0
+                    //     ? "white"
+                    //     : "#FCE3E3",
                     paddingBlock: "0.5px",
                     paddingInline: "16px",
                     borderRadius: "12px",
@@ -1208,7 +1200,7 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
                         {item.count}
                       </span>
                     </div>
-                    <div style={{ width: "200px" }}>
+                    {/* <div style={{ width: "200px" }}>
                       Available Wagons:{" "}
                       <span
                         style={{
@@ -1223,7 +1215,7 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
                             0
                           ) || 0)}
                       </span>
-                    </div>
+                    </div> */}
                   </div>
 
                   {item.hooks.length === 0 && (
@@ -1258,7 +1250,7 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
                         <div key={hookIndex}>
                           <div>
                             <div className="headerForMillDetails_hooks">
-                              <header>{hookIndex + 1} Hook</header>
+                              <header style={{fontWeight: 600}}>Hook {hookIndex + 1} </header>
                               <div style={{ display: "flex", gap: 8 }}>
                                 {
                                 // hookIndex !== 0 ? 
@@ -1286,12 +1278,7 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
                                 //   <div style={{ height: 20, width: 20 }}></div>
                                 // )
                                 }
-                                {item.hooks.length - 1 === hookIndex &&
-                                  (item.hooks.reduce(
-                                    (acc: any, hook: any) =>
-                                      acc + hook.no_of_wagons,
-                                    0
-                                  ) || 0) < item.count && (
+                                {item.hooks.length - 1 === hookIndex && (
                                     <div
                                       onClick={(e) => {
                                         addHookInMillDetails(e, index);
@@ -1306,7 +1293,7 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
                                   )}
                               </div>
                             </div>
-                            <input
+                            {/* <input
                               className="inputForRakeSection"
                               type="number"
                               value={
@@ -1332,7 +1319,7 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
                                 );
                               }}
                               min="0"
-                            />
+                            /> */}
                           </div>
                           <div className="loadingTimeContainer">
                             <div>{text("loadingstarttime")}</div>

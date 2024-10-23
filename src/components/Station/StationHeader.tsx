@@ -36,7 +36,7 @@ const columns: readonly Column[] = [
 ];
 
 function contructingData(stationList: any) {
-    return stationList.map((
+    return stationList && stationList.map((
         station: {
             _id: string,
             code: string,
@@ -118,7 +118,7 @@ export default function StationHeader({ countStation, allStations, setStationPay
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {resultStation.map((row: any, rowIndex: number) => {
+                            {resultStation && resultStation.map((row: any, rowIndex: number) => {
                                 return (
                                     <TableRow hover role="checkbox" tabIndex={-1} key={row.code}>
                                         {columns.map((column) => {

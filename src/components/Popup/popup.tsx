@@ -30,6 +30,7 @@ import { Box, Tab } from "@mui/material";
 import { httpsGet } from "@/utils/Communication";
 import { styled as muiStyled } from '@mui/material/styles';
 import service from "@/utils/timeService";
+import { useRouter } from "next/navigation";
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialogContent-root": {
@@ -82,7 +83,7 @@ interface PopupProps {
 
 export const Popup: React.FC<PopupProps> = ({ data }) => {
   const rowsPerPageOptions = [5, 10, 25, 50];
-
+  const router = useRouter();
   const [childOpen, setChildOpen] = useState(false);
   const [parentTableData, setParentTableData] = useState<any>([]);
   const [filteredData, setFilteredData] = useState<any>([]);
@@ -179,7 +180,7 @@ export const Popup: React.FC<PopupProps> = ({ data }) => {
   }
 
   const getWagonTypes = async () => {
-    const res = await httpsGet('wagon_type/get/all_wagon_type', 0);
+    const res = await httpsGet('wagon_type/get/all_wagon_type', 0, router);
     const wagonType = res && res.data && res.data.map((item: any) => item.name);
     setShowWagonTypes(wagonType);
   }
@@ -244,8 +245,7 @@ export const Popup: React.FC<PopupProps> = ({ data }) => {
       scheme_type: item.scheme_type,
       no_of_wagons: item.no_of_wagons
     };
-    console.log(newChildUpperData);
-    const res = await httpsGet(`get_all_wagon_details?rakeId=${newChildUpperData._id}`, 0);
+    const res = await httpsGet(`get_all_wagon_details?rakeId=${newChildUpperData._id}`, 0, router);
     const newChildLowerData = res && res.map((item: any) => {
       return {
         wagon_no: item.wg_no,

@@ -41,6 +41,7 @@ function SideDrawer() {
 
     useEffect(() => {
         const currentRoute = pathName.split('/')[1]
+        console.log(currentRoute)
         setActive(currentRoute)
     }, []);
 
@@ -119,16 +120,16 @@ function SideDrawer() {
                 style={{ 
                     width: open ? '190px' : '42px',
                     justifyContent: open ? 'start' : 'center',
-                    backgroundColor: handleAgent === true ? 'white' : '',
+                    backgroundColor: ((active === 'handlingAgent') || handleAgent) ? 'white' : '',
                     cursor: 'pointer'
                 }}
             >
                 <Image 
-                    src={ handleAgent?  handlingAgentActive : HandlingAgentInactive} alt='stationManagementIcon'  
-                    style={{ marginLeft: open ? '10px' : '2px', color: handleAgent === true ? 'black' : 'white'}}/>
+                    src={ (active === 'handlingAgent' || handleAgent) ?  handlingAgentActive : HandlingAgentInactive} alt='stationManagementIcon'  
+                    style={{ marginLeft: open ? '10px' : '2px', color: ((active == 'handlingAgent') || handleAgent) ? 'black' : 'white'}}/>
                 <div 
                     className={`${open ? 'fnr_text' : 'fnr_text_none'}`}
-                    style={{ color: handleAgent ? 'black' : 'white' }} >
+                    style={{ color: ((active === 'handlingAgent') || handleAgent) ? 'black' : 'white' }} >
                         Handling Agent
                 </div>
             </div>
@@ -141,14 +142,14 @@ function SideDrawer() {
                 style={{
                     width: open ? '190px' : '42px',
                     justifyContent: open ? 'start' : 'center',
-                    backgroundColor: etaReport === true ? 'white' : '',
+                    backgroundColor: ((active == 'etaReport') || etaReport) ? 'white' : '',
                     cursor: 'pointer'
                 }}
             >
-                <AssessmentIcon style={{ marginLeft: open ? '9px' : '', color: etaReport ? 'black' : 'white' }}/>
+                <AssessmentIcon style={{ marginLeft: open ? '9px' : '', color: ((active == 'etaReport') || etaReport) ? 'black' : 'white' }}/>
                 <div
                     className={`${open ? 'fnr_text' : 'fnr_text_none'}`}
-                    style={{ color: etaReport ? 'black' : 'white' }} 
+                    style={{ color: ((active == 'etaReport') || etaReport) ? 'black' : 'white' }} 
                 >Reports</div>
             </div>
             <div
@@ -159,14 +160,14 @@ function SideDrawer() {
                 style={{
                     width: open ? '190px' : '42px',
                     justifyContent: open ? 'start' : 'center',
-                    backgroundColor: setting === true ? 'white' : '',
+                    backgroundColor: ((active == 'tools') || setting) ? 'white' : '',
                     cursor: 'pointer'
                 }}
             >
-                <SettingsIcon style={{ marginLeft: open ? '9px' : '', color: setting ? 'black' : 'white' }}/>
+                <SettingsIcon style={{ marginLeft: open ? '9px' : '', color: ((active == 'tools') || setting) ? 'black' : 'white' }}/>
                 <div 
                     className={`${open ? 'fnr_text' : 'fnr_text_none'}`}
-                    style={{ color: setting ? 'black' : 'white' }} 
+                    style={{ color: ((active == 'tools') || setting) ? 'black' : 'white' }} 
                     >Settings</div>
             </div>
 
@@ -178,14 +179,14 @@ function SideDrawer() {
                 style={{
                     width: open ? '190px' : '42px',
                     justifyContent: open ? 'start' : 'center',
-                    backgroundColor: dashboard === true ? 'white' : '',
+                    backgroundColor: ((active == 'etaDashboard') || dashboard) ? 'white' : '',
                     cursor: 'pointer'
                 }}
             >
-                <AllInboxIcon style={{ marginLeft: open ? '9px' : '', color: dashboard ? 'black' : 'white' }}/>
+                <AllInboxIcon style={{ marginLeft: open ? '9px' : '', color: ((active == 'etaDashboard') || dashboard) ? 'black' : 'white' }}/>
                 <div
                     className={`${open ? 'fnr_text' : 'fnr_text_none'}`}
-                    style={{ color: dashboard ? 'black' : 'white' }} 
+                    style={{ color: ((active == 'etaDashboard') || dashboard) ? 'black' : 'white' }} 
                 >Dashboard</div>
             </div>
 
@@ -197,14 +198,14 @@ function SideDrawer() {
                  style={{
                      width: open ? '190px' : '42px',
                      justifyContent: open ? 'start' : 'center',
-                     backgroundColor: inPlantWagonDashboard === true ? 'white' : '',
+                     backgroundColor: ((active == 'inPlantDashboard') || inPlantWagonDashboard) ? 'white' : '',
                      cursor: 'pointer'
                  }}
             >
-                <WarehouseIcon style={{ marginLeft: open ? '9px' : '', color: inPlantWagonDashboard ? 'black' : 'white' }}/>
+                <WarehouseIcon style={{ marginLeft: open ? '9px' : '', color: ((active == 'inPlantDashboard') || inPlantWagonDashboard) ? 'black' : 'white' }}/>
                 <div
                     className={`${open ? 'fnr_text' : 'fnr_text_none'}`}
-                    style={{ color: inPlantWagonDashboard ? 'black' : 'white' }} 
+                    style={{ color: ((active == 'inPlantDashboard') || inPlantWagonDashboard) ? 'black' : 'white' }} 
                 >In-Plant Dashboard</div>
             </div>
             

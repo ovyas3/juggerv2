@@ -21,6 +21,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Header from "@/components/Header/header";
 import SideDrawer from "@/components/Drawer/Drawer";
 import { Suspense } from "react";
+import { ThreeCircles } from "react-loader-spinner";
 import Loader from "@/components/Loading/WithBackDrop";
 
 function WagonAssignSheet() {
@@ -65,25 +66,34 @@ function WagonAssignSheetContent() {
   const router = useRouter();
   const id = searchParams.get("shipmentId");
   const [shipmentData, setShipmentData] = useState<any>({});
+  const [loading, setLoading] = useState(false);
 
   const wagonDetails = async () => {
     try {
-      const response = await httpsGet(`get_wagon_details_by_shipment?id=${id}`);
+      setLoading(true);
+      const response = await httpsGet(`get_wagon_details_by_shipment?id=${id}`, 0, router);
       setOriginalWagonDetails(response?.wagonData);
       setShipmentData(response?.shipmentData);
     } catch (error) {
+      setLoading(false);
       console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
 
   const plantDetails = async () => {
     try {
-      const response = await httpsGet(`shipper_constants/get_mills`);
+      setLoading(true);
+      const response = await httpsGet(`shipper_constants/get_mills`, 0, router);
       if (response.statusCode === 200) {
         setPlants(response?.data);
       }
     } catch (error) {
+      setLoading(false);
       console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -152,15 +162,18 @@ function WagonAssignSheetContent() {
         order_no: index + 1,
       })),
     };
-    console.log(payload);
     try {
-      const response = await httpsPost("assign_wagon_to_plant", payload);
+      setLoading(true);
+      const response = await httpsPost("assign_wagon_to_plant", payload, router);
       if (response.statusCode === 200) {
         wagonDetails();
         showMessage.showMessage("Assigned successfully", "success");
       }
     } catch (error) {
+      setLoading(false);
       console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -181,14 +194,30 @@ function WagonAssignSheetContent() {
     setWagonsNewData(updatedItems);
   };
 
-  console.log(plants);
+  const millColors = ["#3351FF", "#0A2540", "#18BE8A", "#6600FF", "#F57600",  "#FFCB47"];
+
+  if (loading) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <ThreeCircles
+          visible={true}
+          height="100"
+          width="100"
+          color="#20114d"
+          ariaLabel="three-circles-loading"
+          wrapperStyle={{}}
+          wrapperClass=""
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="wagon-wrapper">
       <Header title={text("in-plant-Dashboard")} isMapHelper={false} />
 
-      <div id="inside-content-assign">
-        <div id="search-container-assign">
+      <div id="inside-content-assign-wagon">
+        <div id="search-container-assign-wagon">
           <div
             style={{ cursor: "pointer" }}
             onClick={() => {
@@ -197,17 +226,18 @@ function WagonAssignSheetContent() {
           >
             <ArrowBackIcon />
           </div>
-          <h3>{text("assignWagonSheet")}</h3>
+          <h3 className="search-container-assign-title">{text("assignWagonSheet")}</h3>
           <div></div>
         </div>
 
-        <div id="status-for-assign-sheet">
+        <div className="shipment-details-container">
+        <div id="status-for-assign-sheet-wagon">
           <div>
             <header style={{ fontSize: 12, color: "#42454E", marginBottom: 8 }}>
               {text("status")}
             </header>
             <text style={{ fontSize: 16, color: "#42454E", fontWeight: 600 }}>
-              {shipmentData?.status || "XXXXX"}
+              {shipmentData?.status || ""}
             </text>
           </div>
           <div>
@@ -215,7 +245,7 @@ function WagonAssignSheetContent() {
               {text("FNRno")}
             </header>
             <text style={{ fontSize: 16, color: "#42454E", fontWeight: 600 }}>
-              {shipmentData?.FNR || "XXXXX"}
+              {shipmentData?.FNR || ""}
             </text>
           </div>
           <div>
@@ -223,7 +253,7 @@ function WagonAssignSheetContent() {
               {text("edemandno")}
             </header>
             <text style={{ fontSize: 16, color: "#42454E", fontWeight: 600 }}>
-              {shipmentData?.edemand_no || "XXXXX"}
+              {shipmentData?.edemand_no || ""}
             </text>
           </div>
           <div>
@@ -231,60 +261,21 @@ function WagonAssignSheetContent() {
               {text("receivedWagons")}
             </header>
             <text style={{ fontSize: 16, color: "#42454E", fontWeight: 600 }}>
-              {shipmentData?.received_no_of_wagons || "XX"}
+              {shipmentData?.received_no_of_wagons || ""}
             </text>
           </div>
-          <div id="wagons-assign-notassigned">
-            <div>
-              {text("assignedWagons")}
-              <span style={{ color: "#3351FF", fontWeight: 600 }}>
-                {wagonsNewData?.filter((wagons: any) => wagons.plant_assigned)
-                  .length || 0}
-              </span>
-            </div>
-            <div>
-              {text("notAssignedWagons")}
-              <span style={{ color: "red", fontWeight: 600 }}>
-                {wagonsNewData.filter((wagons: any) => !wagons.plant_assigned)
-                  .length || 0}
-              </span>
-            </div>
-            <div>
-              {text("sickWagons")}
-              <span style={{ color: "red", fontWeight: 600 }}>
-                {wagonsNewData.filter((wagons: any) => wagons.is_sick).length ||
-                  0}
-              </span>
-            </div>
-          </div>
+        </div>
         </div>
 
-        <div style={{ marginTop: "20px" }}>
+        <div style={{ marginTop: "16px" }}>
           <DragDropContext onDragEnd={handleOnDragEnd}>
             <Droppable droppableId="items" direction="horizontal">
               {(provided) => (
                 <div
                   {...provided.droppableProps}
                   ref={provided.innerRef}
-                  style={{
-                    display: "flex",
-                    paddingBlock: "16px",
-                    backgroundColor: "transparent",
-                    overflowX: "auto",
-                    marginInline: "24px",
-                  }}
+                  className="train-shipment-container"
                 >
-                  <div id="wagon-locomotion-engine">
-                    <div>
-                      <Image
-                        src={locomotive.src}
-                        alt="locomotive"
-                        width={190}
-                        height={48}
-                        style={{ display: "block" }}
-                      />
-                    </div>
-                  </div>
                   {wagonsNewData.map((wagon: any, index: any) => (
                     <Draggable
                       key={wagon._id}
@@ -355,55 +346,64 @@ function WagonAssignSheetContent() {
                     </Draggable>
                   ))}
                   {provided.placeholder}
+                  <div id="wagon-locomotion-engine">
+                    <div>
+                      <Image
+                        src={locomotive.src}
+                        alt="locomotive"
+                        width={190}
+                        height={48}
+                        style={{ display: "block" }}
+                      />
+                    </div>
+                  </div>
                 </div>
               )}
             </Droppable>
           </DragDropContext>
         </div>
 
-        <div id="assign-wagon-container">
+        <div id="assign-wagon-container-wagon">
           <div>
-            <div style={{ marginTop: 8 }}>Select a mill</div>
-            <div id="plantSelectorContainer">
+            <div className="assign-wagon-container-title">Select a mill</div>
+            <div id="plantSelectorContainerWagon">
               {plants?.map((plant: any, index: any) => {
+                const isSelected = plant?._id === SelectedPlant?._id;
                 return (
                   <div
                     key={index}
-                    id="plantMillSelector"
+                    id="plantMillSelectorWagon"
                     onClick={(e) => {
                       e.stopPropagation();
                       setSelectedPlant(plants[index]);
                     }}
                     style={{
-                      backgroundColor:
-                        plant?._id === SelectedPlant?._id ? "#3351FF" : "",
-                      color: plant?._id === SelectedPlant?._id ? "white" : "",
-                      border:
-                        plant?._id === SelectedPlant?._id
-                          ? "1px solid #3351FF"
-                          : "",
+                      backgroundColor: millColors[index % millColors.length],
+                      color: "white",
+                      border: `1px solid ${millColors[index % millColors.length]}`,
+                      opacity: isSelected ? 1 : 0.5,
                     }}
                   >
                     <div
-                      id="plantRadioButton"
+                      id="plantRadioButtonWagon"
                       style={{
-                        border:
-                          plant?._id === SelectedPlant?._id
-                            ? "1px solid white"
-                            : "",
+                        border: `1px solid ${isSelected ? "white" : ""}`
                       }}
                     >
-                      <div id="plantRadioButtonInside"></div>
+                      <div id="plantRadioButtonInsideWagon"
+                        style={{
+                          backgroundColor: isSelected ? "white" : "",
+                          border: isSelected ? "1px solid white" : "none",
+                        }}
+                      >
+                      </div>
                     </div>
                     <div>
-                      {plant?.name || "XXXX"}{" "}
+                      {plant?.name || ""}{" "}
                       <span
                         style={{
                           fontSize: 13,
-                          color:
-                            plant?._id === SelectedPlant?._id
-                              ? "white"
-                              : "#3351FF",
+                          color: "white"
                         }}
                       >
                         (
@@ -419,24 +419,29 @@ function WagonAssignSheetContent() {
             </div>
           </div>
 
-          <div id="assign-wagon-container-box-selection-container">
+          <div id="assign-wagon-container-box-selection-container-wagon">
             {wagonsNewData.map((wagons: any, index: number) => {
+              const isAssignedToSelectedPlant = wagons?.plant_assigned?._id === SelectedPlant?._id;
+              const isAssignedToOtherPlant = wagons?.plant_assigned && !isAssignedToSelectedPlant;
+              const millIndex = plants.findIndex(
+                (plant: any) => plant?._id === wagons?.plant_assigned?._id
+              );
               return (
                 <div
                   key={index}
-                  className="wagonAssignToMillConatiner"
+                  className="wagonAssignToMillContainerWagon"
                   style={{
                     opacity: wagons.is_sick ? 0.4 : 1,
-                    cursor: wagons.is_sick ? "not-allowed" : "pointer",
+                    cursor: "pointer",
                   }}
                 >
                   <div
-                    className="wagonsAssignToMillImageSelectorConatainer"
+                    className="wagonsAssignToMillImageSelectorContainerWagon"
                     onClick={(e) => {
                       e.stopPropagation();
-                      if (!wagons.is_sick) {
-                        assignWagonsToSelectedPlant(e, wagons, index);
-                      }
+                      assignWagonsToSelectedPlant(e, wagons, index);
+                      // if (!wagons.is_sick) {
+                      // }
                     }}
                     style={{
                       cursor: wagons.is_sick ? "not-allowed" : "pointer",
@@ -444,17 +449,14 @@ function WagonAssignSheetContent() {
                   >
                     {wagons?.plant_assigned && (
                       <div
-                        className="wagonsAssigntoMillCheckedIcon"
+                        className="wagonsAssigntoMillCheckedIconWagon"
                         style={{
-                          backgroundColor:
-                            wagons?.plant_assigned?._id === SelectedPlant?._id
-                              ? "black"
-                              : "#D2D2D2",
-                          cursor:
-                            wagons?.plant_assigned?._id !==
-                              SelectedPlant?._id || wagons.is_sick
-                              ? "not-allowed"
-                              : "pointer",
+                          // backgroundColor: isAssignedToSelectedPlant
+                          //   ? millColors[millIndex % millColors.length]
+                          //   : "#D2D2D2",
+                            backgroundColor: millColors[millIndex % millColors.length],
+                            cursor: isAssignedToOtherPlant || wagons.is_sick ? "not-allowed" : "pointer",
+                            opacity: isAssignedToOtherPlant ? 0.3 : 1,
                         }}
                       >
                         <CheckRoundedIcon
@@ -469,7 +471,7 @@ function WagonAssignSheetContent() {
                         />
                       </div>
                     )}
-                    <div className="wagonsAssignToMillImageSelector">
+                    <div className="wagonsAssignToMillImageSelectorWagon">
                       <div style={{ width: 40, height: 17 }}>
                         <Image
                           src={wagonImage(wagons?.wagon_type?.name).image.src}
@@ -481,45 +483,71 @@ function WagonAssignSheetContent() {
                       </div>
                     </div>
                   </div>
-                  <div id="wagonsAssignToMillTextArea">
-                    <header id="wagonsAssignToMillAssignedPlantName">
+                  <div id="wagonsAssignToMillTextAreaWagon">
+                    <header id="wagonsAssignToMillAssignedPlantNameWagon">
                       {wagons?.plant_assigned?.name || ""}
                     </header>
-                    <header id="wagonsAssignToMillNumber">
-                      {wagons?.w_no || "XXXXXXX"}
+                    <header id="wagonsAssignToMillNumberWagon">
+                      {wagons?.w_no || ""}
                     </header>
-                    <header id="wagonsAssignToMilltype">
-                      {wagons?.wagon_type?.name || "XXXXXXX"}
+                    <header id="wagonsAssignToMilltypeWagon">
+                      {wagons?.wagon_type?.name || ""}
                     </header>
                   </div>
                 </div>
               );
             })}
           </div>
+        </div>
 
-          <div
-            id="buttonContaioner"
-            style={{ textAlign: "right", marginTop: 8 }}
-          >
-            <Button
-              className="buttonMarkPlacement"
-              onClick={(e: any) => {
-                e.stopPropagation();
-                submitAssignToMill();
-              }}
-              style={{
-                color: "white",
-                backgroundColor: "#2862FF",
-                width: 110,
-                border: "1px solid #2862FF",
-                cursor: "pointer",
-                fontWeight: "bold",
-                transition: "all 0.5s ease-in-out",
-              }}
-            >
-              Assign
-            </Button>
+        <div id="buttonContainerWagon">
+          <div id="wagons-assign-notassigned-wagon">
+            <div className="wagons-assign-not-assigned-content">
+              <p className="wagons-assign-not-assigned-content-header">
+                {text("assignedWagons")}
+              </p>
+              <p className="wagons-assign-not-assigned-content-value">
+                {wagonsNewData?.filter((wagons: any) => wagons.plant_assigned)
+                  .length || 0}
+              </p>
+            </div>
+            <div className="wagons-assign-not-assigned-content">
+              <p className="wagons-assign-not-assigned-content-header">
+                {text("notAssignedWagons")}
+              </p>
+              <p className="wagons-assign-not-assigned-content-value">
+                {wagonsNewData.filter((wagons: any) => !wagons.plant_assigned)
+                  .length || 0}
+              </p>
+            </div>
+            <div className="wagons-assign-not-assigned-content">
+              <p className="wagons-assign-not-assigned-content-header">
+                {text("sickWagons")}
+              </p>
+              <p className="wagons-assign-not-assigned-value">
+                {wagonsNewData.filter((wagons: any) => wagons.is_sick).length ||
+                  0}
+              </p>
+            </div>
           </div>
+          <Button
+            className="buttonMarkPlacement"
+            onClick={(e: any) => {
+              e.stopPropagation();
+              submitAssignToMill();
+            }}
+            style={{
+              color: "white",
+              backgroundColor: "#2862FF",
+              width: 110,
+              border: "1px solid #2862FF",
+              cursor: "pointer",
+              fontWeight: "bold",
+              transition: "all 0.5s ease-in-out",
+            }}
+          >
+            Assign
+          </Button>
         </div>
       </div>
 

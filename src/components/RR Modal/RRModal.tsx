@@ -15,6 +15,7 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import { Box } from "@mui/material";
 import { httpsGet } from "@/utils/Communication";
+import { useRouter } from "next/navigation";
 import service from "@/utils/timeService";
 import { stat } from "fs";
 
@@ -37,6 +38,7 @@ interface PopupProps {
 }
 
 const RRModal: React.FC<PopupProps> = ({ isOpen, isClose, rrNumbers, isRRDoc }) => {
+  const router = useRouter();
   const [activeRR, setActiveRR] = useState<string | null>(null);
   const [rrDetails, setRRDetails] = useState<any>({});
   const [rrTableData, setRRTableData] = useState<any>([]);
@@ -44,7 +46,7 @@ const RRModal: React.FC<PopupProps> = ({ isOpen, isClose, rrNumbers, isRRDoc }) 
   const handleRRDetails = async (rrNumber: string, index: number) => {
     setActiveRR(index.toString());
     try{
-      const response = await httpsGet(`get/rr_document?fnr=${rrNumber}`);
+      const response = await httpsGet(`get/rr_document?fnr=${rrNumber}`, 0, router);
       const data = response.data;
       const rrDetail = {
         rrNo: data && data.rr_no

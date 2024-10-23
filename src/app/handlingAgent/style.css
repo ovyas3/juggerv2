@@ -309,7 +309,7 @@
     padding-block: 10px;
     padding-inline: 10px;
     font-size: 12px;
-    align-content: end;
+    align-content: flex-end;
     cursor: pointer;
 }
 .handlingAgent_title{

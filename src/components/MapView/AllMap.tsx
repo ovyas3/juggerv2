@@ -103,7 +103,7 @@ const MapLayers = () => {
     const [showAllRakes, setShowAllRakes] = useState(false);
     const [allRakesPositions, setAllRakesPositions] = useState<any>([]);
     const [list, setList] = useState<any>([]);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [selectedRake, setSelectedRake] = useState<any>(null);
     const selectedMarkerRef = useRef<L.Marker | null>(null);
     const [selectedType,setSelectedType] = useState('total')
@@ -218,7 +218,7 @@ const MapLayers = () => {
     const getRakeShipmentDatas = async () => {
       try {
         // setLoading(true);
-        const res = await httpsGet('get/maps/captive_rakes', 0);
+        const res = await httpsGet('get/maps/captive_rakes', 0, router);
         const data = res.data;
         setSearchRakeName('')
         setSearchFnrNumber('')

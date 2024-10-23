@@ -390,7 +390,7 @@ const MapLayers = () => {
 
   useEffect(() => {
     const fetchNames = async () => {
-      const names = await httpsGet('get/captive_rakes_names');
+      const names = await httpsGet('get/captive_rakes_names', 0, router);
       if(names.data && names.data.length > 0) {
         setCrNames(names.data);
         setFilteredCrOptions(names.data);
@@ -707,7 +707,7 @@ const MapLayers = () => {
     }
 
     setIsTracking(0)
-    const shipments = await httpsPost('/shipment_map_view', payload);
+    const shipments = await httpsPost('/shipment_map_view', payload, router);
     const inTransit = shipments.filter((shipment: any) => (shipment.status === 'ITNS' ));
     const idle = shipments.filter((shipment: any) => (shipment.status === 'INPL'));
     const delivered = shipments.filter((shipment: any) => (shipment.status === 'Delivered'));

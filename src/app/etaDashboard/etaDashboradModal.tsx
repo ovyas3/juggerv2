@@ -13,6 +13,7 @@ import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
 import service from "@/utils/timeService";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 interface Column {
   id: string;
@@ -147,20 +148,25 @@ function EtaDashboardModal({
   headingForModel,
 }: any) {
   const [allShipments, setAllShipments] = useState([]);
+  const router = useRouter();
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
   async function getDelayShipments() {
     const payload = { ids: providedShipments };
-    const response = await httpsPost(
-      "eta_dashboard/details",
-      payload,
-      0,
-      false
-    );
-    if (response.statusCode === 200)
+    try{
+      const response = await httpsPost(
+        "eta_dashboard/details",
+        payload,
+        router,
+        0,
+        false
+      );
       setAllShipments(contructingData(response.data));
+    } catch (error) {
+      console.log(error);
+    }
   }
   useEffect(() => {
     getDelayShipments();

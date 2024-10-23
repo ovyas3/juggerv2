@@ -26,7 +26,7 @@ import Select from "@mui/material/Select";
 import { Box } from "@mui/material";
 import { httpsGet } from "@/utils/Communication";
 import { styled as muiStyled } from '@mui/material/styles';
-import { title } from "process";
+import { useRouter } from "next/navigation";
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialogContent-root": {
@@ -162,6 +162,7 @@ interface PopupProps {
 }
 
 export const Popup: React.FC<PopupProps> = ({ data }) => {
+  const router = useRouter();
   const [childOpen, setChildOpen] = useState(false);
   const [parentTableData, setParentTableData] = useState<any>([]);
   const [filteredData, setFilteredData] = useState<any>([]);
@@ -174,8 +175,6 @@ export const Popup: React.FC<PopupProps> = ({ data }) => {
   const [childTableData, setChildTableData] = useState<any>([]);
   const [childFilteredData, setChildFilteredData] = useState<any>([]);
   // const [dialogDatas, setDialogDatas] = useState<any>([]);
-
-  console.log('data @ popup', data);
 
   const CustomTextField = muiStyled(TextField)(({ theme }) => ({
     '& .MuiInputLabel-root': {
@@ -232,7 +231,6 @@ export const Popup: React.FC<PopupProps> = ({ data }) => {
     const filteredNewData = newData.filter((item: any, index: number, array: any[]) => {
       return array.findIndex((el) => el.rake_id === item.rake_id) === index && item.rake_id !== undefined;
     });
-    console.log('filteredNewData', filteredNewData);
     setParentTableData(filteredNewData);
     setFilteredData(filteredNewData);
 
@@ -242,7 +240,7 @@ export const Popup: React.FC<PopupProps> = ({ data }) => {
   }
 
   const getWagonTypes = async () => {
-    const res = await httpsGet('wagon_type/get/all_wagon_type', 0);
+    const res = await httpsGet('wagon_type/get/all_wagon_type', 0, router);
     const wagonType = res && res.data && res.data.map((item: any) => item.name);
     setShowWagonTypes(wagonType);
   }

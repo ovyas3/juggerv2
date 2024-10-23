@@ -18,7 +18,7 @@ import './agentTable.css'
 import Popover from '@mui/material/Popover';
 import { httpsGet, httpsPost } from '@/utils/Communication';
 import { useSnackbar } from '@/hooks/snackBar';
-
+import { useRouter } from 'next/navigation';
 interface Column {
     id: string,
     label: string;
@@ -36,7 +36,7 @@ const columns: readonly Column[] = [
 ];
 
 function contructingData(agentList: any) {
-    return agentList.map((
+    return agentList && agentList.map((
         agent: {
             _id: string,
             handling_agent: { parent_name: string },
@@ -60,7 +60,7 @@ function contructingData(agentList: any) {
 }
 
 function AgentTable({ agentList, count, setSkipAndLimit,getHandlingAgents }: any) {
-
+    const router = useRouter();
     const [page, setPage] = React.useState(0);
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
     const [result, setResult] = React.useState([]);
@@ -84,7 +84,7 @@ function AgentTable({ agentList, count, setSkipAndLimit,getHandlingAgents }: any
     const sendingReinvite = async (item:any)=>{
         const payload = {invite_id : item._id}
         try {
-            await httpsPost('re_invite/HA', payload).then((res) => {
+            await httpsPost('re_invite/HA', payload, router).then((res) => {
                 if (res && res.statusCode == 200) {
                     showMessage('Invited Successfully.', 'success');
                     setAnchorEl(null);
@@ -95,8 +95,8 @@ function AgentTable({ agentList, count, setSkipAndLimit,getHandlingAgents }: any
                 console.log(err)
             })
         } catch (error) {
-            console.log(error)
-        }
+            console.log(error);
+          }
     }
     const sendingVerification = async (item:any)=>{
         if(item?.verified === 'expired'){
@@ -106,7 +106,7 @@ function AgentTable({ agentList, count, setSkipAndLimit,getHandlingAgents }: any
 
         const payload = {invite_id : item._id}
         try {
-            await httpsPost('verify/HA', payload).then((res) => {
+            await httpsPost('verify/HA', payload, router).then((res) => {
                 if (res && res.statusCode == 200) {
                     showMessage('verified Successfully.', 'success');
                     setAnchorEl(null);
@@ -117,14 +117,14 @@ function AgentTable({ agentList, count, setSkipAndLimit,getHandlingAgents }: any
                 console.log(err)
             })
         } catch (error) {
-            console.log(error)
-        }
+            console.log(error);
+          } 
     }
 
     const deleteInviteHandlingAgent = async (item:any)=>{
        const invite_id = item._id;
        try {
-        const response = await httpsGet(`delete/invited_HA?invite_id=${invite_id}`);
+        const response = await httpsGet(`delete/invited_HA?invite_id=${invite_id}`, 0, router);
         if (response && response.statusCode == 200) {
             showMessage('deleted Successfully.', 'success');
             getHandlingAgents({skipAndLimit: {skip: 0, limit:10 }});
@@ -135,9 +135,9 @@ function AgentTable({ agentList, count, setSkipAndLimit,getHandlingAgents }: any
             showMessage('Something went wrong while deleting.', 'error');
         }
        } catch (error) {
-        showMessage('Something went wrong while deleting.', 'error');
-        console.log(error)
-       }
+          showMessage('Something went wrong while deleting.', 'error');
+          console.log(error);
+        }
     }
 
     useEffect(() => {
@@ -174,7 +174,7 @@ function AgentTable({ agentList, count, setSkipAndLimit,getHandlingAgents }: any
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {result.map((row: any, rowIndex) => {
+                            {result && result.map((row: any, rowIndex) => {
                                 return (
                                     <TableRow hover role="checkbox" tabIndex={-1} key={rowIndex}>
                                         {columns.map((column) => {

@@ -14,8 +14,10 @@ import FormControl from "@mui/material/FormControl";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import { httpsGet, httpsPost } from "@/utils/Communication";
 import "./style.css";
+import { useRouter } from "next/navigation";
 
 function Report() {
+  const router = useRouter();
   const { showMessage } = useSnackbar();
   const mobile = useWindowSize(500);
   const [reportType, setReportType] = React.useState("");
@@ -44,13 +46,14 @@ function Report() {
       } else if (reportType === "MIS") {
         url = `reports/mis?from=${fromDate}&to=${toDate}`;
       }
-      const response = await httpsGet(url);
+      const response = await httpsGet(url, 0, router);
       if (response.statusCode === 200) {
-        console.log("response", response.data.link);
         window.open(response.data.link, "_blank");
         showMessage("Report generated successfully", "success");
       }
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+    } 
   };
 
   return (
