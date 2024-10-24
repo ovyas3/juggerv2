@@ -217,13 +217,13 @@
   }
   .map-view-btn-orders {
     height: 35px;
-    width: 91px;
+    width: 90px;
     font-size: 12px;
     border-radius: 4px;
     display: flex;
     align-items: center;
     padding: 0px 8px 0px 7px;
-    justify-content: space-between;
+    justify-content: center;
     cursor: pointer;
     background: white;
     border: 1px solid rgba(128, 128, 128, 0.3);
