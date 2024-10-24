@@ -18,19 +18,26 @@ function Settings() {
     const router = useRouter();
     const { showMessage } = useSnackbar();
     const mobile = useWindowSize(500);
+    const [loading, setLoading] = useState(false);
     const [time, setTime] = useState("");
     useEffect(() => {
         const fetchPreviousTime = async () => {
             try {
+                setLoading(true);
                 const response = await httpsGet('get/preferred/difference', 0, router);
                 if (response?.statusCode === 200 && response?.data?.preferred_difference_eta) {
                     setTime(response.data.preferred_difference_eta);
+                    setLoading(false);
                 } else {
+                    setLoading(false);
                     showMessage('Unable to fetch preferred ETA', 'error');
                 }
             } catch (error) {
+                setLoading(false);
                 console.log('Error fetching preferred ETA:', error);
                 showMessage('An error occurred while fetching ETA', 'error');
+            } finally {
+                setLoading(false);
             }
         };
 
@@ -46,15 +53,37 @@ function Settings() {
         };
         
         try {
+            setLoading(true);
             const response = await httpsPost(`rake_shipment/preferred_eta`, payload, router);
             if (response?.statusCode === 200) {
+                setLoading(false);
                 showMessage(' Updated Successfully',"success");
             }
         } catch (error) {
+            setLoading(false);
             console.log('Error:', error);
             showMessage('An error occurred, please try again', 'error');
+          } finally {
+            setLoading(false);
           }
     };
+
+    if (loading) {
+        return (
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+            <ThreeCircles
+              visible={true}
+              height="100"
+              width="100"
+              color="#20114d"
+              ariaLabel="three-circles-loading"
+              wrapperStyle={{}}
+              wrapperClass=""
+            />
+          </div>
+        );
+      }
+
     return (
         <div>
             <div style={{ display: 'flex', flexDirection: 'column', margin: '90px' }}>

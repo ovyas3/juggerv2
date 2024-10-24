@@ -14,6 +14,7 @@ import CountUp from 'react-countup';
 import { delay } from "framer-motion";
 import EtaDashboardModal from "./etaDashboradModal";
 import { useRouter } from "next/navigation";
+import { ThreeCircles } from "react-loader-spinner";
 
 
 function EtaDashboard() {
@@ -24,6 +25,7 @@ function EtaDashboard() {
   const [openModalDelay, setOpenModalDelay] = useState(false);
   const [providedShipments, setProvidedShipments] = useState([]);
   const [headingForModel, setHeadingForModel] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const [early, setEarly] = useState({
     count: 0,
@@ -57,19 +59,26 @@ function EtaDashboard() {
  
   async function getStableShipments(){
     try{
+      setLoading(true);
       const response = await httpsGet('get/stable_shipments', 0, router);
       if(response.statusCode === 200) {
+        setLoading(false);
         setStabled_shipments(response?.data?.stabled_shipments);
       }
     } catch (error) {
+      setLoading(false);
       console.log(error);
-    } 
+    } finally {
+      setLoading(false);
+    }
   }
 
   async function getDelayShipments(){
     try{
+      setLoading(true);
       const response = await httpsGet('rake_shipment/en_route_eta_dashboard', 0, router);
       if(response.statusCode === 200) {
+        setLoading(false);
         setEarly(response.data.early);
         setLate(response.data.late);
         setOntime(response.data.on_time);
@@ -79,13 +88,32 @@ function EtaDashboard() {
         setTwentyfourTofourtyeight(response.data['24_48']);
       }
     } catch (error) {
+      setLoading(false);
       console.log(error);
-    } 
+    } finally {
+      setLoading(false);
+    }
   }
   useEffect(()=>{
     getDelayShipments();
     getStableShipments();
   },[])
+
+  if (loading) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <ThreeCircles
+          visible={true}
+          height="100"
+          width="100"
+          color="#20114d"
+          ariaLabel="three-circles-loading"
+          wrapperStyle={{}}
+          wrapperClass=""
+        />
+      </div>
+    );
+  }
 
   return (
     <div>

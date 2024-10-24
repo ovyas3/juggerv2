@@ -14,6 +14,7 @@ import TableRow from "@mui/material/TableRow";
 import service from "@/utils/timeService";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { ThreeCircles } from "react-loader-spinner";
 
 interface Column {
   id: string;
@@ -147,6 +148,7 @@ function EtaDashboardModal({
   setOpenModalDelay,
   headingForModel,
 }: any) {
+  const [loading, setLoading] = useState(false);
   const [allShipments, setAllShipments] = useState([]);
   const router = useRouter();
 
@@ -156,6 +158,7 @@ function EtaDashboardModal({
   async function getDelayShipments() {
     const payload = { ids: providedShipments };
     try{
+      setLoading(true);
       const response = await httpsPost(
         "eta_dashboard/details",
         payload,
@@ -165,12 +168,31 @@ function EtaDashboardModal({
       );
       setAllShipments(contructingData(response.data));
     } catch (error) {
+      setLoading(false);
       console.log(error);
+    } finally {
+      setLoading(false);
     }
   }
   useEffect(() => {
     getDelayShipments();
   }, []);
+
+  if (loading) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <ThreeCircles
+          visible={true}
+          height="100"
+          width="100"
+          color="#20114d"
+          ariaLabel="three-circles-loading"
+          wrapperStyle={{}}
+          wrapperClass=""
+        />
+      </div>
+    );
+  }
 
   return (
     <div

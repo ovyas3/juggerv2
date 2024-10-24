@@ -15,9 +15,11 @@ import Select, { SelectChangeEvent } from "@mui/material/Select";
 import { httpsGet, httpsPost } from "@/utils/Communication";
 import "./style.css";
 import { useRouter } from "next/navigation";
+import { ThreeCircles } from "react-loader-spinner";
 
 function Report() {
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
   const { showMessage } = useSnackbar();
   const mobile = useWindowSize(500);
   const [reportType, setReportType] = React.useState("");
@@ -46,15 +48,36 @@ function Report() {
       } else if (reportType === "MIS") {
         url = `reports/mis?from=${fromDate}&to=${toDate}`;
       }
+      setLoading(true);
       const response = await httpsGet(url, 0, router);
       if (response.statusCode === 200) {
+        setLoading(false);
         window.open(response.data.link, "_blank");
         showMessage("Report generated successfully", "success");
       }
     } catch (error) {
+      setLoading(false);
       console.log(error);
-    } 
+    } finally {
+      setLoading(false);
+    }
   };
+
+  if (loading) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <ThreeCircles
+          visible={true}
+          height="100"
+          width="100"
+          color="#20114d"
+          ariaLabel="three-circles-loading"
+          wrapperStyle={{}}
+          wrapperClass=""
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="handlingAgent_Container">

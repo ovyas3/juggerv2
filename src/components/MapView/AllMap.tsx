@@ -219,31 +219,31 @@ const MapLayers = () => {
       try {
         // setLoading(true);
         const res = await httpsGet('get/maps/captive_rakes', 0, router);
-        const data = res.data;
+        const datas = res.data;
         setSearchRakeName('')
         setSearchFnrNumber('')
-        data.map((data: any) => {
-          if (data && data.rake_updates && data.rake_id) {
-            const isDuplicate = Object.values(coords).flat().some((item: any) => item.rake_id === data.rake_id);
-
-            if (!isDuplicate) {
-              if (!coords[data.name]) {
-                coords[data.name] = [];
-              }
-
-              coords[data.name].push(
-                {
-                  "rake_id": data.rake_id,
-                  "geo_point": data.rake_updates.geo_point,
-                  "time_stamp": {
-                    "$date": data.rake_updates.gps_updated_at
-                  }
+        const missingItems: any = [];
+        try {
+          datas.map((data: any, index: number) => {
+            if (data && data?.rake_updates && data?.rake_id) {
+              const isDuplicate = Object.values(coords).flat().some((item: any) => item?.rake_id === data?.rake_id);
+            
+              if (!isDuplicate) {
+                if (!coords[data.name]) {
+                  coords[data.name] = [];
                 }
-              );
+              
+                coords[data.name].push({
+                  "rake_id": data?.rake_id || '',
+                  "geo_point": data?.rake_updates?.geo_point || '',
+                  "time_stamp": {
+                    "$date": data?.rake_updates?.gps_updated_at || ''
+                  }
+                });
+              }
             }
-          }
-          if (!allRakes.some((item: any) => item.rake_id === data.rake_id)) {
-            const gpsUpdateTime = DateTime.fromJSDate(new Date(data.rake_updates.gps_updated_at));
+
+            const gpsUpdateTime = data?.rake_updates && data?.rake_updates?.gps_updated_at ? DateTime.fromJSDate(new Date(data?.rake_updates?.gps_updated_at)) : DateTime.local();
             const currentTime = DateTime.local();
             const diff = currentTime.diff(gpsUpdateTime, ['hours', 'minutes']);
             const diffInHours = Math.floor(diff.hours);
@@ -251,7 +251,7 @@ const MapLayers = () => {
             const hours = isNaN(diffInHours) ? 'N/A' : `${diffInHours} hr`;
             const minutes = isNaN(diffInMinutes) ? '' : `${diffInMinutes} min`;
             const timeSinceUpdate = `${hours} ${minutes}`;
-
+          
             allRakes.push({
               "rake_id": data.rake_id,
               "name": data.name,
@@ -259,13 +259,13 @@ const MapLayers = () => {
               "fnr_no": data.shipment ? data.shipment.FNR : 'N/A',
               "unique_code": data.shipment ? data.shipment.unique_code : ''
             });
-          }
-
-        });
+          });
+        } catch (error) {
+          console.error("An error occurred during data processing:", error);
+        }
         const allRakesFiltered = allRakes.filter((rake: any) => rake.rake_id !== undefined);
         setAllRakes(allRakesFiltered);
-        setAllRakesBackUp(allRakesFiltered)
-        setCoords(coords);
+        setAllRakesBackUp(allRakesFiltered);
       } catch (error) {
         setLoading(false);
       } finally {
