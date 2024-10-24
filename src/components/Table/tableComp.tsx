@@ -1274,7 +1274,7 @@ export const UploadWagonSheet = ({getWagonDetails,isClose, shipment, setOpenUplo
 
     return (
     <div style={{width:'100vw', height:'100vh', position:'fixed', top:0, left:0 ,zIndex:300, backgroundColor:'rgba(0, 0, 0, 0.5)'}} onClick={(e)=>{e.stopPropagation(); ordersUpload === 'wagonSheet' ? isClose(false) : setOpenUploadFile(false);}}>
-        <div style={{width:800, height:500, backgroundColor:'white', position:'relative', top:'50%', left:'50%', transform:'translate(-50%,-50%)', borderRadius:20, padding:25}} onClick={(e)=>{e.stopPropagation()}}>
+        <div className="upload-wagon-sheet-modal-main" onClick={(e)=>{e.stopPropagation()}}>
 
             <div style={{display:'flex', justifyContent:'space-between',}}>
                 <header style={{fontSize:20, color:'#131722', fontWeight:600}}>{ ordersUpload === 'wagonSheet' ? t('uploadWagonSheet') : t('bulkUoploadShipmnent')  }</header>

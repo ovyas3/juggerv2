@@ -713,3 +713,31 @@
     opacity: 1;
     visibility: visible;
 }
+
+/* Upload Wagon Sheet Styles */
+.upload-wagon-sheet-modal-main{
+    width: 50vw;
+    height: 62vh;
+    background-color: #fff;
+    position: relative;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 16px;
+    padding: 24px;
+
+    @media screen and (max-width: 1024px){
+        width: 82vw;
+        height: 36vh;
+    }
+
+    @media screen and (max-width: 882px){
+        width: 84vw;
+        height: 42vh;
+    }
+
+    @media screen and (max-width: 768px){
+        width: 84vw;
+        height: 48vh;
+    }
+}

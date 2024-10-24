@@ -789,17 +789,7 @@ export const AddIndentNumber = ({
       }}
     >
       <div
-        style={{
-          width: 800,
-          height: 500,
-          backgroundColor: "white",
-          position: "relative",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%,-50%)",
-          borderRadius: 20,
-          padding: 25,
-        }}
+        className="add-indent-number-modal-main"
         onClick={(e) => {
           e.stopPropagation();
         }}

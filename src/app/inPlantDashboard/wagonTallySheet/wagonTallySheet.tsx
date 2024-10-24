@@ -708,7 +708,10 @@ const WagonTallySheet: React.FC = () => {
       selectedPlant, 
       selectedHook,
       wagonCapturedImages,
-
+      dates,
+      formValues,
+      isSick,
+      loading
     ]);
 
   // Function to handle click outside dropdown
