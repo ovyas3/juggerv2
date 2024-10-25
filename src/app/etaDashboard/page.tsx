@@ -15,6 +15,7 @@ import { delay } from "framer-motion";
 import EtaDashboardModal from "./etaDashboradModal";
 import { useRouter } from "next/navigation";
 import { ThreeCircles } from "react-loader-spinner";
+import WagonsDashboard from "./wagonsDashboard/wagonsDashboard";
 
 
 function EtaDashboard() {
@@ -128,6 +129,7 @@ function EtaDashboard() {
           mobile ? "adjustMargin" : "adjustMarginMobile"
         }`}
       >
+        <WagonsDashboard />
         <div id="enRoutesEtaDelay">
           <section id="heading_reload">
             <div id="heading">
@@ -221,7 +223,6 @@ function EtaDashboard() {
            
           </section>
         </div>
-        
       </div>
 
       {openModalDelay && (<EtaDashboardModal providedShipments={providedShipments} setOpenModalDelay={setOpenModalDelay} headingForModel={headingForModel}/>)}

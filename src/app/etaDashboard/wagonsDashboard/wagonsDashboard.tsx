@@ -441,10 +441,12 @@ export default function WagonsDashboard() {
   }
 
   return (
-    <div className='wagon-dashboard-container'>
-      <Header title='Wagons Dashboard' isMapHelper={false} />
-      <div className='wagon-dashboard-container-main'>
-      <StyledBox ref={componentRef}>
+    <StyledBox 
+    ref={componentRef}
+    sx={{
+      marginBottom: '20px',
+    }}
+    >
         <Typography 
           variant="h4" 
           gutterBottom
@@ -695,8 +697,12 @@ export default function WagonsDashboard() {
           </Box>
         </Box>
       </StyledBox>
-      </div>
-      <SideDrawer />
-    </div>
+    // <div className='wagon-dashboard-container'>
+    //   <Header title='Wagons Dashboard' isMapHelper={false} />
+    //   <div className='wagon-dashboard-container-main'>
+      
+    //   </div>
+    //   <SideDrawer />
+    // </div>
   );
 }

@@ -346,25 +346,41 @@ const WagonTallySheet: React.FC = () => {
   };
 
   // Function to handle data with batch id
-  const handleDataWithBatchId = (index: number) => {
-    setFormValues(prev => {
-      const newFormValues = [...prev];
-      newFormValues[index] = {
-        batch_id_heat_no: 'F4373007B0',
-        material: 'Plate',
-        code: 'PA_JAMA45TM01',
-        grade: 'AIS2062 E450BR',
-        width: 16,
-        thick: 2370,
-        length: 12,
-        pieces: 1,
-        line_item: '100',
-        pgi_tw_wrt: 3.57,
-        actual_weight: 4,
-        material_images: [],
-      };
-      return newFormValues;
-    });
+  const handleDataWithBatchId = async (index: number) => {
+    const batchId = formValues[index].batch_id_heat_no;
+    if(batchId && batchId.length === 10) {
+      try{
+        setLoading(true);
+        const response = await httpsGet(`get_material_details?batch_id=${batchId}`, 0, router);
+        let data = response?.data;
+        if (data) {
+          setFormValues(prev => {
+            const newFormValues = [...prev];
+            newFormValues[index] = {
+              ...newFormValues[index],
+              material: data.material,
+              code: data.material_code,
+              grade: data.grade,
+              width: data.width,
+              thick: data.thickness,
+              length: data.length,
+              pieces: data.pieces !== undefined ? data.pieces : newFormValues[index].pieces,
+              line_item: data.line_item !== undefined ? data.line_item : newFormValues[index].line_item,
+              pgi_tw_wrt: data.pgi_tw_wrt !== undefined ? data.pgi_tw_wrt : newFormValues[index].pgi_tw_wrt,
+              actual_weight: data.actual_weight !== undefined ? data.actual_weight : newFormValues[index].actual_weight,
+            };
+            return newFormValues;
+          });
+        }
+      } catch (error) {
+        setLoading(false);
+        console.log(error);
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      showMessage("Please enter valid Batch ID/Heat No", "error");
+    }
   }
 
   // Function to handle add and remove material details
@@ -392,7 +408,27 @@ const WagonTallySheet: React.FC = () => {
   };
 
   // Function to handle confirm of wagon and material photos
-  const handleWagonConfirm = (images: (string | null)[]) => {
+  const handleWagonConfirm = async (images: (string | null)[]) => {
+    console.log(images);
+    let image = images[0];
+
+    if (image && !image.startsWith('data:image/jpeg;base64,')) {
+      image = `data:image/jpeg;base64,${image}`;
+    }
+
+    try{
+      setLoading(true);
+      const response = await httpsPost(`upload_wagon_tally_image?fnr_no=24092908743`, image, router, 0, true);
+      let data = response?.data;
+      console.log(data);
+      showMessage("Image Uploaded Successfully", "success");
+    } catch (error) {
+      setLoading(false);
+      showMessage("Failed to upload image", "error");
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
     setWagonCapturedImages((prevImages) => [...prevImages, ...images]);
   };
 
@@ -732,6 +768,20 @@ const WagonTallySheet: React.FC = () => {
       document.removeEventListener('click', handleClickOutside);
     };
   }, []);
+
+  const handleWagonImages = async () => {
+    try{
+      setLoading(true);
+      await httpsPost(`upload_wagon_tally_image?fnr_no="24092908743"`, { images: wagonCapturedImages }, router);
+    
+    } catch (error) {
+      setLoading(false);
+      console.log(error);
+    } finally {
+      setLoading(false);
+      console.log("Images Uploaded Successfully");
+    }
+  }
 
   if (loading) {
     return (
