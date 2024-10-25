@@ -188,7 +188,7 @@ const CustomTooltip = ({ active, payload, label, isPercentage, isRupees, isTonna
 export default function WagonsDashboard() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
-  const [opportunityLossType, setOpportunityLossType] = useState('');
+  const [opportunityLossType, setOpportunityLossType] = useState('Wagon');
   const [data, setData] = useState([]);
   const [avgWagonsCapacityUtilization, setAvgWagonsCapacityUtilization] = useState('0.00');
   const [formattedOpportunityLossRupees, setFormattedOpportunityLossRupees] = useState('0.00 Cr');
@@ -199,7 +199,7 @@ export default function WagonsDashboard() {
   const [isPercentage, setIsPercentage] = useState(false);
   const [isRupees, setIsRupees] = useState(false);
   const [isTonnage, setIsTonnage] = useState(false);
-  const [yAxisLabel, setYAxisLabel] = useState('Total Tonnage');
+  const [yAxisLabel, setYAxisLabel] = useState('No. of Wagons Ordered');
   const [barDataKeys, setBarDataKeys] = useState<any>({});
 
   const theme = useTheme();
@@ -239,7 +239,7 @@ export default function WagonsDashboard() {
       setIsPercentage(false);
       setIsRupees(false);
       setIsTonnage(false);
-      setYAxisLabel('Total Tonnage');
+      setYAxisLabel('No. of Wagons Ordered');
       setBarDataKeys({
         totalOrdered: 'totalOrdered',
         fullyUtilized: 'fullyUtilized',
@@ -479,6 +479,12 @@ export default function WagonsDashboard() {
             sx={{
               fontFamily: '"Inter", sans-serif',
             }}>
+              <FormControlLabel value="Wagon" control={<Radio />} label="Wagon" sx={{
+                fontSize: '13px',
+                color: '#71747A',
+                fontWeight: 'normal',
+                fontFamily: '"Inter", sans-serif',
+              }} />
               <FormControlLabel value="Percentage" control={<Radio />} label="Percentage" sx={{
                 fontSize: '13px',
                 color: '#71747A',
@@ -498,7 +504,7 @@ export default function WagonsDashboard() {
                 fontFamily: '"Inter", sans-serif',
               }} />
             </RadioGroup>
-            {
+            {/* {
               isPercentage || isRupees || isTonnage ? (
                 <Typography variant="body1" gutterBottom
                   sx={{
@@ -518,7 +524,7 @@ export default function WagonsDashboard() {
                     setIsPercentage(false);
                     setIsRupees(false);
                     setIsTonnage(false);
-                    setYAxisLabel('Total Tonnage');
+                    setYAxisLabel('No. of Wagons Ordered');
                     setBarDataKeys({
                       totalOrdered: 'totalOrdered',
                       fullyUtilized: 'fullyUtilized',
@@ -531,7 +537,7 @@ export default function WagonsDashboard() {
               ) : (
                 null
               )
-            }
+            } */}
             </div>
           </FormControl>
           <Box display="flex" alignItems="center">
