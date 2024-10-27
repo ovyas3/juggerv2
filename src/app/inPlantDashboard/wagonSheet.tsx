@@ -31,6 +31,7 @@ import {
 import captiveRakeIndicator from "@/assets/captive_rakes.svg";
 import SourceOutlinedIcon from "@mui/icons-material/SourceOutlined";
 import { redirect, useRouter, useParams } from "next/navigation";
+import { ThreeCircles } from "react-loader-spinner";
 
 interface Column {
   id: string;
@@ -50,7 +51,7 @@ const columns: readonly Column[] = [
     label: "Placement Time",
     style: "header_placement_time",
   },
-  { id: "drawn_in", label: "Drawn In", style: "header_drawnin" },
+  // { id: "drawn_in", label: "Drawn In", style: "header_drawnin" },
   { id: "action", label: "Action", style: "header_action" },
 ];
 
@@ -63,7 +64,7 @@ function contructingData(shipment: any) {
       status: string;
       edemand_no: string;
       placement_time: any;
-      drawnin_time: any;
+      // drawnin_time: any;
       FNR: string;
       received_no_of_wagons: any;
       indent_no: string;
@@ -116,14 +117,14 @@ function contructingData(shipment: any) {
             ? service.utcToistTime(shipment?.placement_time)
             : "--",
         },
-        drawn_in: {
-          date: shipment?.drawnin_time
-            ? service.utcToist(shipment?.drawnin_time)
-            : "--",
-          time: shipment?.drawnin_time
-            ? service.utcToistTime(shipment?.drawnin_time)
-            : "--",
-        },
+        // drawn_in: {
+        //   date: shipment?.drawnin_time
+        //     ? service.utcToist(shipment?.drawnin_time)
+        //     : "--",
+        //   time: shipment?.drawnin_time
+        //     ? service.utcToistTime(shipment?.drawnin_time)
+        //     : "--",
+        // },
         plant_codes: {
           plant_codes: shipment?.plant_codes
             ? shipment?.plant_codes.filter((item: any) => item !== "NA")
@@ -154,6 +155,7 @@ function WagonTallySheet({}: any) {
     null
   );
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
 
   const openAction = Boolean(anchorEl);
   const [showActionBox, setShowActionBox] = React.useState(-1);
@@ -167,8 +169,8 @@ function WagonTallySheet({}: any) {
     useState(false);
   const [shipmentforPlacementTime, setShipmentforPlacementTime] = useState({});
 
-  const [openDrawnInTimeModal, setOpenDrawnInTimeModal] = useState(false);
-  const [shipmentforDrawnInTime, setShipmentforDrawnInTime] = useState({});
+  // const [openDrawnInTimeModal, setOpenDrawnInTimeModal] = useState(false);
+  // const [shipmentforDrawnInTime, setShipmentforDrawnInTime] = useState({});
 
   const [openAddIndentModal, setOpenAddIndentModal] = useState(false);
   const [shipmentforAddIndent, setShipmentforAddIndent] = useState({});
@@ -186,9 +188,11 @@ function WagonTallySheet({}: any) {
   // api calling
   async function getWagonDetails() {
     try {
+      setLoading(true);
       const response = await httpsPost(
         "rake_shipment/wagon_tally_details",
-        payloadForWagons
+        payloadForWagons,
+        router
       );
       setAllWagonsList(response.data.data);
       setTotalCount(response.data.count.totalCount);
@@ -196,7 +200,10 @@ function WagonTallySheet({}: any) {
       setIndentTotal(response.data.count.totalAVE);
       setActiveCount(response.data?.count?.count);
     } catch (error) {
+      setLoading(false);
       console.log(error);
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -220,12 +227,12 @@ function WagonTallySheet({}: any) {
     setAnchorEl(null);
     // setShowWagonSheet(false);
   };
-  const drawnInTime = (event: any, row: any) => {
-    setOpenDrawnInTimeModal(true);
-    setShipmentforDrawnInTime(row);
-    setShowActionBox(-1);
-    setAnchorEl(null);
-  };
+  // const drawnInTime = (event: any, row: any) => {
+  //   setOpenDrawnInTimeModal(true);
+  //   setShipmentforDrawnInTime(row);
+  //   setShowActionBox(-1);
+  //   setAnchorEl(null);
+  // };
   const uploadWagonSheet = (event: any, row: any) => {
     setOpenUploadWagonSheetModal(true);
     setuploadShipmentwagon(row);
@@ -253,6 +260,13 @@ function WagonTallySheet({}: any) {
   const assignHooksToLoadingShop = (event: any, row: any) => {
     router.push(
       `/inPlantDashboard/assignHooksToLoadingShop?shipmentId=${row?.id}`
+    );
+    setShowActionBox(-1);
+    setAnchorEl(null);
+  };
+  const wagonTallySheet = (event: any, row: any) => {
+    router.push(
+      `/inPlantDashboard/wagonTallySheet?shipmentId=${row?.id}`
     );
     setShowActionBox(-1);
     setAnchorEl(null);
@@ -373,12 +387,34 @@ function WagonTallySheet({}: any) {
     }
   }, [indentNo]);
 
+  if (loading) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <ThreeCircles
+          visible={true}
+          height="100"
+          width="100"
+          color="#20114d"
+          ariaLabel="three-circles-loading"
+          wrapperStyle={{}}
+          wrapperClass=""
+        />
+      </div>
+    );
+  }
+
   return (
     <div>
       <div className="wagon-wrapper">
         <div id="search-container">
-          <div></div>
+          <div id="space-giver"
+          ></div>
           <div className="input-wrapper">
+            <input
+              className="input"
+              placeholder="Search by Indent no."
+              onChange={(e) => setIndentNo(e.target.value)}
+            />
             <Image
               src={searchIcon}
               alt=""
@@ -390,11 +426,6 @@ function WagonTallySheet({}: any) {
                 });
               }}
               style={{ cursor: "pointer" }}
-            ></Image>
-            <input
-              className="input"
-              placeholder="Search by Indent no."
-              onChange={(e) => setIndentNo(e.target.value)}
             />
           </div>
           <div id="status-display">
@@ -443,7 +474,7 @@ function WagonTallySheet({}: any) {
         <div
           style={{
             width: "100%",
-            height: "calc(100vh - 160px)",
+            height: "calc(100vh - 176px)",
             display: "flex",
             flexDirection: "column",
             paddingTop: 10,
@@ -468,6 +499,7 @@ function WagonTallySheet({}: any) {
               page={page}
               onPageChange={handleChangePage}
               onRowsPerPageChange={handleChangeRowsPerPage}
+              labelRowsPerPage="Shipments per page"
               sx={{ position: "absolute", top: -40, zIndex: 100, right: -10 }}
             />
             <TableContainer
@@ -511,7 +543,6 @@ function WagonTallySheet({}: any) {
                         >
                           {columns.map((column) => {
                             const value = row[column.id];
-                            console.log(row.plants_assigned)
                             return (
                               <TableCell
                                 key={column.id}
@@ -700,7 +731,7 @@ function WagonTallySheet({}: any) {
                                   ) : (
                                     "--"
                                   ))}
-                                {column.id === "drawn_in" &&
+                                {/* {column.id === "drawn_in" &&
                                   (row.drawn_in.date !== "--" &&
                                   row.drawn_in.time !== "--" ? (
                                     <>
@@ -713,7 +744,7 @@ function WagonTallySheet({}: any) {
                                     </>
                                   ) : (
                                     "--"
-                                  ))}
+                                  ))} */}
                                 {column.id === "action" && (
                                   <div id="actionIconContaioner">
                                     <div
@@ -776,7 +807,7 @@ function WagonTallySheet({}: any) {
                                           {text("assignWagonToPlant")}
                                         </div>
                                       )}
-                                      {/* {row.plant_codes.plant_codes.length >
+                                      {row.plant_codes.plant_codes.length >
                                         0 && (
                                         <div
                                           className="action-popover-wagon"
@@ -786,7 +817,18 @@ function WagonTallySheet({}: any) {
                                         >
                                           {text("assignsHooksToLoadingShop")}
                                         </div>
-                                      )} */}
+                                      )}
+                                      {row.plant_codes.plant_codes.length >
+                                        0 && (
+                                        <div
+                                          className="action-popover-wagon"
+                                          onClick={(e) => {
+                                            wagonTallySheet(e, row)
+                                          }}
+                                        >
+                                          {text("wagonTallySheet")}
+                                        </div>
+                                      )}
                                       {/* <div
                                         className="action-popover-wagon"
                                         onClick={(e) => {
@@ -893,14 +935,14 @@ function WagonTallySheet({}: any) {
           getWagonDetails={getWagonDetails}
         />
       )}
-      {openDrawnInTimeModal && (
+      {/* {openDrawnInTimeModal && (
         <MarkPlacement
           isClose={setOpenDrawnInTimeModal}
           shipment={shipmentforDrawnInTime}
           different="drawnInTimeFromInplantDashboard"
           getWagonDetails={getWagonDetails}
         />
-      )}
+      )} */}
       {openAddIndentModal && (
         <AddIndentNumber
           isClose={setOpenAddIndentModal}

@@ -11,23 +11,33 @@ import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import { httpsGet, httpsPost } from "@/utils/Communication";
+import { useRouter } from "next/navigation";
+import { ThreeCircles } from "react-loader-spinner";
 
 function Settings() {
+    const router = useRouter();
     const { showMessage } = useSnackbar();
     const mobile = useWindowSize(500);
+    const [loading, setLoading] = useState(false);
     const [time, setTime] = useState("");
     useEffect(() => {
         const fetchPreviousTime = async () => {
             try {
-                const response = await httpsGet('get/preferred/difference');
+                setLoading(true);
+                const response = await httpsGet('get/preferred/difference', 0, router);
                 if (response?.statusCode === 200 && response?.data?.preferred_difference_eta) {
                     setTime(response.data.preferred_difference_eta);
+                    setLoading(false);
                 } else {
+                    setLoading(false);
                     showMessage('Unable to fetch preferred ETA', 'error');
                 }
             } catch (error) {
+                setLoading(false);
                 console.log('Error fetching preferred ETA:', error);
                 showMessage('An error occurred while fetching ETA', 'error');
+            } finally {
+                setLoading(false);
             }
         };
 
@@ -41,18 +51,38 @@ function Settings() {
         const payload = {
             preferred_eta: time,
         };
-        console.log(time);
         
         try {
-            const response = await httpsPost(`rake_shipment/preferred_eta`, payload);
+            setLoading(true);
+            const response = await httpsPost(`rake_shipment/preferred_eta`, payload, router);
             if (response?.statusCode === 200) {
+                setLoading(false);
                 showMessage(' Updated Successfully',"success");
             }
         } catch (error) {
+            setLoading(false);
             console.log('Error:', error);
             showMessage('An error occurred, please try again', 'error');
-        }
+          } finally {
+            setLoading(false);
+          }
     };
+
+    if (loading) {
+        return (
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+            <ThreeCircles
+              visible={true}
+              height="100"
+              width="100"
+              color="#20114d"
+              ariaLabel="three-circles-loading"
+              wrapperStyle={{}}
+              wrapperClass=""
+            />
+          </div>
+        );
+      }
 
     return (
         <div>

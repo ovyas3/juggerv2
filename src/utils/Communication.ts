@@ -3,7 +3,6 @@ import axios from "axios";
 import { environment } from "@/environments/env.api";
 import { getAuth } from "@/services/Authenticator/Auth";
 import { deleteAllCache } from '@/utils/storageService';
-import { redirect, useRouter } from "next/navigation";
 
 const prefix = [
   environment.DEV_API_URL,
@@ -29,9 +28,7 @@ const httpsGet = async (path: string, type: number = 0, router: any = null) => {
     .then((res) => res)
     .catch((err) => {
       if (axios.isAxiosError(err) && err.response?.status === 401) {
-        const router = useRouter()
         const fromRms = Boolean(localStorage.getItem('isRmsLogin'))
-        deleteAllCache();
         if(fromRms) {
           router.push('/signin')
         } else {
@@ -41,12 +38,13 @@ const httpsGet = async (path: string, type: number = 0, router: any = null) => {
             router.push(`${parent[1]}/login`);
           }
         }
+        deleteAllCache();
       }
     });
     return response?.data;
 };
 
-const httpsPost = async (path: string, data: any, type = 0, isFile = false, router: any = null) => {
+const httpsPost = async (path: string, data: any, router: any = null, type = 0, isFile = false) => {
   const auth = getAuth();
   const authorization = {
     Authorization: auth,
@@ -80,9 +78,7 @@ const httpsPost = async (path: string, data: any, type = 0, isFile = false, rout
           if(url.includes('shipper_user/signin')) {
             return err.response.data 
           }
-          const router = useRouter()
           const fromRms = Boolean(localStorage.getItem('isRmsLogin'))
-          deleteAllCache();
           if(fromRms) {
             router.push('/signin')
           } else {
@@ -92,17 +88,11 @@ const httpsPost = async (path: string, data: any, type = 0, isFile = false, rout
               router.push(`${parent[1]}/login`);
             }
           }
+          deleteAllCache();
         }
         return err.response.data 
       });
     return response?.data || response;
-  // } catch(err) {
-  //   console.log(err, err.message, err.response);
-  //   // if (axios.isAxiosError(err) && err.response?.status === 401) {
-  //   //   deleteAllCache();
-  //   //   router.push('/');
-  //   // }
-  // }
 };
 
 const apiCall = async (config: any) => {

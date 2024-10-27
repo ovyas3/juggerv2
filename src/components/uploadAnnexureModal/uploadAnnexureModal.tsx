@@ -23,6 +23,7 @@ import { httpsGet, httpsPost } from "@/utils/Communication";
 import "./uploadAnnexureModal.css";
 import { useSnackbar } from "@/hooks/snackBar";
 import { useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialogContent-root": {
@@ -46,6 +47,7 @@ const UploadAnnexure: React.FC<PopupProps> = ({
   shipmentID,
   FNR_No,
 }) => {
+  const router = useRouter();
   const { showMessage } = useSnackbar();
   const [actionsDrop, setActionsDrop] = useState(-1);
   const [uploadFile, setUploadFile] = useState([]);
@@ -77,7 +79,7 @@ const UploadAnnexure: React.FC<PopupProps> = ({
         rakeShipmentId: shipmentID,
         file: uploadFile,
       };
-      httpsPost("rake_shipment/upload_rake_annexure", payload, 0, true)
+      httpsPost("rake_shipment/upload_rake_annexure", payload, router, 0, true)
         .then((response) => {
           clearInput();
           showMessage("File Uploaded Succcessfully", "success");
@@ -93,7 +95,7 @@ const UploadAnnexure: React.FC<PopupProps> = ({
     const payload = {
       raId: element._id,
     };
-    httpsPost("rake_shipment/delete_ra_document", payload)
+    httpsPost("rake_shipment/delete_ra_document", payload, router)
       .then((response) => {
         if (response.statusCode == 200) {
           showMessage(
@@ -109,7 +111,7 @@ const UploadAnnexure: React.FC<PopupProps> = ({
   };
 
   function getDocData() {
-    httpsGet(`get/rake_shipment/get_ra_documents?rakeShipmentId=${shipmentID}`)
+    httpsGet(`get/rake_shipment/get_ra_documents?rakeShipmentId=${shipmentID}`, 0, router)
       .then((response) => {
         const data = response.data;
         if (data) {

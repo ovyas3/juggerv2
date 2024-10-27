@@ -12,6 +12,7 @@ import Lightning from '@/assets/lightning.svg';
 import LightningSlash from '@/assets/lightning-slash.svg';
 import Tooltip from "@mui/material/Tooltip";
 import { TooltipProps } from "@mui/material/Tooltip";
+import { useTranslations } from "next-intl";
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialogContent-root": {
@@ -65,6 +66,7 @@ interface PhotoCaptureComponentProps {
 }
 
 const PhotoCaptureComponent: React.FC<PhotoCaptureComponentProps> = ({ label, onConfirm }) => {
+  const text = useTranslations("WAGONTALLYSHEET");
   const [open, setOpen] = useState(false);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [facingMode, setFacingMode] = useState('user');
@@ -184,18 +186,18 @@ const PhotoCaptureComponent: React.FC<PhotoCaptureComponentProps> = ({ label, on
                   alt="Captured"
                   className="captured-image"
                   width={560}
-                  height={340}
+                  height={320}
                 />
                 <div className='camera-buttons-container'>
                   <div 
                     onClick={confirmPhoto}
                     className='confirm-image-button'>
-                    Confirm ✔
+                    {text('confirm')} ✔
                   </div>
                   <div 
                     onClick={retakePhoto}
                     className='retake-image-button'>
-                    Retake ❌
+                    {text('reTake')} ❌
                   </div>
                 </div>
               </>
@@ -224,7 +226,7 @@ const PhotoCaptureComponent: React.FC<PhotoCaptureComponentProps> = ({ label, on
                         paddingTop: '2px',
                         gap: '2px'
                     }}>
-                      Switch Camera
+                      {text('switchCamera')} 
                     </div>}>
                     <div onClick={switchCamera} className='switch-button' title="Switch Camera">
                       <Image src={CameraRotate} alt="Switch Camera" />
@@ -246,7 +248,7 @@ const PhotoCaptureComponent: React.FC<PhotoCaptureComponentProps> = ({ label, on
                         paddingTop: '2px',
                         gap: '2px'
                     }}>
-                      Capture Image
+                       {text('captureImage')} 
                     </div>}>
                     <div onClick={capturePhoto} className="capturing-button">
                       <div className="outer-circle">
@@ -272,7 +274,7 @@ const PhotoCaptureComponent: React.FC<PhotoCaptureComponentProps> = ({ label, on
                         paddingTop: '2px',
                         gap: '2px'
                     }}>
-                      {isFlashOn ? "Turn Flash Off" : "Turn Flash On"}
+                      {isFlashOn ?  text('turnFlashOff') :  text('turnFlashOn') }
                     </div>}>
                     <div onClick={toggleFlash} className='switch-button' title={isFlashOn ? "Turn Flash Off" : "Turn Flash On"}>
                       <Image src={isFlashOn ? LightningSlash : Lightning} alt={isFlashOn ? "Turn Flash Off" : "Turn Flash On"} />

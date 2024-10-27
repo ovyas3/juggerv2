@@ -6,6 +6,8 @@ import CloseIcon from '@mui/icons-material/Close';
 import { HANDLING_AGENT_INVITE, EXISTING_AGENT_INVITE } from "@/utils/helper";
 import { httpsGet, httpsPost } from "@/utils/Communication";
 import { useSnackbar } from '@/hooks/snackBar';
+import { useRouter } from 'next/navigation';
+import { ThreeCircles } from "react-loader-spinner";
 
 interface InviteForm {
     email_id: string;
@@ -14,6 +16,7 @@ interface InviteForm {
 }
 
 function InviteBox({ setOpenModalInvite ,getHandlingAgents}: any) {
+    const router = useRouter(); 
     const { showMessage } = useSnackbar();
     const [toggleCloseButton, setToggleCloseButton] = useState(false)
     const [alreadyRegistered, setAlreadyRegistered] = useState(false)
@@ -22,6 +25,7 @@ function InviteBox({ setOpenModalInvite ,getHandlingAgents}: any) {
         pan: '',
         mobile: '',
     })
+    const [loading, setLoading] = useState(false);
 
     const validation = (inviteForm: InviteForm): Boolean => {
         const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
@@ -50,7 +54,8 @@ function InviteBox({ setOpenModalInvite ,getHandlingAgents}: any) {
         else if (!inviteForm.mobile) showMessage('Please Enter Mobile Number', 'error');
         const valid = validation(inviteForm);
         if(valid){
-            await httpsPost(HANDLING_AGENT_INVITE, inviteForm)
+            setLoading(true);
+            await httpsPost(HANDLING_AGENT_INVITE, inviteForm, router)
             .then((res) => {
                     if (res && res.statusCode === 200) {
                         setInviteForm({
@@ -64,7 +69,10 @@ function InviteBox({ setOpenModalInvite ,getHandlingAgents}: any) {
                     }
                 })
                 .catch((error) => {
+                    setLoading(false);
                     console.error(error);
+                }).finally(() => {
+                    setLoading(false);
                 });
         }
     }
@@ -82,16 +90,36 @@ function InviteBox({ setOpenModalInvite ,getHandlingAgents}: any) {
             validForPan = true;
             if(e.target.value.length === 10 && validForPan){
                 try {
-                    await httpsGet(`get/pan?pan=${e.target.value}`).then((res) => {
+                    setLoading(true);
+                    await httpsGet(`get/pan?pan=${e.target.value}`, 0, router).then((res) => {
                         setAlreadyRegistered(true);
                         if(res?.data) setInviteForm(prevState => ({ ...prevState, email_id: res?.data?.email_id, mobile: res?.data?.mobile }));
                     }).catch((err) => {console.log(err)})
                 } catch (error) {
-                    console.log(error)
-                }
+                    setLoading(false);
+                    console.log(error);
+                  } finally {
+                    setLoading(false);
+                  }
             }
         }
     }
+
+    if (loading) {
+        return (
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+            <ThreeCircles
+              visible={true}
+              height="100"
+              width="100"
+              color="#20114d"
+              ariaLabel="three-circles-loading"
+              wrapperStyle={{}}
+              wrapperClass=""
+            />
+          </div>
+        );
+      }
 
     return (
         <div className='invite_container'

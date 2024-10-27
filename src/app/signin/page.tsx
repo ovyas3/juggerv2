@@ -21,7 +21,6 @@ const Signin = () => {
 
   const handleLogin = () => {
     const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    console.log(emailPattern.test(email));
     if (!email.length || !password.length) {
       showMessage("Please fill all the fields.", "error");
       return;
@@ -29,7 +28,7 @@ const Signin = () => {
       showMessage("Please enter a valid Email.", "error");
       return;
     }
-    httpsPost("shipper_user/signin", { email_id: email, password, from: "web" })
+    httpsPost("shipper_user/signin", { email_id: email, password, from: "web" }, router)
       .then(async (response: any) => {
         if (response.statusCode === 200) {
           const signedIn = await handleAuthentication(
@@ -44,7 +43,9 @@ const Signin = () => {
           showMessage(response.message, "error");
         }
       })
-      .catch((err) => {});
+      .catch((err) => {
+        console.log(err);
+      })
   };
 
   return (

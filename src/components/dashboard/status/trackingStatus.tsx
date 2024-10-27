@@ -12,7 +12,6 @@ import forwardArrow from "../../../assets/forward_arrow_icon.svg";
 import { httpsGet } from "@/utils/Communication";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { get } from "http";
 
 interface TrackingStatusProps {
   handleAllRakesAndTable: (props: any) => void;
@@ -83,7 +82,7 @@ const TrackingStatus: React.FC<TrackingStatusProps> = ({ handleAllRakesAndTable,
   }
 
   useEffect(() => {
-    httpsGet("all_tracking_rakes").then((response: any) => {
+    httpsGet("all_tracking_rakes", 0, router).then((response: any) => {
       if (response) {
         if (response.totalRakeCount) setTotalRakes(response.totalRakeCount);
         if (response.scheme) {

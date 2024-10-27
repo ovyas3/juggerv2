@@ -78,7 +78,6 @@ export const handleAuthentication = async (
 };
 
 const checkAuth = async (from: string, rms_auth: string) => {
-  console.log("in auth", { rms_auth });
   if (!(rms_auth && rms_auth.length) && hasCookie("access_token")) {
     return true;
   }

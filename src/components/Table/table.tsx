@@ -56,6 +56,7 @@ import DriveFolderUploadIcon from '@mui/icons-material/DriveFolderUpload';
 import { ActionItem, EditELD, HandlingAgentSelection, PastEta, RemarkComponent, Remarks, Tags,MarkPlacement,HandlingEdemand, UploadWagonSheet, HandlingETA} from './tableComp'
 import SettingsIcon from '@mui/icons-material/Settings';
 import { environment } from '@/environments/env.api';
+import { useRouter } from 'next/navigation';
 
 const status_class_map: { [key: string]: string } = {
     'OB': 'status_title_In_Plant',
@@ -201,6 +202,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
 
     //language controller
     const t = useTranslations("ORDERS")
+    const router = useRouter();
 
     //pagination
     const [page, setPage] = React.useState(0);
@@ -332,7 +334,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
         const payload = {
             rakeId: rake_id
         }
-        httpsPost(FETCH_TRACK_DETAILS, payload).then((res) => {
+        httpsPost(FETCH_TRACK_DETAILS, payload, router).then((res) => {
             if (res && res.statusCode == 200) {
                 showMessage('Track Details Fetched Successfully.', 'success')
                 setTriggerShipments(!triggerShipments)

@@ -21,6 +21,7 @@
   padding-inline: 24px;
   align-items: center;
   flex-direction: row;
+  margin-bottom: 16px;
 }
 
 #status-display{
@@ -44,17 +45,24 @@
 }
 
 #search-container-assign {
-  /* padding-top: 20px; */
-  /* padding-bottom: 20px; */
   display: flex;
   justify-content: space-between;
-  /* height: 82px; */
   padding-inline: 24px;
-  /* align-items: center; */
   flex-direction: row;
-  /* background-color: thistle; */
   padding-block: 10px;
   align-items: start;
+}
+
+#space-giver{
+  width: 212px;
+
+  @media screen and (max-width: 882px) {
+    display: none;
+  }
+
+  @media screen and (max-width: 768px) {
+    display: none;
+  }
 }
 
 .input-wrapper {
@@ -67,6 +75,11 @@
   align-items: center;
   gap: 16px;
   padding-left: 16px;
+  /* margin-left: 14%; */
+
+  @media (max-width: 768px) {
+    margin-left: 0;
+  }
 }
 .icon {
   height: 24px;
@@ -161,10 +174,11 @@
   scroll-behavior: smooth;
   margin-top: 24px;
 }
-#firstSectionofRakeSheet {
+#firstSectionofRakeSheetHandling {
   display: flex;
-  column-gap: 50px;
-  row-gap: 20px;
+  gap: 24px;
+  justify-content: flex-start;
+  align-items: center;
   margin-bottom: 24px;
   flex-wrap: wrap;
 }
@@ -174,9 +188,9 @@
   color: #3c4852;
   margin-bottom: 8px;
 }
-.inputForRakeSection {
+.inputForRakeSectionHandling {
   border: 1px solid #dfe3eb;
-  width: 156px;
+  width: 176px;
   height: 36px;
   border-radius: 4px;
   outline: none;
@@ -413,7 +427,7 @@
   display: flex;
   position: relative;
   border-bottom: 1px solid #dfe3eb;
-  align-items: end;
+  align-items: flex-end;
   background-color: #3351ff;
 }
 #wagon-number-rail{
@@ -525,13 +539,13 @@
   /* background-color: white; */
   height: 85px;
   width: 190px !important;
-  align-content: end;
+  align-content: flex-end;
 }
 #connecting-chain{
   width: 8px;
   /* background-color: wheat; */
   display: flex;
-  align-items: end;
+  align-items: flex-end;
   padding-bottom: 5px;
 }
 #wagon-no-assign-container{
@@ -562,4 +576,31 @@
   padding-block: 4px;
   border-radius: 6px;
   cursor: pointer;
+}
+
+.rake-handling-sheet-modal-main{
+  width: 86vw;
+  height: 84vh;
+  background-color: #fff;
+  border-radius: 16px;
+  position: relative;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 24px;
+
+  @media screen and (max-width: 1024px){
+      width: 90vw;
+      height: 50vh;
+  }
+
+  @media screen and (max-width: 882px){
+      width: 90vw;
+      height: 56vh;
+  }
+
+  @media screen and (max-width: 768px){
+      width: 90vw;
+      height: 66vh;
+  }
 }

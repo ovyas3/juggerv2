@@ -13,7 +13,7 @@
     width: calc(100vw - 70px);
     height: calc(100vh - 56px);
     padding: 8px 24px 24px 24px ;
-    
+    background-color: #fff;
 }
 
 .adjustMargin{
@@ -263,6 +263,7 @@
     border: 1px solid #DFE3EB;
     border-radius: 8px;
     height: 40px;
+    background-color: #fff;
 }
 .dropDown_agentName{
     background-color: #F0F3F9;
@@ -308,9 +309,11 @@
 .handlingAgent_heading{
     padding-block: 10px;
     padding-inline: 10px;
-    font-size: 12px;
-    align-content: end;
+    color: #6c757d;
+    font-size: 14px;
+    align-content: flex-end;
     cursor: pointer;
+    font-weight: 500;
 }
 .handlingAgent_title{
     border-bottom: 1px solid #DFE3EB;
@@ -321,8 +324,6 @@
 .active{
     border-bottom: 1px solid #2050d5;
     color: #2962Ff;
-    font-weight: 400;
-    font-size: 16px;
     position: relative;
     bottom: -1px;
 }

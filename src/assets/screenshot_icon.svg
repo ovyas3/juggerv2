@@ -1,0 +1,7 @@
+<svg id="screenshot_icon" xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36">
+  <g id="Rectangle_4906" data-name="Rectangle 4906" fill="none" stroke="#dbdbd7" stroke-width="1">
+    <rect width="36" height="36" rx="6" stroke="none"/>
+    <rect x="0.5" y="0.5" width="35" height="35" rx="5.5" fill="none"/>
+  </g>
+  <path id="Path_16908" data-name="Path 16908" d="M3,3H5.444V5.444H3ZM7.889,3h2.444V5.444H7.889Zm4.889,0h2.444V5.444H12.778Zm4.889,0h2.444V5.444H17.667Zm4.889,0H25V5.444H22.556Zm0,4.889H25v2.444H22.556ZM3,22.556H5.444V25H3Zm0-4.889H5.444v2.444H3Zm0-4.889H5.444v2.444H3ZM3,7.889H5.444v2.444H3Zm9.37,4.889,1.267-1.9a1.222,1.222,0,0,1,1.017-.544h3.581a1.222,1.222,0,0,1,1.017.544l1.267,1.9h3.259A1.222,1.222,0,0,1,25,14v9.778A1.222,1.222,0,0,1,23.778,25H9.111a1.222,1.222,0,0,1-1.222-1.222V14a1.222,1.222,0,0,1,1.222-1.222Zm4.074,8.556A2.444,2.444,0,1,0,14,18.889,2.444,2.444,0,0,0,16.444,21.333Z" transform="translate(4 4)" fill="#42454e"/>
+</svg>

@@ -5,12 +5,10 @@ import CloseIcon from '@mui/icons-material/Close';
 import { httpsGet, httpsPost } from '@/utils/Communication';
 import ThreeDotsWave from '@/app/stationManagement/loaderAnimation';
 import { useSnackbar } from '@/hooks/snackBar';
-
-
-
+import { useRouter } from 'next/navigation';
 
 function StationAdd({ setOpenAddStationModal, getStations, stationPayload, editStationPayload, editFlag }: any) {
-
+    const router = useRouter();
     const { showMessage } = useSnackbar();
     const [allZones, setAllZones] = useState<string[]>([]);
     const [allStates, setAllStates] = useState<string[]>([]);
@@ -70,7 +68,7 @@ function StationAdd({ setOpenAddStationModal, getStations, stationPayload, editS
     }, [editFlag, editStationPayload]); 
 
     async function getAllZones() {
-        await httpsGet('get/zones').then((response) => {
+        await httpsGet('get/zones', 0 , router).then((response) => {
             setAllZones(response.data);
             setOrginalZones(response.data);
         }).catch((error) => {
@@ -79,7 +77,7 @@ function StationAdd({ setOpenAddStationModal, getStations, stationPayload, editS
     }
 
     async function getAllState() {
-        await httpsGet('get/states').then((response) => {
+        await httpsGet('get/states', 0 , router).then((response) => {
             setAllStates(response.data);
             setOrginalStates(response.data);
         }).catch((error) => {
@@ -125,7 +123,7 @@ function StationAdd({ setOpenAddStationModal, getStations, stationPayload, editS
                     setLoaderForStationCode(false);
                     return;
                 }
-                await httpsGet(`get/station_code?stationCode=${value}`, 1).then((response) => {
+                await httpsGet(`get/station_code?stationCode=${value}`, 1, router).then((response) => {
                     if(response.data.length > 0){
                         setStationList(response.data);
                         setLoaderForStationCode(false);
@@ -138,8 +136,8 @@ function StationAdd({ setOpenAddStationModal, getStations, stationPayload, editS
                     console.log(error)
                 })
             } catch (error) {
-                console.error(error);
-            }
+                console.log(error);
+              }
         }, 2000);
     }
 
@@ -193,7 +191,7 @@ function StationAdd({ setOpenAddStationModal, getStations, stationPayload, editS
         }
         if(!editFlag){
             try {
-                await httpsPost('add/stations', payload).then((res) => {
+                await httpsPost('add/stations', payload, router).then((res) => {
                     if(res.statusCode === 200){
                         getStations({stationPayload});
                         setOpenAddStationModal(false);
@@ -205,11 +203,11 @@ function StationAdd({ setOpenAddStationModal, getStations, stationPayload, editS
                         showMessage('Station Added Successfully', 'success');
                     }
                 }).catch((error) => {
-                    console.error(error);
+                    console.log(error)
                 })
             } catch (error) {
-                console.log(error)
-            }
+                console.log(error);
+              }
         }
         if(editFlag){
             const editPayload = {
@@ -222,7 +220,7 @@ function StationAdd({ setOpenAddStationModal, getStations, stationPayload, editS
                 state: stationAddObject.state
             }
             try {
-                await httpsPost('edit/stations', editPayload).then((res) => {
+                await httpsPost('edit/stations', editPayload, router).then((res) => {
                     if (res.statusCode === 200) {
                         getStations({stationPayload});
                         setOpenAddStationModal(false);
@@ -235,8 +233,8 @@ function StationAdd({ setOpenAddStationModal, getStations, stationPayload, editS
                     }
                 })
             }catch (error) {
-                console.log(error)
-            }
+                console.log(error);
+              } 
 
         }
     }

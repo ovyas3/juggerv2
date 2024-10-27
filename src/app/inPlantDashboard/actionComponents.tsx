@@ -18,6 +18,8 @@ import BFNV from "@/assets/BFNV final 1.png";
 import BOBRN from "@/assets/BOBRN final 1.png";
 import BRNA from "@/assets/BRNA 1.png";
 import BRN229 from "@/assets/BRN 23.png";
+import { useRouter } from "next/navigation";
+import { ThreeCircles } from "react-loader-spinner";
 
 export const MarkPlacement = ({
   isClose,
@@ -25,6 +27,7 @@ export const MarkPlacement = ({
   different = "markplacement",
   getWagonDetails,
 }: any) => {
+  const router = useRouter();
   const t = useTranslations("ORDERS");
 
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -33,6 +36,7 @@ export const MarkPlacement = ({
   const [eIndent, setEIndent] = useState("");
   const [warraning, setWarraning] = useState(false);
   const [openStartDatePicker, setOpenStartDatePicker] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handlePlacementDate = async () => {
     if (!currentDate) {
@@ -62,6 +66,7 @@ export const MarkPlacement = ({
     };
 
     try {
+      setLoading(true);
       const response = await httpsPost(
         different === "drawnInTimeFromInplantDashboard"
           ? "rake_shipment/mark_drawnin"
@@ -70,7 +75,8 @@ export const MarkPlacement = ({
           ? payloadWithdrownDate
           : eIndent
           ? payloadWitheident
-          : payload
+          : payload,
+          router
       );
       if (response.statusCode === 200) {
         isClose(false);
@@ -78,9 +84,28 @@ export const MarkPlacement = ({
         showMessage("Placement Marked Successfully", "success");
       }
     } catch (error) {
+      setLoading(false);
       console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
+
+  if (loading) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <ThreeCircles
+          visible={true}
+          height="100"
+          width="100"
+          color="#20114d"
+          ariaLabel="three-circles-loading"
+          wrapperStyle={{}}
+          wrapperClass=""
+        />
+      </div>
+    );
+  }
 
   return (
     <div
@@ -301,23 +326,29 @@ export const AssignToMill = ({
   shipmentForWagonSheet,
   getWagonDetails,
 }: any) => {
+  const router = useRouter();
   const showMessage = useSnackbar();
   const text = useTranslations("WAGONTALLYSHEET");
   const [originalWagonDetails, setOriginalWagonDetails] = useState<any>([]);
   const [wagonsNewDate, setWagonsNewDate] = useState<any>([]);
   const [plants, setPlants] = useState<any>([]);
   const [SelectedPlant, setSelectedPlant] = useState<any>({});
+  const [loading, setLoading] = useState(false);
 
   const wagonDetails = async () => {
     try {
+      setLoading(true);
       const response = await httpsGet(
-        `get_wagon_details_by_shipment?id=${shipmentForWagonSheet.id}`
+        `get_wagon_details_by_shipment?id=${shipmentForWagonSheet.id}`, 0, router
       );
       console.log(response);
       setOriginalWagonDetails(response.wagonData);
       setPlants(response.plants);
     } catch (error) {
+      setLoading(false);
       console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -386,14 +417,18 @@ export const AssignToMill = ({
       assigned_data: assignedData,
     };
     try {
-      const response = await httpsPost("assign_wagon_to_plant", payload);
+      setLoading(true);
+      const response = await httpsPost("assign_wagon_to_plant", payload, router);
       if (response.statusCode === 200) {
         wagonDetails();
         showMessage.showMessage("Assigned successfully", "success");
         getWagonDetails();
       }
     } catch (error) {
+      setLoading(false);
       console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -426,6 +461,22 @@ export const AssignToMill = ({
       default:
         return BOST;
     }
+  }
+
+  if (loading) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <ThreeCircles
+          visible={true}
+          height="100"
+          width="100"
+          color="#20114d"
+          ariaLabel="three-circles-loading"
+          wrapperStyle={{}}
+          wrapperClass=""
+        />
+      </div>
+    );
   }
 
   return (
@@ -674,9 +725,11 @@ export const AddIndentNumber = ({
   shipment,
   getWagonDetails,
 }: any) => {
+  const router = useRouter();
   const text = useTranslations("WAGONTALLYSHEET");
   const [indentNumber, setIndentNumber] = useState<null | string>(null);
   const showMessage = useSnackbar();
+  const [loading, setLoading] = useState(false);
 
   async function updateIndentNumber() {
     if (!indentNumber) {
@@ -689,14 +742,34 @@ export const AddIndentNumber = ({
     };
 
     try {
-      const response = await httpsPost("rake_shipment/add_indent_no", payload);
+      setLoading(true);
+      const response = await httpsPost("rake_shipment/add_indent_no", payload, router);
       if (response?.statusCode === 200) {
         getWagonDetails();
         isClose(false);
       }
     } catch (error) {
+      setLoading(false);
       console.log(error);
+    } finally {
+      setLoading(false);
     }
+  }
+
+  if (loading) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <ThreeCircles
+          visible={true}
+          height="100"
+          width="100"
+          color="#20114d"
+          ariaLabel="three-circles-loading"
+          wrapperStyle={{}}
+          wrapperClass=""
+        />
+      </div>
+    );
   }
 
   return (
@@ -716,17 +789,7 @@ export const AddIndentNumber = ({
       }}
     >
       <div
-        style={{
-          width: 800,
-          height: 500,
-          backgroundColor: "white",
-          position: "relative",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%,-50%)",
-          borderRadius: 20,
-          padding: 25,
-        }}
+        className="add-indent-number-modal-main"
         onClick={(e) => {
           e.stopPropagation();
         }}

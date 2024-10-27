@@ -10,6 +10,7 @@ import SearchIcon from '@/assets/search_icon.svg';
 import TrainImage from '@/assets/Train_engine-locomotive.png';
 import BFNV from '@/assets/BFNV.png';
 import BOXN from '@/assets/BOXN.png';
+import service from '@/utils/timeService';
 import BRN_22_9 from '@/assets/BRN_22.9.png';
 import ArrowRight from '@/assets/arrow_right_rounded.svg';
 import Minus from '@/assets/minus.svg';
@@ -24,6 +25,12 @@ import CustomDateTimePicker from "./CustomDateTImePicker";
 import PhotoCaptureComponent from "./CustomCamera";
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
+import { useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { httpsGet, httpsPost } from "@/utils/Communication";
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { ThreeCircles } from "react-loader-spinner";
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialogContent-root": {
@@ -162,203 +169,236 @@ const Mill = styled('div')`
   }
 `;
 
-const generateRandomWagonNumber = () => {
-  return Math.floor(10000000000 + Math.random() * 90000000000).toString(); // Generates a 11-digit random number
-};
-
-const wagonTypes = ["BOXN", "BRN_22_9", "BFNV"];
-
-const generateRandomWagonType = () => {
-  return wagonTypes[Math.floor(Math.random() * wagonTypes.length)];
-};
-
-const generateRandomWagons = (numberOfWagons: number) => {
-  const wagons = [];
-  for (let i = 0; i < numberOfWagons; i++) {
-    wagons.push({
-      wagonNumber: generateRandomWagonNumber(),
-      wagonType: generateRandomWagonType(),
-    });
+const datesArr = [
+  {
+    event_name: "Loading Readiness Time",
+    event_code: "WSLRT",
+    hook: 1,
+    event_timestamp: null
+  },
+  {
+    event_name: "Material Loading Start Time",
+    event_code: "WSLST",
+    hook: 1,
+    event_timestamp: null
+  },
+  {
+    event_name: "Material Loading End Time",
+    event_code: "WSLET",
+    hook: 1,
+    event_timestamp: null
+  },
+  {
+    event_name: "Packing Start Time",
+    event_code: "WSPST",
+    hook: 1,
+    event_timestamp: null
+  },
+  {
+    event_name: "Welding & Stepping Start Time",
+    event_code: "WSWST",
+    hook: 1,
+    event_timestamp: null
+  },
+  {
+    event_name: "Welding & Stepping End Time",
+    event_code: "WSWET",
+    hook: 1,
+    event_timestamp: null
+  },
+  {
+    event_name: "Packing End Time",
+    event_code: "WSPET",
+    hook: 1,
+    event_timestamp: null
   }
-  return wagons;
-};
-
-type Wagon = {
-  wagonNumber: string;
-  wagonType: string;
-};
+];
 
 type Mill = {
-  millName: string;
-  millId: string;
-  wagons: Wagon[];
+  wagonNumber: string;
+  wagonType: string;
+  wagonObj: any;
+  is_sick: boolean;
+  _id: string;
 };
 
-interface Props {
-  isSick: boolean;
-}
+type DateEvent = {
+  event_name: string;
+  event_code: string;
+  hook: number;
+  event_timestamp: Date | null | string;
+};
+
+type FormValues = {
+  batch_id_heat_no: string;
+  material: string;
+  code: string;
+  grade: string;
+  width: number;
+  thick: number;
+  length: number;
+  pieces: number;
+  line_item: string;
+  pgi_tw_wrt: number;
+  actual_weight: number;
+  material_images: (string | null)[];
+};
+
+type FormValueKey = 'batch_id_heat_no' | 'material' | 'code' | 'grade' | 'width' | 'thick' | 'length' | 'pieces' | 'line_item' | 'pgi_tw_wrt' | 'actual_weight';
+
+type PickerKey =
+  | "loadingReadinessTime"
+  | "loadingStartTime"
+  | "loadingEndTime"
+  | "packingStartTime"
+  | "weldingStartTime"
+  | "weldingEndTime"
+  | "packingEndTime";
 
 const WagonTallySheet: React.FC = () => {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const id = searchParams.get("shipmentId");
   const { showMessage } = useSnackbar();
   const text = useTranslations("WAGONTALLYSHEET");
   const [openWagonPhotos, setOpenWagonPhotos] = useState(false);
   const [openMaterialPhotos, setOpenMaterialPhotos] = useState(false);
   const [selectedFormIndex, setSelectedFormIndex] = useState<number | null>(null);
   const [selectedTab, setSelectedTab] = useState<number>(0);
-  const [selectedWagon, setSelectedWagon] = useState<number | null>(null);
+  const [selectedWagonNumber, setSelectedWagonNumber] = useState<number | null>(0);
   const [searchTerm, setSearchTerm] = useState("");
   const [isSick, setIsSick] = useState<boolean>(false);
   const [wagonCapturedImages, setWagonCapturedImages] = useState<(string | null)[]>([]);
-  const [materialCapturedImages, setMaterialCapturedImages] = useState<(string | null)[]>([]);
   const [train, setTrain] = useState<Mill[] | null>(null);
   const [scrollValue, setScrollValue] = useState(0);
-  const [formValues, setFormValues] = useState<{ batchId: string, material: string, materialCode: string, grade: string, width: string, thick: string, length: string, pieces: string, lineItem: string, pgiWeight: string, actualWeight: string, images: (string | null)[] }[]>([
+  const [openPlantDropDown, setOpenPlantDropDown] = useState(false);
+  const [selectedPlant, setSelectedPlant] = useState<any>(null);
+  const [allPlants, setAllPlants] = useState<any>([]);
+  const [selectedHook, setSelectedHook] = useState<any>(null);
+  const [openHooksDropdown, setOpenHooksDropdown] = useState(false);
+  const [shipmentData, setShipmentData] = useState<any>(null);
+  const [wagonData, setWagonData] = useState<any>(null);
+  const [selectedWagonDetails, setSelectedWagonDetails] = useState<any>(null);
+  const [openClearDialog, setOpenClearDialog] = useState(false);  
+  const [formValues, setFormValues] = useState<FormValues[]>([
     {
-      batchId: '',
+      batch_id_heat_no: '',
       material: '',
-      materialCode: '',
+      code: '',
       grade: '',
-      width: '',
-      thick: '',
-      length: '',
-      pieces: '',
-      lineItem: '',
-      pgiWeight: '',
-      actualWeight: '',  
-      images: [],
+      width: 0,
+      thick: 0,
+      length: 0,
+      pieces: 0,
+      line_item: '',
+      pgi_tw_wrt: 0,
+      actual_weight: 0,  
+      material_images: [],
     }
   ]);
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    setTrain([
-      { millName: "Plate Mill", millId: "1", wagons: generateRandomWagons(4) },
-      { millName: "Plate Mill", millId: "1", wagons: generateRandomWagons(4) },
-      { millName: "Plate Mill", millId: "1", wagons: generateRandomWagons(4) },
-      { millName: "Plate Mill", millId: "1", wagons: generateRandomWagons(4) },
-      { millName: "Plate Mill", millId: "1", wagons: generateRandomWagons(4) },
-      { millName: "Plate Mill", millId: "1", wagons: generateRandomWagons(4) },
-      { millName: "Plate Mill", millId: "1", wagons: generateRandomWagons(4) },
-      { millName: "Plate Mill", millId: "1", wagons: generateRandomWagons(4) },
-      { millName: "Plate Mill", millId: "1", wagons: generateRandomWagons(4) },
-      { millName: "Plate Mill", millId: "1", wagons: generateRandomWagons(4) },
-      { millName: "Plate Mill", millId: "1", wagons: generateRandomWagons(4) },
-    ]);
-  }, []);
+  // Initial state for dates
+  const [dates, setDates] = useState<DateEvent[]>(datesArr);
 
-  const handleScrollbarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setScrollValue(Number(event.target.value));
-  };
-  
-  // State to store all date values separately
-  const [dates, setDates] = useState({
-    loadingReadinessTime: new Date(2024, 7, 24, 13, 0),
-    loadingStartTime: new Date(2024, 7, 24, 17, 0),
-    loadingEndTime: new Date(2024, 7, 24, 17, 0),
-    packingStartTime: new Date(2024, 7, 24, 18, 0),
-    weldingStartTime: new Date(2024, 7, 24, 18, 0),
-    weldingEndTime: new Date(2024, 7, 24, 18, 0),
-    packingEndTime: new Date(2024, 7, 24, 18, 30),
-  });
-
-  // State to manage which pickers are open
-  const [openPickers, setOpenPickers] = useState({
-    loadingReadinessTime: false,
-    loadingStartTime: false,
-    loadingEndTime: false,
-    packingStartTime: false,
-    weldingStartTime: false,
-    weldingEndTime: false,
-    packingEndTime: false,
-  });
-
-  // Type for picker keys
-  type PickerKey =
-    | "loadingReadinessTime"
-    | "loadingStartTime"
-    | "loadingEndTime"
-    | "packingStartTime"
-    | "weldingStartTime"
-    | "weldingEndTime"
-    | "packingEndTime";
+  // Initial state for open pickers
+  const [openPickers, setOpenPickers] = useState<{ [key in PickerKey]?: boolean }>({});
 
   // Function to toggle open state of pickers
-  const togglePicker = (pickerKey: PickerKey) => {
+  const togglePicker = (eventCode: PickerKey) => {
     setOpenPickers((prev) => ({
       ...prev,
-      [pickerKey]: !prev[pickerKey],
+      [eventCode]: !prev[eventCode],
     }));
   };
-
+  
   // Function to handle date change
-  const handleDateChange = (pickerKey: PickerKey, newDate: Date) => {
-    setDates((prev) => ({
-      ...prev,
-      [pickerKey]: newDate,
-    }));
+  const handleDateChange = (eventCode: string, newDate: Date) => {
+    setDates((prevDates: DateEvent[]) =>
+      prevDates.map((date) =>
+        date.event_code === eventCode
+          ? { ...date, event_timestamp: service.convertToISO(newDate) }
+          : date
+      )
+    );
   };
 
-  const getWagonImage = (type: string) => {
-    switch (type) {
-      case 'BFNV': return BFNV;
-      case 'BOXN': return BOXN;
-      case 'BRN_22_9': return BRN_22_9;
-      default: return '';
-    }
+  const handleWagonClick = (index: number, wagon: any) => {
+    setSelectedWagonNumber(index);
+    setSelectedWagonDetails(wagon);
   };
 
-  const handleWagonClick = (index: number) => {
-    setSelectedWagon(index);
-  };
 
-  type FormValueKey = 'batchId' | 'material' | 'materialCode' | 'grade' | 'width' | 'thick' | 'length' | 'pieces' | 'lineItem' | 'pgiWeight' | 'actualWeight';
-
+  // Function to handle input change in form (Material Details)
   const handleInputChange = (index: number, event: React.ChangeEvent<HTMLInputElement>) => {
     const name = event.target.name as FormValueKey;
     const value = event.target.value;
-
+  
     setFormValues(prev => {
       const newFormValues = [...prev];
-      newFormValues[index][name] = value;
+      if (name === 'width' || name === 'thick' || name === 'length' || name === 'pieces' || name === 'pgi_tw_wrt' || name === 'actual_weight') {
+        newFormValues[index][name] = parseFloat(value) as any;
+      } else {
+        newFormValues[index][name] = value;
+      }
       return newFormValues;
     });
   };
 
-  const handleDataWithBatchId = (index: number) => {
-    setFormValues(prev => {
-      const newFormValues = [...prev];
-      newFormValues[index] = {
-        batchId: 'F4373007B0',
-        material: 'Plate',
-        materialCode: 'PA_JAMA45TM01',
-        grade: 'AIS2062 E450BR',
-        width: '16',
-        thick: '2370',
-        length: '12',
-        pieces: '1',
-        lineItem: '100',
-        pgiWeight: '3.57',
-        actualWeight: '4',
-        images: [],
-      };
-      return newFormValues;
-    });
+  // Function to handle data with batch id
+  const handleDataWithBatchId = async (index: number) => {
+    const batchId = formValues[index].batch_id_heat_no;
+    if(batchId && batchId.length === 10) {
+      try{
+        setLoading(true);
+        const response = await httpsGet(`get_material_details?batch_id=${batchId}`, 0, router);
+        let data = response?.data;
+        if (data) {
+          setFormValues(prev => {
+            const newFormValues = [...prev];
+            newFormValues[index] = {
+              ...newFormValues[index],
+              material: data.material,
+              code: data.material_code,
+              grade: data.grade,
+              width: data.width,
+              thick: data.thickness,
+              length: data.length,
+              pieces: data.pieces !== undefined ? data.pieces : newFormValues[index].pieces,
+              line_item: data.line_item !== undefined ? data.line_item : newFormValues[index].line_item,
+              pgi_tw_wrt: data.pgi_tw_wrt !== undefined ? data.pgi_tw_wrt : newFormValues[index].pgi_tw_wrt,
+              actual_weight: data.actual_weight !== undefined ? data.actual_weight : newFormValues[index].actual_weight,
+            };
+            return newFormValues;
+          });
+        }
+      } catch (error) {
+        setLoading(false);
+        console.log(error);
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      showMessage("Please enter valid Batch ID/Heat No", "error");
+    }
   }
 
+  // Function to handle add and remove material details
   const handleAdd = () => {
     setFormValues([...formValues, 
       {
-        batchId: '',
+        batch_id_heat_no: '',
         material: '',
-        materialCode: '',
+        code: '',
         grade: '',
-        width: '',
-        thick: '',
-        length: '',
-        pieces: '',
-        lineItem: '',
-        pgiWeight: '',
-        actualWeight: '', 
-        images: [], 
+        width: 0,
+        thick: 0,
+        length: 0,
+        pieces: 0,
+        line_item: '',
+        pgi_tw_wrt: 0,
+        actual_weight: 0, 
+        material_images: [], 
       }
     ]);
   };
@@ -367,49 +407,278 @@ const WagonTallySheet: React.FC = () => {
     setFormValues(formValues.filter((_, i) => i !== index));
   };
 
-  const handleWagonConfirm = (images: (string | null)[]) => {
+  // Function to handle confirm of wagon and material photos
+  const handleWagonConfirm = async (images: (string | null)[]) => {
+    console.log(images);
+    let image = images[0];
+
+    if (image && !image.startsWith('data:image/jpeg;base64,')) {
+      image = `data:image/jpeg;base64,${image}`;
+    }
+
+    try{
+      setLoading(true);
+      const response = await httpsPost(`upload_wagon_tally_image?fnr_no=24092908743`, image, router, 0, true);
+      let data = response?.data;
+      console.log(data);
+      showMessage("Image Uploaded Successfully", "success");
+    } catch (error) {
+      setLoading(false);
+      showMessage("Failed to upload image", "error");
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
     setWagonCapturedImages((prevImages) => [...prevImages, ...images]);
-    console.log('Captured Images:', [...wagonCapturedImages, ...images]);
   };
 
   const handleMaterialConfirm = (index: number, images: (string | null)[]) => {
     setFormValues((prevFormValues) => {
         const updatedFormValues = [...prevFormValues];
-        updatedFormValues[index].images = [...updatedFormValues[index].images, ...images];
+        updatedFormValues[index].material_images = [...updatedFormValues[index].material_images, ...images];
         return updatedFormValues;
     });
-    console.log('Captured Images:', formValues[index].images);
   };
 
-  const handleWagonPhotoDelete = (index: number) => {
-    const updatedImages = wagonCapturedImages.filter((_, index) => index !== index);
+  const handleWagonPhotoDelete = (indexNum: number) => {
+    const updatedImages = wagonCapturedImages.filter((_, index) => index !== indexNum);
     setWagonCapturedImages(updatedImages);
   }
 
   const handleMaterialPhotoDelete = (formIndex: number, imageIndex: number) => {
     const updatedFormValues = [...formValues];
-    updatedFormValues[formIndex].images = updatedFormValues[formIndex].images.filter((_, idx) => idx !== imageIndex);
+    updatedFormValues[formIndex].material_images = updatedFormValues[formIndex].material_images.filter((_, idx) => idx !== imageIndex);
     setFormValues(updatedFormValues);
   };
   
-
+  // Function to handle confirm of wagon and material photos
   const handleClear = () => {
     setFormValues([
       {
-        batchId: '',
+        batch_id_heat_no: '',
         material: '',
-        materialCode: '',
+        code: '',
         grade: '',
-        width: '',
-        thick: '',
-        length: '',
-        pieces: '',
-        lineItem: '',
-        pgiWeight: '',
-        actualWeight: '',  
-        images: [],
+        width: 0,
+        thick: 0,
+        length: 0,
+        pieces: 0,
+        line_item: '',
+        pgi_tw_wrt: 0,
+        actual_weight: 0, 
+        material_images: [], 
       }
     ]);
+    setDates(datesArr);
+    setWagonCapturedImages([]);
+  };
+
+  const handleWagonOpen = () => setOpenWagonPhotos(true);
+  const handleWagonClose = () => setOpenWagonPhotos(false);
+
+  const handleMaterialOpen = (index: number) => {
+    setSelectedFormIndex(index); 
+    setOpenMaterialPhotos(true);
+  };
+  
+  const handleMaterialClose = () => {
+    setOpenMaterialPhotos(false);
+    setSelectedFormIndex(null);
+  };
+
+  const handleClearDialogOpen = () => setOpenClearDialog(true);
+
+  const handleClearDialogClose = () => setOpenClearDialog(false);
+
+  // GET request to fetch all plants
+  const getAssignLoadingShop = async () => {
+    try {
+      setLoading(true);
+      const response = await httpsGet(
+        `get_assigned_loading_shops?shipment=${id}`, 0, router
+      );
+      setAllPlants(response?.data);
+    } catch (error) {
+      setLoading(false);
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSelectionOfPlant = (e: any, plant: any, index: number) => {
+    e.stopPropagation();
+    setSelectedPlant(plant);
+    setSelectedHook(plant.hooks[0].hook_no);
+    setOpenPlantDropDown(false);
+  }
+
+  const handleSelectHook = (e: any, hook: any, index: number) => {
+    e.stopPropagation();
+    setSelectedHook(hook.hook_no);
+    setOpenHooksDropdown(false);
+  }
+
+  useEffect(() => {
+    getAssignLoadingShop();
+    setSelectedWagonNumber(0);
+  }, []);
+
+  useEffect(() => {
+    if(allPlants && allPlants.length > 0 && allPlants[0].hooks.length > 0) {
+      setSelectedPlant(allPlants[0]);
+      setSelectedHook(allPlants[0].hooks[0].hook_no);
+      
+    } else {
+      setSelectedPlant(null);
+      setSelectedHook(null);
+    }
+  }, [allPlants]);
+
+  // Assigning Wagon Details nsd Wagon Data
+  const getWagonDetails: any = async () => {
+    try {
+      setLoading(true);
+      const response = await httpsGet(
+        `get_wagon_details_by_shipment?id=${id}&plant=${selectedPlant?.plant?._id}&hook=${selectedHook}`, 0, router
+      );
+      setShipmentData(response?.shipmentData);
+      setWagonData(response?.wagonData);
+    } catch (error) {
+      setLoading(false);
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    const wagonDataForTrain = wagonData && wagonData.length > 0 && wagonData?.map((wagon: any) => {
+    return {
+      wagonNumber: wagon?.w_no || '',
+      wagonType: wagon?.wagon_type?.name || '',
+      wagonObj: wagon?.wagon_type,
+      is_sick: wagon?.is_sick,
+      _id: wagon?._id,
+      };
+    });
+    setTrain(wagonDataForTrain);
+
+    if (wagonDataForTrain && wagonDataForTrain.length > 0) {
+      setSelectedWagonDetails(wagonDataForTrain[0]);
+      setIsSick(wagonDataForTrain[0]?.is_sick);
+    } else {
+      setSelectedWagonDetails(null);
+      setSelectedWagonDetails(null);
+      setIsSick(false);
+    }
+  }, [wagonData]);
+
+  useEffect(() => {
+    if(selectedPlant && selectedHook) {
+      getWagonDetails();
+    }
+  }, [selectedPlant, selectedHook]);
+
+  useEffect(() => {
+    if(selectedWagonDetails) {
+      getWagonTallySheetData();
+    }
+  }, [selectedWagonDetails, selectedPlant, selectedHook]);
+
+  // Function to get wagon image based on wagon type
+  const getWagonImage = (type: string) => {
+    switch (type) {
+      case 'BFNV': return BFNV;
+      case 'BOXN': return BOXN;
+      case 'BRN_22_9': return BRN_22_9;
+      default: return BOXN;
+    }
+  };
+
+  //GET Wagon Tally sheet datas
+  const getWagonTallySheetData = async () => {
+    const id = selectedWagonDetails?._id || '';
+    try {
+      if(id) {
+        setLoading(true);
+        const response = await httpsGet(`get_wagon_details?id=${id}`, 0, router);
+        const { materials, events, wagon_images } = response?.data;
+        if(materials && materials.length > 0) {
+          setFormValues(materials);
+        } else {
+          setFormValues([
+            {
+              batch_id_heat_no: '',
+              material: '',
+              code: '',
+              grade: '',
+              width: 0,
+              thick: 0,
+              length: 0,
+              pieces: 0,
+              line_item: '',
+              pgi_tw_wrt: 0,
+              actual_weight: 0,
+              material_images: [],
+            }
+          ]);
+        }
+        setWagonCapturedImages(wagon_images);
+        const datesArr: any = dates.map(date => {
+          const event = events.find((event: any) => event.event_code === date.event_code);
+          return {
+            ...date,
+            event_timestamp: event?.event_timestamp || null,
+          };
+        });
+        setDates(datesArr);
+      } else{
+        setLoading(false);
+      }
+    } catch (error) {
+      setLoading(false);
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const postWagonTallySheet = async () => {
+    if(selectedWagonDetails && selectedWagonDetails?._id && !isSick) {
+      setLoading(true);
+      const filteredDates = dates.filter(
+        date => date.event_timestamp);
+      const payload = {
+        shipment: id,
+        _id: selectedWagonDetails?._id,
+        wagon_images: wagonCapturedImages,
+        events: filteredDates,
+        materials: formValues,
+        is_sick: isSick,
+      }
+
+      try {
+        await httpsPost('post_wagon_details', payload, router);
+        setLoading(false);
+        getWagonDetails();
+        getWagonTallySheetData();
+        showMessage("Wagon Details Saved & Submitted Successfully", "success");
+      } catch (error) {
+        setLoading(false);
+        showMessage("Failed to save wagon details", "error");
+        console.log(error);
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      showMessage("Please fill all the details", "error");
+    }
+  };
+
+  // Artifical Scrollbar
+  const handleScrollbarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setScrollValue(Number(event.target.value));
   };
 
   useEffect(() => {
@@ -469,26 +738,80 @@ const WagonTallySheet: React.FC = () => {
         observer.disconnect();
       };
     }
-  }, [train]);
+  }, [train, 
+      selectedTab, 
+      selectedWagonDetails, 
+      selectedPlant, 
+      selectedHook,
+      wagonCapturedImages,
+      dates,
+      formValues,
+      isSick,
+      loading
+    ]);
 
-  const handleWagonOpen = () => setOpenWagonPhotos(true);
-  const handleWagonClose = () => setOpenWagonPhotos(false);
+  // Function to handle click outside dropdown
+  const handleClickOutside = (e: MouseEvent) => {
+    if (
+      !(e.target as HTMLElement).closest('#dropdownForPlantsMaincontainerTallySheet') &&
+      !(e.target as HTMLElement).closest('#dropdownListForplantsTallySheet') &&
+      !(e.target as HTMLElement).closest('#dropdownListForHooksTallySheet')
+    ) {
+      setOpenPlantDropDown(false);
+      setOpenHooksDropdown(false);
+    }
+  };
 
-  const handleMaterialOpen = (index: number) => {
-    setSelectedFormIndex(index); 
-    setOpenMaterialPhotos(true);
-  };
-  
-  const handleMaterialClose = () => {
-    setOpenMaterialPhotos(false);
-    setSelectedFormIndex(null);
-  };
+  useEffect(() => {
+    document.addEventListener('click', handleClickOutside);
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, []);
+
+  const handleWagonImages = async () => {
+    try{
+      setLoading(true);
+      await httpsPost(`upload_wagon_tally_image?fnr_no="24092908743"`, { images: wagonCapturedImages }, router);
+    
+    } catch (error) {
+      setLoading(false);
+      console.log(error);
+    } finally {
+      setLoading(false);
+      console.log("Images Uploaded Successfully");
+    }
+  }
+
+  if (loading) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <ThreeCircles
+          visible={true}
+          height="100"
+          width="100"
+          color="#20114d"
+          ariaLabel="three-circles-loading"
+          wrapperStyle={{}}
+          wrapperClass=""
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="wagon-tally-container">
       <Header title={text('wagonTallySheet')} isMapHelper={false} />
       <div className="wagon-tally-sheet-main">
         <div className="wagon-tally-sheet-header">
+          <div
+            className="wagon-tally-sheet-back-icon"
+            onClick={() => {
+              router.push("/inPlantDashboard");
+            }}
+          >
+            <ArrowBackIcon />
+          </div>
           <div className="wagon-tally-sheet-search-input">
             <Image src={SearchIcon} alt="search" className="search-wagon-icon"/>
             <input 
@@ -499,6 +822,7 @@ const WagonTallySheet: React.FC = () => {
               onChange={e => setSearchTerm(e.target.value)}
             />
           </div>
+          <div></div>
         </div>
         <div className="wagon-tally-sheet-body">
           <div className="wagon-tally-sheet-body-header">
@@ -508,13 +832,79 @@ const WagonTallySheet: React.FC = () => {
                 <Tab onClick={() => setSelectedTab(1)} className={selectedTab === 1 ? 'selected' : ''}>Lot</Tab>
               </TabsList>
             </div>
-            <div className="wagon-tally-sheet-body-header-contents">
-              <p className="wagon-tally-sheet-body-header-contents-label">e-Demand: </p>
-              <p className="wagon-tally-sheet-body-header-contents-value">RJKN190820242</p>
+            <div id="filtersForWagonTallySheet">
+              <div id="selectAPlant-wagonTallySheet">
+                <div
+                  id="dropdownForPlantsMaincontainerTallySheet"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setOpenHooksDropdown(false);
+                    setOpenPlantDropDown(!openPlantDropDown);
+                  }}
+                >
+                  <div id="mill-name">{selectedPlant?.plant?.name || "Select Mill"}</div>
+                  <ArrowDropDownIcon />
+                </div>
+                {openPlantDropDown && (
+                  <div id="dropdownListForplantsTallySheet">
+                    {allPlants?.map((eachPlant: any, index: number) => {
+                      return (
+                        <div
+                          onClick={(e) => {
+                            handleSelectionOfPlant(e, eachPlant, index);
+                          }}
+                          key={index}
+                          className="dropdownListForPlantsEachItemTallySheet"
+                        >
+                          {eachPlant?.plant?.name}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+              
+              <div id="hooksFilterTallySheet">
+                <div
+                  id="dropdownForPlantsMaincontainerTallySheet"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setOpenPlantDropDown(false);
+                    setOpenHooksDropdown(!openHooksDropdown);
+                  }}
+                >
+                  <div id="hook-name">{selectedHook ? `Hook ${selectedHook}` : "Select Hook"}</div>
+                  <ArrowDropDownIcon />
+                </div>
+                {openHooksDropdown && (
+                  <div id="dropdownListForHooksTallySheet">
+                    {selectedPlant?.hooks.map(
+                      (eachhook: any, index: number) => {
+                        return (
+                          <div
+                            key={index}
+                            className="dropdownListForPlantsEachItemTallySheet"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleSelectHook(e, eachhook, index);
+                            }}
+                          >
+                            <div>{text('hook')} {eachhook.hook_no}</div>
+                          </div>
+                        );
+                      }
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
             <div className="wagon-tally-sheet-body-header-contents">
-              <p className="wagon-tally-sheet-body-header-contents-label">Total Wagons: </p>
-              <p className="wagon-tally-sheet-body-header-contents-value">44</p>
+              <p className="wagon-tally-sheet-body-header-contents-label">{text('eDemand')}: </p>
+              <p className="wagon-tally-sheet-body-header-contents-value">{shipmentData?.edemand_no || ''}</p>
+            </div>
+            <div className="wagon-tally-sheet-body-header-contents">
+              <p className="wagon-tally-sheet-body-header-contents-label">{text('totalWagons')}: </p>
+              <p className="wagon-tally-sheet-body-header-contents-value">{shipmentData?.received_no_of_wagons || 0}</p>
             </div>
           </div>
           <div className="wagon-tally-sheet-body-content">
@@ -522,27 +912,32 @@ const WagonTallySheet: React.FC = () => {
             <>
               <div className="wagon-tally-sheet-body-content-train" id="train">
               <TrainContainer id="train">
-                {train ? train.flatMap((mill, millIndex, millArray) => (
-                  mill.wagons
-                    .filter(wagon => wagon.wagonNumber.includes(searchTerm))
+                {train ? (
+                  train
+                    .filter(wagon => {
+                      const includesSearchTerm = wagon.wagonNumber.includes(searchTerm);
+                      return includesSearchTerm;
+                    })
                     .map((wagon, wagonIndex) => {
-                      const globalWagonIndex = millArray.slice(0, millIndex).reduce((sum, currMill) => sum + currMill.wagons.length, 0) + wagonIndex;
-                      const totalWagons = millArray.reduce((sum, currMill) => sum + currMill.wagons.length, 0);           
                       return (
-                        <WagonContainer key={globalWagonIndex} onClick={() => handleWagonClick(globalWagonIndex)}>
+                        <WagonContainer key={wagonIndex} onClick={() => handleWagonClick(wagonIndex, wagon)}>
                           <Track>
                             <WagonNumber>{wagon.wagonNumber}</WagonNumber>
                           </Track>
                           <Image src={getWagonImage(wagon.wagonType)} alt={wagon.wagonType} />
-                          {globalWagonIndex !== totalWagons - 1 && <Image src={WagonConnector} alt="Wagon connector" className="wagon-connector-icon" />}
-                          <WagonIndex isSelected={globalWagonIndex === selectedWagon}>{globalWagonIndex + 1}</WagonIndex>
+                          {wagonIndex !== train.length - 1 && (
+                            <Image src={WagonConnector} alt="Wagon connector" className="wagon-connector-icon" />
+                          )}
+                          <WagonIndex isSelected={wagonIndex === selectedWagonNumber}>
+                            {wagonIndex + 1}
+                          </WagonIndex>
                         </WagonContainer>
-                      )
+                      );
                     })
-                )) : <div>
-                  {/* Loading... */}
-                    </div>}
-                <Image src={TrainImage} alt="Train engine" style={{borderBottom: '1px solid #D0D1D3', marginLeft: '-1px'}} />
+                ) : (
+                  <></>
+                )}
+                <Image src={TrainImage} alt="Train engine" style={{ borderBottom: '1px solid #D0D1D3', marginLeft: '-1px' }} />
               </TrainContainer>
               </div>
               <input
@@ -551,29 +946,29 @@ const WagonTallySheet: React.FC = () => {
                 min="0"
                 max="100"
                 value={scrollValue}
-                onChange={handleScrollbarChange} // Attach the onChange handler here
+                onChange={handleScrollbarChange}
               />
               <div className="wagon-tally-sheet-body-content-wagon-details">
                 <div className="wagon-tally-sheet-body-content-wagon-details-container">
                   <div className="wagon-tally-sheet-body-content-wagon-details-contents">
                     <div className="wagon-tally-sheet-body-content-wagon-details-content">
-                      <p className="wagon-tally-sheet-body-content-wagon-details-content-label">Wagon No. </p>
-                      <p className="wagon-tally-sheet-body-content-wagon-details-content-value">JSPL11121</p>
+                      <p className="wagon-tally-sheet-body-content-wagon-details-content-label">{text('wagonNo')}</p>
+                      <p className="wagon-tally-sheet-body-content-wagon-details-content-value">{selectedWagonDetails?.wagonNumber || 'N/A'}</p>
                     </div>
                     <div className="wagon-tally-sheet-body-content-wagon-details-content">
-                      <p className="wagon-tally-sheet-body-content-wagon-details-content-label">Wagon Type </p>
-                      <p className="wagon-tally-sheet-body-content-wagon-details-content-value">BOXN</p>
+                      <p className="wagon-tally-sheet-body-content-wagon-details-content-label">{text('wagonType')}</p>
+                      <p className="wagon-tally-sheet-body-content-wagon-details-content-value">{selectedWagonDetails?.wagonType || selectedWagonDetails?.wagonObj?.name || 'N/A'}</p>
                     </div>
                     <div className="wagon-tally-sheet-body-content-wagon-details-content">
-                      <p className="wagon-tally-sheet-body-content-wagon-details-content-label">CC </p>
-                      <p className="wagon-tally-sheet-body-content-wagon-details-content-value">66.8 MT</p>
+                      <p className="wagon-tally-sheet-body-content-wagon-details-content-label">{text('cc')}</p>
+                      <p className="wagon-tally-sheet-body-content-wagon-details-content-value">{selectedWagonDetails?.wagonObj?.capacity || 0} MT</p>
                     </div>
                     <div className="wagon-tally-sheet-body-content-wagon-details-content">
-                      <p className="wagon-tally-sheet-body-content-wagon-details-content-label">TR </p>
-                      <p className="wagon-tally-sheet-body-content-wagon-details-content-value">23.3 MT</p>
+                      <p className="wagon-tally-sheet-body-content-wagon-details-content-label">{text('tr')}</p>
+                      <p className="wagon-tally-sheet-body-content-wagon-details-content-value">{selectedWagonDetails?.wagonObj?.tare_weight || 0} MT</p>
                     </div>
                     <div className="wagon-tally-sheet-body-content-wagon-details-content">
-                      <p className="wagon-tally-sheet-body-content-wagon-details-content-label">Is the Wagon Sick? </p>
+                      <p className="wagon-tally-sheet-body-content-wagon-details-content-label">{text('isSick')}</p>
                       <div className="wagon-tally-sheet-body-content-wagon-details-content-radio">
                       <div className="wagon-tally-sheet-body-content-wagon-details-content-radio-content">
                         <input 
@@ -585,7 +980,7 @@ const WagonTallySheet: React.FC = () => {
                           checked={isSick === true}
                           onChange={() => setIsSick(true)}
                         />
-                        <label htmlFor="yes" className="wagon-tally-sheet-body-content-wagon-details-content-radio-label">Yes</label>
+                        <label htmlFor="yes" className="wagon-tally-sheet-body-content-wagon-details-content-radio-label">{text('yes')}</label>
                       </div>
                       <div className="wagon-tally-sheet-body-content-wagon-details-header-content-radio-content">
                         <input 
@@ -597,7 +992,7 @@ const WagonTallySheet: React.FC = () => {
                           checked={isSick === false}
                           onChange={() => setIsSick(false)}
                         />
-                        <label htmlFor="no" className="wagon-tally-sheet-body-content-wagon-details-content-radio-label">No</label>
+                        <label htmlFor="no" className="wagon-tally-sheet-body-content-wagon-details-content-radio-label">{text('no')}</label>
                       </div>
                       </div>
                     </div>
@@ -623,81 +1018,38 @@ const WagonTallySheet: React.FC = () => {
                 </div>
                 <div className="wagon-tally-sheet-body-content-wagon-details-container">
                   <div className="wagon-tally-sheet-body-content-wagon-details-contents-down">
-                    <CustomDateTimePicker
-                      label="Loading Readiness Time"
-                      value={dates.loadingReadinessTime}
-                      onChange={(newDate) => handleDateChange("loadingReadinessTime", newDate!)}
-                      open={openPickers.loadingReadinessTime}
-                      onToggle={() => togglePicker("loadingReadinessTime")}
-                      disabled={isSick}
-                    />
-                    <CustomDateTimePicker
-                      label="Material Loading Start Time"
-                      value={dates.loadingStartTime}
-                      onChange={(newDate) => handleDateChange("loadingStartTime", newDate!)}
-                      open={openPickers.loadingStartTime}
-                      onToggle={() => togglePicker("loadingStartTime")}
-                      disabled={isSick}
-                    />
-                    <CustomDateTimePicker
-                      label="Material Loading End Time"
-                      value={dates.loadingEndTime}
-                      onChange={(newDate) => handleDateChange("loadingEndTime", newDate!)}
-                      open={openPickers.loadingEndTime}
-                      onToggle={() => togglePicker("loadingEndTime")}
-                      disabled={isSick}
-                    />
-                    <CustomDateTimePicker
-                      label="Packing Start Time"
-                      value={dates.packingStartTime}
-                      onChange={(newDate) => handleDateChange("packingStartTime", newDate!)}
-                      open={openPickers.packingStartTime}
-                      onToggle={() => togglePicker("packingStartTime")}
-                      disabled={isSick}
-                    />
-                    <CustomDateTimePicker
-                      label="Welding & Stepping Start Time"
-                      value={dates.weldingStartTime}
-                      onChange={(newDate) => handleDateChange("weldingStartTime", newDate!)}
-                      open={openPickers.weldingStartTime}
-                      onToggle={() => togglePicker("weldingStartTime")}
-                      disabled={isSick}
-                    />
-                    <CustomDateTimePicker
-                      label="Welding & Stepping End Time"
-                      value={dates.weldingEndTime}
-                      onChange={(newDate) => handleDateChange("weldingEndTime", newDate!)}
-                      open={openPickers.weldingEndTime}
-                      onToggle={() => togglePicker("weldingEndTime")}
-                      disabled={isSick}
-                    />
-                    <CustomDateTimePicker
-                      label="Packing End Time"
-                      value={dates.packingEndTime}
-                      onChange={(newDate) => handleDateChange("packingEndTime", newDate!)}
-                      open={openPickers.packingEndTime}
-                      onToggle={() => togglePicker("packingEndTime")}
-                      disabled={isSick}
-                    />
+                  {
+                    dates && dates.length > 0 && dates.map((date: any) => (
+                      <CustomDateTimePicker
+                        key={date.event_code}
+                        label={date.event_name}
+                        value={date.event_timestamp}
+                        onChange={(newDate) => handleDateChange(date.event_code, newDate!)}
+                        open={openPickers[date.event_code as PickerKey] ?? false}
+                        onToggle={() => togglePicker(date.event_code as PickerKey)}
+                        disabled={isSick}
+                      />
+                    ))
+                  }
                   </div>
                 </div>
               </div>
               <div className="wagon-tally-sheet-body-content-materials-details">
                 <div className="wagon-tally-sheet-body-content-materials-details-header">
-                  <h3 className="wagon-tally-sheet-body-content-materials-details-header-title">Add Material Details</h3>
+                  <h3 className="wagon-tally-sheet-body-content-materials-details-header-title">{text('addMaterialDetais')}</h3>
                 </div>
                 <div className="wagon-tally-sheet-body-content-materials-details-body-container">
                 {formValues.map((formValue, index) => 
                   <div key={index} className="wagon-tally-sheet-body-content-materials-details-body">
                     <div className="wagon-tally-sheet-body-content-materials-details-body-content">
-                      <p className="wagon-tally-sheet-body-content-materials-details-body-content-label">Batch ID/Heat No.</p>
+                      <p className="wagon-tally-sheet-body-content-materials-details-body-content-label">{text('batchID')}</p>
                       <div className="wagon-tally-sheet-body-content-materials-details-body-content-input-container">
                         <input 
                           type="text" 
                           placeholder="" 
                           className="wagon-tally-sheet-body-content-materials-details-body-content-input"
-                          name="batchId"
-                          value={formValue.batchId}
+                          name="batch_id_heat_no"
+                          value={formValue.batch_id_heat_no}
                           onChange={(event) => handleInputChange(index, event)}/>
                         <div className="wagon-tally-sheet-body-content-materials-details-body-content-input-icon" onClick={() => {
                           handleDataWithBatchId(index);
@@ -707,7 +1059,7 @@ const WagonTallySheet: React.FC = () => {
                       </div>
                     </div>
                     <div className="wagon-tally-sheet-body-content-materials-details-body-content">
-                      <p className="wagon-tally-sheet-body-content-materials-details-body-content-label">Material</p>
+                      <p className="wagon-tally-sheet-body-content-materials-details-body-content-label">{text('material')}</p>
                       <div className="wagon-tally-sheet-body-content-materials-details-body-content-input-container">
                         <input 
                           type="text" 
@@ -719,19 +1071,19 @@ const WagonTallySheet: React.FC = () => {
                       </div>
                     </div>
                     <div className="wagon-tally-sheet-body-content-materials-details-body-content">
-                      <p className="wagon-tally-sheet-body-content-materials-details-body-content-label">Material Code</p>
+                      <p className="wagon-tally-sheet-body-content-materials-details-body-content-label">{text('materialCode')}</p>
                       <div className="wagon-tally-sheet-body-content-materials-details-body-content-input-container">
                         <input 
                           type="text" 
                           placeholder="" 
                           className="wagon-tally-sheet-body-content-materials-details-body-content-input"
-                          name="materialCode"
-                          value={formValue.materialCode}
+                          name="code"
+                          value={formValue.code}
                           onChange={(event) => handleInputChange(index, event)}/>
                       </div>
                     </div>
                     <div className="wagon-tally-sheet-body-content-materials-details-body-content">
-                      <p className="wagon-tally-sheet-body-content-materials-details-body-content-label">Grade</p>
+                      <p className="wagon-tally-sheet-body-content-materials-details-body-content-label">{text('grade')}</p>
                       <div className="wagon-tally-sheet-body-content-materials-details-body-content-input-container">
                         <input 
                           type="text" 
@@ -743,7 +1095,7 @@ const WagonTallySheet: React.FC = () => {
                       </div>
                     </div>
                     <div className="wagon-tally-sheet-body-content-materials-details-body-content">
-                      <p className="wagon-tally-sheet-body-content-materials-details-body-content-label">Width</p>
+                      <p className="wagon-tally-sheet-body-content-materials-details-body-content-label">{text('width')}</p>
                       <div className="wagon-tally-sheet-body-content-materials-details-body-content-input-container">
                         <input 
                           type="text" 
@@ -755,7 +1107,7 @@ const WagonTallySheet: React.FC = () => {
                       </div>
                     </div>
                     <div className="wagon-tally-sheet-body-content-materials-details-body-content">
-                      <p className="wagon-tally-sheet-body-content-materials-details-body-content-label">Thick</p>
+                      <p className="wagon-tally-sheet-body-content-materials-details-body-content-label">{text('thick')}</p>
                       <div className="wagon-tally-sheet-body-content-materials-details-body-content-input-container">
                         <input 
                           type="text" 
@@ -765,12 +1117,12 @@ const WagonTallySheet: React.FC = () => {
                           value={formValue.thick}
                           onChange={(event) => handleInputChange(index, event)}/>
                         <div className="wagon-tally-sheet-body-content-materials-details-body-content-input-unit">
-                          mm
+                        {text('mm')}
                         </div>
                       </div>
                     </div>
                     <div className="wagon-tally-sheet-body-content-materials-details-body-content">
-                      <p className="wagon-tally-sheet-body-content-materials-details-body-content-label">Length</p>
+                      <p className="wagon-tally-sheet-body-content-materials-details-body-content-label">{text('length')}</p>
                       <div className="wagon-tally-sheet-body-content-materials-details-body-content-input-container">
                         <input 
                           type="text" 
@@ -780,12 +1132,12 @@ const WagonTallySheet: React.FC = () => {
                           value={formValue.length}
                           onChange={(event) => handleInputChange(index, event)}/>
                           <div className="wagon-tally-sheet-body-content-materials-details-body-content-input-unit">
-                            m
+                          {text('m')}
                           </div>
                       </div>
                     </div>
                     <div className="wagon-tally-sheet-body-content-materials-details-body-content">
-                      <p className="wagon-tally-sheet-body-content-materials-details-body-content-label">Pieces</p>
+                      <p className="wagon-tally-sheet-body-content-materials-details-body-content-label">{text('pieces')}</p>
                       <div className="wagon-tally-sheet-body-content-materials-details-body-content-input-container">
                         <input 
                           type="text" 
@@ -797,44 +1149,44 @@ const WagonTallySheet: React.FC = () => {
                       </div>
                     </div>
                     <div className="wagon-tally-sheet-body-content-materials-details-body-content">
-                      <p className="wagon-tally-sheet-body-content-materials-details-body-content-label">Line Item</p>
+                      <p className="wagon-tally-sheet-body-content-materials-details-body-content-label">{text('lineItem')}</p>
                       <div className="wagon-tally-sheet-body-content-materials-details-body-content-input-container">
                         <input 
                           type="text" 
                           placeholder="" 
                           className="wagon-tally-sheet-body-content-materials-details-body-content-input"
-                          name="lineItem"
-                          value={formValue.lineItem}
+                          name="line_item"
+                          value={formValue.line_item}
                           onChange={(event) => handleInputChange(index, event)}/>
                       </div>
                     </div>
                     <div className="wagon-tally-sheet-body-content-materials-details-body-content">
-                      <p className="wagon-tally-sheet-body-content-materials-details-body-content-label">PGI WT/ TW Wt.</p>
+                      <p className="wagon-tally-sheet-body-content-materials-details-body-content-label">{text('PGIWt')}</p>
                       <div className="wagon-tally-sheet-body-content-materials-details-body-content-input-container">
                         <input 
                           type="text" 
                           placeholder="" 
                           className="wagon-tally-sheet-body-content-materials-details-body-content-input"
-                          name="pgiWeight"
-                          value={formValue.pgiWeight}
+                          name="pgi_tw_wrt"
+                          value={formValue.pgi_tw_wrt}
                           onChange={(event) => handleInputChange(index, event)}/>
                           <div className="wagon-tally-sheet-body-content-materials-details-body-content-input-unit">
-                            MT
+                          {text('MT')}
                           </div>
                       </div>
                     </div>
                     <div className="wagon-tally-sheet-body-content-materials-details-body-content">
-                      <p className="wagon-tally-sheet-body-content-materials-details-body-content-label">Actual Weight</p>
+                      <p className="wagon-tally-sheet-body-content-materials-details-body-content-label">{text('actualWeight')}</p>
                       <div className="wagon-tally-sheet-body-content-materials-details-body-content-input-container">
                         <input 
                           type="text" 
                           placeholder="" 
                           className="wagon-tally-sheet-body-content-materials-details-body-content-input"
-                          name="actualWeight"
-                          value={formValue.actualWeight}
+                          name="actual_weight"
+                          value={formValue.actual_weight}
                           onChange={(event) => handleInputChange(index, event)}/>
                           <div className="wagon-tally-sheet-body-content-materials-details-body-content-input-unit">
-                            MT
+                          {text('MT')}
                           </div>
                       </div>
                     </div>
@@ -846,17 +1198,17 @@ const WagonTallySheet: React.FC = () => {
                       paddingLeft: '6px',
                       cursor: 'pointer'
                     }}>
-                    {formValue.images && formValue.images.length > 0 && (
+                    {formValue.material_images && formValue.material_images.length > 0 && (
                         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                          <Image src={formValue.images[formValue.images.length - 1] || ''} alt="Captured Image" width={48} height={36} style={{borderRadius: '6px'}} />
-                          {formValue.images.length > 1 && (
+                          <Image src={formValue.material_images[formValue.material_images.length - 1] || ''} alt="Captured Image" width={48} height={36} style={{borderRadius: '6px'}} />
+                          {formValue.material_images.length > 1 && (
                             <div style={{
                               color: '#3351FF',
                               padding: '2px 4px',
                               paddingLeft: '8px',
                               fontSize: '12px'
                             }}>
-                              +{formValue.images.length - 1}
+                              +{formValue.material_images.length - 1}
                             </div>
                           )}
                         </div>
@@ -893,18 +1245,17 @@ const WagonTallySheet: React.FC = () => {
             }
             {selectedTab === 1 && 
             <div style={{width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-              <h2>Coming Soon...</h2>
+              <h2>{text('comingSoon')}...</h2>
             </div>}
           </div>
         </div>
         <div className="wagon-tally-sheet-footer">
           <button className="wagon-tally-sheet-footer-button-clear" onClick={() => {
-            handleClear();
-          }}>CLEAR</button>
+            handleClearDialogOpen();
+          }}>{text('clear')}</button>
           <button className="wagon-tally-sheet-footer-button-save" onClick={() => {
-            console.log(formValues);
-            showMessage("Wagon Details Saved & Submitted Successfully", "success")
-          }}>SAVE & SUBMIT</button>
+            postWagonTallySheet();
+          }}>{text('save&Submit')}</button>
         </div>
         <BootstrapDialog 
           open={openWagonPhotos} 
@@ -922,7 +1273,7 @@ const WagonTallySheet: React.FC = () => {
                 <Image src={CloseButtonIcon} alt="close" />
               </div>
               <div className="photos-album-dialog-header">
-                Wagon Photos
+                {text('wagonPhotos')}
               </div>
               <div className="photos-album-dialog-albums">
                 {wagonCapturedImages.map((image, index) => (
@@ -965,10 +1316,10 @@ const WagonTallySheet: React.FC = () => {
                 <Image src={CloseButtonIcon} alt="close" />
               </div>
               <div className="photos-album-dialog-header">
-                Materials Photos
+                {text('materialPhotos')}
               </div>
               <div className="photos-album-dialog-albums">
-                {selectedFormIndex !== null && formValues[selectedFormIndex].images.map((image, idx) => (
+                {selectedFormIndex !== null && formValues[selectedFormIndex].material_images.map((image, idx) => (
                   <div className="photos-album-dialog-album" key={idx}>
                     <Image 
                       src={image || ''} 
@@ -987,6 +1338,44 @@ const WagonTallySheet: React.FC = () => {
                     />
                   </div>
                 ))}
+              </div>
+            </DialogContent>
+          </div>
+        </BootstrapDialog>
+        <BootstrapDialog
+        open={openClearDialog} 
+        onClose={handleClearDialogClose}
+        aria-labelledby="customized-dialog-title"
+        className="clear-dialog-styles"
+        >
+          <div className='clear-dialog-container'>
+          <DialogContent>
+              <div
+                aria-label="close"
+                onClick={handleClearDialogClose}
+                className="clear-close-icon"
+              >
+                <Image src={CloseButtonIcon} alt="close" />
+              </div>
+              <div className='clear-dialog-content'>
+                <p style={{textAlign: "center", fontWeight: 500, fontSize: 18}}>
+                  {text('clearConfirmMsg')}
+                </p>
+              </div>
+              <div className='clear-dialog-buttons-container'>
+                <div 
+                  onClick={() => {
+                    handleClear();
+                    handleClearDialogClose();
+                  }}
+                  className='confirm-button'>
+                   {text('confirm')}
+                </div>
+                <div 
+                  onClick={handleClearDialogClose}
+                  className='cancel-button'>
+                    {text('cancel')}  
+                </div>
               </div>
             </DialogContent>
           </div>

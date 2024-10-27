@@ -18,6 +18,7 @@ import './agentTable.css'
 import Popover from '@mui/material/Popover';
 import { useSnackbar } from '@/hooks/snackBar';
 import { httpsGet, httpsPost } from '@/utils/Communication';
+import { useRouter } from 'next/navigation';
 
 interface Column {
     id: string,
@@ -35,7 +36,7 @@ const columns: readonly Column[] = [
 ];
 
 function contructingData(agentList: any) {
-    return agentList.map((
+    return agentList && agentList.map((
         agent: {
             _id: string,
             parent_name: string,
@@ -60,7 +61,7 @@ function contructingData(agentList: any) {
 }
 
 function ActiveAgentList({ activeAgentList, activeCount, setActiveSkipAndLimit, getAllActiveHandlingAgents }: any) {
-
+    const router = useRouter();
     const [page, setPage] = React.useState(0);
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
     const [result, setResult] = React.useState([]);
@@ -123,9 +124,8 @@ function ActiveAgentList({ activeAgentList, activeCount, setActiveSkipAndLimit, 
     const deleteActiveHandlingAgent = async (row:any) => {
         const active_id = row._id;
         try {
-            const response = await httpsGet(`delete/active_HA?active_id=${active_id}`);
+            const response = await httpsGet(`delete/active_HA?active_id=${active_id}`, 0, router);
             if (response && response.statusCode === 200) {
-                console.log('response');
                 getAllActiveHandlingAgents({activeSkipAndLimit: { skip: 0, limit:10 }});
                 showMessage('deleted Successfully.', 'success');
                 setAnchorEl(null);
@@ -174,7 +174,7 @@ function ActiveAgentList({ activeAgentList, activeCount, setActiveSkipAndLimit, 
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {result.map((row: any, rowIndex) => {
+                            {result && result.map((row: any, rowIndex) => {
                                 return (
                                     <TableRow hover role="checkbox" tabIndex={-1} key={rowIndex}>
                                         {columns.map((column) => {

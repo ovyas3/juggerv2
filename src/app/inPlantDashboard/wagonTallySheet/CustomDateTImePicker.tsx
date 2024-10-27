@@ -37,7 +37,7 @@ const dateTimePickerStyles = (disabled: boolean) => ({
 
 type CustomDateTimePickerProps = {
   label: string;
-  value: Date;
+  value: Date | null;
   onChange: (date: Date | null) => void;
   open: boolean;
   onToggle: () => void;
@@ -52,7 +52,7 @@ const CustomDateTimePicker: React.FC<CustomDateTimePickerProps> = ({ label, valu
         <DateTimePicker
           open={open}
           onClose={onToggle}
-          value={dayjs(value)}
+          value={value ? dayjs(value) : null}
           sx={dateTimePickerStyles(disabled)}
           ampm={false}
           disabled={disabled}
@@ -60,6 +60,7 @@ const CustomDateTimePicker: React.FC<CustomDateTimePickerProps> = ({ label, valu
             textField: {
               onClick: onToggle,
               fullWidth: true,
+              placeholder: value ? undefined : "Pick a date and time",
               InputProps: {
                 endAdornment: null,
               },
@@ -73,6 +74,8 @@ const CustomDateTimePicker: React.FC<CustomDateTimePickerProps> = ({ label, valu
           onChange={(newDate) => {
             if (newDate) {
               onChange(newDate.toDate());
+            } else {
+              onChange(null);
             }
           }}
           format="DD-MM-YYYY hh:mm A"

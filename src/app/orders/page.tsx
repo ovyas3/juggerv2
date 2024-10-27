@@ -26,9 +26,6 @@ import uploadIcon from '@/assets/uploadIcon.svg';
 import { motion } from 'framer-motion';
 import { UploadWagonSheet } from '@/components/Table/tableComp';
 
-
-
-
 const getStatusCode = (status: string): string => {
   switch (status) {
     case "Available eIndent":
@@ -49,8 +46,6 @@ const getStatusCode = (status: string): string => {
       return 'All'
   }
 }
-
-
 
 const ageingCode = [
   { color: 'green', code: '#18BE8A', text: '1-2 days' },
@@ -93,7 +88,7 @@ const OrdersPage = () => {
   const [statusINPL, setStatusINPL] = useState(false);
 
   const [showRefreash, setShowRefreash] = useState(false)
-  const route = useRouter();
+  const router = useRouter();
   const [totalCountrake, setTotalCountrake] = useState<any>([])
 
   const[query, setQuery] = useState<any>({
@@ -133,8 +128,12 @@ const OrdersPage = () => {
       from: fromDate,
       to: toDate,
     }
-    const response = await httpsGet(`get/status_count?from=${payload.from.ts}&to=${payload.to.ts}`,0,route );
-    return response;
+    try{
+      const response = await httpsGet(`get/status_count?from=${payload.from.ts}&to=${payload.to.ts}`, 0, router );
+      return response;
+    } catch (error) {
+      console.log(error);
+    } 
   }
 
   useEffect(() => {
@@ -192,23 +191,35 @@ const OrdersPage = () => {
 
   // function which bring allshipment 
   async function getAllShipment() {
-    const response = await httpsPost(GET_SHIPMENTS, ShipmentsPayload,0,false,route );
-    if (response.data && response.data.data) {
-      setAllShipment(response.data.data)
-      setCount(response.data.total)
-    } else {
-      setAllShipment([])
-      setCount(0)
-    }
+    try{
+      const response = await httpsPost(GET_SHIPMENTS, ShipmentsPayload, router, 0, false );
+      if (response.data && response.data.data) {
+        setAllShipment(response.data.data)
+        setCount(response.data.total)
+      } else {
+        setAllShipment([])
+        setCount(0)
+      }
+    } catch (error) {
+      console.log(error);
+    } 
   }
 
   async function getCaptiveRake() {
-    const list_captive_rake = await httpsGet(CAPTIVE_RAKE,0,route );
-    setRakeCaptiveList(list_captive_rake.data)
+    try{
+      const list_captive_rake = await httpsGet(CAPTIVE_RAKE, 0 , router );
+      setRakeCaptiveList(list_captive_rake.data)
+    } catch (error) {
+      console.log(error);
+    } 
   }
   async function getRemarksList() {
-    const list_remarks = await httpsGet(REMARKS_LIST,0,route );
-    setRemarksList(list_remarks.data.remark_reasons)
+    try{
+      const list_remarks = await httpsGet(REMARKS_LIST, 0, router );
+      setRemarksList(list_remarks.data.remark_reasons)
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   function clearFilter() {

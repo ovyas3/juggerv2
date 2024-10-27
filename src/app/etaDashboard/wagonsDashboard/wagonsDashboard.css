@@ -1,0 +1,19 @@
+.wagon-dashboard-container {
+  position: relative;
+  display: flex;
+  scrollbar-width: 0px;
+  -ms-overflow-style: none;
+  
+  &::-webkit-scrollbar { 
+    display: none;
+  }
+}
+
+.wagon-dashboard-container-main{
+  height: calc(100vh - 56px);
+  width: calc(100vw - 70px);
+  margin-top: 56px;
+  overflow: hidden;
+  margin-left: 70px;
+  font-family: 'Inter', sans-serif;
+}

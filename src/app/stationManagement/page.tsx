@@ -11,8 +11,10 @@ import searchIcon from '@/assets/search_icon.svg'
 import './page.css'
 import StationAdd from "./stationModal";
 import { httpsGet } from "@/utils/Communication";
+import { useRouter } from "next/navigation";
 
 const Page = () => {
+  const router = useRouter();
   const mobile = useWindowSize(600);
   const [openAddStationModal, setOpenAddStationModal] = useState(false)
 
@@ -31,7 +33,7 @@ const Page = () => {
 
   async function getStations({stationPayload}:any) {
     try {
-      await httpsGet(`get/stations?limit=${stationPayload.limit}&skip=${stationPayload.skip}&state=${stationPayload.state}&zone=${stationPayload.zone}&code=${stationPayload.code}`).then((res) => {
+      await httpsGet(`get/stations?limit=${stationPayload.limit}&skip=${stationPayload.skip}&state=${stationPayload.state}&zone=${stationPayload.zone}&code=${stationPayload.code}`, 0, router).then((res) => {
         setAllStations(res?.data?.stations);
         setCountStation(res?.data?.count);
         setOgStations(res?.data?.stations);
@@ -39,8 +41,8 @@ const Page = () => {
         console.log(err)
       })
     } catch (error) {
-      console.log(error)
-    }
+      console.log(error);
+    } 
   }
 
   function handleSearchStationCode(target: any) {
@@ -61,6 +63,7 @@ const Page = () => {
     if(stationPayload.limit > 0)
     getStations({stationPayload});
   },[stationPayload])
+
 
   return (
     <div className="station-container">

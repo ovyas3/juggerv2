@@ -24,6 +24,10 @@ const getToday = () => {
     return DateTime.local().toISODate();
 }
 
+const convertToISO = (date: Date): string => {
+  return DateTime.fromJSDate(date).toISO() || '';
+};
+
 const diffrent = (start: string, end: string, type: string = 'days') => {
   // @ts-ignore
   return DateTime.fromJSDate(new Date(start)).diff(DateTime.fromJSDate(new Date(end)), type).toObject()[type];
@@ -74,7 +78,8 @@ const service = {
   differenceToday,
   getLocalTime,
   getEpoch,
-  formatDate
+  formatDate,
+  convertToISO
 }
 
 export default service;

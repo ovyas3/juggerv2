@@ -13,16 +13,20 @@ import "./style.css";
 import CountUp from 'react-countup';
 import { delay } from "framer-motion";
 import EtaDashboardModal from "./etaDashboradModal";
+import { useRouter } from "next/navigation";
+import { ThreeCircles } from "react-loader-spinner";
+import WagonsDashboard from "./wagonsDashboard/wagonsDashboard";
 
 
 function EtaDashboard() {
-
+  const router = useRouter();
   const { showMessage } = useSnackbar();
   const mobile = useWindowSize(500);
   const t = useTranslations("ETADASHBOARD");
   const [openModalDelay, setOpenModalDelay] = useState(false);
   const [providedShipments, setProvidedShipments] = useState([]);
   const [headingForModel, setHeadingForModel] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const [early, setEarly] = useState({
     count: 0,
@@ -55,29 +59,62 @@ function EtaDashboard() {
   const [stabled_shipments, setStabled_shipments] = useState([]);
  
   async function getStableShipments(){
-    const response = await httpsGet('get/stable_shipments');
-    if(response.statusCode === 200) {
-      setStabled_shipments(response?.data?.stabled_shipments);
+    try{
+      setLoading(true);
+      const response = await httpsGet('get/stable_shipments', 0, router);
+      if(response.statusCode === 200) {
+        setLoading(false);
+        setStabled_shipments(response?.data?.stabled_shipments);
+      }
+    } catch (error) {
+      setLoading(false);
+      console.log(error);
+    } finally {
+      setLoading(false);
     }
   }
 
   async function getDelayShipments(){
-    const response = await httpsGet('rake_shipment/en_route_eta_dashboard');
-    if(response.statusCode === 200) {
-      console.log(response.data)
-      setEarly(response.data.early);
-      setLate(response.data.late);
-      setOntime(response.data.on_time);
-      setZeroToEight(response.data['0_8']);
-      setEightToSixteen(response.data['8_16']);
-      setSixteenToTwentyFour(response.data['16_24']);
-      setTwentyfourTofourtyeight(response.data['24_48']);
+    try{
+      setLoading(true);
+      const response = await httpsGet('rake_shipment/en_route_eta_dashboard', 0, router);
+      if(response.statusCode === 200) {
+        setLoading(false);
+        setEarly(response.data.early);
+        setLate(response.data.late);
+        setOntime(response.data.on_time);
+        setZeroToEight(response.data['0_8']);
+        setEightToSixteen(response.data['8_16']);
+        setSixteenToTwentyFour(response.data['16_24']);
+        setTwentyfourTofourtyeight(response.data['24_48']);
+      }
+    } catch (error) {
+      setLoading(false);
+      console.log(error);
+    } finally {
+      setLoading(false);
     }
   }
   useEffect(()=>{
     getDelayShipments();
     getStableShipments();
   },[])
+
+  if (loading) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <ThreeCircles
+          visible={true}
+          height="100"
+          width="100"
+          color="#20114d"
+          ariaLabel="three-circles-loading"
+          wrapperStyle={{}}
+          wrapperClass=""
+        />
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -92,6 +129,7 @@ function EtaDashboard() {
           mobile ? "adjustMargin" : "adjustMarginMobile"
         }`}
       >
+        <WagonsDashboard />
         <div id="enRoutesEtaDelay">
           <section id="heading_reload">
             <div id="heading">
@@ -185,7 +223,6 @@ function EtaDashboard() {
            
           </section>
         </div>
-        
       </div>
 
       {openModalDelay && (<EtaDashboardModal providedShipments={providedShipments} setOpenModalDelay={setOpenModalDelay} headingForModel={headingForModel}/>)}

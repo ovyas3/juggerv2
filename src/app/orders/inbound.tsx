@@ -7,12 +7,10 @@ import TableData from "@/components/Table/table";
 import { useRouter } from 'next/navigation';
 
 function Inbound() {
-
-
   const [allShipment, setAllShipment] = useState<any>([]);
   const [count, setCount] = useState(0);
   const [rakeCaptiveList, setRakeCaptiveList] = useState([]);
-  const route = useRouter();
+  const router = useRouter();
   const [inBoundPayload, setInBoundPayload] = useState<any>({
     skip:0,
     limit:10,
@@ -28,37 +26,49 @@ function Inbound() {
   });
 
   async function getInboundList() {
-    const response = await httpsPost('rake_shipment/getShipment',inBoundPayload,0,false);
-    if (response.data && response.data) {
-      setAllShipment(response.data.data)
-      setCount(response.data.total)
+    try{
+      const response = await httpsPost('rake_shipment/getShipment',inBoundPayload, router, 0, false);
+      if (response.data && response.data) {
+        setAllShipment(response.data.data)
+        setCount(response.data.total)
+      }
+    } catch (error) {
+      console.log(error);
     }
   }
 
   async function getCaptiveRake() {
-    const list_captive_rake = await httpsGet('rake_shipment/get/captive_rakes',0,route );
-    setRakeCaptiveList(list_captive_rake.data)
+    try{
+      const list_captive_rake = await httpsGet('rake_shipment/get/captive_rakes',0, router );
+      setRakeCaptiveList(list_captive_rake.data)
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   async function getCountInbound() {
     let from = new Date(inBoundPayload.from).getTime();
     let to = new Date(inBoundPayload.to).getTime();
-    const response = await httpsGet(`get/status_count?from=${from}&to=${to}&outbound=false`)
-    if (response.statusCode === 200) {
-      const data = response.data[0]?.statuses || [];
-      const totalCount = response.data[0]?.totalCount || data.reduce((sum : any, item : any) => sum + item.count, 0);
-      const statusCounts = data.reduce((acc : any, item : any) => {
-        acc[item.status] = item.count;
-        return acc;
-      }, {});
+    try{
+      const response = await httpsGet(`get/status_count?from=${from}&to=${to}&outbound=false`, 0, router )
+      if (response.statusCode === 200) {
+        const data = response.data[0]?.statuses || [];
+        const totalCount = response.data[0]?.totalCount || data.reduce((sum : any, item : any) => sum + item.count, 0);
+        const statusCounts = data.reduce((acc : any, item : any) => {
+          acc[item.status] = item.count;
+          return acc;
+        }, {});
 
-      setCountInbound((prevState) => ({
-        ...prevState,
-        total: totalCount,
-        ITNS: statusCounts.ITNS || 0, 
-        Delivered: statusCounts.Delivered || 0, 
-      }));
-    }
+        setCountInbound((prevState) => ({
+          ...prevState,
+          total: totalCount,
+          ITNS: statusCounts.ITNS || 0, 
+          Delivered: statusCounts.Delivered || 0, 
+        }));
+      }
+    } catch (error) {
+      console.log(error);
+    } 
   }
   useEffect(()=>{
     if(inBoundPayload.from && inBoundPayload.to) {

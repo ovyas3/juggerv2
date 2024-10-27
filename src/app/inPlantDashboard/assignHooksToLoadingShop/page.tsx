@@ -12,8 +12,6 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import Image from "next/image";
 import { useSnackbar } from "@/hooks/snackBar";
-import RemoveIcon from "@mui/icons-material/Remove";
-
 import BOST from "@/assets/BOST Final 1.png";
 import BFNV from "@/assets/BFNV final 1.png";
 import BOBRN from "@/assets/BOBRN final 1.png";
@@ -21,6 +19,20 @@ import BRNA from "@/assets/BRNA 1.png";
 import BRN229 from "@/assets/BRN 23.png";
 import { Suspense } from "react";
 import Loader from "@/components/Loading/WithBackDrop";
+import Dialog from '@mui/material/Dialog';
+import DialogContent from '@mui/material/DialogContent';
+import { styled } from '@mui/material/styles';
+import CloseButtonIcon from "@/assets/close_icon.svg";
+import { ThreeCircles } from "react-loader-spinner";
+
+const BootstrapDialog = styled(Dialog)(({ theme }) => ({
+  "& .MuiDialogContent-root": {
+    padding: theme.spacing(2),
+  },
+  "& .MuiDialogActions-root": {
+    padding: theme.spacing(1),
+  },
+}));
 
 function AssignHooksToLoadingShop() {
   return (
@@ -54,58 +66,20 @@ function wagonImage(wagonImage: any) {
   }
 }
 
-function arePlantRecordsEqual(arr1: any[], arr2: any[]): boolean {
-  // Check if arrays have the same length
-  if (arr1.length !== arr2.length) {
-    return false;
+const compareHooksData = (existingHooks: any[], workingHooks: any[]) => {
+  const filteredExistingHooks = existingHooks.filter((hook) => hook.hook_no !== undefined);
+  const filteredWorkingHooks = workingHooks.filter((hook) => hook.hook_no !== undefined);
+
+  if (filteredExistingHooks.length !== filteredWorkingHooks.length) {
+    return true;
   }
 
-  // Compare each object in the array
-  for (let i = 0; i < arr1.length; i++) {
-    const record1 = arr1[i];
-    const record2 = arr2[i];
+  const hooksMatch = filteredExistingHooks.every((existingHook) =>
+    filteredWorkingHooks.some((workingHook) => workingHook.hook_no === existingHook.hook_no)
+  );
 
-    // Compare plant objects
-    if (
-      record1.plant._id !== record2.plant._id ||
-      record1.plant.name !== record2.plant.name ||
-      record1.plant.shipper !== record2.plant.shipper
-    ) {
-      return false;
-    }
-
-    // Compare other properties
-    if (
-      record1.count !== record2.count ||
-      record1.hooks_assigned !== record2.hooks_assigned
-    ) {
-      return false;
-    }
-
-    // Compare hooksRecords (assuming order matters)
-    if (record1.hooksRecords.length !== record2.hooksRecords.length) {
-      return false;
-    }
-
-    for (let j = 0; j < record1.hooksRecords.length; j++) {
-      if (
-        record1.hooksRecords[j].hookNumber !==
-        record2.hooksRecords[j].hookNumber
-      ) {
-        return false;
-      }
-      if (
-        record1.hooksRecords[j].wagonsList.length !==
-        record2.hooksRecords[j].wagonsList.length
-      ) {
-        return false;
-      }
-      // Further comparison for wagonsList can be done here if needed
-    }
-  }
-
-  return true;
-}
+  return !hooksMatch;
+};
 
 function AssignHooksToLoadingShopContent() {
   const text = useTranslations("WAGONTALLYSHEET");
@@ -122,23 +96,34 @@ function AssignHooksToLoadingShopContent() {
   const [originalHooksList, setOriginalHooksList] = useState<any>([]);
   const [workingWagonsList, setWorkingWagonsList] = useState<any>([]);
   const [wagonListAssignToPlant, setWagonListAssignToPlant] = useState<any>([]);
+  const [originalWagonListAssignToPlant, setOriginalWagonListAssignToPlant] = useState<any>([]);
+  const [openConfirmationDialog, setOpenConfirmationDialog] = useState(false);
+  const [selectedPlantObject, setSelectedPlantObject] = useState<any>(null);
+  const [isSelectionConfirmed, setIsSelectionConfirmed] = useState(false);
 
   // const [hookNumber, setHookNumber] = useState(0);
   const [hookManagement, setHookManagement] = useState<any>([]);
   const [selectedHook, setSelectedHook] = useState<any>(null);
   const [openHooksDropdown, setOpenHooksDropdown] = useState(false);
 
+  const [loading, setLoading] = useState(false);
+
   // api calling
   const getAssignLoadingShop = async () => {
     try {
+      setLoading(true);
       const response = await httpsGet(
-        `get_assigned_loading_shops?shipment=${id}`
+        `get_assigned_loading_shops?shipment=${id}`, 0, router
       );
       setAllPlants(response?.data);
     } catch (error) {
+      setLoading(false);
       console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
+
   const getWagonsByHooks = async () => {
     let payload = {
       shipment: id,
@@ -146,52 +131,102 @@ function AssignHooksToLoadingShopContent() {
     };
     if (payload.plant) {
       try {
-        const response = await httpsPost(`get_wagons_by_hooks`, payload);
+        setLoading(true);
+        const response = await httpsPost(`get_wagons_by_hooks`, payload, router);
         setWagonListAssignToPlant(response?.data?.wagonData);
+        const existingHooksData = response?.data?.wagonData.map((wagon: any) => {
+          return {
+            _id: wagon._id,
+            hook_no: wagon.hook_no,
+          }
+        });
+        setOriginalWagonListAssignToPlant(existingHooksData);
         setShipmentData(response?.data?.shipmentData);
       } catch (error) {
+        setLoading(false);
         console.log(error);
+      } finally {
+        setLoading(false);
       }
     }
   };
 
   const handleAssignHooks = async () => {
+    const selectedWagonsIDs = workingWagonsList
+      .filter((wagon: any) => wagon.hook_no === selectedHook)
+      .map((wagon: any) => wagon._id);
     let payload = {
       shipment: id,
       plant_assigned: selectedPlant?.plant?._id,
-      hook_no: 2,
-      wagons: ["670919b4068631c0c5c7d57f"],
+      hook_no: selectedHook,
+      wagons: selectedWagonsIDs,
     };
-    // try {
-    //     const response = await httpsPost(`assign_hook_to_plant`, payload);
-    //     console.log(response)
-    // } catch (error) {
-    //     console.log(error)
-    // }
+    try {
+        setLoading(true);
+        await httpsPost(`assign_hook_to_plant`, payload, router);
+        showMessage.showMessage(`Hooks assigned successfully for hook ${selectedHook} of ${selectedPlant?.plant?.name}
+        `, "success");
+        getWagonsByHooks();
+    } catch (error) {
+      setLoading(false);
+        console.log(error)
+    } finally {
+      setLoading(false);
+    }
   };
 
   //local functions
+  
   const handleSelectionOfPlant = (
     event: any,
     plantObject: any,
     index: number
   ) => {
     event.stopPropagation();
+    setSelectedPlantObject(plantObject);
+
+    const existingHooksData = originalWagonListAssignToPlant.map((wagon: any) => {
+      return {
+        _id: wagon._id,
+        hook_no: wagon.hook_no,
+      }
+    });
+    const workingHooksData = workingWagonsList.map((wagon: any) => {
+      return {
+        _id: wagon._id,
+        hook_no: wagon.hook_no,
+      }
+    });
+    const confirm = compareHooksData(existingHooksData, workingHooksData);
+    if(confirm) {
+      const handleOpen = () => setOpenConfirmationDialog(true);
+      handleOpen();
+      return;
+    } else {
+      setIsSelectionConfirmed(true);
+    }
+  };
+
+  useEffect(() => {
+    if (isSelectionConfirmed && selectedPlantObject) {
+      handleSelectionOfPlantConfirmed();
+      setIsSelectionConfirmed(false);
+    }
+  }, [isSelectionConfirmed, selectedPlantObject]);
+
+  const handleSelectionOfPlantConfirmed  = () => {
+    const plantObject = selectedPlantObject;
+
     setOpenPlantDropDown(false);
     setOpenHooksDropdown(false);
     setSelectedPlant(plantObject);
     setSelectedHook(plantObject?.hooksRecords[0]?.hookNumber);
-  };
+  }
+
+
   const assignHooksToSelectedWagon = (e: any, wagons: any, index: number) => {
     e.stopPropagation();
-
-    //workingWagonsList
-    // setWorkingWagonsList((prevWagons: any) => {
-    //   const newWagons = [...prevWagons];
-    //   newWagons[index].hook_no = selectedHook;
-    //   return newWagons;
-    // })
-
+    
     setWorkingWagonsList((prevWagons: any) => {
       const newWagons = [...prevWagons];
       if (newWagons[index].hook_no === selectedHook) {
@@ -199,7 +234,7 @@ function AssignHooksToLoadingShopContent() {
       } else {
         if (newWagons[index].hook_no) {
           showMessage.showMessage(
-            `wagon is already assigned to hook ${newWagons[index].hook_no}`,
+            `Wagon is already assigned to hook ${newWagons[index].hook_no}`,
             "error"
           );
           return newWagons;
@@ -224,6 +259,7 @@ function AssignHooksToLoadingShopContent() {
       return newHookManagement;
     });
   };
+
   const handleAssignHooksToSelectedHook = (
     event: any,
     hook: any,
@@ -231,42 +267,7 @@ function AssignHooksToLoadingShopContent() {
   ) => {
     event.stopPropagation();
     setOpenHooksDropdown(false);
-    setSelectedHook(hook?.hookNumber);
-  };
-  const addNewHooksToSelectedPlant = () => {
-    if (
-      selectedPlant.hooksRecords[selectedPlant.hooksRecords.length - 1]
-        ?.wagonsList?.length === 0
-    ) {
-      showMessage.showMessage(
-        `Please select wagons for hook ${
-          selectedPlant.hooksRecords[selectedPlant.hooksRecords.length - 1]
-            ?.hookNumber
-        } `,
-        "error"
-      );
-      return;
-    }
-    const allHaveHookNo = workingWagonsList.every((item: any) =>
-      item.hasOwnProperty("hook_no")
-    );
-    if (allHaveHookNo) {
-      showMessage.showMessage(`All Wagons are assigned`, "error");
-      return;
-    }
-
-    setHookManagement((prevHookManagement: any) => {
-      const newHookManagement = [...prevHookManagement];
-      newHookManagement.map((plantObject: any) => {
-        if (plantObject?.plant?._id === selectedPlant?.plant?._id) {
-          plantObject.hooksRecords = [
-            ...plantObject.hooksRecords,
-            { hookNumber: plantObject.hooksRecords.length + 1, wagonsList: [] },
-          ];
-        }
-      });
-      return newHookManagement;
-    });
+    setSelectedHook(hook?.hook_no);
   };
 
   useEffect(() => {
@@ -276,6 +277,10 @@ function AssignHooksToLoadingShopContent() {
   useEffect(() => {
     if (selectedPlant) getWagonsByHooks();
   }, [selectedPlant]);
+
+  const handleClose = () => {
+    setOpenConfirmationDialog(false);
+  };
 
   useEffect(() => {
     setWorkingWagonsList(wagonListAssignToPlant);
@@ -328,6 +333,40 @@ function AssignHooksToLoadingShopContent() {
     }
   }, [allPlants]);
 
+  const handleClickOutside = (e: MouseEvent) => {
+    if (
+      !(e.target as HTMLElement).closest('#dropdownForPlantsMaincontainer') &&
+      !(e.target as HTMLElement).closest('#dropdownListForplants') &&
+      !(e.target as HTMLElement).closest('#dropdownListForHooks')
+    ) {
+      setOpenPlantDropDown(false);
+      setOpenHooksDropdown(false);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener('click', handleClickOutside);
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, []);
+
+  if (loading) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <ThreeCircles
+          visible={true}
+          height="100"
+          width="100"
+          color="#20114d"
+          ariaLabel="three-circles-loading"
+          wrapperStyle={{}}
+          wrapperClass=""
+        />
+      </div>
+    );
+  }
+
   return (
     <div
       className="wagon-wrapper"
@@ -339,7 +378,7 @@ function AssignHooksToLoadingShopContent() {
     >
       <Header title={text("in-plant-Dashboard")} isMapHelper={false} />
       <div id="pageInsideContent">
-        <div id="search-container-assign">
+        <div id="search-container-assign-hooks">
           <div
             style={{ cursor: "pointer" }}
             onClick={() => {
@@ -348,11 +387,12 @@ function AssignHooksToLoadingShopContent() {
           >
             <ArrowBackIcon />
           </div>
-          <h3>{text("assignsHooksToLoadingShop")}</h3>
+          <h3 className="search-container-assign-title">{text("assignsHooksToLoadingShop")}</h3>
           <div></div>
         </div>
 
-        <div id="status-for-assign-sheet">
+        <div className="shipment-details-container">
+        <div id="status-for-assign-sheet-hooks">
           <div>
             <header style={{ fontSize: 12, color: "#42454E", marginBottom: 8 }}>
               {text("status")}
@@ -385,29 +425,7 @@ function AssignHooksToLoadingShopContent() {
               {shipmentData?.received_no_of_wagons || ""}
             </text>
           </div>
-          {/* <div id="wagons-assign-notassigned">
-            <div>
-              {text("assignedWagons")}
-              <span style={{ color: "#3351FF", fontWeight: 600 }}>
-                {wagonsNewData?.filter((wagons: any) => wagons.plant_assigned)
-                  .length || 0}
-              </span>
-            </div>
-            <div>
-              {text("notAssignedWagons")}
-              <span style={{ color: "red", fontWeight: 600 }}>
-                {wagonsNewData.filter((wagons: any) => !wagons.plant_assigned)
-                  .length || 0}
-              </span>
-            </div>
-            <div>
-              {text("sickWagons")}
-              <span style={{ color: "red", fontWeight: 600 }}>
-                {wagonsNewData.filter((wagons: any) => wagons.is_sick).length ||
-                  0}
-              </span>
-            </div>
-          </div> */}
+        </div>
         </div>
 
         <div id="filtersForHooksAssignToLoadingShop">
@@ -418,6 +436,7 @@ function AssignHooksToLoadingShopContent() {
               onClick={(e) => {
                 e.stopPropagation();
                 setOpenPlantDropDown(!openPlantDropDown);
+                setOpenHooksDropdown(false);
               }}
             >
               <div>{selectedPlant?.plant?.name || "Select Mill"}</div>
@@ -448,6 +467,7 @@ function AssignHooksToLoadingShopContent() {
               id="dropdownForPlantsMaincontainer"
               onClick={(e) => {
                 e.stopPropagation();
+                setOpenPlantDropDown(false)
                 setOpenHooksDropdown(!openHooksDropdown);
               }}
             >
@@ -456,7 +476,7 @@ function AssignHooksToLoadingShopContent() {
             </div>
             {openHooksDropdown && (
               <div id="dropdownListForHooks">
-                {selectedPlant?.hooksRecords.map(
+                {selectedPlant?.hooks.map(
                   (eachhook: any, index: number) => {
                     return (
                       <div
@@ -467,30 +487,11 @@ function AssignHooksToLoadingShopContent() {
                           handleAssignHooksToSelectedHook(e, eachhook, index);
                         }}
                       >
-                        <div>Hook {eachhook.hookNumber}</div>
-                        {index === selectedPlant?.hooksRecords.length - 1 && (
-                          <div className="removeIcon-container-loading-shop">
-                            <RemoveIcon
-                              style={{ fontSize: 20, color: "white" }}
-                            />
-                          </div>
-                        )}
-                        {/* <div className="removeIcon-container-loading-shop"  ><RemoveIcon style={{fontSize: 20, color:'white'}}/></div> */}
+                        <div>Hook {eachhook.hook_no}</div>
                       </div>
                     );
                   }
                 )}
-                <div id="addButtonContainerForHooks">
-                  <div
-                    id="addButtonForHooks"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      addNewHooksToSelectedPlant();
-                    }}
-                  >
-                    ADD
-                  </div>
-                </div>
               </div>
             )}
           </div>
@@ -502,22 +503,15 @@ function AssignHooksToLoadingShopContent() {
               <div
                 key={index}
                 className="wagonAssignToMillConatiner"
-                //   style={{
-                //     opacity: wagons.is_sick ? 0.4 : 1,
-                //     cursor: wagons.is_sick ? "not-allowed" : "pointer",
-                //   }}
               >
                 <div
                   className="wagonsAssignToMillImageSelectorConatainer"
                   onClick={(e) => {
                     e.stopPropagation();
-                    if (!wagons.is_sick) {
-                      assignHooksToSelectedWagon(e, wagons, index);
-                    }
+                    // if (!wagons.is_sick) {
+                    // }
+                    assignHooksToSelectedWagon(e, wagons, index);
                   }}
-                  // style={{
-                  //   cursor: wagons.is_sick ? "not-allowed" : "pointer",
-                  // }}
                 >
                   {wagons?.hook_no && (
                     <div
@@ -534,16 +528,6 @@ function AssignHooksToLoadingShopContent() {
                         alignItems: "center",
                       }}
                     >
-                      {/* <CheckRoundedIcon
-                          style={{
-                            color: "white",
-                            height: "100%",
-                            width: "100%",
-                            display: "flex",
-                            justifyContent: "center",
-                            alignItems: "center",
-                          }}
-                        /> */}
                       <div>{wagons?.hook_no}</div>
                     </div>
                   )}
@@ -564,10 +548,10 @@ function AssignHooksToLoadingShopContent() {
                     {wagons?.plant_assigned?.name || ""}
                   </header>
                   <header id="wagonsAssignToMillNumber">
-                    {wagons?.w_no || "XXXXXXX"}
+                    {wagons?.w_no || ""}
                   </header>
                   <header id="wagonsAssignToMilltype">
-                    {wagons?.wagon_type?.name || "XXXXXXX"}
+                    {wagons?.wagon_type?.name || ""}
                   </header>
                 </div>
               </div>
@@ -575,9 +559,7 @@ function AssignHooksToLoadingShopContent() {
           })}
         </div>
 
-        <div
-          style={{ marginInline: 24, display: "flex", justifyContent: "end" }}
-        >
+        <div id="buttonContainerHooks">
           <div
             style={{
               cursor: "pointer",
@@ -595,6 +577,45 @@ function AssignHooksToLoadingShopContent() {
             ASSIGN
           </div>
         </div>
+
+        <BootstrapDialog 
+          open={openConfirmationDialog} 
+          onClose={handleClose}
+          aria-labelledby="customized-dialog-title"
+          className="confirm-dialog-styles"
+        >
+          <div className='confirm-dialog-container'>
+            <DialogContent>
+              <div
+                aria-label="close"
+                onClick={handleClose}
+                className="confirm-close-icon"
+              >
+                <Image src={CloseButtonIcon} alt="close" />
+              </div>
+              <div className='confirm-dialog-content'>
+                <p style={{textAlign: "center", fontWeight: 500, fontSize: 18}}>
+                  {text('assignHooksConfirmMsg')} 
+                </p>
+              </div>
+              <div className='confirm-dialog-buttons-container'>
+                <div 
+                  onClick={() => {
+                    handleSelectionOfPlantConfirmed();
+                    setOpenConfirmationDialog(false);
+                  }}
+                  className='confirm-button'>
+                  {text('confirm')} 
+                </div>
+                <div 
+                  onClick={handleClose}
+                  className='cancel-button'>
+                  {text('cancel')} 
+                </div>
+              </div>
+            </DialogContent>
+          </div>
+        </BootstrapDialog>
       </div>
       <SideDrawer />
     </div>

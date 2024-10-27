@@ -60,7 +60,6 @@ function Footer() {
           <Tab
             onClick={() => {
               setValue("contact");
-              console.log(value);
             }}
             label="Contact"
             icon={

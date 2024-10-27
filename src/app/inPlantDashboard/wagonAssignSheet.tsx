@@ -15,6 +15,8 @@ import locomotive from "@/assets/Train_engine-removebg-preview 1.png";
 import chain01 from "@/assets/chain 1.png";
 import chain02 from "@/assets/chain 2.png"
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import { useRouter } from "next/navigation";
+import { ThreeCircles } from "react-loader-spinner";
 
 function WagonAssignSheet({
   shipmentForWagonSheet,
@@ -22,8 +24,10 @@ function WagonAssignSheet({
   setShowAssignWagon,
   setShipmentForWagonSheet,
 }: any) {
+  const router = useRouter();
   const showMessage = useSnackbar();
   const text = useTranslations("WAGONTALLYSHEET");
+  const [loading, setLoading] = useState(false);
   const [originalWagonDetails, setOriginalWagonDetails] = useState<any>([]);
   const [wagonsNewData, setWagonsNewData] = useState<any>([]);
   const [plants, setPlants] = useState<any>([]);
@@ -31,14 +35,17 @@ function WagonAssignSheet({
 
   const wagonDetails = async () => {
     try {
+      setLoading(true);
       const response = await httpsGet(
-        `get_wagon_details_by_shipment?id=${shipmentForWagonSheet.id}`
+        `get_wagon_details_by_shipment?id=${shipmentForWagonSheet.id}`, 0, router
       );
-      console.log(response);
       setOriginalWagonDetails(response.wagonData);
       setPlants(response.plants);
     } catch (error) {
+      setLoading(false);
       console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -104,14 +111,18 @@ function WagonAssignSheet({
       assigned_data: assignedData,
     };
     try {
-      const response = await httpsPost("assign_wagon_to_plant", payload);
+      setLoading(true);
+      const response = await httpsPost("assign_wagon_to_plant", payload, router);
       if (response.statusCode === 200) {
         wagonDetails();
         showMessage.showMessage("Assigned successfully", "success");
         // getWagonDetails();
       }
     } catch (error) {
+      setLoading(false);
       console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -139,7 +150,6 @@ function WagonAssignSheet({
 
   // Handle when an item is dropped
   const handleOnDragEnd = (result: any) => {
-    console.log(result);
     if (!result.destination) return;
     const updatedItems = Array.from(wagonsNewData);
     const [movedItem] = updatedItems.splice(result.source.index, 1);
@@ -148,7 +158,21 @@ function WagonAssignSheet({
     setWagonsNewData(updatedItems);
   };
 
-  console.log(wagonsNewData);
+  if (loading) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <ThreeCircles
+          visible={true}
+          height="100"
+          width="100"
+          color="#20114d"
+          ariaLabel="three-circles-loading"
+          wrapperStyle={{}}
+          wrapperClass=""
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="wagon-wrapper">

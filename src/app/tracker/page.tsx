@@ -8,6 +8,8 @@ import { httpsGet } from "../../utils/Communication";
 import dynamic from 'next/dynamic'
 import Placeholder from "@/components/MapView/Skeleton/placeholder";
 import Loader from "@/components/Loading/WithBackDrop";
+import { useRouter } from "next/navigation";
+import { ThreeCircles } from "react-loader-spinner";
 
 const TripTrackerDynamic = dynamic(() => import('../../components/MapView/TripTracker'), {
   loading: () => <Placeholder />,
@@ -15,13 +17,14 @@ const TripTrackerDynamic = dynamic(() => import('../../components/MapView/TripTr
 })
 
 const MapViewPageFunction: NextPage = () => {
+    const router = useRouter();
     const [data, setData] = useState<any>({});
     const [dataFetched, setDataFetched] = useState(false);
     const [routeStation, setRouteStation] = useState<any>({})
     const searchParams = useSearchParams();
     const getData = async (code: string) => {
       const response = await httpsGet(
-        `tracker?unique_code=${code}`
+        `tracker?unique_code=${code}`, 0, router
       ).then((res) => {
         setDataFetched(true);
         return res;
@@ -32,7 +35,7 @@ const MapViewPageFunction: NextPage = () => {
 
     const fetchRouteStations = async (code: string) => {
       const response = await httpsGet(
-        `tracker/routeStations?unique_code=${code}`
+        `tracker/routeStations?unique_code=${code}`, 0, router
       )
       setRouteStation(response.data)
     }
