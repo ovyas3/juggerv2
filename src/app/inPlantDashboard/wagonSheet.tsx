@@ -42,6 +42,7 @@ const columns: readonly Column[] = [
   { id: "sno", label: "SI No", style: "header_sno" },
   { id: "indent", label: "Indent No", style: "header_indent" },
   { id: "edemand", label: "e-Demand No", style: "header_edemand" },
+  { id: "destination", label: "Destination", style: "header_destination_inplant"},
   { id: "plant_codes", label: "Loading Shop", style: "header_plant" },
   { id: "status", label: "Status", style: "header_status" },
   { id: "exp_loading", label: "Expected Loading", style: "header_exp_loading" },
@@ -71,6 +72,7 @@ function contructingData(shipment: any) {
       plant_codes: any;
       is_captive: any;
       wagon_data_uploaded: any;
+      delivery_location: any;
       plants_assigned: [{
         _id: string;
         name: string;
@@ -86,6 +88,8 @@ function contructingData(shipment: any) {
             : "--",
         },
         fnr: shipment?.FNR ? shipment?.FNR : "--",
+        destination_code : shipment?.delivery_location?.code ? shipment?.delivery_location?.code : "--",
+        destination_name : shipment?.delivery_location?.name ? shipment?.delivery_location?.name : "--",
         indent: {
           indent_no: shipment?.indent_no ? shipment?.indent_no : "--",
         },
@@ -612,6 +616,22 @@ function WagonTallySheet({}: any) {
                                           </div>
                                         </div>
                                       )}
+                                    </div>
+                                  </>
+                                )}
+                                {column.id === "destination" && (
+                                  <>
+                                    <div 
+                                      style={{ 
+                                        fontSize: 12,
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        width: 156,
+                                        paddingLeft: 16
+                                      }}
+                                    >
+                                      {row.destination_code} {row.destination_name}
                                     </div>
                                   </>
                                 )}

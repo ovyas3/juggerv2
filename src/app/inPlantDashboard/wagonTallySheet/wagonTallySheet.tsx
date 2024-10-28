@@ -410,25 +410,48 @@ const WagonTallySheet: React.FC = () => {
   // Function to handle confirm of wagon and material photos
   const handleWagonConfirm = async (images: (string | null)[]) => {
     console.log(images);
-    let image = images[0];
-
+    let image: any = images[0];
+  
     if (image && !image.startsWith('data:image/jpeg;base64,')) {
       image = `data:image/jpeg;base64,${image}`;
     }
-
-    try{
+  
+    // Convert base64 to binary Blob
+    const byteString = atob(image.split(',')[1]);
+    const mimeString = image.split(',')[0].split(':')[1].split(';')[0];
+    const ab = new ArrayBuffer(byteString.length);
+    const ia = new Uint8Array(ab);
+    for (let i = 0; i < byteString.length; i++) {
+      ia[i] = byteString.charCodeAt(i);
+    }
+    const blob = new Blob([ab], { type: mimeString });
+  
+    // Create a FormData object
+    const formData = new FormData();
+    formData.append('file', blob, 'image.jpg');
+    // formData.append('fnr_no', '24092908743');
+    // formData.append('type', 'wagon');
+  
+    try {
       setLoading(true);
-      const response = await httpsPost(`upload_wagon_tally_image?fnr_no=24092908743`, image, router, 0, true);
-      let data = response?.data;
+  
+      // Send the FormData object with the appropriate headers
+      const response = await httpsPost(`upload_wagon_tally_image?fnr_no=24092908743`, formData, router, 0, true);
+  
+      const data = response?.data;
       console.log(data);
-      showMessage("Image Uploaded Successfully", "success");
+      if(response?.statusCode === 200) {
+        showMessage("Image uploaded successfully", "success");
+      } else {
+        showMessage("Failed to upload image", "error");
+      }
     } catch (error) {
-      setLoading(false);
       showMessage("Failed to upload image", "error");
       console.log(error);
     } finally {
       setLoading(false);
     }
+  
     setWagonCapturedImages((prevImages) => [...prevImages, ...images]);
   };
 
@@ -542,7 +565,11 @@ const WagonTallySheet: React.FC = () => {
       const response = await httpsGet(
         `get_wagon_details_by_shipment?id=${id}&plant=${selectedPlant?.plant?._id}&hook=${selectedHook}`, 0, router
       );
-      setShipmentData(response?.shipmentData);
+      const shipmentDataObj = {
+        edemand_no: response && response?.shipmentData && response?.shipmentData?.edemand_no ? response?.shipmentData?.edemand_no : '',
+        received_no_of_wagons: response?.wagonData && response?.wagonData?.length ? response?.wagonData?.length : 0,
+      }
+      setShipmentData(shipmentDataObj);
       setWagonData(response?.wagonData);
     } catch (error) {
       setLoading(false);
@@ -769,19 +796,19 @@ const WagonTallySheet: React.FC = () => {
     };
   }, []);
 
-  const handleWagonImages = async () => {
-    try{
-      setLoading(true);
-      await httpsPost(`upload_wagon_tally_image?fnr_no="24092908743"`, { images: wagonCapturedImages }, router);
+
+   
+      
+      
     
-    } catch (error) {
-      setLoading(false);
-      console.log(error);
-    } finally {
-      setLoading(false);
-      console.log("Images Uploaded Successfully");
-    }
-  }
+
+
+
+
+
+
+
+
 
   if (loading) {
     return (

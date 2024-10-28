@@ -23,7 +23,7 @@ import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import { httpsPost, httpsGet } from '@/utils/Communication';
-import { UPDATE_RAKE_CAPTIVE_ID, REMARKS_UPDATE_ID, FETCH_TRACK_DETAILS, UPDATE_ELD, GET_HANDLING_AGENT_LIST } from '@/utils/helper'
+import { UPDATE_RAKE_CAPTIVE_ID, REMARKS_UPDATE_ID, FETCH_TRACK_DETAILS, UPDATE_ELD, GET_HANDLING_AGENT_LIST, UPDATE_DELIVER_STATUS_WITH_REMARK } from '@/utils/helper'
 import CloseIcon from '@mui/icons-material/Close';
 import { MenuItem } from '@mui/material';
 import './style.css'
@@ -61,6 +61,10 @@ async function rake_update_id(payload: Object, router: any) {
 async function remake_update_By_Id(payload: object, router: any) {
     const response = await httpsPost(REMARKS_UPDATE_ID, payload, router);
     return response;
+}
+
+async function updateDeliverStatusWithRemark(payload: object, router: any) {
+    return await httpsPost(UPDATE_DELIVER_STATUS_WITH_REMARK, payload, router);
 }
 
 const status_class_map: { [key: string]: string } = {
@@ -1331,6 +1335,68 @@ export const UploadWagonSheet = ({getWagonDetails,isClose, shipment, setOpenUplo
     </div>
     )
 }
+
+export const ModifyStatus = ({isClose, shipment, getAllShipment}:any) => {
+    const t = useTranslations('ORDERS');
+    const router = useRouter();
+    const [remark, setRemark] = useState('');
+    const id = shipment?._id;
+    const { showMessage } = useSnackbar();
+    const postDeliverStatusWithRemark = async () => {
+        const payload = {
+            id: id,
+            remarks: [
+                {
+                    date: service.getEpoch(new Date()),
+                    remark: remark,
+                }
+            ]
+        }
+
+        try {
+            const response = await updateDeliverStatusWithRemark(payload, router);
+            if (response.statusCode === 200) {
+                showMessage('Status Updated Successfully', 'success');
+                isClose(false);
+                getAllShipment();
+            }
+        } catch (error) {
+            console.log('Error:', error);
+            showMessage('An error occurred, please try again', 'error');
+        }
+        
+    };
+
+    return (
+    <div style={{width:'100vw', height:'100vh', position:'fixed', top:0, left:0 ,zIndex:300, backgroundColor:'rgba(0, 0, 0, 0.5)'}} onClick={(e)=>{e.stopPropagation(); isClose(false)}}>
+        <div className="modify-status-modal-main" onClick={(e)=>{e.stopPropagation()}}>
+
+            <div style={{display:'flex', justifyContent:'space-between',}}>
+                <header style={{fontSize:20, color:'#131722', fontWeight:600}}>Modify Status</header>
+            </div>
+
+            <div className="modify-status-remark">
+                <header style={{ fontSize:14, color:'#42454E', fontWeight: 600}}>Remark</header>
+                <input className="modify-status-remark-input" type="text" placeholder="Enter Remark" value={remark} onChange={
+                    (e) => {
+                        setRemark(e.target.value);
+                    }
+                }/>
+            </div>
+
+            <div className="buttonContaioner">
+                <Button className="buttonMarkPlacement" onClick={(e)=>{ 
+                    e.stopPropagation();  
+                    setRemark('');
+                }} style={{color:'#2862FF', border:'1px solid #2862FF', width:110, cursor:'pointer', fontWeight:'bold', transition:'all 0.5s ease-in-out'}}>{t('clear')}</Button>
+                <Button className="buttonMarkPlacement" onClick={(e)=>{e.stopPropagation(); postDeliverStatusWithRemark(); }} style={{color:'white', backgroundColor:'#2862FF',width:110, border:'1px solid #2862FF', cursor:'pointer', fontWeight:'bold',transition:'all 0.5s ease-in-out' }}>{t('submit')}</Button>
+            </div>    
+            <div className="closeContaioner"><CloseIcon onClick={(e) => { e.stopPropagation(); isClose(false) }}/></div>
+        </div>
+    </div>
+    )
+}
+
 export const HandlingETA = ({ isClose, isOpen, shipment, getAllShipment, difference}: any) => {
     const router = useRouter();
     const { showMessage } = useSnackbar();
