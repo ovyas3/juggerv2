@@ -44,6 +44,7 @@ import Popover from '@mui/material/Popover';
 import { useSnackbar } from '@/hooks/snackBar';
 import captiveRakeIndicator from '@/assets/captive_rakes.svg'
 import wagonIcon from '@/assets/captive_rakes_no_wagons.svg'
+import SendTimeExtensionTwoToneIcon from '@mui/icons-material/SendTimeExtensionTwoTone';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import EditNoteOutlinedIcon from '@mui/icons-material/EditNoteOutlined';
@@ -57,6 +58,7 @@ import { ActionItem, EditELD, HandlingAgentSelection, PastEta, RemarkComponent, 
 import SettingsIcon from '@mui/icons-material/Settings';
 import { environment } from '@/environments/env.api';
 import { useRouter } from 'next/navigation';
+import { ModifyStatus } from './tableComp';
 
 const status_class_map: { [key: string]: string } = {
     'OB': 'status_title_In_Plant',
@@ -109,7 +111,7 @@ const convertArrayToFilteredArray = (inputArray: any, shipmentPayloads: any) => 
         let newDemandDate = new Date(demand_date);
         newDemandDate.setHours(newDemandDate.getHours() - 5);
         newDemandDate.setMinutes(newDemandDate.getMinutes() - 30);
-        let fois_updated_at_date = trip_tracker && trip_tracker[0].fois_updated_at ? trip_tracker[0].fois_updated_at : null;
+        let fois_updated_at_date = trip_tracker && trip_tracker[0]?.fois_updated_at ? trip_tracker[0]?.fois_updated_at : null;
 
         let newRRDate = new Date(rr_dates[0]);
         newRRDate.setHours(newRRDate.getHours() - 5);
@@ -271,6 +273,8 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
 
     //upload wagon Sheet
     const [openUploadWagonSheet, setOpenUploadWagonSheet] = useState(false);
+    const [openModifyStatus, setOpenModifyStatus] = useState(false);
+    const [modifyStatusId, setModifyStatusId] = useState({});  
     const [uploadWagonSheetId, setUploadWagonSheetId] = useState({});
 
     const handleRRDoc = (id: any) => {  // for rr documents
@@ -364,6 +368,11 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
         setOpenUploadWagonSheet(true);
         setUploadWagonSheetId(row);
     }
+
+    const modifyStatus = (row: any) => {
+        setOpenModifyStatus(true);
+        setModifyStatusId(row);
+    } 
 
     useEffect(() => {
         const etaResult = sortArray(allShipments, 'eta', currentETAsorting ? 'dec' : 'asc');
@@ -728,6 +737,16 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                                     onClick={()=>{uploadWagonSheet(row)}}
                                                                                     id='uploadWagonSheet'
                                                                                 />
+                                                                            {
+                                                                                row.status.raw == 'ITNS' && (
+                                                                                    <ActionItem
+                                                                                        icon={<SendTimeExtensionTwoToneIcon style={{ width: "24px", height: '24px', color:'#800080'}} />}
+                                                                                        text={t('modifyStatus')}
+                                                                                        onClick={()=>{modifyStatus(row)}}
+                                                                                        id='modifyStatus'
+                                                                                    />
+                                                                                )
+                                                                            }
                                                                             {row.status.raw == 'AVE' && (
                                                                             <ActionItem
                                                                             icon={<img src={trash.src} style={{ width: "24px", height: '24px'}} />}
@@ -987,6 +1006,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                <UploadAnnexure isOpen={openAnnexureModal} isClose={()=> setOpenAnnexureModal(false)} shipmentID={uploadAnnexureShipID} FNR_No={uploadAnnexureFNR}/>}
             {openMarkPlacement && <MarkPlacement isClose={setOpenMarkPlacement} shipment={markPlacementId} getAllShipment={getAllShipment} different={downOut} />}
             {openUploadWagonSheet && <UploadWagonSheet isClose={setOpenUploadWagonSheet} shipment={uploadWagonSheetId} />  }
+            {openModifyStatus && <ModifyStatus isClose={setOpenModifyStatus} shipment={modifyStatusId} getAllShipment={getAllShipment} />}
             {cancel && 
              <HandlingEdemand isOpen={cancel} isClose={()=> setCancel(false)} shipment={cancelShipID} getAllShipment={getAllShipment}/>}
              {openEtaModel && 
