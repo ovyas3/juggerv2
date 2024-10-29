@@ -1336,6 +1336,113 @@ export const UploadWagonSheet = ({getWagonDetails,isClose, shipment, setOpenUplo
     )
 }
 
+export const UploadDailyRakeHandlingSheet = ({ getWagonDetails, isClose, shipment }:any) => {
+    const router = useRouter();
+    const text = useTranslations('WAGONTALLYSHEET');
+    const [fileName, setFileName] = useState('Drag and Drop to upload the file here');
+    const [uploadFile, setUploadFile] = useState<any>({});
+    const { showMessage } = useSnackbar();
+
+    const handleDragOver = (e:any) => {
+        e.preventDefault();
+        e.stopPropagation();
+      };
+    
+      const handleDrop = (e :any) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+            if(e.dataTransfer.files[0].name.split('.').pop() !== 'csv') {
+                showMessage('Please upload only csv file', 'error');
+                setUploadFile({});
+                setFileName('Drag and Drop to upload the file here');
+                return;
+            }
+            setUploadFile(e.dataTransfer.files[0]);
+            setFileName(e.dataTransfer.files[0].name);
+            e.dataTransfer.clearData();
+        }
+      };
+
+    const uploadWagonSheet = async () => {
+        if(fileName === 'Drag and Drop to upload the file here') {
+            showMessage('Please upload the Daily Rake Handling Sheet', 'error');
+            return;
+        }
+
+        const payload = {
+            file: uploadFile
+        }
+
+        await httpsPost('daily_rake_sheet/upload', payload, router, 0, true).then((response: any) => {
+            if(response.statusCode === 200) {
+                isClose(false); 
+                setFileName('Drag and Drop to upload the file here');
+                setUploadFile({});
+                showMessage('File Uploaded Succcessfully', 'success');
+                getWagonDetails();
+            }
+            else showMessage(response.message, 'error')
+        }).catch((err)=> {
+            console.log(err); 
+            showMessage('Failed to upload the file', 'error')
+        }) 
+           
+    }
+
+    return (
+    <div style={{width:'100vw', height:'100vh', position:'fixed', top:0, left:0 ,zIndex:300, backgroundColor:'rgba(0, 0, 0, 0.5)'}} onClick={(e)=>{e.stopPropagation(); isClose(false)}}>
+        <div className="upload-wagon-sheet-modal-main" onClick={(e)=>{e.stopPropagation()}}>
+
+            <div style={{display:'flex', justifyContent:'space-between',}}>
+                <header style={{fontSize:20, color:'#131722', fontWeight:600}}>{text("uploadDailyRakeHandlingSheet")}</header>
+            </div>
+
+            <div className="status_edemand_fnr" style={{display: 'flex' }}>
+                <div>
+                    <header style={{fontSize:12, color:'#42454E', marginBottom:8}}>{text('status')}</header>
+                    <text style={{fontSize:16, color:"#42454E", fontWeight:600}}>{shipment?.status?.name || shipment?.status?.statusLabel}</text>
+                </div>
+                <div>
+                    <header style={{fontSize:12, color:'#42454E', marginBottom:8}}>{text('FNRno')}</header>
+                    <text style={{fontSize:16, color:"#42454E", fontWeight:600}}>{shipment?.fnr?.primary || shipment?.fnr}</text>
+                </div>
+                <div>
+                    <header style={{fontSize:12, color:'#42454E', marginBottom:8}}>{text('edemandno')}</header>
+                    <text style={{fontSize:16, color:"#42454E", fontWeight:600}}>{shipment?.edemand?.edemand_no || shipment?.edemand?.edemand}</text>
+                </div>
+            </div>
+
+            <div 
+                className="fileUploadContainer"
+                onDragOver={handleDragOver}
+                onDrop={handleDrop}
+            >
+                <label htmlFor="input-file" className="fileUpload">
+                <input type="file" accept=".csv" id="input-file" hidden onChange={(e)=>{  if (e.target.files) {setFileName(e.target.files[0].name); setUploadFile(e.target.files[0]) }}} />
+                    <div className="fileUploadContent">
+                        <div style={{textAlign:'center'}}><CloudUploadIcon style={{width:30, height:30, color:'#5481FF'}}  /></div>
+                        <header style={{color:'#71747A', fontSize:12, marginBottom:10,textAlign:'center'}}>{fileName}</header>
+                        <div style={{display:'flex', justifyContent:'center', alignItems:'center', marginBottom:8}}><div style={{width:135, height:36 , borderRadius:4, backgroundColor:'#42454E', color:'white', textAlign:'center', alignContent:'center', fontSize:12}}>Browse and Upload</div></div>
+                        <p style={{color:'#71747A', fontSize:12,textAlign:'center'}}>Only <span style={{color:'#131722', fontWeight:600}}>CSV</span> file format will be accepted</p>
+                    </div>
+                </label>
+            </div>
+            <div>
+                <p className="sampleFile" onClick={(e)=>{e.stopPropagation();  window.open('https://docs.google.com/spreadsheets/d/1AXhVXT8iHBhpwprUnoK0IAXmZXQuhu9XDW06zKBF6AY/edit?usp=sharing', '_blank'); } } >Download Sample File</p>
+            </div>
+
+
+            <div className="buttonContaioner">
+                <Button className="buttonMarkPlacement" onClick={(e)=>{ e.stopPropagation(); setUploadFile({}); setFileName('Drag and Drop to upload the file here'); }} style={{color:'#2862FF', border:'1px solid #2862FF', width:110, cursor:'pointer', fontWeight:'bold', transition:'all 0.5s ease-in-out'}}>{text('clear')}</Button>
+                <Button className="buttonMarkPlacement" onClick={(e)=>{e.stopPropagation(); uploadWagonSheet(); }} style={{color:'white', backgroundColor:'#2862FF',width:110, border:'1px solid #2862FF', cursor:'pointer', fontWeight:'bold',transition:'all 0.5s ease-in-out' }}>{text('upload')}</Button>
+            </div>    
+            <div className="closeContaioner"><CloseIcon onClick={(e) => { e.stopPropagation(); isClose(false) }}/></div>
+        </div>
+    </div>
+    )
+}
+
 export const MarkComplete = ({isClose, shipment, getAllShipment, query, totalCount, setTotalCountrake}:any) => {
     const t = useTranslations('ORDERS');
     const router = useRouter();
