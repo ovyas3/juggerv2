@@ -73,6 +73,7 @@ function contructingData(shipment: any) {
       is_captive: any;
       wagon_data_uploaded: any;
       delivery_location: any;
+      hooks: any;
       plants_assigned: [{
         _id: string;
         name: string;
@@ -134,6 +135,7 @@ function contructingData(shipment: any) {
             ? shipment?.plant_codes.filter((item: any) => item !== "NA")
             : "--",
         },
+        hooks: shipment?.hooks ? shipment?.hooks : [],
         is_captive: shipment?.is_captive ? shipment?.is_captive : false,
         wagon_data_uploaded: shipment?.wagon_data_uploaded
           ? shipment?.wagon_data_uploaded
@@ -817,7 +819,7 @@ function WagonTallySheet({}: any) {
                                       >
                                         {text("rakeHandlingSheet")}
                                       </div>
-                                      {row.wagon_data_uploaded && (
+                                      {row.wagon_data_uploaded ? (
                                         <div
                                           className="action-popover-wagon"
                                           onClick={(e) => {
@@ -826,9 +828,15 @@ function WagonTallySheet({}: any) {
                                         >
                                           {text("assignWagonToPlant")}
                                         </div>
+                                      ) : (
+                                        <div
+                                          className="action-popover-wagon-disabled"
+                                        >
+                                          {text("assignWagonToPlant")}
+                                        </div>
                                       )}
-                                      {row.plant_codes.plant_codes.length >
-                                        0 && (
+                                      {row?.hooks && row?.hooks?.length >
+                                        0 ? (
                                         <div
                                           className="action-popover-wagon"
                                           onClick={(e) => {
@@ -837,13 +845,29 @@ function WagonTallySheet({}: any) {
                                         >
                                           {text("assignsHooksToLoadingShop")}
                                         </div>
+                                      ) : (
+                                        <div
+                                          className="action-popover-wagon-disabled"
+                                        >
+                                          {text("assignsHooksToLoadingShop")}
+                                        </div>
                                       )}
-                                      {row.plant_codes.plant_codes.length >
-                                        0 && (
+                                      {row?.hooks && row?.hooks?.length >
+                                        0 ? (
                                         <div
                                           className="action-popover-wagon"
                                           onClick={(e) => {
                                             wagonTallySheet(e, row)
+                                          }}
+                                        >
+                                          {text("wagonTallySheet")}
+                                        </div>
+                                      ) : (
+                                        <div
+                                          className="action-popover-wagon-disabled"
+                                          onClick={(e) => {
+                                            console.log("row", row);
+                                            console.log("row.hooks", row.hooks);
                                           }}
                                         >
                                           {text("wagonTallySheet")}

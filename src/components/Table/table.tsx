@@ -58,7 +58,7 @@ import { ActionItem, EditELD, HandlingAgentSelection, PastEta, RemarkComponent, 
 import SettingsIcon from '@mui/icons-material/Settings';
 import { environment } from '@/environments/env.api';
 import { useRouter } from 'next/navigation';
-import { ModifyStatus } from './tableComp';
+import { MarkComplete } from './tableComp';
 
 const status_class_map: { [key: string]: string } = {
     'OB': 'status_title_In_Plant',
@@ -200,7 +200,7 @@ const convertArrayToFilteredArray = (inputArray: any, shipmentPayloads: any) => 
 
 
 // Main component
-export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, count, onFnrChange, reload, remarksList, setTriggerShipments, triggerShipments, getAllShipment, ShipmentsPayload }: any) {
+export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, count, onFnrChange, reload, remarksList, setTriggerShipments, triggerShipments, getAllShipment, ShipmentsPayload, totalCount, query, setTotalCountrake }: any) {
 
     //language controller
     const t = useTranslations("ORDERS")
@@ -369,7 +369,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
         setUploadWagonSheetId(row);
     }
 
-    const modifyStatus = (row: any) => {
+    const markComplete = (row: any) => {
         setOpenModifyStatus(true);
         setModifyStatusId(row);
     } 
@@ -741,9 +741,9 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                                 row.status.raw == 'ITNS' && (
                                                                                     <ActionItem
                                                                                         icon={<SendTimeExtensionTwoToneIcon style={{ width: "24px", height: '24px', color:'#800080'}} />}
-                                                                                        text={t('modifyStatus')}
-                                                                                        onClick={()=>{modifyStatus(row)}}
-                                                                                        id='modifyStatus'
+                                                                                        text={t('markComplete')}
+                                                                                        onClick={()=>{markComplete(row)}}
+                                                                                        id='markComplete'
                                                                                     />
                                                                                 )
                                                                             }
@@ -1006,7 +1006,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                <UploadAnnexure isOpen={openAnnexureModal} isClose={()=> setOpenAnnexureModal(false)} shipmentID={uploadAnnexureShipID} FNR_No={uploadAnnexureFNR}/>}
             {openMarkPlacement && <MarkPlacement isClose={setOpenMarkPlacement} shipment={markPlacementId} getAllShipment={getAllShipment} different={downOut} />}
             {openUploadWagonSheet && <UploadWagonSheet isClose={setOpenUploadWagonSheet} shipment={uploadWagonSheetId} />  }
-            {openModifyStatus && <ModifyStatus isClose={setOpenModifyStatus} shipment={modifyStatusId} getAllShipment={getAllShipment} />}
+            {openModifyStatus && <MarkComplete isClose={setOpenModifyStatus} shipment={modifyStatusId} getAllShipment={getAllShipment} totalCount={totalCount} query={query} setTotalCountrake={setTotalCountrake} />}
             {cancel && 
              <HandlingEdemand isOpen={cancel} isClose={()=> setCancel(false)} shipment={cancelShipID} getAllShipment={getAllShipment}/>}
              {openEtaModel && 

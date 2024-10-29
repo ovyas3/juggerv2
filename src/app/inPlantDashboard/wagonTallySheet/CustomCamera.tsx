@@ -7,6 +7,7 @@ import DialogContent from '@mui/material/DialogContent';
 import Camera from '@/assets/camera.svg';
 import CloseButtonIcon from "@/assets/close_icon.svg";
 import CameraCapture from '@/assets/camera_capture.svg';
+import CameraIcon from '@mui/icons-material/Camera';
 import CameraRotate from '@/assets/camera_rotate.svg';
 import Lightning from '@/assets/lightning.svg';
 import LightningSlash from '@/assets/lightning-slash.svg';
@@ -69,13 +70,20 @@ const PhotoCaptureComponent: React.FC<PhotoCaptureComponentProps> = ({ label, on
   const text = useTranslations("WAGONTALLYSHEET");
   const [open, setOpen] = useState(false);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
-  const [facingMode, setFacingMode] = useState('user');
+  const [facingMode, setFacingMode] = useState<'user' | 'environment'>('environment');
   const webcamRef = useRef<Webcam>(null);
   const [isFlashOn, setIsFlashOn] = useState(false);
   const mediaStreamRef = useRef<MediaStream | null>(null);
 
-  const handleOpen = () => setOpen(true);
+  const handleOpen = async () => {
+    setOpen(true);
+    await switchCamera();
+  };
+
   const handleClose = () => {
+    if (mediaStreamRef.current) {
+      mediaStreamRef.current.getTracks().forEach(track => track.stop());
+    }
     setCapturedImage(null);
     setOpen(false);
   };
@@ -87,20 +95,36 @@ const PhotoCaptureComponent: React.FC<PhotoCaptureComponentProps> = ({ label, on
 
     const constraints = {
       video: {
-        facingMode: { exact: facingMode }, // Access rear or front camera based on current mode
+        facingMode: facingMode,
       },
     };
 
     try {
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
       mediaStreamRef.current = stream;
-      // Update webcam video source
       if (webcamRef.current && webcamRef.current.video) {
         webcamRef.current.video.srcObject = stream;
       }
       setFacingMode(prev => (prev === 'user' ? 'environment' : 'user'));
-    } catch (error) {
-      console.error("Error accessing camera: ", error);
+    } catch (error: any) {
+      if (error.name === 'OverconstrainedError') {
+        console.warn("OverconstrainedError: Falling back to default camera");
+        try {
+          const fallbackConstraints = {
+            video: true,
+          };
+          const fallbackStream = await navigator.mediaDevices.getUserMedia(fallbackConstraints);
+          mediaStreamRef.current = fallbackStream;
+          if (webcamRef.current && webcamRef.current.video) {
+            webcamRef.current.video.srcObject = fallbackStream;
+          }
+          setFacingMode(prev => (prev === 'user' ? 'environment' : 'user'));
+        } catch (fallbackError) {
+          console.error("Error accessing fallback camera: ", fallbackError);
+        }
+      } else {
+        console.error("Error accessing camera: ", error);
+      }
     }
   };
 
@@ -123,32 +147,32 @@ const PhotoCaptureComponent: React.FC<PhotoCaptureComponentProps> = ({ label, on
     setCapturedImage(null);
   };
 
+  const videoConstraints = {
+    facingMode,
+    width: { ideal: 1280 },
+    height: { ideal: 720 }
+  }
+
   const toggleFlash = () => {
     if (mediaStreamRef.current) {
-        const videoTrack = mediaStreamRef.current.getVideoTracks()[0];
+      const videoTrack = mediaStreamRef.current.getVideoTracks()[0];
 
-        if (videoTrack) {
-            // Use type assertion to specify that capabilities have a torch property
-            const capabilities = videoTrack.getCapabilities() as MediaTrackCapabilities & { torch?: boolean };
+      if (videoTrack) {
+        const capabilities = videoTrack.getCapabilities() as MediaTrackCapabilities & { torch?: boolean };
 
-            if (capabilities.torch !== undefined) { // Check if torch capability exists
-              videoTrack.applyConstraints({
-                  advanced: [{ torch: !isFlashOn } as any],
-              });
-              setIsFlashOn(prev => !prev); // Toggle flash state
-          } else {
-              console.warn("Torch not supported on this device.");
-          }
+        if (capabilities.torch !== undefined) { 
+          videoTrack.applyConstraints({
+            advanced: [{ torch: !isFlashOn } as any],
+          });
+          setIsFlashOn(prev => !prev);
+        } else {
+          console.warn("Torch not supported on this device.");
         }
+      }
     }
-};
-
-
-
+  };
 
   useEffect(() => {
-    switchCamera(); 
-
     return () => {
       if (mediaStreamRef.current) {
         mediaStreamRef.current.getTracks().forEach(track => track.stop());
@@ -179,6 +203,10 @@ const PhotoCaptureComponent: React.FC<PhotoCaptureComponentProps> = ({ label, on
               <Image src={CloseButtonIcon} alt="close" />
             </div>
 
+            <div className='camera-dialog-title'>
+              {text('takePhoto')}
+            </div>
+
             {capturedImage ? (
               <>
                 <Image
@@ -190,14 +218,14 @@ const PhotoCaptureComponent: React.FC<PhotoCaptureComponentProps> = ({ label, on
                 />
                 <div className='camera-buttons-container'>
                   <div 
-                    onClick={confirmPhoto}
-                    className='confirm-image-button'>
-                    {text('confirm')} ✔
-                  </div>
-                  <div 
                     onClick={retakePhoto}
                     className='retake-image-button'>
-                    {text('reTake')} ❌
+                    {text('reTake')} 
+                  </div>
+                  <div 
+                    onClick={confirmPhoto}
+                    className='confirm-image-button'>
+                    {text('confirm')} 
                   </div>
                 </div>
               </>
@@ -207,10 +235,10 @@ const PhotoCaptureComponent: React.FC<PhotoCaptureComponentProps> = ({ label, on
                   audio={false}
                   ref={webcamRef}
                   screenshotFormat="image/jpeg"
-                  videoConstraints={{ facingMode }}
+                  videoConstraints= {videoConstraints}
                   className="webcam-view"
                 />
-                <div className='camera-buttons-container'>
+                <div className='camera-buttons-container-initial'>
                 <CustomTooltip 
                   arrow 
                   title={
@@ -228,8 +256,8 @@ const PhotoCaptureComponent: React.FC<PhotoCaptureComponentProps> = ({ label, on
                     }}>
                       {text('switchCamera')} 
                     </div>}>
-                    <div onClick={switchCamera} className='switch-button' title="Switch Camera">
-                      <Image src={CameraRotate} alt="Switch Camera" />
+                    <div onClick={switchCamera} className='switch-button'>
+                      <Image src={CameraRotate} alt="Switch Camera" width={28} height={28} />
                     </div>
                 </CustomTooltip>
 
@@ -251,11 +279,8 @@ const PhotoCaptureComponent: React.FC<PhotoCaptureComponentProps> = ({ label, on
                        {text('captureImage')} 
                     </div>}>
                     <div onClick={capturePhoto} className="capturing-button">
-                      <div className="outer-circle">
-                        <div className="inner-circle">
-                          <Image src={CameraCapture} alt="Capture" />
-                        </div>
-                      </div>
+                          <CameraIcon sx={{ color: '#fff', width: 24, height: 24 }} />
+                          <div className="capturing-button-text">Capture Photo</div>
                     </div>
                   </CustomTooltip>
 
@@ -276,8 +301,8 @@ const PhotoCaptureComponent: React.FC<PhotoCaptureComponentProps> = ({ label, on
                     }}>
                       {isFlashOn ?  text('turnFlashOff') :  text('turnFlashOn') }
                     </div>}>
-                    <div onClick={toggleFlash} className='switch-button' title={isFlashOn ? "Turn Flash Off" : "Turn Flash On"}>
-                      <Image src={isFlashOn ? LightningSlash : Lightning} alt={isFlashOn ? "Turn Flash Off" : "Turn Flash On"} />
+                    <div onClick={toggleFlash} className='switch-button'>
+                      <Image src={isFlashOn ? LightningSlash : Lightning} alt={isFlashOn ? "Turn Flash Off" : "Turn Flash On"}width={26} height={24}/>
                     </div>
                   </CustomTooltip>
                 </div>
@@ -291,3 +316,4 @@ const PhotoCaptureComponent: React.FC<PhotoCaptureComponentProps> = ({ label, on
 };
 
 export default PhotoCaptureComponent;
+
