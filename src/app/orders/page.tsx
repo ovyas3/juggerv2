@@ -476,7 +476,10 @@ const OrdersPage = () => {
                   rakeCaptiveList={rakeCaptiveList} 
                   onFnrChange={handleChangeByFnr} 
                   reload={reload} 
-                  getAllShipment={getAllShipment} 
+                  getAllShipment={getAllShipment}
+                  totalCount = {totalCount}
+                  query = {query}
+                  setTotalCountrake = {setTotalCountrake}
                   setTriggerShipments={setTriggerShipments} 
                   triggerShipments={triggerShipments} 
                   remarksList={remarksList} 

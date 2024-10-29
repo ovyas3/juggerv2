@@ -199,7 +199,7 @@ export default function WagonsDashboard() {
   const [isPercentage, setIsPercentage] = useState(false);
   const [isRupees, setIsRupees] = useState(false);
   const [isTonnage, setIsTonnage] = useState(false);
-  const [yAxisLabel, setYAxisLabel] = useState('No. of Wagons Ordered');
+  const [yAxisLabel, setYAxisLabel] = useState('No. of Wagons');
   const [barDataKeys, setBarDataKeys] = useState<any>({});
 
   const theme = useTheme();
@@ -239,7 +239,7 @@ export default function WagonsDashboard() {
       setIsPercentage(false);
       setIsRupees(false);
       setIsTonnage(false);
-      setYAxisLabel('No. of Wagons Ordered');
+      setYAxisLabel('No. of Wagons');
       setBarDataKeys({
         totalOrdered: 'totalOrdered',
         fullyUtilized: 'fullyUtilized',

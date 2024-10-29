@@ -1336,13 +1336,18 @@ export const UploadWagonSheet = ({getWagonDetails,isClose, shipment, setOpenUplo
     )
 }
 
-export const ModifyStatus = ({isClose, shipment, getAllShipment}:any) => {
+export const MarkComplete = ({isClose, shipment, getAllShipment, query, totalCount, setTotalCountrake}:any) => {
     const t = useTranslations('ORDERS');
     const router = useRouter();
     const [remark, setRemark] = useState('');
     const id = shipment?._id;
     const { showMessage } = useSnackbar();
     const postDeliverStatusWithRemark = async () => {
+        if(remark === '') {
+            showMessage('Please enter remark', 'error');
+            return;
+        } 
+
         const payload = {
             id: id,
             remarks: [
@@ -1359,6 +1364,15 @@ export const ModifyStatus = ({isClose, shipment, getAllShipment}:any) => {
                 showMessage('Status Updated Successfully', 'success');
                 isClose(false);
                 getAllShipment();
+                if (query.from && query.to) {
+                    totalCount(query.from, query.to).then((res: any) => {
+                      if (res && res.statusCode == 200) {
+                        setTotalCountrake(res.data);
+                      }
+                    }).catch((err: any) => {
+                      console.log(err);
+                    });
+                }
             }
         } catch (error) {
             console.log('Error:', error);
@@ -1372,11 +1386,11 @@ export const ModifyStatus = ({isClose, shipment, getAllShipment}:any) => {
         <div className="modify-status-modal-main" onClick={(e)=>{e.stopPropagation()}}>
 
             <div style={{display:'flex', justifyContent:'space-between',}}>
-                <header style={{fontSize:20, color:'#131722', fontWeight:600}}>Modify Status</header>
+                <header style={{fontSize:20, color:'#131722', fontWeight:600}}>{t('markComplete')}</header>
             </div>
 
             <div className="modify-status-remark">
-                <header style={{ fontSize:14, color:'#42454E', fontWeight: 600}}>Remark</header>
+                <header style={{ fontSize:14, color:'#42454E', fontWeight: 600}}>{t('remark')}</header>
                 <input className="modify-status-remark-input" type="text" placeholder="Enter Remark" value={remark} onChange={
                     (e) => {
                         setRemark(e.target.value);

@@ -241,7 +241,7 @@ type FormValues = {
   line_item: string;
   pgi_tw_wrt: number;
   actual_weight: number;
-  material_images: (string | null)[];
+  material_images: (any)[];
 };
 
 type FormValueKey = 'batch_id_heat_no' | 'material' | 'code' | 'grade' | 'width' | 'thick' | 'length' | 'pieces' | 'line_item' | 'pgi_tw_wrt' | 'actual_weight';
@@ -268,7 +268,7 @@ const WagonTallySheet: React.FC = () => {
   const [selectedWagonNumber, setSelectedWagonNumber] = useState<number | null>(0);
   const [searchTerm, setSearchTerm] = useState("");
   const [isSick, setIsSick] = useState<boolean>(false);
-  const [wagonCapturedImages, setWagonCapturedImages] = useState<(string | null)[]>([]);
+  const [wagonCapturedImages, setWagonCapturedImages] = useState<(any)[]>([]);
   const [train, setTrain] = useState<Mill[] | null>(null);
   const [scrollValue, setScrollValue] = useState(0);
   const [openPlantDropDown, setOpenPlantDropDown] = useState(false);
@@ -280,6 +280,8 @@ const WagonTallySheet: React.FC = () => {
   const [wagonData, setWagonData] = useState<any>(null);
   const [selectedWagonDetails, setSelectedWagonDetails] = useState<any>(null);
   const [openClearDialog, setOpenClearDialog] = useState(false);  
+  const [wagonCount, setWagonCount] = useState(0);
+  const [materialCount, setMaterialCount] = useState(0);
   const [formValues, setFormValues] = useState<FormValues[]>([
     {
       batch_id_heat_no: '',
@@ -408,15 +410,13 @@ const WagonTallySheet: React.FC = () => {
   };
 
   // Function to handle confirm of wagon and material photos
-  const handleWagonConfirm = async (images: (string | null)[]) => {
-    console.log(images);
+  const handleGettingS3PathWagon = async (images: (string | null)[]) => {
     let image: any = images[0];
+    let wagonNumber = selectedWagonDetails?.wagonNumber || '';
   
     if (image && !image.startsWith('data:image/jpeg;base64,')) {
       image = `data:image/jpeg;base64,${image}`;
     }
-  
-    // Convert base64 to binary Blob
     const byteString = atob(image.split(',')[1]);
     const mimeString = image.split(',')[0].split(':')[1].split(';')[0];
     const ab = new ArrayBuffer(byteString.length);
@@ -425,25 +425,28 @@ const WagonTallySheet: React.FC = () => {
       ia[i] = byteString.charCodeAt(i);
     }
     const blob = new Blob([ab], { type: mimeString });
-  
-    // Create a FormData object
     const formData = new FormData();
-    formData.append('file', blob, 'image.jpg');
-    // formData.append('fnr_no', '24092908743');
-    // formData.append('type', 'wagon');
+    const uniqueFileName = `${wagonNumber}_${wagonCount}.jpg`;
+    formData.append('file', blob, uniqueFileName);
+    const FNR = shipmentData?.fnr_no || '';
+    let s3Path = '';
   
     try {
       setLoading(true);
-  
-      // Send the FormData object with the appropriate headers
-      const response = await httpsPost(`upload_wagon_tally_image?fnr_no=24092908743`, formData, router, 0, true);
-  
-      const data = response?.data;
-      console.log(data);
-      if(response?.statusCode === 200) {
-        showMessage("Image uploaded successfully", "success");
+      if(FNR && wagonNumber){
+        const response = await httpsPost(`upload_wagon_tally_image?fnr_no=${FNR}`, formData, router, 0, true);
+        if (response && response?.s3Path) {
+          showMessage("Image uploaded successfully", "success");
+          setWagonCount(wagonCount + 1);
+          s3Path = response?.s3Path;
+          return s3Path;
+        } else {
+          showMessage("Failed to upload image", "error");
+          return '';
+        }
       } else {
         showMessage("Failed to upload image", "error");
+        return '';
       }
     } catch (error) {
       showMessage("Failed to upload image", "error");
@@ -451,27 +454,118 @@ const WagonTallySheet: React.FC = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleWagonConfirm = async (images: (string | null)[]) => {
+    const s3Path = await handleGettingS3PathWagon(images);
+    if(s3Path) {
+      setWagonCapturedImages([...wagonCapturedImages, s3Path]);
+      console.log(wagonCapturedImages);
+    }
+  };
+
+  const handleGettingS3PathMaterial = async (images: (string | null)[]) => {
+    let image: any = images[0];
+    let plantId = selectedPlant?.plant?._id || '';
+    let selectedHookNo = selectedHook || '';
   
-    setWagonCapturedImages((prevImages) => [...prevImages, ...images]);
+    if (image && !image.startsWith('data:image/jpeg;base64,')) {
+      image = `data:image/jpeg;base64,${image}`;
+    }
+    const byteString = atob(image.split(',')[1]);
+    const mimeString = image.split(',')[0].split(':')[1].split(';')[0];
+    const ab = new ArrayBuffer(byteString.length);
+    const ia = new Uint8Array(ab);
+    for (let i = 0; i < byteString.length; i++) {
+      ia[i] = byteString.charCodeAt(i);
+    }
+    const blob = new Blob([ab], { type: mimeString });
+    const formData = new FormData();
+    const uniqueFileName = `${plantId}_${selectedHookNo}_${materialCount}.jpg`;
+    formData.append('file', blob, uniqueFileName);
+    const FNR = shipmentData?.fnr_no || '';
+    let s3Path = '';
+  
+    try {
+      setLoading(true);
+      if(FNR && plantId && selectedHookNo) {
+        const response = await httpsPost(`upload_wagon_tally_image?fnr_no=${FNR}`, formData, router, 0, true);
+        if (response && response?.s3Path) {
+          showMessage("Image uploaded successfully", "success");
+          setMaterialCount(materialCount + 1);
+          s3Path = response?.s3Path;
+          return s3Path;
+        } else {
+          showMessage("Failed to upload image", "error");
+          return '';
+        }
+      } else {
+        showMessage("Failed to upload image", "error");
+        return '';
+      }
+    } catch (error) {
+      showMessage("Failed to upload image", "error");
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleMaterialConfirm = (index: number, images: (string | null)[]) => {
-    setFormValues((prevFormValues) => {
-        const updatedFormValues = [...prevFormValues];
-        updatedFormValues[index].material_images = [...updatedFormValues[index].material_images, ...images];
-        return updatedFormValues;
+  const handleMaterialConfirm = async (index: number, images: (string | null)[]) => {
+    const s3Path: any = await handleGettingS3PathMaterial(images);
+    setFormValues(prev => {
+      const newFormValues = [...prev];
+      newFormValues[index].material_images = [...newFormValues[index].material_images, s3Path];
+      return newFormValues;
     });
+    console.log(formValues);
   };
 
-  const handleWagonPhotoDelete = (indexNum: number) => {
-    const updatedImages = wagonCapturedImages.filter((_, index) => index !== indexNum);
-    setWagonCapturedImages(updatedImages);
+  const handleDeletePhotos = async (s3Path: string) => {
+    try {
+      setLoading(true);
+      if(s3Path){
+        const res = await httpsPost('wagon_tally/delete_image', s3Path, router, 0, false);
+        if(res.statusCode === 200) {
+          showMessage("Image deleted successfully", "success");
+          return true;
+        } else {
+          showMessage("Failed to delete image", "error");
+          return false;
+        }
+      } else {
+        showMessage("Failed to delete image", "error");
+        return false;
+      }
+    } catch (error) {
+      showMessage("Failed to delete image", "error");
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
   }
 
-  const handleMaterialPhotoDelete = (formIndex: number, imageIndex: number) => {
-    const updatedFormValues = [...formValues];
-    updatedFormValues[formIndex].material_images = updatedFormValues[formIndex].material_images.filter((_, idx) => idx !== imageIndex);
-    setFormValues(updatedFormValues);
+  const handleWagonPhotoDelete = async (indexNum: number) => {
+    let s3Path = wagonCapturedImages[indexNum];
+    const isDeleted = await handleDeletePhotos(s3Path);
+    if(isDeleted){
+      const updatedImages = wagonCapturedImages.filter((_, index) => index !== indexNum);
+      setWagonCapturedImages(updatedImages);
+    } else {
+      showMessage("Failed to delete image", "error");
+    }
+  }
+
+  const handleMaterialPhotoDelete = async (formIndex: number, imageIndex: number) => {
+    let s3Path = formValues[formIndex].material_images[imageIndex];
+    const isDeleted = await handleDeletePhotos(s3Path);
+    if(isDeleted){
+      const updatedFormValues = [...formValues];
+      updatedFormValues[formIndex].material_images = updatedFormValues[formIndex].material_images.filter((_, idx) => idx !== imageIndex);
+      setFormValues(updatedFormValues);
+    } else {
+      showMessage("Failed to delete image", "error");
+    }
   };
   
   // Function to handle confirm of wagon and material photos
@@ -494,6 +588,8 @@ const WagonTallySheet: React.FC = () => {
     ]);
     setDates(datesArr);
     setWagonCapturedImages([]);
+    setWagonCount(0);
+    setMaterialCount(0);
   };
 
   const handleWagonOpen = () => setOpenWagonPhotos(true);
@@ -568,6 +664,7 @@ const WagonTallySheet: React.FC = () => {
       const shipmentDataObj = {
         edemand_no: response && response?.shipmentData && response?.shipmentData?.edemand_no ? response?.shipmentData?.edemand_no : '',
         received_no_of_wagons: response?.wagonData && response?.wagonData?.length ? response?.wagonData?.length : 0,
+        fnr_no: response && response?.shipmentData && response?.shipmentData?.FNR ? response?.shipmentData?.FNR : '',
       }
       setShipmentData(shipmentDataObj);
       setWagonData(response?.wagonData);
@@ -626,14 +723,25 @@ const WagonTallySheet: React.FC = () => {
   //GET Wagon Tally sheet datas
   const getWagonTallySheetData = async () => {
     const id = selectedWagonDetails?._id || '';
+    setWagonCount(0);
+    setMaterialCount(0);
     try {
       if(id) {
         setLoading(true);
         const response = await httpsGet(`get_wagon_details?id=${id}`, 0, router);
         const { materials, events, wagon_images } = response?.data;
-        if(materials && materials.length > 0) {
+        if (materials && materials.length > 0) {
           setFormValues(materials);
-        } else {
+        
+          const wagonCounts = wagon_images.map((url: string) => {
+            const match = url.match(/_(\d+)\.jpg$/);
+            return match ? parseInt(match[1], 10) : 0;
+          });
+        
+          const maxWagonCount = Math.max(...wagonCounts);
+        
+          setMaterialCount(maxWagonCount);
+        }else {
           setFormValues([
             {
               batch_id_heat_no: '',
@@ -651,7 +759,24 @@ const WagonTallySheet: React.FC = () => {
             }
           ]);
         }
+
         setWagonCapturedImages(wagon_images);
+
+        let wagonMaximumValue = 0;
+
+        if (wagon_images && wagon_images.length > 0) {
+          wagon_images.forEach((url: string) => {
+            const fileName = url.split('/').pop();
+            if (fileName) {
+              const count = parseInt(fileName.split('_').pop()?.split('.')[0] || '0', 10);
+              if (count > wagonMaximumValue) {
+                wagonMaximumValue = count;
+              }
+            }
+          });
+        }
+
+        setWagonCount(wagonMaximumValue);
         const datesArr: any = dates.map(date => {
           const event = events.find((event: any) => event.event_code === date.event_code);
           return {
@@ -795,20 +920,6 @@ const WagonTallySheet: React.FC = () => {
       document.removeEventListener('click', handleClickOutside);
     };
   }, []);
-
-
-   
-      
-      
-    
-
-
-
-
-
-
-
-
 
   if (loading) {
     return (

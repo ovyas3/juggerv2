@@ -110,6 +110,20 @@
 .action-popover-wagon:hover {
   background-color: rgb(233, 229, 229);
 }
+
+.action-popover-wagon-disabled{
+  font-size: 12px;
+  font-weight: 500;
+  padding: 8px 16px;
+  color: #B0B0B0;
+  background-color: #F2F2F2;
+  transition: all 0.3s ease;
+}
+.action-popover-wagon-disabled:hover{
+  background-color: #F2F2F2;
+  cursor: not-allowed;
+}
+
 .aveStatus{
   background-color: #E6EAFF !important;
   color: #536AFE !important;
