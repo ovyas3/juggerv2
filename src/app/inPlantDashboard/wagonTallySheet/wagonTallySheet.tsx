@@ -525,7 +525,8 @@ const WagonTallySheet: React.FC = () => {
     try {
       setLoading(true);
       if(s3Path){
-        const res = await httpsPost('wagon_tally/delete_image', s3Path, router, 0, false);
+        const payload = { s3Path };
+        const res = await httpsPost('wagon_tally/delete_image', payload, router, 0, false);
         if(res.statusCode === 200) {
           showMessage("Image deleted successfully", "success");
           return true;
@@ -547,6 +548,7 @@ const WagonTallySheet: React.FC = () => {
 
   const handleWagonPhotoDelete = async (indexNum: number) => {
     let s3Path = wagonCapturedImages[indexNum];
+    s3Path = String(s3Path);
     const isDeleted = await handleDeletePhotos(s3Path);
     if(isDeleted){
       const updatedImages = wagonCapturedImages.filter((_, index) => index !== indexNum);
