@@ -884,9 +884,6 @@ function WagonTallySheet({}: any) {
                                       ) : (
                                         <div
                                           className="action-popover-wagon-disabled"
-                                          onClick={(e) => {
-                                            wagonTallySheet(e, row)
-                                          }}
                                         >
                                           {text("wagonTallySheet")}
                                         </div>
