@@ -21,6 +21,7 @@ import { httpsPost } from "@/utils/Communication";
 import service from "@/utils/timeService";
 import Popover from "@mui/material/Popover";
 import { UploadWagonSheet } from "@/components/Table/tableComp";
+import { UploadDailyRakeHandlingSheet } from "@/components/Table/tableComp";
 import { useTranslations } from "next-intl";
 import RakeHandlingSheet from "./rakeHandlingSheet";
 import {
@@ -173,6 +174,9 @@ function WagonTallySheet({}: any) {
   const [uploadShipmentwagon, setuploadShipmentwagon] = useState({});
   const [rakeHandlingSheetData, setRakeHandlingSheetData] = useState({});
 
+  const [openUploadDailyRakeHandlingSheet, setOpenUploadDailyRakeHandlingSheet] = useState(false);
+  const [UploadDailyRakeHandlingSheetData, setUploadDailyRakeHandlingSheetData] = useState({});
+
   const [openMarkPlacementTimeModal, setOpenMarkPlacementTimeModal] =
     useState(false);
   const [shipmentforPlacementTime, setShipmentforPlacementTime] = useState({});
@@ -247,6 +251,12 @@ function WagonTallySheet({}: any) {
     setShowActionBox(-1);
     setAnchorEl(null);
   };
+  const uploadDailyRakeHandlingSheet = (event: any, row: any) => {
+    setOpenUploadDailyRakeHandlingSheet(true);
+    setUploadDailyRakeHandlingSheetData(row);
+    setShowActionBox(-1);
+    setAnchorEl(null);
+  }
   const markPlacementTime = (event: any, row: any) => {
     setOpenMarkPlacementTimeModal(true);
     setShipmentforPlacementTime(row);
@@ -807,6 +817,14 @@ function WagonTallySheet({}: any) {
                                       </div>
                                       <div
                                         onClick={(e) =>
+                                          uploadDailyRakeHandlingSheet(e, row)
+                                        }
+                                        className="action-popover-wagon"
+                                      >
+                                        {text("uploadDailyRakeHandlingSheet")}
+                                      </div>
+                                      <div
+                                        onClick={(e) =>
                                           uploadWagonSheet(e, row)
                                         }
                                         className="action-popover-wagon"
@@ -866,9 +884,6 @@ function WagonTallySheet({}: any) {
                                       ) : (
                                         <div
                                           className="action-popover-wagon-disabled"
-                                          onClick={(e) => {
-                                            wagonTallySheet(e, row)
-                                          }}
                                         >
                                           {text("wagonTallySheet")}
                                         </div>
@@ -962,6 +977,13 @@ function WagonTallySheet({}: any) {
         <UploadWagonSheet
           isClose={setOpenUploadWagonSheetModal}
           shipment={uploadShipmentwagon}
+          getWagonDetails={getWagonDetails}
+        />
+      )}
+      {openUploadDailyRakeHandlingSheet && (
+        <UploadDailyRakeHandlingSheet
+          isClose={setOpenUploadDailyRakeHandlingSheet}
+          shipment={UploadDailyRakeHandlingSheetData}
           getWagonDetails={getWagonDetails}
         />
       )}

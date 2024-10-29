@@ -106,6 +106,8 @@
   },
   "WAGONTALLYSHEET":{
     "uploadWagonTallySheet":"Upload Wagon Sheet",
+    "uploadDailyRakeHandlingSheet":"Upload Daily Rake Handling Sheet",
+    "upload":"Upload",
     "rakeHandlingSheet":"Rake Handling Sheet",
     "assignWagonToPlant":"Assign Wagon to Loading Shop",
     "rakeArrivalAtStation":"Rake Arrival At Serving Station",
