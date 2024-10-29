@@ -74,6 +74,7 @@ function contructingData(shipment: any) {
       wagon_data_uploaded: any;
       delivery_location: any;
       hooks: any;
+      showWagonTallySheet: boolean;
       plants_assigned: [{
         _id: string;
         name: string;
@@ -122,6 +123,7 @@ function contructingData(shipment: any) {
             ? service.utcToistTime(shipment?.placement_time)
             : "--",
         },
+        showWagonTallySheet: shipment?.showWagonTallySheet ? shipment?.showWagonTallySheet : false,
         // drawn_in: {
         //   date: shipment?.drawnin_time
         //     ? service.utcToist(shipment?.drawnin_time)
@@ -852,8 +854,7 @@ function WagonTallySheet({}: any) {
                                           {text("assignsHooksToLoadingShop")}
                                         </div>
                                       )}
-                                      {row?.hooks && row?.hooks?.length >
-                                        0 ? (
+                                      {row?.showWagonTallySheet ? (
                                         <div
                                           className="action-popover-wagon"
                                           onClick={(e) => {
@@ -866,8 +867,7 @@ function WagonTallySheet({}: any) {
                                         <div
                                           className="action-popover-wagon-disabled"
                                           onClick={(e) => {
-                                            console.log("row", row);
-                                            console.log("row.hooks", row.hooks);
+                                            wagonTallySheet(e, row)
                                           }}
                                         >
                                           {text("wagonTallySheet")}

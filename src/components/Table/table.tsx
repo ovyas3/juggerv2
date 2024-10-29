@@ -190,7 +190,7 @@ const convertArrayToFilteredArray = (inputArray: any, shipmentPayloads: any) => 
                 name: captive?.name || '--',
             },
             fois_updated_at:{
-                date: service.utcToist(fois_updated_at_date, 'dd-MMM HH:mm') || '--',
+                date: fois_updated_at_date ? service.utcToist(fois_updated_at_date, 'dd-MMM HH:mm') : '--',
             }
         }
     });
