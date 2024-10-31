@@ -1352,12 +1352,12 @@ export const UploadDailyRakeHandlingSheet = ({ getWagonDetails, isClose, shipmen
         e.preventDefault();
         e.stopPropagation();
         if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-            if(e.dataTransfer.files[0].name.split('.').pop() !== 'csv') {
-                showMessage('Please upload only csv file', 'error');
-                setUploadFile({});
-                setFileName('Drag and Drop to upload the file here');
-                return;
-            }
+            // if(e.dataTransfer.files[0].name.split('.').pop() !== 'csv') {
+            //     showMessage('Please upload only csv file', 'error');
+            //     setUploadFile({});
+            //     setFileName('Drag and Drop to upload the file here');
+            //     return;
+            // }
             setUploadFile(e.dataTransfer.files[0]);
             setFileName(e.dataTransfer.files[0].name);
             e.dataTransfer.clearData();
@@ -1419,7 +1419,9 @@ export const UploadDailyRakeHandlingSheet = ({ getWagonDetails, isClose, shipmen
                 onDrop={handleDrop}
             >
                 <label htmlFor="input-file" className="fileUpload">
-                <input type="file" accept=".csv" id="input-file" hidden onChange={(e)=>{  if (e.target.files) {setFileName(e.target.files[0].name); setUploadFile(e.target.files[0]) }}} />
+                <input type="file"
+                 //accept=".csv"
+                  id="input-file" hidden onChange={(e)=>{  if (e.target.files) {setFileName(e.target.files[0].name); setUploadFile(e.target.files[0]) }}} />
                     <div className="fileUploadContent">
                         <div style={{textAlign:'center'}}><CloudUploadIcon style={{width:30, height:30, color:'#5481FF'}}  /></div>
                         <header style={{color:'#71747A', fontSize:12, marginBottom:10,textAlign:'center'}}>{fileName}</header>
