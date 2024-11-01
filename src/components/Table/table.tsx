@@ -757,7 +757,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                             )}
                                                                              <ActionItem
                                                                                 icon={<SettingsIcon style={{ width: "24px", height: '24px'}} />}
-                                                                                text={t('preferedEta')}
+                                                                                text={t('preferredEta')}
                                                                                 onClick={()=>{handleUpdateEta(row)}}
                                                                                 id="updateEta"
                                                                             />                                     
