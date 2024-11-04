@@ -154,3 +154,13 @@
   text-wrap: nowrap;
   min-width: 100px !important;
 }
+
+.commodity-table{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  width: 100%;
+  justify-content: center;
+  margin-bottom: 16px;
+  border-radius: 12px;
+}
