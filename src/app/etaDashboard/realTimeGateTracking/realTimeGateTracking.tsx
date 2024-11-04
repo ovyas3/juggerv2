@@ -362,13 +362,14 @@ export default function RealTimeGateTracking() {
           gutterBottom
           sx={{
             fontWeight: 'bold',
-            fontSize: '1.30rem',
+            fontSize: '1.25rem',
             color: '#2E2D32',
             marginBottom: '20px',
-            letterSpacing: '1px',
+            letterSpacing: '1.54px',
             fontFamily: '"Plus Jakarta Sans", sans-serif',
+            textTransform: 'uppercase',
           }}>
-          Real-time gate-in and gate-out tracking
+          Placement Time & Drawn Out Time
         </Typography>
         <Box sx={{ display: 'flex' }}>
           <CustomDateTimePicker
