@@ -314,9 +314,14 @@ const CommodityTable: React.FC = () => {
           placeholder="Select commodity"
           options={[
             { value: "all", label: "All Commodities" },
-            { value: "steel", label: "Steel" },
-            { value: "coal", label: "Coal" },
-            { value: "cement", label: "Cement" },
+            { value: "IS", label: "IRON & STEEL" },
+            { value: "CEMT", label: "CEMENT" },
+            { value: "COAL", label: "COAL" },
+            { value: "IMCL", label: "IMPORTED COAL" },
+            { value: "IMOR", label: "IMPORTED IRON ORE" },
+            { value: "MIXD", label: "MIXED" },
+            { value: "ORES", label: "ORES" },
+            { value: "RMSP", label: "RAW MATERIAL FOR STEEL PLANT" },
           ]}
         />
         <Select
@@ -326,7 +331,7 @@ const CommodityTable: React.FC = () => {
           options={[
             { value: "all", label: "All Types" },
             { value: "ir", label: "IR" },
-            { value: "saptive", label: "SAPTIVE" },
+            { value: "captive", label: "Captive" },
           ]}
         />
       </div>
