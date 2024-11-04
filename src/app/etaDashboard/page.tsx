@@ -16,6 +16,7 @@ import EtaDashboardModal from "./etaDashboradModal";
 import { useRouter } from "next/navigation";
 import { ThreeCircles } from "react-loader-spinner";
 import WagonsDashboard from "./wagonsDashboard/wagonsDashboard";
+import RealTimeGateTracking from "./realTimeGateTracking/realTimeGateTracking";
 
 
 function EtaDashboard() {
@@ -130,6 +131,11 @@ function EtaDashboard() {
         }`}
       >
         <WagonsDashboard />
+        <div id="enRoutesEtaDelay" style={{
+          marginBottom: '24px'
+        }}>
+          <RealTimeGateTracking />
+        </div>
         <div id="enRoutesEtaDelay">
           <section id="heading_reload">
             <div id="heading">
