@@ -368,11 +368,11 @@ export default function RealTimeGateTracking() {
         <div style={tooltipStyle}>
           <p style={sectionTitleStyle}>{formattedDate}</p>
           <div style={dataRowStyle}>
-            <span style={{ ...colorIndicatorStyle, backgroundColor: '#CDC1FF' }}></span>
+            <span style={{ ...colorIndicatorStyle, backgroundColor: '#F30055' }}></span>
             {`Indian Rakes: ${payload[0]?.payload?.indianRakes}`}
           </div>
           <div style={dataRowStyle}>
-            <span style={{ ...colorIndicatorStyle, backgroundColor: '#BFECFF' }}></span>
+            <span style={{ ...colorIndicatorStyle, backgroundColor: '#21114D' }}></span>
             {`Captive Rakes: ${payload[0]?.payload?.captive}`}
           </div>
           <div style={dataRowStyle}>
@@ -596,13 +596,13 @@ export default function RealTimeGateTracking() {
               />
               <Bar
                 dataKey='captive'
-                fill="#BFECFF"
+                fill="#21114D"
                 name='Captive Rakes'
                 stackId="a"
               />
               <Bar
                 dataKey='indianRakes'
-                fill="#CDC1FF"
+                fill="#F30055"
                 name='Indian Rakes'
                 stackId="a"
               />

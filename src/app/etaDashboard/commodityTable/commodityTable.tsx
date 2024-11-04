@@ -137,7 +137,7 @@ const CommodityTable: React.FC = () => {
   const [startDatePickerOpen, setStartDatePickerOpen] = useState(false)
   const [endDatePickerOpen, setEndDatePickerOpen] = useState(false)
   const [direction, setDirection] = useState("outward")
-  const [commodity, setCommodity] = useState<string[]>(commodities);
+  const [commodity, setCommodity] = useState<string[]>(["IS (IRON & STEEL)"]);
   const [type, setType] = useState<string[]>([])
   const componentRef = useRef<HTMLDivElement>(null);
 
