@@ -6,7 +6,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs from "dayjs";
-import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,Legend, ResponsiveContainer } from 'recharts';
 import { httpsGet } from '@/utils/Communication';
 import { useRouter } from 'next/navigation';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
@@ -16,6 +16,8 @@ import { toPng } from 'html-to-image';
 import Image from 'next/image';
 import { ThreeCircles } from "react-loader-spinner";
 import './realTimeGateTracking.css';
+import { useTranslations } from "next-intl";
+
 
 interface MetricCardProps {
   title: string
@@ -129,6 +131,7 @@ export default function RealTimeGateTracking() {
   const today: any = new Date();
   const oneMonthAgo: any = new Date();
   oneMonthAgo.setMonth(today.getMonth() - 1);
+  const text = useTranslations("ETADASHBOARD");
 
   const [startDate, setStartDate] = useState<any>(oneMonthAgo);
   const [endDate, setEndDate] = useState<any>(today);
@@ -201,7 +204,7 @@ export default function RealTimeGateTracking() {
         const chartData = data.map((item: any) => {
           const value = item.avgTime ? Number(item.avgTime.toFixed(2)) : 0;
           return {
-            date: item._id,
+            date: item.day,
             value: value,
           };
         });
@@ -223,8 +226,10 @@ export default function RealTimeGateTracking() {
       if (response.statusCode === 200) {
         const data = response.data;
         const chartData = data.map((item: any) => ({
-          date: item._id,
+          date: item.day,
           value: item.totalRakes,
+          captive:item.captiveRakes,
+          indianRakes:item?.iRakes,
         }));
         calculateBarChartDomainTicks(chartData);
         setBarChartData(chartData);
@@ -351,6 +356,24 @@ export default function RealTimeGateTracking() {
     );
   }
 
+  const CustomTooltip = ({ active, payload, label }:any) => {
+    console.log('payload',payload, label)
+    if (!active || !payload || !payload.length) return null;
+    const date = new Date(label);
+    const month = date.toLocaleString('en-US', { month: 'short', timeZone: 'UTC' });
+    const year = date.getFullYear() % 100;
+    const formattedDate = `${date.getDate()}-${month}-${year}`;
+    return (
+      <div className="custom-tooltip">
+        <p>{formattedDate}</p>
+        <p>{`Total Rakes: ${payload[0]?.payload?.value}`}</p>
+        <p>{`Captive Rakes: ${payload[0]?.payload?.captive}`}</p>
+        <p>{`Indian Rakes: ${payload[0]?.payload?.indianRakes}`}</p>
+      </div>
+    );
+  };
+
+
   return (
     <Container maxWidth="xl" sx={{ py: 4, backgroundColor: '#fff' }} ref={componentRef}>
       <Box 
@@ -369,7 +392,7 @@ export default function RealTimeGateTracking() {
             fontFamily: '"Plus Jakarta Sans", sans-serif',
             textTransform: 'uppercase',
           }}>
-          Placement Time & Drawn Out Time
+          {text('PTDT_tracking')}
         </Typography>
         <Box sx={{ display: 'flex' }}>
           <CustomDateTimePicker
@@ -469,18 +492,39 @@ export default function RealTimeGateTracking() {
             >
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis 
+                style={{ fontSize: '12px' }}
                 dataKey="date"
-                tickFormatter={(value) => new Date(value).toLocaleDateString('en-US', { month: 'numeric', day: 'numeric' })}
+                tickFormatter={(value) => {
+                  const date = new Date(value);
+                  const day = date.getDate();
+                  const month = date.toLocaleString('en-US', { month: 'short', timeZone: 'UTC' });
+                  const year = date.getFullYear() % 100;
+                  return `${day}/${month}`;
+                }}
               />
               <YAxis 
                 domain={yAxisDomainBar}
                 ticks={yAxisTicksBar}
               />
-              <Tooltip />
+              <Tooltip content={<CustomTooltip />} />
+              <Legend
+                verticalAlign="bottom"
+                height={36}
+                iconType="square"
+                iconSize={12}
+                formatter={(value) => <span style={{ color: '#666', fontSize: 14, textAlign: 'center', marginRight: '32px' }}>{value}</span>}
+              />
               <Bar
-                dataKey="value"
+                dataKey='captive'
                 fill="#32a852"
-                radius={[4, 4, 0, 0]}
+                name='Captive Rakes'
+                stackId="a"
+              />
+              <Bar
+                dataKey='indianRakes'
+                fill="#f9a825"
+                name='Indian Rakes'
+                stackId="a"
               />
             </BarChart>
           </ResponsiveContainer>
