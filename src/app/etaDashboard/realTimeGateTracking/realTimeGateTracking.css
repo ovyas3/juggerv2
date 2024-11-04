@@ -20,12 +20,3 @@
         flex-direction: column;
     }
 }
-.custom-tooltip{
-    background-color: white;
-    border-radius: 4px;
-    padding: 8px;
-    font-size: 12px;
-    font-weight: 400;
-    color: #333333;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}

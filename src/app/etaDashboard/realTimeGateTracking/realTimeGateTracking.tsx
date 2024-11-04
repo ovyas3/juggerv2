@@ -201,13 +201,15 @@ export default function RealTimeGateTracking() {
       const response = await httpsGet(`dashboard/averageTimePerRake?from=${from}&to=${to}`, 0, router);
       if (response.statusCode === 200) {
         const data = response.data;
-        const chartData = data.map((item: any) => {
-          const value = item.avgTime ? Number(item.avgTime.toFixed(2)) : 0;
+        let chartData = data && data.map((item: any) => {
+          const [hours, minutes] = item.avgTime.split(':').map(Number);
+          const value = hours + minutes / 60;
           return {
             date: item.day,
-            value: value,
+            value,
           };
         });
+        chartData = chartData.filter((item: any) => !isNaN(item.value));
         calculateLineChartDomainTicks(chartData);
         setLineChartData(chartData);
       }
@@ -218,14 +220,13 @@ export default function RealTimeGateTracking() {
       setLoading(false);
     }
   }
-
   const getDailyTotalRakesProcessed = async (from: number, to: number) => {
     try {
       setLoading(true);
       const response = await httpsGet(`dashboard/dailyTotalRakesProcessed?from=${from}&to=${to}`, 0, router);
       if (response.statusCode === 200) {
         const data = response.data;
-        const chartData = data.map((item: any) => ({
+        const chartData = data && data.map((item: any) => ({
           date: item.day,
           value: item.totalRakes,
           captive:item.captiveRakes,
@@ -241,22 +242,7 @@ export default function RealTimeGateTracking() {
       setLoading(false);
     }
   }
-
-  const getETA = async (from: number, to: number) => {
-    try {
-      setLoading(true);
-      const response = await httpsGet(`dashboard/eta?from=${from}&to=${to}`, 0, router);
-      if (response.statusCode === 200) {
-        console.log(response.data);
-      }
-    } catch (error) {
-      console.log(error);
-      setLoading(false);
-    } finally {
-      setLoading(false);
-    }
-  }
- 
+  
   useEffect(() => {
     const startDate = service.millies(oneMonthAgo);
     const endDate = service.millies(today);
@@ -267,24 +253,25 @@ export default function RealTimeGateTracking() {
 
   const calculateLineChartDomainTicks = (data: any[]) => {
     const values = data.map((item) => item.value);
+    console.log(values);
     const max = Math.max(...values);
     const min = Math.min(...values);
     const diff = max - min;
-    const domain = [min - diff * 0.1, max + diff * 0.1];
+    const domain = [Math.floor(min - diff * 0.1), Math.ceil(max + diff * 0.1)];
   
     // Calculate step size for 5 ticks
     let stepSize = Math.ceil(max / 5);
   
-    // Round step size to the nearest 500 or 1000
-    if (stepSize <= 500) {
-      stepSize = Math.ceil(stepSize / 500) * 500;
+    // Round step size to the nearest 10 or 20
+    if (stepSize <= 10) {
+      stepSize = Math.ceil(stepSize / 10) * 10;
     } else {
-      stepSize = Math.ceil(stepSize / 1000) * 1000;
+      stepSize = Math.ceil(stepSize / 20) * 20;
     }
   
     // Generate ticks based on the rounded step size
     const ticks = [];
-    for (let i = stepSize; i <= max; i += stepSize) {
+    for (let i = 0; i <= Math.ceil(max / stepSize) * stepSize; i += stepSize) {
       ticks.push(i);
     }
   
@@ -340,6 +327,109 @@ export default function RealTimeGateTracking() {
     }
   };
 
+  const CustomTooltip = ({ active, payload, label }:any) => {
+    if (!active || !payload || !payload.length) return null;
+    const date = new Date(label);
+    const month = date.toLocaleString('en-US', { month: 'short', timeZone: 'UTC' });
+    const year = date.getFullYear() % 100;
+    const formattedDate = `${date.getDate()}-${month}-${year}`;
+
+    const tooltipStyle: React.CSSProperties = {
+      backgroundColor: '#E8F4FF',
+      border: '1px solid #A9D3FF',
+      borderRadius: '8px',
+      padding: '16px',
+      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+      fontFamily: 'Arial, sans-serif',
+      fontSize: '14px',
+      color: '#333',
+      maxWidth: '300px'
+    };
+
+    const colorIndicatorStyle: React.CSSProperties = {
+      display: 'inline-block',
+      width: '12px',
+      height: '12px',
+      marginRight: '8px',
+      borderRadius: '2px'
+    };
+
+    const sectionTitleStyle: React.CSSProperties = {
+      fontWeight: 'bold',
+      marginBottom: '8px'
+    };
+
+    const dataRowStyle: React.CSSProperties = {
+      marginBottom: '4px'
+    };
+
+    return (
+      <div>
+        <div style={tooltipStyle}>
+          <p style={sectionTitleStyle}>{formattedDate}</p>
+          <div style={dataRowStyle}>
+            <span style={{ ...colorIndicatorStyle, backgroundColor: '#f9a825' }}></span>
+            {`Indian Rakes: ${payload[0]?.payload?.indianRakes}`}
+          </div>
+          <div style={dataRowStyle}>
+            <span style={{ ...colorIndicatorStyle, backgroundColor: '#32a852' }}></span>
+            {`Captive Rakes: ${payload[0]?.payload?.captive}`}
+          </div>
+          <div style={dataRowStyle}>
+            <span style={{ ...colorIndicatorStyle, backgroundColor: '#E8F4FF' }}></span>
+            {`Total Rakes: ${payload[0]?.payload?.value}`}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const formatTime = (decimalHours: number) => {
+    const hours = Math.floor(decimalHours);
+    const minutes = Math.round((decimalHours - hours) * 60);
+    return `${hours} hrs ${minutes} mins`;
+  };
+
+  const CustomToolTipLineChart = ({ active, payload, label }: any) => {
+    if (!active || !payload || !payload.length) return null;
+    const date = new Date(label);
+    const month = date.toLocaleString('en-US', { month: 'short', timeZone: 'UTC' });
+    const year = date.getFullYear() % 100;
+    const formattedDate = `${date.getDate()}-${month}-${year}`;
+  
+    const tooltipStyle: React.CSSProperties = {
+      backgroundColor: '#E8F4FF',
+      border: '1px solid #A9D3FF',
+      borderRadius: '8px',
+      padding: '16px',
+      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+      fontFamily: 'Arial, sans-serif',
+      fontSize: '14px',
+      color: '#333',
+      maxWidth: '300px'
+    };
+  
+    const sectionTitleStyle: React.CSSProperties = {
+      fontWeight: 'bold',
+      marginBottom: '8px'
+    };
+  
+    const dataRowStyle: React.CSSProperties = {
+      marginBottom: '4px'
+    };
+  
+    return (
+      <div>
+        <div style={tooltipStyle}>
+          <p style={sectionTitleStyle}>{formattedDate}</p>
+          <div style={dataRowStyle}>
+            Average Time per Rake: <b>{formatTime(payload[0]?.value)}</b>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   if (loading) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
@@ -355,23 +445,6 @@ export default function RealTimeGateTracking() {
       </div>
     );
   }
-
-  const CustomTooltip = ({ active, payload, label }:any) => {
-    console.log('payload',payload, label)
-    if (!active || !payload || !payload.length) return null;
-    const date = new Date(label);
-    const month = date.toLocaleString('en-US', { month: 'short', timeZone: 'UTC' });
-    const year = date.getFullYear() % 100;
-    const formattedDate = `${date.getDate()}-${month}-${year}`;
-    return (
-      <div className="custom-tooltip">
-        <p>{formattedDate}</p>
-        <p>{`Total Rakes: ${payload[0]?.payload?.value}`}</p>
-        <p>{`Captive Rakes: ${payload[0]?.payload?.captive}`}</p>
-        <p>{`Indian Rakes: ${payload[0]?.payload?.indianRakes}`}</p>
-      </div>
-    );
-  };
 
 
   return (
@@ -454,14 +527,21 @@ export default function RealTimeGateTracking() {
             <LineChart data={lineChartData}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis 
-                dataKey="date" 
-                tickFormatter={(value) => new Date(value).toLocaleDateString('en-US', { month: 'numeric', day: 'numeric' })}
+                style={{ fontSize: '12px' }}
+                dataKey="date"
+                tickFormatter={(value) => {
+                  const date = new Date(value);
+                  const day = date.getDate();
+                  const month = date.toLocaleString('en-US', { month: 'short', timeZone: 'UTC' });
+                  return `${day}/${month}`;
+                }}
               />
               <YAxis 
                 domain={yAxisDomainLine}
                 ticks={yAxisTicksLine}
+                tickFormatter={(value) => `${value}h`}
               />
-              <Tooltip />
+              <Tooltip content={<CustomToolTipLineChart />} />
               <Line
                 type="monotone"
                 dataKey="value"
