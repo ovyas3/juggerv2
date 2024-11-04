@@ -1321,7 +1321,7 @@ export const UploadWagonSheet = ({getWagonDetails,isClose, shipment, setOpenUplo
             <div>
                 { ordersUpload === 'ordersUpload' ? 
                     <p className="sampleFile" onClick={(e)=>{e.stopPropagation();  window.open('https://docs.google.com/spreadsheets/d/19siPbQBvrt7F2dKyC-Am2Ief6XO3fPHvc9QPQvuKtm0/edit?usp=sharing', '_blank'); } } >Download Sample File</p>
-                    :<p className="sampleFile" onClick={(e)=>{e.stopPropagation();  window.open('https://docs.google.com/spreadsheets/d/1ZM3AnXF3zI1Rc98b4J890JAcpWaxOrS0ZSgHjAZaBPk/edit?gid=0#gid=0', '_blank'); } } >Download Sample File</p>
+                    :<p className="sampleFile" onClick={(e)=>{e.stopPropagation();  window.open('https://docs.google.com/spreadsheets/d/1QbtGG8hlv3gwaoOdabrJ_jm7Pg95th5dGj0MdyT637Y/edit?usp=sharing', '_blank'); } } >Download Sample File</p>
                 }
             </div>
 
