@@ -1420,13 +1420,13 @@ export const UploadDailyRakeHandlingSheet = ({ getWagonDetails, isClose, shipmen
             >
                 <label htmlFor="input-file" className="fileUpload">
                 <input type="file"
-                 //accept=".csv"
+                 accept=".xlsx"
                   id="input-file" hidden onChange={(e)=>{  if (e.target.files) {setFileName(e.target.files[0].name); setUploadFile(e.target.files[0]) }}} />
                     <div className="fileUploadContent">
                         <div style={{textAlign:'center'}}><CloudUploadIcon style={{width:30, height:30, color:'#5481FF'}}  /></div>
                         <header style={{color:'#71747A', fontSize:12, marginBottom:10,textAlign:'center'}}>{fileName}</header>
                         <div style={{display:'flex', justifyContent:'center', alignItems:'center', marginBottom:8}}><div style={{width:135, height:36 , borderRadius:4, backgroundColor:'#42454E', color:'white', textAlign:'center', alignContent:'center', fontSize:12}}>Browse and Upload</div></div>
-                        <p style={{color:'#71747A', fontSize:12,textAlign:'center'}}>Only <span style={{color:'#131722', fontWeight:600}}>CSV</span> file format will be accepted</p>
+                        <p style={{color:'#71747A', fontSize:12,textAlign:'center'}}>Only <span style={{color:'#131722', fontWeight:600}}>XLSX</span> file format will be accepted</p>
                     </div>
                 </label>
             </div>

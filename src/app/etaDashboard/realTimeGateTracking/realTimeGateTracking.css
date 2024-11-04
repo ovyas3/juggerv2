@@ -1,0 +1,22 @@
+.real-time-gate-tracking-header{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+
+    @media screen and (max-width: 840px){
+        flex-direction: column;
+        justify-self: flex-start;
+        align-items: flex-start !important;
+    }
+}
+
+.real-time-gate-tracking-body{
+    display: flex;
+    margin-bottom: 8px;
+    gap: 16px;
+
+    @media screen and (max-width: 840px){
+        flex-direction: column;
+    }
+}
