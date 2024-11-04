@@ -33,6 +33,10 @@ import captiveRakeIndicator from "@/assets/captive_rakes.svg";
 import SourceOutlinedIcon from "@mui/icons-material/SourceOutlined";
 import { redirect, useRouter, useParams } from "next/navigation";
 import { ThreeCircles } from "react-loader-spinner";
+import uploadIcon from '@/assets/uploadIcon.svg';
+import Tooltip from '@mui/material/Tooltip';
+
+
 
 interface Column {
   id: string;
@@ -251,7 +255,7 @@ function WagonTallySheet({}: any) {
     setShowActionBox(-1);
     setAnchorEl(null);
   };
-  const uploadDailyRakeHandlingSheet = (event: any, row: any) => {
+  const uploadDailyRakeHandlingSheet = (event: any, row: any = {}) => {
     setOpenUploadDailyRakeHandlingSheet(true);
     setUploadDailyRakeHandlingSheetData(row);
     setShowActionBox(-1);
@@ -425,8 +429,7 @@ function WagonTallySheet({}: any) {
     <div>
       <div className="wagon-wrapper">
         <div id="search-container">
-          <div id="space-giver"
-          ></div>
+          <div id="space-giver"></div>
           <div className="input-wrapper">
             <input
               className="input"
@@ -447,6 +450,14 @@ function WagonTallySheet({}: any) {
             />
           </div>
           <div id="status-display">
+            <div id='uploadRakeHandlingSheetContainer' onClick={(e) => uploadDailyRakeHandlingSheet(e)}>
+            <Tooltip title={'Upload Rake Handling Sheet'} arrow >
+              <div id='rakeHandlingSheetUpload'>
+              <div><Image src={uploadIcon.src} height={24} width={24} alt="uploadIcon"  /></div>
+              <div>{text('upload-rake-handling-sheet')}</div>
+              </div>
+            </Tooltip>
+            </div>
             <div
               className="status-display-boxes"
               style={{
@@ -815,14 +826,14 @@ function WagonTallySheet({}: any) {
                                       >
                                         {text("indentNumber")}
                                       </div>
-                                      <div
+                                      {/* <div
                                         onClick={(e) =>
                                           uploadDailyRakeHandlingSheet(e, row)
                                         }
                                         className="action-popover-wagon"
                                       >
                                         {text("uploadDailyRakeHandlingSheet")}
-                                      </div>
+                                      </div> */}
                                       <div
                                         onClick={(e) =>
                                           uploadWagonSheet(e, row)

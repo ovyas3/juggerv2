@@ -103,7 +103,9 @@
     "early":"Early",
     "stableShipments":"Stable Shipments : ",
     "stableFor48hrs":"Stable Shipments",
-    "PTDT_tracking":"Placement Time - DrawnOut Time Tracking"
+    "PTDT_tracking":"Placement Time - DrawnOut Time Tracking",
+    "trendOverSelectedDateRange":"Trend Over Selected Date Range",
+    "comparisonOvertheselectedDateRange":"Comparison Over the selected Date Range"
   },
   "WAGONTALLYSHEET":{
     "uploadWagonTallySheet":"Upload Wagon Sheet",
@@ -199,7 +201,9 @@
     "captureImage": "Capture Image",
     "turnFlashOn": "Turn Flash On",
     "turnFlashOff": "Turn Flash Off",
-    "takePhoto": "Take Photo"
+    "takePhoto": "Take Photo",
+    "upload-rake-handling-sheet":"Upload Rake Handling Sheet",
+    "uploadFile":"Upload File"
   }
 }
 

@@ -618,3 +618,23 @@
       height: 66vh;
   }
 }
+
+#uploadRakeHandlingSheetContainer{
+  background-color: #E8EBFF;
+  font-size: small;
+  height: 32px;
+  width: fit-content;
+  padding-inline: 8px;
+  color: #3351FF;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  margin-top: 6px;
+}
+#rakeHandlingSheetUpload{
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
