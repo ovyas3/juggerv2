@@ -35,6 +35,20 @@
   }
 }
 
+.real-time-gate-tracking-table-wrapper-captiveIR{
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+  margin-top: 36px;
+  height: calc(100% - 20%);
+  overflow-y: auto;
+
+  @media screen and (max-width: 840px){
+    margin-top: 24px;
+    height: calc(100% - 20%);
+  }
+}
+
 .real-time-gate-tracking-table {
   width: 100%;
   border-collapse: separate;
@@ -86,7 +100,7 @@
 
 .real-time-gate-tracking-download-icon{
   text-align: right;
-  width: 60px;
+  width: 40px;
 }
 
 .real-time-gate-tracking-font-medium {
@@ -99,4 +113,19 @@
   position: sticky;
   bottom: 0;
   z-index: 1;
+}
+
+.real-time-gate-tracking-captiveIR-container{
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+  width: 100%;
+  border-radius: 10px;
+  gap: 16px;
+}
+
+.real-time-gate-tracking-captiveIR-piechart-container{
+  flex: 1;
+  margin-top: 42px;
 }

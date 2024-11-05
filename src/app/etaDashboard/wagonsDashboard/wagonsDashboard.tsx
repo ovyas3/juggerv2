@@ -31,7 +31,6 @@ const StyledBox = styled(Box)(({ theme }) => ({
   backgroundColor: '#ffffff',
   borderRadius: '10px',
   padding: theme.spacing(3),
-  boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.1)',
 }));
 
 const StyledSelect = styled(Select)(({ theme }) => ({
