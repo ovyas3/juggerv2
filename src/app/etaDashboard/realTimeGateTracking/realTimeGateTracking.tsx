@@ -375,11 +375,11 @@ export default function RealTimeGateTracking() {
         <div style={tooltipStyle}>
           <p style={sectionTitleStyle}>{formattedDate}</p>
           <div style={dataRowStyle}>
-            <span style={{ ...colorIndicatorStyle, backgroundColor: '#f9a825' }}></span>
+            <span style={{ ...colorIndicatorStyle, backgroundColor: '#F30055' }}></span>
             {`Indian Rakes: ${payload[0]?.payload?.indianRakes}`}
           </div>
           <div style={dataRowStyle}>
-            <span style={{ ...colorIndicatorStyle, backgroundColor: '#32a852' }}></span>
+            <span style={{ ...colorIndicatorStyle, backgroundColor: '#21114D' }}></span>
             {`Captive Rakes: ${payload[0]?.payload?.captive}`}
           </div>
           <div style={dataRowStyle}>
@@ -528,7 +528,7 @@ export default function RealTimeGateTracking() {
         <Card sx={{ p: 3, flex: 1 }}>
           <Typography variant="h6">Average Time per Rake</Typography>
           <Typography color="text.secondary" variant="body2" sx={{ mb: 2 }}>
-            Trend over the past week
+            {text('trendOverSelectedDateRange')}
           </Typography>
           <ResponsiveContainer width="100%" height={400}>
             <LineChart data={lineChartData}>
@@ -563,7 +563,7 @@ export default function RealTimeGateTracking() {
         <Card sx={{ p: 3, flex: 1 }}>
           <Typography variant="h6">Daily Total Rakes Processed</Typography>
           <Typography color="text.secondary" variant="body2" sx={{ mb: 2 }}>
-            Comparison over the past week
+            {text('comparisonOvertheselectedDateRange')}
           </Typography>
           <ResponsiveContainer width="100%" height={400}>
             <BarChart 
@@ -603,13 +603,13 @@ export default function RealTimeGateTracking() {
               />
               <Bar
                 dataKey='captive'
-                fill="#32a852"
+                fill="#21114D"
                 name='Captive Rakes'
                 stackId="a"
               />
               <Bar
                 dataKey='indianRakes'
-                fill="#f9a825"
+                fill="#F30055"
                 name='Indian Rakes'
                 stackId="a"
               />

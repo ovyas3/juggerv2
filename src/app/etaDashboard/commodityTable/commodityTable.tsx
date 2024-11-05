@@ -146,8 +146,8 @@ const CommodityTable: React.FC = () => {
   const [startDatePickerOpen, setStartDatePickerOpen] = useState(false)
   const [endDatePickerOpen, setEndDatePickerOpen] = useState(false)
   const [direction, setDirection] = useState("outward")
-  const [commodity, setCommodity] = useState<string[]>(commodities);
-  const [type, setType] = useState("ir")
+  const [commodity, setCommodity] = useState<string[]>(["IS (IRON & STEEL)"]);
+  const [type, setType] = useState<string[]>([])
   const componentRef = useRef<HTMLDivElement>(null);
 
   const [commodityData, setCommodityData] = useState<CommodityData[]>([])
@@ -184,7 +184,15 @@ const CommodityTable: React.FC = () => {
   const getCommodityData = async (from: number, to: number) => {
     try {
       setLoading(true);
-      const IR = type === 'ir' ? 1 : type === 'captive' ? 2 : 0;
+      
+      const IR = type.includes('ir') && type.includes('captive')
+      ? 0
+      : type.includes('ir')
+      ? 1
+      : type.includes('captive')
+      ? 2
+      : 0;
+
       const outward = direction === 'outward' ? 1 : direction === 'inward' ? 2 : 0;
       const validCommodities = [
         "IS (IRON & STEEL)",
@@ -202,10 +210,13 @@ const CommodityTable: React.FC = () => {
       const params = new URLSearchParams({
         from: from.toString(),
         to: to.toString(),
-        IR: IR.toString(),
         outward: outward.toString()
       });
-  
+
+      if (IR !== 0) {
+        params.append('IR', IR.toString());
+      }
+      
       filteredCommodities.forEach(c => params.append('commodity', c));
   
       const response = await httpsGet(
@@ -369,7 +380,7 @@ const CommodityTable: React.FC = () => {
           placeholder="Select commodity"
           options={commodityOptions}
         />
-        <Select
+        <MultiSelect
           value={type}
           onValueChange={setType}
           placeholder="Select type"
