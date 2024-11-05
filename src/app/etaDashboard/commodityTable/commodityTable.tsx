@@ -15,6 +15,16 @@ import ScreenShotIcon from '@/assets/screenshot_icon.svg';
 import { toPng } from 'html-to-image';
 import Image from 'next/image';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import { styled } from '@mui/system';
+
+const StyledBox = styled(Box)(({ theme }) => ({
+  backgroundColor: '#ffffff',
+  width: '100%',
+  borderRadius: '10px',
+  padding: theme.spacing(3),
+  boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.1)',
+}));
+
 
 interface CommodityData {
   id: number
@@ -173,7 +183,7 @@ const CommodityTable: React.FC = () => {
   };
 
   const getCommodityData = async (from: number, to: number) => {
-    try{
+    try {
       setLoading(true);
       
       const IR = type.includes('ir') && type.includes('captive')
@@ -195,9 +205,9 @@ const CommodityTable: React.FC = () => {
         "ORES (ORES)",
         "RMSP (RAW MATERIAL FOR STEEL PLANT)"
       ];
-      
+  
       const filteredCommodities = commodity.filter(c => validCommodities.includes(c));
-      
+  
       const params = new URLSearchParams({
         from: from.toString(),
         to: to.toString(),
@@ -209,7 +219,7 @@ const CommodityTable: React.FC = () => {
       }
       
       filteredCommodities.forEach(c => params.append('commodity', c));
-      
+  
       const response = await httpsGet(
         `dashboard/eta?${params.toString()}`,
         0,
@@ -243,12 +253,6 @@ const CommodityTable: React.FC = () => {
       console.log('finally')
     }
   }
-
-  useEffect(() => {
-    const startDate = service.millies(oneMonthAgo);
-    const endDate = service.millies(today);
-    getCommodityData(startDate, endDate);
-  }, [])
 
   useEffect(() => {
     if (startDate && endDate) {
@@ -318,7 +322,7 @@ const CommodityTable: React.FC = () => {
   }));
 
   return (
-    <div className="commoditytable-container" ref={componentRef} >
+    <StyledBox ref={componentRef} >
       <Box 
         className="commoditytable-header"
       sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}
@@ -335,7 +339,7 @@ const CommodityTable: React.FC = () => {
             fontFamily: '"Plus Jakarta Sans", sans-serif',
             textTransform: 'uppercase',
           }}>
-          Commodity
+          ETA Compliance
         </Typography>
         <Box sx={{ display: 'flex' }}>
           <CustomDateTimePicker
@@ -422,7 +426,7 @@ const CommodityTable: React.FC = () => {
           </tbody>
         </table>
       </div>
-    </div>
+    </StyledBox>
   )
 }
 
