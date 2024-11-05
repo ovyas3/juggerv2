@@ -53,7 +53,7 @@ const StyledTab = styled(Tab)(({ theme }) => ({
 }))
 
 const TabPanel = styled(Box)({
-  padding: '24px',
+  padding: '0px',
 })
 
 interface TabPanelProps {
@@ -194,7 +194,7 @@ function EtaDashboard() {
           mobile ? "adjustMargin" : "adjustMarginMobile"
         }`}
       >
-        <Box sx={{ width: '100%' }}>
+        <Box sx={{ width: '100%', backgroundColor: '#fff' }}>
           <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
             <StyledTabs value={value} onChange={handleChange} aria-label="dashboard tabs">
               <StyledTab label="Wagons" />
