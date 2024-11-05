@@ -198,7 +198,7 @@ function EtaDashboard() {
           <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
             <StyledTabs value={value} onChange={handleChange} aria-label="dashboard tabs">
               <StyledTab label="Wagons" />
-              <StyledTab label="PT & DT" />
+              <StyledTab label="PT & DW" />
               <StyledTab label="ETA" />
             </StyledTabs>
           </Box>
