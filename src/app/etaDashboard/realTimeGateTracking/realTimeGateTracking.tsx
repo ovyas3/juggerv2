@@ -820,7 +820,7 @@ const convertMinutesToHoursAndMinutes = (minutes: number) => {
         sx={{ display: 'flex', gap: 2 }}
       >
         <Card sx={{ p: 3, flex: 1 }}>
-          <Typography variant="h6">Average Time per Rake</Typography>
+          <Typography variant="h6"  sx={{fontWeight: 600}}>Average Time per Rake</Typography>
           <Typography color="text.secondary" variant="body2" sx={{ mb: 2 }}>
             {text('trendOverSelectedDateRange')}
           </Typography>
@@ -855,7 +855,7 @@ const convertMinutesToHoursAndMinutes = (minutes: number) => {
         </Card>
 
         <Card sx={{ p: 3, flex: 1 }}>
-          <Typography variant="h6">Daily Total Rakes Processed</Typography>
+          <Typography variant="h6"  sx={{fontWeight: 600}}>Daily Total Rakes Processed</Typography>
           <Typography color="text.secondary" variant="body2" sx={{ mb: 2 }}>
             {text('comparisonOvertheselectedDateRange')}
           </Typography>
@@ -912,8 +912,8 @@ const convertMinutesToHoursAndMinutes = (minutes: number) => {
         </Card>
       </Box>
 
-      {/* Average time per rake table */}
-      <div className="real-time-gate-tracking-table-wrapper">
+       {/* Average time per rake table */}
+       <div className="real-time-gate-tracking-table-wrapper">
         <table className="real-time-gate-tracking-table">
           <thead>
             <tr>
@@ -978,6 +978,16 @@ const convertMinutesToHoursAndMinutes = (minutes: number) => {
           </tbody>
         </table>
       </div>
+
+      <Box 
+        className="real-time-gate-tracking-body"
+        sx={{ display: 'flex', gap: 2, marginTop: 4 }}
+      >
+      <Card sx={{ p: 3, flex: 1 }}>
+          <Typography variant="h6" sx={{fontWeight: 600}}>Captive vs IR Rake distribution</Typography>
+          <Typography color="text.secondary" variant="body2" sx={{ mb: 2 }}>
+            Comparison of captive and IR rake usage over time
+          </Typography>
 
       <div className='real-time-gate-tracking-captiveIR-container'>
         {/* Captive IR Table */}
@@ -1047,15 +1057,7 @@ const convertMinutesToHoursAndMinutes = (minutes: number) => {
         </table>
       </div>
 
-      <Card className='real-time-gate-tracking-captiveIR-piechart-container'>
-      <CardContent>
-        {/* <Typography variant="h5" component="div" gutterBottom>
-          Rake Type Distribution
-        </Typography>
-        <Typography variant="body2" color="text.secondary" gutterBottom>
-          Distribution of rake types by percentage
-        </Typography> */}
-        <Box sx={{ height: 400, width: '100%' }}>
+      <div style={{ height: 300, width: '40%'}}>
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
@@ -1076,10 +1078,11 @@ const convertMinutesToHoursAndMinutes = (minutes: number) => {
               <RechartsTooltip content={<CustomTooltipPieChart />} />
             </PieChart>
           </ResponsiveContainer>
-        </Box>
-      </CardContent>
-      </Card>
+        </div>
       </div>
+      </Card>
+      </Box>
+      
     </StyledBox>
   )
 }
