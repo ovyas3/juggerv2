@@ -17,7 +17,14 @@ import Image from 'next/image';
 import { ThreeCircles } from "react-loader-spinner";
 import './realTimeGateTracking.css';
 import { useTranslations } from "next-intl";
+import { styled } from '@mui/system';
 
+const StyledBox = styled(Box)(({ theme }) => ({
+  backgroundColor: '#ffffff',
+  borderRadius: '10px',
+  padding: theme.spacing(3),
+  boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.1)',
+}));
 
 interface MetricCardProps {
   title: string
@@ -242,7 +249,7 @@ export default function RealTimeGateTracking() {
       setLoading(false);
     }
   }
-  
+
   useEffect(() => {
     const startDate = service.millies(oneMonthAgo);
     const endDate = service.millies(today);
@@ -448,7 +455,7 @@ export default function RealTimeGateTracking() {
 
 
   return (
-    <Container maxWidth="xl" sx={{ py: 4, backgroundColor: '#fff' }} ref={componentRef}>
+    <StyledBox ref={componentRef}>
       <Box 
         className="real-time-gate-tracking-header"
       sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}
@@ -610,6 +617,6 @@ export default function RealTimeGateTracking() {
           </ResponsiveContainer>
         </Card>
       </Box>
-    </Container>
+    </StyledBox>
   )
 }
