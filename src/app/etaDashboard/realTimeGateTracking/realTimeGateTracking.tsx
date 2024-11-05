@@ -243,8 +243,18 @@ export default function RealTimeGateTracking() {
   const formatTime = (decimalHours: number) => {
     const hours = Math.floor(decimalHours);
     const minutes = Math.round((decimalHours - hours) * 60);
-    return `${hours} hours ${minutes} mins`;
-  };
+    const hourText = hours === 1 ? 'hour' : 'hours';
+    const minuteText = minutes === 1 ? 'min' : 'mins';
+    return `${hours} ${hourText} ${minutes} ${minuteText}`;
+};
+
+const convertMinutesToHoursAndMinutes = (minutes: number) => {
+    const hours = Math.floor(minutes / 60);
+    const remainingMinutes = Math.floor(minutes % 60);
+    const hourText = hours === 1 ? 'hr' : 'hrs';
+    const minuteText = remainingMinutes === 1 ? 'min' : 'mins';
+    return `${hours} ${hourText} ${remainingMinutes} ${minuteText}`;
+};
 
   const getDashboardMetrics = async () => {
     try {
@@ -254,13 +264,13 @@ export default function RealTimeGateTracking() {
         setLoading(false);
         const data = response.data;
         const formattedData = {
-          dailyAverageTime: data?.dailyAverageTime ? data?.dailyAverageTime.toFixed(2) : 0,
+          dailyAverageTime: data?.dailyAverageTime ? convertMinutesToHoursAndMinutes(data.dailyAverageTime) : "0 hr 0 min",
           dailyTrend: data?.dailyTrend,
-          weeklyAverageTime: data?.weeklyAverageTime ? data?.weeklyAverageTime.toFixed(2) : 0,
+          weeklyAverageTime: data?.weeklyAverageTime ? convertMinutesToHoursAndMinutes(data.weeklyAverageTime) : "0 hr 0 min",
           weeklyTrend: data?.weeklyTrend,
-          monthlyTotalRakes: data?.monthlyTotalRakes ? data?.monthlyTotalRakes.toFixed(2) : 0,
+          monthlyTotalRakes: data?.monthlyTotalRakes ? Number(data?.monthlyTotalRakes.toFixed(2)) : 0,
           monthlyTrend: data?.monthlyTrend,
-        }
+      };
         setDashboardMetrics(formattedData);
       }
     } catch (error) {
