@@ -25,6 +25,7 @@ import { useRouter } from 'next/navigation';
 import { httpsGet } from '@/utils/Communication';
 import { ThreeCircles } from "react-loader-spinner";
 import { toPng } from 'html-to-image';
+import { useTranslations } from 'next-intl';
 
 // Custom styled components
 const StyledBox = styled(Box)(({ theme }) => ({
@@ -72,6 +73,7 @@ interface DataPoint {
 }
 
 const CustomTooltip = ({ active, payload, label, isPercentage, isRupees, isTonnage }: TooltipProps<number, string> & { isPercentage: boolean, isRupees: boolean, isTonnage: boolean }) => {
+  const text = useTranslations("ETADASHBOARD");
   if (active && payload && payload.length) {
 
     // Constant Values
@@ -129,11 +131,11 @@ const CustomTooltip = ({ active, payload, label, isPercentage, isRupees, isTonna
           <div style={tooltipStyle}>
           <div style={sectionTitleStyle}>
             <span style={{ ...colorIndicatorStyle, backgroundColor: '#596CFF' }}></span>
-            Actual Percentage : {actualPercentage}%
+            {text('actualPercentage')} : {actualPercentage}%
           </div>
           <div style={dataRowStyle}>
             <span style={{ ...colorIndicatorStyle, backgroundColor: '#A4ABFF' }}></span>
-            Loss Percentage : {lossPercentage}%
+            {text('lossPercentage')} : {lossPercentage}%
           </div>
         </div>
         </div>
@@ -142,11 +144,11 @@ const CustomTooltip = ({ active, payload, label, isPercentage, isRupees, isTonna
          <div style={tooltipStyle}>
          <div style={sectionTitleStyle}>
             <span style={{ ...colorIndicatorStyle, backgroundColor: '#596CFF' }}></span>
-            Actual Freight Amount : {actualFrieghtAmount}
+            {text('actualFreightAmount')} : {actualFrieghtAmount}
           </div>
           <div style={dataRowStyle}>
             <span style={{ ...colorIndicatorStyle, backgroundColor: '#A4ABFF' }}></span>
-            Loss Freight Amount : {lossFrieghtAmount}
+            {text('lossFreightAmount')} : {lossFrieghtAmount}
           </div>
         </div>
         </div>
@@ -155,11 +157,11 @@ const CustomTooltip = ({ active, payload, label, isPercentage, isRupees, isTonna
           <div style={tooltipStyle}>
           <div style={sectionTitleStyle}>
             <span style={{ ...colorIndicatorStyle, backgroundColor: '#596CFF' }}></span>
-            Actual Tonnage : {actualTonnage}
+            {text('actualTonnage')} : {actualTonnage}
           </div>
           <div style={dataRowStyle}>
             <span style={{ ...colorIndicatorStyle, backgroundColor: '#A4ABFF' }}></span>
-            Loss Tonnage : {lossTonnage}
+            {text('lossTonnage')} : {lossTonnage}
           </div>
         </div>
         </div>
@@ -167,15 +169,15 @@ const CustomTooltip = ({ active, payload, label, isPercentage, isRupees, isTonna
         <div style={tooltipStyle}>
           <div style={sectionTitleStyle}>
             <span style={{ ...colorIndicatorStyle, backgroundColor: '#596CFF' }}></span>
-            Total Wagons : {totalOrdered}
+            {text('totalWagons')} : {totalOrdered}
           </div>
           <div style={dataRowStyle}>
             <span style={{ ...colorIndicatorStyle, backgroundColor: '#A4ABFF' }}></span>
-            Fully Utilized : {fullyUtilized} ({fullyUtilizedPercentage}%)
+            {text('fullyUtilized')} : {fullyUtilized} ({fullyUtilizedPercentage}%)
           </div>
           <div style={dataRowStyle}>
             <span style={{ ...colorIndicatorStyle, backgroundColor: '#EAEBFF' }}></span>
-            Partially Utilized : {partiallyUtilized} ({partiallyUtilizedPercentage}%)
+            {text('partiallyUtilized')} : {partiallyUtilized} ({partiallyUtilizedPercentage}%)
           </div>
         </div>
       )
@@ -186,6 +188,7 @@ const CustomTooltip = ({ active, payload, label, isPercentage, isRupees, isTonna
 
 export default function WagonsDashboard() {
   const router = useRouter();
+  const text = useTranslations("ETADASHBOARD");
   const [loading, setLoading] = useState(true);
   const [opportunityLossType, setOpportunityLossType] = useState('Wagon');
   const [data, setData] = useState([]);
@@ -374,7 +377,6 @@ export default function WagonsDashboard() {
       console.log(error)
     } finally {
       setLoading(false)
-      console.log('Wagons Capacity Utilization data fetched successfully')
     }
   };
 
@@ -456,8 +458,9 @@ export default function WagonsDashboard() {
             marginBottom: '20px',
             letterSpacing: '1.54px',
             fontFamily: '"Plus Jakarta Sans", sans-serif',
+            textTransform: 'uppercase',
           }}>
-          WAGONS CAPACITY UTILIZATION
+          {text('wagonCapacityUtilization')}
         </Typography>
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={3} flexWrap="wrap">
           <FormControl component="fieldset">
@@ -474,7 +477,7 @@ export default function WagonsDashboard() {
               fontWeight: '600',
               fontFamily: '"Inter", sans-serif',
             }}>
-              Opportunity Loss Type:
+              {text('opportunityLossType')}
             </Typography>
             <RadioGroup row value={opportunityLossType} onChange={handleOpportunityLossChange}
             sx={{
@@ -646,7 +649,7 @@ export default function WagonsDashboard() {
                 marginBottom: '16px',
                 fontFamily: '"Inter", sans-serif',
               }}>
-              Overall Statistics
+              {text('overallStatistics')}
             </Typography>
             <StatBox>
               <StatValue style={{ 
@@ -660,7 +663,7 @@ export default function WagonsDashboard() {
                   color: '#42454E',
                   fontWeight: '400',
                 }}
-              >Avg wagons capacity utilization
+              >{text('avgWagonsCapacityUtilization')}
               </StatLabel>
             </StatBox>
             <StatBox>
@@ -675,7 +678,7 @@ export default function WagonsDashboard() {
                   color: '#42454E',
                   fontWeight: '400',
                 }}
-              >Opportunity Loss In Rupees
+              >{text('opportunityLossInRupees')}
               </StatLabel>
             </StatBox>
             <StatBox>
@@ -690,7 +693,7 @@ export default function WagonsDashboard() {
                   color: '#42454E',
                   fontWeight: '400',
                 }}
-              >Opportunity Loss In Tonnage
+              >{text('opportunityLossInTonnage')}
               </StatLabel>
             </StatBox>
           </Box>

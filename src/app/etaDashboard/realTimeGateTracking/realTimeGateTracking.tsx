@@ -22,6 +22,7 @@ import { styled } from '@mui/system';
 import * as XLSX from 'xlsx';
 import DownloadIcon from '@mui/icons-material/Download';
 import Tooltip, { TooltipProps } from "@mui/material/Tooltip";
+import { useSnackbar } from "@/hooks/snackBar";
 
 const StyledBox = styled(Box)(({ theme }) => ({
   backgroundColor: '#ffffff',
@@ -188,6 +189,7 @@ export default function RealTimeGateTracking() {
   const [endDate, setEndDate] = useState<any>(today);
   const [startDatePickerOpen, setStartDatePickerOpen] = useState(false)
   const [endDatePickerOpen, setEndDatePickerOpen] = useState(false)
+  const { showMessage } = useSnackbar();
   const router = useRouter();
 
   const [lineChartData, setLineChartData] = useState<any[]>([]);
@@ -334,16 +336,13 @@ const convertMinutesToHoursAndMinutes = (minutes: number) => {
   
       const totalAvgTime = drawnOutTimeTableData.reduce((sum: number, row: any) => {
         const [hours, minutes] = row.avgTimeFormatted.split(' hours ').map((part: string) => parseInt(part));
-        console.log(`Parsed time for row: ${row.avgTimeFormatted} -> ${hours} hours, ${minutes} minutes`);
         return sum + (hours * 60) + minutes;
       }, 0);
-  
-      console.log(`Total time in minutes: ${totalAvgTime}`);
+
       const avgTime = totalAvgTime / drawnOutTimeTableData.length;
       const avgHours = Math.floor(avgTime / 60);
       const avgMinutes = Math.round(avgTime % 60);
   
-      console.log(`Average time: ${avgHours} hours, ${avgMinutes} minutes`);
       setTotalAvgTimeInTable(`${avgHours} hours ${avgMinutes} mins`);
     } else {
       setTotalRakesInTable(0);
@@ -422,18 +421,13 @@ const convertMinutesToHoursAndMinutes = (minutes: number) => {
       
       const totalAvgTime = captiveIRData.reduce((sum: number, row: any) => {
         const [hours, minutes] = row.avgTimeFormatted.split(' hours ').map((part: string) => parseInt(part));
-        console.log("svservaweDCsaergvse")
-        console.log(`Parsed time for row: ${row.avgTimeFormatted} -> ${hours} hours, ${minutes} minutes`);
         return sum + (hours * 60) + minutes;
       }, 0);
-  
-      console.log(`Total time in minutes: ${totalAvgTime}`);
 
       const avgTime = totalAvgTime / captiveIRData.length;
       const avgHours = Math.floor(avgTime / 60);
       const avgMinutes = Math.round(avgTime % 60);
 
-      console.log(`Average time: ${avgHours} hours, ${avgMinutes} minutes`);
       setTotalAvgTimeCaptiveIR(`${avgHours} hours ${avgMinutes} mins`);
     } else {
       setTotalCaptiveIRRakes(0);
@@ -516,7 +510,7 @@ const convertMinutesToHoursAndMinutes = (minutes: number) => {
         // Create a download link and trigger the download
         const link = document.createElement('a');
         link.href = dataUrl;
-        link.download = 'real-time-gate-in-and-gate-out-tracking.png';
+        link.download = 'placement-time-drawn-out-time-tracking-dashboard.png';
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -568,15 +562,15 @@ const convertMinutesToHoursAndMinutes = (minutes: number) => {
           <p style={sectionTitleStyle}>{formattedDate}</p>
           <div style={dataRowStyle}>
             <span style={{ ...colorIndicatorStyle, backgroundColor: '#596CFF' }}></span>
-            {`Indian Rakes: ${payload[0]?.payload?.indianRakes}`}
+            {text('indianRakes')} : {payload[0]?.payload?.indianRakes}
           </div>
           <div style={dataRowStyle}>
             <span style={{ ...colorIndicatorStyle, backgroundColor: '#A4ABFF' }}></span>
-            {`Captive Rakes: ${payload[0]?.payload?.captive}`}
+            {text('captiveRakes')} : {payload[0]?.payload?.captive}
           </div>
           <div style={dataRowStyle}>
             <span style={{ ...colorIndicatorStyle, backgroundColor: '#E8F4FF' }}></span>
-            {`Total Rakes: ${payload[0]?.payload?.value}`}
+            {text('totalRakes')} : {payload[0]?.payload?.value}
           </div>
         </div>
       </div>
@@ -616,7 +610,7 @@ const convertMinutesToHoursAndMinutes = (minutes: number) => {
         <div style={tooltipStyle}>
           <p style={sectionTitleStyle}>{formattedDate}</p>
           <div style={dataRowStyle}>
-            Average Time per Rake: <b>{formatTime(payload[0]?.value)}</b>
+            {text('averageTimePerRake')} : <b>{formatTime(payload[0]?.value)}</b>
           </div>
         </div>
       </div>
@@ -672,13 +666,13 @@ const convertMinutesToHoursAndMinutes = (minutes: number) => {
             <div style={sectionTitleStyle}>{data.name}</div>
           </div>
           <div style={dataRowStyle}>
-            No. of Rakes: {data.count}
+            {text('noOfRakes')} : <b>{data.count}</b>
           </div>
           {/* <div style={dataRowStyle}>
             Percentage: {data.value}%
           </div> */}
           <div style={dataRowStyle}>
-            Average Time: {data.time}
+            {text('averageTime')} : <b>{data.time}</b>
           </div>
         </div>
       </div>
@@ -704,7 +698,7 @@ const convertMinutesToHoursAndMinutes = (minutes: number) => {
   
       XLSX.writeFile(wb, "Placement-time-drawn-out-time-tracking-table.xlsx");
     } else {
-      console.log('No data to download');
+      showMessage('No data to download', 'error');
     }
   };
 
@@ -727,7 +721,7 @@ const convertMinutesToHoursAndMinutes = (minutes: number) => {
   
       XLSX.writeFile(wb, "Placement-time-drawn-out-time-tracking-rakes-type-table.xlsx");
     } else {
-      console.log('No data to download');
+      showMessage('No data to download', 'error');
     }
   };
 
@@ -795,22 +789,22 @@ const convertMinutesToHoursAndMinutes = (minutes: number) => {
 
       <Box sx={{ display: 'flex', gap: 2, mb: 4 }}>
         <MetricCard
-          title="Daily Average Time (minutes)"
+          title={text('dailyAverageTime')}
           value={dashboardMetrics.dailyAverageTime || 0} 
           change={dashboardMetrics.dailyTrend || 0}
-          changeLabel="from yesterday"
+          changeLabel={text('fromYesterday')}
         />
         <MetricCard
-          title="Weekly Average Time (minutes)"
+          title={text('weeklyAverageTime')}
           value={dashboardMetrics.weeklyAverageTime || 0}
           change={dashboardMetrics.weeklyTrend || 0}
-          changeLabel="from last week"
+          changeLabel={text('fromLastWeek')}
         />
         <MetricCard
-          title="Monthly Total Rakes"
+          title={text('monthlyTotalRakes')}
           value={dashboardMetrics.monthlyTotalRakes || 0}
           change={dashboardMetrics.monthlyTrend || 0}
-          changeLabel="from last month"
+          changeLabel={text('fromLastMonth')}
           unit="rakes"
         />
       </Box>
@@ -820,7 +814,7 @@ const convertMinutesToHoursAndMinutes = (minutes: number) => {
         sx={{ display: 'flex', gap: 2 }}
       >
         <Card sx={{ p: 3, flex: 1 }}>
-          <Typography variant="h6">Average Time per Rake</Typography>
+          <Typography variant="h6"  sx={{fontWeight: 600}}>{text('averageTimePerRake')}</Typography>
           <Typography color="text.secondary" variant="body2" sx={{ mb: 2 }}>
             {text('trendOverSelectedDateRange')}
           </Typography>
@@ -855,7 +849,7 @@ const convertMinutesToHoursAndMinutes = (minutes: number) => {
         </Card>
 
         <Card sx={{ p: 3, flex: 1 }}>
-          <Typography variant="h6">Daily Total Rakes Processed</Typography>
+          <Typography variant="h6"  sx={{fontWeight: 600}}>{text('dailyTotalRakesProcessed')}</Typography>
           <Typography color="text.secondary" variant="body2" sx={{ mb: 2 }}>
             {text('comparisonOvertheselectedDateRange')}
           </Typography>
@@ -912,15 +906,15 @@ const convertMinutesToHoursAndMinutes = (minutes: number) => {
         </Card>
       </Box>
 
-      {/* Average time per rake table */}
-      <div className="real-time-gate-tracking-table-wrapper">
+       {/* Average time per rake table */}
+       <div className="real-time-gate-tracking-table-wrapper">
         <table className="real-time-gate-tracking-table">
           <thead>
             <tr>
-              <th className="real-time-gate-tracking-id-column">S.No</th>
-              <th>Drawn Out Time</th>
-              <th className="real-time-gate-tracking-left-align">No. of Rakes</th>
-              <th className="real-time-gate-tracking-left-align">Average of PT to DW Time</th>
+              <th className="real-time-gate-tracking-id-column">{text('sNo')}</th>
+              <th>{text('drawnOutTime')}</th>
+              <th className="real-time-gate-tracking-left-align">{text('noOfRakes')}</th>
+              <th className="real-time-gate-tracking-left-align">{text('averageOfPTtoDWTime')}</th>
               <th className="real-time-gate-tracking-download-icon">
 
               <CustomDownloadTooltip 
@@ -938,7 +932,7 @@ const convertMinutesToHoursAndMinutes = (minutes: number) => {
                       paddingTop: '2px',
                       gap: '2px'
                   }}>
-                    Download Excel
+                    {text('downloadExcel')}
                   </div>}>
                     <DownloadIcon style={{ 
                       color: '#2a1a6e', 
@@ -958,26 +952,36 @@ const convertMinutesToHoursAndMinutes = (minutes: number) => {
                 <td className="real-time-gate-tracking-left-align">{row.rakeCount}</td>
                 <td className="real-time-gate-tracking-left-align">{row.avgTimeFormatted}</td>
                 <td className="real-time-gate-tracking-download-icon">
-                  <span style={{ visibility: 'hidden' }}>Hidden</span>
+                  <span style={{ visibility: 'hidden' }}>{text('hidden')}</span>
                 </td>
               </tr>
             )) : (
               <tr>
-                <td colSpan={7} style={{ textAlign: 'center' }}>No data found</td>
+                <td colSpan={7} style={{ textAlign: 'center' }}>{text('noDataFound')}</td>
               </tr>
             )
           }
           <tr className="grand-total-row">
-            <td colSpan={2}>Grand Total</td>
+            <td colSpan={2}>{text('grandTotal')}</td>
             <td className="real-time-gate-tracking-left-align">{totalRakesInTable}</td>
             <td className="real-time-gate-tracking-left-align">{totalAvgTimeInTable}</td>
             <td className="real-time-gate-tracking-download-icon">
-              <span style={{ visibility: 'hidden' }}>Hidden</span>
+              <span style={{ visibility: 'hidden' }}>{text('hidden')}</span>
             </td>
           </tr>
           </tbody>
         </table>
       </div>
+
+      <Box 
+        className="real-time-gate-tracking-body"
+        sx={{ display: 'flex', gap: 2, marginTop: 4 }}
+      >
+      <Card sx={{ p: 3, flex: 1 }}>
+          <Typography variant="h6" sx={{fontWeight: 600}}>{text('captiveVsIRRakeDistribution')}</Typography>
+          <Typography color="text.secondary" variant="body2" sx={{ mb: 2 }}>
+            {text('captiveVsIRRakeDistributionDescription')}
+          </Typography>
 
       <div className='real-time-gate-tracking-captiveIR-container'>
         {/* Captive IR Table */}
@@ -985,10 +989,10 @@ const convertMinutesToHoursAndMinutes = (minutes: number) => {
         <table className="real-time-gate-tracking-table">
           <thead>
             <tr>
-              <th className="real-time-gate-tracking-left-align">Rake Type</th>
-              <th className="real-time-gate-tracking-left-align">No. of Rakes</th>
-              <th className="real-time-gate-tracking-left-align">Percentage</th>
-              <th className="real-time-gate-tracking-left-align">Average of PT to DW Time</th>
+              <th className="real-time-gate-tracking-left-align">{text('rakeType')}</th>
+              <th className="real-time-gate-tracking-left-align">{text('noOfRakes')}</th>
+              <th className="real-time-gate-tracking-left-align">{text('percentage')}</th>
+              <th className="real-time-gate-tracking-left-align">{text('averageOfPTtoDWTime')}</th>
               <th className="real-time-gate-tracking-download-icon">
               <CustomDownloadTooltip 
                 arrow 
@@ -1005,7 +1009,7 @@ const convertMinutesToHoursAndMinutes = (minutes: number) => {
                       paddingTop: '2px',
                       gap: '2px'
                   }}>
-                    Download Excel
+                   {text('downloadExcel')}
                   </div>}>
                     <DownloadIcon style={{ 
                       color: '#2a1a6e', 
@@ -1025,12 +1029,12 @@ const convertMinutesToHoursAndMinutes = (minutes: number) => {
                 <td className="real-time-gate-tracking-left-align">{row.rakePercentage}%</td>
                 <td className="real-time-gate-tracking-left-align">{row.avgTimeFormatted}</td>
                 <td className="real-time-gate-tracking-download-icon">
-                  <span style={{ visibility: 'hidden' }}>Hidden</span>
+                  <span style={{ visibility: 'hidden' }}>{text('hidden')}</span>
                 </td>
               </tr>
             )) : (
               <tr>
-                <td colSpan={7} style={{ textAlign: 'center' }}>No data found</td>
+                <td colSpan={7} style={{ textAlign: 'center' }}>{text('noDataFound')}</td>
               </tr>
             )
           }
@@ -1040,22 +1044,14 @@ const convertMinutesToHoursAndMinutes = (minutes: number) => {
             <td className="real-time-gate-tracking-left-align">{totalCaptiveIRRakesPercentage}%</td>
             <td className="real-time-gate-tracking-left-align">{totalAvgTimeCaptiveIR}</td>
             <td className="real-time-gate-tracking-download-icon">
-              <span style={{ visibility: 'hidden' }}>Hidden</span>
+              <span style={{ visibility: 'hidden' }}>{text('hidden')}</span>
             </td>
           </tr>
           </tbody>
         </table>
       </div>
 
-      <Card className='real-time-gate-tracking-captiveIR-piechart-container'>
-      <CardContent>
-        {/* <Typography variant="h5" component="div" gutterBottom>
-          Rake Type Distribution
-        </Typography>
-        <Typography variant="body2" color="text.secondary" gutterBottom>
-          Distribution of rake types by percentage
-        </Typography> */}
-        <Box sx={{ height: 400, width: '100%' }}>
+      <div style={{ height: 300, width: '40%'}}>
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
@@ -1076,10 +1072,11 @@ const convertMinutesToHoursAndMinutes = (minutes: number) => {
               <RechartsTooltip content={<CustomTooltipPieChart />} />
             </PieChart>
           </ResponsiveContainer>
-        </Box>
-      </CardContent>
-      </Card>
+        </div>
       </div>
+      </Card>
+      </Box>
+      
     </StyledBox>
   )
 }
