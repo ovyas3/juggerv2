@@ -795,13 +795,13 @@ const convertMinutesToHoursAndMinutes = (minutes: number) => {
 
       <Box sx={{ display: 'flex', gap: 2, mb: 4 }}>
         <MetricCard
-          title="Daily Average Time (minutes)"
+          title="Daily Average Time"
           value={dashboardMetrics.dailyAverageTime || 0} 
           change={dashboardMetrics.dailyTrend || 0}
           changeLabel="from yesterday"
         />
         <MetricCard
-          title="Weekly Average Time (minutes)"
+          title="Weekly Average Time"
           value={dashboardMetrics.weeklyAverageTime || 0}
           change={dashboardMetrics.weeklyTrend || 0}
           changeLabel="from last week"
