@@ -216,7 +216,7 @@ const CommodityTable: React.FC = () => {
         router
       );
       if(response.statusCode === 200){
-        console.log(response.data);
+        // console.log(response.data);
         const data = response.data;
         const commodityDataArr = data && data.map((item: any) => {
           return {
@@ -240,7 +240,7 @@ const CommodityTable: React.FC = () => {
       console.log(error)
     } finally {
       setLoading(false);
-      console.log('finally')
+      // console.log('finally')
     }
   }
 

@@ -38,7 +38,7 @@
     "submit":"Submit",
     "attach":"Attach",
     "edemand":"e-Demand",
-    "contact":"Contact",
+    "contact":"Log Book",
     "share":"Share",
     "copyToClipboard":"Copy Rake Details",
     "intransit":"In Transit",
@@ -74,7 +74,16 @@
     "uploadFile":"Upload File",
     "bulkUoploadShipmnent":"Bulk Upload Shipments",
     "viewRRDoc":"View Documents",
-    "cancelled":"Cancel"
+    "cancelled":"Cancel",
+    "contactModalHeader":"Contact Details",
+    "stationName":"Station Name",
+    "reasons":"Reason",
+    "contactPerson":"Contant Person",
+    "name":"Name",
+    "contactNo":"Contact No.",
+    "comment":"Comment",
+    "commentPlaceholder":"Enter Your Comment Here",
+    "rate":"Rate This Contact Person"
   },
   "UPLOAD_ANNEXURE":{
     "SNCKBR_MSG":{

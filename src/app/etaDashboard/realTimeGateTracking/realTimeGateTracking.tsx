@@ -253,7 +253,7 @@ export default function RealTimeGateTracking() {
 
   const calculateLineChartDomainTicks = (data: any[]) => {
     const values = data.map((item) => item.value);
-    console.log(values);
+    // console.log(values);
     const max = Math.max(...values);
     const min = Math.min(...values);
     const diff = max - min;

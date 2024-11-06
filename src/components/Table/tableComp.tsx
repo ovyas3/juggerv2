@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import React from "react";
 
 
@@ -53,6 +53,8 @@ import { renderTimeViewClock } from '@mui/x-date-pickers/timeViewRenderers';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 
 import { useRouter } from "next/navigation";
+import StarRateRoundedIcon from '@mui/icons-material/StarRateRounded';
+import CircularProgress from '@mui/material/CircularProgress';
 
 async function rake_update_id(payload: Object, router: any) {
     return await httpsPost(UPDATE_RAKE_CAPTIVE_ID, payload, router);
@@ -1649,5 +1651,186 @@ export const HandlingETA = ({ isClose, isOpen, shipment, getAllShipment, differe
       
     )
 };
+
+const stations = [
+    { value: "visakhapatnam", label: "Visakhapatnam" },
+    { value: "sambalpur", label: "Sambalpur" },
+    { value: "balangir", label: "Balangir" },
+    { value: "kakinada", label: "Kakinada" },
+    { value: "rajahmundryavaram", label: "Rajahmundryavaram" },
+    { value: "vijayawada", label: "Vijayawada" },
+    { value: "guntakal", label: "Guntakal" },
+    { value: "jsw", label: "JSW Bellary Plant" },
+  ]
+  
+  const reasons = [
+    { value: "missing-wagons", label: "Missing Wagons" },
+    { value: "delay", label: "Delay" },
+    { value: "status-update", label: "Status update" },
+    { value: "recovery", label: "Recovery of missing wagon" },
+    { value: "others", label: "Others" },
+  ]
+  
+  const contactPersons = [
+    { value: "controller", label: "Controller" },
+    { value: "station-master", label: "Station Master" },
+    { value: "others", label: "Others" },
+  ]
+
+export const ContactModal = ({isClose, shipment}:any) => {
+
+    const text = useTranslations('ORDERS');
+    const [stationName, setStationName] = useState('');
+    const [reason, setReason] = useState('Select Reason');
+    const [contactPerson, setContactPerson] = useState('Select Contact Person');
+    const [contactNumber, setContactNumber] = useState<null | number>(null);
+    const [name, setName] = useState('');
+    const [rating, setRating] = useState(0); 
+    const [stationList, setStationList] = useState<any>([]);
+    const debounceTimer = useRef<NodeJS.Timeout | null>(null);
+    const [loadder, setLoadder] = useState(false);
+    const [comment, setComment] = useState('');
+    const { showMessage } = useSnackbar();
+
+
+    const [openStationDropDown, setOpenStationDropDown] = useState(false);
+    const [openReasonDropDown, setOpenReasonDropDown] = useState(false);
+    const [opencontactpersonDropDown, setOpencontactpersonDropDown] = useState(false);
+
+    function changeStationName(value:any) {
+        setStationName(value);
+        if (debounceTimer.current) {
+            clearTimeout(debounceTimer.current);
+        }
+        if (value === '') {
+            setLoadder(false);
+            setStationList([]);
+        } else {
+            setLoadder(true);
+            debounceTimer.current = setTimeout(async () => {
+                try {
+                    const response = await httpsGet(`get/stationNames?stationName=${value}`);
+                    if (response.data.length > 0) {
+                        setStationList(response.data);
+                        setLoadder(false);
+                    } else {
+                        setStationList(['No Data Found']);
+                        setLoadder(false);
+                    }
+                } catch (error) {
+                    console.log(error);
+                }
+            }, 1500);
+        }
+    }
+
+    async function submitContact() {
+        let payload = {
+            id:shipment._id,
+            stationName,
+            reason,
+            contactPerson,
+            contactPersonMobile:contactNumber,
+            name,
+            rating,
+            comment,
+        }
+        try {
+            const response = await httpsPost('rake_shipment/updateContactDeta', payload);
+            if (response.statusCode === 200) {
+                isClose(false);
+                setStationName('');
+                setReason('select reason');
+                setContactPerson('select contact person');
+                setContactNumber(null);
+
+                setName('');
+                setRating(0);
+                setComment('');
+
+                setStationList([]);
+                setOpenStationDropDown(false);
+                setOpenReasonDropDown(false);
+                showMessage('Contact Updated Successfully', 'success');
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    } 
+    return(
+        <div style={{width:'100vw', height:'100vh', position:'fixed', top:0, left:0 ,zIndex:300, backgroundColor:'rgba(0, 0, 0, 0.5)'}} onClick={(e)=>{e.stopPropagation(); isClose(false)}}>
+        <div className="contactModal" onClick={(e)=>{e.stopPropagation(); setOpenStationDropDown(false); setStationList([]); setOpenReasonDropDown(false); setOpencontactpersonDropDown(false)}}>
+            <div className="closeContaioner"><CloseIcon onClick={(e) => { e.stopPropagation(); isClose(false) }}/></div>
+            <header id="contactModalHeader">{text('contactModalHeader')} - #{shipment?.fnr?.primary}</header>
+            <div id='formContainer'>
+
+                <div id='stationName'>
+                    <label id='labelName' >{text('stationName')}</label>
+                    <div id='stationNameInput' onClick={(e)=>{e.stopPropagation(); }}><input value={stationName} type="text" placeholder="Enter Name" style={{border:'none', outline:'none'}} onChange={(e)=>{changeStationName(e.target.value);}} /></div>
+                    {stationList.length > 0 && <div id='stationDropDown'>
+                        {stationList?.map((item: any, index: number) => (
+                            <div id='stationNameItem' key={index} onClick={() => {setStationName(item); setStationList([])}}>{item}</div>
+                        ))}
+                    </div>}
+                    {loadder && <div id='loaderForStationName'><CircularProgress size={15} /></div>}
+                </div>
+
+                <div id='stationName'>
+                    <label id='labelName' >{text('reasons')}</label>
+                    <div id='stationNameInput' style={{color:'black', fontSize:'13px'}} onClick={(e)=>{e.stopPropagation(); setOpenReasonDropDown(!openReasonDropDown) }}>{reason}</div>
+                    {openReasonDropDown && <div id='stationDropDown'>
+                        {reasons?.map((item: any, index: number) => (
+                            <div id='stationNameItem' key={index} onClick={() => {setReason(item.label); setOpenReasonDropDown(false);}}>{item.label}</div>
+                        ))}
+                    </div>}
+                </div>
+
+                <div id='stationName'>
+                    <label id='labelName' >{text('contactPerson')}</label>
+                    <div id='stationNameInput' style={{color:'black', fontSize:'13px'}} onClick={(e)=>{e.stopPropagation(); setOpencontactpersonDropDown(!opencontactpersonDropDown) }} >{contactPerson}</div>
+                    {opencontactpersonDropDown && <div id='stationDropDown'>
+                        {contactPersons?.map((item: any, index: number) => (
+                            <div id='stationNameItem' key={index} onClick={() => {setContactPerson(item.label); setOpencontactpersonDropDown(false);}}>{item.label}</div>
+                        ))}
+                    </div>}
+                </div>
+                <div id='stationName'>
+                    <label id='labelName' >{text('name')}</label>
+                    <div id='stationNameInput'><input value={name} onChange={(e)=>{setName(e.target.value)}} type="text" placeholder="Enter Name" style={{border:'none', outline:'none'}} /></div>
+                </div>
+                <div id='stationName'>
+                    <label id='labelName' >{text('contactNo')}</label>
+                    <div id='stationNameInput'><input value={contactNumber ?? ''} onChange={(e)=>{setContactNumber(parseInt(e.target.value)||null)}} type="number" placeholder="Enter Contact Number" style={{border:'none', outline:'none'}} /></div>
+                </div>
+            </div>
+
+            <div id='commentContainer'>
+                <div><label id='labelName' >{text('comment')}</label></div>
+                <div style={{width:'100%', border:"1px solid #E9E9EB", borderRadius:'4px'}}><textarea value={comment} id='commentInput' placeholder={text('commentPlaceholder')} onChange={(e)=>{setComment(e.target.value)}} ></textarea></div>
+            </div>
+
+            <div id='rateContainer'>
+                <div><label id='labelName' >{text('rate')}</label></div>
+                <div className="star-rating">
+                    {[1, 2, 3, 4, 5].map((value) => (
+                        <StarRateRoundedIcon
+                            key={value}
+                            onClick={() => setRating(value)}
+                            className={`star ${value <= rating ? 'selected' : ''}`}
+                            fontSize="medium"
+                            style={{ cursor: 'pointer' }}
+                        />
+                    ))}
+                </div>
+            </div>
+
+            <div id='btnContainer'>
+                <div id='submit-btn' onClick={()=>{submitContact()}} >{text('submit')}</div>
+            </div>
+            
+        </div>
+    </div>
+    );
+}
 
 
