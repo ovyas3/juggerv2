@@ -1,9 +1,9 @@
-.content_container {
+.etaDashboard-container {
   width: calc(100vw - 70px);
   height: calc(100vh - 56px);
   overflow-y: auto;
-  padding: 24px 24px 24px 24px;
-  background-color: #f0f3f8;
+  padding: 12px;
+  background-color: #fff;
 }
 .adjustMargin {
   margin-top: 56px;
@@ -15,8 +15,8 @@
 }
 #enRoutesEtaDelay {
   background-color: white;
-  padding: 12px;
-  border-radius: 6px;
+  padding: 16px;
+  border-radius: 10px;
 }
 #heading {
   display: flex;
@@ -72,6 +72,9 @@
   display: flex;
   justify-content: space-between;
   margin-top: 16px;
+  flex-wrap: wrap;
+  flex-direction: row;
+
 }
 .greenBackground:hover {
   background-color: #e6f7f2 !important;
@@ -150,4 +153,14 @@
 .header_remarks{
   text-wrap: nowrap;
   min-width: 100px !important;
+}
+
+.commodity-table{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  width: 100%;
+  justify-content: center;
+  margin-bottom: 16px;
+  border-radius: 12px;
 }

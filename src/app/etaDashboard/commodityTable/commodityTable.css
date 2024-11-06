@@ -1,0 +1,153 @@
+.commoditytable-header{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+
+  @media screen and (max-width: 780px){
+      flex-direction: column;
+      justify-self: flex-start;
+      align-items: flex-start !important;
+  }
+}
+
+
+.commoditytable-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.commoditytable-table-wrapper {
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+}
+
+.commoditytable-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.commoditytable-table th {
+  background-color: #f8fafc;
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: #4a5568;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.commoditytable-table td {
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: #2d3748;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.commoditytable-table #commoditytable-tr {
+  transition: all 0.3s ease;
+}
+
+.commoditytable-table #commoditytable-tr:hover {
+  background-color: #f7fafc;
+  cursor: pointer;
+}
+
+.commoditytable-table #commoditytable-tr:last-child td {
+  border-bottom: none;
+}
+
+.commoditytable-id-column {
+  width: 100px;
+}
+
+.commoditytable-left-align {
+  text-align: left;
+}
+
+.commoditytable-font-medium {
+  font-weight: 500;
+}
+
+@media (max-width: 640px) {
+  .commoditytable-filters {
+    flex-direction: column;
+  }
+}
+
+/* Container styling for responsiveness */
+.dropdown-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+/* Dropdown styling */
+.dropdown {
+  position: relative;
+  min-width: 120px;
+}
+
+.dropdown select {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  outline: none;
+  appearance: none;
+  background: transparent;
+  color: #333;
+}
+
+.dropdown select:focus {
+  border-color: #3f51b5; /* Primary color for focus outline */
+  box-shadow: 0 0 4px rgba(63, 81, 181, 0.4);
+}
+
+.dropdown label {
+  position: absolute;
+  top: 8px;
+  left: 12px;
+  font-size: 14px;
+  color: #666;
+  pointer-events: none;
+  background-color: #fff;
+  padding: 0 4px;
+  transition: 0.2s ease;
+  transform: translateY(0);
+}
+
+.dropdown select:focus + label,
+.dropdown select:not([value=""]) + label {
+  top: -12px;
+  left: 8px;
+  font-size: 12px;
+  color: #3f51b5;
+}
+
+.dropdown::after {
+  content: "▼";
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 12px;
+  color: #666;
+  pointer-events: none;
+}
+
+/* Responsive dropdown container */
+@media (max-width: 600px) {
+  .dropdown-container {
+    flex-direction: column;
+  }
+}
