@@ -516,7 +516,7 @@ const convertMinutesToHoursAndMinutes = (minutes: number) => {
         // Create a download link and trigger the download
         const link = document.createElement('a');
         link.href = dataUrl;
-        link.download = 'real-time-gate-in-and-gate-out-tracking.png';
+        link.download = 'placement-time-drawn-out-time-tracking-dashboard.png';
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
