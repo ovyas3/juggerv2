@@ -15,6 +15,16 @@ import ScreenShotIcon from '@/assets/screenshot_icon.svg';
 import { toPng } from 'html-to-image';
 import Image from 'next/image';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import { styled } from '@mui/system';
+import { useTranslations } from 'next-intl';
+
+const StyledBox = styled(Box)(({ theme }) => ({
+  backgroundColor: '#ffffff',
+  width: '100%',
+  borderRadius: '10px',
+  padding: theme.spacing(3),
+}));
+
 
 interface CommodityData {
   id: number
@@ -131,6 +141,7 @@ const CommodityTable: React.FC = () => {
   const today: any = new Date();
   const oneMonthAgo: any = new Date();
   oneMonthAgo.setMonth(today.getMonth() - 1);
+  const text = useTranslations('ETADASHBOARD');
 
   const [startDate, setStartDate] = useState<any>(oneMonthAgo);
   const [endDate, setEndDate] = useState<any>(today);
@@ -173,7 +184,7 @@ const CommodityTable: React.FC = () => {
   };
 
   const getCommodityData = async (from: number, to: number) => {
-    try{
+    try {
       setLoading(true);
       
       const IR = type.includes('ir') && type.includes('captive')
@@ -195,9 +206,9 @@ const CommodityTable: React.FC = () => {
         "ORES (ORES)",
         "RMSP (RAW MATERIAL FOR STEEL PLANT)"
       ];
-      
+  
       const filteredCommodities = commodity.filter(c => validCommodities.includes(c));
-      
+  
       const params = new URLSearchParams({
         from: from.toString(),
         to: to.toString(),
@@ -209,14 +220,13 @@ const CommodityTable: React.FC = () => {
       }
       
       filteredCommodities.forEach(c => params.append('commodity', c));
-      
+  
       const response = await httpsGet(
         `dashboard/eta?${params.toString()}`,
         0,
         router
       );
       if(response.statusCode === 200){
-        // console.log(response.data);
         const data = response.data;
         const commodityDataArr = data && data.map((item: any) => {
           return {
@@ -240,15 +250,8 @@ const CommodityTable: React.FC = () => {
       console.log(error)
     } finally {
       setLoading(false);
-      // console.log('finally')
     }
   }
-
-  useEffect(() => {
-    const startDate = service.millies(oneMonthAgo);
-    const endDate = service.millies(today);
-    getCommodityData(startDate, endDate);
-  }, [])
 
   useEffect(() => {
     if (startDate && endDate) {
@@ -318,7 +321,7 @@ const CommodityTable: React.FC = () => {
   }));
 
   return (
-    <div className="commoditytable-container" ref={componentRef} >
+    <StyledBox ref={componentRef} >
       <Box 
         className="commoditytable-header"
       sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}
@@ -335,7 +338,7 @@ const CommodityTable: React.FC = () => {
             fontFamily: '"Plus Jakarta Sans", sans-serif',
             textTransform: 'uppercase',
           }}>
-          Commodity
+           {text('etaCompliance')}
         </Typography>
         <Box sx={{ display: 'flex' }}>
           <CustomDateTimePicker
@@ -392,13 +395,13 @@ const CommodityTable: React.FC = () => {
         <table className="commoditytable-table">
           <thead>
             <tr>
-              <th className="commoditytable-id-column">S.No</th>
-              <th>Commodity</th>
-              <th className="commoditytable-left-align">Within ETA Count</th>
-              <th className="commoditytable-left-align">Within ETA %</th>
-              <th className="commoditytable-left-align">Beyond ETA Count</th>
-              <th className="commoditytable-left-align">Beyond ETA %</th>
-              <th className="commoditytable-left-align">Total</th>
+              <th className="commoditytable-id-column">{text('sNo')}</th>
+              <th>{text('commodity')}</th>
+              <th className="commoditytable-left-align">{text('withinETACount')}</th>
+              <th className="commoditytable-left-align">{text('withinETA')} %</th>
+              <th className="commoditytable-left-align">{text('beyondETACount')}</th>
+              <th className="commoditytable-left-align">{text('beyondETA')} %</th>
+              <th className="commoditytable-left-align">{text('total')}</th>
             </tr>
           </thead>
           <tbody>
@@ -415,14 +418,14 @@ const CommodityTable: React.FC = () => {
               </tr>
             )) : (
               <tr>
-                <td colSpan={7} style={{ textAlign: 'center' }}>No data found</td>
+                <td colSpan={7} style={{ textAlign: 'center' }}>{text('noDataFound')}</td>
               </tr>
             )
           }
           </tbody>
         </table>
       </div>
-    </div>
+    </StyledBox>
   )
 }
 

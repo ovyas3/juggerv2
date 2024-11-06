@@ -1,12 +1,13 @@
 'use client'
 
-import React, { useEffect, useState, useRef } from 'react';
-import { Box, Card, Container, Typography, useTheme, InputAdornment, IconButton } from '@mui/material';
+import React, { useEffect, useState, useRef, use } from 'react';
+import { Box, Card, CardContent, Typography, useTheme, InputAdornment, IconButton } from '@mui/material';
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs from "dayjs";
-import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,Legend, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { Tooltip as RechartsTooltip } from "recharts";
 import { httpsGet } from '@/utils/Communication';
 import { useRouter } from 'next/navigation';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
@@ -17,7 +18,53 @@ import Image from 'next/image';
 import { ThreeCircles } from "react-loader-spinner";
 import './realTimeGateTracking.css';
 import { useTranslations } from "next-intl";
+import { styled } from '@mui/system';
+import * as XLSX from 'xlsx';
+import DownloadIcon from '@mui/icons-material/Download';
+import Tooltip, { TooltipProps } from "@mui/material/Tooltip";
+import { useSnackbar } from "@/hooks/snackBar";
 
+const StyledBox = styled(Box)(({ theme }) => ({
+  backgroundColor: '#ffffff',
+  borderRadius: '10px',
+  padding: theme.spacing(3),
+}));
+
+interface StyledTooltipProps extends TooltipProps {
+  className?: string;
+}
+
+const CustomDownloadTooltip = styled(({ className, ...props }: StyledTooltipProps) => (
+  <Tooltip 
+    {...props} 
+    classes={{ popper: className }} 
+    PopperProps={{
+      popperOptions: {
+        modifiers: [
+          {
+            name: 'offset',
+            options: {
+              offset: [14, -10], 
+            },
+          },
+        ],
+      },
+    }}
+  />
+))({
+  '& .MuiTooltip-tooltip': {
+    backgroundColor: '#000',
+    color: '#fff',
+    width: '100px',
+    height: '24px',
+    boxShadow: '0px 0px 2px rgba(0,0,0,0.1)',
+    fontSize: '8px',
+    fontFamily: '"Inter", sans-serif',
+  },
+  '& .MuiTooltip-arrow': {
+    color: '#000',
+  },
+});
 
 interface MetricCardProps {
   title: string
@@ -126,6 +173,11 @@ const CustomDateTimePicker: React.FC<CustomDateTimePickerProps> = ({
   </div>
 );
 
+const COLORS: any = {
+  IR: '#596CFF',
+  Captive: '#A4ABFF'
+};
+
 export default function RealTimeGateTracking() {
   const theme = useTheme()
   const today: any = new Date();
@@ -137,17 +189,27 @@ export default function RealTimeGateTracking() {
   const [endDate, setEndDate] = useState<any>(today);
   const [startDatePickerOpen, setStartDatePickerOpen] = useState(false)
   const [endDatePickerOpen, setEndDatePickerOpen] = useState(false)
+  const { showMessage } = useSnackbar();
   const router = useRouter();
 
   const [lineChartData, setLineChartData] = useState<any[]>([]);
   const [barChartData, setBarChartData] = useState<any[]>([]);
+  const [pieChartData, setPieChartData] = useState<any[]>([]);
+  const [drawnOutTimeTableData, setDrawnOutTimeTableData] = useState<any[]>([]);
+  const [totalRakesInTable, setTotalRakesInTable] = useState(0);
+  const [totalAvgTimeInTable, setTotalAvgTimeInTable] = useState('0 hours 0 mins');
+
+  const [captiveIRData, setCaptiveIRData] = useState<any[]>([]);
+  const [totalCaptiveIRRakes, setTotalCaptiveIRRakes] = useState(0);
+  const [totalCaptiveIRRakesPercentage, setTotalCaptiveIRRakesPercentage] = useState(0);
+  const [totalAvgTimeCaptiveIR, setTotalAvgTimeCaptiveIR] = useState('0 hours 0 mins');
 
   const [yAxisDomainLine, setYAxisDomainLine] = useState([0, 3000]);
   const [yAxisTicksLine, setYAxisTicksLine] = useState([0, 500, 1000, 1500, 2000, 2500, 3000]);
 
   const [yAxisDomainBar, setYAxisDomainBar] = useState([0, 20]);
   const [yAxisTicksBar, setYAxisTicksBar] = useState([0, 5, 10, 15, 20]);
-
+  
   const [dashboardMetrics, setDashboardMetrics] = useState<any>({});
 
   const componentRef = useRef<HTMLDivElement>(null);
@@ -163,11 +225,13 @@ export default function RealTimeGateTracking() {
         setStartDate(date);
         getAverageTimePerRake(epochTime, newEndDate || 0);
         getDailyTotalRakesProcessed(epochTime, newEndDate || 0);
+        getCaptiveIR(epochTime, newEndDate || 0);
 
       } else {
         setEndDate(date);
         getAverageTimePerRake(newStartDate || 0, epochTime);
         getDailyTotalRakesProcessed(newStartDate || 0, epochTime);
+        getCaptiveIR(newStartDate || 0, epochTime);
       }
     } else {
       if (type === 'start') {
@@ -178,6 +242,22 @@ export default function RealTimeGateTracking() {
     }
   };
 
+  const formatTime = (decimalHours: number) => {
+    const hours = Math.floor(decimalHours);
+    const minutes = Math.round((decimalHours - hours) * 60);
+    const hourText = hours === 1 ? 'hour' : 'hours';
+    const minuteText = minutes === 1 ? 'min' : 'mins';
+    return `${hours} ${hourText} ${minutes} ${minuteText}`;
+};
+
+const convertMinutesToHoursAndMinutes = (minutes: number) => {
+    const hours = Math.floor(minutes / 60);
+    const remainingMinutes = Math.floor(minutes % 60);
+    const hourText = hours === 1 ? 'hr' : 'hrs';
+    const minuteText = remainingMinutes === 1 ? 'min' : 'mins';
+    return `${hours} ${hourText} ${remainingMinutes} ${minuteText}`;
+};
+
   const getDashboardMetrics = async () => {
     try {
       setLoading(true);
@@ -185,7 +265,15 @@ export default function RealTimeGateTracking() {
       if (response.statusCode === 200) {
         setLoading(false);
         const data = response.data;
-        setDashboardMetrics(data);
+        const formattedData = {
+          dailyAverageTime: data?.dailyAverageTime ? convertMinutesToHoursAndMinutes(data.dailyAverageTime) : "0 hr 0 min",
+          dailyTrend: data?.dailyTrend,
+          weeklyAverageTime: data?.weeklyAverageTime ? convertMinutesToHoursAndMinutes(data.weeklyAverageTime) : "0 hr 0 min",
+          weeklyTrend: data?.weeklyTrend,
+          monthlyTotalRakes: data?.monthlyTotalRakes ? Number(data?.monthlyTotalRakes.toFixed(2)) : 0,
+          monthlyTrend: data?.monthlyTrend,
+      };
+        setDashboardMetrics(formattedData);
       }
     } catch (error) {
       console.log(error);
@@ -212,14 +300,56 @@ export default function RealTimeGateTracking() {
         chartData = chartData.filter((item: any) => !isNaN(item.value));
         calculateLineChartDomainTicks(chartData);
         setLineChartData(chartData);
+
+        let drawnOutTimeTableDataArr = data && data.map((item: any) => {
+          const [hours, minutes] = item.avgTime.split(':').map(Number);
+          const value = hours + minutes / 60;
+          const date = item?.day ? service.utcToist(item?.day, 'dd-MMM-yy') : '--';
+          const avgTimeFormatted = formatTime(value);
+          const rakeCount = item?.rakeCount || 0;
+        
+          return {
+            rakeCount,
+            date,
+            avgTimeFormatted,
+            value
+          };
+        });
+
+        drawnOutTimeTableDataArr = drawnOutTimeTableDataArr.filter((item: any) => !isNaN(item.value));
+
+        setDrawnOutTimeTableData(drawnOutTimeTableDataArr);
       }
     } catch (error) {
       console.log(error);
       setLoading(false);
     } finally {
       setLoading(false);
+
     }
   }
+
+  useEffect(() => {
+    if (drawnOutTimeTableData && drawnOutTimeTableData.length) {
+      const totalRakes = drawnOutTimeTableData.reduce((sum: number, row: any) => sum + row.rakeCount, 0);
+      setTotalRakesInTable(totalRakes);
+  
+      const totalAvgTime = drawnOutTimeTableData.reduce((sum: number, row: any) => {
+        const [hours, minutes] = row.avgTimeFormatted.split(' hours ').map((part: string) => parseInt(part));
+        return sum + (hours * 60) + minutes;
+      }, 0);
+
+      const avgTime = totalAvgTime / drawnOutTimeTableData.length;
+      const avgHours = Math.floor(avgTime / 60);
+      const avgMinutes = Math.round(avgTime % 60);
+  
+      setTotalAvgTimeInTable(`${avgHours} hours ${avgMinutes} mins`);
+    } else {
+      setTotalRakesInTable(0);
+      setTotalAvgTimeInTable('0 hours 0 mins');
+    }
+  }, [drawnOutTimeTableData]);
+
   const getDailyTotalRakesProcessed = async (from: number, to: number) => {
     try {
       setLoading(true);
@@ -242,18 +372,81 @@ export default function RealTimeGateTracking() {
       setLoading(false);
     }
   }
-  
+
+  const getCaptiveIR = async (from: number, to: number) => {
+    try{
+      setLoading(true);
+      const response = await httpsGet(`dashboard/captiveIR?from=${from}&to=${to}`, 0, router);
+      if(response.statusCode === 200){
+        const data = response.data;
+        let captiveIRDataArr = data && data.map((item: any) => {
+          const [hours, minutes] = item.avgDuration.split(':').map(Number);
+          const value = hours + minutes / 60;
+          const avgTimeFormatted = formatTime(value);
+          const rakeCount = item?.indentCount || 0;
+          const rakeType = item?.rakeType || '--';
+          const rakePercentage = parseFloat(item?.percentage.replace('%', '')) || 0;
+          return {
+            rakeCount,
+            rakeType,
+            rakePercentage,
+            avgTimeFormatted
+          };
+        });
+        setCaptiveIRData(captiveIRDataArr);
+
+        const piechartData = captiveIRDataArr.map((item: any) => ({
+          name: item.rakeType,
+          value: item.rakePercentage,
+          count: item.rakeCount,
+          time: item.avgTimeFormatted
+        }));
+        setPieChartData(piechartData);
+      }
+    } catch (error) {
+      console.log(error);
+      setLoading(false);
+    } finally { 
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    if(captiveIRData && captiveIRData.length){
+      const totalRakes = captiveIRData.reduce((sum: number, row: any) => sum + row.rakeCount, 0);
+      setTotalCaptiveIRRakes(totalRakes);
+      
+      let totalPercentage = captiveIRData.reduce((sum: number, row: any) => sum + row.rakePercentage, 0);
+      setTotalCaptiveIRRakesPercentage(totalPercentage);
+      
+      const totalAvgTime = captiveIRData.reduce((sum: number, row: any) => {
+        const [hours, minutes] = row.avgTimeFormatted.split(' hours ').map((part: string) => parseInt(part));
+        return sum + (hours * 60) + minutes;
+      }, 0);
+
+      const avgTime = totalAvgTime / captiveIRData.length;
+      const avgHours = Math.floor(avgTime / 60);
+      const avgMinutes = Math.round(avgTime % 60);
+
+      setTotalAvgTimeCaptiveIR(`${avgHours} hours ${avgMinutes} mins`);
+    } else {
+      setTotalCaptiveIRRakes(0);
+      setTotalCaptiveIRRakesPercentage(0);
+      setTotalAvgTimeCaptiveIR('0 hours 0 mins');
+    }
+  }, [captiveIRData]);
+
   useEffect(() => {
     const startDate = service.millies(oneMonthAgo);
     const endDate = service.millies(today);
     getAverageTimePerRake(startDate, endDate);
     getDailyTotalRakesProcessed(startDate, endDate);
+    getCaptiveIR(startDate, endDate);
     getDashboardMetrics();
   }, [])
 
   const calculateLineChartDomainTicks = (data: any[]) => {
     const values = data.map((item) => item.value);
-    // console.log(values);
     const max = Math.max(...values);
     const min = Math.min(...values);
     const diff = max - min;
@@ -317,7 +510,7 @@ export default function RealTimeGateTracking() {
         // Create a download link and trigger the download
         const link = document.createElement('a');
         link.href = dataUrl;
-        link.download = 'real-time-gate-in-and-gate-out-tracking.png';
+        link.download = 'placement-time-drawn-out-time-tracking-dashboard.png';
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -368,26 +561,20 @@ export default function RealTimeGateTracking() {
         <div style={tooltipStyle}>
           <p style={sectionTitleStyle}>{formattedDate}</p>
           <div style={dataRowStyle}>
-            <span style={{ ...colorIndicatorStyle, backgroundColor: '#F30055' }}></span>
-            {`Indian Rakes: ${payload[0]?.payload?.indianRakes}`}
+            <span style={{ ...colorIndicatorStyle, backgroundColor: '#596CFF' }}></span>
+            {text('indianRakes')} : {payload[0]?.payload?.indianRakes}
           </div>
           <div style={dataRowStyle}>
-            <span style={{ ...colorIndicatorStyle, backgroundColor: '#21114D' }}></span>
-            {`Captive Rakes: ${payload[0]?.payload?.captive}`}
+            <span style={{ ...colorIndicatorStyle, backgroundColor: '#A4ABFF' }}></span>
+            {text('captiveRakes')} : {payload[0]?.payload?.captive}
           </div>
           <div style={dataRowStyle}>
             <span style={{ ...colorIndicatorStyle, backgroundColor: '#E8F4FF' }}></span>
-            {`Total Rakes: ${payload[0]?.payload?.value}`}
+            {text('totalRakes')} : {payload[0]?.payload?.value}
           </div>
         </div>
       </div>
     );
-  };
-
-  const formatTime = (decimalHours: number) => {
-    const hours = Math.floor(decimalHours);
-    const minutes = Math.round((decimalHours - hours) * 60);
-    return `${hours} hrs ${minutes} mins`;
   };
 
   const CustomToolTipLineChart = ({ active, payload, label }: any) => {
@@ -423,11 +610,119 @@ export default function RealTimeGateTracking() {
         <div style={tooltipStyle}>
           <p style={sectionTitleStyle}>{formattedDate}</p>
           <div style={dataRowStyle}>
-            Average Time per Rake: <b>{formatTime(payload[0]?.value)}</b>
+            {text('averageTimePerRake')} : <b>{formatTime(payload[0]?.value)}</b>
           </div>
         </div>
       </div>
     );
+  };
+
+  const CustomTooltipPieChart = ({ active, payload }: any) => {
+    if (!active || !payload || !payload.length) return null;
+    const data = payload[0].payload
+
+    const tooltipStyle: React.CSSProperties = {
+      backgroundColor: '#E8F4FF',
+      border: '1px solid #A9D3FF',
+      borderRadius: '8px',
+      padding: '16px',
+      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+      fontFamily: 'Arial, sans-serif',
+      fontSize: '14px',
+      color: '#333',
+      maxWidth: '300px'
+    };
+  
+    const sectionTitleStyle: React.CSSProperties = {
+      fontWeight: 'bold',
+    };
+  
+    const dataRowStyle: React.CSSProperties = {
+      marginBottom: '4px'
+    };
+
+    const colorIndicatorStyle: React.CSSProperties = {
+      display: 'inline-block',
+      width: '12px',
+      height: '12px',
+      marginRight: '8px',
+      borderRadius: '2px'
+    };
+
+    const headerStyle: React.CSSProperties = {
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'flex-start',
+      marginBottom: '8px'
+    };
+
+    return (
+      <div>
+        <div style={tooltipStyle}>
+          <div style={headerStyle}>
+            <span style={{ ...colorIndicatorStyle, backgroundColor: data.name ? 
+              data.name === 'IR' ? '#596CFF' : '#A4ABFF' : '#000'
+             }}></span>
+            <div style={sectionTitleStyle}>{data.name}</div>
+          </div>
+          <div style={dataRowStyle}>
+            {text('noOfRakes')} : <b>{data.count}</b>
+          </div>
+          {/* <div style={dataRowStyle}>
+            Percentage: {data.value}%
+          </div> */}
+          <div style={dataRowStyle}>
+            {text('averageTime')} : <b>{data.time}</b>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  const handleDownload = () => {
+    if(drawnOutTimeTableData && drawnOutTimeTableData.length){
+      const wsData = [
+        ["S.No", "Drawn Out Time", "No. of Rakes", "Average of PT to DW Time"],
+        ...drawnOutTimeTableData.map((row, index) => [
+          index + 1,
+          row.date,
+          row.rakeCount,
+          row.avgTimeFormatted
+        ]),
+        ["Grand Total", "", totalRakesInTable, totalAvgTimeInTable]
+      ];
+  
+      const ws = XLSX.utils.aoa_to_sheet(wsData);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Real-Time Gate Tracking");
+  
+      XLSX.writeFile(wb, "Placement-time-drawn-out-time-tracking-table.xlsx");
+    } else {
+      showMessage('No data to download', 'error');
+    }
+  };
+
+  const handleDownloadCaptiveIR = () => {
+    if(captiveIRData && captiveIRData.length){
+      const wsData = [
+        ["Rake Type", "No. of Rakes", "Percentage","Average of PT to DW Time"],
+        ...captiveIRData.map((row, index) => [
+          row.rakeType,
+          row.rakeCount,
+          row.rakePercentage,
+          row.avgTimeFormatted
+        ]),
+        ["Grand Total", totalCaptiveIRRakes, totalCaptiveIRRakesPercentage, totalAvgTimeCaptiveIR]
+      ];
+  
+      const ws = XLSX.utils.aoa_to_sheet(wsData);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Real-Time Gate Tracking");
+  
+      XLSX.writeFile(wb, "Placement-time-drawn-out-time-tracking-rakes-type-table.xlsx");
+    } else {
+      showMessage('No data to download', 'error');
+    }
   };
 
   if (loading) {
@@ -448,7 +743,7 @@ export default function RealTimeGateTracking() {
 
 
   return (
-    <Container maxWidth="xl" sx={{ py: 4, backgroundColor: '#fff' }} ref={componentRef}>
+    <StyledBox ref={componentRef}>
       <Box 
         className="real-time-gate-tracking-header"
       sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}
@@ -494,22 +789,22 @@ export default function RealTimeGateTracking() {
 
       <Box sx={{ display: 'flex', gap: 2, mb: 4 }}>
         <MetricCard
-          title="Daily Average Time (minutes)"
+          title={text('dailyAverageTime')}
           value={dashboardMetrics.dailyAverageTime || 0} 
           change={dashboardMetrics.dailyTrend || 0}
-          changeLabel="from yesterday"
+          changeLabel={text('fromYesterday')}
         />
         <MetricCard
-          title="Weekly Average Time (minutes)"
+          title={text('weeklyAverageTime')}
           value={dashboardMetrics.weeklyAverageTime || 0}
           change={dashboardMetrics.weeklyTrend || 0}
-          changeLabel="from last week"
+          changeLabel={text('fromLastWeek')}
         />
         <MetricCard
-          title="Monthly Total Rakes"
+          title={text('monthlyTotalRakes')}
           value={dashboardMetrics.monthlyTotalRakes || 0}
           change={dashboardMetrics.monthlyTrend || 0}
-          changeLabel="from last month"
+          changeLabel={text('fromLastMonth')}
           unit="rakes"
         />
       </Box>
@@ -519,7 +814,7 @@ export default function RealTimeGateTracking() {
         sx={{ display: 'flex', gap: 2 }}
       >
         <Card sx={{ p: 3, flex: 1 }}>
-          <Typography variant="h6">Average Time per Rake</Typography>
+          <Typography variant="h6"  sx={{fontWeight: 600}}>{text('averageTimePerRake')}</Typography>
           <Typography color="text.secondary" variant="body2" sx={{ mb: 2 }}>
             {text('trendOverSelectedDateRange')}
           </Typography>
@@ -541,7 +836,7 @@ export default function RealTimeGateTracking() {
                 ticks={yAxisTicksLine}
                 tickFormatter={(value) => `${value}h`}
               />
-              <Tooltip content={<CustomToolTipLineChart />} />
+              <RechartsTooltip content={<CustomToolTipLineChart />} />
               <Line
                 type="monotone"
                 dataKey="value"
@@ -554,7 +849,7 @@ export default function RealTimeGateTracking() {
         </Card>
 
         <Card sx={{ p: 3, flex: 1 }}>
-          <Typography variant="h6">Daily Total Rakes Processed</Typography>
+          <Typography variant="h6"  sx={{fontWeight: 600}}>{text('dailyTotalRakesProcessed')}</Typography>
           <Typography color="text.secondary" variant="body2" sx={{ mb: 2 }}>
             {text('comparisonOvertheselectedDateRange')}
           </Typography>
@@ -586,7 +881,7 @@ export default function RealTimeGateTracking() {
                 domain={yAxisDomainBar}
                 ticks={yAxisTicksBar}
               />
-              <Tooltip content={<CustomTooltip />} />
+              <RechartsTooltip content={<CustomTooltip />} />
               <Legend
                 verticalAlign="bottom"
                 height={36}
@@ -596,13 +891,13 @@ export default function RealTimeGateTracking() {
               />
               <Bar
                 dataKey='captive'
-                fill="#21114D"
+                fill="#A4ABFF"
                 name='Captive Rakes'
                 stackId="a"
               />
               <Bar
                 dataKey='indianRakes'
-                fill="#F30055"
+                fill="#596CFF"
                 name='Indian Rakes'
                 stackId="a"
               />
@@ -610,6 +905,178 @@ export default function RealTimeGateTracking() {
           </ResponsiveContainer>
         </Card>
       </Box>
-    </Container>
+
+       {/* Average time per rake table */}
+       <div className="real-time-gate-tracking-table-wrapper">
+        <table className="real-time-gate-tracking-table">
+          <thead>
+            <tr>
+              <th className="real-time-gate-tracking-id-column">{text('sNo')}</th>
+              <th>{text('drawnOutTime')}</th>
+              <th className="real-time-gate-tracking-left-align">{text('noOfRakes')}</th>
+              <th className="real-time-gate-tracking-left-align">{text('averageOfPTtoDWTime')}</th>
+              <th className="real-time-gate-tracking-download-icon">
+
+              <CustomDownloadTooltip 
+                arrow 
+                title={
+                  <div 
+                    style={{
+                      display: 'flex', 
+                      width: '100%',
+                      flexDirection: 'row', 
+                      justifyContent: 'center',
+                      fontSize: '10px',
+                      fontFamily: '"Inter", sans-serif',
+                      fontWeight: 600,
+                      paddingTop: '2px',
+                      gap: '2px'
+                  }}>
+                    {text('downloadExcel')}
+                  </div>}>
+                    <DownloadIcon style={{ 
+                      color: '#2a1a6e', 
+                      cursor: 'pointer',
+                    }} onClick={handleDownload}
+                    />
+              </CustomDownloadTooltip>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {drawnOutTimeTableData && drawnOutTimeTableData.length ? 
+            drawnOutTimeTableData.map((row: any, index: number) => (
+              <tr key={index} id='real-time-gate-tracking-tr'>
+                <td>{index + 1}.</td>
+                <td className="real-time-gate-tracking-font-medium">{row.date}</td>
+                <td className="real-time-gate-tracking-left-align">{row.rakeCount}</td>
+                <td className="real-time-gate-tracking-left-align">{row.avgTimeFormatted}</td>
+                <td className="real-time-gate-tracking-download-icon">
+                  <span style={{ visibility: 'hidden' }}>{text('hidden')}</span>
+                </td>
+              </tr>
+            )) : (
+              <tr>
+                <td colSpan={7} style={{ textAlign: 'center' }}>{text('noDataFound')}</td>
+              </tr>
+            )
+          }
+          <tr className="grand-total-row">
+            <td colSpan={2}>{text('grandTotal')}</td>
+            <td className="real-time-gate-tracking-left-align">{totalRakesInTable}</td>
+            <td className="real-time-gate-tracking-left-align">{totalAvgTimeInTable}</td>
+            <td className="real-time-gate-tracking-download-icon">
+              <span style={{ visibility: 'hidden' }}>{text('hidden')}</span>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <Box 
+        className="real-time-gate-tracking-body"
+        sx={{ display: 'flex', gap: 2, marginTop: 4 }}
+      >
+      <Card sx={{ p: 3, flex: 1 }}>
+          <Typography variant="h6" sx={{fontWeight: 600}}>{text('captiveVsIRRakeDistribution')}</Typography>
+          <Typography color="text.secondary" variant="body2" sx={{ mb: 2 }}>
+            {text('captiveVsIRRakeDistributionDescription')}
+          </Typography>
+
+      <div className='real-time-gate-tracking-captiveIR-container'>
+        {/* Captive IR Table */}
+      <div className="real-time-gate-tracking-table-wrapper-captiveIR">
+        <table className="real-time-gate-tracking-table">
+          <thead>
+            <tr>
+              <th className="real-time-gate-tracking-left-align">{text('rakeType')}</th>
+              <th className="real-time-gate-tracking-left-align">{text('noOfRakes')}</th>
+              <th className="real-time-gate-tracking-left-align">{text('percentage')}</th>
+              <th className="real-time-gate-tracking-left-align">{text('averageOfPTtoDWTime')}</th>
+              <th className="real-time-gate-tracking-download-icon">
+              <CustomDownloadTooltip 
+                arrow 
+                title={
+                  <div 
+                    style={{
+                      display: 'flex', 
+                      width: '100%',
+                      flexDirection: 'row', 
+                      justifyContent: 'center',
+                      fontSize: '10px',
+                      fontFamily: '"Inter", sans-serif',
+                      fontWeight: 600,
+                      paddingTop: '2px',
+                      gap: '2px'
+                  }}>
+                   {text('downloadExcel')}
+                  </div>}>
+                    <DownloadIcon style={{ 
+                      color: '#2a1a6e', 
+                      cursor: 'pointer',
+                    }} onClick={handleDownloadCaptiveIR}
+                    />
+              </CustomDownloadTooltip>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {captiveIRData && captiveIRData.length ? 
+            captiveIRData.map((row: any, index: number) => (
+              <tr key={index} id='real-time-gate-tracking-tr'>
+                <td className="real-time-gate-tracking-font-medium">{row.rakeType}</td>
+                <td className="real-time-gate-tracking-left-align">{row.rakeCount}</td>
+                <td className="real-time-gate-tracking-left-align">{row.rakePercentage}%</td>
+                <td className="real-time-gate-tracking-left-align">{row.avgTimeFormatted}</td>
+                <td className="real-time-gate-tracking-download-icon">
+                  <span style={{ visibility: 'hidden' }}>{text('hidden')}</span>
+                </td>
+              </tr>
+            )) : (
+              <tr>
+                <td colSpan={7} style={{ textAlign: 'center' }}>{text('noDataFound')}</td>
+              </tr>
+            )
+          }
+          <tr className="grand-total-row">
+            <td>Grand Total</td>
+            <td className="real-time-gate-tracking-left-align">{totalCaptiveIRRakes}</td>
+            <td className="real-time-gate-tracking-left-align">{totalCaptiveIRRakesPercentage}%</td>
+            <td className="real-time-gate-tracking-left-align">{totalAvgTimeCaptiveIR}</td>
+            <td className="real-time-gate-tracking-download-icon">
+              <span style={{ visibility: 'hidden' }}>{text('hidden')}</span>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div style={{ height: 300, width: '40%'}}>
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Pie
+                data={pieChartData}
+                cx="50%"
+                cy="50%"
+                outerRadius={150}
+                paddingAngle={2}
+                dataKey="value"
+                nameKey="name"
+                label={({ name, value }) => `${name}: ${value}%`}
+                labelLine={true}
+              >
+                {pieChartData.map((entry: any, index: number) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[entry.name] || '#000000'} />
+                ))}
+              </Pie>
+              <RechartsTooltip content={<CustomTooltipPieChart />} />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+      </Card>
+      </Box>
+      
+    </StyledBox>
   )
 }
