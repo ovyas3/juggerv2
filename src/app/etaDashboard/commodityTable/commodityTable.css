@@ -20,9 +20,16 @@
 }
 
 .commoditytable-table-wrapper {
-  border: 1px solid #e2e8f0;
+  border: 1px solid #E9E9EB;
   border-radius: 0.5rem;
   overflow-x: auto;
+  width: 38%;
+  max-height: calc(100vh - 500px);
+
+  @media screen and (max-width: 840px){
+      width: 100%;
+      max-height: calc(100vh - 500px);
+  }
 }
 
 .commoditytable-table {
@@ -31,23 +38,41 @@
   border-spacing: 0;
 }
 
-.commoditytable-table th {
-  background-color: #f8fafc;
-  padding: 0.75rem 1rem;
+.commoditytable-th-first-header{
+  padding: 16px;
+  padding-bottom: 2px;
   text-align: left;
   font-weight: 600;
-  font-size: 0.875rem;
+  font-size: 12px;
   line-height: 1.25rem;
-  color: #4a5568;
-  border-bottom: 1px solid #e2e8f0;
+  color: #484A57;
+  font-family: 'Inter', sans-serif;
+  background-color: #f8f9fa;
+}
+
+.commoditytable-th-second-header{
+  padding: 8px 16px;
+  padding-top: 6px;
+  border-bottom: 1px solid #E9E9EB;
+  text-align: center;
+  font-weight: 400;
+  font-size: 12px;
+  background-color: #f8f9fa;
+  line-height: 1.25rem;
+  color: #484A57;
+  font-family: 'Inter', sans-serif;
+}
+
+.commoditytable-th-subs{
+  width: 100px;
 }
 
 .commoditytable-table td {
-  padding: 0.75rem 1rem;
-  font-size: 0.875rem;
+  padding: 8px 16px;
+  font-size: 12px;
   line-height: 1.25rem;
-  color: #2d3748;
-  border-bottom: 1px solid #e2e8f0;
+  color: #44475B;
+  border-bottom: 1px solid #e2e8f0 !important;
 }
 
 .commoditytable-table #commoditytable-tr {
@@ -64,15 +89,77 @@
 }
 
 .commoditytable-id-column {
-  width: 100px;
+  width: 30px;
 }
 
 .commoditytable-left-align {
   text-align: left;
 }
 
+.commoditytable-center-align {
+  text-align: center !important;
+}
+
 .commoditytable-font-medium {
   font-weight: 500;
+  text-align: left !important;
+}
+
+.subtotal-row {
+  font-size: 13px;
+  color: #484A57;
+  background-color: #f8f9fa;
+  font-weight: bold;
+}
+
+.subtotal-row td {
+  background-color: #f8f9fa;
+}
+
+.commoditytable-table thead .commoditytable-th-second-header[colspan="2"] {
+  position: relative;
+}
+
+.commoditytable-table thead .commoditytable-th-second-header[colspan="2"]::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 25%;
+  height: 50%;
+  width: 1px;
+  background-color: #e0e0e0;
+}
+
+.commoditytable-table thead tr:last-child .commoditytable-th-second-header:nth-child(3),
+.commoditytable-table thead tr:last-child .commoditytable-th-second-header:nth-child(5) {
+  position: relative;
+}
+
+.commoditytable-table thead tr:last-child .commoditytable-th-second-header:nth-child(3)::after,
+.commoditytable-table thead tr:last-child .commoditytable-th-second-header:nth-child(5)::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 25%;
+  height: 50%;
+  width: 1px;
+  background-color: #e0e0e0;
+}
+
+.commoditytable-table tbody .commoditytable-left-align:nth-child(3),
+.commoditytable-table tbody .commoditytable-left-align:nth-child(5) {
+  position: relative;
+}
+
+.commoditytable-table tbody .commoditytable-left-align:nth-child(3)::after,
+.commoditytable-table tbody .commoditytable-left-align:nth-child(5)::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 25%;
+  height: 50%;
+  width: 1px;
+  background-color: #e0e0e0;
 }
 
 @media (max-width: 640px) {
@@ -150,4 +237,46 @@
   .dropdown-container {
     flex-direction: column;
   }
+}
+
+.pie-chart-center-text {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.commoditytable-body {
+  display: flex;
+  gap: 1.25rem;
+}
+
+.commoditytable-piechart-wrapper{
+  width: 30%;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #E9E9EB;
+  border-radius: 0.5rem;
+  height: 420px;
+  overflow: visible;
+}
+
+.commoditytable-piechart-content-inner-box{
+  height: 50%;
+  padding: 16px;
+  overflow: visible;
+}
+
+.commoditytable-trend-line-wrapper{
+  width: 30%;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #E9E9EB;
+  border-radius: 0.5rem;
+  height: 420px;
+  overflow: visible;
+}
+
+.commoditytable-trend-line-content-inner-box{
+  height: 50%;
+  padding: 16px;
+  overflow: visible;
 }

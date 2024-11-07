@@ -1778,9 +1778,9 @@ export const ContactModal = ({isClose, shipment}:any) => {
         <div style={{width:'100vw', height:'100vh', position:'fixed', top:0, left:0 ,zIndex:300, backgroundColor:'rgba(0, 0, 0, 0.5)'}} onClick={(e)=>{e.stopPropagation(); isClose(false)}}>
         <div className="contactModal" onClick={(e)=>{e.stopPropagation(); setOpenStationDropDown(false); setStationList([]); setOpenReasonDropDown(false); setOpencontactpersonDropDown(false)}}>
             <div className="closeContaioner"><CloseIcon onClick={(e) => { e.stopPropagation(); isClose(false) }}/></div>
-            <div id='toggle-btn-container' style={{justifyContent:toggleBtn==='newContact'?'left':'right'}} >
+            {/* <div id='toggle-btn-container' style={{justifyContent:toggleBtn==='newContact'?'left':'right'}} >
                 <div id='toggle-btn' style={{ backgroundColor:toggleBtn==='newContact'?'':'#5481FF'}} onClick={(e)=>{e.stopPropagation(); setToggleBtn((prev:any)=>{if(prev === 'newContact') {return 'oldContacts'} else {return 'newContact'} })}}></div>
-            </div>
+            </div> */}
             <div style={{display:toggleBtn === 'newContact'?'block':'none', position:'relative', height:'100%'}}>
                 <header id="contactModalHeader">{text('contactModalHeader')} - #{shipment?.fnr?.primary}</header>
                 <div id='formContainer'>

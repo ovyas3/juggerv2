@@ -161,7 +161,13 @@
     "beyondETACount": "Beyond ETA Count",
     "withinETA": "Within ETA",
     "beyondETA": "Beyond ETA",
-    "total": "Total"
+    "total": "Total",
+    "count": "Count",
+    "date": "Date",
+    "withinETACountAndPercentage": "Within ETA Count & %",
+    "beyondETACountAndPercentage": "Beyond ETA Count & %",
+    "withinETATrendLine": "Within ETA Trend Line",
+    "beyondETATrendLine": "Beyond ETA Trend Line"
   },
   "WAGONTALLYSHEET":{
     "uploadWagonTallySheet":"Upload Wagon Sheet",

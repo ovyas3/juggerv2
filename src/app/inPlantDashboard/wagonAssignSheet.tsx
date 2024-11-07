@@ -321,7 +321,7 @@ function WagonAssignSheet({
 
       <div id="assign-wagon-container" >
         <div>
-          <div style={{ marginTop: 8 }}>Select a mill</div>
+          <div style={{ marginTop: 8 }}>Select a Loading Shop</div>
           <div id="plantSelectorContainer">
             {plants.map((plant: any, index: any) => {
               return (
