@@ -178,6 +178,42 @@ const COLORS: any = {
   Captive: '#A4ABFF'
 };
 
+const tooltipStyle: React.CSSProperties = {
+  backgroundColor: '#E8F4FF',
+  border: '1px solid #A9D3FF',
+  borderRadius: '8px',
+  padding: '16px',
+  boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+  fontFamily: 'Arial, sans-serif',
+  fontSize: '14px',
+  color: '#333',
+  maxWidth: '300px'
+};
+
+const sectionTitleStyle: React.CSSProperties = {
+  fontWeight: 'bold',
+};
+
+const dataRowStyle: React.CSSProperties = {
+  marginBottom: '4px'
+};
+
+const colorIndicatorStyle: React.CSSProperties = {
+  display: 'inline-block',
+  width: '12px',
+  height: '12px',
+  marginRight: '8px',
+  borderRadius: '2px'
+};
+
+const headerStyle: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'flex-start',
+  marginBottom: '8px'
+};
+
+
 export default function RealTimeGateTracking() {
   const theme = useTheme()
   const today: any = new Date();
@@ -527,35 +563,6 @@ const convertMinutesToHoursAndMinutes = (minutes: number) => {
     const year = date.getFullYear() % 100;
     const formattedDate = `${date.getDate()}-${month}-${year}`;
 
-    const tooltipStyle: React.CSSProperties = {
-      backgroundColor: '#E8F4FF',
-      border: '1px solid #A9D3FF',
-      borderRadius: '8px',
-      padding: '16px',
-      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-      fontFamily: 'Arial, sans-serif',
-      fontSize: '14px',
-      color: '#333',
-      maxWidth: '300px'
-    };
-
-    const colorIndicatorStyle: React.CSSProperties = {
-      display: 'inline-block',
-      width: '12px',
-      height: '12px',
-      marginRight: '8px',
-      borderRadius: '2px'
-    };
-
-    const sectionTitleStyle: React.CSSProperties = {
-      fontWeight: 'bold',
-      marginBottom: '8px'
-    };
-
-    const dataRowStyle: React.CSSProperties = {
-      marginBottom: '4px'
-    };
-
     return (
       <div>
         <div style={tooltipStyle}>
@@ -584,27 +591,6 @@ const convertMinutesToHoursAndMinutes = (minutes: number) => {
     const year = date.getFullYear() % 100;
     const formattedDate = `${date.getDate()}-${month}-${year}`;
   
-    const tooltipStyle: React.CSSProperties = {
-      backgroundColor: '#E8F4FF',
-      border: '1px solid #A9D3FF',
-      borderRadius: '8px',
-      padding: '16px',
-      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-      fontFamily: 'Arial, sans-serif',
-      fontSize: '14px',
-      color: '#333',
-      maxWidth: '300px'
-    };
-  
-    const sectionTitleStyle: React.CSSProperties = {
-      fontWeight: 'bold',
-      marginBottom: '8px'
-    };
-  
-    const dataRowStyle: React.CSSProperties = {
-      marginBottom: '4px'
-    };
-  
     return (
       <div>
         <div style={tooltipStyle}>
@@ -620,41 +606,6 @@ const convertMinutesToHoursAndMinutes = (minutes: number) => {
   const CustomTooltipPieChart = ({ active, payload }: any) => {
     if (!active || !payload || !payload.length) return null;
     const data = payload[0].payload
-
-    const tooltipStyle: React.CSSProperties = {
-      backgroundColor: '#E8F4FF',
-      border: '1px solid #A9D3FF',
-      borderRadius: '8px',
-      padding: '16px',
-      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-      fontFamily: 'Arial, sans-serif',
-      fontSize: '14px',
-      color: '#333',
-      maxWidth: '300px'
-    };
-  
-    const sectionTitleStyle: React.CSSProperties = {
-      fontWeight: 'bold',
-    };
-  
-    const dataRowStyle: React.CSSProperties = {
-      marginBottom: '4px'
-    };
-
-    const colorIndicatorStyle: React.CSSProperties = {
-      display: 'inline-block',
-      width: '12px',
-      height: '12px',
-      marginRight: '8px',
-      borderRadius: '2px'
-    };
-
-    const headerStyle: React.CSSProperties = {
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'flex-start',
-      marginBottom: '8px'
-    };
 
     return (
       <div>
@@ -1051,7 +1002,7 @@ const convertMinutesToHoursAndMinutes = (minutes: number) => {
         </table>
       </div>
 
-      <div style={{ height: 300, width: '40%'}}>
+      <div className='real-time-gate-tracking-captiveIR-piechart'>
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
