@@ -10,7 +10,7 @@ import { useSnackbar } from "@/hooks/snackBar";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import dayjs from "dayjs";
-
+import timeService from '@/utils/timeService'
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { renderTimeViewClock } from "@mui/x-date-pickers/timeViewRenderers";
 import { ThreeCircles } from "react-loader-spinner";
@@ -1238,11 +1238,11 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
                           <div>
                             <div className="headerForMillDetails_hooks">
                               <header style={{fontWeight: 600}}>Hook {hookIndex + 1} </header>
-                              <div style={{ display: "flex", gap: 8 }}>
-                                {
-                                // hookIndex !== 0 ? 
+                             { (<div style={{ display: "flex", gap: 8 }}>                
+           
+                                 { !(hookItem.loading_end || hookItem.loading_start) &&
                                 (
-                                  <div
+                                   <div
                                     onClick={(e) => {
                                       hookIndex !== 0 &&
                                       removeHookFromMillDetails(
@@ -1259,12 +1259,13 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
                                     <RemoveIcon
                                       style={{ height: 20, width: 20 }}
                                     />
-                                  </div>
-                                )
+                                  </div>  
+                                  )
                                 //  : (
                                 //   <div style={{ height: 20, width: 20 }}></div>
                                 // )
                                 }
+                                
                                 {item.hooks.length - 1 === hookIndex && (
                                     <div
                                       onClick={(e) => {
@@ -1277,8 +1278,9 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
                                         style={{ height: 20, width: 20 }}
                                       />
                                     </div>
-                                  )}
-                              </div>
+                                  )} 
+                                   
+                              </div>) }
                             </div>
                             {/* <input
                               className="inputForRakeSectionHandling"
@@ -1310,11 +1312,11 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
                           </div>
                           <div className="loadingTimeContainer">
                             <div>{text("loadingstarttime")}</div>
-                            <div style={{ marginTop: 6 }}>--</div>
+                            <div style={{ marginTop: 6 ,color: 'black',fontWeight:600}}>  { timeService.utcToist(hookItem.loading_start)+' '+timeService.utcToistTime(hookItem.loading_start) || '--'}</div>
                           </div>
                           <div className="loadingTimeContainer">
                             <div>{text("loadingEndTime")}</div>
-                            <div style={{ marginTop: 6 }}>--</div>
+                            <div style={{ marginTop: 6 ,color: 'black',fontWeight:600}}>{timeService.utcToist(hookItem.loading_end)+' '+timeService.utcToistTime(hookItem.loading_end) || '--'}</div>
                           </div>
                         </div>
                       );

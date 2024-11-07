@@ -629,7 +629,7 @@ export const AssignToMill = ({
             })}
           </div>
 
-          <div style={{ marginTop: 24 }}>Select a mill</div>
+          <div style={{ marginTop: 24 }}>Select a Loading Shop</div>
           <div id="plantSelectorContainer">
             {plants.map((plant: any, index: any) => {
               return (

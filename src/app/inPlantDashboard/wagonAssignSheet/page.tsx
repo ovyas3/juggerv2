@@ -365,7 +365,7 @@ function WagonAssignSheetContent() {
 
         <div id="assign-wagon-container-wagon">
           <div>
-            <div className="assign-wagon-container-title">Select a mill</div>
+            <div className="assign-wagon-container-title">Select a Loading Shop</div>
             <div id="plantSelectorContainerWagon">
               {plants?.map((plant: any, index: any) => {
                 const isSelected = plant?._id === SelectedPlant?._id;
