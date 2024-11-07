@@ -127,7 +127,7 @@ function ActiveAgentList({ activeAgentList, activeCount, setActiveSkipAndLimit, 
             const response = await httpsGet(`delete/active_HA?active_id=${active_id}`, 0, router);
             if (response && response.statusCode === 200) {
                 getAllActiveHandlingAgents({activeSkipAndLimit: { skip: 0, limit:10 }});
-                showMessage('deleted Successfully.', 'success');
+                showMessage('Handling Agent Deleted Successfully.', 'success');
                 setAnchorEl(null);
                 setShowActionBox(-1);
             }

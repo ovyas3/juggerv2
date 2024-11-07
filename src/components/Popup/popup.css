@@ -572,4 +572,12 @@
   }
 }
 
-
+.no_shipments_found {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 400px;
+  width: calc(100vw - 120px);
+  font-family: "Plus Jakarta Sans";
+  font-weight: bolder;
+}

@@ -25,6 +25,7 @@ const StyledBox = styled(Box)(({ theme }) => ({
   width: '100%',
   borderRadius: '10px',
   padding: theme.spacing(3),
+  borderBottom: '1px solid #E8E8E8',
 }));
 interface CommodityData {
   id: number
