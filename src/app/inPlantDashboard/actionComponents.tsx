@@ -747,13 +747,16 @@ export const AddIndentNumber = ({
       if (response?.statusCode === 200) {
         getWagonDetails();
         isClose(false);
+      } else {
+        showMessage.showMessage('Something went wrong.',"error")
+        isClose(false);
       }
+
     } catch (error) {
       setLoading(false);
+      showMessage.showMessage('Something went wrong.',"error")
       console.log(error);
-    } finally {
-      setLoading(false);
-    }
+    } 
   }
 
   if (loading) {

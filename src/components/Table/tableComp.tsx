@@ -1572,25 +1572,10 @@ export const UploadDailyRakeHandlingSheet = ({ getWagonDetails, isClose, shipmen
 
     return (
     <div style={{width:'100vw', height:'100vh', position:'fixed', top:0, left:0 ,zIndex:300, backgroundColor:'rgba(0, 0, 0, 0.5)'}} onClick={(e)=>{e.stopPropagation(); isClose(false)}}>
-        <div className="upload-wagon-sheet-modal-main" onClick={(e)=>{e.stopPropagation()}}>
+        <div className="upload-wagon-sheet-modal-main" style={{height:'52vh'}} onClick={(e)=>{e.stopPropagation()}}>
 
             <div style={{display:'flex', justifyContent:'space-between',}}>
                 <header style={{fontSize:20, color:'#131722', fontWeight:600}}>{text("uploadDailyRakeHandlingSheet")}</header>
-            </div>
-
-            <div className="status_edemand_fnr" style={{display: 'flex' }}>
-                <div>
-                    <header style={{fontSize:12, color:'#42454E', marginBottom:8}}>{text('status')}</header>
-                    <text style={{fontSize:16, color:"#42454E", fontWeight:600}}>{shipment?.status?.name || shipment?.status?.statusLabel}</text>
-                </div>
-                <div>
-                    <header style={{fontSize:12, color:'#42454E', marginBottom:8}}>{text('FNRno')}</header>
-                    <text style={{fontSize:16, color:"#42454E", fontWeight:600}}>{shipment?.fnr?.primary || shipment?.fnr}</text>
-                </div>
-                <div>
-                    <header style={{fontSize:12, color:'#42454E', marginBottom:8}}>{text('edemandno')}</header>
-                    <text style={{fontSize:16, color:"#42454E", fontWeight:600}}>{shipment?.edemand?.edemand_no || shipment?.edemand?.edemand}</text>
-                </div>
             </div>
 
             <div 
