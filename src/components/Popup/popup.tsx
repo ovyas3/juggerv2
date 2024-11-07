@@ -348,6 +348,7 @@ export const Popup: React.FC<PopupProps> = ({ data }) => {
     }, [searchRakeName]);
   
      return (
+      <>
       <TableHead>
         <TableRow>
           <TableCell align="center" className="table-columns">
@@ -436,6 +437,14 @@ export const Popup: React.FC<PopupProps> = ({ data }) => {
           </TableCell>
         </TableRow>
       </TableHead>
+      {filteredData.length === 0 && (
+        <TableRow>
+          <TableCell colSpan={10} align="center" className='no_shipments_found'>
+            No Shipment is found
+          </TableCell>
+        </TableRow>
+      )}
+      </>
     );
   }
 

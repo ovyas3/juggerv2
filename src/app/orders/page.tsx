@@ -170,6 +170,9 @@ const OrdersPage = () => {
       if (status.length === 0) {
         const { status, ...newState } = prevState;
         return newState;
+      } else if(status[0] === 'All'){
+        const { status, ...newState } = prevState;
+        return newState;
       } else {
         const modifiedStatus = status.map(getStatusCode);
         return { ...prevState, status: modifiedStatus };
