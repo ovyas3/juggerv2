@@ -884,6 +884,20 @@ export const HandlingAgentSelection = ({ shipmentId, setOpen, locationId, getAll
         </div>
     );
 };
+
+const material = [
+    "Plate Mill",
+    "Bar Mill",
+    "Rail Mill",
+    "Semis",
+    "SPM"
+];
+
+const materialOptions = material.map(option => ({
+    value: option,
+    label: option
+}));
+
 export const MarkPlacement = ({isClose ,shipment, getAllShipment, different = 'markplacement'}: any) =>{
     const t = useTranslations("ORDERS");
     const router = useRouter();
@@ -892,6 +906,7 @@ export const MarkPlacement = ({isClose ,shipment, getAllShipment, different = 'm
     const [avetoInplant, setAvetoInplant] = useState(false);
     const [eIndent, setEIndent] = useState('');
     const [warraning, setWarraning] = useState(false);
+    const [materials, setMaterials] = useState<string[]>([]);
     const [openStartDatePicker, setOpenStartDatePicker] = useState(false);
 
     const handlePlacementDate = async() => {
@@ -905,10 +920,17 @@ export const MarkPlacement = ({isClose ,shipment, getAllShipment, different = 'm
         }
 
         const data = new Date(currentDate);
-        const payloadWitheident = {
+        let payloadMarkPlacement: any = {
             id: shipment._id,
-            placement_time : new Date (data.toUTCString()),
-            indent_no : eIndent
+            placement_time: new Date(data.toUTCString()),
+        };
+        
+        if (materials && materials.length > 0) {
+            payloadMarkPlacement.materials = materials;
+        }
+
+        if (eIndent && eIndent.length > 0) {
+            payloadMarkPlacement.indent_no = eIndent;
         }
 
         const payload = {
@@ -922,7 +944,9 @@ export const MarkPlacement = ({isClose ,shipment, getAllShipment, different = 'm
         }
        
       try {
-        const response = await httpsPost(different === 'downOut'?'rake_shipment/mark_drawnout':'rake_shipment/mark_placement', different === 'downOut' ?(payloadWithdrownDate):(eIndent?payloadWitheident: payload), router)
+        const response = await httpsPost(
+            different === 'downOut' ? 'rake_shipment/mark_drawnout' : 'rake_shipment/mark_placement', 
+            different === 'downOut' ? (payloadWithdrownDate) : (eIndent ? payloadMarkPlacement : payload), router)
         if(response.statusCode === 200) {
             isClose(false);
             getAllShipment();
@@ -936,7 +960,7 @@ export const MarkPlacement = ({isClose ,shipment, getAllShipment, different = 'm
 
     return (
         <div style={{width:'100vw', height:'100vh', position:'fixed', top:0, left:0 ,zIndex:300, backgroundColor:'rgba(0, 0, 0, 0.5)'}} onClick={(e)=>{e.stopPropagation(); isClose(false);}}>
-            <div style={{width:800, height:500, backgroundColor:'white', position:'relative', top:'50%', left:'50%', transform:'translate(-50%,-50%)', borderRadius:20, padding:25}} onClick={(e)=>{e.stopPropagation()}}>
+            <div style={{width:800, height: different = 'markplacement' ?  580 : 500, backgroundColor:'white', position:'relative', top:'50%', left:'50%', transform:'translate(-50%,-50%)', borderRadius:20, padding:25}} onClick={(e)=>{e.stopPropagation()}}>
              
                     <div style={{display:'flex', justifyContent:'space-between',}}>
                         <header style={{fontSize:20, color:'#131722', fontWeight:600}}>{different==='downOut'?'Drawn Out Time':'Mark Placement'}</header>
@@ -1023,12 +1047,23 @@ export const MarkPlacement = ({isClose ,shipment, getAllShipment, different = 'm
 
                     {
                         different !== 'downOut' && (
-                            <div style={{marginTop:24}}>
-                            <header style={{ marginBottom:8, fontSize:12, color:'#42454E'}}>{t('IndentNo')}</header>
-                            <div style={{border:'1px solid #E9E9EB', borderRadius:6,height:40.12, display:'flex', alignItems:'center', paddingLeft:12 }}>
-                                <input onChange={(e)=>{setEIndent(e.target.value)}} type="text" placeholder='Enter Indent No.' style={{fontWeight:600, fontSize:14, color:'#42454E', border:'none',outline:'none', width:'100%'}} />
-                            </div>
-                            </div>
+                            <>
+                                <div style={{marginTop:24}}>
+                                    <header style={{ marginBottom:8, fontSize:12, color:'#42454E'}}>{t('IndentNo')}</header>
+                                    <div style={{border:'1px solid #E9E9EB', borderRadius:6,height:40.12, display:'flex', alignItems:'center', paddingLeft:12 }}>
+                                        <input onChange={(e)=>{setEIndent(e.target.value)}} type="text" placeholder='Enter Indent No.' style={{fontWeight:600, fontSize:14, color:'#42454E', border:'none',outline:'none', width:'100%'}} />
+                                    </div>
+                                </div>
+                                <div style={{marginTop:24}}>
+                                    <header style={{ marginBottom:8, fontSize:12, color:'#42454E'}}>{t('material')}</header>
+                                    <MultiSelect
+                                      value={materials}
+                                      onValueChange={setMaterials}
+                                      placeholder="Select Materials"
+                                      options={materialOptions}
+                                    />
+                                </div>
+                            </>
                         )
                     }
                    
@@ -1055,6 +1090,149 @@ export const MarkPlacement = ({isClose ,shipment, getAllShipment, different = 'm
         </div>
     );
 }
+
+
+interface MultiSelectProps {
+  value: string[];
+  onValueChange: (value: string[]) => void;
+  placeholder: string;
+  options: { value: string; label: string }[];
+}
+
+const MultiSelect: React.FC<MultiSelectProps> = ({ value, onValueChange, placeholder, options }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const selectRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (selectRef.current && !selectRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  const handleSelectItem = (selectedValue: string) => {
+    if (value.includes(selectedValue)) {
+      onValueChange(value.filter((v) => v !== selectedValue));
+    } else {
+      onValueChange([...value, selectedValue]);
+    }
+  };
+
+  return (
+    <div className="select-container" ref={selectRef}>
+      <div className="select-trigger" onClick={() => setIsOpen(!isOpen)}>
+        <span className="selected-values">
+          {value.length > 0 ? value.map(v => options.find(option => option.value === v)?.label).join(', ') : placeholder}
+        </span>
+        <svg
+          className={`arrow ${isOpen ? 'open' : ''}`}
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+      </div>
+      {isOpen && (
+        <div className="select-content">
+          {options.map((option) => (
+            <div
+              key={option.value}
+              className={`select-item ${value.includes(option.value) ? 'selected' : ''}`}
+              onClick={() => handleSelectItem(option.value)}
+            >
+              <input
+                type="checkbox"
+                checked={value.includes(option.value)}
+                onChange={() => handleSelectItem(option.value)}
+              />
+              {option.label}
+            </div>
+          ))}
+        </div>
+      )}
+      <style jsx>{`
+        .select-container {
+          position: relative;
+          width: 100%;
+        }
+        .select-trigger {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 0.5rem 1rem;
+          font-size: 0.875rem;
+          line-height: 1.25rem;
+          background-color: #ffffff;
+          border: 1px solid #e2e8f0;
+          border-radius: 0.375rem;
+          cursor: pointer;
+          transition: all 0.2s ease-in-out;
+        }
+        .select-trigger:hover {
+          border-color: #cbd5e0;
+        }
+        .selected-values {
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          max-width: 90%;
+        }
+        .arrow {
+          transition: transform 0.2s ease-in-out;
+        }
+        .arrow.open {
+          transform: rotate(180deg);
+        }
+        .select-content {
+          position: absolute;
+          top: 100%;
+          left: 0;
+          width: 100%;
+          max-height: 200px;
+          overflow-y: auto;
+          background-color: #ffffff;
+          border: 1px solid #e2e8f0;
+          border-top: none;
+          border-radius: 0 0 0.375rem 0.375rem;
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+          z-index: 10;
+        }
+        .select-item {
+          display: flex;
+          align-items: center;
+          padding: 0.5rem 1rem;
+          font-size: 0.875rem;
+          line-height: 1.25rem;
+          cursor: pointer;
+          transition: background-color 0.2s ease-in-out;
+        }
+        .select-item:hover {
+          background-color: #f7fafc;
+        }
+        .select-item.selected {
+          background-color: #e2e8f0;
+        }
+        .select-item input {
+          margin-right: 0.5rem;
+        }
+      `}</style>
+    </div>
+  );
+};
+
 export const HandlingEdemand = ({ isClose, isOpen, getAllShipment, shipment }: any) => {
     const router = useRouter();
     const { showMessage } = useSnackbar();
