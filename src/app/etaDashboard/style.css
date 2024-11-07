@@ -25,6 +25,8 @@
   font-size: 16px;
   font-weight: 400;
   color: #343743;
+  font-weight: 600;
+  font-family: 'Plus Jakarta Sans', sans-serif;
 }
 #heading_reload {
   display: flex;
