@@ -53,37 +53,44 @@ function contructingData(shipment: any) {
   return shipment.map(
     (shipment: {
       _id: string;
-      FNR: string;
-      contact: {
-        stationName: string;
-        reason: string;
-        contactPerson: string;
-        contactPersonMobile: string;
-        comment: string;
-        rating: number;
-        name: string;
-      };
+      fnr: string;
+      // contact: {
+      //   stationName: string;
+      //   reason: string;
+      //   contactPerson: string;
+      //   contactPersonMobile: string;
+      //   comment: string;
+      //   rating: number;
+      //   name: string;
+      // };
+      stationName: string;
+      reason: string;
+      role: string;
+      name: string;
+      mobile: string;
+      comment: string;
+      rating: number;
     }) => {
       return {
-        id: shipment?._id && shipment._id,
-        stationName: shipment?.contact.stationName
-          ? shipment?.contact.stationName
+        id: shipment?._id ? shipment._id : '--',
+        stationName: shipment?.stationName
+          ? shipment?.stationName
           : "--",
-        fnr: shipment?.FNR ? shipment?.FNR : "--",
-        contactPersonRole: shipment?.contact.contactPerson
-          ? shipment?.contact.contactPerson
+        fnr: shipment?.fnr ? shipment?.fnr : "--",
+        contactPersonRole: shipment?.role
+          ? shipment?.role
           : "--",
         contactPersonName: {
-          contactPersonName: shipment?.contact.name
-            ? shipment?.contact.name
+          contactPersonName: shipment?.name
+            ? shipment?.name
             : "--",
         },
-        contact: shipment?.contact.contactPersonMobile
-          ? shipment?.contact.contactPersonMobile
+        contact: shipment?.mobile
+          ? shipment?.mobile
           : "--",
-        reason: shipment?.contact.reason ? shipment?.contact.reason : "--",
-        comment: shipment?.contact.comment ? shipment?.contact.comment : "--",
-        rating: shipment?.contact.rating ? shipment?.contact.rating : 0,
+        reason: shipment?.reason ? shipment?.reason : "--",
+        comment: shipment?.comment ? shipment?.comment : "--",
+        rating: shipment?.rating ? shipment?.rating : 0,
       };
     }
   );
@@ -213,7 +220,15 @@ const ContactTable = ({ contactDetails }: any) => {
                                 <div>
                                   {row.contactPersonName.contactPersonName}
                                 </div>
-                                <div style={{ color: "gold", display: "flex", gap:3, marginTop:2, fontSize:10 }}>
+                                <div
+                                  style={{
+                                    color: "gold",
+                                    display: "flex",
+                                    gap: 3,
+                                    marginTop: 2,
+                                    fontSize: 10,
+                                  }}
+                                >
                                   {Array.from(
                                     { length: row.rating },
                                     (_, i) => (

@@ -83,7 +83,8 @@
     "contactNo":"Contact No.",
     "comment":"Comment",
     "commentPlaceholder":"Enter Your Comment Here",
-    "rate":"Rate This Contact Person"
+    "rate":"Rate This Contact Person",
+    "contactModalHeaderOld":"Old Contacts Details"
   },
   "UPLOAD_ANNEXURE":{
     "SNCKBR_MSG":{
