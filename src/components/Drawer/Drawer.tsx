@@ -19,6 +19,7 @@ import AssessmentIcon from '@mui/icons-material/Assessment';
 import SettingsIcon from '@mui/icons-material/Settings';
 import AllInboxIcon from '@mui/icons-material/AllInbox';
 import WarehouseIcon from '@mui/icons-material/Warehouse';
+import ContactPageIcon from '@mui/icons-material/ContactPage';
 
 function SideDrawer() {
     const [open, setOpen] = useState(false);
@@ -31,6 +32,7 @@ function SideDrawer() {
     const [dashboard, setDashboard] = useState(false);
     const  [setting,setSetting] = useState(false)
     const [inPlantWagonDashboard, setInPlantWagonDashboard] = useState(false);
+    const [contactDashboard, setContactDashboard] = useState(false);
  
     const pathName = usePathname();
     const handleRouting = (route: string) => {
@@ -207,6 +209,25 @@ function SideDrawer() {
                     className={`${open ? 'fnr_text' : 'fnr_text_none'}`}
                     style={{ color: ((active == 'inPlantDashboard') || inPlantWagonDashboard) ? 'black' : 'white' }} 
                 >In-Plant Dashboard</div>
+            </div>
+
+             <div
+                 onMouseEnter={()=>{ setContactDashboard(true) }}
+                 onMouseLeave={()=>{ setContactDashboard(false) }}
+                 onClick={() => handleRouting('contact')}
+                 className='station-code'
+                 style={{
+                     width: open ? '190px' : '42px',
+                     justifyContent: open ? 'start' : 'center',
+                     backgroundColor: ((active == 'contact') || contactDashboard) ? 'white' : '',
+                     cursor: 'pointer'
+                 }}
+            >
+                <ContactPageIcon style={{ marginLeft: open ? '9px' : '', color: ((active == 'contact') || contactDashboard) ? 'black' : 'white' }}/>
+                <div
+                    className={`${open ? 'fnr_text' : 'fnr_text_none'}`}
+                    style={{ color: ((active == 'contact') || contactDashboard) ? 'black' : 'white' }} 
+                >Contact Dashboard</div>
             </div>
             
 
