@@ -96,7 +96,7 @@ export const ActivityTimeLineChart = (props: any) => {
                     <TimelineOppositeContent sx={{
               fontWeight: 900
             }}  color="text.secondary" fontSize={"small"} marginTop={"20px"}>
-                      { service.utcToistTime(firstPing.time_stamp, 'dd-MM-yyyy HH:mm') }
+                      {firstPing.time_stamp ? service.utcToistTime(firstPing.time_stamp, 'dd-MM-yyyy HH:mm') : 'Date & Time Not Available'}
                     </TimelineOppositeContent>
                     <TimelineSeparator >
                       <TimelineConnector />
@@ -116,7 +116,7 @@ export const ActivityTimeLineChart = (props: any) => {
                 return (
                   <TimelineItem key={ping._id} style={{fontSize: '17px'}}>
                     <TimelineOppositeContent color="text.secondary" fontSize={"small"} marginTop={"20px"}>
-                      { service.utcToistTime(ping.time_stamp, 'dd-MM-yyyy HH:mm') }
+                      {ping.time_stamp ? service.utcToistTime(ping.time_stamp, 'dd-MM-yyyy HH:mm') : 'Date & Time Not Available'}
                     </TimelineOppositeContent>
                     <TimelineSeparator >
                       <TimelineConnector />

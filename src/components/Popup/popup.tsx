@@ -348,7 +348,6 @@ export const Popup: React.FC<PopupProps> = ({ data }) => {
     }, [searchRakeName]);
   
      return (
-      <>
       <TableHead>
         <TableRow>
           <TableCell align="center" className="table-columns">
