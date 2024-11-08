@@ -20,6 +20,7 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import AllInboxIcon from '@mui/icons-material/AllInbox';
 import WarehouseIcon from '@mui/icons-material/Warehouse';
 import ContactPageIcon from '@mui/icons-material/ContactPage';
+import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 
 function SideDrawer() {
     const [open, setOpen] = useState(false);
@@ -30,7 +31,8 @@ function SideDrawer() {
     const [handleAgent, setHandleAgent] = useState(false);
     const [etaReport, setEtaReport] = useState(false);
     const [dashboard, setDashboard] = useState(false);
-    const  [setting,setSetting] = useState(false)
+    const  [setting,setSetting] = useState(false);
+    const [showSubMenu, setShowSubMenu] = useState(false);
     const [inPlantWagonDashboard, setInPlantWagonDashboard] = useState(false);
     const [contactDashboard, setContactDashboard] = useState(false);
  
@@ -155,22 +157,59 @@ function SideDrawer() {
                 >Reports</div>
             </div>
             <div
-                onMouseEnter={()=>{ setSetting(true) }}
-                onMouseLeave={()=>{ setSetting(false) }}
-                onClick={() => handleRouting('tools')}
-                className='station-code'
+                onMouseEnter={() => { setSetting(true); setShowSubMenu(true); }}
+                onMouseLeave={() => { setSetting(false); }}
+                // onClick={() => handleRouting('tools')}
+                className="station-code"
                 style={{
                     width: open ? '190px' : '42px',
                     justifyContent: open ? 'start' : 'center',
-                    backgroundColor: ((active == 'tools') || setting) ? 'white' : '',
-                    cursor: 'pointer'
+                    backgroundColor: ((active == 'updateETA') 
+                    || (active == 'whatsAppNotify')
+                    || setting) ? 'white' : '',
+                    cursor: 'pointer',
+                    position: 'relative'
                 }}
             >
-                <SettingsIcon style={{ marginLeft: open ? '9px' : '', color: ((active == 'tools') || setting) ? 'black' : 'white' }}/>
+                <SettingsIcon style={{ 
+                    marginLeft: open ? '9px' : '', 
+                    color: ((active == 'updateETA') 
+                    || (active == 'whatsAppNotify')
+                    || setting) ? 'black' : 'white' }}
+                />
                 <div 
                     className={`${open ? 'fnr_text' : 'fnr_text_none'}`}
-                    style={{ color: ((active == 'tools') || setting) ? 'black' : 'white' }} 
-                    >Settings</div>
+                    style={{ 
+                        color: ((active == 'updateETA') 
+                        || (active == 'whatsAppNotify')
+                        || setting) ? 'black' : 'white' }} 
+                >Settings</div>
+                {setting && <ArrowRightIcon style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)' }} />}
+                {/* Submenu */}
+                {(showSubMenu && setting) && (
+                    <div
+                        className="submenu"
+                        onMouseEnter={() => { setShowSubMenu(true); }}
+                        onMouseLeave={() => { setShowSubMenu(false); }}
+                    >
+                        <div
+                            className="submenu-option"
+                            onClick={() => handleRouting('updateETA')}
+                            style={{
+                                color: (active == 'updateETA') ? 'black' : '',
+                                backgroundColor: (active == 'updateETA') ? 'white' : ''
+                            }}
+                        >Update ETA</div>
+                        <div
+                            className="submenu-option"
+                            onClick={() => handleRouting('whatsAppNotify')}
+                            style={{
+                                color: (active == 'whatsAppNotify') ? 'black' : '',
+                                backgroundColor: (active == 'whatsAppNotify') ? 'white' : ''
+                            }}
+                        >WhatsApp Notify</div>
+                    </div>
+                )}
             </div>
 
             <div
