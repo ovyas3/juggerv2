@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useRef, useEffect } from 'react';
-import './customMultiSelect.css';
+import './CustomMultiSelect.css';
 
 interface MultiSelectProps {
   value: string[];
