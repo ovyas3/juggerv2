@@ -132,12 +132,13 @@ const WagonIndex = styled('div')<{ isSelected: boolean }>`
 const WagonNumber = styled('div')`
   position: absolute;
   top: -50px;
-  left: 34px;
+  left: 42px;
   transform: translateX(-50%);
   font-family: 'Inter', sans-serif;
   color: #3C4852;
   font-size: 8px;
   font-weight: 400;
+  width: max-content;
 `;
 
 const Mill = styled('div')`
@@ -353,7 +354,7 @@ const WagonTallySheet: React.FC = () => {
     if(batchId && batchId.length === 10) {
       try{
         setLoading(true);
-        const response = await httpsGet(`get_material_details?batch_id=${batchId}`, 0, router);
+        const response = await httpsGet(`get_material_details?batch_id=${batchId}&plant=${selectedPlant?.plant?._id}`, 0, router);
         let data = response?.data;
         if (data) {
           setFormValues(prev => {
