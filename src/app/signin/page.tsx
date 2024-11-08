@@ -66,14 +66,14 @@ const Signin = () => {
           <div className="input-content">
             <span className="input-header">Email Address</span>
             <input
-              className="input"
+              className="input-box"
               onChange={(e) => setEmail(e.target.value)}
             />
           </div>
           <div className="input-content">
             <span className="input-header">Password</span>
             <input
-              className="input password"
+              className="input-box password"
               type={hidePasswordFlag ? "password" : "text"}
               onChange={(e) => {
                 const updatedPassword = e.target.value.replace(/•/g, "-");
