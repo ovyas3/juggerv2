@@ -56,6 +56,8 @@ import { useRouter } from "next/navigation";
 import StarRateRoundedIcon from '@mui/icons-material/StarRateRounded';
 import CircularProgress from '@mui/material/CircularProgress';
 
+import CustomMultiSelect from "../UI/CustomMultiSelect/CustomMultiSelect";
+
 async function rake_update_id(payload: Object, router: any) {
     return await httpsPost(UPDATE_RAKE_CAPTIVE_ID, payload, router);
 }
@@ -1056,7 +1058,7 @@ export const MarkPlacement = ({isClose ,shipment, getAllShipment, different = 'm
                                 </div>
                                 <div style={{marginTop:24}}>
                                     <header style={{ marginBottom:8, fontSize:12, color:'#42454E'}}>{t('material')}</header>
-                                    <MultiSelect
+                                    <CustomMultiSelect
                                       value={materials}
                                       onValueChange={setMaterials}
                                       placeholder="Select Materials"
@@ -1090,148 +1092,6 @@ export const MarkPlacement = ({isClose ,shipment, getAllShipment, different = 'm
         </div>
     );
 }
-
-
-interface MultiSelectProps {
-  value: string[];
-  onValueChange: (value: string[]) => void;
-  placeholder: string;
-  options: { value: string; label: string }[];
-}
-
-const MultiSelect: React.FC<MultiSelectProps> = ({ value, onValueChange, placeholder, options }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const selectRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (selectRef.current && !selectRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
-
-  const handleSelectItem = (selectedValue: string) => {
-    if (value.includes(selectedValue)) {
-      onValueChange(value.filter((v) => v !== selectedValue));
-    } else {
-      onValueChange([...value, selectedValue]);
-    }
-  };
-
-  return (
-    <div className="select-container" ref={selectRef}>
-      <div className="select-trigger" onClick={() => setIsOpen(!isOpen)}>
-        <span className="selected-values">
-          {value.length > 0 ? value.map(v => options.find(option => option.value === v)?.label).join(', ') : placeholder}
-        </span>
-        <svg
-          className={`arrow ${isOpen ? 'open' : ''}`}
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <polyline points="6 9 12 15 18 9"></polyline>
-        </svg>
-      </div>
-      {isOpen && (
-        <div className="select-content">
-          {options.map((option) => (
-            <div
-              key={option.value}
-              className={`select-item ${value.includes(option.value) ? 'selected' : ''}`}
-              onClick={() => handleSelectItem(option.value)}
-            >
-              <input
-                type="checkbox"
-                checked={value.includes(option.value)}
-                onChange={() => handleSelectItem(option.value)}
-              />
-              {option.label}
-            </div>
-          ))}
-        </div>
-      )}
-      <style jsx>{`
-        .select-container {
-          position: relative;
-          width: 100%;
-        }
-        .select-trigger {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          padding: 0.5rem 1rem;
-          font-size: 0.875rem;
-          line-height: 1.25rem;
-          background-color: #ffffff;
-          border: 1px solid #e2e8f0;
-          border-radius: 0.375rem;
-          cursor: pointer;
-          transition: all 0.2s ease-in-out;
-        }
-        .select-trigger:hover {
-          border-color: #cbd5e0;
-        }
-        .selected-values {
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          max-width: 90%;
-        }
-        .arrow {
-          transition: transform 0.2s ease-in-out;
-        }
-        .arrow.open {
-          transform: rotate(180deg);
-        }
-        .select-content {
-          position: absolute;
-          top: 100%;
-          left: 0;
-          width: 100%;
-          max-height: 200px;
-          overflow-y: auto;
-          background-color: #ffffff;
-          border: 1px solid #e2e8f0;
-          border-top: none;
-          border-radius: 0 0 0.375rem 0.375rem;
-          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-          z-index: 10;
-        }
-        .select-item {
-          display: flex;
-          align-items: center;
-          padding: 0.5rem 1rem;
-          font-size: 0.875rem;
-          line-height: 1.25rem;
-          cursor: pointer;
-          transition: background-color 0.2s ease-in-out;
-        }
-        .select-item:hover {
-          background-color: #f7fafc;
-        }
-        .select-item.selected {
-          background-color: #e2e8f0;
-        }
-        .select-item input {
-          margin-right: 0.5rem;
-        }
-      `}</style>
-    </div>
-  );
-};
 
 export const HandlingEdemand = ({ isClose, isOpen, getAllShipment, shipment }: any) => {
     const router = useRouter();
