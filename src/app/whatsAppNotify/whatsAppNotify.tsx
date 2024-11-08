@@ -1,11 +1,11 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useWindowSize } from "@/utils/hooks";
 import SideDrawer from "@/components/Drawer/Drawer";
 import MobileDrawer from "@/components/Drawer/mobile_drawer";
 import { useSnackbar } from "@/hooks/snackBar";
-import { httpsPost } from "@/utils/Communication";
+import { httpsGet, httpsPost } from "@/utils/Communication";
 import { useRouter } from "next/navigation";
 import { ThreeCircles } from "react-loader-spinner";
 import "./whatsAppNotify.css";
@@ -74,6 +74,27 @@ const WhatsAppNotify = () => {
     }
   };
 
+  const getWhatsAppNumbers = async () => {
+    setLoading(true)
+    try {
+      const response = await httpsGet('get/WhatsApp_numbers', 0, router)
+      if (response.statusCode === 200) {
+        const numbers = response?.data
+          && response?.data?.notification 
+          && response?.data?.notification?.whatsApp ? 
+          response?.data?.notification?.whatsApp : ['']
+        setNumbers(numbers)
+      } else {
+        showMessage('Failed to fetch WhatsApp numbers', 'error')
+      }
+    } catch (error) {
+      console.error(error)
+      showMessage('Failed to fetch WhatsApp numbers', 'error')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const postWhatsAppNumbers = async (numbers: string[]) => {
     setLoading(true)
     try {
@@ -91,6 +112,10 @@ const WhatsAppNotify = () => {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    getWhatsAppNumbers()
+  }, []);
 
   if (loading) {
     return (
@@ -119,7 +144,7 @@ const WhatsAppNotify = () => {
           <form onSubmit={handleSubmit} className="whatsApp-notify-form">
             <label className="whatsApp-notify-label">Enter WhatsApp Numbers to Get Notified</label>
             <div className="whatsApp-notify-inputContainer">
-            {numbers.map((number, index) => (
+            {numbers && numbers.map((number, index) => (
               <div key={index} className="whatsApp-notify-inputGroup">
                 <label className="whatsApp-notify-indexLabel">{index + 1}</label>
                 <input
