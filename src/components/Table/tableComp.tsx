@@ -55,6 +55,9 @@ import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { useRouter } from "next/navigation";
 import StarRateRoundedIcon from '@mui/icons-material/StarRateRounded';
 import CircularProgress from '@mui/material/CircularProgress';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import EastIcon from '@mui/icons-material/East';
+import WestIcon from '@mui/icons-material/West';
 
 async function rake_update_id(payload: Object, router: any) {
     return await httpsPost(UPDATE_RAKE_CAPTIVE_ID, payload, router);
@@ -1692,14 +1695,54 @@ export const ContactModal = ({isClose, shipment}:any) => {
     const [comment, setComment] = useState('');
     const { showMessage } = useSnackbar();
     const [toggleBtn, setToggleBtn] = useState('newContact');
-
-
     const [openStationDropDown, setOpenStationDropDown] = useState(false);
     const [openReasonDropDown, setOpenReasonDropDown] = useState(false);
     const [opencontactpersonDropDown, setOpencontactpersonDropDown] = useState(false);
 
+
+
+    const [oldContactsList, setOldContactList] = useState([]);
+    const [oldRecord, setOldRecord] = useState<any>({
+        stationNameOld:'',
+        reasonOld:'Select Reason',
+        role:'Select Contact Person',
+        name:'',
+        mobile:'',
+        comment:'',
+        rating:0
+    })
+
+
     function changeStationName(value:any) {
         setStationName(value);
+        if (debounceTimer.current) {
+            clearTimeout(debounceTimer.current);
+        }
+        if (value === '') {
+            setLoadder(false);
+            setStationList([]);
+        } else {
+            setLoadder(true);
+            debounceTimer.current = setTimeout(async () => {
+                try {
+                    const response = await httpsGet(`get/stationNames?stationName=${value}`);
+                    if (response.data.length > 0) {
+                        setStationList(response.data);
+                        setLoadder(false);
+                    } else {
+                        setStationList(['No Data Found']);
+                        setLoadder(false);
+                    }
+                } catch (error) {
+                    console.log(error);
+                }
+            }, 1500);
+        }
+    }
+
+    function changeStationNameOld(value:any) {
+        // setStationName(value);
+        setOldRecord({...oldRecord, stationNameOld:value})
         if (debounceTimer.current) {
             clearTimeout(debounceTimer.current);
         }
@@ -1759,28 +1802,67 @@ export const ContactModal = ({isClose, shipment}:any) => {
         }
     } 
 
-    const OldConatct = [
-        {name:'rahul',rating:4,phoneNo:'9876543212'},
-        {name:'rohit',rating:3,phoneNo:'9876543212'},
-        {name:'bansi',rating:2,phoneNo:'9876543212'},
-        {name:'babool',rating:2,phoneNo:'9876543212'},
-        {name:'babool',rating:2,phoneNo:'9876543212'},
-        {name:'babool',rating:2,phoneNo:'9876543212'},
-        {name:'babool',rating:2,phoneNo:'9876543212'},
-        {name:'babool',rating:2,phoneNo:'9876543212'},
-        {name:'babool',rating:2,phoneNo:'9876543212'},
-        {name:'babool',rating:2,phoneNo:'9876543212'},
-        {name:'babool',rating:2,phoneNo:'9876543212'},
-        {name:'babool',rating:2,phoneNo:'9876543212'},
-    ]
+    async function submitOldContact() {
+        let payload = {
+            id:shipment._id,
+            stationName: oldRecord.stationNameOld,
+            reason: oldRecord.reasonOld,
+            contactPerson: oldRecord.role,
+            name: oldRecord.name,
+            contactPersonMobile: oldRecord.mobile.toString(),
+            comment: oldRecord.comment,
+            rating: oldRecord.rating,
+        }
+        try {
+            const response = await httpsPost('rake_shipment/addOldContactDetails', payload);
+            if (response.statusCode === 200) {
+                isClose(false);
+                setOldRecord({
+                    stationNameOld:'',
+                    reasonOld:'Select Reason',
+                    role:'Select Contact Person',
+                    name:'',
+                    mobile:'',
+                    comment:'',
+                    rating:0
+                })
+                showMessage('Contact Updated Successfully', 'success');
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    async function getOldDetails () {
+        const response = await httpsGet(`rake_shipment/updateOldContactDetails?id=${shipment._id}`);
+        if(response.statusCode === 200){
+            setOldContactList(response.data)
+        }
+    }
+
+    useEffect(()=>{
+        getOldDetails();
+    },[])
 
     return(
         <div style={{width:'100vw', height:'100vh', position:'fixed', top:0, left:0 ,zIndex:300, backgroundColor:'rgba(0, 0, 0, 0.5)'}} onClick={(e)=>{e.stopPropagation(); isClose(false)}}>
         <div className="contactModal" onClick={(e)=>{e.stopPropagation(); setOpenStationDropDown(false); setStationList([]); setOpenReasonDropDown(false); setOpencontactpersonDropDown(false)}}>
             <div className="closeContaioner"><CloseIcon onClick={(e) => { e.stopPropagation(); isClose(false) }}/></div>
-            {/* <div id='toggle-btn-container' style={{justifyContent:toggleBtn==='newContact'?'left':'right'}} >
-                <div id='toggle-btn' style={{ backgroundColor:toggleBtn==='newContact'?'':'#5481FF'}} onClick={(e)=>{e.stopPropagation(); setToggleBtn((prev:any)=>{if(prev === 'newContact') {return 'oldContacts'} else {return 'newContact'} })}}></div>
-            </div> */}
+
+       
+            {oldContactsList.length > 0 &&  toggleBtn === 'newContact' ?  ( <div id='toggle-btn-container' onClick={(e)=>{e.stopPropagation(); setToggleBtn((prev:any)=>{if(prev === 'newContact') {return 'oldContacts'} else {return 'newContact'} })}}>
+                <div id='toggle-btn'>Previous Contacts - {oldContactsList.length}</div>
+                <div><EastIcon style={{fontSize:'12px', marginTop:2}}/></div>
+            </div>):
+             ( <div id='toggle-btn-container' onClick={(e)=>{e.stopPropagation(); setToggleBtn((prev:any)=>{if(prev === 'newContact') {return 'oldContacts'} else {return 'newContact'} })}}>
+             <div id='toggle-btn'>Add New Contact</div>
+             <div><WestIcon style={{fontSize:'12px', marginTop:2}}/></div>
+         </div>)
+            }
+           
+            
+
+
             <div style={{display:toggleBtn === 'newContact'?'block':'none', position:'relative', height:'100%'}}>
                 <header id="contactModalHeader">{text('contactModalHeader')} - #{shipment?.fnr?.primary}</header>
                 <div id='formContainer'>
@@ -1815,10 +1897,12 @@ export const ContactModal = ({isClose, shipment}:any) => {
                         ))}
                     </div>}
                 </div>
+
                 <div id='stationName'>
                     <label id='labelName' >{text('name')}</label>
                     <div id='stationNameInput'><input value={name} onChange={(e)=>{setName(e.target.value)}} type="text" placeholder="Enter Name" style={{border:'none', outline:'none'}} /></div>
                 </div>
+
                 <div id='stationName'>
                     <label id='labelName' >{text('contactNo')}</label>
                     <div id='stationNameInput'><input value={contactNumber ?? ''} onChange={(e)=>{setContactNumber(parseInt(e.target.value)||null)}} type="number" placeholder="Enter Contact Number" style={{border:'none', outline:'none'}} /></div>
@@ -1851,19 +1935,105 @@ export const ContactModal = ({isClose, shipment}:any) => {
             </div> 
 
             <div style={{display: toggleBtn === 'oldContacts' ? 'block':'none'}} >
-                <header id="contactModalHeader">{text('contactModalHeaderOld')} - #{shipment?.fnr?.primary}</header>
+                <header id="contactModalHeader">{text('contactModalHeader')} - #{shipment?.fnr?.primary}</header>
                 <div id='containorOldcontact'>
                     <div id='listAreaOfOldConatcts'>
-                        {OldConatct.map((item:any, index:number)=>{
+                        {oldContactsList.map((item:any, index:number)=>{
                             return(
-                                <div key={index} id='boxContainer'>
-
+                                <div key={index} id='boxContainer' onClick={(e)=>{e.stopPropagation(); setOldRecord({...oldRecord, name:item.name, mobile:item.ph_no})}}>
+                                    <div id='image-name-rate-Conatainer' >{item.name.charAt(0)}</div>
+                                    <div id='textArea'>
+                                        <div id='contactName'>{item.name}</div>
+                                        <div style={{display:'flex', alignItems:'center'}}>
+                                            <div id='contactNumber'>{item.ph_no}</div>
+                                            <div style={{display:'flex', alignItems:'center'}}>
+                                             <div id='contactRate'>{Math.round(item.avgRating)}</div>
+                                             <div><StarRateRoundedIcon style={{color:'#18BE8A', fontSize:'18px', marginTop:2}} /></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id='rightArrowContainer'><ChevronRightIcon/></div>
                                 </div>
                             );
                         })}
                     </div>
-                    <div id='divider'></div>
-                    <div id='addInfoArea'>sdvvsd</div>
+                    {oldRecord.name && oldRecord.mobile && ( <div id='divider'></div>)}
+                    {oldRecord.name && oldRecord.mobile && (  <div id='addInfoArea'>
+                        <div style={{display:'flex',gap:'21px'}}> 
+                        <div id='stationName'>
+                            <label id='labelName' >{text('stationName')}</label>
+                            <div id='stationNameInput' onClick={(e)=>{e.stopPropagation(); }}><input value={oldRecord?.stationNameOld} type="text" placeholder="Enter Name" style={{border:'none', outline:'none'}} onChange={(e)=>{changeStationNameOld(e.target.value);}} /></div>
+                            {stationList.length > 0 && <div id='stationDropDown'>
+                                {stationList?.map((item: any, index: number) => (
+                                    <div id='stationNameItem' key={index} onClick={() => {setOldRecord({...oldRecord,stationNameOld:item}); setStationList([])}}>{item}</div>
+                                ))}
+                            </div>}
+                            {loadder && <div id='loaderForStationName'><CircularProgress size={15} /></div>}
+                        </div>
+
+                        <div id='stationName'>
+                            <label id='labelName' >{text('reasons')}</label>
+                            <div id='stationNameInput' style={{color:'black', fontSize:'13px'}} onClick={(e)=>{e.stopPropagation(); setOpenReasonDropDown(!openReasonDropDown) }}>{oldRecord.reasonOld}</div>
+                            {openReasonDropDown && <div id='stationDropDown'>
+                                {reasons?.map((item: any, index: number) => (
+                                <div id='stationNameItem' key={index} onClick={() => { setOldRecord({...oldRecord,reasonOld:item.label}) ;setOpenReasonDropDown(false);}}>{item.label}</div>
+                                ))}
+                            </div>}
+                        </div>
+
+                        <div id='stationName'>
+                            <label id='labelName' >{text('contactPerson')}</label>
+                            <div id='stationNameInput' style={{color:'black', fontSize:'13px'}} onClick={(e)=>{e.stopPropagation(); setOpencontactpersonDropDown(!opencontactpersonDropDown) }} >{oldRecord.role}</div>
+                            {opencontactpersonDropDown && <div id='stationDropDown'>
+                                {contactPersons?.map((item: any, index: number) => (
+                                    <div id='stationNameItem' key={index} onClick={() => { setOldRecord({...oldRecord, role:item.label}) ;setOpencontactpersonDropDown(false);}}>{item.label}</div>
+                                ))}
+                            </div>}
+                        </div>
+
+                        {/* <div id='stationName'>
+                            <label id='labelName' >{text('name')}</label>
+                            <div id='stationNameInput' style={{cursor:'not-allowed'}}><input disabled value={oldRecord?.name} onChange={(e)=>{setName(e.target.value)}} type="text" placeholder="Enter Name" style={{border:'none', outline:'none', backgroundColor:'white', cursor:'not-allowed'}} /></div>
+                        </div> */}
+
+                        {/* <div id='stationName'>
+                            <label id='labelName' >{text('contactNo')}</label>
+                            <div id='stationNameInput' style={{cursor:'not-allowed'}}><input value={oldRecord?.mobile} onChange={(e)=>{setContactNumber(parseInt(e.target.value)||null)}} type="number" placeholder="Enter Contact Number" style={{border:'none', outline:'none' ,cursor:'not-allowed', backgroundColor:'white',}} /></div>
+                        </div> */}
+                        </div>
+
+                        <div id='commentContainer' style={{marginTop:20}}>
+                            <div><label id='labelName' >{text('comment')}</label></div>
+                            <div style={{width:'100%', border:"1px solid #E9E9EB", borderRadius:'4px'}}><textarea value={oldRecord?.comment} id='commentInput' placeholder={text('commentPlaceholder')} onChange={(e)=>{setOldRecord({...oldRecord,comment:e.target.value}); setComment(e.target.value)}} ></textarea></div>
+                        </div>
+
+                        <div id='rateContainer'>
+                            <div><label id='labelName' >{text('rate')}</label></div>
+                            <div className="star-rating">
+                                {[1, 2, 3, 4, 5].map((value) => (
+                                    <StarRateRoundedIcon
+                                        key={value}
+                                        onClick={() => setOldRecord({...oldRecord,rating:value})}
+                                        className={`star ${value <= oldRecord?.rating ? 'selected' : ''}`}
+                                        fontSize="medium"
+                                        style={{ cursor: 'pointer' }}
+                                    />
+                                ))}
+                            </div>
+                        </div>
+
+                        <div id='dividerHorizontal'></div>
+
+                        <div id='btnContainerOldContact'>
+                            <div id='btnContainerOldContactInner'>
+                                <div id='contactName'>{oldRecord?.name}</div>
+                                <div id='contactNumber'>{oldRecord?.mobile}</div>
+                            </div>
+                            <div id='submit-btn' onClick={()=>{submitOldContact()}} >{text('submit')}</div>
+                        </div>
+                    </div>)}
+                   
+                   
                 </div>
             </div>
         

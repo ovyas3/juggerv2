@@ -33,7 +33,7 @@ function Contact() {
 
   const handleSearch = (value: string) => {
     if(value) {
-      setContactDetails(ogContactDetails.filter((contact: any) => contact.contact.stationName.toLowerCase().includes(value.toLowerCase())));
+      setContactDetails(ogContactDetails.filter((contact: any) => contact.stationName.toLowerCase().includes(value.toLowerCase())));
     } else {
       setContactDetails(ogContactDetails);
     }
