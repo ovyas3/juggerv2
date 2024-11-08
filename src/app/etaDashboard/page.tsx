@@ -20,6 +20,7 @@ import RealTimeGateTracking from "./realTimeGateTracking/realTimeGateTracking";
 import CommodityTable from "./commodityTable/commodityTable";
 import { Tabs, Tab, Box } from '@mui/material'
 import { styled } from '@mui/system'
+import WagonTypeWiseRakeTrend from "./wagonTypeWiseRakeTrend/wagonTypeWiseRakeTrend";
 
 // Custom styled components
 const StyledTabs = styled(Tabs)({
@@ -200,6 +201,7 @@ function EtaDashboard() {
               <StyledTab label="Wagons" />
               <StyledTab label="PT & DW" />
               <StyledTab label="ETA" />
+              <StyledTab label="Rake" />
             </StyledTabs>
           </Box>
           <CustomTabPanel value={value} index={0}>
@@ -305,6 +307,9 @@ function EtaDashboard() {
                 
               </section>
             </div>
+          </CustomTabPanel>
+          <CustomTabPanel value={value} index={3}>
+            <WagonTypeWiseRakeTrend />
           </CustomTabPanel>
         </Box>
         
