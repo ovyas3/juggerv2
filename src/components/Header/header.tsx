@@ -25,15 +25,13 @@ const Header = ({title, setReloadOnHeaderChange, isMapHelper, getAllShipment, is
   const router = useRouter();
   const [parent_name, setParentName] = useState<string>("");
   const [shippers, setShippers] = useState([]);
-  const [selected_shipper, setSelectedShipper] = useState("");
 
   useEffect(() => {
     const parent_name = getCookie("parent_name")?.toString() || "";
-    const shippersData = JSON.parse(localStorage.getItem("corporate_shipper") || "[]");
-    const selected_shipper = localStorage.getItem("selected_shipper");
+    const isRmsLogin = Boolean(localStorage.getItem('isRmsLogin'))
+    const shippersData = JSON.parse(isRmsLogin ? (localStorage.getItem("shippers") || "[]"):(localStorage.getItem("corporate_shipper") || "[]"));
     setParentName(parent_name);
     setShippers(shippersData);
-    // setSelectedShipper(selected_shipper);
   }, []);
 
   return (

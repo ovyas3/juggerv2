@@ -38,6 +38,7 @@ function Filters({ onToFromChange, onChangeStatus, onChangeRakeTypes, reload, sh
     };
 
     const names = [
+        'All',
         'Available eIndent',
         'In Plant',
         'Ready for Departure',

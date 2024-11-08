@@ -2,15 +2,10 @@
 
 import React, { useEffect, useState, useRef, use } from 'react';
 import { Box, Card, CardContent, Typography, useTheme, InputAdornment, IconButton } from '@mui/material';
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import dayjs from "dayjs";
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { Tooltip as RechartsTooltip } from "recharts";
 import { httpsGet } from '@/utils/Communication';
 import { useRouter } from 'next/navigation';
-import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import service from '@/utils/timeService';
 import ScreenShotIcon from '@/assets/screenshot_icon.svg';
 import { toPng } from 'html-to-image';
@@ -23,6 +18,7 @@ import * as XLSX from 'xlsx';
 import DownloadIcon from '@mui/icons-material/Download';
 import Tooltip, { TooltipProps } from "@mui/material/Tooltip";
 import { useSnackbar } from "@/hooks/snackBar";
+import CustomDatePicker from '@/components/UI/CustomDatePicker/CustomDatePicker';
 
 const StyledBox = styled(Box)(({ theme }) => ({
   backgroundColor: '#ffffff',
@@ -86,91 +82,6 @@ const MetricCard = ({ title, value, change, changeLabel, unit = 'minutes' }: Met
       {change}% {changeLabel}
     </Typography>
   </Card>
-)
-
-const dateTimePickerStyles = (disabled: boolean) => ({
-  width: "80%",
-  ".MuiInputBase-input": {
-    padding: "6px 8px",
-    fontFamily: "'Inter', sans-serif",
-    fontSize: "13px ",
-    color: "#42454E",
-    fontWeight: 600,
-    cursor: disabled ? "not-allowed" : "default",
-  },
-  ".MuiInputBase-root": {
-    padding: 0,
-    // border: "none",
-    // "& fieldset": { border: "none" },
-  },
-  "& .MuiOutlinedInput-root": {
-    "&:hover fieldset": {
-      // border: "none",
-    },
-    "&.Mui-focused fieldset": {
-      border: "1px solid #90caf9",
-    },
-  },
-  "& .MuiIconButton-root": {
-    padding: 0,
-    marginRight: '8px',
-  },
-})
-
-
-interface CustomDateTimePickerProps {
-  label: string;
-  value: Date | null;
-  onChange: (date: Date | null) => void;
-  open: boolean;
-  onToggle: () => void;
-  disabled: boolean;
-}
-
-const CustomDateTimePicker: React.FC<CustomDateTimePickerProps> = ({ 
-  label, 
-  value, 
-  onChange, 
-  open, 
-  onToggle, 
-  disabled 
-}) => (
-  <div style={{ display: 'flex', flexDirection: 'column', marginRight: '16px' }}>
-    <Typography variant="caption">{label}</Typography>
-    <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <DatePicker
-        open={open}
-        onClose={onToggle}
-        value={value ? dayjs(value) : null}
-        sx={dateTimePickerStyles(disabled)}
-        disabled={disabled}
-        slotProps={{
-          textField: {
-            onClick: onToggle,
-            fullWidth: true,
-            placeholder: value ? undefined : "Pick a date",
-            InputProps: {
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton onClick={onToggle} disabled={disabled}>
-                    <CalendarTodayIcon sx={{fontSize: 18}} />
-                  </IconButton>
-                </InputAdornment>
-              ),
-            },
-          },
-        }}
-        onChange={(newDate) => {
-          if (newDate) {
-            onChange(newDate.toDate())
-          } else {
-            onChange(null)
-          }
-        }}
-        format="DD-MM-YYYY"
-      />
-    </LocalizationProvider>
-  </div>
 );
 
 const COLORS: any = {
@@ -223,8 +134,6 @@ export default function RealTimeGateTracking() {
 
   const [startDate, setStartDate] = useState<any>(oneMonthAgo);
   const [endDate, setEndDate] = useState<any>(today);
-  const [startDatePickerOpen, setStartDatePickerOpen] = useState(false)
-  const [endDatePickerOpen, setEndDatePickerOpen] = useState(false)
   const { showMessage } = useSnackbar();
   const router = useRouter();
 
@@ -252,6 +161,16 @@ export default function RealTimeGateTracking() {
 
   const [loading, setLoading] = useState(true);
 
+  const handleStartDateChange = (date: Date | null) => {
+    setStartDate(date);
+    handleDateChange(date, 'start');
+  }
+
+  const handleEndDateChange = (date: Date | null) => {
+    setEndDate(date);
+    handleDateChange(date, 'end');
+  }
+  
   const handleDateChange = (date: any, type: 'start' | 'end') => {
     if (date) {
       const epochTime = service.millies(date);
@@ -713,25 +632,29 @@ const convertMinutesToHoursAndMinutes = (minutes: number) => {
           }}>
           {text('PTDT_tracking')}
         </Typography>
-        <Box sx={{ display: 'flex' }}>
-          <CustomDateTimePicker
+        <Box sx={{ 
+          display: 'flex', 
+          alignItems: 'center',
+          gap: 2
+        }}>
+          <CustomDatePicker
             label="From"
             value={startDate}
-            onChange={(date) => handleDateChange(date, 'start')}
-            open={startDatePickerOpen}
-            onToggle={() => setStartDatePickerOpen(!startDatePickerOpen)}
-            disabled={false}
+            onChange={handleStartDateChange}
+            maxDate={endDate}
+            defaultDate={oneMonthAgo}
+            maxSelectableDate={today}
           />
-          <CustomDateTimePicker
+          <CustomDatePicker
             label="To"
             value={endDate}
-            onChange={(date) => handleDateChange(date, 'end')}
-            open={endDatePickerOpen}
-            onToggle={() => setEndDatePickerOpen(!endDatePickerOpen)}
-            disabled={false}
+            onChange={handleEndDateChange}
+            minDate={startDate}
+            defaultDate={today}
+            minSelectableDate={startDate}
           />
-          <IconButton onClick={handleScreenshot} style={{
-            paddingTop: '12px',
+          <IconButton onClick={handleScreenshot} sx={{
+            padding: 0
           }}>
             <Image src={ScreenShotIcon} alt='Screenshot' />
           </IconButton>

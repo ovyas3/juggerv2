@@ -59,6 +59,8 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import EastIcon from '@mui/icons-material/East';
 import WestIcon from '@mui/icons-material/West';
 
+import CustomMultiSelect from "../UI/CustomMultiSelect/CustomMultiSelect";
+
 async function rake_update_id(payload: Object, router: any) {
     return await httpsPost(UPDATE_RAKE_CAPTIVE_ID, payload, router);
 }
@@ -887,6 +889,20 @@ export const HandlingAgentSelection = ({ shipmentId, setOpen, locationId, getAll
         </div>
     );
 };
+
+const material = [
+    "Plate Mill",
+    "Bar Mill",
+    "Rail Mill",
+    "Semis",
+    "SPM"
+];
+
+const materialOptions = material.map(option => ({
+    value: option,
+    label: option
+}));
+
 export const MarkPlacement = ({isClose ,shipment, getAllShipment, different = 'markplacement'}: any) =>{
     const t = useTranslations("ORDERS");
     const router = useRouter();
@@ -895,6 +911,7 @@ export const MarkPlacement = ({isClose ,shipment, getAllShipment, different = 'm
     const [avetoInplant, setAvetoInplant] = useState(false);
     const [eIndent, setEIndent] = useState('');
     const [warraning, setWarraning] = useState(false);
+    const [materials, setMaterials] = useState<string[]>([]);
     const [openStartDatePicker, setOpenStartDatePicker] = useState(false);
 
     const handlePlacementDate = async() => {
@@ -908,10 +925,17 @@ export const MarkPlacement = ({isClose ,shipment, getAllShipment, different = 'm
         }
 
         const data = new Date(currentDate);
-        const payloadWitheident = {
+        let payloadMarkPlacement: any = {
             id: shipment._id,
-            placement_time : new Date (data.toUTCString()),
-            indent_no : eIndent
+            placement_time: new Date(data.toUTCString()),
+        };
+        
+        if (materials && materials.length > 0) {
+            payloadMarkPlacement.materials = materials;
+        }
+
+        if (eIndent && eIndent.length > 0) {
+            payloadMarkPlacement.indent_no = eIndent;
         }
 
         const payload = {
@@ -925,7 +949,9 @@ export const MarkPlacement = ({isClose ,shipment, getAllShipment, different = 'm
         }
        
       try {
-        const response = await httpsPost(different === 'downOut'?'rake_shipment/mark_drawnout':'rake_shipment/mark_placement', different === 'downOut' ?(payloadWithdrownDate):(eIndent?payloadWitheident: payload), router)
+        const response = await httpsPost(
+            different === 'downOut' ? 'rake_shipment/mark_drawnout' : 'rake_shipment/mark_placement', 
+            different === 'downOut' ? (payloadWithdrownDate) : (eIndent ? payloadMarkPlacement : payload), router)
         if(response.statusCode === 200) {
             isClose(false);
             getAllShipment();
@@ -939,7 +965,7 @@ export const MarkPlacement = ({isClose ,shipment, getAllShipment, different = 'm
 
     return (
         <div style={{width:'100vw', height:'100vh', position:'fixed', top:0, left:0 ,zIndex:300, backgroundColor:'rgba(0, 0, 0, 0.5)'}} onClick={(e)=>{e.stopPropagation(); isClose(false);}}>
-            <div style={{width:800, height:500, backgroundColor:'white', position:'relative', top:'50%', left:'50%', transform:'translate(-50%,-50%)', borderRadius:20, padding:25}} onClick={(e)=>{e.stopPropagation()}}>
+            <div style={{width:800, height: different = 'markplacement' ?  580 : 500, backgroundColor:'white', position:'relative', top:'50%', left:'50%', transform:'translate(-50%,-50%)', borderRadius:20, padding:25}} onClick={(e)=>{e.stopPropagation()}}>
              
                     <div style={{display:'flex', justifyContent:'space-between',}}>
                         <header style={{fontSize:20, color:'#131722', fontWeight:600}}>{different==='downOut'?'Drawn Out Time':'Mark Placement'}</header>
@@ -1026,12 +1052,23 @@ export const MarkPlacement = ({isClose ,shipment, getAllShipment, different = 'm
 
                     {
                         different !== 'downOut' && (
-                            <div style={{marginTop:24}}>
-                            <header style={{ marginBottom:8, fontSize:12, color:'#42454E'}}>{t('IndentNo')}</header>
-                            <div style={{border:'1px solid #E9E9EB', borderRadius:6,height:40.12, display:'flex', alignItems:'center', paddingLeft:12 }}>
-                                <input onChange={(e)=>{setEIndent(e.target.value)}} type="text" placeholder='Enter Indent No.' style={{fontWeight:600, fontSize:14, color:'#42454E', border:'none',outline:'none', width:'100%'}} />
-                            </div>
-                            </div>
+                            <>
+                                <div style={{marginTop:24}}>
+                                    <header style={{ marginBottom:8, fontSize:12, color:'#42454E'}}>{t('IndentNo')}</header>
+                                    <div style={{border:'1px solid #E9E9EB', borderRadius:6,height:40.12, display:'flex', alignItems:'center', paddingLeft:12 }}>
+                                        <input onChange={(e)=>{setEIndent(e.target.value)}} type="text" placeholder='Enter Indent No.' style={{fontWeight:600, fontSize:14, color:'#42454E', border:'none',outline:'none', width:'100%'}} />
+                                    </div>
+                                </div>
+                                <div style={{marginTop:24}}>
+                                    <header style={{ marginBottom:8, fontSize:12, color:'#42454E'}}>{t('material')}</header>
+                                    <CustomMultiSelect
+                                      value={materials}
+                                      onValueChange={setMaterials}
+                                      placeholder="Select Materials"
+                                      options={materialOptions}
+                                    />
+                                </div>
+                            </>
                         )
                     }
                    
@@ -1058,6 +1095,7 @@ export const MarkPlacement = ({isClose ,shipment, getAllShipment, different = 'm
         </div>
     );
 }
+
 export const HandlingEdemand = ({ isClose, isOpen, getAllShipment, shipment }: any) => {
     const router = useRouter();
     const { showMessage } = useSnackbar();
@@ -1397,25 +1435,10 @@ export const UploadDailyRakeHandlingSheet = ({ getWagonDetails, isClose, shipmen
 
     return (
     <div style={{width:'100vw', height:'100vh', position:'fixed', top:0, left:0 ,zIndex:300, backgroundColor:'rgba(0, 0, 0, 0.5)'}} onClick={(e)=>{e.stopPropagation(); isClose(false)}}>
-        <div className="upload-wagon-sheet-modal-main" onClick={(e)=>{e.stopPropagation()}}>
+        <div className="upload-wagon-sheet-modal-main" style={{height:'52vh'}} onClick={(e)=>{e.stopPropagation()}}>
 
             <div style={{display:'flex', justifyContent:'space-between',}}>
                 <header style={{fontSize:20, color:'#131722', fontWeight:600}}>{text("uploadDailyRakeHandlingSheet")}</header>
-            </div>
-
-            <div className="status_edemand_fnr" style={{display: 'flex' }}>
-                <div>
-                    <header style={{fontSize:12, color:'#42454E', marginBottom:8}}>{text('status')}</header>
-                    <text style={{fontSize:16, color:"#42454E", fontWeight:600}}>{shipment?.status?.name || shipment?.status?.statusLabel}</text>
-                </div>
-                <div>
-                    <header style={{fontSize:12, color:'#42454E', marginBottom:8}}>{text('FNRno')}</header>
-                    <text style={{fontSize:16, color:"#42454E", fontWeight:600}}>{shipment?.fnr?.primary || shipment?.fnr}</text>
-                </div>
-                <div>
-                    <header style={{fontSize:12, color:'#42454E', marginBottom:8}}>{text('edemandno')}</header>
-                    <text style={{fontSize:16, color:"#42454E", fontWeight:600}}>{shipment?.edemand?.edemand_no || shipment?.edemand?.edemand}</text>
-                </div>
             </div>
 
             <div 

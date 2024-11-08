@@ -4,10 +4,6 @@ import React, { useState, useRef, useEffect } from 'react'
 import { 
   Box, Typography, Grid, Paper, InputAdornment, IconButton } from '@mui/material';
 import { PieChart, Pie, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Sector, ResponsiveContainer, Cell } from 'recharts'
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import dayjs from "dayjs";
 import './commodityTable.css'
 import { httpsGet } from '@/utils/Communication'
 import { useRouter } from 'next/navigation'
@@ -16,15 +12,18 @@ import service from '@/utils/timeService';
 import ScreenShotIcon from '@/assets/screenshot_icon.svg';
 import { toPng } from 'html-to-image';
 import Image from 'next/image';
-import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import { styled } from '@mui/system';
 import { useTranslations } from 'next-intl';
+import CustomDatePicker from '@/components/UI/CustomDatePicker/CustomDatePicker';
+import CustomSelect from '@/components/UI/CustomSelect/CustomSelect';
+import CustomMultiSelect from '@/components/UI/CustomMultiSelect/CustomMultiSelect';
 
 const StyledBox = styled(Box)(({ theme }) => ({
   backgroundColor: '#ffffff',
   width: '100%',
   borderRadius: '10px',
   padding: theme.spacing(3),
+  borderBottom: '1px solid #E8E8E8',
 }));
 interface CommodityData {
   id: number
@@ -39,92 +38,6 @@ interface CommodityData {
   }
   total: number
 }
-
-
-const dateTimePickerStyles = (disabled: boolean) => ({
-  width: "80%",
-  ".MuiInputBase-input": {
-    padding: "6px 8px",
-    fontFamily: "'Inter', sans-serif",
-    fontSize: "13px ",
-    color: "#42454E",
-    fontWeight: 600,
-    cursor: disabled ? "not-allowed" : "default",
-  },
-  ".MuiInputBase-root": {
-    padding: 0,
-    // border: "none",
-    // "& fieldset": { border: "none" },
-  },
-  "& .MuiOutlinedInput-root": {
-    "&:hover fieldset": {
-      // border: "none",
-    },
-    "&.Mui-focused fieldset": {
-      border: "1px solid #90caf9",
-    },
-  },
-  "& .MuiIconButton-root": {
-    padding: 0,
-    marginRight: '8px',
-  },
-})
-
-
-interface CustomDateTimePickerProps {
-  label: string;
-  value: Date | null;
-  onChange: (date: Date | null) => void;
-  open: boolean;
-  onToggle: () => void;
-  disabled: boolean;
-}
-
-const CustomDateTimePicker: React.FC<CustomDateTimePickerProps> = ({ 
-  label, 
-  value, 
-  onChange, 
-  open, 
-  onToggle, 
-  disabled 
-}) => (
-  <div style={{ display: 'flex', flexDirection: 'column', marginRight: '16px' }}>
-    <Typography variant="caption">{label}</Typography>
-    <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <DatePicker
-        open={open}
-        onClose={onToggle}
-        value={value ? dayjs(value) : null}
-        sx={dateTimePickerStyles(disabled)}
-        disabled={disabled}
-        slotProps={{
-          textField: {
-            onClick: onToggle,
-            fullWidth: true,
-            placeholder: value ? undefined : "Pick a date",
-            InputProps: {
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton onClick={onToggle} disabled={disabled}>
-                    <CalendarTodayIcon sx={{fontSize: 18}} />
-                  </IconButton>
-                </InputAdornment>
-              ),
-            },
-          },
-        }}
-        onChange={(newDate) => {
-          if (newDate) {
-            onChange(newDate.toDate())
-          } else {
-            onChange(null)
-          }
-        }}
-        format="DD-MM-YYYY"
-      />
-    </LocalizationProvider>
-  </div>
-);
 
 const commodities = [
   "IS (IRON & STEEL)",
@@ -232,8 +145,6 @@ const CommodityTable: React.FC = () => {
 
   const [startDate, setStartDate] = useState<any>(oneMonthAgo);
   const [endDate, setEndDate] = useState<any>(today);
-  const [startDatePickerOpen, setStartDatePickerOpen] = useState(false)
-  const [endDatePickerOpen, setEndDatePickerOpen] = useState(false)
   const [direction, setDirection] = useState("outward")
   const [commodity, setCommodity] = useState<string[]>(["IS (IRON & STEEL)"]);
   const [type, setType] = useState<string[]>([])
@@ -264,6 +175,16 @@ const CommodityTable: React.FC = () => {
     { date: 'Oct 15', ...mockData.reduce((acc, item) => ({ ...acc, [item.commodity]: item.beyondETA.count * 1.2 }), {}) },
     { date: 'Oct 31', ...mockData.reduce((acc, item) => ({ ...acc, [item.commodity]: item.beyondETA.count * 0.95 }), {}) },
   ]
+
+  const handleStartDateChange = (date: Date | null) => {
+    setStartDate(date);
+    handleDateChange(date, 'start');
+  }
+
+  const handleEndDateChange = (date: Date | null) => {
+    setEndDate(date);
+    handleDateChange(date, 'end');
+  }
 
   const handleDateChange = (date: any, type: 'start' | 'end') => {
     if (date) {
@@ -580,32 +501,36 @@ const CommodityTable: React.FC = () => {
           }}>
            {text('etaCompliance')}
         </Typography>
-        <Box sx={{ display: 'flex' }}>
-          <CustomDateTimePicker
+        <Box sx={{ 
+          display: 'flex', 
+          alignItems: 'center',
+          gap: 2
+        }}>
+          <CustomDatePicker
             label="From"
             value={startDate}
-            onChange={(date) => handleDateChange(date, 'start')}
-            open={startDatePickerOpen}
-            onToggle={() => setStartDatePickerOpen(!startDatePickerOpen)}
-            disabled={false}
+            onChange={handleStartDateChange}
+            maxDate={endDate}
+            defaultDate={oneMonthAgo}
+            maxSelectableDate={today}
           />
-          <CustomDateTimePicker
+          <CustomDatePicker
             label="To"
             value={endDate}
-            onChange={(date) => handleDateChange(date, 'end')}
-            open={endDatePickerOpen}
-            onToggle={() => setEndDatePickerOpen(!endDatePickerOpen)}
-            disabled={false}
+            onChange={handleEndDateChange}
+            minDate={startDate}
+            defaultDate={today}
+            minSelectableDate={startDate}
           />
           <IconButton onClick={handleScreenshot} style={{
-            paddingTop: '12px',
+            padding: 0
           }}>
             <Image src={ScreenShotIcon} alt='Screenshot' />
           </IconButton>
         </Box>
       </Box>
       <div className="commoditytable-filters">
-        <Select
+        <CustomSelect
           value={direction}
           onValueChange={setDirection}
           placeholder="Select direction"
@@ -614,13 +539,13 @@ const CommodityTable: React.FC = () => {
             { value: "inward", label: "Inward" },
           ]}
         />
-        <MultiSelect
+        <CustomMultiSelect
           value={commodity}
           onValueChange={setCommodity}
           placeholder="Select commodity"
           options={commodityOptions}
         />
-        <MultiSelect
+        <CustomMultiSelect
           value={type}
           onValueChange={setType}
           placeholder="Select type"
@@ -893,261 +818,5 @@ const CommodityTable: React.FC = () => {
     </StyledBox>
   )
 }
-
-interface SelectProps {
-  value: string
-  onValueChange: (value: string) => void
-  placeholder: string
-  options: { value: string; label: string }[]
-}
-
-const Select: React.FC<SelectProps> = ({ value, onValueChange, placeholder, options }) => {
-  const [isOpen, setIsOpen] = useState(false)
-  const selectRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (selectRef.current && !selectRef.current.contains(event.target as Node)) {
-        setIsOpen(false)
-      }
-    }
-
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-    }
-  }, [])
-
-  return (
-    <div className="select-container" ref={selectRef}>
-      <div className="select-trigger" onClick={() => setIsOpen(!isOpen)}>
-        <span>{value ? options.find(option => option.value === value)?.label : placeholder}</span>
-        <svg
-          className={`arrow ${isOpen ? 'open' : ''}`}
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <polyline points="6 9 12 15 18 9"></polyline>
-        </svg>
-      </div>
-      {isOpen && (
-        <div className="select-content">
-          {options.map((option) => (
-            <div
-              key={option.value}
-              className="select-item"
-              onClick={() => {
-                onValueChange(option.value)
-                setIsOpen(false)
-              }}
-            >
-              {option.label}
-            </div>
-          ))}
-        </div>
-      )}
-      <style jsx>{`
-        .select-container {
-          position: relative;
-          width: 180px;
-        }
-        .select-trigger {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          padding: 0.5rem 1rem;
-          font-size: 0.875rem;
-          line-height: 1.25rem;
-          background-color: #ffffff;
-          border: 1px solid #e2e8f0;
-          border-radius: 0.375rem;
-          cursor: pointer;
-          transition: all 0.2s ease-in-out;
-        }
-        .select-trigger:hover {
-          border-color: #cbd5e0;
-        }
-        .arrow {
-          transition: transform 0.2s ease-in-out;
-        }
-        .arrow.open {
-          transform: rotate(180deg);
-        }
-        .select-content {
-          position: absolute;
-          top: 100%;
-          left: 0;
-          width: 100%;
-          max-height: 200px;
-          overflow-y: auto;
-          background-color: #ffffff;
-          border: 1px solid #e2e8f0;
-          border-top: none;
-          border-radius: 0 0 0.375rem 0.375rem;
-          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-          z-index: 10;
-        }
-        .select-item {
-          padding: 0.5rem 1rem;
-          font-size: 0.875rem;
-          line-height: 1.25rem;
-          cursor: pointer;
-          transition: background-color 0.2s ease-in-out;
-        }
-        .select-item:hover {
-          background-color: #f7fafc;
-        }
-      `}</style>
-    </div>
-  )
-}
-
-interface MultiSelectProps {
-  value: string[];
-  onValueChange: (value: string[]) => void;
-  placeholder: string;
-  options: { value: string; label: string }[];
-}
-
-const MultiSelect: React.FC<MultiSelectProps> = ({ value, onValueChange, placeholder, options }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const selectRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (selectRef.current && !selectRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
-
-  const handleSelectItem = (selectedValue: string) => {
-    if (value.includes(selectedValue)) {
-      onValueChange(value.filter((v) => v !== selectedValue));
-    } else {
-      onValueChange([...value, selectedValue]);
-    }
-  };
-
-  return (
-    <div className="select-container" ref={selectRef}>
-      <div className="select-trigger" onClick={() => setIsOpen(!isOpen)}>
-        <span className="selected-values">
-          {value.length > 0 ? value.map(v => options.find(option => option.value === v)?.label).join(', ') : placeholder}
-        </span>
-        <svg
-          className={`arrow ${isOpen ? 'open' : ''}`}
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <polyline points="6 9 12 15 18 9"></polyline>
-        </svg>
-      </div>
-      {isOpen && (
-        <div className="select-content">
-          {options.map((option) => (
-            <div
-              key={option.value}
-              className={`select-item ${value.includes(option.value) ? 'selected' : ''}`}
-              onClick={() => handleSelectItem(option.value)}
-            >
-              <input
-                type="checkbox"
-                checked={value.includes(option.value)}
-                onChange={() => handleSelectItem(option.value)}
-              />
-              {option.label}
-            </div>
-          ))}
-        </div>
-      )}
-      <style jsx>{`
-        .select-container {
-          position: relative;
-          width: 180px;
-        }
-        .select-trigger {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          padding: 0.5rem 1rem;
-          font-size: 0.875rem;
-          line-height: 1.25rem;
-          background-color: #ffffff;
-          border: 1px solid #e2e8f0;
-          border-radius: 0.375rem;
-          cursor: pointer;
-          transition: all 0.2s ease-in-out;
-        }
-        .select-trigger:hover {
-          border-color: #cbd5e0;
-        }
-        .selected-values {
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          max-width: 140px;
-        }
-        .arrow {
-          transition: transform 0.2s ease-in-out;
-        }
-        .arrow.open {
-          transform: rotate(180deg);
-        }
-        .select-content {
-          position: absolute;
-          top: 100%;
-          left: 0;
-          width: 100%;
-          max-height: 200px;
-          overflow-y: auto;
-          background-color: #ffffff;
-          border: 1px solid #e2e8f0;
-          border-top: none;
-          border-radius: 0 0 0.375rem 0.375rem;
-          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-          z-index: 10;
-        }
-        .select-item {
-          display: flex;
-          align-items: center;
-          padding: 0.5rem 1rem;
-          font-size: 0.875rem;
-          line-height: 1.25rem;
-          cursor: pointer;
-          transition: background-color 0.2s ease-in-out;
-        }
-        .select-item:hover {
-          background-color: #f7fafc;
-        }
-        .select-item.selected {
-          background-color: #e2e8f0;
-        }
-        .select-item input {
-          margin-right: 0.5rem;
-        }
-      `}</style>
-    </div>
-  );
-};
 
 export default CommodityTable;
