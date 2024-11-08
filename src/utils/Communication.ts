@@ -14,6 +14,8 @@ const parent = [
   environment.PROD_SMART
 ]
 
+let redirectInProgress = false;
+
 const httpsGet = async (path: string, type: number = 0, router: any = null) => {
   const authorization = {
     Authorization: getAuth(),
@@ -27,10 +29,11 @@ const httpsGet = async (path: string, type: number = 0, router: any = null) => {
   const response = await axios(config)
     .then((res) => res)
     .catch((err) => {
-      if (axios.isAxiosError(err) && err.response?.status === 401) {
+      if (axios.isAxiosError(err) && err.response?.status === 401 && !redirectInProgress) {
+        redirectInProgress = true
         const fromRms = Boolean(localStorage.getItem('isRmsLogin'))
         if(fromRms) {
-          router.push('/signin')
+         router.push('/signin')
         } else {
           if(prefix[0].includes('dev')){
             router.push(`${parent[0]}/login`);
@@ -38,7 +41,9 @@ const httpsGet = async (path: string, type: number = 0, router: any = null) => {
             router.push(`${parent[1]}/login`);
           }
         }
-        deleteAllCache();
+        deleteAllCache()
+      } else {
+        redirectInProgress = false
       }
     });
     return response?.data;
@@ -74,7 +79,8 @@ const httpsPost = async (path: string, data: any, router: any = null, type = 0, 
     const response = await axios(config)
       .then((res) => res)
       .catch((err) => {
-        if (axios.isAxiosError(err) && err.response?.status === 401) {
+        if (axios.isAxiosError(err) && err.response?.status === 401 && !redirectInProgress) {
+          redirectInProgress = true
           if(url.includes('shipper_user/signin')) {
             return err.response.data 
           }
@@ -89,6 +95,8 @@ const httpsPost = async (path: string, data: any, router: any = null, type = 0, 
             }
           }
           deleteAllCache();
+        } else {
+          redirectInProgress = false
         }
         return err.response.data 
       });
