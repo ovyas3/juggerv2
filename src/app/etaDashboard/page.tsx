@@ -21,6 +21,7 @@ import CommodityTable from "./commodityTable/commodityTable";
 import { Tabs, Tab, Box } from '@mui/material'
 import { styled } from '@mui/system'
 import WagonTypeWiseRakeTrend from "./wagonTypeWiseRakeTrend/wagonTypeWiseRakeTrend";
+import DestinationWiseTrend from "./destinationWiseTrend/destinationWiseTrend";
 
 // Custom styled components
 const StyledTabs = styled(Tabs)({
@@ -202,6 +203,7 @@ function EtaDashboard() {
               <StyledTab label="PT & DW" />
               <StyledTab label="ETA" />
               <StyledTab label="Rake" />
+              <StyledTab label="Destination" />
             </StyledTabs>
           </Box>
           <CustomTabPanel value={value} index={0}>
@@ -310,6 +312,9 @@ function EtaDashboard() {
           </CustomTabPanel>
           <CustomTabPanel value={value} index={3}>
             <WagonTypeWiseRakeTrend />
+          </CustomTabPanel>
+          <CustomTabPanel value={value} index={4}>
+            <DestinationWiseTrend />
           </CustomTabPanel>
         </Box>
         

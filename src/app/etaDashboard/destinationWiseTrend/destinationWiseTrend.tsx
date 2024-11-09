@@ -19,20 +19,14 @@ import { styled } from '@mui/system';
 import DownloadIcon from '@mui/icons-material/Download';
 
 // Define types
-type WagonTypeData = {
-  wagonType: string
+type DestinationData = {
+  destination: string
   departureCount: number
 }
 
 type MonthData = {
   _id: string
-  wagonTypeData: WagonTypeData[]
-}
-
-type ResponseData = {
-  data: MonthData[]
-  msg: string
-  statusCode: number
+  destinationData: DestinationData[]
 }
 
 interface StyledTooltipProps extends TooltipProps {
@@ -71,7 +65,7 @@ const CustomDownloadTooltip = styled(({ className, ...props }: StyledTooltipProp
   },
 });
 
-const WagonDataVisualization: React.FC = () => {
+const DestinationWiseTrend: React.FC = () => {
   const componentRef = useRef<HTMLDivElement>(null);
   const today: any = new Date();
   const oneMonthAgo: any = new Date();
@@ -84,7 +78,7 @@ const WagonDataVisualization: React.FC = () => {
   const [endDate, setEndDate] = useState<any>(today);
 
   const [chartData, setChartData] = useState<any>([]);
-  const [allWagonTypes, setAllWagonTypes] = useState<any>([]);
+  const [allDestinationDatas, setAllDestinationDatas] = useState<any>([]);
   const [tableData, setTableData] = useState<any>([]);
   const [months, setMonths] = useState<any>([]);
 
@@ -105,11 +99,11 @@ const WagonDataVisualization: React.FC = () => {
       const newEndDate: any = service.millies(endDate);
       if (type === 'start') {
         setStartDate(date);
-        getWagonTypeWiseRakeDepartureTrend(epochTime, newEndDate || 0);
+        getDestinationWiseTrend(epochTime, newEndDate || 0);
 
       } else {
         setEndDate(date);
-        getWagonTypeWiseRakeDepartureTrend(newStartDate || 0, epochTime);
+        getDestinationWiseTrend(newStartDate || 0, epochTime);
       }
     } else {
       if (type === 'start') {
@@ -120,10 +114,10 @@ const WagonDataVisualization: React.FC = () => {
     }
   };
 
-  const getWagonTypeWiseRakeDepartureTrend = async (from: number, to: number) => {
+  const getDestinationWiseTrend = async (from: number, to: number) => {
     try {
       setLoading(true);
-      const response = await httpsGet(`dashboard/wagonType?from=${from}&to=${to}`, 0, router);
+      const response = await httpsGet(`dashboard/destinationTrend?from=${from}&to=${to}`, 0, router);
       if (response.statusCode === 200) {
         setLoading(false);
         const data = response?.data;
@@ -131,29 +125,31 @@ const WagonDataVisualization: React.FC = () => {
   
         const chartData = filteredData.map((monthData: any) => {
           const monthObj: { [key: string]: string | number } = { month: monthData._id };
-          monthData.wagonTypeData.forEach((wagonData: any) => {
-            monthObj[wagonData.wagonType] = wagonData.departureCount;
+          monthData.destinationData.forEach((destinationData: any) => {
+            monthObj[destinationData.destination] = destinationData.departureCount;
           });
           return monthObj;
         });
   
-        const allWagonTypes = Array.from(new Set(filteredData.flatMap((monthData: any) => 
-          monthData.wagonTypeData.map((wagonData: any) => wagonData.wagonType)
+        const allDestinationDatas = Array.from(new Set(filteredData.flatMap((monthData: any) => 
+          monthData.destinationData.map((destinationData: any) => destinationData.destination)
         )));
   
-        const tableData = allWagonTypes.map((wagonType: any) => {
-          const row: { [key: string]: string | number } = { wagonType };
+        const tableData = allDestinationDatas.map((destinationData: any) => {
+          const row: { [key: string]: string | number } = { destinationData };
           filteredData.forEach((monthData: any) => {
-            const wagonData = monthData.wagonTypeData.find((w: any) => w.wagonType === wagonType);
+            const wagonData = monthData.destinationData.find((w: any) => w.destination === destinationData);
             row[monthData._id] = wagonData ? wagonData.departureCount : 0;
           });
           return row;
         });
 
+        console.log('tableData', tableData);
+
         const months = filteredData.map((monthData: any) => monthData._id);
   
         setChartData(chartData);
-        setAllWagonTypes(allWagonTypes);
+        setAllDestinationDatas(allDestinationDatas);
         setTableData(tableData);
         setMonths(months);
       }
@@ -168,7 +164,7 @@ const WagonDataVisualization: React.FC = () => {
   useEffect(() => {
     const startDate = service.millies(oneMonthAgo);
     const endDate = service.millies(today);
-    getWagonTypeWiseRakeDepartureTrend(startDate, endDate);
+    getDestinationWiseTrend(startDate, endDate);
   }, [])
 
   const handleScreenshot = async () => {
@@ -262,7 +258,7 @@ const WagonDataVisualization: React.FC = () => {
               fontFamily: '"Plus Jakarta Sans", sans-serif',
               textTransform: 'uppercase',
             }}>
-            Wagon Type Wise Rake Departure Trend
+            Destination Wise Rake Departure Trend
           </Typography>
 
           <Box sx={{ 
@@ -302,11 +298,11 @@ const WagonDataVisualization: React.FC = () => {
               <YAxis />
               <RechartsTooltip />
               <Legend />
-              {allWagonTypes.map((wagonType: any, index: number) => (
+              {allDestinationDatas.map((destination: any, index: number) => (
                 <Bar 
-                  key={wagonType} 
-                  dataKey={wagonType} 
-                  name={wagonType} 
+                  key={destination} 
+                  dataKey={destination} 
+                  name={destination} 
                   fill={`hsl(${index * 25}, 70%, 50%)`} 
                 />
               ))}
@@ -318,7 +314,7 @@ const WagonDataVisualization: React.FC = () => {
           <Table sx={{ minWidth: 650 }} aria-label="wagon type data table">
             <TableHead>
               <TableRow>
-                <TableCell>Wagon Type</TableCell>
+                <TableCell>Destination</TableCell>
                 {months.map((month: string) => (
                   <TableCell key={month} align="right">{formatMonth(month)}</TableCell>
                 ))}
@@ -353,9 +349,9 @@ const WagonDataVisualization: React.FC = () => {
             </TableHead>
             <TableBody>
               {tableData.map((row: any) => (
-                <TableRow key={row.wagonType as string}>
+                <TableRow key={row.destinationData as string}>
                   <TableCell component="th" scope="row">
-                    {row.wagonType}
+                    {row.destinationData}
                   </TableCell>
                   {months.map((month: any) => (
                     <TableCell key={month} align="right">{row[month]}</TableCell>
@@ -373,4 +369,4 @@ const WagonDataVisualization: React.FC = () => {
   )
 }
 
-export default WagonDataVisualization
+export default DestinationWiseTrend
