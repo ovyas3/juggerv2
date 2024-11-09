@@ -193,7 +193,7 @@ const DestinationWiseTrend: React.FC = () => {
 
         const link = document.createElement('a');
         link.href = dataUrl;
-        link.download = 'wagon-type-wise-rake-departure-trend.png';
+        link.download = 'destination-wise-rake-departure-trend.png';
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -214,15 +214,15 @@ const DestinationWiseTrend: React.FC = () => {
     const worksheetData = [
       ['Wagon Type', ...months.map((month: any) => formatMonth(month))],
       ...tableData.map((row: any) => [
-        row.wagonType,
+        row.destinationData,
         ...months.map((month: any) => row[month])
       ])
     ];
 
     const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Wagon Type Wise Rake');
-    XLSX.writeFile(workbook, 'wagon-type-wise-rake-departure-trend.xlsx');
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Destination Wise Trend');
+    XLSX.writeFile(workbook, 'destination-wise-rake-departure-trend.xlsx');
   };
 
   if (loading) {
