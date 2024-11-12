@@ -54,11 +54,12 @@ import PublishedWithChangesIcon from '@mui/icons-material/PublishedWithChanges';
 import UpdateIcon from '@mui/icons-material/Update';
 import trash from '@/assets/trash_icon.png'
 import DriveFolderUploadIcon from '@mui/icons-material/DriveFolderUpload';
-import { ActionItem, EditELD, HandlingAgentSelection, PastEta, RemarkComponent, Remarks, Tags,MarkPlacement,HandlingEdemand, UploadWagonSheet, HandlingETA, ContactModal} from './tableComp'
+import { ActionItem, EditELD, HandlingAgentSelection, PastEta, RemarkComponent, Remarks, Tags,MarkPlacement,HandlingEdemand, UploadWagonSheet, HandlingETA, ContactModal, ViewContactModal} from './tableComp'
 import SettingsIcon from '@mui/icons-material/Settings';
 import { environment } from '@/environments/env.api';
 import { useRouter } from 'next/navigation';
 import { MarkComplete } from './tableComp';
+import ImportContactsIcon from '@mui/icons-material/ImportContacts';
 
 const status_class_map: { [key: string]: string } = {
     'OB': 'status_title_In_Plant',
@@ -280,6 +281,10 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
     //contact modal
     const [contactModal, setContactModal] = useState(false);
     const [contactData, setContactData] = useState({});
+
+    // view Contact modal
+    const [viewContactModal, setViewContactModal] = useState(false);
+    const [viewContactData, setViewContactData] = useState({});
 
     const handleRRDoc = (id: any) => {  // for rr documents
         setRRModalOpen(true);
@@ -687,6 +692,11 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                                 text={t('contact')}
                                                                                 onClick={() => { setContactModal(true); setContactData(row) }}
                                                                             />
+                                                                             <ActionItem
+                                                                                icon={<ImportContactsIcon style={{ width: "24px", height: '24px', color: '#FAB12F' }} />}
+                                                                                text={t('viewAllContacts')}
+                                                                                onClick={() => { setViewContactModal(true); setViewContactData(row) }}
+                                                                            />
                                                                             <ActionItem
                                                                                 icon={<BookmarkAddOutlinedIcon style={{ width: "24px", height: '24px', color: '#658147' }} />}
                                                                                 text={t('addremarks')}
@@ -1017,6 +1027,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
              {openEtaModel && 
              <HandlingETA isOpen={openEtaModel} isClose={()=> setOpenEtaModal(false)} shipment={updateEtaShipID} getAllShipment={getAllShipment} difference={differenceETA} />}
              {contactModal && <ContactModal isClose={setContactModal} shipment={contactData} />}
+             {viewContactModal && <ViewContactModal isClose={setViewContactModal} shipmentData={viewContactData} />}
             <Modal
                 open={open}
                 onClose={(e) => { handleClose(e) }}
