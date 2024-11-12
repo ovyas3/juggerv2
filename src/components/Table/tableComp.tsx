@@ -2,7 +2,6 @@ import { useEffect, useState, useRef } from "react";
 import React from "react";
 
 
-import Paper from '@mui/material/Paper';
 
 import Checkbox from '@mui/material/Checkbox';
 import { useCallback } from 'react'
@@ -60,6 +59,17 @@ import EastIcon from '@mui/icons-material/East';
 import WestIcon from '@mui/icons-material/West';
 
 import CustomMultiSelect from "../UI/CustomMultiSelect/CustomMultiSelect";
+
+import {
+    Paper,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TablePagination,
+    TableRow,
+  } from "@mui/material";
 
 async function rake_update_id(payload: Object, router: any) {
     return await httpsPost(UPDATE_RAKE_CAPTIVE_ID, payload, router);
@@ -1721,20 +1731,16 @@ export const ContactModal = ({isClose, shipment}:any) => {
     const [openStationDropDown, setOpenStationDropDown] = useState(false);
     const [openReasonDropDown, setOpenReasonDropDown] = useState(false);
     const [opencontactpersonDropDown, setOpencontactpersonDropDown] = useState(false);
+    const currentDate = new Date();
 
 
+    const [contactNumberListDropDown, setContactNumberListDropDown] = useState(false);
+    const [contactListNumber, setContactListNumber] = useState<any>([]);
+    const [contactListNumberCopy, setContactListNumberCopy] = useState([]);
+    const [stationNameCopy, setStationNameCopy] = useState([]);
 
-    const [oldContactsList, setOldContactList] = useState([]);
-    const [oldRecord, setOldRecord] = useState<any>({
-        stationNameOld:'',
-        reasonOld:'Select Reason',
-        role:'Select Contact Person',
-        name:'',
-        mobile:'',
-        comment:'',
-        rating:0
-    })
-
+    const [stationNameDropDown, setStationNameDropDown] = useState(false);
+    const [oldContactDetailsList, setOldContactDetailsList] = useState<any>([]);
 
     function changeStationName(value:any) {
         setStationName(value);
@@ -1751,34 +1757,7 @@ export const ContactModal = ({isClose, shipment}:any) => {
                     const response = await httpsGet(`get/stationNames?stationName=${value}`);
                     if (response.data.length > 0) {
                         setStationList(response.data);
-                        setLoadder(false);
-                    } else {
-                        setStationList(['No Data Found']);
-                        setLoadder(false);
-                    }
-                } catch (error) {
-                    console.log(error);
-                }
-            }, 1500);
-        }
-    }
-
-    function changeStationNameOld(value:any) {
-        // setStationName(value);
-        setOldRecord({...oldRecord, stationNameOld:value})
-        if (debounceTimer.current) {
-            clearTimeout(debounceTimer.current);
-        }
-        if (value === '') {
-            setLoadder(false);
-            setStationList([]);
-        } else {
-            setLoadder(true);
-            debounceTimer.current = setTimeout(async () => {
-                try {
-                    const response = await httpsGet(`get/stationNames?stationName=${value}`);
-                    if (response.data.length > 0) {
-                        setStationList(response.data);
+                        setStationNameCopy(response.data)
                         setLoadder(false);
                     } else {
                         setStationList(['No Data Found']);
@@ -1802,6 +1781,20 @@ export const ContactModal = ({isClose, shipment}:any) => {
             rating,
             comment,
         }
+        if(contactNumber === null) return showMessage('Please Enter Contact Number', 'error');
+        const phoneNumberPattern = /^[0-9]{10}$/;
+        if (!phoneNumberPattern.test(contactNumber.toString())) {
+            return showMessage('Please Enter a Valid 10-Digit Contact Number', 'error');
+        }
+        if(stationName === '' || stationName === 'No Data Found' || !stationNameCopy.some(item => item === stationName) ) {
+            return showMessage('Please Select Station Name From List', 'error');
+        }
+        if(reason === 'Select Reason') return showMessage('Please Select Reason', 'error');
+        if(contactPerson === 'Select Contact Person') return showMessage('Please Select Contact Person', 'error');
+        if(name === '') return showMessage('Please Enter Name', 'error');
+        if(comment === '') return showMessage('Please Enter Comment', 'error');
+        if(rating === 0) return showMessage('Please Enter Rating', 'error');
+        
         try {
             const response = await httpsPost('rake_shipment/updateContactDeta', payload);
             if (response.statusCode === 200) {
@@ -1825,67 +1818,28 @@ export const ContactModal = ({isClose, shipment}:any) => {
         }
     } 
 
-    async function submitOldContact() {
-        let payload = {
-            id:shipment._id,
-            stationName: oldRecord.stationNameOld,
-            reason: oldRecord.reasonOld,
-            contactPerson: oldRecord.role,
-            name: oldRecord.name,
-            contactPersonMobile: oldRecord.mobile.toString(),
-            comment: oldRecord.comment,
-            rating: oldRecord.rating,
-        }
+    const getContactDetailsByStationName = async () => {
         try {
-            const response = await httpsPost('rake_shipment/addOldContactDetails', payload);
-            if (response.statusCode === 200) {
-                isClose(false);
-                setOldRecord({
-                    stationNameOld:'',
-                    reasonOld:'Select Reason',
-                    role:'Select Contact Person',
-                    name:'',
-                    mobile:'',
-                    comment:'',
-                    rating:0
-                })
-                showMessage('Contact Updated Successfully', 'success');
-            }
-        } catch (error) {
+           const response = await httpsGet(`rake_shipment/getAllContactList?id=${shipment._id}&stationName=${stationName}`);
+           if(response.statusCode === 200) {
+                setOldContactDetailsList(response.data);
+           }
+        }catch (error) {
             console.log(error);
         }
     }
 
-    async function getOldDetails () {
-        const response = await httpsGet(`rake_shipment/updateOldContactDetails?id=${shipment._id}`);
-        if(response.statusCode === 200){
-            setOldContactList(response.data)
-        }
-    }
-
     useEffect(()=>{
-        getOldDetails();
-    },[])
+        if(stationName !== '' && stationName !== 'No Data Found' && stationNameCopy.some(item => item === stationName)) {
+            getContactDetailsByStationName();
+        }
+    },[stationName])
 
     return(
         <div style={{width:'100vw', height:'100vh', position:'fixed', top:0, left:0 ,zIndex:300, backgroundColor:'rgba(0, 0, 0, 0.5)'}} onClick={(e)=>{e.stopPropagation(); isClose(false)}}>
-        <div className="contactModal" onClick={(e)=>{e.stopPropagation(); setOpenStationDropDown(false); setStationList([]); setOpenReasonDropDown(false); setOpencontactpersonDropDown(false)}}>
+        <div className="contactModal" onClick={(e)=>{e.stopPropagation(); setOpenStationDropDown(false); setStationList([]); setOpenReasonDropDown(false); setOpencontactpersonDropDown(false); setContactNumberListDropDown(false); setStationNameDropDown(false);}}>
             <div className="closeContaioner"><CloseIcon onClick={(e) => { e.stopPropagation(); isClose(false) }}/></div>
-
-       
-            {oldContactsList.length > 0 &&  toggleBtn === 'newContact' ?  ( <div id='toggle-btn-container' onClick={(e)=>{e.stopPropagation(); setToggleBtn((prev:any)=>{if(prev === 'newContact') {return 'oldContacts'} else {return 'newContact'} })}}>
-                <div id='toggle-btn'>Previous Contacts - {oldContactsList.length}</div>
-                <div><EastIcon style={{fontSize:'12px', marginTop:2}}/></div>
-            </div>):
-             ( <div id='toggle-btn-container' onClick={(e)=>{e.stopPropagation(); setToggleBtn((prev:any)=>{if(prev === 'newContact') {return 'oldContacts'} else {return 'newContact'} })}}>
-             <div id='toggle-btn'>Add New Contact</div>
-             <div><WestIcon style={{fontSize:'12px', marginTop:2}}/></div>
-         </div>)
-            }
-           
-            
-
-
+        
             <div style={{display:toggleBtn === 'newContact'?'block':'none', position:'relative', height:'100%'}}>
                 <header id="contactModalHeader">{text('contactModalHeader')} - #{shipment?.fnr?.primary}</header>
                 <div id='formContainer'>
@@ -1902,13 +1856,18 @@ export const ContactModal = ({isClose, shipment}:any) => {
                 </div>
 
                 <div id='stationName'>
-                    <label id='labelName' >{text('reasons')}</label>
-                    <div id='stationNameInput' style={{color:'black', fontSize:'13px'}} onClick={(e)=>{e.stopPropagation(); setOpenReasonDropDown(!openReasonDropDown) }}>{reason}</div>
-                    {openReasonDropDown && <div id='stationDropDown'>
-                        {reasons?.map((item: any, index: number) => (
-                            <div id='stationNameItem' key={index} onClick={() => {setReason(item.label); setOpenReasonDropDown(false);}}>{item.label}</div>
+                    <label id='labelName' >{text('name')}</label>
+                    <div id='stationNameInput' onClick={(e)=>{e.stopPropagation(); setStationNameDropDown(!stationNameDropDown) }}><input value={name} onChange={(e)=>{setName(e.target.value)}} type="text" placeholder="Enter Name" style={{border:'none', outline:'none'}} /></div>
+                    {stationNameDropDown && <div id='stationDropDown'>
+                        {oldContactDetailsList?.map((item: any, index: number) => (
+                            <div id='stationNameItem' key={index} onClick={() => {setContactNumberListDropDown(false); setName(item.name); setContactNumber(item.ph_no); setContactPerson(item.role); setStationNameDropDown(false); }}>{item.name}</div>
                         ))}
                     </div>}
+                </div>
+
+                <div id='stationName'>
+                    <label id='labelName' >{text('contactNo')}</label>
+                    <div id='stationNameInput' onClick={(e)=>{ e.stopPropagation();}} ><input value={contactNumber ?? ''} onChange={(e)=>{setContactNumber(parseInt(e.target.value)||null);}} type="number" placeholder="Enter Contact Number" style={{border:'none', outline:'none'}} /></div>
                 </div>
 
                 <div id='stationName'>
@@ -1920,16 +1879,31 @@ export const ContactModal = ({isClose, shipment}:any) => {
                         ))}
                     </div>}
                 </div>
-
+                
                 <div id='stationName'>
-                    <label id='labelName' >{text('name')}</label>
-                    <div id='stationNameInput'><input value={name} onChange={(e)=>{setName(e.target.value)}} type="text" placeholder="Enter Name" style={{border:'none', outline:'none'}} /></div>
+                    <label id='labelName' >{text('reasons')}</label>
+                    <div id='stationNameInput' style={{color:'black', fontSize:'13px'}} onClick={(e)=>{e.stopPropagation(); setOpenReasonDropDown(!openReasonDropDown) }}>{reason}</div>
+                    {openReasonDropDown && <div id='stationDropDown'>
+                        {reasons?.map((item: any, index: number) => (
+                            <div id='stationNameItem' key={index} onClick={() => {setReason(item.label); setOpenReasonDropDown(false);}}>{item.label}</div>
+                        ))}
+                    </div>}
                 </div>
 
                 <div id='stationName'>
-                    <label id='labelName' >{text('contactNo')}</label>
-                    <div id='stationNameInput'><input value={contactNumber ?? ''} onChange={(e)=>{setContactNumber(parseInt(e.target.value)||null)}} type="number" placeholder="Enter Contact Number" style={{border:'none', outline:'none'}} /></div>
+                    <label id='labelName' >{text('currentTime')}</label>
+                    <div id="stationNameInput" style={{cursor:'not-allowed', fontSize:'13px'}}>
+                    {new Date().toLocaleString('en-US', {
+                        day: '2-digit',
+                        month: 'short',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: false
+                    }).replace(',', '').replace(/\b(\d{2})\b/, '$1 -')}
+                    </div>
                 </div>
+
             </div>
 
             <div id='commentContainer'>
@@ -1957,112 +1931,297 @@ export const ContactModal = ({isClose, shipment}:any) => {
             </div>
             </div> 
 
-            <div style={{display: toggleBtn === 'oldContacts' ? 'block':'none'}} >
-                <header id="contactModalHeader">{text('contactModalHeader')} - #{shipment?.fnr?.primary}</header>
-                <div id='containorOldcontact'>
-                    <div id='listAreaOfOldConatcts'>
-                        {oldContactsList.map((item:any, index:number)=>{
-                            return(
-                                <div key={index} id='boxContainer' onClick={(e)=>{e.stopPropagation(); setOldRecord({...oldRecord, name:item.name, mobile:item.ph_no})}}>
-                                    <div id='image-name-rate-Conatainer' >{item.name.charAt(0)}</div>
-                                    <div id='textArea'>
-                                        <div id='contactName'>{item.name}</div>
-                                        <div style={{display:'flex', alignItems:'center'}}>
-                                            <div id='contactNumber'>{item.ph_no}</div>
-                                            <div style={{display:'flex', alignItems:'center'}}>
-                                             <div id='contactRate'>{Math.round(item.avgRating)}</div>
-                                             <div><StarRateRoundedIcon style={{color:'#18BE8A', fontSize:'18px', marginTop:2}} /></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div id='rightArrowContainer'><ChevronRightIcon/></div>
-                                </div>
-                            );
-                        })}
-                    </div>
-                    {oldRecord.name && oldRecord.mobile && ( <div id='divider'></div>)}
-                    {oldRecord.name && oldRecord.mobile && (  <div id='addInfoArea'>
-                        <div style={{display:'flex',gap:'21px'}}> 
-                        <div id='stationName'>
-                            <label id='labelName' >{text('stationName')}</label>
-                            <div id='stationNameInput' onClick={(e)=>{e.stopPropagation(); }}><input value={oldRecord?.stationNameOld} type="text" placeholder="Enter Name" style={{border:'none', outline:'none'}} onChange={(e)=>{changeStationNameOld(e.target.value);}} /></div>
-                            {stationList.length > 0 && <div id='stationDropDown'>
-                                {stationList?.map((item: any, index: number) => (
-                                    <div id='stationNameItem' key={index} onClick={() => {setOldRecord({...oldRecord,stationNameOld:item}); setStationList([])}}>{item}</div>
-                                ))}
-                            </div>}
-                            {loadder && <div id='loaderForStationName'><CircularProgress size={15} /></div>}
-                        </div>
-
-                        <div id='stationName'>
-                            <label id='labelName' >{text('reasons')}</label>
-                            <div id='stationNameInput' style={{color:'black', fontSize:'13px'}} onClick={(e)=>{e.stopPropagation(); setOpenReasonDropDown(!openReasonDropDown) }}>{oldRecord.reasonOld}</div>
-                            {openReasonDropDown && <div id='stationDropDown'>
-                                {reasons?.map((item: any, index: number) => (
-                                <div id='stationNameItem' key={index} onClick={() => { setOldRecord({...oldRecord,reasonOld:item.label}) ;setOpenReasonDropDown(false);}}>{item.label}</div>
-                                ))}
-                            </div>}
-                        </div>
-
-                        <div id='stationName'>
-                            <label id='labelName' >{text('contactPerson')}</label>
-                            <div id='stationNameInput' style={{color:'black', fontSize:'13px'}} onClick={(e)=>{e.stopPropagation(); setOpencontactpersonDropDown(!opencontactpersonDropDown) }} >{oldRecord.role}</div>
-                            {opencontactpersonDropDown && <div id='stationDropDown'>
-                                {contactPersons?.map((item: any, index: number) => (
-                                    <div id='stationNameItem' key={index} onClick={() => { setOldRecord({...oldRecord, role:item.label}) ;setOpencontactpersonDropDown(false);}}>{item.label}</div>
-                                ))}
-                            </div>}
-                        </div>
-
-                        {/* <div id='stationName'>
-                            <label id='labelName' >{text('name')}</label>
-                            <div id='stationNameInput' style={{cursor:'not-allowed'}}><input disabled value={oldRecord?.name} onChange={(e)=>{setName(e.target.value)}} type="text" placeholder="Enter Name" style={{border:'none', outline:'none', backgroundColor:'white', cursor:'not-allowed'}} /></div>
-                        </div> */}
-
-                        {/* <div id='stationName'>
-                            <label id='labelName' >{text('contactNo')}</label>
-                            <div id='stationNameInput' style={{cursor:'not-allowed'}}><input value={oldRecord?.mobile} onChange={(e)=>{setContactNumber(parseInt(e.target.value)||null)}} type="number" placeholder="Enter Contact Number" style={{border:'none', outline:'none' ,cursor:'not-allowed', backgroundColor:'white',}} /></div>
-                        </div> */}
-                        </div>
-
-                        <div id='commentContainer' style={{marginTop:20}}>
-                            <div><label id='labelName' >{text('comment')}</label></div>
-                            <div style={{width:'100%', border:"1px solid #E9E9EB", borderRadius:'4px'}}><textarea value={oldRecord?.comment} id='commentInput' placeholder={text('commentPlaceholder')} onChange={(e)=>{setOldRecord({...oldRecord,comment:e.target.value}); setComment(e.target.value)}} ></textarea></div>
-                        </div>
-
-                        <div id='rateContainer'>
-                            <div><label id='labelName' >{text('rate')}</label></div>
-                            <div className="star-rating">
-                                {[1, 2, 3, 4, 5].map((value) => (
-                                    <StarRateRoundedIcon
-                                        key={value}
-                                        onClick={() => setOldRecord({...oldRecord,rating:value})}
-                                        className={`star ${value <= oldRecord?.rating ? 'selected' : ''}`}
-                                        fontSize="medium"
-                                        style={{ cursor: 'pointer' }}
-                                    />
-                                ))}
-                            </div>
-                        </div>
-
-                        <div id='dividerHorizontal'></div>
-
-                        <div id='btnContainerOldContact'>
-                            <div id='btnContainerOldContactInner'>
-                                <div id='contactName'>{oldRecord?.name}</div>
-                                <div id='contactNumber'>{oldRecord?.mobile}</div>
-                            </div>
-                            <div id='submit-btn' onClick={()=>{submitOldContact()}} >{text('submit')}</div>
-                        </div>
-                    </div>)}
-                   
-                   
-                </div>
-            </div>
-        
         </div>
     </div>
     );
 }
 
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 
+export const ViewContactModal = ({isClose, shipmentData}:any) => {
+    const text = useTranslations('ORDERS');
+    const [viewContactsList, setViewContactsList] = useState([]);
+
+    const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [page, setPage] = useState(0);
+  const [showActionBox, setShowActionBox] = React.useState(-1);
+  const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(
+    null
+  );
+
+  const handleChangePage = (event: unknown, newPage: number) => {
+    setPage(newPage);
+  };
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setRowsPerPage(+event.target.value);
+    setPage(0);
+  };
+
+  function clickActionBox(
+    e: React.MouseEvent<SVGSVGElement, MouseEvent>,
+    index: number,
+    id: string,
+    locationId: string
+  ) {
+    e.stopPropagation();
+    setShowActionBox((prevIndex: any) => (prevIndex === index ? -1 : index));
+  }
+
+  const handleCloseAction = () => {
+    setAnchorEl(null);
+    setShowActionBox(-1);
+  };
+
+    const viewAllContactsDetails = async () => {
+        try {
+            const response = await httpsGet(`rake_shipment/viewContactDetails?id=${shipmentData._id}`);
+            if (response.statusCode === 200) {
+                setViewContactsList(response.data);
+            }
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    useEffect(() => {
+        viewAllContactsDetails();
+    }, [])
+
+    interface Column {
+        id: string;
+        label: string;
+        style: string;
+      }
+
+    const columns: readonly Column[] = [
+        { id: "sno", label: "SI No", style: "header_sno" },
+        { id: "stationName", label: "Station Name", style: "header_stationName" },
+        { id: "fnr", label: "FNR No", style: "header_fnr" },
+        {
+          id: "contactPersonRole",
+          label: "Contact Person Role",
+          style: "header_contactPersonRole",
+        },
+        { id: "name", label: "Name", style: "header_name" },
+        { id: "contact", label: "Contact No.", style: "header_contact_no" },
+        { id: "reason", label: "Reason", style: "header_reason" },
+        { id: "comment", label: "Comment", style: "header_comment" },
+        // { id: "action", label: "Action", style: "header_action" },
+      ];
+      
+      function contructingData(shipment: any) {
+        return shipment.map(
+          (shipment: {
+            _id: string;
+            fnr: string;
+            stationName: string;
+            reason: string;
+            role: string;
+            name: string;
+            mobile: string;
+            comment: string;
+            rating: number;
+            created_at: string;
+          }) => {
+            return {
+              id: shipment?._id ? shipment._id : '--',
+              stationName: shipment?.stationName
+                ? shipment?.stationName
+                : "--",
+              fnr: shipment?.fnr ? shipment?.fnr : "--",
+              contactPersonRole: shipment?.role
+                ? shipment?.role
+                : "--",
+              contactPersonName: {
+                contactPersonName: shipment?.name
+                  ? shipment?.name
+                  : "--",
+              },
+              contact: shipment?.mobile
+                ? shipment?.mobile
+                : "--",
+              reason: shipment?.reason ? shipment?.reason : "--",
+              comment: shipment?.comment ? shipment?.comment : "--",
+              rating: shipment?.rating ? shipment?.rating : 0,
+              created_at: shipment?.created_at ? shipment?.created_at : "--",
+            };
+          }
+        );
+      }
+    console.log(shipmentData)
+    console.log(viewContactsList)
+    return (
+        <div style={{width:'100vw', height:'100vh', position:'fixed', top:0, left:0 ,zIndex:300, backgroundColor:'rgba(0, 0, 0, 0.5)'}} onClick={(e)=>{e.stopPropagation(); isClose(false)}}>
+        <div id="viewContactModal" onClick={(e)=>{e.stopPropagation();}}>
+            <div className="closeContaioner"><CloseIcon onClick={(e) => { e.stopPropagation(); isClose(false) }}/></div>
+            <header id="contactModalHeader">{text('contactModalHeader')} - #{shipmentData?.fnr?.primary}</header>
+            <div
+      style={{
+        width: "100%",
+        height: "90%",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      <Paper
+        sx={{
+          position: "relative",
+          width: "100%",
+          height: "100%",
+          display: "flex",
+          flexDirection: "column",
+          boxShadow: "none",
+        }}
+      >
+        {/* <TablePagination
+          rowsPerPageOptions={[5, 10, 25, 50, 100]}
+          component="div"
+          count={viewContactsList.length}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+          labelRowsPerPage="Contacts per page:"
+          sx={{ position: "absolute", top: -40, zIndex: 100, right: -10 }}
+        /> */}
+        <TableContainer
+          sx={{
+            overflow: "auto",
+            borderRadius: "4px",
+            border: "1px solid #E9E9EB",
+          }}
+        >
+          <Table stickyHeader aria-label="sticky table">
+            <TableHead>
+              <TableRow>
+                {columns.map((column) => (
+                  <TableCell
+                    key={column.id}
+                    className={column.style}
+                    style={{
+                      textAlign: "center",
+                      padding: "8px 10px 8px 10px",
+                      fontSize: 11,
+                      fontWeight: 600,
+                      color: "#484A57",
+                      whiteSpace: "nowrap",
+                      paddingInline: 10,
+                    }}
+                  >
+                    {column.label}
+                  </TableCell>
+                ))}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {contructingData(viewContactsList).map(
+                (row: any, rowIndex: any) => {
+                  return (
+                    <TableRow
+                      hover
+                      role="checkbox"
+                      tabIndex={-1}
+                      key={rowIndex}
+                    >
+                      {columns.map((column) => {
+                        const value = row[column.id];
+                        return (
+                          <TableCell
+                            key={column.id}
+                            sx={{
+                              textAlign: "center",
+                              padding: "8px 10px 8px 10px",
+                              fontSize: 10,
+                            }}
+                          >
+                            {typeof value !== "object" && value}
+                            {column.id === "sno" && (
+                              <div style={{ fontSize: 12 }}>
+                                {rowIndex + 1 + page * rowsPerPage}.
+                              </div>
+                            )}
+                            {column.id === "name" && (
+                              <div style={{ textAlign: "left", paddingLeft:10 }}>
+                                <div>
+                                  {row.contactPersonName.contactPersonName}
+                                </div>
+                                <div
+                                  style={{
+                                    color: "gold",
+                                    display: "flex",
+                                    gap: 3,
+                                    marginTop: 2,
+                                    fontSize: 10,
+                                  }}
+                                >
+                                  {Array.from(
+                                    { length: row.rating },
+                                    (_, i) => (
+                                      <span key={i}>★</span>
+                                    )
+                                  )}
+                                </div>
+                              </div>
+                            )}
+                            {column.id === 'stationName' && (
+                                <div>{service.utcToist(row.created_at, 'dd-MMM-yy HH:mm')}</div>
+                            )}
+                            {column.id === "action" && (
+                              <div id="actionIconContaioner">
+                                <div
+                                  id="actionIcon"
+                                  onClick={(e: any) => {
+                                    clickActionBox(e, rowIndex, "", "");
+                                    setAnchorEl(
+                                      e.currentTarget as unknown as HTMLButtonElement
+                                    );
+                                  }}
+                                >
+                                  <MoreHorizIcon
+                                    style={{ color: "white", fontSize: 16 }}
+                                  />
+                                </div>
+                                <Popover
+                                  open={
+                                    showActionBox === rowIndex ? true : false
+                                  }
+                                  anchorEl={anchorEl}
+                                  onClose={handleCloseAction}
+                                  anchorOrigin={{
+                                    vertical: 30,
+                                    horizontal: -120,
+                                  }}
+                                >
+                                  <div
+                                    className="action-popover-wagon"
+                                    onClick={(e) => {}}
+                                  >
+                                    Rate Again
+                                  </div>
+                                  {/* <div
+                                    className="action-popover-wagon"
+                                    onClick={(e) => {}}
+                                  >
+                                    Delete Contact
+                                  </div> */}
+                                </Popover>
+                              </div>
+                            )}
+                          </TableCell>
+                        );
+                      })}
+                    </TableRow>
+                  );
+                }
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Paper>
+    </div>
+        </div>
+    </div>
+    )
+}

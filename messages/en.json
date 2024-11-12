@@ -38,7 +38,7 @@
     "submit":"Submit",
     "attach":"Attach",
     "edemand":"e-Demand",
-    "contact":"Log Book",
+    "contact":"Add Logs",
     "share":"Share",
     "copyToClipboard":"Copy Rake Details",
     "intransit":"In Transit",
@@ -79,13 +79,15 @@
     "contactModalHeader":"Contact Details",
     "stationName":"Station Name",
     "reasons":"Reason",
-    "contactPerson":"Contant Person",
+    "contactPerson":"Role",
     "name":"Name",
     "contactNo":"Contact No.",
     "comment":"Comment",
     "commentPlaceholder":"Enter Your Comment Here",
     "rate":"Rate This Contact Person",
-    "contactModalHeaderOld":"Previous Contacts Details"
+    "contactModalHeaderOld":"Previous Contacts Details",
+    "currentTime":"Contact Time",
+    "viewAllContacts":"View All Contacts"
   },
   "UPLOAD_ANNEXURE":{
     "SNCKBR_MSG":{

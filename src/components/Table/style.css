@@ -373,6 +373,17 @@ input::-webkit-inner-spin-button {
   /* min-height: 515px; */
   height: 401px;
 }
+#viewContactModal{
+  width: 1000px;
+    background-color: #fff;
+    position: relative;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 16px;
+    padding: 24px;
+  height: 500px;
+}
 #contactModalHeader{
   font-size: 18px;
   font-weight: 500;
@@ -601,4 +612,32 @@ input::-webkit-inner-spin-button {
   display: flex;
   flex-direction: column;
   gap:4px;
+}
+.header_name{
+  text-align: left !important;
+  padding-left: 20px !important;
+}
+
+#actionIconContaioner{
+  display: flex;
+  justify-content: center;
+}
+#actionIcon{
+  background-color: #2B68FF;
+  height: 24px;
+  width: 24px;
+  border-radius: 4px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.action-popover-wagon{
+  font-size: 12px;
+  font-weight: 500;
+  padding: 8px 10px;
+  cursor: pointer;
+  min-width: 150px;
+}
+.action-popover-wagon:hover{
+  background-color: rgb(233, 229, 229);
 }
