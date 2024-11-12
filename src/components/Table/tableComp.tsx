@@ -975,7 +975,7 @@ export const MarkPlacement = ({isClose ,shipment, getAllShipment, different = 'm
 
     return (
         <div style={{width:'100vw', height:'100vh', position:'fixed', top:0, left:0 ,zIndex:300, backgroundColor:'rgba(0, 0, 0, 0.5)'}} onClick={(e)=>{e.stopPropagation(); isClose(false);}}>
-            <div style={{width:800, height: different = 'markplacement' ?  580 : 500, backgroundColor:'white', position:'relative', top:'50%', left:'50%', transform:'translate(-50%,-50%)', borderRadius:20, padding:25}} onClick={(e)=>{e.stopPropagation()}}>
+            <div style={{width:800, height: different === 'markplacement' ?  580 : 500, backgroundColor:'white', position:'relative', top:'50%', left:'50%', transform:'translate(-50%,-50%)', borderRadius:20, padding:25}} onClick={(e)=>{e.stopPropagation()}}>
              
                     <div style={{display:'flex', justifyContent:'space-between',}}>
                         <header style={{fontSize:20, color:'#131722', fontWeight:600}}>{different==='downOut'?'Drawn Out Time':'Mark Placement'}</header>
