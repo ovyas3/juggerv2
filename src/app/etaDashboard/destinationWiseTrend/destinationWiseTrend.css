@@ -1,0 +1,12 @@
+.wagon-type-wise-rake-trend-header{
+  display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+
+    @media screen and (max-width: 840px){
+        flex-direction: column;
+        justify-self: flex-start;
+        align-items: flex-start !important;
+    }
+}
