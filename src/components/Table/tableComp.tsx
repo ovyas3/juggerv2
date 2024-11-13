@@ -2041,10 +2041,10 @@ export const ViewContactModal = ({isClose, shipmentData}:any) => {
           }) => {
             return {
               id: shipment?._id ? shipment._id : '--',
-              stationName: shipment?.stnName.name
-                ? shipment?.stnName.name
+              stationName: shipment?.stnName?.name
+                ? shipment?.stnName?.name
                 : "--",
-              fnr: shipment?.rakeShipment.FNR ? shipment?.rakeShipment.FNR : "--",
+              fnr: shipment?.rakeShipment?.FNR ? shipment?.rakeShipment?.FNR : "--",
               contactPersonRole: shipment?.role
                 ? shipment?.role
                 : "--",

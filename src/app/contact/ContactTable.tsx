@@ -67,11 +67,11 @@ function contructingData(shipment: any) {
       rating: number;
     }) => {
       return {
-        id: shipment?._id ? shipment._id : '--',
-        stationName: shipment?.stnName.name
-          ? shipment?.stnName.name
+        id: shipment?._id ? shipment?._id : '--',
+        stationName: shipment?.stnName?.name
+          ? shipment?.stnName?.name
           : "--",
-        fnr: shipment?.rakeShipment.FNR ? shipment?.rakeShipment.FNR : "--",
+        fnr: shipment?.rakeShipment?.FNR ? shipment?.rakeShipment?.FNR : "--",
         contactPersonRole: shipment?.role
           ? shipment?.role
           : "--",
