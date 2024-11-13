@@ -10,7 +10,7 @@ import Image from "next/image";
 import calenderIcon from "@/assets/calender_icon_filters.svg";
 
 interface CustomDatePickerProps {
-  label: string;
+  label: string | null;
   value: Date | null;
   onChange: (date: Date | null) => void;
   minDate?: Date;
@@ -22,7 +22,7 @@ interface CustomDatePickerProps {
 }
 
 const CustomDatePicker: React.FC<CustomDatePickerProps> = ({
-  label,
+  label = null,
   value,
   onChange,
   minDate,
@@ -70,8 +70,8 @@ const CustomDatePicker: React.FC<CustomDatePickerProps> = ({
   return (
     <div
       style={{
-        height: 36,
-        width: 132,
+        height: '100%',
+        width: '100%',
         border: "1px solid #E9E9EB",
         borderRadius: "6px",
         display: "flex",
@@ -85,7 +85,7 @@ const CustomDatePicker: React.FC<CustomDatePickerProps> = ({
         <Image src={calenderIcon} alt="calendar icon" />
       </div>
       <div style={{ flex: 1, marginTop: 6, marginLeft: 10 }}>
-        <div style={{ fontSize: 10, color: "#44475B" }}>{label}</div>
+        {label && <div style={{ fontSize: 10, color: "#44475B" }}>{label}</div>}
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <DatePicker
             open={open}
@@ -109,11 +109,13 @@ const CustomDatePicker: React.FC<CustomDatePickerProps> = ({
               ".MuiInputBase-input": {
                 padding: "0 !important",
                 fontSize: "12px !important",
+                
               },
               ".MuiInputBase-root": {
                 padding: 0,
                 border: "none",
                 "& fieldset": { border: "none" },
+                paddingBottom:'6px'
               },
               "& .MuiOutlinedInput-root": {
                 "&:hover fieldset": { border: "none" },

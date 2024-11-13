@@ -59,6 +59,7 @@ import EastIcon from '@mui/icons-material/East';
 import WestIcon from '@mui/icons-material/West';
 
 import CustomMultiSelect from "../UI/CustomMultiSelect/CustomMultiSelect";
+import CustomDatePicker from '../UI/CustomDatePicker/CustomDatePicker'
 
 import {
     Paper,
@@ -1731,12 +1732,11 @@ export const ContactModal = ({isClose, shipment}:any) => {
     const [openStationDropDown, setOpenStationDropDown] = useState(false);
     const [openReasonDropDown, setOpenReasonDropDown] = useState(false);
     const [opencontactpersonDropDown, setOpencontactpersonDropDown] = useState(false);
-    const currentDate = new Date();
-
+    const [currentDate, setCurrentDate] = useState(new Date());
+    const [stationId, setStationId] = useState('');
+    const [stationCode, setStationCode] = useState('');
 
     const [contactNumberListDropDown, setContactNumberListDropDown] = useState(false);
-    const [contactListNumber, setContactListNumber] = useState<any>([]);
-    const [contactListNumberCopy, setContactListNumberCopy] = useState([]);
     const [stationNameCopy, setStationNameCopy] = useState([]);
 
     const [stationNameDropDown, setStationNameDropDown] = useState(false);
@@ -1780,14 +1780,17 @@ export const ContactModal = ({isClose, shipment}:any) => {
             name,
             rating,
             comment,
+            contactTime: new Date (currentDate).toISOString(),
+            stationCode,
+            stationId
+        }
+        if(stationName === '' || stationName === 'No Data Found' || !stationNameCopy.some((item:any) => item.name === stationName) ) {
+            return showMessage('Please Select Station Name From List', 'error');
         }
         if(contactNumber === null) return showMessage('Please Enter Contact Number', 'error');
         const phoneNumberPattern = /^[0-9]{10}$/;
         if (!phoneNumberPattern.test(contactNumber.toString())) {
             return showMessage('Please Enter a Valid 10-Digit Contact Number', 'error');
-        }
-        if(stationName === '' || stationName === 'No Data Found' || !stationNameCopy.some(item => item === stationName) ) {
-            return showMessage('Please Select Station Name From List', 'error');
         }
         if(reason === 'Select Reason') return showMessage('Please Select Reason', 'error');
         if(contactPerson === 'Select Contact Person') return showMessage('Please Select Contact Person', 'error');
@@ -1830,7 +1833,7 @@ export const ContactModal = ({isClose, shipment}:any) => {
     }
 
     useEffect(()=>{
-        if(stationName !== '' && stationName !== 'No Data Found' && stationNameCopy.some(item => item === stationName)) {
+        if(stationName !== '' && stationName !== 'No Data Found' && stationNameCopy.some((item:any) => item.name === stationName)) {
             getContactDetailsByStationName();
         }
     },[stationName])
@@ -1849,7 +1852,7 @@ export const ContactModal = ({isClose, shipment}:any) => {
                     <div id='stationNameInput' onClick={(e)=>{e.stopPropagation(); }}><input value={stationName} type="text" placeholder="Enter Name" style={{border:'none', outline:'none'}} onChange={(e)=>{changeStationName(e.target.value);}} /></div>
                     {stationList.length > 0 && <div id='stationDropDown'>
                         {stationList?.map((item: any, index: number) => (
-                            <div id='stationNameItem' key={index} onClick={() => {setStationName(item); setStationList([])}}>{item}</div>
+                            <div id='stationNameItem' key={index} onClick={() => {setStationName(item.name); setStationList([]); setStationCode(item.code); setStationId(item._id)}}>{item.name}</div>
                         ))}
                     </div>}
                     {loadder && <div id='loaderForStationName'><CircularProgress size={15} /></div>}
@@ -1892,15 +1895,21 @@ export const ContactModal = ({isClose, shipment}:any) => {
 
                 <div id='stationName'>
                     <label id='labelName' >{text('currentTime')}</label>
-                    <div id="stationNameInput" style={{cursor:'not-allowed', fontSize:'13px'}}>
-                    {new Date().toLocaleString('en-US', {
+                    <div id="datePickerContainer" style={{ fontSize:'13px', }}>
+                    {/* {new Date().toLocaleString('en-US', {
                         day: '2-digit',
                         month: 'short',
                         year: 'numeric',
                         hour: '2-digit',
                         minute: '2-digit',
                         hour12: false
-                    }).replace(',', '').replace(/\b(\d{2})\b/, '$1 -')}
+                    }).replace(',', '').replace(/\b(\d{2})\b/, '$1 -')} */}
+                    <CustomDatePicker value={currentDate} onChange={(date) => {
+                        if (date === null) {
+                            date = new Date();
+                        }
+                        setCurrentDate(date);
+                    }}label={null} />
                     </div>
                 </div>
 
@@ -2015,8 +2024,12 @@ export const ViewContactModal = ({isClose, shipmentData}:any) => {
         return shipment.map(
           (shipment: {
             _id: string;
-            fnr: string;
-            stationName: string;
+            rakeShipment: {
+                FNR:string
+            };
+            stnName: {
+                name:string
+            };
             reason: string;
             role: string;
             name: string;
@@ -2024,13 +2037,14 @@ export const ViewContactModal = ({isClose, shipmentData}:any) => {
             comment: string;
             rating: number;
             created_at: string;
+            contactTime:any;
           }) => {
             return {
               id: shipment?._id ? shipment._id : '--',
-              stationName: shipment?.stationName
-                ? shipment?.stationName
+              stationName: shipment?.stnName.name
+                ? shipment?.stnName.name
                 : "--",
-              fnr: shipment?.fnr ? shipment?.fnr : "--",
+              fnr: shipment?.rakeShipment.FNR ? shipment?.rakeShipment.FNR : "--",
               contactPersonRole: shipment?.role
                 ? shipment?.role
                 : "--",
@@ -2046,6 +2060,7 @@ export const ViewContactModal = ({isClose, shipmentData}:any) => {
               comment: shipment?.comment ? shipment?.comment : "--",
               rating: shipment?.rating ? shipment?.rating : 0,
               created_at: shipment?.created_at ? shipment?.created_at : "--",
+              contactTime:shipment?.contactTime ? shipment?.contactTime : '--',
             };
           }
         );
@@ -2166,7 +2181,7 @@ export const ViewContactModal = ({isClose, shipmentData}:any) => {
                               </div>
                             )}
                             {column.id === 'stationName' && (
-                                <div>{service.utcToist(row.created_at, 'dd-MMM-yy HH:mm')}</div>
+                                <div>{service.utcToist(row.contactTime, 'dd-MMM-yy HH:mm')}</div>
                             )}
                             {column.id === "action" && (
                               <div id="actionIconContaioner">
