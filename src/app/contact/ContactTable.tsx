@@ -42,7 +42,7 @@ const columns: readonly Column[] = [
     label: "Contact Person Role",
     style: "header_contactPersonRole",
   },
-  { id: "name", label: "Name", style: "header_name" },
+  { id: "name", label: "Name", style: "headerContact_name" },
   { id: "contact", label: "Contact No.", style: "header_contact_no" },
   { id: "reason", label: "Reason", style: "header_reason" },
   { id: "comment", label: "Comment", style: "header_comment" },
@@ -53,17 +53,12 @@ function contructingData(shipment: any) {
   return shipment.map(
     (shipment: {
       _id: string;
-      fnr: string;
-      // contact: {
-      //   stationName: string;
-      //   reason: string;
-      //   contactPerson: string;
-      //   contactPersonMobile: string;
-      //   comment: string;
-      //   rating: number;
-      //   name: string;
-      // };
-      stationName: string;
+      rakeShipment: {
+        FNR:string
+      };
+      stnName: {
+        name:string
+      };
       reason: string;
       role: string;
       name: string;
@@ -73,10 +68,10 @@ function contructingData(shipment: any) {
     }) => {
       return {
         id: shipment?._id ? shipment._id : '--',
-        stationName: shipment?.stationName
-          ? shipment?.stationName
+        stationName: shipment?.stnName.name
+          ? shipment?.stnName.name
           : "--",
-        fnr: shipment?.fnr ? shipment?.fnr : "--",
+        fnr: shipment?.rakeShipment.FNR ? shipment?.rakeShipment.FNR : "--",
         contactPersonRole: shipment?.role
           ? shipment?.role
           : "--",
@@ -148,7 +143,7 @@ const ContactTable = ({ contactDetails }: any) => {
           boxShadow: "none",
         }}
       >
-        <TablePagination
+        {/* <TablePagination
           rowsPerPageOptions={[5, 10, 25, 50, 100]}
           component="div"
           count={contactDetails.length}
@@ -158,7 +153,7 @@ const ContactTable = ({ contactDetails }: any) => {
           onRowsPerPageChange={handleChangeRowsPerPage}
           labelRowsPerPage="Shipments per page"
           sx={{ position: "absolute", top: -40, zIndex: 100, right: -10 }}
-        />
+        /> */}
         <TableContainer
           sx={{
             overflow: "auto",
@@ -176,7 +171,7 @@ const ContactTable = ({ contactDetails }: any) => {
                     style={{
                       textAlign: "center",
                       padding: "8px 0px 8px 0px",
-                      fontSize: 14,
+                      fontSize: 12,
                       fontWeight: 600,
                       color: "#484A57",
                       whiteSpace: "nowrap",

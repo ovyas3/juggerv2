@@ -6,7 +6,8 @@
 }
 .header_name{
  /* background-color: violet !important; */
- min-width: 215px !important;
+ /* min-width: 215px !important; */
+ text-align: center !important;
 }
 .header_email{
     /* background-color: tomato !important; */

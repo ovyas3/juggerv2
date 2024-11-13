@@ -14,6 +14,8 @@ import searchIcon from "@/assets/search_wagon.svg";
 import Image from "next/image";
 import ContactTable from "./ContactTable";
 import ContactFilters from "./ContactFilters";
+import { redirect, useRouter, useParams } from "next/navigation";
+
 
 
 
@@ -22,6 +24,7 @@ function Contact() {
   const t = useTranslations("ETADASHBOARD");
   const todaysDate = new Date();
   const twentyDaysBefore = new Date(todaysDate.getTime() - 200 * 24 * 60 * 60 * 1000);
+  const route = useRouter();
 
   const [ogContactDetails, setOgContactDetails] = useState([]);
   const [contactDetails, setContactDetails] = useState([]);
@@ -82,13 +85,14 @@ function Contact() {
             />
             <input id="inputSearch" placeholder="search station name" onChange={(e)=>{handleSearch(e.target.value)}}/>
           </div>
+          <div id='view-all-contact-btn' onClick={()=>{route.push(`/contact/allContacts`)}} >Distinct Contacts</div>
         </div>
 
         <div id='filterContainer'>
           <ContactFilters setContactDetailsPayload={setContactDetailsPayload} />
         </div>
 
-        <div id='tableContainer'>
+        <div id='tableContainer' style={{marginTop:24}}>
           <ContactTable contactDetails={contactDetails} />
         </div>
 

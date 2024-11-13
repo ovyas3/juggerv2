@@ -16,6 +16,24 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    position: relative;
+  }
+  #view-all-contact-btn{
+    position: absolute;
+    width: fit-content;
+    padding-inline: 16px;
+    padding-block: 10px;
+    font-size: small;
+    right: 0px;
+    background-color: #E6EAFF;
+    color: #3351FE;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+  }
+  #view-all-contact-btn:hover{
+    background-color: #2B68FF;
+    color: white;
   }
   #searchBox{
     height: 40px;
@@ -60,7 +78,7 @@
 .action-popover-wagon:hover{
   background-color: rgb(233, 229, 229);
 }
-.header_name{
+.headerContact_name{
   text-align: left !important;
   padding-left: 0px !important;
 }
