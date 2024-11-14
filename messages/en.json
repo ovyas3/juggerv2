@@ -87,7 +87,8 @@
     "rate":"Rate This Contact Person",
     "contactModalHeaderOld":"Previous Contacts Details",
     "currentTime":"Contact Date",
-    "viewAllContacts":"View All Contacts"
+    "viewAllContacts":"View All Contacts",
+    "otherReason":"Other Reasons"
   },
   "UPLOAD_ANNEXURE":{
     "SNCKBR_MSG":{

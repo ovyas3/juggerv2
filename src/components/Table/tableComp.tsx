@@ -59,7 +59,7 @@ import EastIcon from '@mui/icons-material/East';
 import WestIcon from '@mui/icons-material/West';
 
 import CustomMultiSelect from "../UI/CustomMultiSelect/CustomMultiSelect";
-import CustomDatePicker from '../UI/CustomDatePicker/CustomDatePicker'
+import CustomDateTimePicker from '../UI/CustomDateTimePicker/CustomDateTimePicker';
 
 import {
     Paper,
@@ -1711,7 +1711,7 @@ const stations = [
   const contactPersons = [
     { value: "controller", label: "Controller" },
     { value: "station-master", label: "Station Master" },
-    { value: "others", label: "Others" },
+    // { value: "others", label: "Others" },
   ]
 
 export const ContactModal = ({isClose, shipment}:any) => {
@@ -1735,6 +1735,7 @@ export const ContactModal = ({isClose, shipment}:any) => {
     const [currentDate, setCurrentDate] = useState(new Date());
     const [stationId, setStationId] = useState('');
     const [stationCode, setStationCode] = useState('');
+    const [otherReasons, setOtherReasons] = useState<String | null>(null);
 
     const [contactNumberListDropDown, setContactNumberListDropDown] = useState(false);
     const [stationNameCopy, setStationNameCopy] = useState([]);
@@ -1774,7 +1775,7 @@ export const ContactModal = ({isClose, shipment}:any) => {
         let payload = {
             id:shipment._id,
             stationName,
-            reason,
+            reason:otherReasons || reason,
             contactPerson,
             contactPersonMobile:contactNumber,
             name,
@@ -1782,7 +1783,8 @@ export const ContactModal = ({isClose, shipment}:any) => {
             comment,
             contactTime: new Date (currentDate).toISOString(),
             stationCode,
-            stationId
+            stationId,
+            
         }
         if(stationName === '' || stationName === 'No Data Found' || !stationNameCopy.some((item:any) => item.name === stationName) ) {
             return showMessage('Please Select Station Name From List', 'error');
@@ -1793,6 +1795,9 @@ export const ContactModal = ({isClose, shipment}:any) => {
             return showMessage('Please Enter a Valid 10-Digit Contact Number', 'error');
         }
         if(reason === 'Select Reason') return showMessage('Please Select Reason', 'error');
+        if(reason === 'Others' && otherReasons === null){
+            return showMessage('Please Enter Other Reason', 'error');
+        }
         if(contactPerson === 'Select Contact Person') return showMessage('Please Select Contact Person', 'error');
         if(name === '') return showMessage('Please Enter Name', 'error');
         if(comment === '') return showMessage('Please Enter Comment', 'error');
@@ -1823,7 +1828,7 @@ export const ContactModal = ({isClose, shipment}:any) => {
 
     const getContactDetailsByStationName = async () => {
         try {
-           const response = await httpsGet(`rake_shipment/getAllContactList?id=${shipment._id}&stationName=${stationName}`);
+           const response = await httpsGet(`rake_shipment/getAllContactList?id=${shipment._id}&stnID=${stationId}`);
            if(response.statusCode === 200) {
                 setOldContactDetailsList(response.data);
            }
@@ -1870,7 +1875,9 @@ export const ContactModal = ({isClose, shipment}:any) => {
 
                 <div id='stationName'>
                     <label id='labelName' >{text('contactNo')}</label>
-                    <div id='stationNameInput' onClick={(e)=>{ e.stopPropagation();}} ><input value={contactNumber ?? ''} onChange={(e)=>{setContactNumber(parseInt(e.target.value)||null);}} type="number" placeholder="Enter Contact Number" style={{border:'none', outline:'none'}} /></div>
+                    <div id='stationNameInput' onClick={(e)=>{ e.stopPropagation();}} ><input value={contactNumber ?? ''} onChange={(e)=>{setContactNumber(parseInt(e.target.value)||null);}} type="number" placeholder="Enter Contact Number" style={{border:'none', outline:'none'}} onKeyDown={(e) => {
+                if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {e.preventDefault();}
+                }}/></div>
                 </div>
 
                 <div id='stationName'>
@@ -1888,28 +1895,22 @@ export const ContactModal = ({isClose, shipment}:any) => {
                     <div id='stationNameInput' style={{color:'black', fontSize:'13px'}} onClick={(e)=>{e.stopPropagation(); setOpenReasonDropDown(!openReasonDropDown) }}>{reason}</div>
                     {openReasonDropDown && <div id='stationDropDown'>
                         {reasons?.map((item: any, index: number) => (
-                            <div id='stationNameItem' key={index} onClick={() => {setReason(item.label); setOpenReasonDropDown(false);}}>{item.label}</div>
+                            <div id='stationNameItem' key={index} onClick={() => {setReason(item.label); setOtherReasons(null); setOpenReasonDropDown(false);}}>{item.label}</div>
                         ))}
                     </div>}
                 </div>
-
+             
+                {(reason === 'Others' )&& (
+                    <div id='stationName'>
+                    <label id='labelName' >{text('otherReason')}</label>
+                    <div id='stationNameInput'><input onChange={(e)=>{setOtherReasons(e.target.value)}} value={(otherReasons|| "").toString()} type="text" placeholder="Enter your reason" style={{border:'none', outline:'none'}} /></div>
+                    </div>
+                )}
+                
                 <div id='stationName'>
                     <label id='labelName' >{text('currentTime')}</label>
                     <div id="datePickerContainer" style={{ fontSize:'13px', }}>
-                    {/* {new Date().toLocaleString('en-US', {
-                        day: '2-digit',
-                        month: 'short',
-                        year: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        hour12: false
-                    }).replace(',', '').replace(/\b(\d{2})\b/, '$1 -')} */}
-                    <CustomDatePicker value={currentDate} onChange={(date) => {
-                        if (date === null) {
-                            date = new Date();
-                        }
-                        setCurrentDate(date);
-                    }}label={null} />
+                    <CustomDateTimePicker value={currentDate} onChange={(date:any) => {setCurrentDate(date);}} label={null} />
                     </div>
                 </div>
 
@@ -2065,8 +2066,6 @@ export const ViewContactModal = ({isClose, shipmentData}:any) => {
           }
         );
       }
-    console.log(shipmentData)
-    console.log(viewContactsList)
     return (
         <div style={{width:'100vw', height:'100vh', position:'fixed', top:0, left:0 ,zIndex:300, backgroundColor:'rgba(0, 0, 0, 0.5)'}} onClick={(e)=>{e.stopPropagation(); isClose(false)}}>
         <div id="viewContactModal" onClick={(e)=>{e.stopPropagation();}}>
