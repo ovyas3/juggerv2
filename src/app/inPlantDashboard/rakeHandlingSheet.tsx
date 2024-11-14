@@ -698,7 +698,7 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
                         setRakeArrivalAtStationDate(newDate.toDate());
                       }
                     }}
-                    format="DD-MM-YYYY hh:mm A"
+                    format="DD-MM-YYYY HH:mm "
                   />
                 </LocalizationProvider>
               </div>
@@ -767,7 +767,7 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
                         setStabledDate(newDate.toDate());
                       }
                     }}
-                    format="DD-MM-YYYY hh:mm A"
+                    format="DD-MM-YYYY HH:mm "
                   />
                 </LocalizationProvider>
               </div>
@@ -837,7 +837,7 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
                         setPlacementTimeDate(newDate.toDate());
                       }
                     }}
-                    format="DD-MM-YYYY hh:mm A"
+                    format="DD-MM-YYYY HH:mm "
                   />
                 </LocalizationProvider>
               </div>
@@ -910,7 +910,7 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
                         setRakeArrivalAtPlantDate(newDate.toDate());
                       }
                     }}
-                    format="DD-MM-YYYY hh:mm A"
+                    format="DD-MM-YYYY HH:mm "
                   />
                 </LocalizationProvider>
               </div>
@@ -978,7 +978,7 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
                         setBpReleaseDate(newDate.toDate());
                       }
                     }}
-                    format="DD-MM-YYYY hh:mm A"
+                    format="DD-MM-YYYY HH:mm "
                   />
                 </LocalizationProvider>
               </div>
@@ -1052,7 +1052,7 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
                         setWagonPlacedAtLoadingPointDate(newDate.toDate());
                       }
                     }}
-                    format="DD-MM-YYYY hh:mm A"
+                    format="DD-MM-YYYY HH:mm "
                   />
                 </LocalizationProvider>
               </div>
@@ -1121,7 +1121,7 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
                         setLoadRakeFormationDate(newDate.toDate());
                       }
                     }}
-                    format="DD-MM-YYYY hh:mm A"
+                    format="DD-MM-YYYY HH:mm "
                   />
                 </LocalizationProvider>
               </div>
@@ -1435,7 +1435,7 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
                         setLoadRakeFormationDate(newDate.toDate());
                       }
                     }}
-                    format="DD-MM-YYYY hh:mm A"
+                    format="DD-MM-YYYY HH:mm "
                   />
                 </LocalizationProvider>
               </div>
@@ -1503,7 +1503,7 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
                         setRakeReleaseDate(newDate.toDate());
                       }
                     }}
-                    format="DD-MM-YYYY hh:mm A"
+                    format="DD-MM-YYYY HH:mm "
                   />
                 </LocalizationProvider>
               </div>
@@ -1573,7 +1573,7 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
                         setRlylocoReportingDate(newDate.toDate());
                       }
                     }}
-                    format="DD-MM-YYYY hh:mm A"
+                    format="DD-MM-YYYY HH:mm "
                   />
                 </LocalizationProvider>
               </div>
@@ -1639,7 +1639,7 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
                         setEotDate(newDate.toDate());
                       }
                     }}
-                    format="DD-MM-YYYY hh:mm A"
+                    format="DD-MM-YYYY HH:mm "
                   />
                 </LocalizationProvider>
               </div>
@@ -1707,7 +1707,7 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
                         setApReadyDate(newDate.toDate());
                       }
                     }}
-                    format="DD-MM-YYYY hh:mm A"
+                    format="DD-MM-YYYY HH:mm "
                   />
                 </LocalizationProvider>
               </div>
@@ -1775,7 +1775,7 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
                         setDrawnOutDate(newDate.toDate());
                       }
                     }}
-                    format="DD-MM-YYYY hh:mm A"
+                    format="DD-MM-YYYY HH:mm "
                   />
                 </LocalizationProvider>
               </div>

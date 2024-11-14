@@ -34,7 +34,7 @@ interface Column {
 const columns: readonly Column[] = [
     { id: "sno", label: "SI No", style: "header_sno" },
     { id: "stationName", label: "Station Name", style: "header_stationName" },
-    { id: "fnr", label: "FNR No", style: "header_fnr" },
+    // { id: "fnr", label: "FNR No", style: "header_fnr" },
     {
       id: "contactPersonRole",
       label: "Contact Person Role",
@@ -67,7 +67,7 @@ const columns: readonly Column[] = [
           stationName: shipment?.stn.name
             ? shipment?.stn.name
             : "--",
-          fnr: shipment?.rakeShipment.FNR ? shipment?.rakeShipment.FNR : "--",
+        //   fnr: shipment?.rakeShipment.FNR ? shipment?.rakeShipment.FNR : "--",
           contactPersonRole: shipment?.role
             ? shipment?.role
             : "--",
