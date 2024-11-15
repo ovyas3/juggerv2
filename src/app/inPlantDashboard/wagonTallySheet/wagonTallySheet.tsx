@@ -376,10 +376,10 @@ const WagonTallySheet: React.FC = () => {
           });
         }
       } catch (error) {
-        setLoading(false);
+        // setLoading(false);
         console.log(error);
       } finally {
-        setLoading(false);
+        // setLoading(false);
       }
     } else {
       showMessage("Please enter valid Batch ID/Heat No", "error");
@@ -924,9 +924,9 @@ const WagonTallySheet: React.FC = () => {
     };
   }, []);
 
-  if (loading) {
-    return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+  return (
+    <div className="wagon-tally-container">
+       {loading && <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh',position:'absolute',width:'100vw',background:'white',zIndex:100,opacity:0.5}}>
         <ThreeCircles
           visible={true}
           height="100"
@@ -936,12 +936,7 @@ const WagonTallySheet: React.FC = () => {
           wrapperStyle={{}}
           wrapperClass=""
         />
-      </div>
-    );
-  }
-
-  return (
-    <div className="wagon-tally-container">
+      </div>}
       <Header title={text('wagonTallySheet')} isMapHelper={false} />
       <div className="wagon-tally-sheet-main">
         <div className="wagon-tally-sheet-header">
