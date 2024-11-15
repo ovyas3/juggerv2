@@ -376,10 +376,10 @@ const WagonTallySheet: React.FC = () => {
           });
         }
       } catch (error) {
-        // setLoading(false);
+        setLoading(false);
         console.log(error);
       } finally {
-        // setLoading(false);
+        setLoading(false);
       }
     } else {
       showMessage("Please enter valid Batch ID/Heat No", "error");
