@@ -270,6 +270,19 @@
     "takePhoto": "Take Photo",
     "upload-rake-handling-sheet":"Upload Rake Handling Sheet",
     "uploadFile":"Upload File"
+  },
+  "CONTACT":{
+    "contactModalHeaderEdit":"Edit Contact",
+    "name":"Name:",
+    "stationName":"Station Name:",
+    "phoneNo":"Phone No. :",
+    "role":"Contact Person Role:",
+    "editComment":"Comment",
+    "reasons":"Reasons",
+    "rate":"Rate Us",
+    "submit":"Submit",
+    "deleteContactHeader":"Delete Contact"
   }
+
 }
 

@@ -105,7 +105,7 @@ function Contact() {
         </div>
 
         <div id="tableContainer" style={{ marginTop: 24 }}>
-          <ContactTable contactDetails={contactDetails} />
+          <ContactTable contactDetails={contactDetails} getContactDetails={getContactDetails} />
         </div>
       </div>
 

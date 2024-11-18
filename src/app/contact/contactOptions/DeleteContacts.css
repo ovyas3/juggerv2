@@ -1,0 +1,41 @@
+#close-btn-container{
+    background-color: white;
+    position: absolute;
+    height: 36px;
+    width: 36px;
+    border-radius: 50%;
+    top:-45px;
+    right: 0px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 3px;
+    transition: transform 1.5s ease-in-out;
+    cursor: pointer;
+}
+#close-btn-container:hover{
+    transform: rotate(360deg);
+}
+#deleteStatus{
+    display: flex;
+    justify-content: center;
+    gap:110px;
+    font-size: 14px;
+    position: relative;
+}
+
+#delete-btn{
+    position: absolute;
+    background-color: #2B68FF;
+    bottom: 24px;
+    right: 24px;
+    width: fit-content;
+    text-transform: uppercase;
+    color: aliceblue;
+    font-size: 14px;
+    padding-inline: 16px;
+    font-weight: 600;
+    padding-block: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+}

@@ -638,3 +638,7 @@
   align-items: center;
   gap: 6px;
 }
+.header_destination_inplant{
+  /* background-color: #00B275 !important; */
+  width: 250px !important;
+}
