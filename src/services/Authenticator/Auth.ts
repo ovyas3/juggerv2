@@ -51,6 +51,7 @@ export const handleAuthentication = async (
   rms_data: any = {}
 ) => {
   if (from === "tms_rms" && rms_auth) {
+    localStorage.removeItem('isRMSLogin')
     const authenticated = await httpsPost("tms_rms/verify", { rms_auth })
       .then((res) => {
         if(res) {
