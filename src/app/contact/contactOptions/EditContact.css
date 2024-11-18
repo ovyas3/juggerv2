@@ -1,0 +1,124 @@
+#close-btn-container{
+    background-color: white;
+    position: absolute;
+    height: 36px;
+    width: 36px;
+    border-radius: 50%;
+    top:-45px;
+    right: 0px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 3px;
+    transition: transform 1.5s ease-in-out;
+    cursor: pointer;
+}
+#close-btn-container:hover{
+    transform: rotate(360deg);
+}
+#contactModalHeader{
+    font-size: 18px;
+    font-weight: 500;
+    color: #131722;
+    margin-bottom: 20px;
+}
+#statusBar{
+    background-color: #F2F6FF;
+    display: flex;
+    justify-content:space-around;
+    align-items: center;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 400;
+    padding-block: 24px;
+}
+#headerStatus{
+    font-size: 14px;
+    font-weight: 600;
+    margin-top: 4px;
+}
+#textArea{
+    border: none;
+    outline: 'none';
+    font-size: 12px;
+    width: 100%;
+    padding: 4px;
+    resize: vertical;
+    min-height: 60px;
+    font-family: inherit;
+    padding: 10px;
+    outline: none;
+}
+#textAreaContainer{
+    border: 1px solid #E9E9EB;
+    border-radius: 4px;
+}
+#editHeader{
+    font-size: 12px;
+    font-weight: 400;
+}
+#editFiledContainer{
+    margin-top: 12px;
+    position: relative;
+}
+#stationNameInput{
+    width: 190px;
+    height: 36px;
+    border: 1px solid #DFE3EB;
+    border-radius: 4px;
+    font-size: 14px;
+    color: #858585;
+    font-weight: 400;
+    align-content: center;
+    padding-left: 10px;
+}
+#stationDropDown{
+    position: absolute;
+    width: 202px;
+    z-index: 1;
+    background-color: white;
+    font-size: 12px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
+    border-radius: 4px;
+    max-height: 140px;
+    overflow-y: auto;
+    bottom: -148px;
+}
+#stationNameItem{
+    padding: 12px 16px;
+    cursor: pointer;
+    transition: all 0.1s ease-in-out;
+}
+#stationNameItem:hover{
+    background-color: #E9E9EB;
+}
+.star-rating {
+    display: flex;
+    font-size: 2em;
+}
+  
+.star {
+    color: gray;
+    transition: color 0.2s;
+}
+  
+.star.selected {
+    color: gold;
+}
+
+#btnContainer{
+    background-color: #5481FF;
+    position: absolute;
+    bottom: 24px;
+    right: 24px;
+    width: fit-content;
+    font-size: 12px;
+    text-transform: uppercase;
+    color: white;
+    padding-inline: 32px;
+    padding-block: 12px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+}
+

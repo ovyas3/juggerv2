@@ -1688,17 +1688,6 @@ export const HandlingETA = ({ isClose, isOpen, shipment, getAllShipment, differe
       
     )
 };
-
-const stations = [
-    { value: "visakhapatnam", label: "Visakhapatnam" },
-    { value: "sambalpur", label: "Sambalpur" },
-    { value: "balangir", label: "Balangir" },
-    { value: "kakinada", label: "Kakinada" },
-    { value: "rajahmundryavaram", label: "Rajahmundryavaram" },
-    { value: "vijayawada", label: "Vijayawada" },
-    { value: "guntakal", label: "Guntakal" },
-    { value: "jsw", label: "JSW Bellary Plant" },
-  ]
   
   const reasons = [
     { value: "missing-wagons", label: "Missing Wagons" },
@@ -1711,6 +1700,7 @@ const stations = [
   const contactPersons = [
     { value: "controller", label: "Controller" },
     { value: "station-master", label: "Station Master" },
+    { value: "liaisoning-manager", label: "Liaisoning Manager"}
     // { value: "others", label: "Others" },
   ]
 
@@ -1761,7 +1751,7 @@ export const ContactModal = ({isClose, shipment}:any) => {
                         setStationNameCopy(response.data)
                         setLoadder(false);
                     } else {
-                        setStationList(['No Data Found']);
+                        setStationList([{name:'No Data Found'}]);
                         setLoadder(false);
                     }
                 } catch (error) {
@@ -1857,7 +1847,7 @@ export const ContactModal = ({isClose, shipment}:any) => {
                     <div id='stationNameInput' onClick={(e)=>{e.stopPropagation(); }}><input value={stationName} type="text" placeholder="Enter Name" style={{border:'none', outline:'none'}} onChange={(e)=>{changeStationName(e.target.value);}} /></div>
                     {stationList.length > 0 && <div id='stationDropDown'>
                         {stationList?.map((item: any, index: number) => (
-                            <div id='stationNameItem' key={index} onClick={() => {setStationName(item.name); setStationList([]); setStationCode(item.code); setStationId(item._id)}}>{item.name}</div>
+                            <div id='stationNameItem' key={index} onClick={() => {setStationName(item.name); setStationList([]); setStationCode(item.code); setStationId(item._id)}}>{item.name} { item?.code && <span style={{fontWeight:'bold'}}>({item.code})</span>}</div>
                         ))}
                     </div>}
                     {loadder && <div id='loaderForStationName'><CircularProgress size={15} /></div>}

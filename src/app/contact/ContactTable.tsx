@@ -27,6 +27,8 @@ import {
   TablePagination,
   TableRow,
 } from "@mui/material";
+import EditContact from './contactOptions/EditContact'
+import DeleteContacts from './contactOptions/DeleteContacts'
 
 interface Column {
   id: string;
@@ -91,7 +93,7 @@ function contructingData(shipment: any) {
   );
 }
 
-const ContactTable = ({ contactDetails }: any) => {
+const ContactTable = ({ contactDetails, getContactDetails }: any) => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [page, setPage] = useState(0);
   const [showActionBox, setShowActionBox] = React.useState(-1);
@@ -99,15 +101,11 @@ const ContactTable = ({ contactDetails }: any) => {
     null
   );
 
-  const handleChangePage = (event: unknown, newPage: number) => {
-    setPage(newPage);
-  };
-  const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setRowsPerPage(+event.target.value);
-    setPage(0);
-  };
+  const [openEditModel, setOpenEditModel] = useState(false);
+  const [editContact, setEditContact] = useState({})
+
+  const [openDeleteModel, setOpenDeleteModel] = useState(false);
+  const [deleteContact, setDeleteContact] = useState({});
 
   function clickActionBox(
     e: React.MouseEvent<SVGSVGElement, MouseEvent>,
@@ -261,13 +259,23 @@ const ContactTable = ({ contactDetails }: any) => {
                                 >
                                   <div
                                     className="action-popover-wagon"
-                                    onClick={(e) => {}}
+                                    onClick={(e) => {
+                                      setOpenEditModel(true)
+                                      setEditContact(row)
+                                      setAnchorEl(null);
+                                      setShowActionBox(-1);
+                                    }}
                                   >
                                     Edit Contact
                                   </div>
                                   <div
                                     className="action-popover-wagon"
-                                    onClick={(e) => {}}
+                                    onClick={(e) => {
+                                      setOpenDeleteModel(true);
+                                      setDeleteContact(row);
+                                      setAnchorEl(null);
+                                      setShowActionBox(-1);
+                                    }}
                                   >
                                     Delete Contact
                                   </div>
@@ -285,6 +293,8 @@ const ContactTable = ({ contactDetails }: any) => {
           </Table>
         </TableContainer>
       </Paper>
+      {openEditModel &&  <EditContact contact={editContact} isClose={setOpenEditModel} getContactDetails={getContactDetails} ></EditContact> }
+      {openDeleteModel && <DeleteContacts contact={deleteContact} isClose={setOpenDeleteModel} getContactDetails={getContactDetails}/>}
     </div>
   );
 };

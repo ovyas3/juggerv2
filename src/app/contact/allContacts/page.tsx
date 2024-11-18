@@ -13,7 +13,8 @@ import service from "@/utils/timeService";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import Popover from '@mui/material/Popover';
 import { ThreeCircles } from "react-loader-spinner";
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';import {
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import {
     Paper,
     Table,
     TableBody,
@@ -128,7 +129,7 @@ const AllContactsContext = () => {
     };
   
     const getDistinctContacts = async () => {
-      const response = await httpsGet(`rake_shipment/getDistinctContacts`);
+      const response = await httpsGet(`contact_details/getDistinctContacts`);
       if (response.statusCode === 200) {
         setContactList(response.data);
       }

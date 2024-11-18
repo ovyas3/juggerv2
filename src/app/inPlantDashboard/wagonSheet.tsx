@@ -645,20 +645,16 @@ function WagonTallySheet({}: any) {
                                   </>
                                 )}
                                 {column.id === "destination" && (
-                                  <>
                                     <div 
                                       style={{ 
                                         fontSize: 12,
                                         display: 'flex',
                                         alignItems: 'center',
                                         justifyContent: 'center',
-                                        width: 156,
-                                        paddingLeft: 16
                                       }}
                                     >
                                       {row.destination_code} {row.destination_name}
                                     </div>
-                                  </>
                                 )}
                                 {column.id === "plant" && (
                                   <>
