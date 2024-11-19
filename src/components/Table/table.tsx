@@ -903,7 +903,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                 <div style={{ color: row.status.raw === 'AVE' ? parseInt(row.daysAging) > 10 ? 'red' : 'green' : 'black' }}>{value.edemand_no}</div>
                                                                 {(row?.intent_no || row?.captive.name !== '--') && <div style={{paddingTop: '6px', display:'flex', justifyContent:'space-between', paddingRight:12}}>
                                                                     { row?.intent_no && <div>{row?.intent_no}</div>}
-                                                                    { row?.captive.name !== '--' && <div>{row?.captive.name}</div>}
+                                                                    { row?.captive.name !== '--' && <div style={{ color: 'green' }}>{row?.captive.name}</div>}
                                                                 </div>}
                                                                 <div className='no_of_wagons'>
                                                                     <div className='request_wagons'>
