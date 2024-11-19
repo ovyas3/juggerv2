@@ -9,6 +9,7 @@ import TrackingStatus from "../status/trackingStatus";
 import { Popup } from "@/components/Popup/popup";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
+// import MapViewPage from "@/app/MapsHelper/page";
 
 const Tabsection = () => {
   const router = useRouter();
@@ -19,8 +20,8 @@ const Tabsection = () => {
   const [helpCenterBtnHovered, setHelpCenterBtnHovered] = useState(false);
   const t = useTranslations("DASHBOARD");
 
-  const handleChange = (val: any) => {
-    setValue(val);
+  const handleChange = (event: React.ChangeEvent<{}>, newValue: string) => {
+    setValue(newValue);
   };
 
   const handleAllRakesAndTable = async (props: any) => {
@@ -93,6 +94,7 @@ const Tabsection = () => {
               <Box sx={{ borderBottom: 1, borderColor: "divider"}}>
                 <TabList onChange={handleChange}>
                   <Tab label={t("railOverview")} value="1" />
+                  {/* <Tab label={t("mapView")} value="2" /> */}
                 </TabList>
               </Box>
              <TabPanel value="1" className="tabpanel-container">
@@ -112,6 +114,9 @@ const Tabsection = () => {
                   </div>
                 </div>
               </TabPanel>
+              {/* <TabPanel value="2" className="tabpanel-container">
+               
+              </TabPanel> */}
             </TabContext>
           </Box>
         </div>

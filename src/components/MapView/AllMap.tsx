@@ -764,9 +764,11 @@ const MapLayers = () => {
                   </Marker>)}
                   {showAllRakes &&
                   <>
-                  <MarkerClusterGroup chunkedLoading iconCreateFunction={createClusterCustomIconTracking}>
+                  {/* <MarkerClusterGroup chunkedLoading iconCreateFunction={createClusterCustomIconTracking}>
+                  
+                  </MarkerClusterGroup> */}
                   {/* Mapping through the markers */}
-                    {showAllRakes && ['total','tracking'].includes(selectedType) && allRakesPositions.map((rake:any, index: number) => <Marker key={index} position={rake.coords} icon={customIcon} ref={(el) => {
+                  {showAllRakes && ['total','tracking'].includes(selectedType) && allRakesPositions.map((rake:any, index: number) => <Marker key={index} position={rake.coords} icon={customIcon} ref={(el) => {
                       if (selectedRake && selectedRake.name === rake.data.title) {
                         selectedMarkerRef.current = el;
                       }
@@ -777,10 +779,11 @@ const MapLayers = () => {
                         <h4 style={{marginTop: '1em', marginBottom: "1em"}}>Last Updated At: {rake.data.ts}</h4>
                       </Popup>
                     </Marker>)}
-                  </MarkerClusterGroup>
-                  <MarkerClusterGroup chunkedLoading iconCreateFunction={createClusterCustomIconIdle}>
+                  {/* <MarkerClusterGroup chunkedLoading iconCreateFunction={createClusterCustomIconIdle}>
+                  
+                  </MarkerClusterGroup> */}
                   {/* Mapping through the markers */}
-                    {showAllRakes && ['total','idle'].includes(selectedType) && allIdleRakes.map((rake:any, index: number) => <Marker key={index} position={rake.coords} icon={customIconIdle} ref={(el) => {
+                  {showAllRakes && ['total','idle'].includes(selectedType) && allIdleRakes.map((rake:any, index: number) => <Marker key={index} position={rake.coords} icon={customIconIdle} ref={(el) => {
                       if (selectedRake && selectedRake.name === rake.data.title) {
                         selectedMarkerRef.current = el;
                       }
@@ -791,7 +794,6 @@ const MapLayers = () => {
                         <h4 style={{marginTop: '1em', marginBottom: "1em"}}>Last Updated At: {rake.data.ts}</h4>
                       </Popup>
                     </Marker>)}
-                  </MarkerClusterGroup>
                   </>
                   }
           
