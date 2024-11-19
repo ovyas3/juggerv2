@@ -26,7 +26,8 @@
    "trackingStatus":"TRACKING STATUS",
    "wagons":"Wagons",
    "withLoad":"With Load",
-   "withoutLoad":"Empty"
+   "withoutLoad":"Empty",
+   "mapView":"Map View"
   },
   "HEADER":{
     "shipments":"Shipments",
