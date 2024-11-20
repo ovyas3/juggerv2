@@ -92,7 +92,7 @@ function UploadModel({setOpenUploadModel}:any){
                <p className="sampleFile" onClick={(e)=>{e.stopPropagation();  window.open('https://docs.google.com/spreadsheets/d/18sF1ybRgrk-BRhMVZkIFnwT7DX7Ui8yGDW9rPVyv_xw/edit?gid=0#gid=0', '_blank'); } } >Download Sample File</p>
             </div>
 
-            <div className="buttonContaioner">
+            <div id="buttonContaioner">
                 <Button className="buttonMarkPlacement" onClick={(e)=>{ e.stopPropagation(); setUploadFile({}); setFileName('Drag and Drop to upload the file here'); }} style={{color:'#2862FF', border:'1px solid #2862FF', width:110, cursor:'pointer', fontWeight:'bold', transition:'all 0.5s ease-in-out'}}>{t('clear')}</Button>
                 <Button className="buttonMarkPlacement" onClick={(e)=>{e.stopPropagation(); uploadWagonSheet(); }} style={{color:'white', backgroundColor:'#2862FF',width:110, border:'1px solid #2862FF', cursor:'pointer', fontWeight:'bold',transition:'all 0.5s ease-in-out' }}>{t('upload')}</Button>
             </div> 
