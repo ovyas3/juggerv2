@@ -1700,7 +1700,7 @@ export const HandlingETA = ({ isClose, isOpen, shipment, getAllShipment, differe
   const contactPersons = [
     { value: "controller", label: "Controller" },
     { value: "station-master", label: "Station Master" },
-    { value: "liaisoning-manager", label: "Liaisoning Manager"}
+    { value: "liaison-manager", label: "Liaison Manager"}
     // { value: "others", label: "Others" },
   ]
 
