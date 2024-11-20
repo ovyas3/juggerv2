@@ -10,6 +10,10 @@ import { Popup } from "@/components/Popup/popup";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import MapView from "../mapView/mapView";
+import Image from "next/image";
+import uploadIcon from '@/assets/uploadIcon.svg';
+import UploadModel from "./tabSectionAction/UploadModel";
+
 
 const Tabsection = () => {
   const router = useRouter();
@@ -19,6 +23,7 @@ const Tabsection = () => {
   const [statusNumber, setStatusNumber] = useState<number>(0);
   const [helpCenterBtnHovered, setHelpCenterBtnHovered] = useState(false);
   const t = useTranslations("DASHBOARD");
+  const [openUploadModel, setOpenUploadModel] = useState(false);
 
   const handleChange = (event: React.ChangeEvent<{}>, newValue: string) => {
     setValue(newValue);
@@ -41,6 +46,7 @@ const Tabsection = () => {
   };
 
   const handleSchemeTypeAndTable = async (props: any) => {
+    console.log(props,'propssvsbjfdfck')
     const getSchemeType = props;
     const validSchemes = ["SFTO", "GPWIS", "BFNV"];
   
@@ -97,7 +103,11 @@ const Tabsection = () => {
                   <Tab label={t("mapView")} value="2" />
                 </TabList>
               </Box>
-             <TabPanel value="1" className="tabpanel-container">
+             <TabPanel value="1" className="tabpanel-container" style={{position:'relative'}}>
+                <div onClick={()=>setOpenUploadModel(!openUploadModel)} id='uploadFiles' style={{paddingInline:'10px', cursor:'pointer' , gap:'8px', borderRadius:'6px' ,display:'flex', alignItems:'center', position:'absolute', top:8, right:30, width:'fit-content', height:'fit-content', zIndex:'1', backgroundColor:'#E6EAFF', color:"#3351FE"}}>
+                <div><Image src={uploadIcon.src} height={24} width={24} alt='upload' style={{marginTop:'8px'}} /></div>
+                <div>Upload Files</div>
+                </div>
                 <div className="tabpanel-contents">
                   <div className="tracking-status-dashboard">
                     <TrackingStatus 
@@ -110,7 +120,8 @@ const Tabsection = () => {
                   </div>
                   <div className="vertical-line"/>
                   <div className="popup-container">
-                  {data && <Popup data={data} />}
+                  {data && <Popup data={data} handleSchemeTypeAndTable={handleSchemeTypeAndTable}/>}
+                  {openUploadModel && <UploadModel  setOpenUploadModel={setOpenUploadModel}/>}
                   </div>
                 </div>
               </TabPanel>

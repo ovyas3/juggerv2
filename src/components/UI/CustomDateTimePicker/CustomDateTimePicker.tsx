@@ -45,32 +45,6 @@ const CustomDatePicker: React.FC<CustomDatePickerProps> = ({
     setSelectedDate(value || defaultDate || null);
   }, [value, defaultDate]);
 
-  const handleDateChange = (newDate: Dayjs | null) => {
-    const newDateValue = newDate ? newDate.toDate() : null;
-
-    // Validation Logic
-    if (minDate && newDateValue && newDateValue < minDate) {
-      setError(`${label} cannot be before the minimum date`);
-      onDateValidation && onDateValidation(false);
-      return;
-    }
-
-    if (maxDate && newDateValue && newDateValue > maxDate) {
-      setError(`${label} cannot be after the maximum date`);
-      onDateValidation && onDateValidation(false);
-      return;
-    }
-
-    setError("");
-    setSelectedDate(newDateValue);
-    onChange(newDateValue);
-    onDateValidation && onDateValidation(true);
-
-    // Close DatePicker after selecting a valid date
-    if (newDateValue) {
-      setOpen(false);
-    }
-  };
 
   return (
     <div

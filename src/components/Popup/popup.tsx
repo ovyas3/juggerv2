@@ -27,10 +27,14 @@ import Tooltip from "@mui/material/Tooltip";
 import { TooltipProps } from "@mui/material/Tooltip";
 import Select from "@mui/material/Select";
 import { Box, Tab } from "@mui/material";
-import { httpsGet } from "@/utils/Communication";
+import { httpsGet, httpsPost } from "@/utils/Communication";
 import { styled as muiStyled } from '@mui/material/styles';
 import service from "@/utils/timeService";
 import { useRouter } from "next/navigation";
+import CustomDateTimePicker from '@/components/UI/CustomDateTimePicker/CustomDateTimePicker';
+import { useSnackbar } from '@/hooks/snackBar';
+import CustomDatePicker from '@/components/UI/CustomDatePicker/CustomDatePicker'
+           
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialogContent-root": {
@@ -79,9 +83,10 @@ const CustomTooltip = styled(({ className, ...props }: StyledTooltipProps) => (
 
 interface PopupProps {
   data: any;
+  handleSchemeTypeAndTable:any
 }
 
-export const Popup: React.FC<PopupProps> = ({ data }) => {
+export const Popup: React.FC<PopupProps> = ({ data, handleSchemeTypeAndTable }) => {
   const rowsPerPageOptions = [5, 10, 25, 50];
   const router = useRouter();
   const [childOpen, setChildOpen] = useState(false);
@@ -101,6 +106,18 @@ export const Popup: React.FC<PopupProps> = ({ data }) => {
   // const [dialogDatas, setDialogDatas] = useState<any>([]);
   const [page, setPage] = useState<number>(0);
   const [rowsPerPage, setRowsPerPage] = useState<number>(rowsPerPageOptions[0]);
+
+  const [rohDone, setRohDone] = useState<Date | null>(null);
+  const [rohDue, setRohDue] = useState('--');
+
+  const [pohDone, setPohDone] = useState<Date | null>(null);
+  const [pohDue, setPohDue] = useState('--')
+
+  const [bpcDone, setBpcDone] = useState<Date | null>(null);
+  const [bpcDue, setBpcDue] = useState('--')
+
+  const [selectedSchemeTypeForDates, setSelectedSchemeTypeForDates] = useState('');
+  const {showMessage} = useSnackbar();
 
   const CustomTextField = muiStyled(TextField)(({ theme }) => ({
     '& .MuiInputLabel-root': {
@@ -165,7 +182,9 @@ export const Popup: React.FC<PopupProps> = ({ data }) => {
         roh_due: item.roh_due ? service.utcToist(item.roh_due, 'dd/MM/yyyy') : 'N/A',
         poh_done: item.poh ? service.utcToist(item.poh, 'dd/MM/yyyy') : 'N/A',
         poh_due: item.poh_due ? service.utcToist(item.poh_due, 'dd/MM/yyyy') : 'N/A',
-        isTracking: item.is_tracking ? item.is_tracking : false
+        isTracking: item.is_tracking ? item.is_tracking : false,
+        bpc_done: item.bpc ? service.utcToist(item.bpc, 'dd/MM/yyyy') : 'N/A',
+        bpc_due: item.bpc_due ? service.utcToist(item.bpc_due, 'dd/MM/yyyy') : 'N/A',
       }
     });
     const filteredNewData = newData.filter((item: any, index: number, array: any[]) => {
@@ -238,6 +257,41 @@ export const Popup: React.FC<PopupProps> = ({ data }) => {
     setSearchChildTerm('');
     setWagonType('');
     setChildFilteredDataCount(0);
+    setSelectedSchemeTypeForDates(item.scheme_type);
+
+    setRohDone((prev: any) => {
+      const [day, month, year] = item.roh_done?.split("/") || [];
+      if (!day || !month || !year) {
+        console.error("Invalid roh_done format");
+        return null;
+      }
+      const utcDate = new Date(Date.UTC(+year, +month - 1, +day));
+      return utcDate;
+    });
+    setRohDue(item.roh_due);
+
+    setPohDone((prev:any)=>{
+      const [day, month, year] = item.poh_done?.split("/") || [];
+      if(!day || !month || !year){
+        console.error("Invalid roh_done format");
+        return null;
+      }
+      const utcDate = new Date(Date.UTC(+year, +month - 1, +day));
+      return utcDate;
+    });
+    setPohDue(item.poh_due);
+
+    setBpcDone((prev:any)=>{
+      const [day, month, year] = item.bpc_done?.split("/") || [];
+      if(!day || !month || !year){
+        console.error("Invalid roh_done format");
+        return null;
+      }
+      const utcDate = new Date(Date.UTC(+year, +month - 1, +day));
+      return utcDate;
+    });
+    setBpcDue(item.bpc_due);
+
     const newChildUpperData = {
       _id: item._id,
       rake_name: item.rake_name ? item.rake_name : 'N/A',
@@ -434,6 +488,12 @@ export const Popup: React.FC<PopupProps> = ({ data }) => {
           <TableCell align="left" className="table-columns">
             POH Due
           </TableCell>
+          <TableCell align="left" className="table-columns">
+            BPC Done
+          </TableCell>
+          <TableCell align="left" className="table-columns">
+            BPC Due
+          </TableCell>
         </TableRow>
       </TableHead>
     );
@@ -461,6 +521,8 @@ export const Popup: React.FC<PopupProps> = ({ data }) => {
            <TableCell align="left" className='table-rows'>{item.roh_due}</TableCell>
            <TableCell align="left" className='table-rows'>{item.poh_done}</TableCell>
            <TableCell align="left" className='table-rows'>{item.poh_due}</TableCell>
+           <TableCell align="left" className='table-rows'>{item.bpc_done}</TableCell>
+           <TableCell align="left" className='table-rows'>{item.bpc_due}</TableCell>
         </TableRow>
         );
     })
@@ -469,10 +531,10 @@ export const Popup: React.FC<PopupProps> = ({ data }) => {
   const ChildDialogComponent = () => (
     childData && (
       <div className="child-upper-containers" key={childData.rake_id}>
-      <DialogContent>
+      {/* <DialogContent>
         <p className="title">Rake Name</p>
         <p className="number">{childData.rake_name}</p>
-      </DialogContent>
+      </DialogContent> */}
       <DialogContent>
         <p className="title">Rake ID</p>
         <p className="number">{childData.rake_id}</p>
@@ -488,6 +550,110 @@ export const Popup: React.FC<PopupProps> = ({ data }) => {
     </div>
     )
   );
+
+  const updateTime = async ({payload}:{payload:any}) => {
+    const response = await httpsPost(`edit/cr_dates`,payload);
+    if(response.statusCode === 200){
+      showMessage('ROH Date Updated', 'success');
+      handleSchemeTypeAndTable(payload.type);
+    }
+  }
+  useEffect(()=>{
+    if(rohDone !== null && rohDone !== undefined && typeof rohDone !== 'string'){
+      let payload = {
+        _id:childData._id,
+        type:selectedSchemeTypeForDates,
+        data:{
+          date: rohDone,
+          type:'ROH'
+        }
+      }
+      updateTime({payload});
+    }
+ },[rohDone])
+
+ useEffect(()=>{
+  if(pohDone !== null && pohDone !== undefined && typeof pohDone !== 'string'){
+    let payload = {
+      _id:childData._id,
+      type:selectedSchemeTypeForDates,
+      data:{
+        date: pohDone,
+        type:'POH'
+      }
+    }
+    updateTime({payload});
+  }
+},[pohDone])
+
+useEffect(()=>{
+  if(bpcDone !== null && bpcDone !== undefined && typeof bpcDone !== 'string'){
+    let payload = {
+      _id:childData._id,
+      type:selectedSchemeTypeForDates,
+      data:{
+        date: bpcDone,
+        type:'BPC'
+      }
+    }
+    updateTime({payload});
+  }
+},[bpcDone])
+
+useEffect(()=>{
+  data.filter((item: any) => {
+    if(item._id === childData._id){
+      setRohDue(service.utcToist(item?.roh_due, 'dd/MM/yyyy'));
+      setPohDue(service.utcToist(item?.poh_due, 'dd/MM/yyyy'));
+      setBpcDue(service.utcToist(item?.bpc_due, 'dd/MM/yyyy'));
+    }
+  })
+},[data])
+
+  const ChildDatePikerComponent = () => {
+    return(<div style={{borderTop:'1px solid #E5E5E5', paddingTop:'24px'}}>
+      <div style={{display:'flex', paddingInline:'24px' ,justifyContent:'space-between'}}>
+     <div>
+       <label style={{fontSize:12, }}>ROH Done</label>
+       <div style={{width:176, height:36}} onClick={(e)=>e.stopPropagation()}>
+       <CustomDatePicker value={typeof rohDone === 'string' ? null : rohDone} onChange={(date:any) => {setRohDone(date);}} label={null} />
+       </div>
+     </div>
+
+     <div>
+       <label style={{fontSize:12, }}>POH Done</label>
+       <div style={{width:176, height:36}} onClick={(e)=>e.stopPropagation()}>
+       <CustomDatePicker value={typeof pohDone === 'string' ? null : pohDone} onChange={(date:any) => {setPohDone(date);}} label={null} />
+       </div>
+     </div>
+
+     <div>
+       <label style={{fontSize:12, }}>BPC Done</label>
+       <div style={{width:176, height:36}} onClick={(e)=>e.stopPropagation()}>
+         <CustomDatePicker value={typeof bpcDone === 'string' ? null : bpcDone} onChange={(date:any) => {setBpcDone(date);}} label={null} />
+       </div>
+     </div>
+      </div>
+      
+      <div style={{display:'flex', paddingInline:'24px' ,justifyContent:'space-between', marginTop:'30px', marginBottom:'16px'}}>
+     <div>
+       <label style={{fontSize:12, }}>ROH Due</label>
+       <div style={{width:176, height:36, fontSize:16}}>{rohDue?.toString() ?? ''}</div>
+     </div>
+
+     <div>
+       <label style={{fontSize:12, }}>POH Due</label>
+       <div style={{width:176, height:36, fontSize:16}}>{pohDue?.toString() ?? ''}</div>
+     </div>
+
+     <div>
+       <label style={{fontSize:12, }}>BPC Due</label>
+       <div style={{width:176, height:36, fontSize:16}}>{bpcDue?.toString() ?? ''}</div>
+     </div>
+      </div>
+   </div>);
+    
+    };
 
   const ChildTableHeadComponent = () => {
     const inputRef = useRef<any>(null);
@@ -600,7 +766,6 @@ export const Popup: React.FC<PopupProps> = ({ data }) => {
     ))
   );
 
-
   const ChildTableComponent = () => (
     <>
     <TableContainer
@@ -635,6 +800,10 @@ export const Popup: React.FC<PopupProps> = ({ data }) => {
 
         <div className="child-upper-container">
           <ChildDialogComponent />
+        </div>
+
+        <div id='child-middle-container'>
+          <ChildDatePikerComponent />
         </div>
 
         <div className="child-lower-container">

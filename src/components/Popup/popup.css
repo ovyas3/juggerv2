@@ -150,6 +150,8 @@
   display: inline-block;
   border-radius: 12px !important;
   overflow-y: unset;
+  width: 700px !important;
+  background-color: white;
 }
 
 .child-dialog-styles .MuiDialog-container .MuiDialog-paper{
@@ -169,9 +171,13 @@
 }
 
 .child-dialog-styles .child-upper-containers {
-  padding: 24px 32px 24px 24px;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  /* padding: 24px 32px 24px 24px; */
+  /* display: grid; */
+  /* grid-template-columns: 1fr 1fr; */
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: 10px;
+
 
   .title {
     font-size: 16px;
@@ -550,7 +556,7 @@
 
 
   .child-dialog-styles .child-upper-containers {
-    grid-template-columns: 1fr;
+    /* grid-template-columns: 1fr; */
   }
 }
 
