@@ -518,28 +518,33 @@ const MapLayers = () => {
     }
 
     return (
-      <div>
+      // <div>
         <div className="map-container">
-          {isMobile ? <SideDrawer /> : null}
+          {/* {isMobile ? <SideDrawer /> : null}
           <div style={{ width: '100%', overflow: 'hidden' }}>
             {isMobile ? <Header title="Captive Rakes Map View" isMapHelper={true}></Header> : <MobileHeader />}
-            <div style={{
+            
+          </div> */}
+          <div style={{
               paddingTop: isMobile ? 12 : 24, 
-              paddingBottom: isMobile ? 32 : 65,  
+              paddingBottom: isMobile ? 32 : 65, 
+              width: '100%', 
               position:'relative',
             }}>
               <Box
                 sx={{
                     marginTop: mobile ? "150px" : "",
-                    height: "90vh",
+                    height: "80vh",
                     width: "100%",
                     p: 0,
                     display: "flex",
                     flexDirection: "column",
                     zIndex: 0,
+                    overflow: "hidden",
                     justifyContent: 'center',
                     alignItems: "center",
                     alignContent: 'space-around',
+                    position:'relative',
                 }}
               >
                 <FormGroup className='mapButtons'>
@@ -547,11 +552,19 @@ const MapLayers = () => {
                     control={<Switch checked={showTracks} onChange={() => setShowTracks(!showTracks)} />}
                     label="Show All Tracks"
                     labelPlacement="start"
+                    sx={{
+                      color: '#42454e',
+                      fontSize: '12px',
+                    }}
                   />
                   <FormControlLabel
                     control={<Switch checked={showAllRakes} onChange={() => setShowAllRakes(!showAllRakes)} />}
                     label="Show All Rakes"
                     labelPlacement="start"
+                    sx={{
+                      color: '#42454e',
+                      fontSize: '12px',
+                    }}
                   />
                 </FormGroup>
                 <Grid className="mapshelper-sidebar-container" >
@@ -738,7 +751,7 @@ const MapLayers = () => {
                          } */}
                   </Grid> 
                 </Grid>
-                <MapContainer className="map" id="map-helpers" center={center} zoom={5} style={{ minHeight: '105%',width: '101%', padding: '0px', zIndex: '0', position: 'fixed' }} attributionControl={false} ref={setMap} >
+                <MapContainer className="map" id="map-helpers" center={center} zoom={5} style={{ minHeight: '85%',width: '100%', padding: '0px', zIndex: '0', position: 'fixed' }} attributionControl={false} ref={setMap} >
                   <div className={"layersControl"} style={{marginTop:'60px'}} >
                     <LayersControl>
                     <LayersControl.BaseLayer checked name="Street View">
@@ -800,9 +813,8 @@ const MapLayers = () => {
                 </MapContainer>
               </Box>
             </div>
-          </div>
         </div>
-      </div>
+      // </div>
     );
 }
 

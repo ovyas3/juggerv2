@@ -214,13 +214,13 @@ const TrackingStatus: React.FC<TrackingStatusProps> = ({ handleAllRakesAndTable,
         <div className="tracking-status-header">
           TRACKING STATUS
         </div>
-        <div className="map-view-btn" 
+        {/* <div className="map-view-btn" 
              onMouseEnter={() => setIsMapHover(true)} 
              onMouseLeave={() => setIsMapHover(false)}
              onClick={() => router.push('/MapsHelper')}>
           <Image src={isMapHover ? MapViewHoverIcon : MapViewIcon} alt="map view" width={16} height={16}/>
           <span className="map-view-btn-header">Map View</span>
-        </div>
+        </div> */}
       </div>
       <div className="status-container">
         <div
