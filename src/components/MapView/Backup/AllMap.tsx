@@ -4,8 +4,8 @@ import { MapContainer, TileLayer, Marker, LayersControl, Popup, GeoJSON, Polylin
 import MarkerClusterGroup from "react-leaflet-cluster";
 import './MapLayers.css';
 import { httpsGet } from "@/utils/Communication";
-import getBoundary from "./IndianClaimed";
-import coordsOfTracks from "./IndianTracks";
+import getBoundary from "../IndianClaimed";
+import coordsOfTracks from "../IndianTracks";
 import { useWindowSize } from "@/utils/hooks";
 import { MagnifyingGlass } from 'react-loader-spinner';
 
@@ -518,7 +518,7 @@ const MapLayers = () => {
     }
 
     return (
-      // <div>
+      <div>
         <div className="map-container">
           {/* {isMobile ? <SideDrawer /> : null}
           <div style={{ width: '100%', overflow: 'hidden' }}>
@@ -534,17 +534,15 @@ const MapLayers = () => {
               <Box
                 sx={{
                     marginTop: mobile ? "150px" : "",
-                    height: "80vh",
+                    height: "100vh",
                     width: "100%",
                     p: 0,
                     display: "flex",
                     flexDirection: "column",
                     zIndex: 0,
-                    overflow: "hidden",
                     justifyContent: 'center',
                     alignItems: "center",
                     alignContent: 'space-around',
-                    position:'relative',
                 }}
               >
                 <FormGroup className='mapButtons'>
@@ -552,19 +550,11 @@ const MapLayers = () => {
                     control={<Switch checked={showTracks} onChange={() => setShowTracks(!showTracks)} />}
                     label="Show All Tracks"
                     labelPlacement="start"
-                    sx={{
-                      color: '#42454e',
-                      fontSize: '12px',
-                    }}
                   />
                   <FormControlLabel
                     control={<Switch checked={showAllRakes} onChange={() => setShowAllRakes(!showAllRakes)} />}
                     label="Show All Rakes"
                     labelPlacement="start"
-                    sx={{
-                      color: '#42454e',
-                      fontSize: '12px',
-                    }}
                   />
                 </FormGroup>
                 <Grid className="mapshelper-sidebar-container" >
@@ -751,7 +741,7 @@ const MapLayers = () => {
                          } */}
                   </Grid> 
                 </Grid>
-                <MapContainer className="map" id="map-helpers" center={center} zoom={5} style={{ minHeight: '85%',width: '100%', padding: '0px', zIndex: '0', position: 'fixed' }} attributionControl={false} ref={setMap} >
+                <MapContainer className="map" id="map-helpers" center={center} zoom={5} style={{ minHeight: '105%',width: '101%', padding: '0px', zIndex: '0', position: 'fixed' }} attributionControl={false} ref={setMap} >
                   <div className={"layersControl"} style={{marginTop:'60px'}} >
                     <LayersControl>
                     <LayersControl.BaseLayer checked name="Street View">
@@ -814,7 +804,7 @@ const MapLayers = () => {
               </Box>
             </div>
         </div>
-      // </div>
+      </div>
     );
 }
 

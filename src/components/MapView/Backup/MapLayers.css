@@ -7,10 +7,8 @@
   display: flex;
   flex-direction: row;
   position: relative;
-  height: 100%;
+  height: 100vh;
   width: 100%;
-  overflow-y: hidden;
-  justify-content: center;
 }
 
 .shipments-filter {
@@ -116,10 +114,10 @@
 .mapshelper-sidebar-container{
   position: absolute;
   width: 424px;
-  height: 100%;
+  height:100%;
   background: white;
-  top: 0%;
-  left: 0%;
+  left: 70px;
+  top: 5%;
   overflow-x: auto;
   background-color: #F8F8F8;
   z-index: 1;
@@ -129,10 +127,11 @@
 .tracking-details-container {
   width: 394px;
   height: 25%;
+  margin-top: 38px;
+  margin-left: 16px;
   border-radius: 12px;
   background-color: #ffffff;
-  margin: 16px;
-  padding: 8px;
+  padding: 8px 20px;
 }
 
 .tracking-details-container .hr-line {
@@ -147,8 +146,8 @@
 .tracking-status {
   display: flex;
   flex-direction: column;
-  padding: 8px 12px;
-  width: 100px;
+  padding: 20px 16px;
+  width:100px;
   cursor: pointer;
   border-radius: 8px;
 }
@@ -189,31 +188,32 @@
   font-size: 16px;
   font-weight: 600;
   color: #42454E;
-  padding: 8px;
+  padding: 20px 16px;
   font-family: "Inter", sans-serif;
 }
 
 #map-helpers .leaflet-right {
-  right: 40px !important;
+  right: 28px !important;
 }
 
 #map-helpers .leaflet-top {
-  top: 20px !important;
+  top: 180px !important;
 }
 
 #map-helpers .leaflet-left {
-  left: 470px !important;
+  left: 520px !important;
 }
 
 .idle-non-tracking-container{
   width: 394px;
-  height: 100%;
-  margin: 8px;
+  height: 75px;
+  margin-top: 16px;
+  margin-left: 16px;
   border-radius: 12px;
   background-color: #ffffff;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  padding: 8px;
+  padding: 12px;
   justify-content: flex-start;
   align-items: center;
   gap: 16px;
@@ -318,8 +318,8 @@
 
 .mapButtons {
   position: absolute;
-  top: 2%;
-  right: 10%;
+  top: 10%;
+  right: 8%;
   z-index: 10;
   width: 30%;
   justify-content: space-around;

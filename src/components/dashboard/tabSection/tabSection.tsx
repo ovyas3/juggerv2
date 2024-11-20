@@ -9,7 +9,7 @@ import TrackingStatus from "../status/trackingStatus";
 import { Popup } from "@/components/Popup/popup";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-// import MapViewPage from "@/app/MapsHelper/page";
+import MapView from "../mapView/mapView";
 
 const Tabsection = () => {
   const router = useRouter();
@@ -94,7 +94,7 @@ const Tabsection = () => {
               <Box sx={{ borderBottom: 1, borderColor: "divider"}}>
                 <TabList onChange={handleChange}>
                   <Tab label={t("railOverview")} value="1" />
-                  {/* <Tab label={t("mapView")} value="2" /> */}
+                  <Tab label={t("mapView")} value="2" />
                 </TabList>
               </Box>
              <TabPanel value="1" className="tabpanel-container">
@@ -114,9 +114,15 @@ const Tabsection = () => {
                   </div>
                 </div>
               </TabPanel>
-              {/* <TabPanel value="2" className="tabpanel-container">
-               
-              </TabPanel> */}
+              <TabPanel value="2" className="tabpanel-container">
+                <div style={{
+                  width: '100%',
+                  height: '80vh',
+                  overflow: 'auto',
+                }}>
+                  <MapView />
+                </div>
+              </TabPanel>
             </TabContext>
           </Box>
         </div>
