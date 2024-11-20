@@ -14,7 +14,7 @@ const AuthController = () => {
     const from = localStorage.getItem('isRmsLogin') === 'true' ? 'rms_login' : rms_auth ? 'tms_rms' : '' || '';
     const isAuth = await checkAuth(from,rms_auth);
     if (isAuth) {
-      router.push("/orders");
+      router.push("/welcome");
     } else {
       if(from === 'tms_rms') {
        router.push("https://etms.instavans.com/login");

@@ -1,4 +1,12 @@
 {
+  "WELCOME":{
+    "welcome": "Welcome to RMS",
+    "subTitle": "Empowering shippers to optimize their rail supply chain with automation, visibility, and enhanced operational efficiency.",
+    "quickActions": "Quick Actions",
+    "whatsNew": "What's New",
+    "whatsNewSubtitle": "Stay tuned for exciting updates and new features coming to our rail management platform...",
+    "support": "Support"
+  },
   "LOGIN": {
     "loginButton": "LOG IN",
     "forgotPasswordButton": "Forgot Password?",
