@@ -178,13 +178,13 @@ const WhatsAppNotify = () => {
           </form>
         </div>
       </div>
-      {mobile ? (
+      {/* {mobile ? (
           <SideDrawer />
       ) : (
           <div className="bottom_bar">
               <MobileDrawer />
           </div>
-      )}
+      )} */}
     </div>
   );
 };
