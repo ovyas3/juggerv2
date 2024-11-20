@@ -1,0 +1,33 @@
+.content_container_contact {
+    width: calc(100vw - 70px);
+    height: calc(100vh - 56px);
+    overflow-y: auto;
+    padding: 20px;
+  }
+  .adjustMargin {
+    margin-top: 56px;
+    margin-left: 70px;
+  }
+  .adjustMarginMobile {
+    width: 100vw;
+    height: calc(100vh - 56px - 54px);
+  }
+#left-section{
+    width: 30%;
+    min-width: 200px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    font-size: 14px;
+    padding-inline: 20px;
+    padding-block: 20px;
+}
+.activeOption{
+    background-color: #3351FF;
+    color: white;
+    border-radius: 8px;
+}
+#right-section{
+    width: 70%;
+    border-left: 1px solid #DFE3EB;
+}

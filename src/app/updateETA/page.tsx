@@ -14,7 +14,7 @@ import { httpsGet, httpsPost } from "@/utils/Communication";
 import { useRouter } from "next/navigation";
 import { ThreeCircles } from "react-loader-spinner";
 
-function Settings() {
+function UpdateETA() {
     const router = useRouter();
     const { showMessage } = useSnackbar();
     const mobile = useWindowSize(500);
@@ -86,7 +86,7 @@ function Settings() {
 
     return (
         <div>
-            <div style={{ display: 'flex', flexDirection: 'column', margin: '90px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column',margin:'40px' }}>
                 
                 <div>
                     <div style={{ color: '#3351FF', fontSize: '14px', fontWeight: 500, marginLeft: '8px', position: 'relative', display: 'inline-block' ,gap:'10px'}}>
@@ -143,15 +143,15 @@ function Settings() {
                 </div>
             </div>
 
-            {mobile ? (
+            {/* {mobile ? (
                 <SideDrawer />
             ) : (
                 <div className="bottom_bar">
                     <MobileDrawer />
                 </div>
-            )}
+            )} */}
         </div>
     );
 }
 
-export default Settings;
+export default UpdateETA;
