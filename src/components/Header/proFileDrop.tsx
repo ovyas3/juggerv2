@@ -19,6 +19,7 @@ import { useTranslations } from 'next-intl';
 import './proFileDrop.css'
 import { deleteAllCache } from '@/utils/storageService';
 import { useRouter } from 'next/navigation';
+import { environment } from "@/environments/env.api";
 
 export default function AccountMenu() {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -38,7 +39,8 @@ export default function AccountMenu() {
     if(fromRms) {
       router.push('/signin')
     } else {
-      router.push('https://etms.instavans.com/login');
+      const isDev = process.env.NODE_ENV === 'development';
+      router.push(isDev ? environment.DEV_ETMS : environment.PROD_SMART);
     }
   }
 

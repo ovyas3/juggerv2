@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import "./Auth.css";
 import Loader from "../Loading/WithBackDrop";
+import { environment } from "@/environments/env.api";
 
 const AuthController = () => {
   const searchParams = useSearchParams();
@@ -16,8 +17,9 @@ const AuthController = () => {
     if (isAuth) {
       router.push("/welcome");
     } else {
+      const isDev = process.env.NODE_ENV === 'development';
       if(from === 'tms_rms') {
-       router.push("https://etms.instavans.com/login");
+        router.push(isDev ? environment.DEV_ETMS : environment.PROD_SMART);
       } else {
        router.push("/signin");
       }
