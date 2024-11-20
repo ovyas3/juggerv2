@@ -109,6 +109,7 @@ const MapLayers = () => {
     const [selectedType,setSelectedType] = useState('total')
     const [searchRakeName, setSearchRakeName] = useState('')
     const [searchFnrNumber, setSearchFnrNumber] = useState('')
+    const [tracks, setTracks] = useState<any>(null);
 
     const inputRefRakeName = useRef<any>(null);
     const inputRefFnrNumber = useRef<any>(null);   
@@ -500,6 +501,19 @@ const MapLayers = () => {
       }
     };
 
+    useEffect(() => {
+      const loadTracks = async () => {
+        // Simulate async loading
+        const data = await new Promise((resolve) => {
+          setTimeout(() => resolve(coordsOfTracks), 0);
+        });
+        setTracks(data);
+        setLoading(false);
+      };
+  
+      loadTracks();
+    }, []);
+
     if (loading) {
       return (
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
@@ -767,7 +781,8 @@ const MapLayers = () => {
                     </LayersControl.BaseLayer>
                     </LayersControl>
                   </div>
-                  {showTracks && <GeoJSON data={coordsOfTracks} style={geoJSONStyle} />}
+                  {/* {showTracks && <GeoJSON data={coordsOfTracks} style={geoJSONStyle} />} */}
+                  {showTracks && <GeoJSON data={tracks} style={geoJSONStyle} />}
                   {showRoute && route.length && <Polyline pathOptions={{ color:'blue' }} positions={route} />}
                   {currentLocation.length && currentLocation.map((cr:any, index: number) => <Marker key={index} position={cr.coords} icon={customIcon}>
                     <Popup>
