@@ -33,13 +33,12 @@
   .sampleFile:hover{
     text-decoration: underline;
   }
-.buttonContaioner{
+#buttonContaioner{
     display: flex;
     position: absolute;
     bottom: 20px;
     display: flex;
     justify-content: space-between;
-    width: 100%;
-    padding-right: 40px;
-
+    right: 20px;
+    gap:20px
 }
