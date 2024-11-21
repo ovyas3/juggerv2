@@ -187,13 +187,13 @@ export const Popup: React.FC<PopupProps> = ({ data, handleSchemeTypeAndTable }) 
         bpc_due: item.bpc_due ? service.utcToist(item.bpc_due, 'dd/MM/yyyy') : 'N/A',
       }
     });
-    const filteredNewData = newData.filter((item: any, index: number, array: any[]) => {
-      return array.findIndex((el) => el.rake_id === item.rake_id) === index && item.rake_id !== undefined;
-    });
+    // const filteredNewData = newData.filter((item: any, index: number, array: any[]) => {
+    //   return array.findIndex((el) => el.rake_id === item.rake_id) === index && item.rake_id !== undefined;
+    // });
 
-    setParentTableData(filteredNewData);
-    setFilteredData(filteredNewData);
-    const count_data = filteredNewData.length;
+    setParentTableData(newData);
+    setFilteredData(newData);
+    const count_data = newData.length;
     setCount(count_data);
     // setDialogDatas(dialogData);
   }
