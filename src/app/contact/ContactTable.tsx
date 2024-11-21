@@ -38,6 +38,7 @@ interface Column {
 const columns: readonly Column[] = [
   { id: "sno", label: "SI No", style: "header_sno" },
   { id: "stationName", label: "Station Name", style: "header_stationName" },
+  { id: "stationCode", label: "Station Code", style: "header_stationCode" },
   { id: "fnr", label: "FNR No", style: "header_fnr" },
   {
     id: "contactPersonRole",
@@ -59,7 +60,8 @@ function contructingData(shipment: any) {
         FNR:string
       };
       stnName: {
-        name:string
+        name:string;
+        code:string;
       };
       reason: string;
       role: string;
@@ -88,12 +90,13 @@ function contructingData(shipment: any) {
         reason: shipment?.reason ? shipment?.reason : "--",
         comment: shipment?.comment ? shipment?.comment : "--",
         rating: shipment?.rating ? shipment?.rating : 0,
+        stationCode: shipment?.stnName?.code ? shipment?.stnName?.code : "--",
       };
     }
   );
 }
 
-const ContactTable = ({ contactDetails, getContactDetails }: any) => {
+const ContactTable = ({ contactDetails, getContactDetails, setContactDetailsPayload, contactCount }: any) => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [page, setPage] = useState(0);
   const [showActionBox, setShowActionBox] = React.useState(-1);
@@ -117,10 +120,23 @@ const ContactTable = ({ contactDetails, getContactDetails }: any) => {
     setShowActionBox((prevIndex: any) => (prevIndex === index ? -1 : index));
   }
 
+  const handleChangePage = (event: unknown, newPage: number) => {setPage(newPage);};
+
+  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {setRowsPerPage(+event.target.value);setPage(0);};
+
   const handleCloseAction = () => {
     setAnchorEl(null);
     setShowActionBox(-1);
   };
+
+  useEffect(()=>{
+    setContactDetailsPayload((prev:any)=>{
+      const newState = {...prev};
+      newState.skip = page * rowsPerPage;
+      newState.limit = rowsPerPage;
+      return newState
+    })
+  },[rowsPerPage,page])
 
   return (
     <div
@@ -141,17 +157,17 @@ const ContactTable = ({ contactDetails, getContactDetails }: any) => {
           boxShadow: "none",
         }}
       >
-        {/* <TablePagination
+        <TablePagination
           rowsPerPageOptions={[5, 10, 25, 50, 100]}
           component="div"
-          count={contactDetails.length}
+          count={contactCount}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
           labelRowsPerPage="Shipments per page"
           sx={{ position: "absolute", top: -40, zIndex: 100, right: -10 }}
-        /> */}
+        />
         <TableContainer
           sx={{
             overflow: "auto",
