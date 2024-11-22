@@ -164,8 +164,9 @@ function EditContact({ contact, isClose,getContactDetails }: any) {
           </div>
         </div>
 
-        <div id='btnContainerEdit'>
-            <div onClick={()=>{submitContact()}} >{text('submit')}</div>
+
+        <div id='btnContainerEdit' onClick={()=>{submitContact()}} >
+            <div >{text('submit')}</div>
         </div>
 
 

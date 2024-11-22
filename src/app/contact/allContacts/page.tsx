@@ -228,7 +228,7 @@ const AllContactsContext = () => {
               page={page}
               onPageChange={handleChangePage}
               onRowsPerPageChange={handleChangeRowsPerPage}
-              labelRowsPerPage="Shipments per page"
+              labelRowsPerPage="Contacts per page"
               sx={{ position: "absolute", top: -40, zIndex: 100, right: -10 }}
             />
             <TableContainer
