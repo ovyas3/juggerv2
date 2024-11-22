@@ -37,7 +37,7 @@ const Signin = () => {
             response.data
           );
           if (signedIn) {
-            router.push("/inPlantDashboard");
+            router.push("/orders");
           }
         } else {
           showMessage(response.message, "error");
