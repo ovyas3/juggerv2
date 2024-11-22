@@ -211,10 +211,10 @@ export default  function Dashboard() {
                   position={rake.geo_point?.coordinates?.reverse()} // No TypeScript error due to explicit tuple type
                   icon={loadedIcon}
                 >
-                  <Popup>
+                  {/* <Popup>
                     <h3>Rake Name: {rake.title}</h3>
                     <p>Loading Status{rake.loading_status}</p>
-                  </Popup>
+                  </Popup> */}
                 </Marker>
               ))}
             </MapContainer>
