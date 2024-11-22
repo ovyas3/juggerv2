@@ -63,6 +63,7 @@ function Contact() {
   };
 
   const handleContactDetailsBysearch = async () => {
+    if(searchCode === -1 || searchCode === "") return;
     try {
       setContactDetailsPayload((prev: any) => {
         const newPayload = { ...prev };

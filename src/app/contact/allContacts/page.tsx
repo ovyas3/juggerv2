@@ -140,6 +140,7 @@ const AllContactsContext = () => {
   };
 
   const handleContactDetailsBysearch = async () => {
+    if(searchCode === -1 || searchCode === '') return;
     const response = await httpsGet(`contact_details/getDistinctContacts?limit=100&skip=0&stnCode=${searchCode.toString().toLocaleUpperCase()}`);
     if (response.statusCode === 200) {
       setContactList(response.data.distinctContacts);
@@ -213,10 +214,10 @@ const AllContactsContext = () => {
             sx={{
               position: "relative",
               width: "100%",
-              height: "100%",
               display: "flex",
               flexDirection: "column",
               boxShadow: "none",
+              height:'calc(100vh - 165px)'
             }}
           >
             <TablePagination
