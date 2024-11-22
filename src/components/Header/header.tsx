@@ -28,8 +28,7 @@ const Header = ({title, setReloadOnHeaderChange, isMapHelper, getAllShipment, is
 
   useEffect(() => {
     const parent_name = getCookie("parent_name")?.toString() || "";
-    const isRmsLogin = Boolean(localStorage.getItem('isRmsLogin'))
-    const shippersData = JSON.parse(isRmsLogin ? (localStorage.getItem("shippers") || "[]"):(localStorage.getItem("corporate_shipper") || "[]"));
+    const shippersData = JSON.parse(localStorage.getItem("corporate_shipper") || "[]");
     setParentName(parent_name);
     setShippers(shippersData);
   }, []);
