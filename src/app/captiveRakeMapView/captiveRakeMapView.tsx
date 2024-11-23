@@ -34,11 +34,15 @@ export default  function CaptiveRakeMapView() {
     const response = await httpsGet('get/captive_rake_locations',0,router)
     if(response.statusCode === 200) {
       const coords = response.data?.filter((val:any)=> val.geo_point.coordinates[0] !== 0 && val.geo_point.coordinates[1] !== 0)
-      console.log(coords, "coords");
+      console.log('All coordinates:', coords.map((c: any) => c.geo_point.coordinates));
+      
       setCoordsData(coords);
       const loadedRakes = coords.filter((val: any) => val.loading_status === "L");
       const emptyRakes = coords.filter((val: any) => val.loading_status === "E");
-      console.log(loadedRakes, emptyRakes, "loadedRakes", "emptyRakes");
+      
+      console.log('Loaded rakes coordinates:', loadedRakes.map((c: any) => c.geo_point.coordinates));
+      console.log('Empty rakes coordinates:', emptyRakes.map((c: any) => c.geo_point.coordinates));
+      
       setLoadedRakes(loadedRakes);
       setEmptyRakes(emptyRakes);
     }
@@ -285,50 +289,47 @@ export default  function CaptiveRakeMapView() {
                 </LayersControl.BaseLayer>
               </LayersControl>
 
-              {/* Add markers with custom icons */}
-              {coordsData && coordsData.length > 0 &&
-              coordsData.map((rake:any, index: number) => (
-                <Marker
-                  key={index}
-                  position={rake.geo_point?.coordinates?.reverse()}
-                  icon={customLoadedIcon}
-                >
-                  {/* <Popup>
-                    <h3>Rake Name: {rake.title}</h3>
-                    <p>Loading Status{rake.loading_status}</p>
-                  </Popup> */}
-                </Marker>
-              ))}
-              {
-                loadedRakes && loadedRakes.length > 0 &&
-                loadedRakes.map((rake:any, index: number) => (
+              {loadedRakes.map((rake: any, index: number) => {
+                // Create a copy of coordinates to avoid mutating the original data
+                const coordinates = [...rake.geo_point.coordinates];
+                // Leaflet expects coordinates in [latitude, longitude] order
+                const position: [number, number] = [coordinates[1], coordinates[0]];
+                
+                return (
                   <Marker
                     key={index}
-                    position={rake.geo_point?.coordinates?.reverse()}
+                    position={position}
                     icon={customLoadedIcon}
                   >
-                    {/* <Popup>
-                      <h3>Rake Name: {rake.title}</h3>
-                      <p>Loading Status{rake.loading_status}</p>
-                    </Popup> */}
+                    <Popup>
+                      <div>
+                        <h3>Loaded Rake</h3>
+                        {/* <p>Status: {rake.loading_status}</p> */}
+                      </div>
+                    </Popup>
                   </Marker>
-                ))
-              }
-              {
-                emptyRakes && emptyRakes.length > 0 &&
-                emptyRakes.map((rake:any, index: number) => (
+                );
+              })}
+              
+              {emptyRakes.map((rake: any, index: number) => {
+                const coordinates = [...rake.geo_point.coordinates];
+                const position: [number, number] = [coordinates[1], coordinates[0]];
+                
+                return (
                   <Marker
                     key={index}
-                    position={rake.geo_point?.coordinates?.reverse()}
+                    position={position}
                     icon={customEmptyIcon}
                   >
-                    {/* <Popup>
-                      <h3>Rake Name: {rake.title}</h3>
-                      <p>Loading Status{rake.loading_status}</p>
-                    </Popup> */}
+                    <Popup>
+                      <div>
+                        <h3>Empty Rake</h3>
+                        {/* <p>Status: {rake.loading_status}</p> */}
+                      </div>
+                    </Popup>
                   </Marker>
-                ))
-              }
+                );
+              })}
             </MapContainer>
           </div>
         </div>
