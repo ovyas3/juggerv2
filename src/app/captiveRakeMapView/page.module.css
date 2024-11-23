@@ -172,10 +172,10 @@
   transform: translate(-50%, -50%);
   width: 12px;
   height: 12px;
-  background: #E6667B; 
+  background: #D32F2F;  
   border-radius: 50%;
   box-shadow: 0 0 0 2px white,
-              0 0 0 8px rgba(230, 102, 123, 0.2); 
+              0 0 0 8px rgba(211, 47, 47, 0.25);  
   z-index: 2;
-  opacity: 0.5;
+  opacity: 0.8;  
 }
