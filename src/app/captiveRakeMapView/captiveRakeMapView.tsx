@@ -304,7 +304,7 @@ export default  function CaptiveRakeMapView() {
                     <Popup>
                       <div>
                         <h3>Loaded Rake</h3>
-                        <p>Status: {rake.loading_status}</p>
+                        {/* <p>Status: {rake.loading_status}</p> */}
                       </div>
                     </Popup>
                   </Marker>
@@ -324,7 +324,7 @@ export default  function CaptiveRakeMapView() {
                     <Popup>
                       <div>
                         <h3>Empty Rake</h3>
-                        <p>Status: {rake.loading_status}</p>
+                        {/* <p>Status: {rake.loading_status}</p> */}
                       </div>
                     </Popup>
                   </Marker>
