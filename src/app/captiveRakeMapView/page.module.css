@@ -138,3 +138,44 @@
   color: #42454E;
   font-size: 12px;
 }
+
+/* Custom Marker Styles */
+.markerWrapper :global(.custom-div-icon) {
+  background: transparent;
+  border: none;
+}
+
+.markerWrapper :global(.marker-pin) {
+  position: relative;
+  width: 30px;
+  height: 30px;
+}
+
+.markerWrapper :global(.dot) {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 12px;
+  height: 12px;
+  background: #334FFC;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px white,
+              0 0 0 8px rgba(51, 79, 252, 0.2);
+  z-index: 2;
+}
+
+.markerWrapper :global(.dot-empty) {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 12px;
+  height: 12px;
+  background: #E6667B; 
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px white,
+              0 0 0 8px rgba(230, 102, 123, 0.2); 
+  z-index: 2;
+  opacity: 0.5;
+}
