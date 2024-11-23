@@ -20,30 +20,30 @@ function Contact() {
   const mobile = useWindowSize(500);
   const t = useTranslations("ETADASHBOARD");
   const todaysDate = new Date();
-  const twentyDaysBefore = new Date(
-    todaysDate.getTime() - 200 * 24 * 60 * 60 * 1000
-  );
+  const twentyDaysBefore = new Date(todaysDate.getTime() - 200 * 24 * 60 * 60 * 1000);
   const route = useRouter();
-
+  const [searchCode, setSearchCode] = useState<number | string>(-1);
+  const [contactCount, setContactCount] = useState(0);
   const [ogContactDetails, setOgContactDetails] = useState([]);
   const [contactDetails, setContactDetails] = useState([]);
   const [contactDetailsPayload, setContactDetailsPayload] = useState<any>({
     from: "",
     to: "",
-    contactPersonRole: [],
+    limit:10,
+    skip:0
   });
 
-  const handleSearch = (value: string) => {
-    if (value) {
-      setContactDetails(
-        ogContactDetails.filter((contact: any) =>
-          contact.stnName.name.toLowerCase().includes(value.toLowerCase())
-        )
-      );
-    } else {
-      setContactDetails(ogContactDetails);
-    }
-  };
+  // const handleSearch = (value: string) => {
+  //   if (value) {
+  //     setContactDetails(
+  //       ogContactDetails.filter((contact: any) =>
+  //         contact.stnName.name.toLowerCase().includes(value.toLowerCase())
+  //       )
+  //     );
+  //   } else {
+  //     setContactDetails(ogContactDetails);
+  //   }
+  // };
 
   // api calling
   const getContactDetails = async () => {
@@ -53,18 +53,42 @@ function Contact() {
         contactDetailsPayload
       );
       if (response?.statusCode === 200) {
-        setContactDetails(response?.data);
-        setOgContactDetails(response?.data);
+        setContactDetails(response?.data?.data);
+        setOgContactDetails(response?.data?.data);
+        setContactCount(response?.data?.count);
       }
     } catch (error) {
       console.log(error);
     }
   };
 
+  const handleContactDetailsBysearch = async () => {
+    if(searchCode === -1 || searchCode === "") return;
+    try {
+      setContactDetailsPayload((prev: any) => {
+        const newPayload = { ...prev };
+        newPayload.stnCode = searchCode.toString().toLocaleUpperCase();
+        return newPayload;
+      })
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   useEffect(() => {
     if (contactDetailsPayload.from && contactDetailsPayload.to)
       getContactDetails();
   }, [contactDetailsPayload]);
+
+  useEffect(()=>{
+    if(searchCode === ""){
+      setContactDetailsPayload((prev: any)=>{
+        const newPayload = { ...prev };
+        const {stnCode, ...rest} = newPayload;
+        return {...rest}
+      });
+    }
+  },[searchCode])
 
   return (
     <div>
@@ -81,12 +105,12 @@ function Contact() {
       >
         <div id="searchContainer">
           <div id="searchBox">
-            <Image src={searchIcon} alt="" style={{ cursor: "pointer" }} />
+            <Image src={searchIcon} alt="" style={{ cursor: "pointer" }} onClick={() => handleContactDetailsBysearch()} />
             <input
               id="inputSearch"
-              placeholder="search station name"
+              placeholder="search station code"
               onChange={(e) => {
-                handleSearch(e.target.value);
+                setSearchCode(e.target.value);
               }}
             />
           </div>
@@ -105,7 +129,7 @@ function Contact() {
         </div>
 
         <div id="tableContainer" style={{ marginTop: 24 }}>
-          <ContactTable contactDetails={contactDetails} getContactDetails={getContactDetails} />
+          <ContactTable contactCount={contactCount} contactDetails={contactDetails} getContactDetails={getContactDetails} setContactDetailsPayload={setContactDetailsPayload} />
         </div>
       </div>
 

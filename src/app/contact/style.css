@@ -30,6 +30,7 @@
     border-radius: 6px;
     cursor: pointer;
     transition: all 0.3s ease-in-out;
+    top:0px
   }
   #view-all-contact-btn:hover{
     background-color: #2B68FF;
