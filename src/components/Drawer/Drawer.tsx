@@ -235,6 +235,15 @@ function SideDrawer() {
                     style={{ color: ((active == 'contact') || contactDashboard) ? 'black' : 'white' }} 
                 >Contact Dashboard</div>
             </div>
+            <div 
+                style={{cursor:'pointer',color:'white'}}
+                onClick={() => handleRouting('captiveRakeMapView')} 
+                className='contact-icon'
+            >
+                <TrainIcon style={{ marginLeft: '9px', color:'white'}} />
+                <div className={`${open ? 'fnr_text' : 'fnr_text_none'}`}  > Captive Rakes Management
+                </div>
+            </div>
             
 
         </div>
