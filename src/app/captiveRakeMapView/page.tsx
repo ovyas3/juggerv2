@@ -13,6 +13,7 @@ import emptyRakes from "@/assets/empty_rakes_icon.svg";
 import { useEffect, useState } from "react";
 import { httpsGet } from '@/utils/Communication';
 import { useRouter } from 'next/navigation';
+import getBoundary from '@/components/MapView/IndianClaimed';
 
 
 interface RakeLocation {
@@ -23,7 +24,7 @@ interface RakeLocation {
 }
 
 export default  function Dashboard() {
-  const center: [number, number] = [24.2654256, 78.9145218];
+  const center: [number, number] = [22.2197, 92.9629];
   const [map, setMap] = useState<L.Map | null>(null);
   const router = useRouter()
   const [coordsData, setCoordsData] = useState([])
@@ -32,7 +33,7 @@ export default  function Dashboard() {
     const response = await httpsGet('get/captive_rake_locations',0,router)
     if(response.statusCode === 200) {
       const coords = response.data?.filter((val:any)=> val.geo_point.coordinates[0] !== 0 && val.geo_point.coordinates[1] !== 0)
-
+      console.log(coords)
       setCoordsData(coords)
     }
   }
@@ -88,6 +89,34 @@ export default  function Dashboard() {
     }
   };
 
+  const boundaryStyle = (feature: any) => {
+    switch (feature.properties.boundary) {
+      case 'claimed':
+        return {
+          color: "#C2B3BF", weight: 2
+        };
+      default:
+        return {
+          color: "", weight: 0
+        };
+    }
+  }
+
+  const addIndiaBoundaries = () => {
+    const b = getBoundary();
+    if (map instanceof L.Map) {
+      L.geoJSON(b, {
+        style: boundaryStyle
+      }).addTo(map);
+    } else {
+      console.error('map is not a Leaflet map object');
+    }
+  }
+
+  useEffect(() => {
+    addIndiaBoundaries();
+  }, [map]);
+
   return (
     <div className="">
       <Header title={"Captive Rake Map View"} />
@@ -96,10 +125,17 @@ export default  function Dashboard() {
         <div className={styles.container}>
           <div className={styles.leftPanel}>
           <div className={styles.rakesStatus}>
-            <h2>Rakes Status</h2>
+            <h2>Captive Rakes Status</h2>
             <div className={styles.statusItems}>
               <div className={styles.statusItem}>
-                <span className={styles.icon}>
+              <span className={styles.icon} style={{ 
+                backgroundColor: '#F8F8F8',
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '8px'
+              }}>
                   <Image src={rakesLoaded} alt=""/>
                 </span>
                 <div className={styles.labelCont}>
@@ -108,9 +144,16 @@ export default  function Dashboard() {
                 </div>
               </div>
               <div className={styles.statusItem}>
-                <span className={styles.icon}>
+              <span className={styles.icon} style={{ 
+                backgroundColor: '#F8F8F8',
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '8px'
+              }}>
                 <Image src={captiveRakes} alt=""/>
-                </span>
+              </span>
                 <div className={styles.labelCont}>
                 <span className={styles.label} style={{color:'#18BE8A'}}>Loaded</span>
                 <span className={styles.value}>32</span>
@@ -151,9 +194,13 @@ export default  function Dashboard() {
                 <span className={styles.value}>12</span>
                 <span className={styles.label}>Loading</span>
               </div>
-              <div className={styles.placementItem}>
+              <div className={styles.placementItem} style={{
+                paddingRight: '24px',
+              }}>
                 <span className={styles.value}>08</span>
                 <span className={styles.label}>Unloading</span>
+              </div>
+              <div className={styles.placementItem}>
               </div>
             </div>
           </div>
