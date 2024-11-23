@@ -9,7 +9,7 @@ import SideDrawer from "@/components/Drawer/Drawer";
 import Image from "next/image";
 import rakesLoaded from "@/assets/rakes_loaded.svg";
 import captiveRakes from '@/assets/cr.svg'
-import emptyRakes from "@/assets/empty_rakes_icon.svg";
+import emptyRakesIcon from "@/assets/empty_rakes_icon.svg";
 import { useEffect, useState } from "react";
 import { httpsGet } from '@/utils/Communication';
 import { useRouter } from 'next/navigation';
@@ -27,14 +27,21 @@ export default  function Dashboard() {
   const center: [number, number] = [22.2197, 92.9629];
   const [map, setMap] = useState<L.Map | null>(null);
   const router = useRouter()
-  const [coordsData, setCoordsData] = useState([])
+  const [coordsData, setCoordsData] = useState([]);
+  const [loadedRakes, setLoadedRakes] = useState<any>([]);
+  const [emptyRakes, setEmptyRakes] = useState<any>([]);
 
   async function getCoords() {
     const response = await httpsGet('get/captive_rake_locations',0,router)
     if(response.statusCode === 200) {
       const coords = response.data?.filter((val:any)=> val.geo_point.coordinates[0] !== 0 && val.geo_point.coordinates[1] !== 0)
-      console.log(coords)
-      setCoordsData(coords)
+      console.log(coords, "coords");
+      setCoordsData(coords);
+      const loadedRakes = coords.filter((val: any) => val.loading_status === "L");
+      const emptyRakes = coords.filter((val: any) => val.loading_status === "E");
+      console.log(loadedRakes, emptyRakes, "loadedRakes", "emptyRakes");
+      setLoadedRakes(loadedRakes);
+      setEmptyRakes(emptyRakes);
     }
   }
 
@@ -49,10 +56,10 @@ export default  function Dashboard() {
   ];
 
   const summaryData = [
-    { plant: "JBSK", from: 12, towards: 8, others: 0 },
-    { plant: "JSPP", from: 16, towards: 9, others: 2 },
-    { plant: "PJPD", from: 10, towards: 2, others: 4 },
-    { plant: "Barbil", from: 4, towards: 1, others: 6 },
+    { plant: "JBSK", from: 10, towards: 6, others: 0 },
+    { plant: "JSPP", from: 12, towards: 4, others: 2 },
+    { plant: "PJPD", from: 10, towards: 1, others: 2 },
+    { plant: "Barbil", from: 2, towards: 1, others: 4 },
   ];
   // Define custom icons
   const loadedIcon = new L.Icon({
@@ -88,6 +95,28 @@ export default  function Dashboard() {
         return loadedIcon;
     }
   };
+
+  const customLoadedIcon = new L.DivIcon({
+    className: `${styles.markerWrapper} custom-div-icon`,
+    html: `
+      <div class="marker-pin">
+        <div class="dot"></div>
+      </div>
+    `,
+    iconSize: [30, 30],
+    iconAnchor: [15, 15],
+  });
+
+  const customEmptyIcon = new L.DivIcon({
+    className: `${styles.markerWrapper} custom-div-icon`,
+    html: `
+      <div class="marker-pin">
+        <div class="dot-empty"></div>
+      </div>
+    `,
+    iconSize: [30, 30],
+    iconAnchor: [15, 15],
+  });
 
   const boundaryStyle = (feature: any) => {
     switch (feature.properties.boundary) {
@@ -140,7 +169,9 @@ export default  function Dashboard() {
                 </span>
                 <div className={styles.labelCont}>
                 <span className={styles.label} style={{color:'#334FFC'}}>Total</span>
-                <span className={styles.value}>50</span>
+                <span className={styles.value}>
+                  {coordsData && coordsData.length > 0 && coordsData.length || 0}
+                </span>
                 </div>
               </div>
               <div className={styles.statusItem}>
@@ -156,14 +187,18 @@ export default  function Dashboard() {
               </span>
                 <div className={styles.labelCont}>
                 <span className={styles.label} style={{color:'#18BE8A'}}>Loaded</span>
-                <span className={styles.value}>32</span>
+                <span className={styles.value}>
+                  {loadedRakes && loadedRakes.length > 0 && loadedRakes.length || 0}
+                </span>
                 </div>
               </div>
               <div className={styles.statusItem}>
-              <Image src={emptyRakes} alt=""/>
+              <Image src={emptyRakesIcon} alt=""/>
               <div className={styles.labelCont}>
               <span className={styles.label} style={{color:'#E6667B'}}>Empty</span>
-                <span className={styles.value}>18</span>
+                <span className={styles.value}>
+                  {emptyRakes && emptyRakes.length > 0 && emptyRakes.length || 0}
+                </span>
                 </div>
               </div>
             </div>
@@ -252,11 +287,12 @@ export default  function Dashboard() {
               </LayersControl>
 
               {/* Add markers with custom icons */}
-              {coordsData.map((rake:any, index) => (
+              {coordsData && coordsData.length > 0 &&
+              coordsData.map((rake:any, index: number) => (
                 <Marker
                   key={index}
-                  position={rake.geo_point?.coordinates?.reverse()} // No TypeScript error due to explicit tuple type
-                  icon={loadedIcon}
+                  position={rake.geo_point?.coordinates?.reverse()}
+                  icon={customLoadedIcon}
                 >
                   {/* <Popup>
                     <h3>Rake Name: {rake.title}</h3>
@@ -264,6 +300,36 @@ export default  function Dashboard() {
                   </Popup> */}
                 </Marker>
               ))}
+              {
+                loadedRakes && loadedRakes.length > 0 &&
+                loadedRakes.map((rake:any, index: number) => (
+                  <Marker
+                    key={index}
+                    position={rake.geo_point?.coordinates?.reverse()}
+                    icon={customLoadedIcon}
+                  >
+                    {/* <Popup>
+                      <h3>Rake Name: {rake.title}</h3>
+                      <p>Loading Status{rake.loading_status}</p>
+                    </Popup> */}
+                  </Marker>
+                ))
+              }
+              {
+                emptyRakes && emptyRakes.length > 0 &&
+                emptyRakes.map((rake:any, index: number) => (
+                  <Marker
+                    key={index}
+                    position={rake.geo_point?.coordinates?.reverse()}
+                    icon={customEmptyIcon}
+                  >
+                    {/* <Popup>
+                      <h3>Rake Name: {rake.title}</h3>
+                      <p>Loading Status{rake.loading_status}</p>
+                    </Popup> */}
+                  </Marker>
+                ))
+              }
             </MapContainer>
           </div>
         </div>
