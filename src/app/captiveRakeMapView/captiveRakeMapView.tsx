@@ -14,6 +14,7 @@ import { useEffect, useState } from "react";
 import { httpsGet } from '@/utils/Communication';
 import { useRouter } from 'next/navigation';
 import getBoundary from '@/components/MapView/IndianClaimed';
+import timeService from '@/utils/timeService';
 
 interface RakeLocation {
   coords: [number, number]; // Tuple type for Leaflet position
@@ -302,9 +303,26 @@ export default  function CaptiveRakeMapView() {
                     icon={customLoadedIcon}
                   >
                     <Popup>
-                      <div>
-                        <h3>Loaded Rake</h3>
-                        {/* <p>Status: {rake.loading_status}</p> */}
+                      <div style={{
+                        padding: '6px',
+                        minWidth: '230px'
+                      }}>
+                        <div style={{
+                          fontSize: '13px',
+                          color: '#42454E',
+                          display: 'grid',
+                          gap: '4px'
+                        }}>
+                          <p style={{ margin: '2px 0' }}><strong>Rake ID:</strong> {rake.rake?.rake_id || 'N/A'}</p>
+                          <p style={{ margin: '2px 0' }}><strong>Rake Name:</strong> {rake.rake?.name || 'N/A'}</p>
+                          <p style={{ margin: '2px 0' }}><strong>From Station:</strong> {rake.from ? `${rake.from.code} ${rake.from.name}` : 'N/A'}</p>
+                          <p style={{ margin: '2px 0' }}><strong>To Station:</strong> {rake.to ? `${rake.to.code} ${rake.to.name}` : 'N/A'}</p>
+                          <p style={{ margin: '2px 0' }}><strong>Current Station:</strong> {rake.current_station ? `${rake.current_station.code} ${rake.current_station.name}` : 'N/A'}</p>
+                          <p style={{ margin: '2px 0' }}><strong>Updated At FOIS:</strong> {rake.updated_on ? `${timeService.utcToist(rake.updated_on, 'dd-MMM')} ${timeService.utcToistTime(rake.updated_on, 'HH:mm')}` : 'N/A'}</p>
+                          <p style={{ margin: '2px 0' }}><strong>Data Fetched At:</strong> {rake.updated_at ? `${timeService.utcToist(rake.updated_at, 'dd-MMM')} ${timeService.utcToistTime(rake.updated_at, 'HH:mm')}` : 'N/A'}</p>
+                          <p style={{ margin: '2px 0' }}><strong>Commodity:</strong> {rake.commodity && rake.commodity.length > 0 ? rake.commodity.join(', ') : 'N/A'}</p>
+                          <p style={{ margin: '2px 0' }}><strong>Status:</strong> <span style={{ color: '#334FFC' }}>Loaded</span></p>
+                        </div>
                       </div>
                     </Popup>
                   </Marker>
@@ -322,9 +340,26 @@ export default  function CaptiveRakeMapView() {
                     icon={customEmptyIcon}
                   >
                     <Popup>
-                      <div>
-                        <h3>Empty Rake</h3>
-                        {/* <p>Status: {rake.loading_status}</p> */}
+                      <div style={{
+                        padding: '6px',
+                        minWidth: '230px'
+                      }}>
+                        <div style={{
+                          fontSize: '12px',
+                          color: '#42454E',
+                          display: 'grid',
+                          gap: '4px'
+                        }}>
+                          <p style={{ margin: '2px 0' }}><strong>Rake ID:</strong> {rake.rake?.rake_id || 'N/A'}</p>
+                          <p style={{ margin: '2px 0' }}><strong>Rake Name:</strong> {rake.rake?.name || 'N/A'}</p>
+                          <p style={{ margin: '2px 0' }}><strong>From Station:</strong> {rake.from ? `${rake.from.code} ${rake.from.name}` : 'N/A'}</p>
+                          <p style={{ margin: '2px 0' }}><strong>To Station:</strong> {rake.to ? `${rake.to.code} ${rake.to.name}` : 'N/A'}</p>
+                          <p style={{ margin: '2px 0' }}><strong>Current Station:</strong> {rake.current_station ? `${rake.current_station.code} ${rake.current_station.name}` : 'N/A'}</p>
+                          <p style={{ margin: '2px 0' }}><strong>Updated At FOIS:</strong> {rake.updated_on ? `${timeService.utcToist(rake.updated_on, 'dd-MMM')} ${timeService.utcToistTime(rake.updated_on, 'HH:mm')}` : 'N/A'}</p>
+                          <p style={{ margin: '2px 0' }}><strong>Data Fetched At:</strong> {rake.updated_at ? `${timeService.utcToist(rake.updated_at, 'dd-MMM')} ${timeService.utcToistTime(rake.updated_at, 'HH:mm')}` : 'N/A'}</p>
+                          <p style={{ margin: '2px 0' }}><strong>Commodity:</strong> {rake.commodity && rake.commodity.length > 0 ? rake.commodity.join(', ') : 'N/A'}</p>
+                          <p style={{ margin: '2px 0' }}><strong>Status:</strong> <span style={{ color: '#D32F2F' }}>Empty</span></p>
+                        </div>
                       </div>
                     </Popup>
                   </Marker>
