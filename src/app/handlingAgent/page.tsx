@@ -18,6 +18,7 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 import { useSnackbar } from '@/hooks/snackBar';
 import ActiveAgentList from '@/app/handlingAgent/activeHAtable';
 import { useRouter } from 'next/navigation';
+import { useMediaQuery, useTheme } from '@mui/material';
 
 interface SkipAndLimit {
     skip: number,
@@ -35,7 +36,8 @@ function HandlingAgent() {
     const { showMessage } = useSnackbar();
     const [agentList, setAgentList] = useState([]);
     const [originalAgentList, setOriginalAgentList] = useState([]);
-    const mobile = useWindowSize(500);
+    const theme = useTheme();
+    const mobile = useMediaQuery(theme.breakpoints.down('sm'));
     const [openModalInvite, setOpenModalInvite] = useState(false);
     const [skipAndLimit, setSkipAndLimit] = useState<SkipAndLimit>({
         skip: 0,
@@ -124,12 +126,17 @@ function HandlingAgent() {
     }
 
     return (
-        <div className='handlingAgent_Container'>
+        <div 
+            className='handlingAgent_Container'
+            style={{
+                marginBottom: !mobile ? '0px' : '60px',
+            }}
+        >
             {/* ------------header ----------- */}
-            {mobile ? <Header title={'Handling Agent'} isMapHelper={false} /> : <MobileHeader />}
+            {!mobile ? <Header title={'Handling Agent'} isMapHelper={false} /> : <MobileHeader />}
 
             {/* ---------- pageContent---------- */}
-            <div className={`content_container ${mobile ? 'adjustMargin' : 'adjustMarginMobile'}`}  >
+            <div className={`content_container ${!mobile ? 'adjustMargin' : 'adjustMarginMobile'}`}  >
 
                 <div className='handlingAgent_title'>
                     <div className='handlingAgent_title_container'>
@@ -196,7 +203,7 @@ function HandlingAgent() {
             </div>
 
             {/* ----------sildeDrawer ------------- */}
-            {mobile ? <SideDrawer /> : <div className="bottom_bar"><MobileDrawer /></div>}
+            {!mobile ? <SideDrawer /> : <div ><MobileDrawer /></div>}
         </div>
     )
 }

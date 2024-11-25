@@ -12,23 +12,25 @@ import "./style.css";
 import { redirect, useRouter, useParams } from "next/navigation";
 import UpdateETA from '@/app/updateETA/page';
 import WhatsAppNotify from '@/app/whatsAppNotify/page';
+import { useMediaQuery, useTheme } from '@mui/material';
 
 function Settings() {
-    const mobile = useWindowSize(500);
     const text = useTranslations("ETADASHBOARD");
     const route = useRouter();
     const [activeOption, setActiveOption] = useState("updateETA");
+    const theme = useTheme();
+    const mobile = useMediaQuery(theme.breakpoints.down('md'));
   
     return (
         <div>
-          {mobile ? (
+          {!mobile ? (
             <Header title={"Settings"} isMapHelper={false} />
           ) : (
             <MobileHeader />
           )}
     
           <div
-            className={`content_container_contact ${mobile ? "adjustMargin" : "adjustMarginMobile"}`}
+            className={`content_container_contact ${!mobile ? "adjustMargin" : "adjustMarginMobile"}`}
             style={{backgroundColor:'#F0F3F9'}}
           >
 
@@ -49,10 +51,10 @@ function Settings() {
 
           </div>
     
-          {mobile ? (
+          {!mobile ? (
             <SideDrawer />
           ) : (
-            <div className="bottom_bar">
+            <div >
               <MobileDrawer />
             </div>
           )}

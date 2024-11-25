@@ -8,24 +8,31 @@ import MobileHeader from "@/components/Header/mobileHeader";
 import Header from "@/components/Header/header";
 import { useWindowSize } from "@/utils/hooks";
 import {useTranslations} from 'next-intl';
+import { useMediaQuery, useTheme } from '@mui/material';
 
 const Page = () => {
-  const mobile = useWindowSize(600);
   const t = useTranslations('HEADER');
+  const theme = useTheme();
+  const mobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   return (
    <div>
-      <div className="dashboardContainer">
+      <div 
+        className="dashboardContainer"
+        style={{
+          marginBottom: !mobile ? '0px' : '60px',
+        }}
+      >
         <div style={{ width: '100%', overflowX: 'auto' }}>
             {
-              mobile ? <Header title={'Captive Rakes'} isMapHelper={false}/> : <MobileHeader />
+              !mobile ? <Header title={'Captive Rakes'} isMapHelper={false}/> : <MobileHeader />
             }
         </div>
         <div>
           <Tabsection/>
         </div>
       </div>
-      {mobile ? <SideDrawer /> : <div className="bottom_bar">
+      {!mobile ? <SideDrawer /> : <div >
         <MobileDrawer />
       </div>} 
    </div>
