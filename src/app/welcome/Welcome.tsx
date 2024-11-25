@@ -65,7 +65,11 @@ const items = [
 },
 ];
 
-const Welcome = () => {
+interface WelcomeProps {
+  onDashboardClick?: () => void;
+}
+
+const Welcome: React.FC<WelcomeProps> = ({ onDashboardClick }) => {
   const router = useRouter();
   const [isVisible, setIsVisible] = useState(false)
   const ref = useRef(null)
@@ -108,9 +112,20 @@ const Welcome = () => {
   }
 
   const handleRedirect = (path: string) => {
-    console.log('path', path);
-    router.push(path);
+    if (path === '/dashboard') {
+      router.push('/dashboard?tab=3');
+    } else {
+      router.push(path);
+    }
   }
+
+  const handleDashboardClick = () => {
+    if (onDashboardClick) {
+      onDashboardClick();
+    } else {
+      router.push('/dashboard');
+    }
+  };
 
   return (
     <div>

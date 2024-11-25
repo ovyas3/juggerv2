@@ -52,7 +52,7 @@ const navigationItems: NavItem[] = [
     // { id: 'etaDashboard', label: 'Dashboard', icon: AllInboxIcon },
     { id: 'inPlantDashboard', label: 'In-Plant Dashboard', icon: WarehouseIcon },
     { id: 'contact', label: 'Contact Dashboard', icon: ContactPageIcon },
-    { id: 'captiveRakeMapView', label: 'Captive Rakes Management', icon: TrainIcon }
+    // { id: 'captiveRakeMapView', label: 'Captive Rakes Management', icon: TrainIcon }
 ];
 
 const NavItem = ({ 
