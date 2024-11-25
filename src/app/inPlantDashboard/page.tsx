@@ -6,20 +6,35 @@ import { useWindowSize as useWindowSize } from "@/utils/hooks";
 import SideDrawer from "@/components/Drawer/Drawer";
 import "./page.css";
 import { useTranslations } from "next-intl";
+import { useMediaQuery, useTheme } from '@mui/material';
+import MobileDrawer from '@/components/Drawer/mobile_drawer';
+import MobileHeader from '@/components/Header/mobileHeader';
 
 import WagonTallySheet from "./wagonSheet";
 import WagonAssignSheet from "./wagonAssignSheet";
 
 const Page = () => {
-  const mobile = useWindowSize(500);
+  const theme = useTheme();
+  const mobile = useMediaQuery(theme.breakpoints.down('sm'));
   const text = useTranslations("WAGONTALLYSHEET");
   return (
-      <div className="wagon-tally-container">
-        <Header title={text("in-plant-Dashboard")} isMapHelper={false} />
-        <div id="pageInsideContent">
+      <div className="">
+        { !mobile ?
+          <Header title={text("in-plant-Dashboard")} isMapHelper={false} /> 
+          : <MobileHeader />
+        }
+        <div 
+          id="pageInsideContent"
+          style={{
+            marginTop: !mobile ? '56px' : '0px',
+            marginLeft: !mobile ? '70px' : '0px',
+          }}
+        >
           <WagonTallySheet />
         </div>
-        <SideDrawer />
+        { !mobile ?
+          <SideDrawer /> : <MobileDrawer />
+        }
       </div>
   );
 };

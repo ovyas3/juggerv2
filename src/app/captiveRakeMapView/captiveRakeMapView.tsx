@@ -15,6 +15,9 @@ import { httpsGet } from '@/utils/Communication';
 import { useRouter } from 'next/navigation';
 import getBoundary from '@/components/MapView/IndianClaimed';
 import timeService from '@/utils/timeService';
+import { useMediaQuery, useTheme } from '@mui/material';
+import MobileDrawer from '@/components/Drawer/mobile_drawer';
+import MobileHeader from '@/components/Header/mobileHeader';
 
 interface RakeLocation {
   coords: [number, number]; // Tuple type for Leaflet position
@@ -30,6 +33,8 @@ export default  function CaptiveRakeMapView() {
   const [coordsData, setCoordsData] = useState([]);
   const [loadedRakes, setLoadedRakes] = useState<any>([]);
   const [emptyRakes, setEmptyRakes] = useState<any>([]);
+  const theme = useTheme();
+  const mobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   async function getCoords() {
     const response = await httpsGet('get/captive_rake_locations',0,router)
@@ -152,10 +157,16 @@ export default  function CaptiveRakeMapView() {
 
   return (
     <div className="">
-      <Header title={"Captive Rake Map View"} />
-      <SideDrawer />
+      {!mobile ? <Header title={"Captive Rake Map View"} /> : <MobileHeader />}
+      {!mobile ? <SideDrawer /> : <MobileDrawer />}
       <div>
-        <div className={styles.container}>
+        <div 
+          className={styles.container}
+          style={{
+            marginTop: !mobile ? '56px' : '0px',
+            marginLeft: !mobile ? '70px' : '0px',
+          }}
+        >
           <div className={styles.leftPanel}>
           <div className={styles.rakesStatus}>
             <h2>Captive Rakes Status</h2>
@@ -321,7 +332,7 @@ export default  function CaptiveRakeMapView() {
                           <p style={{ margin: '2px 0' }}><strong>Updated At FOIS:</strong> {rake.updated_on ? `${timeService.utcToist(rake.updated_on, 'dd-MMM')} ${timeService.utcToistTime(rake.updated_on, 'HH:mm')}` : 'N/A'}</p>
                           <p style={{ margin: '2px 0' }}><strong>Data Fetched At:</strong> {rake.updated_at ? `${timeService.utcToist(rake.updated_at, 'dd-MMM')} ${timeService.utcToistTime(rake.updated_at, 'HH:mm')}` : 'N/A'}</p>
                           <p style={{ margin: '2px 0' }}><strong>Commodity:</strong> {rake.commodity && rake.commodity.length > 0 ? rake.commodity.join(', ') : 'N/A'}</p>
-                          <p style={{ margin: '2px 0' }}><strong>Status:</strong> <span style={{ color: '#334FFC' }}>Loaded</span></p>
+                          <p style={{ margin: '2px 0' }}><strong>Status:</strong> <span>Loaded</span></p>
                         </div>
                       </div>
                     </Popup>
@@ -358,7 +369,7 @@ export default  function CaptiveRakeMapView() {
                           <p style={{ margin: '2px 0' }}><strong>Updated At FOIS:</strong> {rake.updated_on ? `${timeService.utcToist(rake.updated_on, 'dd-MMM')} ${timeService.utcToistTime(rake.updated_on, 'HH:mm')}` : 'N/A'}</p>
                           <p style={{ margin: '2px 0' }}><strong>Data Fetched At:</strong> {rake.updated_at ? `${timeService.utcToist(rake.updated_at, 'dd-MMM')} ${timeService.utcToistTime(rake.updated_at, 'HH:mm')}` : 'N/A'}</p>
                           <p style={{ margin: '2px 0' }}><strong>Commodity:</strong> {rake.commodity && rake.commodity.length > 0 ? rake.commodity.join(', ') : 'N/A'}</p>
-                          <p style={{ margin: '2px 0' }}><strong>Status:</strong> <span style={{ color: '#D32F2F' }}>Empty</span></p>
+                          <p style={{ margin: '2px 0' }}><strong>Status:</strong> <span>Empty</span></p>
                         </div>
                       </div>
                     </Popup>
