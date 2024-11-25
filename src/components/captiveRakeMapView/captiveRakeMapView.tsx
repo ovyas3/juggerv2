@@ -26,7 +26,7 @@ interface RakeLocation {
   updatedAt: string;
 }
 
-const statusCodeWithExpansion: any = {
+const rakeStatus: any = {
   AR: "Available for Release",
   FD: "Forwarded",
   DP: "Departed",
@@ -409,7 +409,7 @@ export default function CaptiveRakeMapView() {
                         }}>
                           <p style={{ margin: '2px 0' }}><strong>Rake ID:</strong> {marker.rake?.rake_id || 'N/A'}</p>
                           <p style={{ margin: '2px 0' }}><strong>Rake Name:</strong> {marker.rake?.name || 'N/A'}</p>
-                          <p style={{ margin: '2px 0' }}><strong>Rake Status:</strong> {marker.stts_code ? statusCodeWithExpansion[marker.stts_code] : 'N/A'}</p>
+                          <p style={{ margin: '2px 0' }}><strong>Rake Status:</strong> {marker.stts_code ? rakeStatus[marker.stts_code] : 'N/A'}</p>
                           <p style={{ margin: '2px 0' }}><strong>From Station:</strong> {marker.from ? `${marker.from.code} ${marker.from.name}` : 'N/A'}</p>
                           <p style={{ margin: '2px 0' }}><strong>To Station:</strong> {marker.to ? `${marker.to.code} ${marker.to.name}` : 'N/A'}</p>
                           <p style={{ margin: '2px 0' }}><strong>Current Station:</strong> {marker.current_station ? `${marker.current_station.code} ${marker.current_station.name}` : 'N/A'}</p>

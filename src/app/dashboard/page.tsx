@@ -1,5 +1,5 @@
 'use client'
-import React from "react";
+import React, { Suspense } from "react";
 import Tabsection from "../../components/dashboard/tabSection/tabSection";
 import SideDrawer from "@/components/Drawer/Drawer";
 import MobileDrawer from "@/components/Drawer/mobile_drawer";
@@ -10,7 +10,7 @@ import {useTranslations} from 'next-intl';
 import { useMediaQuery, useTheme } from '@mui/material';
 import { useSearchParams } from 'next/navigation';
 
-const Page = () => {
+const DashboardContent = () => {
   const t = useTranslations('HEADER');
   const theme = useTheme();
   const mobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -38,6 +38,14 @@ const Page = () => {
         <MobileDrawer />
       </div>} 
    </div>
+  );
+};
+
+const Page = () => {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <DashboardContent />
+    </Suspense>
   );
 };
 
