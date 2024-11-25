@@ -67,6 +67,11 @@ export default function CaptiveRakeMapView() {
     { plant: "PJPD", from: 10, towards: 1, others: 2 },
     { plant: "Barbil", from: 2, towards: 1, others: 4 },
   ]);
+  const [stats, setStats] = useState({
+    "T+1": 0,
+    "T+2": 0,
+    "T+3": 0,
+  });
   const [activeFilter, setActiveFilter] = useState<'total' | 'loaded' | 'empty'>('total');
 
   const filteredCoords = useMemo(() => {
@@ -93,6 +98,8 @@ export default function CaptiveRakeMapView() {
           val.geo_point.coordinates[0] !== 0 && 
           val.geo_point.coordinates[1] !== 0
         );
+        const stats = response.data.stats;
+        setStats(stats);
         
         // Separate loaded and empty rakes
         const loaded = coords.filter((val: any) => val.loading_status === "L");
@@ -306,15 +313,15 @@ export default function CaptiveRakeMapView() {
                 <h2>Rakes Arrival</h2>
                 <div className={styles.arrivalItems}>
                   <div className={styles.arrivalItem}>
-                    <span className={styles.value}>20</span>
+                    <span className={styles.value}>{stats["T+1"]}</span>
                     <span className={styles.label}>T+1</span>
                   </div>
                   <div className={styles.arrivalItem}>
-                    <span className={styles.value}>06</span>
+                    <span className={styles.value}>{stats["T+2"]}</span>
                     <span className={styles.label}>T+2</span>
                   </div>
                   <div className={styles.arrivalItem}>
-                    <span className={styles.value}>06</span>
+                    <span className={styles.value}>{stats["T+3"]}</span>
                     <span className={styles.label}>&gt;T+3</span>
                   </div>
                 </div>
