@@ -26,6 +26,30 @@ interface RakeLocation {
   updatedAt: string;
 }
 
+const statusCodeWithExpansion: any = {
+  AR: "Available for Release",
+  FD: "Forwarded",
+  DP: "Departed",
+  ST: "Stopped",
+  RL: "Released",
+  RD: "Ready for Departure",
+  BP: "Brake Power Certificate Issued",
+  CL: "Cleared",
+  MT: "Empty",
+  LD: "Loaded",
+  OT: "On Transit",
+  SH: "Shunted",
+  UC: "Under Clearance",
+  UI: "Under Inspection",
+  UP: "Under Placement",
+  RR: "Ready for Release",
+  HO: "Hold",
+  CW: "Charged Wagon",
+  PL: "Placed",
+  AB: "Abandoned",
+};
+
+
 export default function CaptiveRakeMapView() {
   const theme = useTheme();
   const mobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -63,12 +87,8 @@ export default function CaptiveRakeMapView() {
   async function getCoords() {
     try {
       const response = await httpsGet('get/captive_rake_locations', 0, router);
-      console.log('Response:', response);
-      console.log('Status Code:', response?.statusCode);
-      console.log('Data:', response?.data);
-      console.log('Data Type:', typeof response?.data);
       if (response?.statusCode === 200 && Array.isArray(response?.data.data)) {
-        const coords = response.data.data.filter((val: any) => 
+        const coords = response.data.data && response.data.data.length > 0 && response.data.data.filter((val: any) => 
           val?.geo_point?.coordinates && 
           val.geo_point.coordinates[0] !== 0 && 
           val.geo_point.coordinates[1] !== 0
@@ -389,13 +409,15 @@ export default function CaptiveRakeMapView() {
                         }}>
                           <p style={{ margin: '2px 0' }}><strong>Rake ID:</strong> {marker.rake?.rake_id || 'N/A'}</p>
                           <p style={{ margin: '2px 0' }}><strong>Rake Name:</strong> {marker.rake?.name || 'N/A'}</p>
+                          <p style={{ margin: '2px 0' }}><strong>Rake Status:</strong> {marker.stts_code ? statusCodeWithExpansion[marker.stts_code] : 'N/A'}</p>
                           <p style={{ margin: '2px 0' }}><strong>From Station:</strong> {marker.from ? `${marker.from.code} ${marker.from.name}` : 'N/A'}</p>
                           <p style={{ margin: '2px 0' }}><strong>To Station:</strong> {marker.to ? `${marker.to.code} ${marker.to.name}` : 'N/A'}</p>
                           <p style={{ margin: '2px 0' }}><strong>Current Station:</strong> {marker.current_station ? `${marker.current_station.code} ${marker.current_station.name}` : 'N/A'}</p>
                           <p style={{ margin: '2px 0' }}><strong>Updated At FOIS:</strong> {marker.updated_on ? `${timeService.utcToist(marker.updated_on, 'dd-MMM')} ${timeService.utcToistTime(marker.updated_on, 'HH:mm')}` : 'N/A'}</p>
                           <p style={{ margin: '2px 0' }}><strong>Data Fetched At:</strong> {marker.updated_at ? `${timeService.utcToist(marker.updated_at, 'dd-MMM')} ${timeService.utcToistTime(marker.updated_at, 'HH:mm')}` : 'N/A'}</p>
+                          <p style={{ margin: '2px 0' }}><strong>ETA:</strong> {marker.expd_arvl_time ? `${timeService.utcToist(marker.expd_arvl_time, 'dd-MMM')} ${timeService.utcToistTime(marker.expd_arvl_time, 'HH:mm')}` : 'N/A'}</p>
                           <p style={{ margin: '2px 0' }}><strong>Commodity:</strong> {marker.commodity && marker.commodity.length > 0 ? marker.commodity.join(', ') : 'N/A'}</p>
-                          <p style={{ margin: '2px 0' }}><strong>Status:</strong> <span>{marker.loading_status === "L" ? "Loaded" : "Empty"}</span></p>
+                          <p style={{ margin: '2px 0' }}><strong>Remaining Distance:</strong> {marker.rmng_km ? marker.rmng_km : 'N/A'} km</p>
                         </div>
                       </div>
                     </Popup>
