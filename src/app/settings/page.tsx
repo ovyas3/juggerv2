@@ -12,6 +12,7 @@ import "./style.css";
 import { redirect, useRouter, useParams } from "next/navigation";
 import UpdateETA from '@/app/updateETA/page';
 import WhatsAppNotify from '@/app/whatsAppNotify/page';
+import Preferences from "@/components/Preferences/preferences";
 
 function Settings() {
     const mobile = useWindowSize(500);
@@ -36,10 +37,12 @@ function Settings() {
                 <div id="left-section">
                     <div className={activeOption === 'updateETA' ? 'activeOption':""} style={{paddingInline:'16px', paddingBlock:'10px', cursor:'pointer'}} onClick={()=>setActiveOption('updateETA')} >Update ETA</div>
                     <div className={activeOption === 'whatsAppNotify' ? 'activeOption':""} style={{paddingInline:'16px', paddingBlock:'10px', cursor:'pointer'}} onClick={()=>setActiveOption('whatsAppNotify')} >WhatsApp Notify</div>
+                    <div className={activeOption === 'preferences' ? 'activeOption':""} style={{paddingInline:'16px', paddingBlock:'10px', cursor:'pointer'}} onClick={()=>setActiveOption('preferences')} >Preferences</div>
                 </div>
                 <div id="right-section">
                     {activeOption === 'updateETA' && <UpdateETA />}
                     {activeOption === 'whatsAppNotify' && <WhatsAppNotify />}
+                    {activeOption === 'preferences' && <Preferences/>}
                 </div>
             </div>
             

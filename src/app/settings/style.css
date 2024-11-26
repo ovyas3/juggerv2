@@ -30,4 +30,8 @@
 #right-section{
     width: 70%;
     border-left: 1px solid #DFE3EB;
+    overflow-y: scroll;
+    padding: 24px;
+    scroll-behavior: smooth;
+    position: relative;
 }

@@ -291,6 +291,110 @@
     "rate":"Rate Us",
     "submit":"Submit",
     "deleteContactHeader":"Delete Contact"
+  },
+  "SETTINGS": {
+   "statusCodes":[
+      {
+        "code": "AR",
+        "status": "Available for Release",
+        "description": "Wagon is ready for release after unloading."
+      },
+      {
+        "code": "FD",
+        "status": "Forwarded",
+        "description": "Wagon or rake has been dispatched or forwarded to another station or yard."
+      },
+      {
+        "code": "DP",
+        "status": "Departed",
+        "description": "Wagon or rake has left the station or yard."
+      },
+      {
+        "code": "ST",
+        "status": "Stopped",
+        "description": "Wagon or rake is halted, either at a station or yard."
+      },
+      {
+        "code": "RL",
+        "status": "Released",
+        "description": "Wagon has been cleared for reuse after unloading or maintenance."
+      },
+      {
+        "code": "RD",
+        "status": "Ready for Departure",
+        "description": "Wagon or train is prepared to leave after loading or maintenance."
+      },
+      {
+        "code": "BP",
+        "status": "Brake Power Certificate Issued",
+        "description": "Indicates that the brake power certificate has been issued for the train."
+      },
+      {
+        "code": "CL",
+        "status": "Cleared",
+        "description": "Consignment has been cleared for onward movement."
+      },
+      {
+        "code": "MT",
+        "status": "Empty",
+        "description": "The wagon is empty and ready for loading."
+      },
+      {
+        "code": "LD",
+        "status": "Loaded",
+        "description": "The wagon has been loaded with goods."
+      },
+      {
+        "code": "OT",
+        "status": "On Transit",
+        "description": "The wagon is currently in transit between two stations."
+      },
+      {
+        "code": "SH",
+        "status": "Shunted",
+        "description": "The wagon has been moved within the yard for positioning or sorting."
+      },
+      {
+        "code": "UC",
+        "status": "Under Clearance",
+        "description": "Wagon is being cleared or processed."
+      },
+      {
+        "code": "UI",
+        "status": "Under Inspection",
+        "description": "Wagon is under maintenance or inspection."
+      },
+      {
+        "code": "UP",
+        "status": "Under Placement",
+        "description": "Wagon is being placed for loading or unloading."
+      },
+      {
+        "code": "RR",
+        "status": "Ready for Release",
+        "description": "Wagon is ready for dispatch or movement after unloading."
+      },
+      {
+        "code": "HO",
+        "status": "Hold",
+        "description": "The wagon or consignment is temporarily on hold."
+      },
+      {
+        "code": "CW",
+        "status": "Charged Wagon",
+        "description": "Wagon has been charged and is ready for movement."
+      },
+      {
+        "code": "PL",
+        "status": "Placed",
+        "description": "Wagon has been placed at the loading or unloading point."
+      },
+      {
+        "code": "AB",
+        "status": "Abandoned",
+        "description": "Movement or operation of the wagon has been canceled."
+      }
+    ]
   }
 
 }
