@@ -63,9 +63,18 @@ export default function CaptiveRakeMapView() {
     { plant: "Barbil", from: 2, towards: 1, others: 4 },
   ]);
   const [stats, setStats] = useState({
-    "T+1": 0,
-    "T+2": 0,
-    "T+3": 0,
+    "T+1": {
+      count: 0,
+      _id: []
+    },
+    "T+2": {
+      count: 0,
+      _id: []
+    },
+    "T+3": {
+      count: 0,
+      _id: []
+    }
   });
   const [activeFilter, setActiveFilter] = useState<'total' | 'loaded' | 'empty'>('total');
   const [activeRakeFilter, setActiveRakeFilter] = useState<string>("All");
@@ -76,15 +85,28 @@ export default function CaptiveRakeMapView() {
     "GPWIS": 0,
     "BFNV": 0
   });
+  const [selectedArrival, setSelectedArrival] = useState<string | null>(null);
+  const [selectedRow, setSelectedRow] = useState<number | null>(null);
 
   const handleRakeFilterClick = (filterType: string) => {
     setActiveRakeFilter(filterType === activeRakeFilter ? "All" : filterType);
     getCoords(filterType);
     getRakeStatusData(filterType);
+    getRakeStats(filterType);
   };
 
   const handleFilterClick = (filter: 'total' | 'loaded' | 'empty') => {
     setActiveFilter(filter === activeFilter ? 'total' : filter);
+  };
+
+  const handleArrivalClick = (period: string, ids: string[]) => {
+    setSelectedArrival(selectedArrival === period ? null : period);
+    console.log(`Selected ${period} arrival _ids:`, ids);
+  };
+
+  const handleRowClick = (index: number, rowData: any) => {
+    setSelectedRow(selectedRow === index ? null : index);
+    console.log('Selected row data:', rowData);
   };
 
   const filteredCoords = useMemo(() => {
@@ -126,12 +148,6 @@ export default function CaptiveRakeMapView() {
         const loaded = coords && coords.length > 0 && coords.filter((val: any) => val.loading_status === "L") || [];
         const empty = coords && coords.length > 0 && coords.filter((val: any) => val.loading_status !== "L") || [];
 
-        const stats = response.data.stats || {
-          "T+1": 0,
-          "T+2": 0,
-          "T+3": 0
-        };
-
         const rakeStatusData = Object.entries(response.data.stts_code || {}).map(([code, count]) => ({
           code,
           text: rakeStatus[code] || code,
@@ -158,8 +174,6 @@ export default function CaptiveRakeMapView() {
         setCoordsData(coords);
         setLoadedRakes(loaded);
         setEmptyRakes(empty);
-        setStats(stats);
-        // setRakeStatusData(rakeStatusData);
         setRakeTypeData(rakeTypeCounts);
       } else {
         console.error('Invalid response format:', response);
@@ -188,9 +202,41 @@ export default function CaptiveRakeMapView() {
     }
   }
 
+  async function getRakeStats(scheme: string) {
+    try{
+      const url = scheme === "All" ? 'get/tAndTplus' : `get/tAndTplus?scheme=${scheme}`;
+      const response = await httpsGet(url, 0, router);
+      if (response?.statusCode === 200) {
+        const statsData = response.data || {};
+        console.log(statsData, "statsData");
+        setStats(statsData);
+
+        if(!statsData) {
+          setStats({
+            "T+1": {
+              count: 0,
+              _id: []
+            },
+            "T+2": {
+              count: 0,
+              _id: []
+            },
+            "T+3": {
+              count: 0,
+              _id: []
+            }
+          })
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   useEffect(()=>{
    getCoords('All')
    getRakeStatusData('All')
+   getRakeStats('All')
   },[])
 
   useEffect(() => {
@@ -243,7 +289,7 @@ export default function CaptiveRakeMapView() {
             <g transform="matrix(1, 0, 0, 1, -3920, 5968)" filter="url(#shadow)">
               <rect width="20" height="20" rx="6" transform="translate(6 4)" fill="#fff"/>
             </g>
-            <path d="M160-871.474v-6a1.957,1.957,0,0,1,.434-1.334,2.732,2.732,0,0,1,1.145-.758,6.5,6.5,0,0,1,1.618-.347q.908-.087,1.855-.087,1.042,0,1.966.087a6.186,6.186,0,0,1,1.611.347,2.453,2.453,0,0,1,1.082.758,2.086,2.086,0,0,1,.395,1.334v6a2.135,2.135,0,0,1-.639,1.571,2.135,2.135,0,0,1-1.571.64l.947.947V-868h-1.263l-1.263-1.263h-2.526L162.526-868h-1.263v-.316l.947-.947a2.135,2.135,0,0,1-1.571-.64A2.135,2.135,0,0,1,160-871.474Zm1.263-3.474h3.158v-1.895h-3.158Zm4.421,0h3.158v-1.895h-3.158Zm-2.842,3.789a.92.92,0,0,0,.679-.268.92.92,0,0,0,.268-.679.92.92,0,0,0-.268-.679.92.92,0,0,0-.679-.268.92.92,0,0,0-.679.268.92.92,0,0,0-.268.679A.92.92,0,0,0,162.842-871.158Zm4.421,0a.92.92,0,0,0,.679-.268.92.92,0,0,0,.268-.679.921.921,0,0,0-.268-.679A.92.92,0,0,0,167.263-871.158Z" transform="translate(-4069 6856.005)" 
+            <path d="M160-871.474v-6a1.957,1.957,0,0,1,.434-1.334,2.732,2.732,0,0,1,1.145-.758,6.5,6.5,0,0,1,1.618-.347q.908-.087,1.855-.087,1.042,0,1.966.087a6.186,6.186,0,0,1,1.611.347,2.453,2.453,0,0,1,1.082.758,2.086,2.086,0,0,1,.395,1.334v6a2.135,2.135,0,0,1-.639,1.571,2.135,2.135,0,0,1-1.571.64l.947.947V-868h-1.263l-1.263-1.263h-2.526L162.526-868h-1.263v-.316l.947-.947a2.135,2.135,0,0,1-1.571-.64A2.135,2.135,0,0,1,160-871.474Zm1.263-3.474h3.158v-1.895h-3.158Zm4.421,0h3.158v-1.895h-3.158Zm-2.842,3.789a.92.92,0,0,0,.679-.268.92.92,0,0,0,.268-.679.92.92,0,0,0-.268-.679.92.92,0,0,0-.679-.268.92.92,0,0,0-.679.268.92.92,0,0,0-.268.679A.92.92,0,0,0,162.842-871.158Zm4.421,0a.92.92,0,0,0,.679-.268.92.92,0,0,0,.268-.679A.921.921,0,0,0,167.263-871.158Z" transform="translate(-4069 6856.005)" 
             fill="${fillColor}"/>
           </g>
         </svg>
@@ -398,18 +444,37 @@ export default function CaptiveRakeMapView() {
             </div>
 
             <div className={styles.rakesArrival}>
-              <h2>Rakes Arrival</h2>
+              <div className={styles.arrivalHeader}>
+                <h2>Rakes Arrival</h2>
+                {selectedArrival && (
+                  <button 
+                    className={styles.clearFilter}
+                    onClick={() => setSelectedArrival(null)}
+                  >
+                    Clear
+                  </button>
+                )}
+              </div>
               <div className={styles.arrivalItems}>
-                <div className={styles.arrivalItem}>
-                  <span className={styles.value}>{stats["T+1"]}</span>
+                <div 
+                  className={`${styles.arrivalItem} ${selectedArrival === "T+1" ? styles.selected : ""}`}
+                  onClick={() => handleArrivalClick("T+1", stats["T+1"]._id || [])}
+                >
+                  <span className={styles.value}>{stats["T+1"].count || 0}</span>
                   <span className={styles.label}>T+1</span>
                 </div>
-                <div className={styles.arrivalItem}>
-                  <span className={styles.value}>{stats["T+2"]}</span>
+                <div 
+                  className={`${styles.arrivalItem} ${selectedArrival === "T+2" ? styles.selected : ""}`}
+                  onClick={() => handleArrivalClick("T+2", stats["T+2"]._id || [])}
+                >
+                  <span className={styles.value}>{stats["T+2"].count || 0}</span>
                   <span className={styles.label}>T+2</span>
                 </div>
-                <div className={styles.arrivalItem}>
-                  <span className={styles.value}>{stats["T+3"]}</span>
+                <div 
+                  className={`${styles.arrivalItem} ${selectedArrival === "T+3" ? styles.selected : ""}`}
+                  onClick={() => handleArrivalClick("T+3", stats["T+3"]._id || [])}
+                >
+                  <span className={styles.value}>{stats["T+3"].count || 0}</span>
                   <span className={styles.label}>&gt;T+3</span>
                 </div>
               </div>
@@ -417,24 +482,55 @@ export default function CaptiveRakeMapView() {
 
             <div className={styles.rakeStatusInMovement}>
               <h2>Rake Status</h2>
-              <table className={styles.summaryTable}>
-                <thead>
-                  <tr>
-                    <th>S.No</th>
-                    <th>Code</th>
-                    <th>Counts</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {rakeStatusData.map((row: any, index: number) => (
-                    <tr key={index}>
-                      <td style={{fontWeight:'bold', color:''}}>{index + 1}</td>
-                      <td>{row.code} ({row.text})</td>
-                      <td>{row.count}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              <div className={styles.rakeStatusTableWrapper}>
+                <div className={styles.tableHeaderWrapper}>
+                  <table className={styles.rakeStatusTable}>
+                    <thead>
+                      <tr>
+                        <th style={{
+                          width: '10%',
+                          textAlign: 'center',
+                        }}>S.No</th>
+                        <th style={{
+                          width: '65%',
+                          textAlign: 'left',
+                        }}>Code</th>
+                        <th style={{
+                          width: '25%',
+                          textAlign: 'center',
+                        }}>Counts</th>
+                      </tr>
+                    </thead>
+                  </table>
+                </div>
+                <div className={styles.tableBodyWrapper}>
+                  <table className={styles.rakeStatusTable}>
+                    <tbody>
+                      {rakeStatusData.map((row: any, index: number) => (
+                        <tr 
+                          key={index}
+                          className={selectedRow === index ? styles.selected : ''}
+                          onClick={() => handleRowClick(index, row)}
+                        >
+                          <td style={{
+                            width: '10%',
+                            textAlign: 'center',
+                            fontWeight:'bold'
+                          }}>{index + 1}</td>
+                          <td style={{
+                            width: '65%',
+                            textAlign: 'left'
+                          }}>{row.code} ({row.text})</td>
+                          <td style={{
+                            width: '25%',
+                            textAlign: 'center'
+                          }}>{row.count}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
             </div>
 
             {/* <div className={styles.rakesPlacementRegion}>
