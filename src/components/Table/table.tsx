@@ -68,7 +68,8 @@ const status_class_map: { [key: string]: string } = {
     'ITNS': 'status_title_In_Transit',
     'Delivered': 'status_title_Delivered',
     'INPL': 'status_title_INPL',
-    "stabled": 'status_title_stabled'
+    "stabled": 'status_title_stabled',
+    "CNCL": 'status_title_CNCL'
 }
 
 const convertArrayToFilteredArray = (inputArray: any, shipmentPayloads: any) => {
