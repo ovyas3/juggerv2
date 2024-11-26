@@ -400,6 +400,15 @@
     align-items: center;
     margin-bottom: 6px;
 }
+.status_title_CNCL{
+    height: 25px;
+    background-color: #FCE3E3;
+    color: #CF5455;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 6px;
+}
 
 .status_resize {
     display: flex;
