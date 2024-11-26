@@ -271,6 +271,14 @@ const OrdersPage = () => {
             textTextColor = '#536AFE'; 
           }
           break;
+        case "CNCL":
+          if (statuses.includes('CNCL') ) {
+            backgroundColor = '#FF5C5C1F';
+            countTextColor = '#FF5C5C'; 
+            textTextColor = '#FF5C5C'; 
+          }
+          break;
+
       default:
         backgroundColor = '#FFFFFF';
         countTextColor = '#42454E';
@@ -348,6 +356,20 @@ const OrdersPage = () => {
           return newState;
         });
         break;
+      case "CNCL":
+        setShipmentsPayload((prevState: any) => {
+          let newState = { ...prevState };
+          if(!newState.status.includes('CNCL')){
+            newState.status = [...newState.status, 'CNCL'];
+            setStatus(newState.status);
+          }else{
+            newState.status = newState.status.filter((item: string) => item !== 'CNCL');
+            setStatus(newState.status);
+          }
+          return newState;
+        })
+
+
       default:
         break;
     }
@@ -467,9 +489,9 @@ const OrdersPage = () => {
                       <div style={{fontSize:20, fontWeight:500, color: getStatusColor(status, 'Delivered').countTextColor}}><CountUp duration={1.5} end={deliveredCount}/></div>
                       <div style={{fontSize:12, color: getStatusColor(status, 'Delivered').textTextColor}}>{t('Delivered')}</div>
                     </div>
-                    <div className='display_status_inner_box' style={{cursor:'pointer', backgroundColor:'#FFE3E3', borderColor:'#FFE3E3'}}>
-                      <div style={{fontSize:20, fontWeight:500, color:'#C62E2E' }}><CountUp duration={1.5} end={cancelledCount}/></div>
-                      <div style={{fontSize:12, color: '#C62E2E'}}>{t('cancelled')}</div>
+                    <div className='display_status_inner_box' style={{cursor:'pointer', backgroundColor: getStatusColor(status, 'CNCL').backgroundColor, borderColor:'#FFE3E3'}} onClick={()=>{changeStatusByDashBoard('CNCL')}}>
+                      <div style={{fontSize:20, fontWeight:500, color: getStatusColor(status, 'CNCL').countTextColor}}><CountUp duration={1.5} end={cancelledCount}/></div>
+                      <div style={{fontSize:12, color: getStatusColor(status, 'CNCL').textTextColor}}>{t('cancelled')}</div>
                     </div>
                 </div> 
               </div>
