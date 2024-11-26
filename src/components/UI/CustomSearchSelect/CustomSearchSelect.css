@@ -1,0 +1,8 @@
+#rakeOptions{
+    padding-inline: 8px;
+    padding-block: 8px;
+    cursor: pointer;
+}
+#rakeOptions:hover{
+    background-color: #F1F0E8;
+}

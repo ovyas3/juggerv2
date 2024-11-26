@@ -53,7 +53,7 @@ const columns: readonly Column[] = [
 ];
 
 function contructingData(shipment: any) {
-  return shipment.map(
+  return shipment?.map(
     (shipment: {
       _id: string;
       rakeShipment: {
@@ -198,7 +198,7 @@ const ContactTable = ({ contactDetails, getContactDetails, setContactDetailsPayl
               </TableRow>
             </TableHead>
             <TableBody>
-              {contructingData(contactDetails).map(
+              {contructingData(contactDetails)?.map(
                 (row: any, rowIndex: any) => {
                   return (
                     <TableRow

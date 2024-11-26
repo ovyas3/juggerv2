@@ -13,6 +13,7 @@ import MapView from "../mapView/mapView";
 import Image from "next/image";
 import uploadIcon from '@/assets/uploadIcon.svg';
 import UploadModel from "./tabSectionAction/UploadModel";
+import UpdateAgreementID from "./tabSectionAction/UpdateAgreementID";
 
 
 const Tabsection = () => {
@@ -24,6 +25,7 @@ const Tabsection = () => {
   const [helpCenterBtnHovered, setHelpCenterBtnHovered] = useState(false);
   const t = useTranslations("DASHBOARD");
   const [openUploadModel, setOpenUploadModel] = useState(false);
+  const [updateAgreementModel, setUpdateAgreementModel] = useState(false);
 
   const handleChange = (event: React.ChangeEvent<{}>, newValue: string) => {
     setValue(newValue);
@@ -104,9 +106,12 @@ const Tabsection = () => {
                 </TabList>
               </Box>
              <TabPanel value="1" className="tabpanel-container" style={{position:'relative'}}>
-                <div onClick={()=>setOpenUploadModel(!openUploadModel)} id='uploadFiles' style={{paddingInline:'10px', cursor:'pointer' , gap:'8px', borderRadius:'6px' ,display:'flex', alignItems:'center', position:'absolute', top:8, right:30, width:'fit-content', height:'fit-content', zIndex:'1', backgroundColor:'#E6EAFF', color:"#3351FE"}}>
-                <div><Image src={uploadIcon.src} height={24} width={24} alt='upload' style={{marginTop:'8px'}} /></div>
-                <div>Upload Files</div>
+                <div onClick={()=>setOpenUploadModel(!openUploadModel)} id='uploadFiles' style={{paddingInline:'10px', cursor:'pointer' , gap:'8px', borderRadius:'6px' ,display:'flex', alignItems:'center', position:'absolute', top:8, right:30, width:'fit-content', height:'fit-content', zIndex:'1', backgroundColor:'#E6EAFF', color:"#3351FE", fontSize:'12px'}}>
+                  <div><Image src={uploadIcon.src} height={24} width={24} alt='upload' style={{marginTop:'4px'}} /></div>
+                  <div>Upload Files</div>
+                </div>
+                <div onClick={()=>{setUpdateAgreementModel(!updateAgreementModel)}} style={{paddingInline:'10px', paddingBlock:'8px',fontSize:'12px', cursor:'pointer' , gap:'8px', borderRadius:'6px' ,display:'flex', alignItems:'center', position:'absolute', top:8, right:160, width:'fit-content', height:'fit-content', zIndex:'1', backgroundColor:'#E6EAFF', color:"#3351FE"}}>
+                  <text>{t("updateAgreementID")}</text>
                 </div>
                 <div className="tabpanel-contents">
                   <div className="tracking-status-dashboard">
@@ -122,6 +127,7 @@ const Tabsection = () => {
                   <div className="popup-container">
                   {data && <Popup data={data} handleSchemeTypeAndTable={handleSchemeTypeAndTable}/>}
                   {openUploadModel && <UploadModel  setOpenUploadModel={setOpenUploadModel}/>}
+                  {updateAgreementModel && <UpdateAgreementID  setUpdateAgreementModel={setUpdateAgreementModel}/>}
                   </div>
                 </div>
               </TabPanel>

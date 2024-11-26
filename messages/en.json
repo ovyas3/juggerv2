@@ -35,7 +35,8 @@
    "wagons":"Wagons",
    "withLoad":"With Load",
    "withoutLoad":"Empty",
-   "mapView":"Map View"
+   "mapView":"Map View",
+   "updateAgreementID":"Update Agreement ID"
   },
   "HEADER":{
     "shipments":"Shipments",
