@@ -39,6 +39,7 @@ const Preferences = () => {
 
   return (
     <div className="color-pickers">
+      <div style={{fontWeight:'bold'}}>Status</div>
       {statusCodes.map((field) => (
         <div key={field.code} className="color-field">
           <Label htmlFor={field.code} description={field.description}>
