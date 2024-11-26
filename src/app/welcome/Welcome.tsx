@@ -15,6 +15,7 @@ import TrainFilled from '@/assets/train-fill.svg';
 import { redirect } from 'next/dist/server/api-utils'
 import { red } from '@mui/material/colors'
 import { useRouter } from 'next/navigation'
+import { useMediaQuery, useTheme } from '@mui/material';
 
 const variants = {
   hidden: { opacity: 0 },
@@ -64,11 +65,16 @@ const items = [
 },
 ];
 
-const Welcome = () => {
+interface WelcomeProps {
+  onDashboardClick?: () => void;
+}
+
+const Welcome: React.FC<WelcomeProps> = ({ onDashboardClick }) => {
   const router = useRouter();
   const [isVisible, setIsVisible] = useState(false)
   const ref = useRef(null)
-  const mobile = useWindowSize(600);
+  const theme = useTheme();
+  const mobile = useMediaQuery(theme.breakpoints.down('sm'));
   const t = useTranslations('WELCOME');
 
   useEffect(() => {
@@ -106,14 +112,30 @@ const Welcome = () => {
   }
 
   const handleRedirect = (path: string) => {
-    console.log('path', path);
-    router.push(path);
+    if (path === '/dashboard') {
+      router.push('/dashboard?tab=3');
+    } else {
+      router.push(path);
+    }
   }
+
+  const handleDashboardClick = () => {
+    if (onDashboardClick) {
+      onDashboardClick();
+    } else {
+      router.push('/dashboard');
+    }
+  };
 
   return (
     <div>
       <div className='welcome-main'>
-        <div className="welcome-landing-page">
+        <div 
+          className="welcome-landing-page"
+          style={{
+            marginBottom: !mobile ? '0px' : '72px',
+          }}
+        >
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -185,7 +207,7 @@ const Welcome = () => {
           </div>
         </div>
       </div> 
-      {mobile ? <SideDrawer /> : <div className="bottom_bar">
+      {!mobile ? <SideDrawer /> : <div >
         <MobileDrawer />
       </div>}
     </div>
