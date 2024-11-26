@@ -46,15 +46,76 @@
 .plantRakesSummary h2,
 .rakeStatusInMovement h2 {
   margin-top: 0;
-  margin-bottom: 15px;
+  margin-bottom: 12px;
   font-size: 16px;
   font-weight: bold;
   color: #42454E;
 }
 
 .arrivalItems {
-  display: grid;
-  grid-template-columns: 30%;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.arrivalItem {
+  flex: 1;
+  padding: 6px;
+  border-radius: 8px;
+  background-color: #f8f8f8;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  border: 2px solid transparent;
+  position: relative;
+  overflow: hidden;
+}
+
+.arrivalItem:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+}
+
+.arrivalItem.selected {
+  border-color: #334FFC;
+  background-color: rgba(51, 79, 252, 0.05);
+}
+
+.arrivalItem.selected::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 24px 24px 0;
+  border-color: transparent #334FFC transparent transparent;
+}
+
+.arrivalItem .value {
+  font-size: 24px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 4px;
+  display: block;
+}
+
+.arrivalItem.selected .value {
+  color: #334FFC;
+}
+
+.arrivalItem .label {
+  font-size: 12px;
+  color: #666;
+  font-weight: 500;
+  text-align: left;
+  display: block;
+}
+
+.arrivalItem:hover .value {
+  color: #1a2fd0;
 }
 
 .statusItems {
@@ -627,4 +688,165 @@
     padding: 6px 12px;
     font-size: 13px;
   }
+}
+
+.arrivalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.clearFilter {
+  background: none;
+  border: none;
+  color: #666;
+  margin-bottom: 12px;
+  font-size: 12px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.2s ease;
+}
+
+.clearFilter::before {
+  content: '×';
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.clearFilter:hover {
+  background-color: #f0f0f0;
+  color: #334FFC;
+}
+
+.rakeStatusTableWrapper {
+  position: relative;
+  max-height: 250px;
+  overflow: hidden;
+}
+
+.tableHeaderWrapper {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background-color: white;
+}
+
+.tableBodyWrapper {
+  overflow-y: auto;
+  max-height: calc(250px - 40px);
+}
+
+.rakeStatusTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.rakeStatusTable th,
+.rakeStatusTable td {
+  padding: 8px;
+  border-bottom: 1px solid #DFE3EB;
+}
+
+.rakeStatusTable thead tr {
+  background-color: white;
+}
+
+.rakeStatusTable th {
+  padding: 8px 16px;
+  font-weight: 600;
+  color: #6b7280;
+  font-size: 12px;
+  text-align: left;
+  position: relative;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: linear-gradient(to bottom, #ffffff, #fafbff);
+}
+
+.rakeStatusTable th:after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(to right, #eef1f8 20%, transparent);
+}
+
+.rakeStatusTable tbody tr {
+  cursor: pointer;
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.rakeStatusTable tbody tr:before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: #334FFC;
+  opacity: 0;
+  transition: all 0.3s ease;
+  border-radius: 0 4px 4px 0;
+}
+
+.rakeStatusTable tbody tr:hover {
+  background-color: #f8faff;
+}
+
+.rakeStatusTable tbody tr:hover:before {
+  opacity: 0.3;
+}
+
+.rakeStatusTable tbody tr.selected {
+  background-color: #f8faff;
+}
+
+.rakeStatusTable tbody tr.selected:before {
+  opacity: 1;
+}
+
+.rakeStatusTable tbody tr.selected td {
+  color: #334FFC;
+}
+
+.rakeStatusTable td {
+  padding: 12px 16px;
+  font-size: 13px;
+  color: #42454E;
+  transition: all 0.2s ease;
+  line-height: 1.5;
+}
+
+.rakeStatusTable td:first-child {
+  font-weight: 600;
+  color: #334FFC;
+}
+
+/* Custom scrollbar */
+.rakeStatusTableWrapper::-webkit-scrollbar {
+  width: 8px;
+}
+
+.rakeStatusTableWrapper::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.rakeStatusTableWrapper::-webkit-scrollbar-thumb {
+  background: #eef1f8;
+  border-radius: 4px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+.rakeStatusTableWrapper::-webkit-scrollbar-thumb:hover {
+  background: #dde1f0;
+  border: 2px solid transparent;
+  background-clip: padding-box;
 }

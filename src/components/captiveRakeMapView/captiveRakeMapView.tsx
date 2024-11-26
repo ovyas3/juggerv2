@@ -63,38 +63,56 @@ export default function CaptiveRakeMapView() {
     { plant: "Barbil", from: 2, towards: 1, others: 4 },
   ]);
   const [stats, setStats] = useState({
-    "T+1": 0,
-    "T+2": 0,
-    "T+3": 0,
+    "T+1": {
+      count: 0,
+      _id: []
+    },
+    "T+2": {
+      count: 0,
+      _id: []
+    },
+    "T+3": {
+      count: 0,
+      _id: []
+    }
   });
   const [activeFilter, setActiveFilter] = useState<'total' | 'loaded' | 'empty'>('total');
   const [activeRakeFilter, setActiveRakeFilter] = useState<string>("All");
-  const [rakeStatusData, setRakeStatusData] = useState([
-    { code: 'AR', text: 'Available for Release', count: 4 },
-    { code: 'ST', text: 'Stabled', count: 10 },
-    { code: 'RD', text: 'Ready for Departure', count: 6 },
-    { code: 'FD', text: 'Forwarded', count: 12 },
-  ]);
+  const [rakeStatusData, setRakeStatusData] = useState<any>([]);
   const [rakeTypeData, setRakeTypeData] = useState({
     "All": 0,
     "SFTO": 0,
     "GPWIS": 0,
     "BFNV": 0
   });
+  const [selectedArrival, setSelectedArrival] = useState<string | null>(null);
+  const [selectedRow, setSelectedRow] = useState<number | null>(null);
 
   const handleRakeFilterClick = (filterType: string) => {
     setActiveRakeFilter(filterType === activeRakeFilter ? "All" : filterType);
     getCoords(filterType);
+    getRakeStatusData(filterType);
+    getRakeStats(filterType);
   };
 
   const handleFilterClick = (filter: 'total' | 'loaded' | 'empty') => {
     setActiveFilter(filter === activeFilter ? 'total' : filter);
   };
 
+  const handleArrivalClick = (period: string, ids: string[]) => {
+    setSelectedArrival(selectedArrival === period ? null : period);
+    console.log(`Selected ${period} arrival _ids:`, ids);
+  };
+
+  const handleRowClick = (index: number, rowData: any) => {
+    setSelectedRow(selectedRow === index ? null : index);
+    console.log('Selected row data:', rowData);
+  };
+
   const filteredCoords = useMemo(() => {
     return coordsData && coordsData.length > 0 && coordsData.filter((val: any) => {
       const matchesRakeType = activeRakeFilter === "All" || 
-        (val.rake?.name && val.rake.name.includes(activeRakeFilter));
+        (val?.scheme && val.scheme === activeRakeFilter);
 
       const matchesLoadingStatus = activeFilter === 'total' ||
         (activeFilter === 'loaded' && val.loading_status === "L") ||
@@ -106,7 +124,7 @@ export default function CaptiveRakeMapView() {
 
   const filteredCounts = useMemo(() => {
     const rakeFilteredData = coordsData && coordsData.length > 0 && coordsData.filter((val: any) => 
-      activeRakeFilter === "All" || (val.rake?.name && val.rake.name.includes(activeRakeFilter))
+      activeRakeFilter === "All" || (val?.scheme && val.scheme === activeRakeFilter)
     ) || [];
 
     return {
@@ -115,25 +133,6 @@ export default function CaptiveRakeMapView() {
       empty: rakeFilteredData.filter((val: any) => val.loading_status !== "L").length
     };
   }, [coordsData, activeRakeFilter]);
-
-  const getFilteredStatusCounts = useMemo(() => {
-    const statusCounts: { [key: string]: number } = {};
-    
-    rakeStatusData.forEach(status => {
-      statusCounts[status.code] = 0;
-    });
-
-    filteredCoords.forEach((item: any) => {
-      if (item.rake?.status) {
-        statusCounts[item.rake.status] = (statusCounts[item.rake.status] || 0) + 1;
-      }
-    });
-
-    return rakeStatusData.map(status => ({
-      ...status,
-      count: statusCounts[status.code] || 0
-    }));
-  }, [filteredCoords, rakeStatusData]);
 
   async function getCoords(scheme: string) {
     try {
@@ -149,35 +148,11 @@ export default function CaptiveRakeMapView() {
         const loaded = coords && coords.length > 0 && coords.filter((val: any) => val.loading_status === "L") || [];
         const empty = coords && coords.length > 0 && coords.filter((val: any) => val.loading_status !== "L") || [];
 
-        const stats = response.data.stats || {
-          "T+1": 0,
-          "T+2": 0,
-          "T+3": 0
-        };
-
         const rakeStatusData = Object.entries(response.data.stts_code || {}).map(([code, count]) => ({
           code,
           text: rakeStatus[code] || code,
           count: count as number
         }));
-
-        // const rakeTypeCounts = coords && coords.length > 0 && coords.reduce((acc: any, val: any) => {
-        //   const rakeScheme = val.rake?.scheme || '';
-        //   if (rakeScheme == "SFTO") acc.SFTO++;
-        //   if (rakeScheme == "GPWIS") acc.GPWIS++;
-        //   if (rakeScheme == "BFNV") acc.BFNV++;
-        //   return acc;
-        // }, {
-        //   All: coords.length,
-        //   SFTO: 0,
-        //   GPWIS: 0,
-        //   BFNV: 0
-        // }) || {
-        //   All: 0,
-        //   SFTO: 0,
-        //   GPWIS: 0,
-        //   BFNV: 0
-        // };
 
         const rakeTypeCounts = response.data.scheme_wise_count.map((scheme: any) => ({
           [scheme.scheme]: scheme.count
@@ -199,8 +174,6 @@ export default function CaptiveRakeMapView() {
         setCoordsData(coords);
         setLoadedRakes(loaded);
         setEmptyRakes(empty);
-        setStats(stats);
-        // setRakeStatusData(rakeStatusData);
         setRakeTypeData(rakeTypeCounts);
       } else {
         console.error('Invalid response format:', response);
@@ -210,8 +183,60 @@ export default function CaptiveRakeMapView() {
     }
   }
 
+  async function getRakeStatusData(scheme: string) {
+    try{
+      const url = scheme === "All" ? 'get/schemeWiseCount' : `get/schemeWiseCount?scheme=${scheme}`;
+      const response = await httpsGet(url, 0, router);
+      if (response?.statusCode === 200) {
+        const rakeStatusData = Object.entries(response.data || {}).map(([code, rake]: [string, any]) => ({
+          code,
+          text: rakeStatus[code] || code,
+          count: rake.count as number,
+          _ids: rake._ids
+        }));
+        console.log(rakeStatusData);
+        setRakeStatusData(rakeStatusData);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async function getRakeStats(scheme: string) {
+    try{
+      const url = scheme === "All" ? 'get/tAndTplus' : `get/tAndTplus?scheme=${scheme}`;
+      const response = await httpsGet(url, 0, router);
+      if (response?.statusCode === 200) {
+        const statsData = response.data || {};
+        console.log(statsData, "statsData");
+        setStats(statsData);
+
+        if(!statsData) {
+          setStats({
+            "T+1": {
+              count: 0,
+              _id: []
+            },
+            "T+2": {
+              count: 0,
+              _id: []
+            },
+            "T+3": {
+              count: 0,
+              _id: []
+            }
+          })
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   useEffect(()=>{
    getCoords('All')
+   getRakeStatusData('All')
+   getRakeStats('All')
   },[])
 
   useEffect(() => {
@@ -264,7 +289,7 @@ export default function CaptiveRakeMapView() {
             <g transform="matrix(1, 0, 0, 1, -3920, 5968)" filter="url(#shadow)">
               <rect width="20" height="20" rx="6" transform="translate(6 4)" fill="#fff"/>
             </g>
-            <path d="M160-871.474v-6a1.957,1.957,0,0,1,.434-1.334,2.732,2.732,0,0,1,1.145-.758,6.5,6.5,0,0,1,1.618-.347q.908-.087,1.855-.087,1.042,0,1.966.087a6.186,6.186,0,0,1,1.611.347,2.453,2.453,0,0,1,1.082.758,2.086,2.086,0,0,1,.395,1.334v6a2.135,2.135,0,0,1-.639,1.571,2.135,2.135,0,0,1-1.571.64l.947.947V-868h-1.263l-1.263-1.263h-2.526L162.526-868h-1.263v-.316l.947-.947a2.135,2.135,0,0,1-1.571-.64A2.135,2.135,0,0,1,160-871.474Zm1.263-3.474h3.158v-1.895h-3.158Zm4.421,0h3.158v-1.895h-3.158Zm-2.842,3.789a.92.92,0,0,0,.679-.268.92.92,0,0,0,.268-.679.92.92,0,0,0-.268-.679.92.92,0,0,0-.679-.268.92.92,0,0,0-.679.268.92.92,0,0,0-.268.679A.92.92,0,0,0,162.842-871.158Zm4.421,0a.92.92,0,0,0,.679-.268.92.92,0,0,0,.268-.679.92.92,0,0,0-.268-.679.921.921,0,0,0-.679-.268.92.92,0,0,0-.679.268.92.92,0,0,0-.268.679A.92.92,0,0,0,167.263-871.158Z" transform="translate(-4069 6856.005)" 
+            <path d="M160-871.474v-6a1.957,1.957,0,0,1,.434-1.334,2.732,2.732,0,0,1,1.145-.758,6.5,6.5,0,0,1,1.618-.347q.908-.087,1.855-.087,1.042,0,1.966.087a6.186,6.186,0,0,1,1.611.347,2.453,2.453,0,0,1,1.082.758,2.086,2.086,0,0,1,.395,1.334v6a2.135,2.135,0,0,1-.639,1.571,2.135,2.135,0,0,1-1.571.64l.947.947V-868h-1.263l-1.263-1.263h-2.526L162.526-868h-1.263v-.316l.947-.947a2.135,2.135,0,0,1-1.571-.64A2.135,2.135,0,0,1,160-871.474Zm1.263-3.474h3.158v-1.895h-3.158Zm4.421,0h3.158v-1.895h-3.158Zm-2.842,3.789a.92.92,0,0,0,.679-.268.92.92,0,0,0,.268-.679.92.92,0,0,0-.268-.679.92.92,0,0,0-.679-.268.92.92,0,0,0-.679.268.92.92,0,0,0-.268.679A.92.92,0,0,0,162.842-871.158Zm4.421,0a.92.92,0,0,0,.679-.268.92.92,0,0,0,.268-.679A.921.921,0,0,0,167.263-871.158Z" transform="translate(-4069 6856.005)" 
             fill="${fillColor}"/>
           </g>
         </svg>
@@ -419,18 +444,37 @@ export default function CaptiveRakeMapView() {
             </div>
 
             <div className={styles.rakesArrival}>
-              <h2>Rakes Arrival</h2>
+              <div className={styles.arrivalHeader}>
+                <h2>Rakes Arrival</h2>
+                {selectedArrival && (
+                  <button 
+                    className={styles.clearFilter}
+                    onClick={() => setSelectedArrival(null)}
+                  >
+                    Clear
+                  </button>
+                )}
+              </div>
               <div className={styles.arrivalItems}>
-                <div className={styles.arrivalItem}>
-                  <span className={styles.value}>{stats["T+1"]}</span>
+                <div 
+                  className={`${styles.arrivalItem} ${selectedArrival === "T+1" ? styles.selected : ""}`}
+                  onClick={() => handleArrivalClick("T+1", stats["T+1"]._id || [])}
+                >
+                  <span className={styles.value}>{stats["T+1"].count || 0}</span>
                   <span className={styles.label}>T+1</span>
                 </div>
-                <div className={styles.arrivalItem}>
-                  <span className={styles.value}>{stats["T+2"]}</span>
+                <div 
+                  className={`${styles.arrivalItem} ${selectedArrival === "T+2" ? styles.selected : ""}`}
+                  onClick={() => handleArrivalClick("T+2", stats["T+2"]._id || [])}
+                >
+                  <span className={styles.value}>{stats["T+2"].count || 0}</span>
                   <span className={styles.label}>T+2</span>
                 </div>
-                <div className={styles.arrivalItem}>
-                  <span className={styles.value}>{stats["T+3"]}</span>
+                <div 
+                  className={`${styles.arrivalItem} ${selectedArrival === "T+3" ? styles.selected : ""}`}
+                  onClick={() => handleArrivalClick("T+3", stats["T+3"]._id || [])}
+                >
+                  <span className={styles.value}>{stats["T+3"].count || 0}</span>
                   <span className={styles.label}>&gt;T+3</span>
                 </div>
               </div>
@@ -438,24 +482,55 @@ export default function CaptiveRakeMapView() {
 
             <div className={styles.rakeStatusInMovement}>
               <h2>Rake Status</h2>
-              <table className={styles.summaryTable}>
-                <thead>
-                  <tr>
-                    <th>S.No</th>
-                    <th>Code</th>
-                    <th>Counts</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {rakeStatusData.map((row, index) => (
-                    <tr key={index}>
-                      <td style={{fontWeight:'bold', color:''}}>{index + 1}</td>
-                      <td>{row.code} ({row.text})</td>
-                      <td>{row.count}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              <div className={styles.rakeStatusTableWrapper}>
+                <div className={styles.tableHeaderWrapper}>
+                  <table className={styles.rakeStatusTable}>
+                    <thead>
+                      <tr>
+                        <th style={{
+                          width: '10%',
+                          textAlign: 'center',
+                        }}>S.No</th>
+                        <th style={{
+                          width: '65%',
+                          textAlign: 'left',
+                        }}>Code</th>
+                        <th style={{
+                          width: '25%',
+                          textAlign: 'center',
+                        }}>Counts</th>
+                      </tr>
+                    </thead>
+                  </table>
+                </div>
+                <div className={styles.tableBodyWrapper}>
+                  <table className={styles.rakeStatusTable}>
+                    <tbody>
+                      {rakeStatusData.map((row: any, index: number) => (
+                        <tr 
+                          key={index}
+                          className={selectedRow === index ? styles.selected : ''}
+                          onClick={() => handleRowClick(index, row)}
+                        >
+                          <td style={{
+                            width: '10%',
+                            textAlign: 'center',
+                            fontWeight:'bold'
+                          }}>{index + 1}</td>
+                          <td style={{
+                            width: '65%',
+                            textAlign: 'left'
+                          }}>{row.code} ({row.text})</td>
+                          <td style={{
+                            width: '25%',
+                            textAlign: 'center'
+                          }}>{row.count}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
             </div>
 
             {/* <div className={styles.rakesPlacementRegion}>
@@ -516,57 +591,50 @@ export default function CaptiveRakeMapView() {
               ref={setMap}
             >
               <LayersControl>
-                <LayersControl.BaseLayer checked name="Street View">
-                  <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                </LayersControl.BaseLayer>
-                <LayersControl.BaseLayer name="Satellite View">
+                <LayersControl.BaseLayer checked name="OpenStreetMap">
                   <TileLayer
-                    attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-                    url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                   />
                 </LayersControl.BaseLayer>
               </LayersControl>
-
-              {filteredCoords.map((marker: any, index: number) => {
-                const icon = getIcon(marker.loading_status);
-                console.log(marker);
-                return (
-                  <Marker
-                    key={index}
-                    position={[
-                      marker.geo_point.coordinates[1],
-                      marker.geo_point.coordinates[0],
-                    ]}
-                    icon={icon}
-                  >
-                    <Popup>
-                      <div style={{
-                        padding: '6px',
-                        minWidth: '230px'
-                      }}>
+                {filteredCoords.map((marker: any, index: number) => {
+                  const icon = getIcon(marker.loading_status);
+                  
+                  return (
+                    <Marker
+                      key={index}
+                      position={[marker.geo_point.coordinates[1], marker.geo_point.coordinates[0]]}
+                      icon={icon}
+                    >
+                      <Popup>
                         <div style={{
-                          fontSize: '13px',
-                          color: '#42454E',
-                          display: 'grid',
-                          gap: '4px'
+                          padding: '6px',
+                          minWidth: '230px'
                         }}>
-                          <p style={{ margin: '2px 0' }}><strong>Rake ID:</strong> {marker.rake?.rake_id || 'N/A'}</p>
-                          <p style={{ margin: '2px 0' }}><strong>Rake Name:</strong> {marker.rake?.name || 'N/A'}</p>
-                          <p style={{ margin: '2px 0' }}><strong>Rake Status:</strong> {marker.stts_code ? rakeStatus[marker.stts_code] : 'N/A'}</p>
-                          <p style={{ margin: '2px 0' }}><strong>From Station:</strong> {marker.from ? `${marker.from.code} ${marker.from.name}` : 'N/A'}</p>
-                          <p style={{ margin: '2px 0' }}><strong>To Station:</strong> {marker.to ? `${marker.to.code} ${marker.to.name}` : 'N/A'}</p>
-                          <p style={{ margin: '2px 0' }}><strong>Current Station:</strong> {marker.current_station ? `${marker.current_station.code} ${marker.current_station.name}` : 'N/A'}</p>
-                          <p style={{ margin: '2px 0' }}><strong>Updated At FOIS:</strong> {marker.updated_on ? `${timeService.utcToist(marker.updated_on, 'dd-MMM')} ${timeService.utcToistTime(marker.updated_on, 'HH:mm')}` : 'N/A'}</p>
-                          <p style={{ margin: '2px 0' }}><strong>Data Fetched At:</strong> {marker.updated_at ? `${timeService.utcToist(marker.updated_at, 'dd-MMM')} ${timeService.utcToistTime(marker.updated_at, 'HH:mm')}` : 'N/A'}</p>
-                          <p style={{ margin: '2px 0' }}><strong>ETA:</strong> {marker.expd_arvl_time ? `${timeService.utcToist(marker.expd_arvl_time, 'dd-MMM')} ${timeService.utcToistTime(marker.expd_arvl_time, 'HH:mm')}` : 'N/A'}</p>
-                          <p style={{ margin: '2px 0' }}><strong>Commodity:</strong> {marker.commodity && marker.commodity.length > 0 ? marker.commodity.join(', ') : 'N/A'}</p>
-                          <p style={{ margin: '2px 0' }}><strong>Remaining Distance:</strong> {marker.rmng_km ? marker.rmng_km : 'N/A'} km</p>
+                          <div style={{
+                            fontSize: '13px',
+                            color: '#42454E',
+                            display: 'grid',
+                            gap: '4px'
+                          }}>
+                            <p style={{ margin: '2px 0' }}><strong>Rake ID:</strong> {marker.rake?.rake_id || 'N/A'}</p>
+                            <p style={{ margin: '2px 0' }}><strong>Rake Name:</strong> {marker.rake?.name || 'N/A'}</p>
+                            <p style={{ margin: '2px 0' }}><strong>Rake Status:</strong> {marker.stts_code ? rakeStatus[marker.stts_code] : 'N/A'}</p>
+                            <p style={{ margin: '2px 0' }}><strong>From Station:</strong> {marker.from ? `${marker.from.code} ${marker.from.name}` : 'N/A'}</p>
+                            <p style={{ margin: '2px 0' }}><strong>To Station:</strong> {marker.to ? `${marker.to.code} ${marker.to.name}` : 'N/A'}</p>
+                            <p style={{ margin: '2px 0' }}><strong>Current Station:</strong> {marker.current_station ? `${marker.current_station.code} ${marker.current_station.name}` : 'N/A'}</p>
+                            <p style={{ margin: '2px 0' }}><strong>Updated At FOIS:</strong> {marker.updated_on ? `${timeService.utcToist(marker.updated_on, 'dd-MMM')} ${timeService.utcToistTime(marker.updated_on, 'HH:mm')}` : 'N/A'}</p>
+                            <p style={{ margin: '2px 0' }}><strong>Data Fetched At:</strong> {marker.updated_at ? `${timeService.utcToist(marker.updated_at, 'dd-MMM')} ${timeService.utcToistTime(marker.updated_at, 'HH:mm')}` : 'N/A'}</p>
+                            <p style={{ margin: '2px 0' }}><strong>ETA:</strong> {marker.expd_arvl_time ? `${timeService.utcToist(marker.expd_arvl_time, 'dd-MMM')} ${timeService.utcToistTime(marker.expd_arvl_time, 'HH:mm')}` : 'N/A'}</p>
+                            <p style={{ margin: '2px 0' }}><strong>Commodity:</strong> {marker.commodity && marker.commodity.length > 0 ? marker.commodity.join(', ') : 'N/A'}</p>
+                            <p style={{ margin: '2px 0' }}><strong>Remaining Distance:</strong> {marker.rmng_km ? marker.rmng_km : 'N/A'} km</p>
+                          </div>
                         </div>
-                      </div>
-                    </Popup>
-                  </Marker>
-                );
-              })}
+                      </Popup>
+                    </Marker>
+                  );
+                })}
             </MapContainer>
           </div>
         </div>
