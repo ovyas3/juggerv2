@@ -70,14 +70,10 @@ export default function CaptiveRakeMapView() {
   const [activeFilter, setActiveFilter] = useState<'total' | 'loaded' | 'empty'>('total');
   const [activeRakeFilter, setActiveRakeFilter] = useState<string>("All");
   const [rakeStatusData, setRakeStatusData] = useState([
-    { code: 'AR', text: 'Available for Release', count: 16 },
-    { code: 'ST', text: 'Stabled', count: 4 },
+    { code: 'AR', text: 'Available for Release', count: 4 },
+    { code: 'ST', text: 'Stabled', count: 10 },
     { code: 'RD', text: 'Ready for Departure', count: 6 },
-    { code: 'FD', text: 'Forwarded', count: 14 },
-    { code: 'DP', text: 'Departed', count: 12 },
-    { code: 'RL', text: 'Released', count: 5 },
-    { code: 'BP', text: 'Brake Power Certificate Issued', count: 7 },
-    { code: 'CL', text: 'Cleared', count: 2 },
+    { code: 'FD', text: 'Forwarded', count: 12 },
   ]);
   const [rakeTypeData, setRakeTypeData] = useState({
     "All": 0,
@@ -422,7 +418,7 @@ export default function CaptiveRakeMapView() {
             </div>
 
             <div className={styles.rakeStatusInMovement}>
-              <h2>Statuses of Rakes in Movement</h2>
+              <h2>Rake Status</h2>
               <table className={styles.summaryTable}>
                 <thead>
                   <tr>
@@ -432,7 +428,7 @@ export default function CaptiveRakeMapView() {
                   </tr>
                 </thead>
                 <tbody>
-                  {getFilteredStatusCounts.map((row, index) => (
+                  {rakeStatusData.map((row, index) => (
                     <tr key={index}>
                       <td style={{fontWeight:'bold', color:''}}>{index + 1}</td>
                       <td>{row.code} ({row.text})</td>
@@ -443,7 +439,7 @@ export default function CaptiveRakeMapView() {
               </table>
             </div>
 
-            <div className={styles.rakesPlacementRegion}>
+            {/* <div className={styles.rakesPlacementRegion}>
               <h2>Rakes Placement Region</h2>
               <div className={styles.placementItems}>
                 <div className={styles.placementItem}>
@@ -459,7 +455,7 @@ export default function CaptiveRakeMapView() {
                 <div className={styles.placementItem}>
                 </div>
               </div>
-            </div>
+            </div> */}
 
             <div className={styles.plantRakesSummary}>
               <h2>Plant Rakes Summary</h2>
