@@ -203,16 +203,16 @@
 }
 
 .markerDot.loaded {
-  background: #18BE8A;
-  box-shadow: 0 0 0 2px rgba(24, 190, 138, 0.2),
-              0 0 0 6px rgba(24, 190, 138, 0.15),
+  background: #037f58;
+  box-shadow: 0 0 0 2px rgba(3, 127, 88, 0.2),
+              0 0 0 6px rgba(3, 127, 88, 0.15),
               0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .markerDot.empty {
-  background: #E6667B;
-  box-shadow: 0 0 0 2px rgba(230, 102, 123, 0.2),
-              0 0 0 6px rgba(230, 102, 123, 0.15),
+  background: #e31f3f;
+  box-shadow: 0 0 0 2px rgba(227, 31, 63, 0.2),
+              0 0 0 6px rgba(227, 31, 63, 0.15),
               0 2px 4px rgba(0, 0, 0, 0.1);
 }
 

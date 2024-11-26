@@ -84,6 +84,7 @@ export default function CaptiveRakeMapView() {
 
   const handleRakeFilterClick = (filterType: string) => {
     setActiveRakeFilter(filterType === activeRakeFilter ? "All" : filterType);
+    getCoords(filterType);
   };
 
   const handleFilterClick = (filter: 'total' | 'loaded' | 'empty') => {
@@ -91,7 +92,7 @@ export default function CaptiveRakeMapView() {
   };
 
   const filteredCoords = useMemo(() => {
-    return coordsData.filter((val: any) => {
+    return coordsData && coordsData.length > 0 && coordsData.filter((val: any) => {
       const matchesRakeType = activeRakeFilter === "All" || 
         (val.rake?.name && val.rake.name.includes(activeRakeFilter));
 
@@ -100,16 +101,16 @@ export default function CaptiveRakeMapView() {
         (activeFilter === 'empty' && val.loading_status !== "L");
 
       return matchesRakeType && matchesLoadingStatus;
-    });
+    }) || [];
   }, [coordsData, activeFilter, activeRakeFilter]);
 
   const filteredCounts = useMemo(() => {
-    const rakeFilteredData = coordsData.filter((val: any) => 
+    const rakeFilteredData = coordsData && coordsData.length > 0 && coordsData.filter((val: any) => 
       activeRakeFilter === "All" || (val.rake?.name && val.rake.name.includes(activeRakeFilter))
-    );
+    ) || [];
 
     return {
-      total: rakeFilteredData.length,
+      total: rakeFilteredData && rakeFilteredData.length,
       loaded: rakeFilteredData.filter((val: any) => val.loading_status === "L").length,
       empty: rakeFilteredData.filter((val: any) => val.loading_status !== "L").length
     };
@@ -134,9 +135,10 @@ export default function CaptiveRakeMapView() {
     }));
   }, [filteredCoords, rakeStatusData]);
 
-  async function getCoords() {
+  async function getCoords(scheme: string) {
     try {
-      const response = await httpsGet('get/captive_rake_locations', 0, router);
+      const url = scheme === "All" ? 'get/captive_rake_locations' : `get/captive_rake_locations?scheme=${scheme}`;
+      const response = await httpsGet(url, 0, router);
       if (response?.statusCode === 200 && Array.isArray(response?.data.data)) {
         const coords = response.data.data && response.data.data.length > 0 && response.data.data.filter((val: any) => 
           val?.geo_point?.coordinates && 
@@ -159,24 +161,41 @@ export default function CaptiveRakeMapView() {
           count: count as number
         }));
 
-        const rakeTypeCounts = coords && coords.length > 0 && coords.reduce((acc: any, val: any) => {
-          const rakeScheme = val.rake?.scheme || '';
-          if (rakeScheme == "SFTO") acc.SFTO++;
-          if (rakeScheme == "GPWIS") acc.GPWIS++;
-          if (rakeScheme == "BFNV") acc.BFNV++;
-          return acc;
+        // const rakeTypeCounts = coords && coords.length > 0 && coords.reduce((acc: any, val: any) => {
+        //   const rakeScheme = val.rake?.scheme || '';
+        //   if (rakeScheme == "SFTO") acc.SFTO++;
+        //   if (rakeScheme == "GPWIS") acc.GPWIS++;
+        //   if (rakeScheme == "BFNV") acc.BFNV++;
+        //   return acc;
+        // }, {
+        //   All: coords.length,
+        //   SFTO: 0,
+        //   GPWIS: 0,
+        //   BFNV: 0
+        // }) || {
+        //   All: 0,
+        //   SFTO: 0,
+        //   GPWIS: 0,
+        //   BFNV: 0
+        // };
+
+        const rakeTypeCounts = response.data.scheme_wise_count.map((scheme: any) => ({
+          [scheme.scheme]: scheme.count
+        })).reduce((acc: any, val: any) => {
+          return {
+            ...acc,
+            ...val
+          };
         }, {
-          All: coords.length,
-          SFTO: 0,
-          GPWIS: 0,
-          BFNV: 0
-        }) || {
           All: 0,
           SFTO: 0,
           GPWIS: 0,
           BFNV: 0
-        };
+        });
         
+        rakeTypeCounts.Others = 0;
+        const total = Object.values(rakeTypeCounts).reduce((a: any, b: any) => a + b, 0);
+        rakeTypeCounts.All = total; 
         setCoordsData(coords);
         setLoadedRakes(loaded);
         setEmptyRakes(empty);
@@ -192,7 +211,7 @@ export default function CaptiveRakeMapView() {
   }
 
   useEffect(()=>{
-   getCoords()
+   getCoords('All')
   },[])
 
   useEffect(() => {
@@ -226,7 +245,7 @@ export default function CaptiveRakeMapView() {
   });
 
   const createTrainIcon = (isLoaded: boolean) => {
-    const fillColor = isLoaded ? '#18BE8A' : '#E6667B';
+    const fillColor = isLoaded ? '#037f58' : '#e31f3f';
     const size = 26; // Desired size
     return L.divIcon({
       className: 'custom-div-icon',
@@ -510,6 +529,7 @@ export default function CaptiveRakeMapView() {
 
               {filteredCoords.map((marker: any, index: number) => {
                 const icon = getIcon(marker.loading_status);
+                console.log(marker);
                 return (
                   <Marker
                     key={index}
