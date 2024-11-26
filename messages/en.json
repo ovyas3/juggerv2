@@ -35,7 +35,8 @@
    "wagons":"Wagons",
    "withLoad":"With Load",
    "withoutLoad":"Empty",
-   "mapView":"Map View"
+   "mapView":"Map View",
+   "foisDetails":"FOIS Details"
   },
   "HEADER":{
     "shipments":"Shipments",

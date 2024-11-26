@@ -15,9 +15,11 @@ import Image from "next/image";
 import ContactTable from "./ContactTable";
 import ContactFilters from "./ContactFilters";
 import { redirect, useRouter, useParams } from "next/navigation";
+import { useMediaQuery, useTheme } from '@mui/material';
 
 function Contact() {
-  const mobile = useWindowSize(500);
+  const theme = useTheme();
+  const mobile = useMediaQuery(theme.breakpoints.down('sm'));
   const t = useTranslations("ETADASHBOARD");
   const todaysDate = new Date();
   const twentyDaysBefore = new Date(todaysDate.getTime() - 200 * 24 * 60 * 60 * 1000);
@@ -92,7 +94,7 @@ function Contact() {
 
   return (
     <div>
-      {mobile ? (
+      {!mobile ? (
         <Header title={"Contact Details"} isMapHelper={false} />
       ) : (
         <MobileHeader />
@@ -100,7 +102,7 @@ function Contact() {
 
       <div
         className={`content_container_contact ${
-          mobile ? "adjustMargin" : "adjustMarginMobile"
+          !mobile ? "adjustMargin" : "adjustMarginMobile"
         }`}
       >
         <div id="searchContainer">
@@ -133,10 +135,10 @@ function Contact() {
         </div>
       </div>
 
-      {mobile ? (
+      {!mobile ? (
         <SideDrawer />
       ) : (
-        <div className="bottom_bar">
+        <div >
           <MobileDrawer />
         </div>
       )}

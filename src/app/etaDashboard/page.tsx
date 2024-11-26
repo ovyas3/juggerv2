@@ -22,6 +22,7 @@ import { Tabs, Tab, Box } from '@mui/material'
 import { styled } from '@mui/system'
 import WagonTypeWiseRakeTrend from "./wagonTypeWiseRakeTrend/wagonTypeWiseRakeTrend";
 import DestinationWiseTrend from "./destinationWiseTrend/destinationWiseTrend";
+import { useMediaQuery, useTheme } from '@mui/material';
 
 // Custom styled components
 const StyledTabs = styled(Tabs)({
@@ -84,7 +85,8 @@ function EtaDashboard() {
   const router = useRouter();
   const [value, setValue] = useState(0)
   const { showMessage } = useSnackbar();
-  const mobile = useWindowSize(500);
+  const theme = useTheme();
+  const mobile = useMediaQuery(theme.breakpoints.down('sm'));
   const t = useTranslations("ETADASHBOARD");
   const [openModalDelay, setOpenModalDelay] = useState(false);
   const [providedShipments, setProvidedShipments] = useState([]);
@@ -185,7 +187,7 @@ function EtaDashboard() {
 
   return (
     <div>
-      {mobile ? (
+      {!mobile ? (
         <Header title={"Dashboard"} isMapHelper={false} />
       ) : (
         <MobileHeader />
@@ -193,7 +195,7 @@ function EtaDashboard() {
 
       <div
         className={`etaDashboard-container ${
-          mobile ? "adjustMargin" : "adjustMarginMobile"
+          !mobile ? "adjustMargin" : "adjustMarginMobile"
         }`}
       >
         <Box sx={{ width: '100%', backgroundColor: '#fff' }}>
@@ -322,10 +324,10 @@ function EtaDashboard() {
 
       {openModalDelay && (<EtaDashboardModal providedShipments={providedShipments} setOpenModalDelay={setOpenModalDelay} headingForModel={headingForModel}/>)}
 
-      {mobile ? (
+      {!mobile ? (
         <SideDrawer />
       ) : (
-        <div className="bottom_bar">
+        <div >
           <MobileDrawer />
         </div>
       )}

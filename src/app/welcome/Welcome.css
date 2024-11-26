@@ -247,17 +247,6 @@
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
-.bottom_bar{
-  width: 100%;
-  background-color: #f0f3f9;
-  position: fixed;
-  bottom: 0;
-  height: 65px;
-  border-top-left-radius: 8px;
-  border-top-right-radius: 8px;
-  color: white;
-}
-
 @media (max-width: 768px) {
   .welcome-landing-page {
     padding: 1rem;
@@ -355,9 +344,5 @@
 
   .support-button {
     padding: 0.5rem 1rem;
-  }
-
-  .bottom_bar{
-    height: 55px;
   }
 }

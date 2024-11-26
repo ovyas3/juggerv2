@@ -25,6 +25,7 @@ import Image from 'next/image';
 import uploadIcon from '@/assets/uploadIcon.svg';
 import { motion } from 'framer-motion';
 import { UploadWagonSheet } from '@/components/Table/tableComp';
+import { useMediaQuery, useTheme } from '@mui/material';
 
 const getStatusCode = (status: string): string => {
   switch (status) {
@@ -67,7 +68,8 @@ const getRakeTypeCode = (rakeTypes: string): string => {
 
 const OrdersPage = () => {
   const t = useTranslations('ORDERS');
-  const mobile = useWindowSize(500);
+  const theme = useTheme();
+  const mobile = useMediaQuery(theme.breakpoints.down('sm'));
   const tablePagination = useWindowSize(1300);
   const [allShipment, setAllShipment] = useState([]);
   const [count, setCount] = useState(0);
@@ -373,22 +375,23 @@ const OrdersPage = () => {
     <div>
       <div className='orderContainer'>
         <div style={{ width: '100%', overflowX: 'auto' }}>
-          {mobile ? <Header title={'Shipments'} setReloadOnHeaderChange={setReloadOnHeaderChange} isMapHelper={false} /> : <MobileHeader />}
+          {!mobile ? <Header title={'Shipments'} setReloadOnHeaderChange={setReloadOnHeaderChange} isMapHelper={false} /> : <MobileHeader />}
           <div
             className='tableContainer'
             style={{
               paddingInline: 24,
               paddingTop: 10,
-              paddingBottom: mobile ? 24 : 65,
+              paddingBottom: !mobile ? 24 : 65,
               position: 'relative',
-              marginTop: mobile ? '56px' : '24px',
-              marginLeft: mobile ? '70px' : '0px',
+              marginTop: !mobile ? '56px' : '24px',
+              marginLeft: !mobile ? '70px' : '0px',
+              marginBottom: !mobile ? '0px' : '60px',
               height: 'calc(100vh - 56px)'
             }}
           >
 
             <div className='outbound_inbound_ageing'>
-              {mobile ? <div className='outbound_inbound'>
+              {!mobile ? <div className='outbound_inbound'>
                 {['outbound', 'inbound'].map(bound => (
                   <div
                     key={bound}
@@ -504,7 +507,7 @@ const OrdersPage = () => {
       
     
 
-      {mobile ? <SideDrawer /> : <div className="bottom_bar">
+      {!mobile ? <SideDrawer /> : <div className="bottom_bar">
         <MobileDrawer />
       </div>}
     </div>
