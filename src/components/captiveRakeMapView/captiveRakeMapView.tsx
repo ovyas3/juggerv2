@@ -164,10 +164,10 @@ export default function CaptiveRakeMapView() {
         }));
 
         const rakeTypeCounts = coords && coords.length > 0 && coords.reduce((acc: any, val: any) => {
-          const rakeName = val.rake?.name || '';
-          if (rakeName.includes("SFTO")) acc.SFTO++;
-          if (rakeName.includes("GPWIS")) acc.GPWIS++;
-          if (rakeName.includes("BFNV")) acc.BFNV++;
+          const rakeScheme = val.rake?.scheme || '';
+          if (rakeScheme == "SFTO") acc.SFTO++;
+          if (rakeScheme == "GPWIS") acc.GPWIS++;
+          if (rakeScheme == "BFNV") acc.BFNV++;
           return acc;
         }, {
           All: coords.length,
