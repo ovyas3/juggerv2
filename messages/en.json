@@ -293,6 +293,20 @@
     "rate":"Rate Us",
     "submit":"Submit",
     "deleteContactHeader":"Delete Contact"
+  },
+  "SETTINGS": {
+   "statusCodes":[
+      {
+        "code": "MT",
+        "status": "Empty",
+        "description": "The wagon is empty and ready for loading."
+      },
+      {
+        "code": "LD",
+        "status": "Loaded",
+        "description": "The wagon has been loaded with goods."
+      }
+    ]
   }
 
 }
