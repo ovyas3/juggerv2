@@ -1172,7 +1172,7 @@ export const HandlingEdemand = ({ isClose, isOpen, getAllShipment, shipment }: a
             position: 'relative',
             outline: 'none',
             padding: '32px',
-            textAlign: 'center',
+            textAlign: 'center', 
           }}
         >
           <div>
