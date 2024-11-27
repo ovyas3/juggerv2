@@ -905,10 +905,8 @@ const material = [
     "Plate Mill",
     "Bar Mill",
     "Rail Mill",
-    "Semis Mill",
-    "SPM Mill",
-    "HSM Mill",
-    "CRM Mill",
+    "Semis",
+    "SPM"
 ];
 
 const materialOptions = material.map(option => ({
