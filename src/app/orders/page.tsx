@@ -74,7 +74,6 @@ const OrdersPage = () => {
   const [allShipment, setAllShipment] = useState([]);
   const [count, setCount] = useState(0);
   const [rakeCaptiveList, setRakeCaptiveList] = useState([]);
-
   const [reload, setReload] = useState(false)
   const [reloadOnHeaderChange, setReloadOnHeaderChange] = useState(false);
   const { showMessage } = useSnackbar();
@@ -278,7 +277,6 @@ const OrdersPage = () => {
             textTextColor = '#FF5C5C'; 
           }
           break;
-
       default:
         backgroundColor = '#FFFFFF';
         countTextColor = '#42454E';
@@ -368,8 +366,6 @@ const OrdersPage = () => {
           }
           return newState;
         })
-
-
       default:
         break;
     }
@@ -392,7 +388,6 @@ const OrdersPage = () => {
   const cancelledCount = totalCountrake[0]?.statuses?.find((item: any) => item.status === "CNCL")?.count || 0;
 
   const [openUploadFile, setOpenUploadFile] = useState(false);
-
   return (
     <div>
       <div className='orderContainer'>
@@ -401,18 +396,18 @@ const OrdersPage = () => {
           <div
             className='tableContainer'
             style={{
-              paddingInline: 24,
-              paddingTop: 10,
-              paddingBottom: !mobile ? 24 : 65,
+              marginTop: 56,
               position: 'relative',
-              marginTop: !mobile ? '56px' : '24px',
-              marginLeft: !mobile ? '70px' : '0px',
-              marginBottom: !mobile ? '0px' : '60px',
-              height: 'calc(100vh - 56px)'
+              marginLeft: !mobile ? 70 : 0,
+              height:'calc(100vh - 56px)',
+              paddingInline:24,
+              paddingTop: 12,
+              paddingBottom: !mobile ? 70 : 0,
             }}
           >
 
-            <div className='outbound_inbound_ageing'>
+             <div className='outbound_inbound_ageing'>
+
               {!mobile ? <div className='outbound_inbound'>
                 {['outbound', 'inbound'].map(bound => (
                   <div
@@ -425,10 +420,12 @@ const OrdersPage = () => {
                 ))}</div>
                 :
                 <div className='mobile_outbound_inbound'>
-                  <div className='mobile_outbound'>{t('outbound')}</div>
+                  <div className={selected_bound === 'outbound' ? 'underLine':""} style={{fontSize:14, width:100, textAlign:'center', paddingBottom:12}} onClick={() => setSelected_bound('outbound')}>Outbound</div>
+                  <div className={selected_bound === 'inbound' ? 'underLine' : ''} style={{width:100,fontSize:14, textAlign:'center'}} onClick={() => setSelected_bound('inbound')}>Inbound</div>
                 </div>
               }
-              <div id='uploadFile_refreash'>
+
+             { !mobile && <div id='uploadFile_refreash'>
                 <motion.div id='uploadButton'
                    whileHover={{ scale: 0.95 }}
                    whileTap={{ scale: 0.9 }}
@@ -457,15 +454,18 @@ const OrdersPage = () => {
                   <div className='refreash_reload' style={{ opacity: showRefreash ? 1 : 0 }}>refresh filters</div>
                 </div>
               </div>
-              </div>
+              </div>}
+
             </div>
 
-            <div className='filter_aging_table_display' style={{display:selected_bound==='inbound'?'none':'block'}}>
+            {selected_bound === 'outbound' && <div className='filter_aging_table_display'>
 
               <div className='filters_aging'>
-                <div className='filters' style={{ overflowX: 'auto', maxWidth: '87%' }}>
+
+                <div className='filters'>
                   <Filters onToFromChange={handleToFromChange} onChangeStatus={handleChangeStatus} onChangeRakeTypes={handleChangeRakeType} reload={reload} getShipments={getAllShipment} shipmentsPayloadSetter={setShipmentsPayload} setTriggerShipments={setTriggerShipments} triggerShipments={triggerShipments} />
                 </div>
+
                 <div className='display_status'>
                     <div className='display_status_inner_box' style={{
                       backgroundColor: (status.includes('AVE') && status.includes('ITNS')  && status.includes('Delivered')  && status.includes('INPL') ) ? '#000000' : '#FFFFFF',
@@ -494,6 +494,7 @@ const OrdersPage = () => {
                       <div style={{fontSize:12, color: getStatusColor(status, 'CNCL').textTextColor}}>{t('cancelled')}</div>
                     </div>
                 </div> 
+
               </div>
 
               <div className='table'>
@@ -514,13 +515,12 @@ const OrdersPage = () => {
                   ShipmentsPayload={ShipmentsPayload}
                   />
               </div>
-            </div>
+              
+            </div> }
+            
 
-            {selected_bound === 'inbound' &&
-              <div className='inboundContainer'>
-                <Inbound/>
-              </div>
-            }
+            {selected_bound === 'inbound' && <div className='inboundContainer'><Inbound/></div>}
+
           </div>
         </div>
       </div>
@@ -529,7 +529,7 @@ const OrdersPage = () => {
       
     
 
-      {!mobile ? <SideDrawer /> : <div className="bottom_bar">
+      {!mobile ? <SideDrawer /> : <div>
         <MobileDrawer />
       </div>}
     </div>
@@ -539,3 +539,5 @@ const OrdersPage = () => {
 OrdersPage.displayName = 'OrdersPage';
 
 export default OrdersPage;
+
+

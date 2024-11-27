@@ -17,6 +17,7 @@ import Image from "next/image";
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import captiveRakeIndicator from '@/assets/captive_rakes.svg'
 import Link from "next/link";
+import { useMediaQuery, useTheme } from '@mui/material';
 
 
 
@@ -122,6 +123,9 @@ function contructingData(shipment: any) {
 }
 
 function InboundTable({ allShipment, count, setInBoundPayload }: any) {
+
+  const theme = useTheme();
+  const mobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
@@ -143,23 +147,20 @@ function InboundTable({ allShipment, count, setInBoundPayload }: any) {
   },[page, rowsPerPage])
 
   return (
-    <div>
-      <div>
-        <div>
-          <div
+     <div
             id="tableContainer"
             style={{
               width: "100%",
-              height: "95%",
+              height: !mobile ? "calc(100vh - 200px)" : "calc(100vh - 300px)",
               display: "flex",
               flexDirection: "column",
-              paddingTop: 36,
+              paddingTop:'25px'
             }}
           >
             <Paper
               sx={{
-                width: "100%",
                 position: "relative",
+                width: "100%",
                 height: "100%",
                 display: "flex",
                 flexDirection: "column",
@@ -313,9 +314,6 @@ function InboundTable({ allShipment, count, setInBoundPayload }: any) {
                 />
             </Paper>
           </div>
-        </div>
-      </div>
-    </div>
   );
 }
 export default InboundTable;
