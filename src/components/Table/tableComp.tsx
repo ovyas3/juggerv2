@@ -901,20 +901,18 @@ export const HandlingAgentSelection = ({ shipmentId, setOpen, locationId, getAll
     );
 };
 
-const material = [
-    "Plate Mill",
-    "Bar Mill",
-    "Rail Mill",
-    "Semis Mill",
-    "SPM Mill",
-    "HSM Mill",
-    "CRM Mill",
-];
+// const material = [
+//     "Plate Mill",
+//     "Bar Mill",
+//     "Rail Mill",
+//     "Semis",
+//     "SPM"
+// ];
 
-const materialOptions = material.map(option => ({
-    value: option,
-    label: option
-}));
+// const materialOptions = material.map(option => ({
+//     value: option,
+//     label: option
+// }));
 
 export const MarkPlacement = ({isClose ,shipment, getAllShipment, different = 'markplacement'}: any) =>{
     const t = useTranslations("ORDERS");
@@ -926,6 +924,27 @@ export const MarkPlacement = ({isClose ,shipment, getAllShipment, different = 'm
     const [warraning, setWarraning] = useState(false);
     const [materials, setMaterials] = useState<string[]>([]);
     const [openStartDatePicker, setOpenStartDatePicker] = useState(false);
+    const [materialDropdownItems, setMaterialDropdownItems] = useState([]);
+
+
+    async function getMills() {
+        const response = await httpsGet(`shipper_constants/get_mills`, 0, router);
+        if (response.statusCode === 200) {
+            const materialOptions = response.data?.map((option:any) => ({
+                value: option._id,
+                label: option.name
+            }));
+          setMaterialDropdownItems(materialOptions);
+        }
+    }
+
+    useEffect(()=>{
+      getMills()
+      console.log(shipment)
+      if(shipment.intent_no) {
+        setEIndent(shipment.intent_no)
+      }
+    },[])
 
     const handlePlacementDate = async() => {
         if(!currentDate) {
@@ -1069,7 +1088,7 @@ export const MarkPlacement = ({isClose ,shipment, getAllShipment, different = 'm
                                 <div style={{marginTop:24}}>
                                     <header style={{ marginBottom:8, fontSize:12, color:'#42454E'}}>{t('IndentNo')}</header>
                                     <div style={{border:'1px solid #E9E9EB', borderRadius:6,height:40.12, display:'flex', alignItems:'center', paddingLeft:12 }}>
-                                        <input onChange={(e)=>{setEIndent(e.target.value)}} type="text" placeholder='Enter Indent No.' style={{fontWeight:600, fontSize:14, color:'#42454E', border:'none',outline:'none', width:'100%'}} />
+                                        <input onChange={(e)=>{setEIndent(e.target.value)}} value={eIndent} type="text" placeholder='Enter Indent No.' style={{fontWeight:600, fontSize:14, color:'#42454E', border:'none',outline:'none', width:'100%'}} />
                                     </div>
                                 </div>
                                 <div style={{marginTop:24}}>
@@ -1078,7 +1097,7 @@ export const MarkPlacement = ({isClose ,shipment, getAllShipment, different = 'm
                                       value={materials}
                                       onValueChange={setMaterials}
                                       placeholder="Select Materials"
-                                      options={materialOptions}
+                                      options={materialDropdownItems}
                                     />
                                 </div>
                             </>
