@@ -265,16 +265,10 @@
 
 .markerDot.loaded {
   background: #037f58;
-  box-shadow: 0 0 0 2px rgba(3, 127, 88, 0.2),
-              0 0 0 6px rgba(3, 127, 88, 0.15),
-              0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .markerDot.empty {
   background: #e31f3f;
-  box-shadow: 0 0 0 2px rgba(227, 31, 63, 0.2),
-              0 0 0 6px rgba(227, 31, 63, 0.15),
-              0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .pulsingDot {
