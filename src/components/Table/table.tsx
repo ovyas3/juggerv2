@@ -109,8 +109,9 @@ const convertArrayToFilteredArray = (inputArray: any, shipmentPayloads: any) => 
             drawnout_time:any,
             captive:any,
             fois_updated_at:any,
+            materials?: any
         }) => {
-        const { edemand_no,captive,fois_updated_at, FNR,placement_time,indent_no, drawnout_time, all_FNRs,rr_dates, delivery_location, trip_tracker, others, remarks, unique_code, status, pickup_date, captive_id, is_captive, eta, rr_document, polyline, past_etas, no_of_wagons, received_no_of_wagons, demand_date, paid_by, commodity_desc, expected_loading_date, HA } = item;
+        const { edemand_no,captive,fois_updated_at, FNR,placement_time,indent_no, drawnout_time, all_FNRs,rr_dates, delivery_location, trip_tracker, others, remarks, unique_code, status, pickup_date, captive_id, is_captive, eta, rr_document, polyline, past_etas, no_of_wagons, received_no_of_wagons, demand_date, paid_by, commodity_desc, expected_loading_date, HA, materials } = item;
         let newDemandDate = new Date(demand_date);
         newDemandDate.setHours(newDemandDate.getHours() - 5);
         newDemandDate.setMinutes(newDemandDate.getMinutes() - 30);
@@ -144,6 +145,7 @@ const convertArrayToFilteredArray = (inputArray: any, shipmentPayloads: any) => 
             material: {
                 name: others.demandedCommodity || '--',
             },
+            materials: materials,
             pickupdate: {
                 date: service.utcToist(pickup_date) || '--',
                 pickupTime: service.utcToistTime(pickup_date) || '--'

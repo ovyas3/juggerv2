@@ -39,6 +39,7 @@ export interface row {
   pickupdate: {
       date: string
   },
+  materials: [string],
   status: {
     name: string,
     code: string,
