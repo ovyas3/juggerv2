@@ -689,7 +689,7 @@ function AssignHooksToLoadingShopContent() {
               <b>{train?.length}</b>
             </div>
             {selectedPlant?.hooks.map((hook:any)=>
-              <div>
+              <div key={hook}>
                 <div>Hook {hook.hook_no} Assigned</div>
                 <b>{workingWagonsList?.filter((val:any)=> val.hook_no === hook.hook_no)?.length}</b>
               </div>
