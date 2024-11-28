@@ -51,9 +51,9 @@ function UpdateAgreementID({
     //   return;
     // }
     let payload = {
-      id: selectedRake._id,
+      id: selectedRake?._id,
       // rake: selectedRake.rake_id,
-      agreement_id: selectedRake.agreement_id,
+      agreement_id: selectedRake?.agreement_id,
     };
     try {
       const response = await httpsPost(
@@ -140,9 +140,9 @@ function UpdateAgreementID({
             style={{ display: "flex", flexDirection: "column", marginTop: 24 }}
           >
             <label style={{ fontSize: 12 }}>Agreement ID</label>
-              <input
+            <input
               placeholder="Enter The Agreement ID"
-                type="text"
+              type="text"
               style={{
                 width: "100%",
                 padding: 8,
@@ -160,9 +160,9 @@ function UpdateAgreementID({
                   agreement_id: e.target.value,
                 });
               }}
-              />
-            </div>
-          )}
+            />
+          </div>
+        )}
 
         <div
           style={{
@@ -208,8 +208,8 @@ function UpdateAgreementID({
                 handleUpdate();
               }}
             >
-            Update
-          </button>
+             Update
+           </button>
           </div>
         </div>
       </div>
