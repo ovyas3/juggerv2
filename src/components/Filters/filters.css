@@ -228,7 +228,7 @@
     background: white;
     border: 1px solid rgba(128, 128, 128, 0.3);
     flex-direction: row;
-    margin-left: 20px;
+    /* margin-left: 20px; */
     background-color: #fff;
     border: 1px solid #E9E9EB;
     gap:4px
@@ -303,4 +303,10 @@
     background-color: white;
     color:#0168FF;
     cursor: pointer;
+}
+#filterContainer{
+    gap: 20px;
+    @media screen and (max-width: 1200px) {
+        gap:16px
+    }
 }

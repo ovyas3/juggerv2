@@ -60,6 +60,7 @@ import { environment } from '@/environments/env.api';
 import { useRouter } from 'next/navigation';
 import { MarkComplete } from './tableComp';
 import ImportContactsIcon from '@mui/icons-material/ImportContacts';
+import { useMediaQuery, useTheme } from '@mui/material';
 
 const status_class_map: { [key: string]: string } = {
     'OB': 'status_title_In_Plant',
@@ -207,6 +208,8 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
     //language controller
     const t = useTranslations("ORDERS")
     const router = useRouter();
+    const theme = useTheme();
+    const mobile = useMediaQuery(theme.breakpoints.down('sm'));
 
     //pagination
     const [page, setPage] = React.useState(0);
@@ -506,9 +509,10 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
 
     return (
         <div 
+        id='outBoundTableContainer'
         style={{
             width: "100%",
-            height: "calc(100vh - 200px)",
+            height: !mobile ? "calc(100vh - 200px)" : "calc(100vh - 400px)",
             display: "flex",
             flexDirection: "column",
             paddingTop:'25px'

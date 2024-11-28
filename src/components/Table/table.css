@@ -813,3 +813,11 @@
     font-weight: 500;
     font-family: "Plus Jakarta Sans";
 }
+#outBoundTableContainer{
+    @media screen and (max-width: 1200px){
+        height: calc(100vh - 250px) !important;
+    }
+    @media screen and (max-width: 600px){
+        height: calc(100vh - 300px) !important;
+    }
+}
