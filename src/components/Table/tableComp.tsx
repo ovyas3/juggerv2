@@ -931,20 +931,19 @@ export const MarkPlacement = ({isClose ,shipment, getAllShipment, different = 'm
         const response = await httpsGet(`shipper_constants/get_mills`, 0, router);
         if (response.statusCode === 200) {
             const materialOptions = response.data?.map((option:any) => ({
-                value: option._id,
+                value: option.name,
                 label: option.name
             }));
           setMaterialDropdownItems(materialOptions);
         }
     }
 
-    useEffect(()=>{
-      getMills()
-      console.log(shipment)
-      if(shipment.intent_no) {
-        setEIndent(shipment.intent_no)
+    useEffect(() => {
+      getMills();
+      if (shipment.intent_no) {
+        setEIndent(shipment.intent_no);
       }
-    },[])
+    }, []);
 
     const handlePlacementDate = async() => {
         if(!currentDate) {
@@ -1091,7 +1090,8 @@ export const MarkPlacement = ({isClose ,shipment, getAllShipment, different = 'm
                                         <input onChange={(e)=>{setEIndent(e.target.value)}} value={eIndent} type="text" placeholder='Enter Indent No.' style={{fontWeight:600, fontSize:14, color:'#42454E', border:'none',outline:'none', width:'100%'}} />
                                     </div>
                                 </div>
-                                <div style={{marginTop:24}}>
+                                <div style={{marginTop:24,display:'flex',columnGap:'52px'}}>
+                                    <div>
                                     <header style={{ marginBottom:8, fontSize:12, color:'#42454E'}}>{t('material')}</header>
                                     <CustomMultiSelect
                                       value={materials}
@@ -1099,6 +1099,11 @@ export const MarkPlacement = ({isClose ,shipment, getAllShipment, different = 'm
                                       placeholder="Select Materials"
                                       options={materialDropdownItems}
                                     />
+                                    </div>
+                                    <div>
+                                     <header style={{ marginBottom:8, fontSize:12, color:'#42454E'}}>{"Materials Selection Saved Previously"}</header>
+                                     <div style={{fontSize:'14px',marginTop:'4px'}}>{shipment.materials?.join(', ')}</div>
+                                    </div>
                                 </div>
                             </>
                         )

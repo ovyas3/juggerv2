@@ -72,6 +72,35 @@
     width: 156px;
 }
 
+.count-hookwise {
+    display: flex;
+    flex-direction: row;
+    font-size: 14px;
+    font-weight: 500;
+    gap: 42px;
+    color: #3C4852;
+}
+
+.count-hookwise b {
+    color: #000000;
+    font-size: 16px;
+}
+
+.badge-hook {
+    position: absolute;
+    background: #000;
+    color: white;
+    border-radius: 100%;
+    font-size: 12px;
+    width: 16px;
+    height: 16px;
+    display: flex;
+    justify-content: center;
+    font-weight: 600;
+    align-items: center;
+    top: 110%;
+}
+
 .dropdownListForPlantsEachItem{
     padding-inline: 10px;
     padding-block: 6px;
@@ -83,6 +112,14 @@
     background-color: #E9EEF2;
     cursor: pointer;
 }
+
+.wagon-connector-icon {
+    position: absolute;
+    right: -4%;
+    bottom: 0;
+    transform: translateY(-2px);
+}
+
 .wagonAssignToMillConatiner{
     height: 50px;
     width: 145px;
