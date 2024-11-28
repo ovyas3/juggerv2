@@ -313,47 +313,7 @@ function Filters({ onToFromChange, onChangeStatus, onChangeRakeTypes, reload, sh
                     </div>
                 </div>
 
-                {/* <div className='status_container' style={{marginRight: 40 }}>
-                    <FormControl sx={{  margin: 0, padding: 0,  marginTop: '2px' }}>
-                        <InputLabel id="demo-multiple-checkbox-label" sx={{
-                            padding: 0, fontSize: 14, marginTop: '6px',
-                        }}></InputLabel>
-                        <Select
-
-                            labelId="demo-multiple-checkbox-label"
-                            id="demo-multiple-checkbox"
-                            value={status}
-                            multiple
-                            onChange={handleChange}
-                            input={<OutlinedInput
-                                sx={{
-                                    width: '170px',
-                                    '& .MuiOutlinedInput-notchedOutline': {
-                                        border: '1px solid #E9E9EB'
-                                    },
-                                    '&:hover .MuiOutlinedInput-notchedOutline': {
-                                        border: '1px solid #E9E9EB'
-                                    },
-                                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                                        border: '1px solid #E9E9EB'
-                                    },
-                                }}
-                            />}
-                            renderValue={(selected: any) => selected.join(', ')}
-                            // renderValue={(selected) => selected}
-                            MenuProps={MenuProps}
-                        >
-                            {names.map((name) => (
-                                <MenuItem key={name} value={name} sx={{ padding: 0 }} >
-                                    <Checkbox checked={status.indexOf(name) > -1} sx={{ paddingLeft: '8px', padding: '4px', '& .MuiSvgIcon-root': { fontSize: 15 } }} />
-                                    <ListItemText primary={name} primaryTypographyProps={{ fontSize: '12px', fontFamily: 'Inter, sans-serif' }} />
-                                </MenuItem>
-                            ))}
-                        </Select>
-                    </FormControl>
-                </div> */}
-
-                <div className='status_container' style={{ marginRight:30 }}>
+                <div className='status_container'>
                     <FormControl sx={{
                         width: '180px', margin: 0, padding: 0,
                         '.mui-kk1bwy-MuiButtonBase-root-MuiMenuItem-root': {
@@ -411,12 +371,12 @@ function Filters({ onToFromChange, onChangeStatus, onChangeRakeTypes, reload, sh
                     </motion.div>
                 </div>
 
-                <div style={{position: 'relative'}}>
+                {/* <div style={{position: 'relative'}}>
                     <div className="filter-container" onClick={() => setOpenFilterModal(true)}>
-                        {/* <FilterAltIcon className="filter-icon" /> */}
+                        <FilterAltIcon className="filter-icon" />
                         <img src={filter_icon.src} alt='' />
                     </div>
-                </div>
+                </div> */}
             
             </div>
 

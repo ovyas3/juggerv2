@@ -9,17 +9,53 @@ import rakesLoadedIcon from "@/assets/rakes_loaded.svg";
 import captiveRakes from '@/assets/cr.svg'
 import emptyRakesIcon from "@/assets/empty_rakes_icon.svg";
 import { useEffect, useState, useMemo } from "react";
-import { httpsGet } from '@/utils/Communication';
+import { httpsGet, httpsPost } from '@/utils/Communication';
 import { useRouter } from 'next/navigation';
 import getBoundary from '@/components/MapView/IndianClaimed';
 import timeService from '@/utils/timeService';
 import { useMediaQuery, useTheme } from '@mui/material';
+import { get } from 'http';
+
+interface SchemeData {
+  count: number;
+  _id: string[];
+}
+
+interface RakeTypeData {
+  All: SchemeData;
+  SFTO: SchemeData;
+  GPWIS: SchemeData;
+  BFNV: SchemeData;
+  [key: string]: SchemeData;
+}
 
 interface RakeLocation {
   coords: [number, number]; // Tuple type for Leaflet position
   type: "loaded" | "empty" | "captive";
   title: string;
   updatedAt: string;
+}
+
+interface RakeStatusData {
+  code: string;
+  text: string;
+  count: number;
+  _ids: string[];
+}
+
+interface StatsData {
+  "T+1": {
+    count: number;
+    _id: string[];
+  };
+  "T+2": {
+    count: number;
+    _id: string[];
+  };
+  "T+3": {
+    count: number;
+    _id: string[];
+  };
 }
 
 const rakeStatus: any = {
@@ -62,7 +98,7 @@ export default function CaptiveRakeMapView() {
     { plant: "PJPD", from: 10, towards: 1, others: 2 },
     { plant: "Barbil", from: 2, towards: 1, others: 4 },
   ]);
-  const [stats, setStats] = useState({
+  const [stats, setStats] = useState<StatsData>({
     "T+1": {
       count: 0,
       _id: []
@@ -78,21 +114,34 @@ export default function CaptiveRakeMapView() {
   });
   const [activeFilter, setActiveFilter] = useState<'total' | 'loaded' | 'empty'>('total');
   const [activeRakeFilter, setActiveRakeFilter] = useState<string>("All");
-  const [rakeStatusData, setRakeStatusData] = useState<any>([]);
-  const [rakeTypeData, setRakeTypeData] = useState({
-    "All": 0,
-    "SFTO": 0,
-    "GPWIS": 0,
-    "BFNV": 0
+  const [rakeStatusData, setRakeStatusData] = useState<RakeStatusData[]>([]);
+  const [rakeTypeData, setRakeTypeData] = useState<RakeTypeData>({
+    All: {
+      count: 0,
+      _id: []
+    },
+    SFTO: {
+      count: 0,
+      _id: []
+    },
+    GPWIS: {
+      count: 0,
+      _id: []
+    },
+    BFNV: {
+      count: 0,
+      _id: []
+    }
   });
   const [selectedArrival, setSelectedArrival] = useState<string | null>(null);
   const [selectedRow, setSelectedRow] = useState<number | null>(null);
 
-  const handleRakeFilterClick = (filterType: string) => {
+  const handleRakeFilterClick = (filterType: string, ids: string[]) => {
     setActiveRakeFilter(filterType === activeRakeFilter ? "All" : filterType);
-    getCoords(filterType);
+    getCoords(filterType, ids);
     getRakeStatusData(filterType);
     getRakeStats(filterType);
+    getSchemeWiseCount(filterType);
   };
 
   const handleFilterClick = (filter: 'total' | 'loaded' | 'empty') => {
@@ -101,12 +150,12 @@ export default function CaptiveRakeMapView() {
 
   const handleArrivalClick = (period: string, ids: string[]) => {
     setSelectedArrival(selectedArrival === period ? null : period);
-    console.log(`Selected ${period} arrival _ids:`, ids);
+    getCoords(activeRakeFilter, ids);
   };
 
-  const handleRowClick = (index: number, rowData: any) => {
+  const handleRowClick = (index: number, rowData: RakeStatusData) => {
     setSelectedRow(selectedRow === index ? null : index);
-    console.log('Selected row data:', rowData);
+    getCoords(activeRakeFilter, rowData._ids);
   };
 
   const filteredCoords = useMemo(() => {
@@ -134,10 +183,22 @@ export default function CaptiveRakeMapView() {
     };
   }, [coordsData, activeRakeFilter]);
 
-  async function getCoords(scheme: string) {
+  async function getCoords(scheme: string, ids: string[] = []) {
     try {
-      const url = scheme === "All" ? 'get/captive_rake_locations' : `get/captive_rake_locations?scheme=${scheme}`;
-      const response = await httpsGet(url, 0, router);
+      const url ='get/captive_rake_locations';
+      let payload = {};
+      if (scheme !== "All") {
+        payload = {
+          scheme
+        }
+      }
+      if(ids.length > 0) {
+        payload = {
+          ...payload,
+          ids
+        }
+      }
+      const response = await httpsPost(url, payload, router, 0, false);
       if (response?.statusCode === 200 && Array.isArray(response?.data.data)) {
         const coords = response.data.data && response.data.data.length > 0 && response.data.data.filter((val: any) => 
           val?.geo_point?.coordinates && 
@@ -148,33 +209,9 @@ export default function CaptiveRakeMapView() {
         const loaded = coords && coords.length > 0 && coords.filter((val: any) => val.loading_status === "L") || [];
         const empty = coords && coords.length > 0 && coords.filter((val: any) => val.loading_status !== "L") || [];
 
-        const rakeStatusData = Object.entries(response.data.stts_code || {}).map(([code, count]) => ({
-          code,
-          text: rakeStatus[code] || code,
-          count: count as number
-        }));
-
-        const rakeTypeCounts = response.data.scheme_wise_count.map((scheme: any) => ({
-          [scheme.scheme]: scheme.count
-        })).reduce((acc: any, val: any) => {
-          return {
-            ...acc,
-            ...val
-          };
-        }, {
-          All: 0,
-          SFTO: 0,
-          GPWIS: 0,
-          BFNV: 0
-        });
-        
-        rakeTypeCounts.Others = 0;
-        const total = Object.values(rakeTypeCounts).reduce((a: any, b: any) => a + b, 0);
-        rakeTypeCounts.All = total; 
         setCoordsData(coords);
         setLoadedRakes(loaded);
         setEmptyRakes(empty);
-        setRakeTypeData(rakeTypeCounts);
       } else {
         console.error('Invalid response format:', response);
       }
@@ -183,9 +220,58 @@ export default function CaptiveRakeMapView() {
     }
   }
 
-  async function getRakeStatusData(scheme: string) {
+  async function getSchemeWiseCount(scheme: string) {
     try{
       const url = scheme === "All" ? 'get/schemeWiseCount' : `get/schemeWiseCount?scheme=${scheme}`;
+      const response = await httpsGet(url, 0, router);
+      if (response?.statusCode === 200) {
+        const schemeWiseCount: RakeTypeData = {
+          All: {
+            count: 0,
+            _id: []
+          },
+          SFTO: {
+            count: 0,
+            _id: []
+          },
+          GPWIS: {
+            count: 0,
+            _id: []
+          },
+          BFNV: {
+            count: 0,
+            _id: []
+          }
+        };
+
+        if(response.data && response.data.length > 0) {
+          // Process each scheme data
+          response.data.forEach((item: { scheme: keyof RakeTypeData; count: number; ids: string[] }) => {
+            if (item.scheme && schemeWiseCount.hasOwnProperty(item.scheme)) {
+              schemeWiseCount[item.scheme] = {
+                count: item.count || 0,
+                _id: item.ids || []
+              };
+            }
+          });
+
+          // Calculate total for All
+          schemeWiseCount.All = {
+            count: response.data.reduce((acc: number, val: { count: number }) => acc + (val.count || 0), 0),
+            _id: response.data.reduce((acc: string[], val: { ids: string[] }) => [...acc, ...(val.ids || [])], [])
+          };
+        }
+        
+        setRakeTypeData(schemeWiseCount);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async function getRakeStatusData(scheme: string) {
+    try{
+      const url = scheme === "All" ? 'get/statuCount' : `get/statuCount?scheme=${scheme}`;
       const response = await httpsGet(url, 0, router);
       if (response?.statusCode === 200) {
         const rakeStatusData = Object.entries(response.data || {}).map(([code, rake]: [string, any]) => ({
@@ -194,7 +280,6 @@ export default function CaptiveRakeMapView() {
           count: rake.count as number,
           _ids: rake._ids
         }));
-        console.log(rakeStatusData);
         setRakeStatusData(rakeStatusData);
       }
     } catch (error) {
@@ -208,7 +293,6 @@ export default function CaptiveRakeMapView() {
       const response = await httpsGet(url, 0, router);
       if (response?.statusCode === 200) {
         const statsData = response.data || {};
-        console.log(statsData, "statsData");
         setStats(statsData);
 
         if(!statsData) {
@@ -234,9 +318,10 @@ export default function CaptiveRakeMapView() {
   }
 
   useEffect(()=>{
-   getCoords('All')
+   getCoords('All', [])
    getRakeStatusData('All')
    getRakeStats('All')
+   getSchemeWiseCount('All');
   },[])
 
   useEffect(() => {
@@ -246,12 +331,6 @@ export default function CaptiveRakeMapView() {
       });
     }
   }, [map]);
-
-  const rakeLocations: RakeLocation[] = [
-    { coords: [24.5, 78.9], type: "loaded", title: "Loaded Rake 1", updatedAt: "2024-11-20" },
-    { coords: [24.3, 78.7], type: "empty", title: "Empty Rake 2", updatedAt: "2024-11-21" },
-    { coords: [24.1, 78.8], type: "captive", title: "Captive Rake 3", updatedAt: "2024-11-22" },
-  ];
 
   const customLoadedIcon = L.divIcon({
     className: 'custom-div-icon',
@@ -355,31 +434,31 @@ export default function CaptiveRakeMapView() {
             <div className={styles.rakeTypeFilters}>
               <div 
                 className={`${styles.filterChip} ${activeRakeFilter === "All" ? styles.active : ""}`}
-                onClick={() => handleRakeFilterClick("All")}
+                onClick={() => handleRakeFilterClick("All", rakeTypeData.All?._id)}
               >
                 <span>All</span>
-                <span className={styles.count}>{rakeTypeData.All || 0}</span>
+                <span className={styles.count}>{rakeTypeData.All?.count || 0}</span>
               </div>
               <div 
                 className={`${styles.filterChip} ${activeRakeFilter === "SFTO" ? styles.active : ""}`}
-                onClick={() => handleRakeFilterClick("SFTO")}
+                onClick={() => handleRakeFilterClick("SFTO", rakeTypeData.SFTO?._id)}
               >
                 <span>SFTO</span>
-                <span className={styles.count}>{rakeTypeData.SFTO || 0}</span>
+                <span className={styles.count}>{rakeTypeData.SFTO?.count || 0}</span>
               </div>
               <div 
                 className={`${styles.filterChip} ${activeRakeFilter === "BFNV" ? styles.active : ""}`}
-                onClick={() => handleRakeFilterClick("BFNV")}
+                onClick={() => handleRakeFilterClick("BFNV", rakeTypeData.BFNV?._id)}
               >
                 <span>BFNV</span>
-                <span className={styles.count}>{rakeTypeData.BFNV || 0}</span>
+                <span className={styles.count}>{rakeTypeData.BFNV?.count || 0}</span>
               </div>
               <div 
                 className={`${styles.filterChip} ${activeRakeFilter === "GPWIS" ? styles.active : ""}`}
-                onClick={() => handleRakeFilterClick("GPWIS")}
+                onClick={() => handleRakeFilterClick("GPWIS", rakeTypeData.GPWIS?._id)}
               >
                 <span>GPWIS</span>
-                <span className={styles.count}>{rakeTypeData.GPWIS || 0}</span>
+                <span className={styles.count}>{rakeTypeData.GPWIS?.count || 0}</span>
               </div>
             </div>
 
@@ -449,7 +528,12 @@ export default function CaptiveRakeMapView() {
                 {selectedArrival && (
                   <button 
                     className={styles.clearFilter}
-                    onClick={() => setSelectedArrival(null)}
+                    onClick={() => 
+                    {
+                      getCoords(activeRakeFilter, [])
+                      setSelectedArrival(null)
+                    }
+                    }
                   >
                     Clear
                   </button>
@@ -506,7 +590,7 @@ export default function CaptiveRakeMapView() {
                 <div className={styles.tableBodyWrapper}>
                   <table className={styles.rakeStatusTable}>
                     <tbody>
-                      {rakeStatusData.map((row: any, index: number) => (
+                      {rakeStatusData.map((row: RakeStatusData, index: number) => (
                         <tr 
                           key={index}
                           className={selectedRow === index ? styles.selected : ''}
