@@ -15,21 +15,25 @@ function UpdateAgreementID({
   interface Rake {
     _id: string | number;
     value: string;
-    captive_id: string;
+    rake_id: string;
     agreement_id: string;
-    rake_service_id: string;
   }
   const [selectedRake, setSelectedRake] = useState<Rake | null>(null);
-  const [allCaptiveList, setAllCaptiveList] = useState([]);
+  const [allCaptiveList, setAllCaptiveList] = useState<Rake[]>([]);
   const { showMessage } = useSnackbar();
   const isMobile = useWindowSize(420);
 
   console.log("sdvjbjfvks", isMobile);
 
   const getCaptiveRakeDetails = async () => {
-    const response = await httpsGet("wagon_details/allRakes");
-    if (response.statusCode === 200) {
-      setAllCaptiveList(response?.rakes);
+    try {
+      const response = await httpsGet("get/captive/rakes_ids");
+      if (response && Array.isArray(response)) {
+          setAllCaptiveList(response);
+      }
+    } catch (error) {
+        console.error("Error fetching rake details:", error);
+        showMessage("Failed to fetch rake details", "error");
     }
   };
 
@@ -38,7 +42,6 @@ function UpdateAgreementID({
       showMessage("Please Select Rake", "warning");
       return;
     }
-    console.log(selectedRake)
     if(selectedRake?.agreement_id === ''){
         showMessage('Please Enter The Agreement ID', 'error')
         return;
@@ -48,13 +51,13 @@ function UpdateAgreementID({
     //   return;
     // }
     let payload = {
-      rakeService_id: selectedRake?.rake_service_id,
-      captive_id: selectedRake?.captive_id,
+      id: selectedRake?._id,
+      // rake: selectedRake.rake_id,
       agreement_id: selectedRake?.agreement_id,
     };
     try {
       const response = await httpsPost(
-        "wagon_details/update_agreementID",
+        "update/captive/agreement_id",
         payload
       );
       if (response.statusCode === 200) {
@@ -105,7 +108,7 @@ function UpdateAgreementID({
         }}
       >
         <div id="closeContaionerUpdateAgreementID">
-          <CloseIcon
+        <CloseIcon
             onClick={(e) => {
               e.stopPropagation();
               setUpdateAgreementModel(false);
@@ -122,24 +125,17 @@ function UpdateAgreementID({
         <div style={{ marginTop: "20px" }}>
           <CustomSearchSelect
             label="Rake ID"
-            options={allCaptiveList
-              ?.filter((item: any) => {
-                if (item.captive_id) return { item };
-              })
-              .map((item: any) => {
-                return {
-                  _id: item._id,
-                  value: item.captive_id.rake_id,
-                  captive_id: item.captive_id._id,
-                  agreement_id: item?.captive_id?.rake_service?.agreement_id || item?.captive_id?.agreement_id ,
-                  rake_service_id: item?.captive_id?.rake_service?._id,
-                };
-              })}
+            options={allCaptiveList.map((item: any) => ({
+              _id: item._id,
+              value: item.rake_id,
+              rake_id: item.rake_id,
+              agreement_id: item.agreement_id
+          }))}
             onChange={setSelectedRake}
           />
         </div>
 
-        {selectedRake && (
+          {selectedRake && (
           <div
             style={{ display: "flex", flexDirection: "column", marginTop: 24 }}
           >
@@ -212,8 +208,8 @@ function UpdateAgreementID({
                 handleUpdate();
               }}
             >
-              Update
-            </button>
+             Update
+           </button>
           </div>
         </div>
       </div>
