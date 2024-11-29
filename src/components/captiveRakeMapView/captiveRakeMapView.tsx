@@ -44,15 +44,15 @@ interface RakeStatusData {
 }
 
 interface StatsData {
+  "Today": {
+    count: number;
+    _id: string[];
+  };
   "T+1": {
     count: number;
     _id: string[];
   };
   "T+2": {
-    count: number;
-    _id: string[];
-  };
-  "T+3": {
     count: number;
     _id: string[];
   };
@@ -92,22 +92,16 @@ export default function CaptiveRakeMapView() {
   const [coordsData, setCoordsData] = useState<any[]>([]);
   const [loadedRakes, setLoadedRakes] = useState<any>([]);
   const [emptyRakes, setEmptyRakes] = useState<any>([]);
-  const [summaryData, setSummaryData] = useState([
-    { plant: "JBSK", from: 10, towards: 6, others: 0 },
-    { plant: "JSPP", from: 12, towards: 4, others: 2 },
-    { plant: "PJPD", from: 10, towards: 1, others: 2 },
-    { plant: "Barbil", from: 2, towards: 1, others: 4 },
-  ]);
   const [stats, setStats] = useState<StatsData>({
+    "Today": {
+      count: 0,
+      _id: []
+    },
     "T+1": {
       count: 0,
       _id: []
     },
     "T+2": {
-      count: 0,
-      _id: []
-    },
-    "T+3": {
       count: 0,
       _id: []
     }
@@ -135,6 +129,10 @@ export default function CaptiveRakeMapView() {
   });
   const [selectedArrival, setSelectedArrival] = useState<string | null>(null);
   const [selectedRow, setSelectedRow] = useState<number | null>(null);
+  const [plantRakesSummary,setPlantRakesSummary] = useState<any>({from:{},to:{}})
+  const [plantRakesSummaryPlants,setPlantRakesSummaryPlants] = useState<any>([])
+  const [totalCRCount, setTotalCRCount] = useState(0)
+  const [usedCRCount,setUsedCRCount] = useState(0)
 
   const handleRakeFilterClick = (filterType: string, ids: string[]) => {
     setActiveRakeFilter(filterType === activeRakeFilter ? "All" : filterType);
@@ -224,45 +222,28 @@ export default function CaptiveRakeMapView() {
     try{
       const url = scheme === "All" ? 'get/schemeWiseCount' : `get/schemeWiseCount?scheme=${scheme}`;
       const response = await httpsGet(url, 0, router);
+      const data = rakeTypeData
       if (response?.statusCode === 200) {
-        const schemeWiseCount: RakeTypeData = {
-          All: {
-            count: 0,
-            _id: []
-          },
-          SFTO: {
-            count: 0,
-            _id: []
-          },
-          GPWIS: {
-            count: 0,
-            _id: []
-          },
-          BFNV: {
-            count: 0,
-            _id: []
-          }
-        };
-
         if(response.data && response.data.length > 0) {
           // Process each scheme data
           response.data.forEach((item: { scheme: keyof RakeTypeData; count: number; ids: string[] }) => {
-            if (item.scheme && schemeWiseCount.hasOwnProperty(item.scheme)) {
-              schemeWiseCount[item.scheme] = {
+            if (item.scheme && data.hasOwnProperty(item.scheme)) {
+              data[item.scheme] = {
                 count: item.count || 0,
                 _id: item.ids || []
               };
             }
           });
-
-          // Calculate total for All
-          schemeWiseCount.All = {
-            count: response.data.reduce((acc: number, val: { count: number }) => acc + (val.count || 0), 0),
+          if(scheme === 'All') {
+            const total = response.data.reduce((acc: number, val: { count: number }) => acc + (val.count || 0), 0)
+           data.All = {
+            count: total,
             _id: response.data.reduce((acc: string[], val: { ids: string[] }) => [...acc, ...(val.ids || [])], [])
-          };
+           };
+          setTotalCRCount(total)
         }
-        
-        setRakeTypeData(schemeWiseCount);
+        }
+        setRakeTypeData(data);
       }
     } catch (error) {
       console.log(error);
@@ -297,15 +278,15 @@ export default function CaptiveRakeMapView() {
 
         if(!statsData) {
           setStats({
+            "Today": {
+              count: 0,
+              _id: []
+            },
             "T+1": {
               count: 0,
               _id: []
             },
             "T+2": {
-              count: 0,
-              _id: []
-            },
-            "T+3": {
               count: 0,
               _id: []
             }
@@ -317,12 +298,60 @@ export default function CaptiveRakeMapView() {
     }
   }
 
+  async function getPlantRakesSummary() {
+    const queryParams =
+      activeRakeFilter !== "All" ? `?scheme=${activeRakeFilter}` : "";
+    const response = await httpsGet("get/ownOrOthers" + queryParams, 0, router);
+    if (response.statusCode === 200) {
+      const data = response.data || [];
+      setPlantRakesSummary(data);
+      if (activeRakeFilter === "All") {
+        const plants = [
+          ...new Set([
+            ...Object.keys(data.from || {}),
+            ...Object.keys(data.to || {}),
+          ]),
+        ];
+        setPlantRakesSummaryPlants(plants);
+        let totalSum = 0;
+      
+      Object.keys(data.from || {}).forEach((key) => {
+        if (key !== "others") {
+          totalSum += data.from[key]?.count;
+        }
+      });
+
+      Object.keys(data.to || {}).forEach((key) => {
+        if (key !== "others") {
+          totalSum += data.to[key]?.count;
+        }
+      });
+
+      setUsedCRCount(totalSum) 
+      }
+    }
+  }
+
+  function handlePlantRakesMapFilter(ids: string[] = []) {
+    if (ids.length) {
+      getCoords(activeRakeFilter, ids);
+    } else {
+      setCoordsData([]);
+    }
+  } 
+
   useEffect(()=>{
    getCoords('All', [])
    getRakeStatusData('All')
    getRakeStats('All')
    getSchemeWiseCount('All');
+   getPlantRakesSummary()
   },[])
+
+
+  useEffect(()=>{
+    getPlantRakesSummary()
+  },[activeRakeFilter])
 
   useEffect(() => {
     if (map) {
@@ -332,21 +361,31 @@ export default function CaptiveRakeMapView() {
     }
   }, [map]);
 
-  const customLoadedIcon = L.divIcon({
-    className: 'custom-div-icon',
-    html: `<div class="${styles.markerDot} ${styles.loaded}"></div>`,
-    iconSize: [16, 16],
-    iconAnchor: [8, 8],
-    popupAnchor: [0, -8]
-  });
+  const customLoadedIcon = (stabled: any) => {
+    const stabledClass = stabled ? styles.stabledBorder : "";
 
-  const customEmptyIcon = L.divIcon({
-    className: 'custom-div-icon',
-    html: `<div class="${styles.markerDot} ${styles.empty}"></div>`,
-    iconSize: [16, 16],
-    iconAnchor: [8, 8],
-    popupAnchor: [0, -8]
-  });
+    return L.divIcon({
+      className: "custom-div-icon",
+      html: `<div class="${styles.markerDot} ${styles.loaded}  ${stabledClass}"></div>`,
+      iconSize: [16, 16],
+      iconAnchor: [8, 8],
+      popupAnchor: [0, -8],
+    });
+  };
+
+
+
+  const customEmptyIcon = (stabled: any) => {
+    const stabledClass = stabled ? styles.stabledBorder : "";
+
+    return L.divIcon({
+      className: "custom-div-icon",
+      html: `<div class="${styles.markerDot} ${styles.empty} ${stabledClass}"></div>`,
+      iconSize: [16, 16],
+      iconAnchor: [8, 8],
+      popupAnchor: [0, -8],
+    });
+  };
 
   const createTrainIcon = (isLoaded: boolean) => {
     const fillColor = isLoaded ? '#037f58' : '#e31f3f';
@@ -379,11 +418,12 @@ export default function CaptiveRakeMapView() {
     });
   };
 
-  const getIcon = (status: string) => {
+  const getIcon = (status: string,status_code: string) => {
     if (currentZoom > 9) {
       return createTrainIcon(status === "L");
     }
-    return status === "L" ? customLoadedIcon : customEmptyIcon;
+    const stabled = Boolean(status_code === 'ST')
+    return status === "L" ? customLoadedIcon(stabled) : customEmptyIcon(stabled);
   };
 
   const boundaryStyle = (feature: any) => {
@@ -417,106 +457,145 @@ export default function CaptiveRakeMapView() {
   return (
     <div>
       <div>
-        <div 
-          className={styles.container}
-        >
-          <div className={`${styles.leftPanel} ${isCollapsed ? styles.collapsed : ''}`}>
+        <div className={styles.container}>
+          <div
+            className={`${styles.leftPanel} ${
+              isCollapsed ? styles.collapsed : ""
+            }`}
+          >
             {mobile && (
               <>
-                <div 
+                <div
                   className={styles.collapseHandle}
                   onClick={() => setIsCollapsed(!isCollapsed)}
-                >
-                </div>
+                ></div>
               </>
             )}
 
             <div className={styles.rakeTypeFilters}>
-              <div 
-                className={`${styles.filterChip} ${activeRakeFilter === "All" ? styles.active : ""}`}
-                onClick={() => handleRakeFilterClick("All", rakeTypeData.All?._id)}
+              <div
+                className={`${styles.filterChip} ${
+                  activeRakeFilter === "All" ? styles.active : ""
+                }`}
+                onClick={() =>
+                  handleRakeFilterClick("All", rakeTypeData.All?._id)
+                }
               >
                 <span>All</span>
-                <span className={styles.count}>{rakeTypeData.All?.count || 0}</span>
+                <span className={styles.count}>
+                  {rakeTypeData.All?.count || 0}
+                </span>
               </div>
-              <div 
-                className={`${styles.filterChip} ${activeRakeFilter === "SFTO" ? styles.active : ""}`}
-                onClick={() => handleRakeFilterClick("SFTO", rakeTypeData.SFTO?._id)}
+              <div
+                className={`${styles.filterChip} ${
+                  activeRakeFilter === "SFTO" ? styles.active : ""
+                }`}
+                onClick={() =>
+                  handleRakeFilterClick("SFTO", rakeTypeData.SFTO?._id)
+                }
               >
-                <span>SFTO</span>
-                <span className={styles.count}>{rakeTypeData.SFTO?.count || 0}</span>
+                <span>SFTO-BRN</span>
+                <span className={styles.count}>
+                  {rakeTypeData.SFTO?.count || 0}
+                </span>
               </div>
-              <div 
-                className={`${styles.filterChip} ${activeRakeFilter === "BFNV" ? styles.active : ""}`}
-                onClick={() => handleRakeFilterClick("BFNV", rakeTypeData.BFNV?._id)}
+              <div
+                className={`${styles.filterChip} ${
+                  activeRakeFilter === "BFNV" ? styles.active : ""
+                }`}
+                onClick={() =>
+                  handleRakeFilterClick("BFNV", rakeTypeData.BFNV?._id)
+                }
               >
-                <span>BFNV</span>
-                <span className={styles.count}>{rakeTypeData.BFNV?.count || 0}</span>
+                <span>SFTO-BFNV</span>
+                <span className={styles.count}>
+                  {rakeTypeData.BFNV?.count || 0}
+                </span>
               </div>
-              <div 
-                className={`${styles.filterChip} ${activeRakeFilter === "GPWIS" ? styles.active : ""}`}
-                onClick={() => handleRakeFilterClick("GPWIS", rakeTypeData.GPWIS?._id)}
+              <div
+                className={`${styles.filterChip} ${
+                  activeRakeFilter === "GPWIS" ? styles.active : ""
+                }`}
+                onClick={() =>
+                  handleRakeFilterClick("GPWIS", rakeTypeData.GPWIS?._id)
+                }
               >
                 <span>GPWIS</span>
-                <span className={styles.count}>{rakeTypeData.GPWIS?.count || 0}</span>
+                <span className={styles.count}>
+                  {rakeTypeData.GPWIS?.count || 0}
+                </span>
               </div>
             </div>
 
             <div className={styles.rakesStatus}>
               <h2>Captive Rakes Status</h2>
               <div className={styles.statusItems}>
-                <div 
-                  className={`${styles.statusItem} ${styles.totalStatus} ${activeFilter === 'total' ? styles.activeTotal : ''}`}
-                  onClick={() => handleFilterClick('total')}
+                <div
+                  className={`${styles.statusItem} ${styles.totalStatus} ${
+                    activeFilter === "total" ? styles.activeTotal : ""
+                  }`}
+                  onClick={() => handleFilterClick("total")}
                 >
-                  <span className={styles.icon} style={{ 
-                    backgroundColor: '#F8F8F8',
-                    borderRadius: '50%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    padding: '8px'
-                  }}>
-                    <Image src={rakesLoadedIcon} alt=""/>
+                  <span
+                    className={styles.icon}
+                    style={{
+                      backgroundColor: "#F8F8F8",
+                      borderRadius: "50%",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      padding: "8px",
+                    }}
+                  >
+                    <Image src={rakesLoadedIcon} alt="" />
                   </span>
                   <div className={styles.labelCont}>
-                  <span className={styles.label} style={{color: '#334FFC'}}>Total</span>
-                  <span className={styles.value}>
-                    {filteredCounts.total}
-                  </span>
+                    <span className={styles.label} style={{ color: "#334FFC" }}>
+                      Total
+                    </span>
+                    <span className={styles.value}>{filteredCounts.total}</span>
                   </div>
                 </div>
-                <div 
-                  className={`${styles.statusItem} ${styles.loadedStatus} ${activeFilter === 'loaded' ? styles.activeLoaded : ''}`}
-                  onClick={() => handleFilterClick('loaded')}
+                <div
+                  className={`${styles.statusItem} ${styles.loadedStatus} ${
+                    activeFilter === "loaded" ? styles.activeLoaded : ""
+                  }`}
+                  onClick={() => handleFilterClick("loaded")}
                 >
-                  <span className={styles.icon} style={{ 
-                    backgroundColor: '#F8F8F8',
-                    borderRadius: '50%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    padding: '8px'
-                  }}>
-                    <Image src={captiveRakes} alt=""/>
+                  <span
+                    className={styles.icon}
+                    style={{
+                      backgroundColor: "#F8F8F8",
+                      borderRadius: "50%",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      padding: "8px",
+                    }}
+                  >
+                    <Image src={captiveRakes} alt="" />
                   </span>
                   <div className={styles.labelCont}>
-                  <span className={styles.label} style={{color: '#18BE8A'}}>Loaded</span>
-                  <span className={styles.value}>
-                    {filteredCounts.loaded}
-                  </span>
+                    <span className={styles.label} style={{ color: "#18BE8A" }}>
+                      Loaded
+                    </span>
+                    <span className={styles.value}>
+                      {filteredCounts.loaded}
+                    </span>
                   </div>
                 </div>
-                <div 
-                  className={`${styles.statusItem} ${styles.emptyStatus} ${activeFilter === 'empty' ? styles.activeEmpty : ''}`}
-                  onClick={() => handleFilterClick('empty')}
+                <div
+                  className={`${styles.statusItem} ${styles.emptyStatus} ${
+                    activeFilter === "empty" ? styles.activeEmpty : ""
+                  }`}
+                  onClick={() => handleFilterClick("empty")}
                 >
-                  <Image src={emptyRakesIcon} alt=""/>
+                  <Image src={emptyRakesIcon} alt="" />
                   <div className={styles.labelCont}>
-                  <span className={styles.label} style={{color: '#E6667B'}}>Empty</span>
-                  <span className={styles.value}>
-                    {filteredCounts.empty}
-                  </span>
+                    <span className={styles.label} style={{ color: "#E6667B" }}>
+                      Empty
+                    </span>
+                    <span className={styles.value}>{filteredCounts.empty}</span>
                   </div>
                 </div>
               </div>
@@ -526,40 +605,56 @@ export default function CaptiveRakeMapView() {
               <div className={styles.arrivalHeader}>
                 <h2>Rakes Arrival</h2>
                 {selectedArrival && (
-                  <button 
+                  <button
                     className={styles.clearFilter}
-                    onClick={() => 
-                    {
-                      getCoords(activeRakeFilter, [])
-                      setSelectedArrival(null)
-                    }
-                    }
+                    onClick={() => {
+                      getCoords(activeRakeFilter, []);
+                      setSelectedArrival(null);
+                    }}
                   >
                     Clear
                   </button>
                 )}
               </div>
               <div className={styles.arrivalItems}>
-                <div 
-                  className={`${styles.arrivalItem} ${selectedArrival === "T+1" ? styles.selected : ""}`}
-                  onClick={() => handleArrivalClick("T+1", stats["T+1"]._id || [])}
+                <div
+                  className={`${styles.arrivalItem} ${
+                    selectedArrival === "Today" ? styles.selected : ""
+                  }`}
+                  onClick={() =>
+                    handleArrivalClick("Today", stats["Today"]._id || [])
+                  }
                 >
-                  <span className={styles.value}>{stats["T+1"].count || 0}</span>
+                  <span className={styles.value}>
+                    {stats["Today"]?.count || 0}
+                  </span>
+                  <span className={styles.label}>Today</span>
+                </div>
+                <div
+                  className={`${styles.arrivalItem} ${
+                    selectedArrival === "T+1" ? styles.selected : ""
+                  }`}
+                  onClick={() =>
+                    handleArrivalClick("T+1", stats["T+1"]._id || [])
+                  }
+                >
+                  <span className={styles.value}>
+                    {stats["T+2"].count || 0}
+                  </span>
                   <span className={styles.label}>T+1</span>
                 </div>
-                <div 
-                  className={`${styles.arrivalItem} ${selectedArrival === "T+2" ? styles.selected : ""}`}
-                  onClick={() => handleArrivalClick("T+2", stats["T+2"]._id || [])}
+                <div
+                  className={`${styles.arrivalItem} ${
+                    selectedArrival === "T+2" ? styles.selected : ""
+                  }`}
+                  onClick={() =>
+                    handleArrivalClick("T+2", stats["T+2"]._id || [])
+                  }
                 >
-                  <span className={styles.value}>{stats["T+2"].count || 0}</span>
-                  <span className={styles.label}>T+2</span>
-                </div>
-                <div 
-                  className={`${styles.arrivalItem} ${selectedArrival === "T+3" ? styles.selected : ""}`}
-                  onClick={() => handleArrivalClick("T+3", stats["T+3"]._id || [])}
-                >
-                  <span className={styles.value}>{stats["T+3"].count || 0}</span>
-                  <span className={styles.label}>&gt;T+3</span>
+                  <span className={styles.value}>
+                    {stats["T+2"].count || 0}
+                  </span>
+                  <span className={styles.label}>&gt;T+2</span>
                 </div>
               </div>
             </div>
@@ -571,18 +666,30 @@ export default function CaptiveRakeMapView() {
                   <table className={styles.rakeStatusTable}>
                     <thead>
                       <tr>
-                        <th style={{
-                          width: '10%',
-                          textAlign: 'center',
-                        }}>S.No</th>
-                        <th style={{
-                          width: '65%',
-                          textAlign: 'left',
-                        }}>Code</th>
-                        <th style={{
-                          width: '25%',
-                          textAlign: 'center',
-                        }}>Counts</th>
+                        <th
+                          style={{
+                            width: "10%",
+                            textAlign: "center",
+                          }}
+                        >
+                          S.No
+                        </th>
+                        <th
+                          style={{
+                            width: "65%",
+                            textAlign: "left",
+                          }}
+                        >
+                          Code
+                        </th>
+                        <th
+                          style={{
+                            width: "25%",
+                            textAlign: "center",
+                          }}
+                        >
+                          Counts
+                        </th>
                       </tr>
                     </thead>
                   </table>
@@ -590,27 +697,44 @@ export default function CaptiveRakeMapView() {
                 <div className={styles.tableBodyWrapper}>
                   <table className={styles.rakeStatusTable}>
                     <tbody>
-                      {rakeStatusData.map((row: RakeStatusData, index: number) => (
-                        <tr 
-                          key={index}
-                          className={selectedRow === index ? styles.selected : ''}
-                          onClick={() => handleRowClick(index, row)}
-                        >
-                          <td style={{
-                            width: '10%',
-                            textAlign: 'center',
-                            fontWeight:'bold'
-                          }}>{index + 1}</td>
-                          <td style={{
-                            width: '65%',
-                            textAlign: 'left'
-                          }}>{row.code} ({row.text})</td>
-                          <td style={{
-                            width: '25%',
-                            textAlign: 'center'
-                          }}>{row.count}</td>
-                        </tr>
-                      ))}
+                      {rakeStatusData.map(
+                        (row: RakeStatusData, index: number) => (
+                          <tr
+                            key={index}
+                            style={row.code === 'ST' ? { backgroundColor: '#f5f5f5' } : { backgroundColor: '' }}
+                            className={
+                              selectedRow === index ? styles.selected : "" 
+                            }
+                            onClick={() => handleRowClick(index, row)}
+                          >
+                            <td
+                              style={{
+                                width: "10%",
+                                textAlign: "center",
+                                fontWeight: "bold",
+                              }}
+                            >
+                              {index + 1}
+                            </td>
+                            <td
+                              style={{
+                                width: "65%",
+                                textAlign: "left",
+                              }}
+                            >
+                              {row.code} ({row.text})
+                            </td>
+                            <td
+                              style={{
+                                width: "25%",
+                                textAlign: "center",
+                              }}
+                            >
+                              {row.count}
+                            </td>
+                          </tr>
+                        )
+                      )}
                     </tbody>
                   </table>
                 </div>
@@ -634,30 +758,81 @@ export default function CaptiveRakeMapView() {
                 </div>
               </div>
             </div> */}
-
             <div className={styles.plantRakesSummary}>
               <h2>Plant Rakes Summary</h2>
+
               <table className={styles.summaryTable}>
                 <thead>
                   <tr>
-                    <th style={{color:'#18BE8A'}}>Plant</th>
-                    <th>From</th>
-                    <th>Towards</th>
-                    <th>Others</th>
+                    <th style={{ color: "#18BE8A" }}>Category</th>
+                    {plantRakesSummaryPlants
+                      .filter((plant: any) => plant !== "others")
+                      .concat("others")
+                      .map((plant: any, index: any) => (
+                        <th key={index} style={{ fontWeight: "bold" }}>
+                          {plant}
+                        </th>
+                      ))}
                   </tr>
                 </thead>
                 <tbody>
-                  {summaryData.map((row, index) => (
-                    <tr key={index}>
-                      <td style={{fontWeight:'bold',color:''}}>{row.plant}</td>
-                      <td>{row.from}</td>
-                      <td>{row.towards}</td>
-                      <td>{row.others}</td>
-                    </tr>
-                  ))}
+                  <tr>
+                    <td>From</td>
+                    {plantRakesSummaryPlants
+                      .filter((plant: any) => plant !== "others")
+                      .concat("others")
+                      .map((plant: any, index: any) => (
+                        <td key={index}>
+                          <span
+                            onClick={() =>
+                              handlePlantRakesMapFilter(
+                                plantRakesSummary.from[plant]?.ids
+                              )
+                            }
+                            style={{ cursor: "pointer" }}
+                          >
+                            {plantRakesSummary.from[plant]?.count ?? 0}
+                          </span>
+                        </td>
+                      ))}
+                  </tr>
+                  <tr>
+                    <td>Towards</td>
+                    {plantRakesSummaryPlants
+                      .filter((plant: any) => plant !== "others")
+                      .concat("others")
+                      .map((plant: any, index: any) => (
+                        <td key={index}>
+                          <span
+                            onClick={() =>
+                              handlePlantRakesMapFilter(
+                                plantRakesSummary.to[plant]?.ids
+                              )
+                            }
+                            style={{ cursor: "pointer" }}
+                          >
+                            {plantRakesSummary.to[plant]?.count ?? 0}
+                          </span>
+                        </td>
+                      ))}
+                  </tr>
                 </tbody>
               </table>
             </div>
+            <div className={styles.captiveRakeCountBox}>
+            <h2>Captive Rakes Utilization</h2>
+                  <div className={styles.countWrapper}>
+                    <p className={styles.infoCR}>Used Captive Rakes:</p>
+                    <p className={styles.usedCount}>{usedCRCount}</p>/
+                    <p className={styles.totalCount}>{totalCRCount}</p>
+                  </div>
+                  <div className={styles.usagePercentageWrapper}>
+                  <p className={styles.infoCR}>Utilization Percentage:</p>
+                    <p className={styles.usagePercentage}>
+                      {((usedCRCount / totalCRCount) * 100).toFixed(2)}%
+                    </p>
+                  </div>
+                </div>
           </div>
           <div className={styles.rightPanel}>
             <MapContainer
@@ -665,11 +840,11 @@ export default function CaptiveRakeMapView() {
               id="map-helpers"
               center={center}
               zoom={5}
-              style={{ 
-                height: "100%", 
-                width: "100%", 
-                padding: "0px", 
-                zIndex: "0" 
+              style={{
+                height: "100%",
+                width: "100%",
+                padding: "0px",
+                zIndex: "0",
               }}
               attributionControl={false}
               ref={setMap}
@@ -682,43 +857,117 @@ export default function CaptiveRakeMapView() {
                   />
                 </LayersControl.BaseLayer>
               </LayersControl>
-                {filteredCoords.map((marker: any, index: number) => {
-                  const icon = getIcon(marker.loading_status);
-                  
-                  return (
-                    <Marker
-                      key={index}
-                      position={[marker.geo_point.coordinates[1], marker.geo_point.coordinates[0]]}
-                      icon={icon}
-                    >
-                      <Popup>
-                        <div style={{
-                          padding: '6px',
-                          minWidth: '230px'
-                        }}>
-                          <div style={{
-                            fontSize: '13px',
-                            color: '#42454E',
-                            display: 'grid',
-                            gap: '4px'
-                          }}>
-                            <p style={{ margin: '2px 0' }}><strong>Rake ID:</strong> {marker.rake?.rake_id || 'N/A'}</p>
-                            <p style={{ margin: '2px 0' }}><strong>Rake Name:</strong> {marker.rake?.name || 'N/A'}</p>
-                            <p style={{ margin: '2px 0' }}><strong>Rake Status:</strong> {marker.stts_code ? rakeStatus[marker.stts_code] : 'N/A'}</p>
-                            <p style={{ margin: '2px 0' }}><strong>From Station:</strong> {marker.from ? `${marker.from.code} ${marker.from.name}` : 'N/A'}</p>
-                            <p style={{ margin: '2px 0' }}><strong>To Station:</strong> {marker.to ? `${marker.to.code} ${marker.to.name}` : 'N/A'}</p>
-                            <p style={{ margin: '2px 0' }}><strong>Current Station:</strong> {marker.current_station ? `${marker.current_station.code} ${marker.current_station.name}` : 'N/A'}</p>
-                            <p style={{ margin: '2px 0' }}><strong>Updated At FOIS:</strong> {marker.updated_on ? `${timeService.utcToist(marker.updated_on, 'dd-MMM')} ${timeService.utcToistTime(marker.updated_on, 'HH:mm')}` : 'N/A'}</p>
-                            <p style={{ margin: '2px 0' }}><strong>Data Fetched At:</strong> {marker.updated_at ? `${timeService.utcToist(marker.updated_at, 'dd-MMM')} ${timeService.utcToistTime(marker.updated_at, 'HH:mm')}` : 'N/A'}</p>
-                            <p style={{ margin: '2px 0' }}><strong>ETA:</strong> {marker.expd_arvl_time ? `${timeService.utcToist(marker.expd_arvl_time, 'dd-MMM')} ${timeService.utcToistTime(marker.expd_arvl_time, 'HH:mm')}` : 'N/A'}</p>
-                            <p style={{ margin: '2px 0' }}><strong>Commodity:</strong> {marker.commodity && marker.commodity.length > 0 ? marker.commodity.join(', ') : 'N/A'}</p>
-                            <p style={{ margin: '2px 0' }}><strong>Remaining Distance:</strong> {marker.rmng_km ? marker.rmng_km : 'N/A'} km</p>
-                          </div>
+              {filteredCoords.map((marker: any, index: number) => {
+                const icon = getIcon(marker.loading_status, marker.stts_code);
+
+                return (
+                  <Marker
+                    key={index}
+                    position={[
+                      marker.geo_point.coordinates[1],
+                      marker.geo_point.coordinates[0],
+                    ]}
+                    icon={icon}
+                  >
+                    <Popup>
+                      <div
+                        style={{
+                          padding: "6px",
+                          minWidth: "230px",
+                        }}
+                      >
+                        <div
+                          style={{
+                            fontSize: "13px",
+                            color: "#42454E",
+                            display: "grid",
+                            gap: "4px",
+                          }}
+                        >
+                          <p style={{ margin: "2px 0" }}>
+                            <strong>Rake ID:</strong>{" "}
+                            {marker.rake?.rake_id || "N/A"}
+                          </p>
+                          <p style={{ margin: "2px 0" }}>
+                            <strong>Rake Name:</strong>{" "}
+                            {marker.rake?.name || "N/A"}
+                          </p>
+                          <p style={{ margin: "2px 0" }}>
+                            <strong>Rake Status:</strong>{" "}
+                            {marker.stts_code
+                              ? rakeStatus[marker.stts_code]
+                              : "N/A"}
+                          </p>
+                          <p style={{ margin: "2px 0" }}>
+                            <strong>From Station:</strong>{" "}
+                            {marker.from
+                              ? `${marker.from.code} ${marker.from.name}`
+                              : "N/A"}
+                          </p>
+                          <p style={{ margin: "2px 0" }}>
+                            <strong>To Station:</strong>{" "}
+                            {marker.to
+                              ? `${marker.to.code} ${marker.to.name}`
+                              : "N/A"}
+                          </p>
+                          <p style={{ margin: "2px 0" }}>
+                            <strong>Current Station:</strong>{" "}
+                            {marker.current_station
+                              ? `${marker.current_station.code} ${marker.current_station.name}`
+                              : "N/A"}
+                          </p>
+                          <p style={{ margin: "2px 0" }}>
+                            <strong>Updated At FOIS:</strong>{" "}
+                            {marker.updated_on
+                              ? `${timeService.utcToist(
+                                  marker.updated_on,
+                                  "dd-MMM"
+                                )} ${timeService.utcToistTime(
+                                  marker.updated_on,
+                                  "HH:mm"
+                                )}`
+                              : "N/A"}
+                          </p>
+                          <p style={{ margin: "2px 0" }}>
+                            <strong>Data Fetched At:</strong>{" "}
+                            {marker.updated_at
+                              ? `${timeService.utcToist(
+                                  marker.updated_at,
+                                  "dd-MMM"
+                                )} ${timeService.utcToistTime(
+                                  marker.updated_at,
+                                  "HH:mm"
+                                )}`
+                              : "N/A"}
+                          </p>
+                          <p style={{ margin: "2px 0" }}>
+                            <strong>ETA:</strong>{" "}
+                            {marker.expd_arvl_time
+                              ? `${timeService.utcToist(
+                                  marker.expd_arvl_time,
+                                  "dd-MMM"
+                                )} ${timeService.utcToistTime(
+                                  marker.expd_arvl_time,
+                                  "HH:mm"
+                                )}`
+                              : "N/A"}
+                          </p>
+                          <p style={{ margin: "2px 0" }}>
+                            <strong>Commodity:</strong>{" "}
+                            {marker.commodity && marker.commodity.length > 0
+                              ? marker.commodity.join(", ")
+                              : "N/A"}
+                          </p>
+                          <p style={{ margin: "2px 0" }}>
+                            <strong>Remaining Distance:</strong>{" "}
+                            {marker.rmng_km ? marker.rmng_km : "N/A"} km
+                          </p>
                         </div>
-                      </Popup>
-                    </Marker>
-                  );
-                })}
+                      </div>
+                    </Popup>
+                  </Marker>
+                );
+              })}
             </MapContainer>
           </div>
         </div>
