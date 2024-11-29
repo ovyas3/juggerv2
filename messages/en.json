@@ -35,7 +35,9 @@
    "wagons":"Wagons",
    "withLoad":"With Load",
    "withoutLoad":"Empty",
-   "mapView":"Map View"
+   "mapView":"Map View",
+   "updateAgreementID":"Update Agreement ID",
+   "foisDetails":"FOIS Details"
   },
   "HEADER":{
     "shipments":"Shipments",
@@ -291,6 +293,20 @@
     "rate":"Rate Us",
     "submit":"Submit",
     "deleteContactHeader":"Delete Contact"
+  },
+  "SETTINGS": {
+   "statusCodes":[
+      {
+        "code": "MT",
+        "status": "Empty",
+        "description": "The wagon is empty and ready for loading."
+      },
+      {
+        "code": "LD",
+        "status": "Loaded",
+        "description": "The wagon has been loaded with goods."
+      }
+    ]
   }
 
 }

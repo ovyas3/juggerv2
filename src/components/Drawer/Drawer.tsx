@@ -3,243 +3,172 @@
 import Image from 'next/image';
 import './Drawer.css'
 import defaultLogo from '@/assets/logo_default_icon.svg';
-// import fnrIcon from '@/assets/active_fnr_dashboard_icon.svg'
-import contactIcon from '@/assets/inactive_contact_dashboard+icon.svg'
-import { useEffect, useState } from 'react';
-import TrainIcon from '@mui/icons-material/Train';
-import SupportAgentIcon from '@mui/icons-material/SupportAgent';
-import DashboardIcon from '@mui/icons-material/Dashboard';
+import fullLogo from '@/assets/Smartruck_hover_logo.svg'
 import StationManagementActive from '../../assets/station_management_active_icon.svg';
 import StationManagementInactive from '../../assets/station_management_inactive_icon.svg';
-import { useRouter, usePathname } from 'next/navigation';
-import fullLogo from '@/assets/Smartruck_hover_logo.svg'
 import HandlingAgentInactive from '@/assets/handling_agent_inactive_icon.svg';
 import handlingAgentActive from '@/assets/handling_agent_active_icon.svg'
+import { useEffect, useState } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
+import TrainIcon from '@mui/icons-material/Train';
+import DashboardIcon from '@mui/icons-material/Dashboard';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import SettingsIcon from '@mui/icons-material/Settings';
 import AllInboxIcon from '@mui/icons-material/AllInbox';
 import WarehouseIcon from '@mui/icons-material/Warehouse';
 import ContactPageIcon from '@mui/icons-material/ContactPage';
-import ArrowRightIcon from '@mui/icons-material/ArrowRight';
+
+interface NavItem {
+    id: string;
+    label: string;
+    icon: any;
+    activeIcon?: string;
+    inactiveIcon?: string;
+    isImageIcon?: boolean;
+}
+
+const navigationItems: NavItem[] = [
+    { id: 'orders', label: 'Shipments', icon: TrainIcon },
+    { id: 'dashboard', label: 'Captive Rakes', icon: DashboardIcon },
+    { 
+        id: 'stationManagement', 
+        label: 'Station Management', 
+        icon: '',
+        activeIcon: StationManagementActive,
+        inactiveIcon: StationManagementInactive,
+        isImageIcon: true 
+    },
+    { 
+        id: 'handlingAgent', 
+        label: 'Handling Agent', 
+        icon: '',
+        activeIcon: handlingAgentActive,
+        inactiveIcon: HandlingAgentInactive,
+        isImageIcon: true 
+    },
+    { id: 'etaReport', label: 'Reports', icon: AssessmentIcon },
+    { id: 'settings', label: 'Settings', icon: SettingsIcon },
+    { id: 'etaDashboard', label: 'Dashboard', icon: AllInboxIcon },
+    { id: 'inPlantDashboard', label: 'In-Plant Dashboard', icon: WarehouseIcon },
+    { id: 'contact', label: 'Contact Dashboard', icon: ContactPageIcon },
+    // { id: 'captiveRakeMapView', label: 'Captive Rakes Management', icon: TrainIcon }
+];
+
+const NavItem = ({ 
+    item, 
+    isActive, 
+    isHovered, 
+    isOpen, 
+    onClick, 
+    onMouseEnter, 
+    onMouseLeave 
+}: {
+    item: NavItem;
+    isActive: boolean;
+    isHovered: boolean;
+    isOpen: boolean;
+    onClick: () => void;
+    onMouseEnter: () => void;
+    onMouseLeave: () => void;
+}) => {
+    const isHighlighted = isActive || isHovered;
+    const Icon = item.icon;
+
+    return (
+        <div
+            onClick={onClick}
+            onMouseEnter={onMouseEnter}
+            onMouseLeave={onMouseLeave}
+            className='station-code'
+            style={{
+                width: isOpen ? '190px' : '42px',
+                justifyContent: isOpen ? 'start' : 'center',
+                backgroundColor: isHighlighted ? 'white' : '',
+                cursor: 'pointer'
+            }}
+        >
+            {item.isImageIcon ? (
+                <Image
+                    src={isHighlighted ? item.activeIcon! : item.inactiveIcon!}
+                    alt={item.label}
+                    style={{ 
+                        marginLeft: isOpen ? '10px' : '2px',
+                        color: isHighlighted ? 'black' : 'white'
+                    }}
+                />
+            ) : (
+                <Icon 
+                    style={{ 
+                        marginLeft: isOpen ? '9px' : '', 
+                        color: isHighlighted ? 'black' : 'white' 
+                    }}
+                />
+            )}
+            <div
+                className={`${isOpen ? 'fnr_text' : 'fnr_text_none'}`}
+                style={{ color: isHighlighted ? 'black' : 'white' }}
+            >
+                {item.label}
+            </div>
+        </div>
+    );
+};
 
 function SideDrawer() {
     const [open, setOpen] = useState(false);
-    const [activeContact, setActiveContact] = useState(false);
-    const [station, setStation] = useState(false);
-    const [active, setActive] = useState('orders')
+    const [active, setActive] = useState('orders');
+    const [hoveredId, setHoveredId] = useState<string | null>(null);
     const router = useRouter();
-    const [handleAgent, setHandleAgent] = useState(false);
-    const [etaReport, setEtaReport] = useState(false);
-    const [dashboard, setDashboard] = useState(false);
-    const [setting, setSetting] = useState(false);
-    const [showSubMenu, setShowSubMenu] = useState(false);
-    const [inPlantWagonDashboard, setInPlantWagonDashboard] = useState(false);
-    const [contactDashboard, setContactDashboard] = useState(false);
- 
     const pathName = usePathname();
+
     const handleRouting = (route: string) => {
-        console.log(route)
-        router.push('/' + route)
-        setActive(route)
+        router.push('/' + route);
+        setActive(route);
     };
 
     useEffect(() => {
-        const currentRoute = pathName.split('/')[1]
-        console.log(currentRoute)
-        setActive(currentRoute)
-    }, []);
+        const currentRoute = pathName.split('/')[1];
+        setActive(currentRoute);
+    }, [pathName]);
 
     return (
         <div 
             className='containerDrawer' 
-            onMouseEnter={() => { setOpen(true) }} 
-            onMouseLeave={() => { setOpen(false) }} 
+            onMouseEnter={() => setOpen(true)} 
+            onMouseLeave={() => setOpen(false)} 
             style={{ 
                 alignItems: 'start', 
                 width: open ? '218px' : '70px', 
                 transition: 'width 0.2s ease-in'
-             }}>
-            <div className='img'><Image src={open ? fullLogo : defaultLogo} alt='' style={{ height:'56px', marginLeft:open ? '23px' : '0px'}} /></div>
-            
-            <div 
-                className='fnr-icon' onClick={() => handleRouting('orders')} 
-                style={{ 
-                    width: open ? '190px' : '42px', 
-                    transition: 'width 0.2s ease-in', 
-                    backgroundColor: (active == 'orders' || active == 'shipment_map_view') ? 'white' : '', 
-                    cursor: 'pointer' 
-                }}>
-                <TrainIcon style={{ marginLeft: '9px', color: (active == 'orders' || active == 'shipment_map_view') ? 'black' : 'white' }} />
-                <div className={`${open ? 'fnr_text' : 'fnr_text_none'}`} 
-                    style={{ color: (active == 'orders' || active == 'shipment_map_view') ? 'black' : 'white' }} >Shipments
-                </div>
-            </div>
-
-            <div 
-                onMouseEnter={() => { setActiveContact(true) }} 
-                onMouseLeave={() => { setActiveContact(false) }} 
-                onClick={() => handleRouting('dashboard')} 
-                className='contact-icon' 
-                style={{ 
-                    width: open ? '190px' : '42px',
-                    justifyContent: open ? 'start' : 'center',
-                    backgroundColor: ((active == 'dashboard') || activeContact) ? 'white' : '',
-                    cursor: 'pointer' }}
-            >
-                <DashboardIcon style={{ marginLeft: open ? '9px' : '', color: ((active == 'dashboard') || activeContact) ? 'black' : 'white' }} />
-                <div 
-                    className={`${open ? 'fnr_text' : 'fnr_text_none'}`} 
-                    style={{ color: ((active == 'dashboard') || activeContact) ? 'black' : 'white' }} >
-                        Captive Rakes
-                </div>
-            </div>
-
-            <div 
-                onMouseEnter={() => { setStation(true) }}
-                onMouseLeave={() => { setStation(false) }}
-                onClick={() => handleRouting('stationManagement')}
-                className='station-code'
-                style={{ 
-                    width: open ? '190px' : '42px',
-                    justifyContent: open ? 'start' : 'center',
-                    backgroundColor: ((active === 'stationManagement') || station) ? 'white' : '',
-                    cursor: 'pointer'
-                }}
-            >
+            }}
+        >
+            <div className='img'>
                 <Image 
-                    src={ (active === 'stationManagement' || station) ?  StationManagementActive : StationManagementInactive} alt='stationManagementIcon'  
-                    style={{ marginLeft: open ? '9px' : '', color: ((active == 'stationManagement') || station) ? 'black' : 'white' }}/>
-                <div 
-                    className={`${open ? 'fnr_text' : 'fnr_text_none'}`}
-                    style={{ color: ((active === 'stationManagement') || station) ? 'black' : 'white' }} >
-                        Station Management
-                </div>
-            </div>
-
-            <div 
-                onMouseEnter={() => { setHandleAgent(true) }}
-                onMouseLeave={() => { setHandleAgent(false) }}
-                onClick={() => handleRouting('handlingAgent')}
-                className='station-code'
-                style={{ 
-                    width: open ? '190px' : '42px',
-                    justifyContent: open ? 'start' : 'center',
-                    backgroundColor: ((active === 'handlingAgent') || handleAgent) ? 'white' : '',
-                    cursor: 'pointer'
-                }}
-            >
-                <Image 
-                    src={ (active === 'handlingAgent' || handleAgent) ?  handlingAgentActive : HandlingAgentInactive} alt='stationManagementIcon'  
-                    style={{ marginLeft: open ? '10px' : '2px', color: ((active == 'handlingAgent') || handleAgent) ? 'black' : 'white'}}/>
-                <div 
-                    className={`${open ? 'fnr_text' : 'fnr_text_none'}`}
-                    style={{ color: ((active === 'handlingAgent') || handleAgent) ? 'black' : 'white' }} >
-                        Handling Agent
-                </div>
-            </div>
-
-            <div
-                onMouseEnter={()=>{ setEtaReport(true) }}
-                onMouseLeave={()=>{ setEtaReport(false) }}
-                onClick={() => handleRouting('etaReport')}
-                className='station-code'
-                style={{
-                    width: open ? '190px' : '42px',
-                    justifyContent: open ? 'start' : 'center',
-                    backgroundColor: ((active == 'etaReport') || etaReport) ? 'white' : '',
-                    cursor: 'pointer'
-                }}
-            >
-                <AssessmentIcon style={{ marginLeft: open ? '9px' : '', color: ((active == 'etaReport') || etaReport) ? 'black' : 'white' }}/>
-                <div
-                    className={`${open ? 'fnr_text' : 'fnr_text_none'}`}
-                    style={{ color: ((active == 'etaReport') || etaReport) ? 'black' : 'white' }} 
-                >Reports</div>
-            </div>
-            <div
-                onMouseEnter={() => { setSetting(true);}}
-                onMouseLeave={() => { setSetting(false); }}
-                onClick={() => handleRouting('settings')}
-                className="station-code"
-                style={{
-                    width: open ? '190px' : '42px',
-                    justifyContent: open ? 'start' : 'center',
-                    backgroundColor: ((active == 'settings') || setting) ? 'white' : '',
-                    cursor: 'pointer',
-                }}
-            >
-                <SettingsIcon style={{ 
-                    marginLeft: open ? '9px' : '', 
-                    color: ((active == 'settings') || setting) ? 'black' : 'white' }}
+                    src={open ? fullLogo : defaultLogo} 
+                    alt='logo'
+                    style={{ 
+                        height: '56px', 
+                        marginLeft: open ? '23px' : '0px',
+                        marginBottom: '10px'
+                    }} 
+                    onClick={() => handleRouting('welcome')}
                 />
-                <div 
-                    className={`${open ? 'fnr_text' : 'fnr_text_none'}`}
-                    style={{color: ((active == 'settings') || setting) ? 'black' : 'white' }} 
-                >Settings</div>
-                
             </div>
 
-            <div
-                onMouseEnter={()=>{ setDashboard(true) }}
-                onMouseLeave={()=>{ setDashboard(false) }}
-                onClick={() => handleRouting('etaDashboard')}
-                className='station-code'
-                style={{
-                    width: open ? '190px' : '42px',
-                    justifyContent: open ? 'start' : 'center',
-                    backgroundColor: ((active == 'etaDashboard') || dashboard) ? 'white' : '',
-                    cursor: 'pointer'
-                }}
-            >
-                <AllInboxIcon style={{ marginLeft: open ? '9px' : '', color: ((active == 'etaDashboard') || dashboard) ? 'black' : 'white' }}/>
-                <div
-                    className={`${open ? 'fnr_text' : 'fnr_text_none'}`}
-                    style={{ color: ((active == 'etaDashboard') || dashboard) ? 'black' : 'white' }} 
-                >Dashboard</div>
-            </div>
-
-            <div
-                 onMouseEnter={()=>{ setInPlantWagonDashboard(true) }}
-                 onMouseLeave={()=>{ setInPlantWagonDashboard(false) }}
-                 onClick={() => handleRouting('inPlantDashboard')}
-                 className='station-code'
-                 style={{
-                     width: open ? '190px' : '42px',
-                     justifyContent: open ? 'start' : 'center',
-                     backgroundColor: ((active == 'inPlantDashboard') || inPlantWagonDashboard) ? 'white' : '',
-                     cursor: 'pointer'
-                 }}
-            >
-                <WarehouseIcon style={{ marginLeft: open ? '9px' : '', color: ((active == 'inPlantDashboard') || inPlantWagonDashboard) ? 'black' : 'white' }}/>
-                <div
-                    className={`${open ? 'fnr_text' : 'fnr_text_none'}`}
-                    style={{ color: ((active == 'inPlantDashboard') || inPlantWagonDashboard) ? 'black' : 'white' }} 
-                >In-Plant Dashboard</div>
-            </div>
-
-             <div
-                 onMouseEnter={()=>{ setContactDashboard(true) }}
-                 onMouseLeave={()=>{ setContactDashboard(false) }}
-                 onClick={() => handleRouting('contact')}
-                 className='station-code'
-                 style={{
-                     width: open ? '190px' : '42px',
-                     justifyContent: open ? 'start' : 'center',
-                     backgroundColor: ((active == 'contact') || contactDashboard) ? 'white' : '',
-                     cursor: 'pointer'
-                 }}
-            >
-                <ContactPageIcon style={{ marginLeft: open ? '9px' : '', color: ((active == 'contact') || contactDashboard) ? 'black' : 'white' }}/>
-                <div
-                    className={`${open ? 'fnr_text' : 'fnr_text_none'}`}
-                    style={{ color: ((active == 'contact') || contactDashboard) ? 'black' : 'white' }} 
-                >Contact Dashboard</div>
-            </div>
-            
-
+            {navigationItems.map((item) => (
+                <NavItem
+                    key={item.id}
+                    item={item}
+                    isActive={active === item.id}
+                    isHovered={hoveredId === item.id}
+                    isOpen={open}
+                    onClick={() => handleRouting(item.id)}
+                    onMouseEnter={() => setHoveredId(item.id)}
+                    onMouseLeave={() => setHoveredId(null)}
+                />
+            ))}
         </div>
     );
-
 }
 
 export default SideDrawer;

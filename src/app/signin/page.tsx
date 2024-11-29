@@ -5,7 +5,7 @@ import "./page.css";
 import Image from "next/image";
 import Logo from "../../assets/logo.svg";
 import { useState } from "react";
-import { httpsPost } from "@/utils/Communication";
+import { httpsGet, httpsPost } from "@/utils/Communication";
 import { useRouter } from "next/navigation";
 import { handleAuthentication } from "@/services/Authenticator/Auth";
 import showPassword from "@/assets/show_password.svg";
@@ -18,6 +18,15 @@ const Signin = () => {
   const [password, setPassword] = useState("");
   const router = useRouter();
   const [hidePasswordFlag, setHidePasswordFlag] = useState(true);
+
+
+  async function getPreferences() {
+    const response = await httpsGet('/get_preferences', 0, router)
+    if(response.statusCode === 200) {
+      const preferences = response.data?.constant
+      localStorage.setItem('preferences',JSON.stringify(preferences))
+    } 
+  }
 
   const handleLogin = () => {
     const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -37,7 +46,8 @@ const Signin = () => {
             response.data
           );
           if (signedIn) {
-            router.push("/orders");
+            getPreferences()
+            router.push("/inPlantDashboard");
           }
         } else {
           showMessage(response.message, "error");

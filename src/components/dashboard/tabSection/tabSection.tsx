@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { httpsGet } from "@/utils/Communication";
 import { Tab, Box } from "@mui/material";
 import "./tabSection.css";
@@ -8,25 +8,63 @@ import { TabContext, TabList, TabPanel } from "@mui/lab";
 import TrackingStatus from "../status/trackingStatus";
 import { Popup } from "@/components/Popup/popup";
 import { useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
-import MapView from "../mapView/mapView";
+import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import uploadIcon from '@/assets/uploadIcon.svg';
 import UploadModel from "./tabSectionAction/UploadModel";
+import UpdateAgreementID from "./tabSectionAction/UpdateAgreementID";
+import dynamic from 'next/dynamic';
+import Placeholder from '@/components/MapView/Skeleton/placeholder';
 
+// Dynamic imports with loading placeholder
+const MapView = dynamic(
+  () => import('../mapView/mapView'),
+  { 
+    loading: () => <Placeholder />,
+    ssr: false 
+  }
+);
 
-const Tabsection = () => {
+const CaptiveRakeMapView = dynamic(
+  () => import('@/components/captiveRakeMapView/captiveRakeMapView'),
+  { 
+    loading: () => <Placeholder />,
+    ssr: false 
+  }
+);
+
+interface TabSectionProps {
+  initialTab?: string;
+}
+
+const Tabsection: React.FC<TabSectionProps> = ({ initialTab }) => {
   const router = useRouter();
-  const [value, setValue] = useState("1");
+  const searchParams = useSearchParams();
+  const [value, setValue] = useState(initialTab || "1");
   const [data, setData] = useState<any>([]);
   const [statusInfo, setStatusInfo] = useState<string>('');
   const [statusNumber, setStatusNumber] = useState<number>(0);
   const [helpCenterBtnHovered, setHelpCenterBtnHovered] = useState(false);
-  const t = useTranslations("DASHBOARD");
   const [openUploadModel, setOpenUploadModel] = useState(false);
+  const [updateAgreementModel, setUpdateAgreementModel] = useState(false);
+  const t = useTranslations("DASHBOARD");
+
+  useEffect(() => {
+    // Check for tab parameter in URL
+    const tabFromUrl = searchParams.get('tab');
+    if (tabFromUrl) {
+      setValue(tabFromUrl);
+    } else if (initialTab) {
+      setValue(initialTab);
+    }
+  }, [initialTab, searchParams]);
 
   const handleChange = (event: React.ChangeEvent<{}>, newValue: string) => {
     setValue(newValue);
+    // Update URL with new tab value
+    const url = new URL(window.location.href);
+    url.searchParams.set('tab', newValue);
+    window.history.pushState({}, '', url);
   };
 
   const handleAllRakesAndTable = async (props: any) => {
@@ -101,12 +139,16 @@ const Tabsection = () => {
                 <TabList onChange={handleChange}>
                   <Tab label={t("railOverview")} value="1" />
                   <Tab label={t("mapView")} value="2" />
+                  <Tab label={t("foisDetails")} value="3" />
                 </TabList>
               </Box>
              <TabPanel value="1" className="tabpanel-container" style={{position:'relative'}}>
-                <div onClick={()=>setOpenUploadModel(!openUploadModel)} id='uploadFiles' style={{paddingInline:'10px', cursor:'pointer' , gap:'8px', borderRadius:'6px' ,display:'flex', alignItems:'center', position:'absolute', top:8, right:30, width:'fit-content', height:'fit-content', zIndex:'1', backgroundColor:'#E6EAFF', color:"#3351FE"}}>
-                <div><Image src={uploadIcon.src} height={24} width={24} alt='upload' style={{marginTop:'8px'}} /></div>
-                <div>Upload Files</div>
+                <div onClick={()=>setOpenUploadModel(!openUploadModel)} id='uploadFiles' style={{paddingInline:'10px', cursor:'pointer' , gap:'8px', borderRadius:'6px' ,display:'flex', alignItems:'center', position:'absolute', top:8, right:30, width:'fit-content', height:'fit-content', zIndex:'1', backgroundColor:'#E6EAFF', color:"#3351FE", fontSize:'12px'}}>
+                  <div><Image src={uploadIcon.src} height={24} width={24} alt='upload' style={{marginTop:'4px'}} /></div>
+                  <div>Upload Files</div>
+                </div>
+                <div onClick={()=>{setUpdateAgreementModel(!updateAgreementModel)}} style={{paddingInline:'10px', paddingBlock:'8px',fontSize:'12px', cursor:'pointer' , gap:'8px', borderRadius:'6px' ,display:'flex', alignItems:'center', position:'absolute', top:8, right:160, width:'fit-content', height:'fit-content', zIndex:'1', backgroundColor:'#E6EAFF', color:"#3351FE"}}>
+                  <text>{t("updateAgreementID")}</text>
                 </div>
                 <div className="tabpanel-contents">
                   <div className="tracking-status-dashboard">
@@ -122,6 +164,7 @@ const Tabsection = () => {
                   <div className="popup-container">
                   {data && <Popup data={data} handleSchemeTypeAndTable={handleSchemeTypeAndTable}/>}
                   {openUploadModel && <UploadModel  setOpenUploadModel={setOpenUploadModel}/>}
+                  {updateAgreementModel && <UpdateAgreementID  setUpdateAgreementModel={setUpdateAgreementModel}/>}
                   </div>
                 </div>
               </TabPanel>
@@ -132,6 +175,15 @@ const Tabsection = () => {
                   overflow: 'auto',
                 }}>
                   <MapView />
+                </div>
+              </TabPanel>
+              <TabPanel value="3" className="tabpanel-container">
+                <div style={{
+                  width: '100%',
+                  height: '80vh',
+                  overflow: 'auto',
+                }}>
+                  <CaptiveRakeMapView />
                 </div>
               </TabPanel>
             </TabContext>

@@ -16,12 +16,14 @@ import { httpsGet, httpsPost } from "@/utils/Communication";
 import "./style.css";
 import { useRouter } from "next/navigation";
 import { ThreeCircles } from "react-loader-spinner";
+import { useMediaQuery, useTheme } from '@mui/material';
 
 function Report() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const { showMessage } = useSnackbar();
-  const mobile = useWindowSize(500);
+  const theme = useTheme();
+  const mobile = useMediaQuery(theme.breakpoints.down('md'));
   const [reportType, setReportType] = React.useState("");
   const [fromDate, setFromDate] = React.useState(-1);
   const [toDate, setToDate] = React.useState(-1);
@@ -80,8 +82,10 @@ function Report() {
   }
 
   return (
-    <div className="handlingAgent_Container">
-      {mobile ? (
+    <div 
+      className="handlingAgent_Container"
+    >
+      {!mobile ? (
         <Header title={"Reports"} isMapHelper={false} />
       ) : (
         <MobileHeader />
@@ -89,7 +93,7 @@ function Report() {
 
       <div
         className={`content_container ${
-          mobile ? "adjustMargin" : "adjustMarginMobile"
+          !mobile ? "adjustMargin" : "adjustMarginMobile"
         }`}
       >
         <div className="report_type">
@@ -201,10 +205,10 @@ function Report() {
         </div>
       </div>
 
-      {mobile ? (
+      {!mobile ? (
         <SideDrawer />
       ) : (
-        <div className="bottom_bar">
+        <div >
           <MobileDrawer />
         </div>
       )}

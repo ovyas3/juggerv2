@@ -8,7 +8,7 @@ import ProfileDrop from '@/components/Header/proFileDrop'
 export default function MobileHeader() {
     return (
         <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', paddingRight:'24px',
-            border :'1px solid #DFE3EB'
+            border :'1px solid #DFE3EB', height:'56px', backgroundColor:'white',position:'fixed', top:'0', left:'0', zIndex:'1', width:'100%'
         }}>
             <div style={{ display: 'flex', alignItems: 'center' }}>
                 <div><Image src={defaultLogo} alt='' /></div>

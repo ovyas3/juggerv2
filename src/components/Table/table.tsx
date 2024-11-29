@@ -60,6 +60,7 @@ import { environment } from '@/environments/env.api';
 import { useRouter } from 'next/navigation';
 import { MarkComplete } from './tableComp';
 import ImportContactsIcon from '@mui/icons-material/ImportContacts';
+import { useMediaQuery, useTheme } from '@mui/material';
 
 const status_class_map: { [key: string]: string } = {
     'OB': 'status_title_In_Plant',
@@ -68,7 +69,8 @@ const status_class_map: { [key: string]: string } = {
     'ITNS': 'status_title_In_Transit',
     'Delivered': 'status_title_Delivered',
     'INPL': 'status_title_INPL',
-    "stabled": 'status_title_stabled'
+    "stabled": 'status_title_stabled',
+    "CNCL": 'status_title_CNCL'
 }
 
 const convertArrayToFilteredArray = (inputArray: any, shipmentPayloads: any) => {
@@ -107,8 +109,9 @@ const convertArrayToFilteredArray = (inputArray: any, shipmentPayloads: any) => 
             drawnout_time:any,
             captive:any,
             fois_updated_at:any,
+            materials?: any
         }) => {
-        const { edemand_no,captive,fois_updated_at, FNR,placement_time,indent_no, drawnout_time, all_FNRs,rr_dates, delivery_location, trip_tracker, others, remarks, unique_code, status, pickup_date, captive_id, is_captive, eta, rr_document, polyline, past_etas, no_of_wagons, received_no_of_wagons, demand_date, paid_by, commodity_desc, expected_loading_date, HA } = item;
+        const { edemand_no,captive,fois_updated_at, FNR,placement_time,indent_no, drawnout_time, all_FNRs,rr_dates, delivery_location, trip_tracker, others, remarks, unique_code, status, pickup_date, captive_id, is_captive, eta, rr_document, polyline, past_etas, no_of_wagons, received_no_of_wagons, demand_date, paid_by, commodity_desc, expected_loading_date, HA, materials } = item;
         let newDemandDate = new Date(demand_date);
         newDemandDate.setHours(newDemandDate.getHours() - 5);
         newDemandDate.setMinutes(newDemandDate.getMinutes() - 30);
@@ -142,6 +145,7 @@ const convertArrayToFilteredArray = (inputArray: any, shipmentPayloads: any) => 
             material: {
                 name: others.demandedCommodity || '--',
             },
+            materials: materials,
             pickupdate: {
                 date: service.utcToist(pickup_date) || '--',
                 pickupTime: service.utcToistTime(pickup_date) || '--'
@@ -206,6 +210,8 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
     //language controller
     const t = useTranslations("ORDERS")
     const router = useRouter();
+    const theme = useTheme();
+    const mobile = useMediaQuery(theme.breakpoints.down('sm'));
 
     //pagination
     const [page, setPage] = React.useState(0);
@@ -505,9 +511,10 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
 
     return (
         <div 
+        id='outBoundTableContainer'
         style={{
             width: "100%",
-            height: "calc(100vh - 200px)",
+            height: !mobile ? "calc(100vh - 200px)" : "calc(100vh - 400px)",
             display: "flex",
             flexDirection: "column",
             paddingTop:'25px'

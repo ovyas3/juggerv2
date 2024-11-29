@@ -35,7 +35,7 @@ import { redirect, useRouter, useParams } from "next/navigation";
 import { ThreeCircles } from "react-loader-spinner";
 import uploadIcon from '@/assets/uploadIcon.svg';
 import Tooltip from '@mui/material/Tooltip';
-
+import { useSearchParams } from 'next/navigation';
 
 
 interface Column {
@@ -153,16 +153,21 @@ function contructingData(shipment: any) {
   );
 }
 function WagonTallySheet({}: any) {
+  const searchParams = useSearchParams()
   const text = useTranslations("WAGONTALLYSHEET");
   const [allWagonsList, setAllWagonsList] = useState([]);
   const [totalCount, setTotalCount] = useState(0);
   const [page, setPage] = useState(0);
-  const [indentNo, setIndentNo] = useState("");
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const indent_no_from_params = searchParams.get('indent_no')
+  const [indentNo, setIndentNo] = useState(
+    indent_no_from_params ? indent_no_from_params : ''
+  );
   const [payloadForWagons, setPayloadForWagons] = useState<any>({
     skip: 0,
     limit: 10,
     status: ["AVE", "INPL"],
+    ...(indent_no_from_params && { indent_no:indent_no_from_params }),
   });
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(
     null
@@ -385,11 +390,25 @@ function WagonTallySheet({}: any) {
     return { bgColor, textColor };
   };
 
-  // useEffect
-  useEffect(() => {
+  useEffect(()=>{
     getWagonDetails();
-  }, [payloadForWagons]);
+  },[payloadForWagons])
 
+  useEffect(() => {
+    const indentNoFromParams = searchParams.get("indent_no");
+    setIndentNo(indentNoFromParams || "");
+  
+    setPayloadForWagons((prev: any) => {
+      if (indentNoFromParams?.length) {
+        return { ...prev, indent_no: indentNoFromParams };
+      } else {
+        const { indent_no, ...rest } = prev;
+        return rest;
+      }
+    });
+
+  }, [searchParams]);
+  
   useEffect(() => {
     setPayloadForWagons((pre: any) => {
       return {
@@ -400,14 +419,6 @@ function WagonTallySheet({}: any) {
     });
   }, [page, rowsPerPage]);
 
-  useEffect(() => {
-    if (!indentNo) {
-      setPayloadForWagons((pre: any) => {
-        const { indent_no, ...rest } = pre;
-        return rest;
-      });
-    }
-  }, [indentNo]);
 
   if (loading) {
     return (
@@ -434,6 +445,7 @@ function WagonTallySheet({}: any) {
             <input
               className="input"
               placeholder="Search by Indent no."
+              value={indentNo}
               onChange={(e) => setIndentNo(e.target.value)}
             />
             <Image
@@ -441,10 +453,11 @@ function WagonTallySheet({}: any) {
               alt=""
               className="icon"
               onClick={() => {
-                setPayloadForWagons({
-                  ...payloadForWagons,
-                  indent_no: indentNo,
-                });
+                if(indentNo) {
+                  router.push(`/inPlantDashboard?indent_no=${indentNo}`)
+                } else {
+                  router.push(`/inPlantDashboard`)
+                }
               }}
               style={{ cursor: "pointer" }}
             />

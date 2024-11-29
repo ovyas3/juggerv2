@@ -1,0 +1,18 @@
+#closeContaionerUpdateAgreementID{
+    background-color: white;
+    height: 40px;
+    width: 40px;
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    right: 0;
+    top: -50px;
+    cursor: pointer;
+    z-index: 1000;
+    transition: all 1s ease-in-out;
+}
+#closeContaionerUpdateAgreementID:hover{
+    rotate: 180deg;
+}

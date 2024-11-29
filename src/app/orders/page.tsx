@@ -25,6 +25,7 @@ import Image from 'next/image';
 import uploadIcon from '@/assets/uploadIcon.svg';
 import { motion } from 'framer-motion';
 import { UploadWagonSheet } from '@/components/Table/tableComp';
+import { useMediaQuery, useTheme } from '@mui/material';
 
 const getStatusCode = (status: string): string => {
   switch (status) {
@@ -67,12 +68,12 @@ const getRakeTypeCode = (rakeTypes: string): string => {
 
 const OrdersPage = () => {
   const t = useTranslations('ORDERS');
-  const mobile = useWindowSize(500);
+  const theme = useTheme();
+  const mobile = useMediaQuery(theme.breakpoints.down('sm'));
   const tablePagination = useWindowSize(1300);
   const [allShipment, setAllShipment] = useState([]);
   const [count, setCount] = useState(0);
   const [rakeCaptiveList, setRakeCaptiveList] = useState([]);
-
   const [reload, setReload] = useState(false)
   const [reloadOnHeaderChange, setReloadOnHeaderChange] = useState(false);
   const { showMessage } = useSnackbar();
@@ -269,6 +270,13 @@ const OrdersPage = () => {
             textTextColor = '#536AFE'; 
           }
           break;
+        case "CNCL":
+          if (statuses.includes('CNCL') ) {
+            backgroundColor = '#FF5C5C1F';
+            countTextColor = '#FF5C5C'; 
+            textTextColor = '#FF5C5C'; 
+          }
+          break;
       default:
         backgroundColor = '#FFFFFF';
         countTextColor = '#42454E';
@@ -346,6 +354,18 @@ const OrdersPage = () => {
           return newState;
         });
         break;
+      case "CNCL":
+        setShipmentsPayload((prevState: any) => {
+          let newState = { ...prevState };
+          if(!newState.status.includes('CNCL')){
+            newState.status = [...newState.status, 'CNCL'];
+            setStatus(newState.status);
+          }else{
+            newState.status = newState.status.filter((item: string) => item !== 'CNCL');
+            setStatus(newState.status);
+          }
+          return newState;
+        })
       default:
         break;
     }
@@ -368,27 +388,27 @@ const OrdersPage = () => {
   const cancelledCount = totalCountrake[0]?.statuses?.find((item: any) => item.status === "CNCL")?.count || 0;
 
   const [openUploadFile, setOpenUploadFile] = useState(false);
-
   return (
     <div>
       <div className='orderContainer'>
         <div style={{ width: '100%', overflowX: 'auto' }}>
-          {mobile ? <Header title={'Shipments'} setReloadOnHeaderChange={setReloadOnHeaderChange} isMapHelper={false} /> : <MobileHeader />}
+          {!mobile ? <Header title={'Shipments'} setReloadOnHeaderChange={setReloadOnHeaderChange} isMapHelper={false} /> : <MobileHeader />}
           <div
             className='tableContainer'
             style={{
-              paddingInline: 24,
-              paddingTop: 10,
-              paddingBottom: mobile ? 24 : 65,
+              marginTop: 56,
               position: 'relative',
-              marginTop: mobile ? '56px' : '24px',
-              marginLeft: mobile ? '70px' : '0px',
-              height: 'calc(100vh - 56px)'
+              marginLeft: !mobile ? 70 : 0,
+              height:'calc(100vh - 56px)',
+              paddingInline:24,
+              paddingTop: 12,
+              paddingBottom: !mobile ? 70 : 0,
             }}
           >
 
-            <div className='outbound_inbound_ageing'>
-              {mobile ? <div className='outbound_inbound'>
+             <div className='outbound_inbound_ageing'>
+
+              {!mobile ? <div className='outbound_inbound'>
                 {['outbound', 'inbound'].map(bound => (
                   <div
                     key={bound}
@@ -400,10 +420,12 @@ const OrdersPage = () => {
                 ))}</div>
                 :
                 <div className='mobile_outbound_inbound'>
-                  <div className='mobile_outbound'>{t('outbound')}</div>
+                  <div className={selected_bound === 'outbound' ? 'underLine':""} style={{fontSize:14, width:100, textAlign:'center', paddingBottom:12}} onClick={() => setSelected_bound('outbound')}>Outbound</div>
+                  <div className={selected_bound === 'inbound' ? 'underLine' : ''} style={{width:100,fontSize:14, textAlign:'center'}} onClick={() => setSelected_bound('inbound')}>Inbound</div>
                 </div>
               }
-              <div id='uploadFile_refreash'>
+
+             { !mobile && <div id='uploadFile_refreash'>
                 <motion.div id='uploadButton'
                    whileHover={{ scale: 0.95 }}
                    whileTap={{ scale: 0.9 }}
@@ -432,15 +454,18 @@ const OrdersPage = () => {
                   <div className='refreash_reload' style={{ opacity: showRefreash ? 1 : 0 }}>refresh filters</div>
                 </div>
               </div>
-              </div>
+              </div>}
+
             </div>
 
-            <div className='filter_aging_table_display' style={{display:selected_bound==='inbound'?'none':'block'}}>
+            {selected_bound === 'outbound' && <div className='filter_aging_table_display'>
 
               <div className='filters_aging'>
-                <div className='filters' style={{ overflowX: 'auto', maxWidth: '87%' }}>
+
+                <div className='filters'>
                   <Filters onToFromChange={handleToFromChange} onChangeStatus={handleChangeStatus} onChangeRakeTypes={handleChangeRakeType} reload={reload} getShipments={getAllShipment} shipmentsPayloadSetter={setShipmentsPayload} setTriggerShipments={setTriggerShipments} triggerShipments={triggerShipments} />
                 </div>
+
                 <div className='display_status'>
                     <div className='display_status_inner_box' style={{
                       backgroundColor: (status.includes('AVE') && status.includes('ITNS')  && status.includes('Delivered')  && status.includes('INPL') ) ? '#000000' : '#FFFFFF',
@@ -464,11 +489,12 @@ const OrdersPage = () => {
                       <div style={{fontSize:20, fontWeight:500, color: getStatusColor(status, 'Delivered').countTextColor}}><CountUp duration={1.5} end={deliveredCount}/></div>
                       <div style={{fontSize:12, color: getStatusColor(status, 'Delivered').textTextColor}}>{t('Delivered')}</div>
                     </div>
-                    <div className='display_status_inner_box' style={{cursor:'pointer', backgroundColor:'#FFE3E3', borderColor:'#FFE3E3'}}>
-                      <div style={{fontSize:20, fontWeight:500, color:'#C62E2E' }}><CountUp duration={1.5} end={cancelledCount}/></div>
-                      <div style={{fontSize:12, color: '#C62E2E'}}>{t('cancelled')}</div>
+                    <div className='display_status_inner_box' style={{cursor:'pointer', backgroundColor: getStatusColor(status, 'CNCL').backgroundColor, borderColor:'#FFE3E3'}} onClick={()=>{changeStatusByDashBoard('CNCL')}}>
+                      <div style={{fontSize:20, fontWeight:500, color: getStatusColor(status, 'CNCL').countTextColor}}><CountUp duration={1.5} end={cancelledCount}/></div>
+                      <div style={{fontSize:12, color: getStatusColor(status, 'CNCL').textTextColor}}>{t('cancelled')}</div>
                     </div>
                 </div> 
+
               </div>
 
               <div className='table'>
@@ -489,13 +515,12 @@ const OrdersPage = () => {
                   ShipmentsPayload={ShipmentsPayload}
                   />
               </div>
-            </div>
+              
+            </div> }
+            
 
-            {selected_bound === 'inbound' &&
-              <div className='inboundContainer'>
-                <Inbound/>
-              </div>
-            }
+            {selected_bound === 'inbound' && <div className='inboundContainer'><Inbound/></div>}
+
           </div>
         </div>
       </div>
@@ -504,7 +529,7 @@ const OrdersPage = () => {
       
     
 
-      {mobile ? <SideDrawer /> : <div className="bottom_bar">
+      {!mobile ? <SideDrawer /> : <div>
         <MobileDrawer />
       </div>}
     </div>
@@ -514,3 +539,5 @@ const OrdersPage = () => {
 OrdersPage.displayName = 'OrdersPage';
 
 export default OrdersPage;
+
+

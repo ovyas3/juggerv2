@@ -5,8 +5,14 @@ import InboundTable from '@/components/inbound/inboundTable';
 import { httpsPost , httpsGet} from "@/utils/Communication";
 import TableData from "@/components/Table/table";
 import { useRouter } from 'next/navigation';
+import { useMediaQuery, useTheme } from '@mui/material';
+
 
 function Inbound() {
+
+  const theme = useTheme();
+  const mobile = useMediaQuery(theme.breakpoints.down('sm'));
+
   const [allShipment, setAllShipment] = useState<any>([]);
   const [count, setCount] = useState(0);
   const [rakeCaptiveList, setRakeCaptiveList] = useState([]);

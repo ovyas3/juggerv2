@@ -5,13 +5,17 @@ import Header from "@/components/Header/header";
 import { httpsPost, httpsGet } from "@/utils/Communication";
 import SideDrawer from "@/components/Drawer/Drawer";
 import "./style.css";
+import WagonConnector from '@/assets/wagon_connector.png';
 import { useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
+import TrainImage from '@/assets/Train_engine-locomotive.png';
 import { useRouter } from "next/navigation";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import Image from "next/image";
 import { useSnackbar } from "@/hooks/snackBar";
+import BOXN from '@/assets/BOXN.png';
+import BRN_22_9 from '@/assets/BRN_22.9.png';
 import BOST from "@/assets/BOST Final 1.png";
 import BFNV from "@/assets/BFNV final 1.png";
 import BOBRN from "@/assets/BOBRN final 1.png";
@@ -33,6 +37,76 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
     padding: theme.spacing(1),
   },
 }));
+
+
+type Mill = {
+  wagonNumber: string;
+  wagonType: string;
+  wagonObj: any;
+  is_sick: boolean;
+  _id: string;
+};
+
+const WagonContainer = styled('div')`
+  position: relative;
+  display: inline-flex;
+  justify-content: center;
+  align-items: flex-end;
+  border-bottom: 1px solid #D0D1D3;
+  gap: 6px;
+  margin-right: -4.5px;
+  transition: all 0.3s ease;
+  border-bottom: '1px solid #D0D1D3';
+  &:hover {
+    cursor: pointer;
+  }
+`;
+
+const Track = styled('div')`
+  position: relative;
+  width: 100%;
+`;
+
+const TrainContainer = styled('div')`
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  padding-top: 12px;
+  padding-bottom: 24px;
+  margin-left: 16px;
+`;
+
+const WagonIndex = styled('div')<{ isSelected: boolean }>`
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  color: ${props => props.isSelected ? '#FFFFFF' : '#71747A'};
+  background-color: ${props => props.isSelected ? '#3351FF' : 'transparent'};
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  margin-top: 2px;
+  padding: 4px;
+  width: 22px; 
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: translate(-50%, 0);
+`;
+
+const WagonNumber = styled('div')`
+  position: absolute;
+  top: -50px;
+  left: 42px;
+  transform: translateX(-50%);
+  font-family: 'Inter', sans-serif;
+  color: #3C4852;
+  font-size: 8px;
+  font-weight: 400;
+  width: max-content;
+`;
 
 function AssignHooksToLoadingShop() {
   return (
@@ -88,11 +162,10 @@ function AssignHooksToLoadingShopContent() {
   const id = searchParams.get("shipmentId");
   const showMessage = useSnackbar();
   const [shipmentData, setShipmentData] = useState<any>(null);
-
+  const [train, setTrain] = useState<Mill[] | null>(null);
   const [openPlantDropDown, setOpenPlantDropDown] = useState(false);
   const [selectedPlant, setSelectedPlant] = useState<any>(null);
   const [allPlants, setAllPlants] = useState<any>([]);
-
   const [originalHooksList, setOriginalHooksList] = useState<any>([]);
   const [workingWagonsList, setWorkingWagonsList] = useState<any>([]);
   const [wagonListAssignToPlant, setWagonListAssignToPlant] = useState<any>([]);
@@ -278,6 +351,20 @@ function AssignHooksToLoadingShopContent() {
     if (selectedPlant) getWagonsByHooks();
   }, [selectedPlant]);
 
+  useEffect(() => {
+    const wagonDataForTrain = workingWagonsList && workingWagonsList.length > 0 && workingWagonsList?.map((wagon: any) => {
+      return {
+        wagonNumber: wagon?.w_no || '',
+        wagonType: wagon?.wagon_type?.name || '',
+        wagonObj: wagon?.wagon_type,
+        is_sick: wagon?.is_sick,
+        hook_no: wagon?.hook_no,
+        _id: wagon?._id,
+        };
+      });
+      setTrain(wagonDataForTrain);
+  },[workingWagonsList])
+
   const handleClose = () => {
     setOpenConfirmationDialog(false);
   };
@@ -316,6 +403,16 @@ function AssignHooksToLoadingShopContent() {
       return newHookManagement;
     });
   }, [wagonListAssignToPlant]);
+
+
+  const getWagonImage = (type: string) => {
+    switch (type) {
+      case 'BFNV': return BFNV;
+      case 'BOXN': return BOXN;
+      case 'BRN_22_9': return BRN_22_9;
+      default: return BOXN;
+    }
+  };
 
   useEffect(() => {
     if (allPlants.length > 0) {
@@ -427,6 +524,31 @@ function AssignHooksToLoadingShopContent() {
           </div>
         </div>
         </div>
+        <div className="wagon-tally-sheet-body-content-train" id="train">
+              <TrainContainer id="train">
+                {train ? (
+                  train
+                    .map((wagon:any, wagonIndex:any) => {
+                      console.log(wagon)
+                      return (
+                        <WagonContainer key={wagonIndex}>
+                          <Track>
+                            <WagonNumber>{wagon.wagonNumber}</WagonNumber>
+                          </Track>
+                          <Image src={getWagonImage(wagon.wagonType)} alt={wagon.wagonType} />
+                          {wagonIndex !== train.length - 1 && (
+                            <Image src={WagonConnector} alt="Wagon connector" className="wagon-connector-icon" />
+                          )}
+                           {wagon.hook_no && <div className="badge-hook">{wagon.hook_no}</div>}
+                        </WagonContainer>
+                      );
+                    })
+                ) : (
+                  <></>
+                )}
+                <Image src={TrainImage} alt="Train engine" style={{ borderBottom: '1px solid #D0D1D3', marginLeft: '-1px' }} />
+              </TrainContainer>
+              </div>
 
         <div id="filtersForHooksAssignToLoadingShop">
           <div id="selectAPlant">
@@ -560,6 +682,20 @@ function AssignHooksToLoadingShopContent() {
         </div>
 
         <div id="buttonContainerHooks">
+          <div className="" style={{display:'flex',width:'100%'}}>
+           <div className="count-hookwise">
+            <div>
+              <div>Total</div> 
+              <b>{train?.length}</b>
+            </div>
+            {selectedPlant?.hooks.map((hook:any)=>
+              <div key={hook}>
+                <div>Hook {hook.hook_no} Assigned</div>
+                <b>{workingWagonsList?.filter((val:any)=> val.hook_no === hook.hook_no)?.length}</b>
+              </div>
+            )}
+           </div>
+          </div>
           <div
             style={{
               cursor: "pointer",
