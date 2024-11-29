@@ -893,6 +893,7 @@ export default function CaptiveRakeMapView() {
                 {legendItems.map((item: any) => {
                   return (
                     <div
+                    key={item}
                       style={{
                         fontSize: "10px",
                         display: "flex",
