@@ -51,7 +51,7 @@ function UpdateAgreementID({
     //   return;
     // }
     let payload = {
-      id: selectedRake?._id,
+      rake: selectedRake?._id,
       // rake: selectedRake.rake_id,
       agreement_id: selectedRake?.agreement_id,
     };
@@ -95,8 +95,8 @@ function UpdateAgreementID({
     >
       <div
         style={{
-          width: 500,
-          height: 450,
+          width: 450,
+          height: 380,
           borderRadius: 10,
           backgroundColor: "white",
           position: "relative",

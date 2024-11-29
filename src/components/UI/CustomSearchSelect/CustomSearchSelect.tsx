@@ -97,7 +97,7 @@ const CustomSearchSelect = ({
             top: 70,
             borderRadius: 6,
             fontSize: 12,
-            maxHeight: 200,
+            maxHeight: 175,
             overflow: "auto",
             backgroundColor:'white'
           }}
