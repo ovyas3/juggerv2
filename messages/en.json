@@ -37,7 +37,9 @@
    "withoutLoad":"Empty",
    "mapView":"Map View",
    "updateAgreementID":"Update Agreement ID",
-   "foisDetails":"FOIS Details"
+   "foisDetails":"FOIS Details",
+   "Overview":"OVERVIEW",
+   "Insights":"INSIGHTS"
   },
   "HEADER":{
     "shipments":"Shipments",

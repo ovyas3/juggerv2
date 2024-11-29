@@ -1,3 +1,4 @@
+
 .container {
   display: flex;
   height: 80vh;
@@ -285,8 +286,8 @@
 }
 
 .markerDot {
-  width: 13px;
-  height: 13px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
   position: relative;
   box-sizing: border-box; 
@@ -302,8 +303,8 @@
 
 .markerDot.stabledBorder {
   border: 3px solid #131722;
-  width: 19px; 
-  height: 19px; 
+  width: 15px; 
+  height: 15px; 
 }
 
 
@@ -609,6 +610,15 @@
     left: 0;
     right: 0;
     z-index: 1;
+  }
+
+  .leaflet-top .leaflet-control {
+    position: absolute !important; /* Ensure your rules take precedence */
+    top: 100px !important;   /* Distance from the top edge of the map */
+    right: 10px;  /* Distance from the right edge of the map */
+    left: auto;   /* Reset the left position */
+    bottom: auto; /* Reset the bottom position */
+    z-index: 1000; /* Ensure it stays above other elements */
   }
 
   .statusItems {
