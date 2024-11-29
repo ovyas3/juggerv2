@@ -25,7 +25,7 @@
 
 .rakeStatusInMovement{
   height: calc(330px - 20px);
-  overflow-y: auto;
+  overflow-y: hidden;
 }
 
 .rakesStatus,
@@ -203,6 +203,34 @@
   border: none;
 }
 
+
+.summaryTable td {
+  padding: 10px 15px;
+  text-align: center;
+  position: relative;
+  transition: all 0.3s ease; 
+}
+
+.summaryTable td:hover {
+  background-color: #f0f8ff;
+  transform: scale(1.05); 
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.summaryTable td span {
+  display: block;
+  transition: color 0.3s ease;
+}
+
+.summaryTable td:hover span {
+  color: #18be8a; 
+  text-decoration: underline; 
+}
+
+.summaryTable td:active {
+  transform: scale(1); 
+}
+
 .summaryTable th,
 .summaryTable td {
   border: 1px solid #DFE3EB;
@@ -261,15 +289,89 @@
   height: 13px;
   border-radius: 50%;
   position: relative;
+  box-sizing: border-box; 
 }
 
 .markerDot.loaded {
-  background: #037f58;
+  background: #1ab836;
 }
 
 .markerDot.empty {
-  background: #e31f3f;
+  background: #FF2A1F;
 }
+
+.markerDot.stabledBorder {
+  border: 3px solid #131722;
+  width: 19px; 
+  height: 19px; 
+}
+
+
+.captiveRakeCountBox {
+  padding: 15px;
+  background-color: #ffffff;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  text-align: left;
+}
+
+.captiveRakeCountBox h2 {
+  margin-top: 0;
+  margin-bottom: 12px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #42454E; 
+}
+
+.infoCR {
+  font-size: 12px;
+
+}
+
+.countWrapper {
+  display: flex;
+  justify-content: left;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.usedCount {
+  font-size: 14px; /* Set to 14px */
+  font-weight: bold;
+  color: #18BE8A; /* Old green for used count */
+  margin: 0;
+  padding:0 4px;
+}
+
+.totalCount {
+  font-size: 14px; /* Set to 14px */
+  font-weight: bold;
+  color: #000000; /* Black for total count */
+  margin: 0;
+  padding:0 4px;
+}
+
+.usagePercentageWrapper {
+  margin-top: 10px;
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.usagePercentage {
+  font-size: 14px; /* Set to 14px */
+  font-weight: bold;
+}
+
+.usagePercentage span {
+  font-size: 12px;
+  font-weight: normal;
+  color: #7d7d7d;
+}
+
+
 
 .pulsingDot {
   position: relative;
