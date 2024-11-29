@@ -31,7 +31,7 @@ const DashboardContent = () => {
             }
         </div>
         <div>
-          <Tabsection initialTab={fromWelcome === 'true' ? "3" : "1"}/>
+          <Tabsection initialTab={"1"}/>
         </div>
       </div>
       {!mobile ? <SideDrawer /> : <div >

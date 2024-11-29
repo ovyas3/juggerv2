@@ -3,7 +3,6 @@
 import { MapContainer, TileLayer, Marker, LayersControl, Popup } from 'react-leaflet';
 import "leaflet/dist/leaflet.css";
 import L from "leaflet"; // Import Leaflet for creating custom icons
-import styles from "./page.module.css";
 import Image from "next/image";
 import rakesLoadedIcon from "@/assets/rakes_loaded.svg";
 import captiveRakes from '@/assets/cr.svg'
@@ -15,6 +14,7 @@ import getBoundary from '@/components/MapView/IndianClaimed';
 import timeService from '@/utils/timeService';
 import { useMediaQuery, useTheme } from '@mui/material';
 import { get } from 'http';
+import styles from "./page.module.css";
 
 interface SchemeData {
   count: number;
@@ -148,7 +148,11 @@ export default function CaptiveRakeMapView() {
 
   const handleArrivalClick = (period: string, ids: string[]) => {
     setSelectedArrival(selectedArrival === period ? null : period);
-    getCoords(activeRakeFilter, ids);
+    if(ids.length) {
+      getCoords(activeRakeFilter, ids);
+    } else {
+      setCoordsData([])
+    }
   };
 
   const handleRowClick = (index: number, rowData: RakeStatusData) => {
@@ -358,8 +362,19 @@ export default function CaptiveRakeMapView() {
       map.on('zoomend', () => {
         setCurrentZoom(map.getZoom());
       });
+  
+      const streetViewControl = document.querySelector('.leaflet-control-layers');
+      
+      if (streetViewControl && streetViewControl instanceof HTMLElement) {
+        streetViewControl.style.top = '42px';  
+        streetViewControl.style.right = '0px';  
+      }
     }
-  }, [map]);
+  }, [map]);  
+ 
+  useEffect(()=>{
+   setSelectedRow(-1)
+  },[selectedArrival])
 
   const customLoadedIcon = (stabled: any) => {
     const stabledClass = stabled ? styles.stabledBorder : "";
@@ -386,6 +401,23 @@ export default function CaptiveRakeMapView() {
       popupAnchor: [0, -8],
     });
   };
+
+  const legendItems = [
+    {
+      label: 'Loaded',
+      class: `${styles.markerDot} ${styles.loaded}`,
+    },
+    {
+      label: 'Empty',
+      class: `${styles.markerDot} ${styles.empty}`,
+    },  {
+      label: 'Stabled(Loaded)',
+      class: `${styles.markerDot} ${styles.loaded} ${styles.stabledBorder}`,
+    },  {
+      label: 'Stabled(Empty)',
+      class: `${styles.markerDot} ${styles.empty} ${styles.stabledBorder}`,
+    }
+  ]
 
   const createTrainIcon = (isLoaded: boolean) => {
     const fillColor = isLoaded ? '#037f58' : '#e31f3f';
@@ -639,7 +671,7 @@ export default function CaptiveRakeMapView() {
                   }
                 >
                   <span className={styles.value}>
-                    {stats["T+2"].count || 0}
+                    {stats["T+1"].count || 0}
                   </span>
                   <span className={styles.label}>T+1</span>
                 </div>
@@ -701,9 +733,13 @@ export default function CaptiveRakeMapView() {
                         (row: RakeStatusData, index: number) => (
                           <tr
                             key={index}
-                            style={row.code === 'ST' ? { backgroundColor: '#f5f5f5' } : { backgroundColor: '' }}
+                            style={
+                              row.code === "ST"
+                                ? { backgroundColor: "#f5f5f5" }
+                                : { backgroundColor: "" }
+                            }
                             className={
-                              selectedRow === index ? styles.selected : "" 
+                              selectedRow === index ? styles.selected : ""
                             }
                             onClick={() => handleRowClick(index, row)}
                           >
@@ -784,11 +820,12 @@ export default function CaptiveRakeMapView() {
                       .map((plant: any, index: any) => (
                         <td key={index}>
                           <span
-                            onClick={() =>
+                            onClick={() => {
                               handlePlantRakesMapFilter(
                                 plantRakesSummary.from[plant]?.ids
-                              )
-                            }
+                              );
+                              setSelectedArrival(null);
+                            }}
                             style={{ cursor: "pointer" }}
                           >
                             {plantRakesSummary.from[plant]?.count ?? 0}
@@ -804,11 +841,12 @@ export default function CaptiveRakeMapView() {
                       .map((plant: any, index: any) => (
                         <td key={index}>
                           <span
-                            onClick={() =>
+                            onClick={() => {
                               handlePlantRakesMapFilter(
                                 plantRakesSummary.to[plant]?.ids
-                              )
-                            }
+                              );
+                              setSelectedArrival(null);
+                            }}
                             style={{ cursor: "pointer" }}
                           >
                             {plantRakesSummary.to[plant]?.count ?? 0}
@@ -820,21 +858,55 @@ export default function CaptiveRakeMapView() {
               </table>
             </div>
             <div className={styles.captiveRakeCountBox}>
-            <h2>Captive Rakes Utilization</h2>
-                  <div className={styles.countWrapper}>
-                    <p className={styles.infoCR}>Used Captive Rakes:</p>
-                    <p className={styles.usedCount}>{usedCRCount}</p>/
-                    <p className={styles.totalCount}>{totalCRCount}</p>
-                  </div>
-                  <div className={styles.usagePercentageWrapper}>
-                  <p className={styles.infoCR}>Utilization Percentage:</p>
-                    <p className={styles.usagePercentage}>
-                      {((usedCRCount / totalCRCount) * 100).toFixed(2)}%
-                    </p>
-                  </div>
-                </div>
+              <h2>Captive Rakes Utilization</h2>
+              <div className={styles.countWrapper}>
+                <p className={styles.infoCR}>Used Captive Rakes:</p>
+                <p className={styles.usedCount}>{usedCRCount}</p>/
+                <p className={styles.totalCount}>{totalCRCount}</p>
+              </div>
+              <div className={styles.usagePercentageWrapper}>
+                <p className={styles.infoCR}>Utilization Percentage:</p>
+                <p className={styles.usagePercentage}>
+                  {((usedCRCount / totalCRCount) * 100).toFixed(2)}%
+                </p>
+              </div>
+            </div>
           </div>
           <div className={styles.rightPanel}>
+            <div style={{ position: "relative" }}>
+              <div
+                style={{
+                  height: "32px",
+                  display: "flex",
+                  justifyContent: "space-evenly",
+                  position: "absolute",
+                  background: "white",
+                  zIndex: 1000,
+                  right: "10px",
+                  top: "10px",
+                  width: "350px",
+                  borderRadius: "6px",
+                  boxShadow: "rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px",
+                  color: "#42454E",
+                }}
+              >
+                {legendItems.map((item: any) => {
+                  return (
+                    <div
+                      style={{
+                        fontSize: "10px",
+                        display: "flex",
+                        alignItems: "center",
+                        columnGap: "4px",
+                      }}
+                    >
+                      <div className={item.class}></div>
+                      <div>{item.label}</div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
             <MapContainer
               className="map"
               id="map-helpers"
@@ -890,7 +962,7 @@ export default function CaptiveRakeMapView() {
                           </p>
                           <p style={{ margin: "2px 0" }}>
                             <strong>Rake Name:</strong>{" "}
-                            {marker.rake?.name || "N/A"}
+                          {marker.rake?.name || "N/A"}
                           </p>
                           <p style={{ margin: "2px 0" }}>
                             <strong>Rake Status:</strong>{" "}

@@ -137,12 +137,13 @@ const Tabsection: React.FC<TabSectionProps> = ({ initialTab }) => {
             <TabContext value={value}>
               <Box sx={{ borderBottom: 1, borderColor: "divider"}}>
                 <TabList onChange={handleChange}>
-                  <Tab label={t("railOverview")} value="1" />
-                  <Tab label={t("mapView")} value="2" />
-                  <Tab label={t("foisDetails")} value="3" />
+                  {/* <Tab label={t("railOverview")} value="1" />
+                  <Tab label={t("mapView")} value="2" /> */}
+                  <Tab label={t("Overview")} value="1" />
+                  <Tab label={t("Insights")} value="2" />
                 </TabList>
               </Box>
-             <TabPanel value="1" className="tabpanel-container" style={{position:'relative'}}>
+             {/* <TabPanel value="1" className="tabpanel-container" style={{position:'relative'}}>
                 <div onClick={()=>setOpenUploadModel(!openUploadModel)} id='uploadFiles' style={{paddingInline:'10px', cursor:'pointer' , gap:'8px', borderRadius:'6px' ,display:'flex', alignItems:'center', position:'absolute', top:8, right:30, width:'fit-content', height:'fit-content', zIndex:'1', backgroundColor:'#E6EAFF', color:"#3351FE", fontSize:'12px'}}>
                   <div><Image src={uploadIcon.src} height={24} width={24} alt='upload' style={{marginTop:'4px'}} /></div>
                   <div>Upload Files</div>
@@ -176,14 +177,15 @@ const Tabsection: React.FC<TabSectionProps> = ({ initialTab }) => {
                 }}>
                   <MapView />
                 </div>
-              </TabPanel>
-              <TabPanel value="3" className="tabpanel-container">
-                <div style={{
-                  width: '100%',
-                  height: '80vh',
-                  overflow: 'auto',
-                }}>
+              </TabPanel> */}
+              <TabPanel value="1" className="tabpanel-container">
+                <div >
                   <CaptiveRakeMapView />
+                </div>
+              </TabPanel>
+              <TabPanel value="2" className="tabpanel-container">
+                <div style={{display:'flex',alignItems:'center',justifyContent:'center',height:'50vh'}}>
+                  <h1>Coming Soon</h1>
                 </div>
               </TabPanel>
             </TabContext>
