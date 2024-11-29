@@ -894,7 +894,7 @@ export default function CaptiveRakeMapView() {
                   return (
                     <div
                     key={item}
-                      style={{
+                      style={{ 
                         fontSize: "10px",
                         display: "flex",
                         alignItems: "center",
