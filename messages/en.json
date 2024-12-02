@@ -297,7 +297,13 @@
     "deleteContactHeader":"Delete Contact"
   },
   "SETTINGS": {
-   "statusCodes":[
+    "updateETA": "Update ETA",
+    "notification": "Notification",
+    "preferences": "Preferences",
+    "captiveRakes": "Captive Rakes",
+    "station&Contacts": "Station & Contacts",
+    "hubRMS": "Hub RMS",
+    "statusCodes":[
       {
         "code": "MT",
         "status": "Empty",

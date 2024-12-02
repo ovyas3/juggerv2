@@ -10,6 +10,66 @@ import { useRouter } from "next/navigation";
 import { ThreeCircles } from "react-loader-spinner";
 import "./whatsAppNotify.css";
 import WhatsAppIcon from '@mui/icons-material/WhatsApp';
+import { Tabs, Tab, Box } from '@mui/material'
+import { styled } from '@mui/system'
+
+// Custom styled components
+const StyledTabs = styled(Tabs)({
+  borderBottom: '1px solid #e8e8e8',
+  '& .MuiTabs-indicator': {
+    backgroundColor: '#2962FF',
+    height: '3px',
+    borderRadius: '3px 3px 0 0',
+  },
+})
+
+const StyledTab = styled(Tab)(({ theme }) => ({
+  textTransform: 'none',
+  minWidth: 0,
+  fontSize: '14px',
+  fontWeight: 500,
+  marginRight: theme.spacing(4),
+  color: 'rgba(0, 0, 0, 0.85)',
+  fontFamily: 'Inter, sans-serif',
+  '&:hover': {
+    color: '#2962ee',
+    opacity: 1,
+  },
+  '&.Mui-selected': {
+    color: '#2962FF',
+    fontWeight: 600,
+  },
+  '&.Mui-focusVisible': {
+    backgroundColor: 'rgba(0, 0, 0, 0.04)',
+  },
+}))
+
+const TabPanel = styled(Box)({
+  padding: '0px',
+})
+
+interface TabPanelProps {
+  children?: React.ReactNode
+  index: number
+  value: number
+}
+
+function CustomTabPanel(props: TabPanelProps) {
+  const { children, value, index, ...other } = props
+
+  return (
+    <TabPanel
+      role="tabpanel"
+      hidden={value !== index}
+      id={`dashboard-tabpanel-${index}`}
+      aria-labelledby={`dashboard-tab-${index}`}
+      {...other}
+    >
+      {value === index && <Box>{children}</Box>}
+    </TabPanel>
+  )
+}
+
 
 const WhatsAppNotify = () => {
   const router = useRouter();
@@ -18,6 +78,11 @@ const WhatsAppNotify = () => {
   const [loading, setLoading] = useState(false);
   const [numbers, setNumbers] = useState<string[]>(['']);
   const [error, setError] = useState<string>('');
+  const [value, setValue] = useState(0);
+
+  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+    setValue(newValue)
+  }
 
   const handleNumberChange = (index: number, value: string) => {
     const isValidInput = /^[0-9, ]*$/.test(value);
@@ -136,7 +201,63 @@ const WhatsAppNotify = () => {
   return (
     <div>
       <div className="whatsApp-notify-container">
-        <div className="whatsApp-notify-card">
+        <Box sx={{ width: '100%', backgroundColor: '#fff' }}>
+          <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+            <StyledTabs value={value} onChange={handleChange} aria-label="dashboard tabs">
+              <StyledTab label="Stabled" />
+              <StyledTab label="Delay At Plant" />
+              <StyledTab label="Delay At Destination" />
+              <StyledTab label="Notification" />
+            </StyledTabs>
+          </Box>
+          <CustomTabPanel value={value} index={0}>
+            <h3 className="whatsApp-notify-title">WhatsApp Notify</h3>
+            <div className="whatsApp-notify-inputContainer">
+            {numbers && numbers.map((number, index) => (
+              <div key={index} className="whatsApp-notify-inputGroup">
+                <label className="whatsApp-notify-indexLabel">Contact Number</label>
+                <div className="whatsApp-notify-inputWithButton">
+                  <input
+                    type="text"
+                    placeholder={`Contact Number ${index + 1}`}
+                    value={number}
+                    onChange={(e) => handleNumberChange(index, e.target.value)}
+                    className="whatsApp-notify-input"
+                  />
+                  {index > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => removeNumberField(index)}
+                      className="whatsApp-notify-removeButton"
+                    >
+                      ✕
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+            </div>
+            <button type="button" onClick={addNumberField} className="whatsApp-notify-addButton">
+              + Add Another Contact Details
+            </button>
+          
+            {error && <div className="whatsApp-notify-error">{error}</div>}
+
+            <div className="whatsApp-notify-buttonContainer">
+              <button type="button" onClick={handleSubmit} className="whatsApp-notify-submitButton">
+                Submit
+              </button>
+              <button type="button" onClick={() => {
+                getWhatsAppNumbers()
+                setError('')
+                setNumbers([''])
+              }} className="whatsApp-notify-clearButton">
+                Clear
+              </button>
+            </div>  
+          </CustomTabPanel>
+        </Box>
+        {/* <div className="whatsApp-notify-card">
           <h1 className="whatsApp-notify-title">
             <WhatsAppIcon style={{ fontSize: '1.8rem', color: '#4caf50', marginRight: 5 }} />
             WhatsApp Notify
@@ -176,15 +297,8 @@ const WhatsAppNotify = () => {
               Notify
             </button>
           </form>
-        </div>
+        </div> */}
       </div>
-      {/* {mobile ? (
-          <SideDrawer />
-      ) : (
-          <div >
-              <MobileDrawer />
-          </div>
-      )} */}
     </div>
   );
 };

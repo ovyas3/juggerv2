@@ -606,7 +606,6 @@
     height: 90vh;
     width: 100%;
     position: fixed;
-    top: 124px;
     left: 0;
     right: 0;
     z-index: 1;
@@ -701,9 +700,9 @@
 .filterChip {
   display: inline-flex;
   align-items: center;
-  padding: 4px 10px;
-  border-radius: 16px;
-  font-size: 0.85rem;
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: 12px;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   background: rgba(255, 255, 255, 0.08);
@@ -718,31 +717,35 @@
 
 /* All filter */
 .filterChip:first-child:hover {
-  background: rgba(25, 118, 210, 0.1);
-  border-color: rgba(25, 118, 210, 0.3);
+  background: #334FFC;
+  border-color: #334FFC;
+  color: white;
 }
 
 /* SFTO filter */
 .filterChip:nth-child(2):hover {
-  background: rgba(255, 152, 0, 0.1);
-  border-color: rgba(255, 152, 0, 0.3);
+  background: #FF9800;
+  border-color: #FF9800;
+  color: white;
 }
 
 /* BFNV filter */
 .filterChip:nth-child(3):hover {
-  background: rgba(76, 175, 80, 0.1);
-  border-color: rgba(76, 175, 80, 0.3);
+  background: #4CAF50;
+  border-color: #4CAF50;
+  color: white;
 }
 
 /* GPWIS filter */
 .filterChip:nth-child(4):hover {
-  background: rgba(156, 39, 176, 0.1);
-  border-color: rgba(156, 39, 176, 0.3);
+  background: #9C27B0;
+  border-color: #9C27B0;
+  color: white;
 }
 
 /* Active states */
 .filterChip.active {
-  background: #1976d2;
+  background: #334FFC;
   border-color: #1565c0;
   color: white;
 }

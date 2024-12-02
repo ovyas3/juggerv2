@@ -1,18 +1,5 @@
-.content_container{
-    width: calc(100vw - 70px);
-    height: calc(100vh - 56px);
-    padding: 8px 24px 24px 24px ;
-    background-color: #fff;
-}
-
-.adjustMargin{
-    margin-top: 56px;
-    margin-left: 70px;
-   
-}
-.adjustMarginMobile {
-    width: 100vw;
-    height: calc(100vh - 56px - 54px);
+.handlingAgent_pageContent{
+    width: 100%;
 }
 .invite_button{
     background-color: #3352FF1F;
