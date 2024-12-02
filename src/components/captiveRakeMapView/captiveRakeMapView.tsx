@@ -133,9 +133,10 @@ export default function CaptiveRakeMapView() {
   const [plantRakesSummaryPlants,setPlantRakesSummaryPlants] = useState<any>([])
   const [totalCRCount, setTotalCRCount] = useState(0)
   const [usedCRCount,setUsedCRCount] = useState(0)
+  const [shouldAutoFit, setShouldAutoFit] = useState(true);
 
   const fitMapBounds = useCallback((coordinates: any[]) => {
-    if (map && coordinates && coordinates.length > 0) {
+    if (map && coordinates && coordinates.length > 0 && shouldAutoFit) {
       const validCoords = coordinates.filter(
         (coord: any) =>
           coord?.geo_point?.coordinates &&
@@ -154,19 +155,51 @@ export default function CaptiveRakeMapView() {
         const bounds = L.latLngBounds(latLngs);
         
         if (bounds.isValid()) {
+          // Calculate zoom level based on number of coordinates
+          let zoomLevel;
+          if (validCoords.length === 1) {
+            zoomLevel = 15; // Very high zoom for single point
+          } else if (validCoords.length <= 3) {
+            zoomLevel = 13; // High zoom for few points
+          } else if (validCoords.length <= 10) {
+            zoomLevel = 11; // Medium-high zoom for moderate points
+          } else {
+            zoomLevel = 10; // Medium zoom for many points
+          }
+
           const paddedBounds = bounds.pad(0.1); // 10% padding
-          
           map.fitBounds(paddedBounds, {
             animate: true,
-            duration: 0.5,
-            maxZoom: 10
+            duration: 1.2, // Increased duration for smoother transition
+            easeLinearity: 0.5, // Makes the animation more smooth
+            maxZoom: zoomLevel // Apply calculated zoom level
           });
         }
       }
-    } else if (map) {
+    } else if (map && shouldAutoFit) {
       map.setView(center, 5);
     }
-  }, [map, center]);
+  }, [map, center, shouldAutoFit]);
+
+  useEffect(() => {
+    if (map) {
+      const handleMapInteraction = () => {
+        setShouldAutoFit(false);
+      };
+
+      map.on('dragstart', handleMapInteraction);
+      map.on('zoomstart', handleMapInteraction);
+
+      return () => {
+        map.off('dragstart', handleMapInteraction);
+        map.off('zoomstart', handleMapInteraction);
+      };
+    }
+  }, [map]);
+
+  useEffect(() => {
+    setShouldAutoFit(true);
+  }, [activeFilter, activeRakeFilter]);
 
   const filteredCoords = useMemo(() => {
     return coordsData && coordsData.length > 0 && coordsData.filter((val: any) => {
