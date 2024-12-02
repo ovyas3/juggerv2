@@ -163,7 +163,7 @@ const WhatsAppNotify = () => {
   const postWhatsAppNumbers = async (numbers: string[]) => {
     setLoading(true)
     try {
-      const response = await httpsPost('set/WhatsApp_numbers', { numbers }, router, 0, false)
+      const response = await httpsPost('set/WhatsApp_numbers', { mobileNos:numbers }, router, 0, false)
       if (response.statusCode === 200) {
         showMessage(`Successfully notified ${numbers.length} numbers.`, 'success');
       } else {
