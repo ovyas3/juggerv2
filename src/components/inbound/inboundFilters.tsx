@@ -89,9 +89,9 @@ function InboundFilters({setInBoundPayload}:any) {
       ...prevPayload,
       from: startDate,
       to: endDate,
-      rake_types: rakeArray,
+      // rake_types: rakeArray,
     }));
-  }, [startDate, endDate, rakeArray,]);
+  }, [startDate, endDate]);
 
   return (
     <div id="inboundFiltersContainer">

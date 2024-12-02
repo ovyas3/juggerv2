@@ -1,16 +1,19 @@
 .content_container_contact {
-    width: calc(100vw - 70px);
-    height: calc(100vh - 56px);
+    width: 100vw;
+    height: 100vh;
     overflow-y: auto;
     padding: 20px;
   }
   .adjustMargin {
     margin-top: 56px;
     margin-left: 70px;
+    height: calc(100vh - 56px);
+    width: calc(100vw - 70px);
   }
   .adjustMarginMobile {
     width: 100vw;
-    height: calc(100vh - 56px - 54px);
+    height: calc(100vh - 110px);
+    margin-top: 53px;
   }
 #left-section{
     width: 30%;
