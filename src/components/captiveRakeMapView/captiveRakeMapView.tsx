@@ -7,7 +7,7 @@ import Image from "next/image";
 import rakesLoadedIcon from "@/assets/rakes_loaded.svg";
 import captiveRakes from '@/assets/cr.svg'
 import emptyRakesIcon from "@/assets/empty_rakes_icon.svg";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { httpsGet, httpsPost } from '@/utils/Communication';
 import { useRouter } from 'next/navigation';
 import getBoundary from '@/components/MapView/IndianClaimed';
@@ -134,31 +134,39 @@ export default function CaptiveRakeMapView() {
   const [totalCRCount, setTotalCRCount] = useState(0)
   const [usedCRCount,setUsedCRCount] = useState(0)
 
-  const handleRakeFilterClick = (filterType: string, ids: string[]) => {
-    setActiveRakeFilter(filterType === activeRakeFilter ? "All" : filterType);
-    getCoords(filterType, ids);
-    getRakeStatusData(filterType);
-    getRakeStats(filterType);
-    getSchemeWiseCount(filterType);
-  };
+  const fitMapBounds = useCallback((coordinates: any[]) => {
+    if (map && coordinates && coordinates.length > 0) {
+      const validCoords = coordinates.filter(
+        (coord: any) =>
+          coord?.geo_point?.coordinates &&
+          coord.geo_point.coordinates[0] !== 0 &&
+          coord.geo_point.coordinates[1] !== 0
+      );
 
-  const handleFilterClick = (filter: 'total' | 'loaded' | 'empty') => {
-    setActiveFilter(filter === activeFilter ? 'total' : filter);
-  };
+      if (validCoords.length > 0) {
+        const latLngs: L.LatLngExpression[] = validCoords.map((coord: any) => (
+          [
+            coord.geo_point.coordinates[1],
+            coord.geo_point.coordinates[0]
+          ] as L.LatLngTuple
+        ));
 
-  const handleArrivalClick = (period: string, ids: string[]) => {
-    setSelectedArrival(selectedArrival === period ? null : period);
-    if(ids.length) {
-      getCoords(activeRakeFilter, ids);
-    } else {
-      setCoordsData([])
+        const bounds = L.latLngBounds(latLngs);
+        
+        if (bounds.isValid()) {
+          const paddedBounds = bounds.pad(0.1); // 10% padding
+          
+          map.fitBounds(paddedBounds, {
+            animate: true,
+            duration: 0.5,
+            maxZoom: 10
+          });
+        }
+      }
+    } else if (map) {
+      map.setView(center, 5);
     }
-  };
-
-  const handleRowClick = (index: number, rowData: RakeStatusData) => {
-    setSelectedRow(selectedRow === index ? null : index);
-    getCoords(activeRakeFilter, rowData._ids);
-  };
+  }, [map, center]);
 
   const filteredCoords = useMemo(() => {
     return coordsData && coordsData.length > 0 && coordsData.filter((val: any) => {
@@ -184,6 +192,38 @@ export default function CaptiveRakeMapView() {
       empty: rakeFilteredData.filter((val: any) => val.loading_status !== "L").length
     };
   }, [coordsData, activeRakeFilter]);
+
+  useEffect(() => {
+    if (map && filteredCoords.length > 0) {
+      fitMapBounds(filteredCoords);
+    }
+  }, [filteredCoords, map, fitMapBounds]);
+
+  const handleRakeFilterClick = (filterType: string, ids: string[]) => {
+    setActiveRakeFilter(filterType === activeRakeFilter ? "All" : filterType);
+    getCoords(filterType, ids);
+    getRakeStatusData(filterType);
+    getRakeStats(filterType);
+    getSchemeWiseCount(filterType);
+  };
+
+  const handleFilterClick = (filter: 'total' | 'loaded' | 'empty') => {
+    setActiveFilter(filter === activeFilter ? 'total' : filter);
+  };
+
+  const handleArrivalClick = (period: string, ids: string[]) => {
+    setSelectedArrival(selectedArrival === period ? null : period);
+    if(ids.length) {
+      getCoords(activeRakeFilter, ids);
+    } else {
+      setCoordsData([])
+    }
+  };
+
+  const handleRowClick = (index: number, rowData: RakeStatusData) => {
+    setSelectedRow(selectedRow === index ? null : index);
+    getCoords(activeRakeFilter, rowData._ids);
+  };
 
   async function getCoords(scheme: string, ids: string[] = []) {
     try {
@@ -214,6 +254,9 @@ export default function CaptiveRakeMapView() {
         setCoordsData(coords);
         setLoadedRakes(loaded);
         setEmptyRakes(empty);
+        
+        // Fit map bounds to the filtered coordinates
+        fitMapBounds(coords);
       } else {
         console.error('Invalid response format:', response);
       }
@@ -336,11 +379,15 @@ export default function CaptiveRakeMapView() {
     }
   }
 
-  function handlePlantRakesMapFilter(ids: string[] = []) {
+  const handlePlantRakesMapFilter = (ids: string[] = []) => {
     if (ids.length) {
       getCoords(activeRakeFilter, ids);
     } else {
       setCoordsData([]);
+      // Reset map to default view when no coordinates
+      if (map) {
+        map.setView(center, 5);
+      }
     }
   } 
 
@@ -611,9 +658,7 @@ export default function CaptiveRakeMapView() {
                     <span className={styles.label} style={{ color: "#18BE8A" }}>
                       Loaded
                     </span>
-                    <span className={styles.value}>
-                      {filteredCounts.loaded}
-                    </span>
+                    <span className={styles.value}>{filteredCounts.loaded}</span>
                   </div>
                 </div>
                 <div
