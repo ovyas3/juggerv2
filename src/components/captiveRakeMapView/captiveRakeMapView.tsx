@@ -2,6 +2,7 @@
 
 import { MapContainer, TileLayer, Marker, LayersControl, Popup } from 'react-leaflet';
 import "leaflet/dist/leaflet.css";
+import "leaflet-boundary-canvas";
 import L from "leaflet"; // Import Leaflet for creating custom icons
 import Image from "next/image";
 import rakesLoadedIcon from "@/assets/rakes_loaded.svg";
@@ -15,6 +16,7 @@ import timeService from '@/utils/timeService';
 import { useMediaQuery, useTheme } from '@mui/material';
 import { get } from 'http';
 import styles from "./page.module.css";
+import getIndiaMap from "@/components/MapView/IndiaMap";
 
 interface SchemeData {
   count: number;
@@ -382,7 +384,7 @@ export default function CaptiveRakeMapView() {
     const queryParams =
       activeRakeFilter !== "All" ? `?scheme=${activeRakeFilter}` : "";
     const response = await httpsGet("get/ownOrOthers" + queryParams, 0, router);
-    if (response.statusCode === 200) {
+    if (response?.data && response?.data?.length > 0) {
       const data = response.data || [];
       setPlantRakesSummary(data);
       if (activeRakeFilter === "All") {
@@ -551,19 +553,42 @@ export default function CaptiveRakeMapView() {
     }
   }
 
-  const addIndiaBoundaries = () => {
-    const b = getBoundary();
-    if (map instanceof L.Map) {
-      L.geoJSON(b, {
-        style: boundaryStyle
-      }).addTo(map);
-    } else {
-      console.error('map is not a Leaflet map object');
-    }
-  }
-
   useEffect(() => {
-    addIndiaBoundaries();
+    if (!map) return;
+
+    const fetchGeoJSON = async () => {
+      try {
+        const { features} = getIndiaMap();
+        
+        const indiaGeoJSON = {
+          type: "FeatureCollection",
+          features
+        };
+
+        // Add boundary masking with the combined GeoJSON
+        const osmLayer = (L.TileLayer as any).boundaryCanvas(
+          "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+          {
+            boundary: indiaGeoJSON,
+            attribution:
+              '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+          }
+        );
+
+        map.addLayer(osmLayer);
+
+        // Add the claimed boundaries as a separate layer
+        const claimedBoundaries = getBoundary();
+        L.geoJSON(claimedBoundaries, {
+          style: boundaryStyle
+        }).addTo(map);
+
+      } catch (error) {
+        console.error("Error fetching GeoJSON:", error);
+      }
+    };
+
+    fetchGeoJSON();
   }, [map]);
 
   return (
@@ -1000,14 +1025,14 @@ export default function CaptiveRakeMapView() {
               attributionControl={false}
               ref={setMap}
             >
-              <LayersControl>
+              {/* <LayersControl>
                 <LayersControl.BaseLayer checked name="OpenStreetMap">
                   <TileLayer
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                   />
                 </LayersControl.BaseLayer>
-              </LayersControl>
+              </LayersControl> */}
               {filteredCoords.map((marker: any, index: number) => {
                 const icon = getIcon(marker.loading_status, marker.stts_code);
 
