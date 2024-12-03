@@ -10,8 +10,8 @@ import ContactPageIcon from '@mui/icons-material/ContactPage';
 
 import ShipmentInactive from "@/assets/shipments_bg_icon.svg";
 import ShipmentActive from "@/assets/shipments_wg_icon.svg";
-import DashboardInactive from "@/assets/dashboard_bg_icon.svg";
-import DashboardActive from "@/assets/dashboard_wg_icon.svg";
+import DashboardInactive from "@/assets/Dashboard_bg_icon.svg";
+import DashboardActive from "@/assets/Dashboard_wg_icon.svg";
 import ReportInactive from "@/assets/reports_bg_icon.svg";
 import ReportActive from "@/assets/reports_wg_icon.svg";
 import SettingsInactive from "@/assets/settings_bg_icon.svg";
