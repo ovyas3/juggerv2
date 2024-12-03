@@ -28,30 +28,29 @@ interface NavItem {
 }
 
 const navigationItems: NavItem[] = [
+    { id: 'etaDashboard', label: 'Dashboard', icon: AllInboxIcon },
     { id: 'orders', label: 'Shipments', icon: TrainIcon },
     { id: 'dashboard', label: 'Captive Rakes', icon: DashboardIcon },
-    { 
-        id: 'stationManagement', 
-        label: 'Station Management', 
-        icon: '',
-        activeIcon: StationManagementActive,
-        inactiveIcon: StationManagementInactive,
-        isImageIcon: true 
-    },
-    { 
-        id: 'handlingAgent', 
-        label: 'Handling Agent', 
-        icon: '',
-        activeIcon: handlingAgentActive,
-        inactiveIcon: HandlingAgentInactive,
-        isImageIcon: true 
-    },
+    // { 
+    //     id: 'stationManagement', 
+    //     label: 'Station Management', 
+    //     icon: '',
+    //     activeIcon: StationManagementActive,
+    //     inactiveIcon: StationManagementInactive,
+    //     isImageIcon: true 
+    // },
+    // { 
+    //     id: 'handlingAgent', 
+    //     label: 'Handling Agent', 
+    //     icon: '',
+    //     activeIcon: handlingAgentActive,
+    //     inactiveIcon: HandlingAgentInactive,
+    //     isImageIcon: true 
+    // },
+    { id: 'inPlantDashboard', label: 'In-Plant Details', icon: WarehouseIcon },
     { id: 'etaReport', label: 'Reports', icon: AssessmentIcon },
     { id: 'settings', label: 'Settings', icon: SettingsIcon },
-    { id: 'etaDashboard', label: 'Dashboard', icon: AllInboxIcon },
-    { id: 'inPlantDashboard', label: 'In-Plant Details', icon: WarehouseIcon },
     { id: 'contact', label: 'Contact Logs', icon: ContactPageIcon },
-    // { id: 'captiveRakeMapView', label: 'Captive Rakes Management', icon: TrainIcon }
 ];
 
 const NavItem = ({ 

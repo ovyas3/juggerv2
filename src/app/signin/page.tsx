@@ -47,7 +47,7 @@ const Signin = () => {
           );
           if (signedIn) {
             getPreferences()
-            router.push("/inPlantDashboard");
+            router.push("/welcome");
           }
         } else {
           showMessage(response.message, "error");

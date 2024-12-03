@@ -10,19 +10,8 @@
        margin-left: 15px;
     }
 }
-
-.pageContainer{
-    margin-top: 56px;
-    margin-left: 70px;
-    width: calc(100vw - 70px);
-    height: calc(100vh - 56px);
-    padding: 24px;
-}
-.marginAtMobile{
-    margin-top: 0px;
-    margin-left: 0px;
-    height: calc(100vh - 65px);
-    width: 100vw;
+.station-content{
+    width: 100%;
 }
 .filters_stations{
     display: flex;

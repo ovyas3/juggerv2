@@ -25,7 +25,6 @@ const TrackingStatus: React.FC<TrackingStatusProps> = ({ handleAllRakesAndTable,
   const router = useRouter();
   const t = useTranslations("DASHBOARD");
   const [isHovered, setIsHovered] = useState(false);
-  const [isMapHover, setIsMapHover] = useState(false);
   const [nonTrackingEmptyHovered, setNonTrackingEmptyHovered] = useState(false);
   const [nonTrackingWithLoadHovered, setNonTrackingWithLoadHovered] = useState(false);
   const [totalRakes, setTotalRakes] = useState(0);
@@ -207,21 +206,8 @@ const TrackingStatus: React.FC<TrackingStatusProps> = ({ handleAllRakesAndTable,
     }
   }
 
-
   return (
     <div className="tracking-status-container">
-      <div className="tracking-status-head">
-        <div className="tracking-status-header">
-          TRACKING STATUS
-        </div>
-        {/* <div className="map-view-btn" 
-             onMouseEnter={() => setIsMapHover(true)} 
-             onMouseLeave={() => setIsMapHover(false)}
-             onClick={() => router.push('/MapsHelper')}>
-          <Image src={isMapHover ? MapViewHoverIcon : MapViewIcon} alt="map view" width={16} height={16}/>
-          <span className="map-view-btn-header">Map View</span>
-        </div> */}
-      </div>
       <div className="status-container">
         <div
           className="status-wrapper"
