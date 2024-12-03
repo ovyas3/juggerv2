@@ -40,7 +40,7 @@
 
 .whatsApp-notify-indexLabel {
   margin-right: 0.5rem;
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   font-weight: 500;
   font-family: 'Inter', sans-serif;
   color: #42454E;
@@ -48,8 +48,14 @@
 
 .whatsApp-notify-inputWithButton{
   display: flex;
-  gap: 0.6rem;
+  gap: 1.4rem;
   align-items: center;
+}
+
+.whatsaApp-notify-inputWithLabel{
+  display: flex;
+  gap: 0.3rem;
+  flex-direction: column;
 }
 
 .whatsApp-notify-input {
@@ -70,6 +76,7 @@
   width: 20px;
   height: 20px;
   font-size: 14px;
+  margin-top: 16px;
   cursor: pointer;
 }
 
