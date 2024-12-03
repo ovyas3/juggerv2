@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, Suspense } from "react";
 import Header from "@/components/Header/header";
 import MobileHeader from "@/components/Header/mobileHeader";
 import SideDrawer from "@/components/Drawer/Drawer";
@@ -63,12 +63,14 @@ function Settings() {
             </div>
           </div>
           <div id="right-section">
-            {activeOption === 'captiveRakes' && <CaptiveRakeSettings />}
-            {activeOption === 'station&Contacts' && <StationManagement />}
-            {activeOption === 'hubRMS' && <HandlingAgent />}
-            {activeOption === 'updateETA' && <UpdateETA />}
-            {activeOption === 'notification' && <WhatsAppNotify />}
-            {activeOption === 'preferences' && <Preferences/>}
+            <Suspense fallback={<div>Loading...</div>}>
+              {activeOption === 'captiveRakes' && <CaptiveRakeSettings />}
+              {activeOption === 'station&Contacts' && <StationManagement />}
+              {activeOption === 'hubRMS' && <HandlingAgent />}
+              {activeOption === 'updateETA' && <UpdateETA />}
+              {activeOption === 'notification' && <WhatsAppNotify />}
+              {activeOption === 'preferences' && <Preferences/>}
+            </Suspense>
           </div>
         </div>
       </div>
