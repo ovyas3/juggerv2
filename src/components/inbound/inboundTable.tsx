@@ -224,7 +224,7 @@ function InboundTable({ allShipment, count, setInBoundPayload }: any) {
                                     <>
                                         <div id='pickupLocationInfo'>
                                             <div>{row.pickupLocation?.name}</div>
-                                            <div>{!row.pickupLocation?.name.includes(row.pickupLocation?.code) && row.pickupLocation?.code}</div>
+                                            <div>{!row.pickupLocation?.name?.includes(row.pickupLocation?.code) && row.pickupLocation?.code}</div>
                                             <div>{row.pickupLocation?.state}</div>
                                         </div>
                                         <div id='paidBy'>{row.paidBy}</div>

@@ -4,19 +4,22 @@ import Image from 'next/image';
 import './Drawer.css'
 import defaultLogo from '@/assets/logo_default_icon.svg';
 import fullLogo from '@/assets/Smartruck_hover_logo.svg'
-import StationManagementActive from '../../assets/station_management_active_icon.svg';
-import StationManagementInactive from '../../assets/station_management_inactive_icon.svg';
-import HandlingAgentInactive from '@/assets/handling_agent_inactive_icon.svg';
-import handlingAgentActive from '@/assets/handling_agent_active_icon.svg'
 import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import TrainIcon from '@mui/icons-material/Train';
-import DashboardIcon from '@mui/icons-material/Dashboard';
-import AssessmentIcon from '@mui/icons-material/Assessment';
-import SettingsIcon from '@mui/icons-material/Settings';
-import AllInboxIcon from '@mui/icons-material/AllInbox';
-import WarehouseIcon from '@mui/icons-material/Warehouse';
 import ContactPageIcon from '@mui/icons-material/ContactPage';
+
+import ShipmentInactive from "@/assets/shipments_bg_icon.svg";
+import ShipmentActive from "@/assets/shipments_wg_icon.svg";
+import DashboardInactive from "@/assets/Dashboard_bg_icon.svg";
+import DashboardActive from "@/assets/Dashboard_wg_icon.svg";
+import ReportInactive from "@/assets/reports_bg_icon.svg";
+import ReportActive from "@/assets/reports_wg_icon.svg";
+import SettingsInactive from "@/assets/settings_bg_icon.svg";
+import SettingsActive from "@/assets/settings_wg_icon.svg";
+import CaptiveRakeInactive from "@/assets/captiverakes_bg_icon.svg";
+import CaptiveRakeActive from "@/assets/captiverakes_wg_icon.svg";
+import InPlantDetailsInactive from "@/assets/Inplant_details_bg_icon.svg";
+import InPlantDetailsActive from "@/assets/Inplant_details_wg_icon.svg";
 
 interface NavItem {
     id: string;
@@ -28,30 +31,55 @@ interface NavItem {
 }
 
 const navigationItems: NavItem[] = [
-    { id: 'orders', label: 'Shipments', icon: TrainIcon },
-    { id: 'dashboard', label: 'Captive Rakes', icon: DashboardIcon },
     { 
-        id: 'stationManagement', 
-        label: 'Station Management', 
+        id: 'etaDashboard', 
+        label: 'Dashboard',
         icon: '',
-        activeIcon: StationManagementActive,
-        inactiveIcon: StationManagementInactive,
-        isImageIcon: true 
+        activeIcon: DashboardActive,
+        inactiveIcon: DashboardInactive,
+        isImageIcon: true
     },
     { 
-        id: 'handlingAgent', 
-        label: 'Handling Agent', 
+        id: 'orders', 
+        label: 'Shipments',
         icon: '',
-        activeIcon: handlingAgentActive,
-        inactiveIcon: HandlingAgentInactive,
-        isImageIcon: true 
+        activeIcon: ShipmentActive,
+        inactiveIcon: ShipmentInactive,
+        isImageIcon: true
     },
-    { id: 'etaReport', label: 'Reports', icon: AssessmentIcon },
-    { id: 'settings', label: 'Settings', icon: SettingsIcon },
-    { id: 'etaDashboard', label: 'Dashboard', icon: AllInboxIcon },
-    { id: 'inPlantDashboard', label: 'In-Plant Details', icon: WarehouseIcon },
+    { 
+        id: 'dashboard', 
+        label: 'Captive Rakes',
+        icon: '',
+        activeIcon: CaptiveRakeActive,
+        inactiveIcon: CaptiveRakeInactive,
+        isImageIcon: true
+    },
+    { 
+        id: 'inPlantDashboard', 
+        label: 'In-Plant Details',
+        icon: '',
+        activeIcon: InPlantDetailsActive,
+        inactiveIcon: InPlantDetailsInactive,
+        isImageIcon: true
+    },
+    { 
+        id: 'etaReport', 
+        label: 'Reports',
+        icon: '',
+        activeIcon: ReportActive,
+        inactiveIcon: ReportInactive,
+        isImageIcon: true
+    },
+    { 
+        id: 'settings', 
+        label: 'Settings',
+        icon: '',
+        activeIcon: SettingsActive,
+        inactiveIcon: SettingsInactive,
+        isImageIcon: true
+    },
     { id: 'contact', label: 'Contact Logs', icon: ContactPageIcon },
-    // { id: 'captiveRakeMapView', label: 'Captive Rakes Management', icon: TrainIcon }
 ];
 
 const NavItem = ({ 
@@ -72,7 +100,6 @@ const NavItem = ({
     onMouseLeave: () => void;
 }) => {
     const isHighlighted = isActive || isHovered;
-    const Icon = item.icon;
 
     return (
         <div
@@ -93,11 +120,10 @@ const NavItem = ({
                     alt={item.label}
                     style={{ 
                         marginLeft: isOpen ? '10px' : '2px',
-                        color: isHighlighted ? 'black' : 'white'
                     }}
                 />
             ) : (
-                <Icon 
+                <item.icon 
                     style={{ 
                         marginLeft: isOpen ? '9px' : '', 
                         color: isHighlighted ? 'black' : 'white' 

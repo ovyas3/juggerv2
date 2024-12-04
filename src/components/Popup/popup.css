@@ -4,14 +4,13 @@
   display: inline-block;
   border-radius: 12px !important;
   overflow-y: unset;
-  margin-top: 6px;
   width: 100%;
   padding-right: 24px;
   font-family: 'Plus Jakarta Sans', sans-serif;
 }
 
 .lower-conatiner{
-  padding: 12px;
+  padding: 6px;
   /* border-radius: 0 0 12px 12px; */
 
   .MuiPaper-root{
@@ -29,8 +28,8 @@
   }
 
   .table-parent-container{
-    min-width: 650px !important;
-    max-height: 500px;
+    min-width: 700px !important;
+    max-height: 400px;
   }
 
   .MuiTable-root .MuiTableBody-root .MuiTableRow-root:hover{
@@ -321,7 +320,7 @@
   }
 
   .lower-conatiner{
-    padding: 16px;
+    padding: 12px;
   }
 }
 

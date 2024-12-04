@@ -37,7 +37,9 @@
    "withoutLoad":"Empty",
    "mapView":"Map View",
    "updateAgreementID":"Update Agreement ID",
-   "foisDetails":"FOIS Details"
+   "foisDetails":"FOIS Details",
+   "Overview":"OVERVIEW",
+   "Insights":"INSIGHTS"
   },
   "HEADER":{
     "shipments":"Shipments",
@@ -295,7 +297,13 @@
     "deleteContactHeader":"Delete Contact"
   },
   "SETTINGS": {
-   "statusCodes":[
+    "updateETA": "Update ETA",
+    "notification": "Notification",
+    "preferences": "Preferences",
+    "captiveRakes": "Captive Rakes",
+    "station&Contacts": "Station & Contacts",
+    "hubRMS": "Hub RMS",
+    "statusCodes":[
       {
         "code": "MT",
         "status": "Empty",

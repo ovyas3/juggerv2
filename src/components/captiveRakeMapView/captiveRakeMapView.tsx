@@ -2,19 +2,21 @@
 
 import { MapContainer, TileLayer, Marker, LayersControl, Popup } from 'react-leaflet';
 import "leaflet/dist/leaflet.css";
+import "leaflet-boundary-canvas";
 import L from "leaflet"; // Import Leaflet for creating custom icons
-import styles from "./page.module.css";
 import Image from "next/image";
 import rakesLoadedIcon from "@/assets/rakes_loaded.svg";
 import captiveRakes from '@/assets/cr.svg'
 import emptyRakesIcon from "@/assets/empty_rakes_icon.svg";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { httpsGet, httpsPost } from '@/utils/Communication';
 import { useRouter } from 'next/navigation';
 import getBoundary from '@/components/MapView/IndianClaimed';
 import timeService from '@/utils/timeService';
 import { useMediaQuery, useTheme } from '@mui/material';
 import { get } from 'http';
+import styles from "./page.module.css";
+import getIndiaMap from "@/components/MapView/IndiaMap";
 
 interface SchemeData {
   count: number;
@@ -133,28 +135,73 @@ export default function CaptiveRakeMapView() {
   const [plantRakesSummaryPlants,setPlantRakesSummaryPlants] = useState<any>([])
   const [totalCRCount, setTotalCRCount] = useState(0)
   const [usedCRCount,setUsedCRCount] = useState(0)
+  const [shouldAutoFit, setShouldAutoFit] = useState(true);
 
-  const handleRakeFilterClick = (filterType: string, ids: string[]) => {
-    setActiveRakeFilter(filterType === activeRakeFilter ? "All" : filterType);
-    getCoords(filterType, ids);
-    getRakeStatusData(filterType);
-    getRakeStats(filterType);
-    getSchemeWiseCount(filterType);
-  };
+  const fitMapBounds = useCallback((coordinates: any[]) => {
+    if (map && coordinates && coordinates.length > 0 && shouldAutoFit) {
+      const validCoords = coordinates.filter(
+        (coord: any) =>
+          coord?.geo_point?.coordinates &&
+          coord.geo_point.coordinates[0] !== 0 &&
+          coord.geo_point.coordinates[1] !== 0
+      );
 
-  const handleFilterClick = (filter: 'total' | 'loaded' | 'empty') => {
-    setActiveFilter(filter === activeFilter ? 'total' : filter);
-  };
+      if (validCoords.length > 0) {
+        const latLngs: L.LatLngExpression[] = validCoords.map((coord: any) => (
+          [
+            coord.geo_point.coordinates[1],
+            coord.geo_point.coordinates[0]
+          ] as L.LatLngTuple
+        ));
 
-  const handleArrivalClick = (period: string, ids: string[]) => {
-    setSelectedArrival(selectedArrival === period ? null : period);
-    getCoords(activeRakeFilter, ids);
-  };
+        const bounds = L.latLngBounds(latLngs);
+        
+        if (bounds.isValid()) {
+          // Calculate zoom level based on number of coordinates
+          let zoomLevel;
+          if (validCoords.length === 1) {
+            zoomLevel = 15; // Very high zoom for single point
+          } else if (validCoords.length <= 3) {
+            zoomLevel = 13; // High zoom for few points
+          } else if (validCoords.length <= 10) {
+            zoomLevel = 11; // Medium-high zoom for moderate points
+          } else {
+            zoomLevel = 10; // Medium zoom for many points
+          }
 
-  const handleRowClick = (index: number, rowData: RakeStatusData) => {
-    setSelectedRow(selectedRow === index ? null : index);
-    getCoords(activeRakeFilter, rowData._ids);
-  };
+          const paddedBounds = bounds.pad(0.1); // 10% padding
+          map.fitBounds(paddedBounds, {
+            animate: true,
+            duration: 1.2, // Increased duration for smoother transition
+            easeLinearity: 0.5, // Makes the animation more smooth
+            maxZoom: zoomLevel // Apply calculated zoom level
+          });
+        }
+      }
+    } else if (map && shouldAutoFit) {
+      map.setView(center, 5);
+    }
+  }, [map, center, shouldAutoFit]);
+
+  useEffect(() => {
+    if (map) {
+      const handleMapInteraction = () => {
+        setShouldAutoFit(false);
+      };
+
+      map.on('dragstart', handleMapInteraction);
+      map.on('zoomstart', handleMapInteraction);
+
+      return () => {
+        map.off('dragstart', handleMapInteraction);
+        map.off('zoomstart', handleMapInteraction);
+      };
+    }
+  }, [map]);
+
+  useEffect(() => {
+    setShouldAutoFit(true);
+  }, [activeFilter, activeRakeFilter]);
 
   const filteredCoords = useMemo(() => {
     return coordsData && coordsData.length > 0 && coordsData.filter((val: any) => {
@@ -180,6 +227,38 @@ export default function CaptiveRakeMapView() {
       empty: rakeFilteredData.filter((val: any) => val.loading_status !== "L").length
     };
   }, [coordsData, activeRakeFilter]);
+
+  useEffect(() => {
+    if (map && filteredCoords.length > 0) {
+      fitMapBounds(filteredCoords);
+    }
+  }, [filteredCoords, map, fitMapBounds]);
+
+  const handleRakeFilterClick = (filterType: string, ids: string[]) => {
+    setActiveRakeFilter(filterType === activeRakeFilter ? "All" : filterType);
+    getCoords(filterType, ids);
+    getRakeStatusData(filterType);
+    getRakeStats(filterType);
+    getSchemeWiseCount(filterType);
+  };
+
+  const handleFilterClick = (filter: 'total' | 'loaded' | 'empty') => {
+    setActiveFilter(filter === activeFilter ? 'total' : filter);
+  };
+
+  const handleArrivalClick = (period: string, ids: string[]) => {
+    setSelectedArrival(selectedArrival === period ? null : period);
+    if(ids.length) {
+      getCoords(activeRakeFilter, ids);
+    } else {
+      setCoordsData([])
+    }
+  };
+
+  const handleRowClick = (index: number, rowData: RakeStatusData) => {
+    setSelectedRow(selectedRow === index ? null : index);
+    getCoords(activeRakeFilter, rowData._ids);
+  };
 
   async function getCoords(scheme: string, ids: string[] = []) {
     try {
@@ -210,6 +289,9 @@ export default function CaptiveRakeMapView() {
         setCoordsData(coords);
         setLoadedRakes(loaded);
         setEmptyRakes(empty);
+        
+        // Fit map bounds to the filtered coordinates
+        fitMapBounds(coords);
       } else {
         console.error('Invalid response format:', response);
       }
@@ -302,7 +384,7 @@ export default function CaptiveRakeMapView() {
     const queryParams =
       activeRakeFilter !== "All" ? `?scheme=${activeRakeFilter}` : "";
     const response = await httpsGet("get/ownOrOthers" + queryParams, 0, router);
-    if (response.statusCode === 200) {
+    if (response?.data && response?.data?.length > 0) {
       const data = response.data || [];
       setPlantRakesSummary(data);
       if (activeRakeFilter === "All") {
@@ -332,11 +414,15 @@ export default function CaptiveRakeMapView() {
     }
   }
 
-  function handlePlantRakesMapFilter(ids: string[] = []) {
+  const handlePlantRakesMapFilter = (ids: string[] = []) => {
     if (ids.length) {
       getCoords(activeRakeFilter, ids);
     } else {
       setCoordsData([]);
+      // Reset map to default view when no coordinates
+      if (map) {
+        map.setView(center, 5);
+      }
     }
   } 
 
@@ -358,8 +444,19 @@ export default function CaptiveRakeMapView() {
       map.on('zoomend', () => {
         setCurrentZoom(map.getZoom());
       });
+  
+      const streetViewControl = document.querySelector('.leaflet-control-layers');
+      
+      if (streetViewControl && streetViewControl instanceof HTMLElement) {
+        streetViewControl.style.top = '42px';  
+        streetViewControl.style.right = '0px';  
+      }
     }
-  }, [map]);
+  }, [map]);  
+ 
+  useEffect(()=>{
+   setSelectedRow(-1)
+  },[selectedArrival])
 
   const customLoadedIcon = (stabled: any) => {
     const stabledClass = stabled ? styles.stabledBorder : "";
@@ -386,6 +483,23 @@ export default function CaptiveRakeMapView() {
       popupAnchor: [0, -8],
     });
   };
+
+  const legendItems = [
+    {
+      label: 'Loaded',
+      class: `${styles.markerDot} ${styles.loaded}`,
+    },
+    {
+      label: 'Empty',
+      class: `${styles.markerDot} ${styles.empty}`,
+    },  {
+      label: 'Stabled(Loaded)',
+      class: `${styles.markerDot} ${styles.loaded} ${styles.stabledBorder}`,
+    },  {
+      label: 'Stabled(Empty)',
+      class: `${styles.markerDot} ${styles.empty} ${styles.stabledBorder}`,
+    }
+  ]
 
   const createTrainIcon = (isLoaded: boolean) => {
     const fillColor = isLoaded ? '#037f58' : '#e31f3f';
@@ -439,19 +553,42 @@ export default function CaptiveRakeMapView() {
     }
   }
 
-  const addIndiaBoundaries = () => {
-    const b = getBoundary();
-    if (map instanceof L.Map) {
-      L.geoJSON(b, {
-        style: boundaryStyle
-      }).addTo(map);
-    } else {
-      console.error('map is not a Leaflet map object');
-    }
-  }
-
   useEffect(() => {
-    addIndiaBoundaries();
+    if (!map) return;
+
+    const fetchGeoJSON = async () => {
+      try {
+        const { features} = getIndiaMap();
+        
+        const indiaGeoJSON = {
+          type: "FeatureCollection",
+          features
+        };
+
+        // Add boundary masking with the combined GeoJSON
+        const osmLayer = (L.TileLayer as any).boundaryCanvas(
+          "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+          {
+            boundary: indiaGeoJSON,
+            attribution:
+              '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+          }
+        );
+
+        map.addLayer(osmLayer);
+
+        // Add the claimed boundaries as a separate layer
+        const claimedBoundaries = getBoundary();
+        L.geoJSON(claimedBoundaries, {
+          style: boundaryStyle
+        }).addTo(map);
+
+      } catch (error) {
+        console.error("Error fetching GeoJSON:", error);
+      }
+    };
+
+    fetchGeoJSON();
   }, [map]);
 
   return (
@@ -579,9 +716,7 @@ export default function CaptiveRakeMapView() {
                     <span className={styles.label} style={{ color: "#18BE8A" }}>
                       Loaded
                     </span>
-                    <span className={styles.value}>
-                      {filteredCounts.loaded}
-                    </span>
+                    <span className={styles.value}>{filteredCounts.loaded}</span>
                   </div>
                 </div>
                 <div
@@ -639,7 +774,7 @@ export default function CaptiveRakeMapView() {
                   }
                 >
                   <span className={styles.value}>
-                    {stats["T+2"].count || 0}
+                    {stats["T+1"].count || 0}
                   </span>
                   <span className={styles.label}>T+1</span>
                 </div>
@@ -701,9 +836,13 @@ export default function CaptiveRakeMapView() {
                         (row: RakeStatusData, index: number) => (
                           <tr
                             key={index}
-                            style={row.code === 'ST' ? { backgroundColor: '#f5f5f5' } : { backgroundColor: '' }}
+                            style={
+                              row.code === "ST"
+                                ? { backgroundColor: "#f5f5f5" }
+                                : { backgroundColor: "" }
+                            }
                             className={
-                              selectedRow === index ? styles.selected : "" 
+                              selectedRow === index ? styles.selected : ""
                             }
                             onClick={() => handleRowClick(index, row)}
                           >
@@ -784,11 +923,12 @@ export default function CaptiveRakeMapView() {
                       .map((plant: any, index: any) => (
                         <td key={index}>
                           <span
-                            onClick={() =>
+                            onClick={() => {
                               handlePlantRakesMapFilter(
                                 plantRakesSummary.from[plant]?.ids
-                              )
-                            }
+                              );
+                              setSelectedArrival(null);
+                            }}
                             style={{ cursor: "pointer" }}
                           >
                             {plantRakesSummary.from[plant]?.count ?? 0}
@@ -804,11 +944,12 @@ export default function CaptiveRakeMapView() {
                       .map((plant: any, index: any) => (
                         <td key={index}>
                           <span
-                            onClick={() =>
+                            onClick={() => {
                               handlePlantRakesMapFilter(
                                 plantRakesSummary.to[plant]?.ids
-                              )
-                            }
+                              );
+                              setSelectedArrival(null);
+                            }}
                             style={{ cursor: "pointer" }}
                           >
                             {plantRakesSummary.to[plant]?.count ?? 0}
@@ -820,21 +961,56 @@ export default function CaptiveRakeMapView() {
               </table>
             </div>
             <div className={styles.captiveRakeCountBox}>
-            <h2>Captive Rakes Utilization</h2>
-                  <div className={styles.countWrapper}>
-                    <p className={styles.infoCR}>Used Captive Rakes:</p>
-                    <p className={styles.usedCount}>{usedCRCount}</p>/
-                    <p className={styles.totalCount}>{totalCRCount}</p>
-                  </div>
-                  <div className={styles.usagePercentageWrapper}>
-                  <p className={styles.infoCR}>Utilization Percentage:</p>
-                    <p className={styles.usagePercentage}>
-                      {((usedCRCount / totalCRCount) * 100).toFixed(2)}%
-                    </p>
-                  </div>
-                </div>
+              <h2>Captive Rakes Utilization</h2>
+              <div className={styles.countWrapper}>
+                <p className={styles.infoCR}>Used Captive Rakes:</p>
+                <p className={styles.usedCount}>{usedCRCount}</p>/
+                <p className={styles.totalCount}>{totalCRCount}</p>
+              </div>
+              <div className={styles.usagePercentageWrapper}>
+                <p className={styles.infoCR}>Utilization Percentage:</p>
+                <p className={styles.usagePercentage}>
+                  {((usedCRCount / totalCRCount) * 100).toFixed(2)}%
+                </p>
+              </div>
+            </div>
           </div>
           <div className={styles.rightPanel}>
+            <div style={{ position: "relative" }}>
+              <div
+                style={{
+                  height: "32px",
+                  display: "flex",
+                  justifyContent: "space-evenly",
+                  position: "absolute",
+                  background: "white",
+                  zIndex: 1000,
+                  right: "10px",
+                  top: "10px",
+                  width: "350px",
+                  borderRadius: "6px",
+                  boxShadow: "rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px",
+                  color: "#42454E",
+                }}
+              >
+                {legendItems.map((item: any) => {
+                  return (
+                    <div
+                    key={item}
+                      style={{ 
+                        fontSize: "10px",
+                        display: "flex",
+                        alignItems: "center",
+                        columnGap: "4px",
+                      }}
+                    >
+                      <div className={item.class}></div>
+                      <div>{item.label}</div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
             <MapContainer
               className="map"
               id="map-helpers"
@@ -849,14 +1025,14 @@ export default function CaptiveRakeMapView() {
               attributionControl={false}
               ref={setMap}
             >
-              <LayersControl>
+              {/* <LayersControl>
                 <LayersControl.BaseLayer checked name="OpenStreetMap">
                   <TileLayer
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                   />
                 </LayersControl.BaseLayer>
-              </LayersControl>
+              </LayersControl> */}
               {filteredCoords.map((marker: any, index: number) => {
                 const icon = getIcon(marker.loading_status, marker.stts_code);
 
@@ -890,7 +1066,7 @@ export default function CaptiveRakeMapView() {
                           </p>
                           <p style={{ margin: "2px 0" }}>
                             <strong>Rake Name:</strong>{" "}
-                            {marker.rake?.name || "N/A"}
+                          {marker.rake?.name || "N/A"}
                           </p>
                           <p style={{ margin: "2px 0" }}>
                             <strong>Rake Status:</strong>{" "}

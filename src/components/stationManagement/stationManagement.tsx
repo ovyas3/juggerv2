@@ -8,13 +8,13 @@ import { useWindowSize } from "@/utils/hooks";
 import MobileHeader from "@/components/Header/mobileHeader";
 import { useEffect, useState } from "react";
 import searchIcon from '@/assets/search_icon.svg'
-import './page.css'
+import './stationManagement.css'
 import StationAdd from "./stationModal";
 import { httpsGet } from "@/utils/Communication";
 import { useRouter } from "next/navigation";
 import { useMediaQuery, useTheme } from '@mui/material';
 
-const Page = () => {
+const StationManagement = () => {
   const router = useRouter();
   const theme = useTheme();
   const mobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -70,15 +70,12 @@ const Page = () => {
   return (
     <div 
       className="station-container"
-      style={{
-        marginBottom: !mobile ? '0px' : '60px',
-      }}
     >
       {/* ------------header ----------- */}
-      {!mobile ? <Header title={'Station Management'} isMapHelper={false} /> : <MobileHeader />}
+      {/* {!mobile ? <Header title={'Station Management'} isMapHelper={false} /> : <MobileHeader />} */}
 
       {/* ----------Page Content------------ */}
-      <div className={`pageContainer ${!mobile ? '' : 'marginAtMobile'}`}>
+      <div className="station-content">
         {/* --------------content other than table ------------------ */}
         <div className="filters_stations">
           <div></div>
@@ -103,9 +100,9 @@ const Page = () => {
       </div>
 
       {/* ----------sildeDrawer ------------- */}
-      {!mobile ? <SideDrawer /> : <div ><MobileDrawer /></div>}
+      {/* {!mobile ? <SideDrawer /> : <div ><MobileDrawer /></div>} */}
     </div>
   )
 }
 
-export default Page;
+export default StationManagement;

@@ -1,68 +1,89 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useState, Suspense } from "react";
 import Header from "@/components/Header/header";
 import MobileHeader from "@/components/Header/mobileHeader";
-import { useWindowSize } from "@/utils/hooks";
 import SideDrawer from "@/components/Drawer/Drawer";
 import MobileDrawer from "@/components/Drawer/mobile_drawer";
-import { useSnackbar } from "@/hooks/snackBar";
-import { httpsGet, httpsPost } from "@/utils/Communication";
 import { useTranslations } from "next-intl";
 import "./style.css";
-import { redirect, useRouter, useParams } from "next/navigation";
 import UpdateETA from '@/app/updateETA/page';
-import WhatsAppNotify from '@/app/whatsAppNotify/page';
+import WhatsAppNotify from "@/components/whatsAppNotify/whatsAppNotify";
 import Preferences from "@/components/Preferences/preferences";
 import { useMediaQuery, useTheme } from '@mui/material';
+import CaptiveRakeSettings from "@/components/captiveRakeSettings/captiveRakeSettings";
+import StationManagement from "@/components/stationManagement/stationManagement";
+import HandlingAgent from "@/components/handlingAgent/handlingAgent";
 
 function Settings() {
-    const text = useTranslations("ETADASHBOARD");
-    const route = useRouter();
-    const [activeOption, setActiveOption] = useState("updateETA");
-    const theme = useTheme();
-    const mobile = useMediaQuery(theme.breakpoints.down('md'));
-  
-    return (
-        <div>
-          {!mobile ? (
-            <Header title={"Settings"} isMapHelper={false} />
-          ) : (
-            <MobileHeader />
-          )}
-    
-          <div
-            className={`content_container_contact ${!mobile ? "adjustMargin" : "adjustMarginMobile"}`}
-            style={{backgroundColor:'#F0F3F9'}}
-          >
+  const text = useTranslations("SETTINGS");
+  const [activeOption, setActiveOption] = useState("captiveRakes");
+  const theme = useTheme();
+  const mobile = useMediaQuery(theme.breakpoints.down('md'));
 
-            <div style={{width:'100%', backgroundColor:'white', height:'100%', borderRadius:'12px', boxShadow:'0px 4px 12px rgba(0, 0, 0, 0.15)', display:'flex', }}>
-                <div id="left-section">
-                    <div className={activeOption === 'updateETA' ? 'activeOption':""} style={{paddingInline:'16px', paddingBlock:'10px', cursor:'pointer'}} onClick={()=>setActiveOption('updateETA')} >Update ETA</div>
-                    <div className={activeOption === 'whatsAppNotify' ? 'activeOption':""} style={{paddingInline:'16px', paddingBlock:'10px', cursor:'pointer'}} onClick={()=>setActiveOption('whatsAppNotify')} >WhatsApp Notify</div>
-                    <div className={activeOption === 'preferences' ? 'activeOption':""} style={{paddingInline:'16px', paddingBlock:'10px', cursor:'pointer'}} onClick={()=>setActiveOption('preferences')} >Preferences</div>
-                </div>
-                <div id="right-section">
-                    {activeOption === 'updateETA' && <UpdateETA />}
-                    {activeOption === 'whatsAppNotify' && <WhatsAppNotify />}
-                    {activeOption === 'preferences' && <Preferences/>}
-                </div>
+  return (
+    <div>
+      {!mobile ? (
+        <Header title={"Settings"} isMapHelper={false} />
+      ) : (
+        <MobileHeader />
+      )}
+
+      <div className={`content_container_settings ${!mobile ? "adjustMargin" : "adjustMarginMobile"}`}>
+        <div id="settings-container">
+          <div id="left-section">
+            <div 
+              className={activeOption === 'captiveRakes' ? 'activeOptionSettings': "normalOptionSettings" } 
+              onClick={()=>setActiveOption('captiveRakes')}>
+                {text("captiveRakes")}
             </div>
-            
-
-
-
-
+            <div 
+              className={activeOption === 'station&Contacts' ? 'activeOptionSettings': "normalOptionSettings" } 
+              onClick={()=>setActiveOption('station&Contacts')}>
+                {text("station&Contacts")}
+            </div>
+            <div 
+              className={activeOption === 'hubRMS' ? 'activeOptionSettings': "normalOptionSettings" } 
+              onClick={()=>setActiveOption('hubRMS')}>
+                {text("hubRMS")}
+            </div>
+            <div 
+              className={activeOption === 'updateETA' ? 'activeOptionSettings': "normalOptionSettings" } 
+              onClick={()=>setActiveOption('updateETA')}>
+                {text("updateETA")}
+            </div>
+            <div 
+              className={activeOption === 'notification' ? 'activeOptionSettings': "normalOptionSettings" } 
+              onClick={()=>setActiveOption('notification')}>
+                {text("notification")}
+            </div>
+            <div 
+              className={activeOption === 'preferences' ? 'activeOptionSettings': "normalOptionSettings" } 
+              onClick={()=>setActiveOption('preferences')}>
+                {text("preferences")}
+            </div>
           </div>
-    
-          {!mobile ? (
-            <SideDrawer />
-          ) : (
-            <div >
-              <MobileDrawer />
-            </div>
-          )}
+          <div id="right-section">
+            <Suspense fallback={<div>Loading...</div>}>
+              {activeOption === 'captiveRakes' && <CaptiveRakeSettings />}
+              {activeOption === 'station&Contacts' && <StationManagement />}
+              {activeOption === 'hubRMS' && <HandlingAgent />}
+              {activeOption === 'updateETA' && <UpdateETA />}
+              {activeOption === 'notification' && <WhatsAppNotify />}
+              {activeOption === 'preferences' && <Preferences/>}
+            </Suspense>
+          </div>
         </div>
-      );
+      </div>
+
+      {!mobile ? (
+        <SideDrawer />
+      ) : (
+        <div >
+          <MobileDrawer />
+        </div>
+      )}
+    </div>
+  );
 }
 
 export default Settings;
