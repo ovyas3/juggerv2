@@ -243,7 +243,6 @@
     opacity: 1;
     z-index: 3000;
     position: absolute;
-    right: 510px;
   }
   .search-container {
     display: flex;
