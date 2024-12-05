@@ -384,8 +384,8 @@ export default function CaptiveRakeMapView() {
     const queryParams =
       activeRakeFilter !== "All" ? `?scheme=${activeRakeFilter}` : "";
     const response = await httpsGet("get/ownOrOthers" + queryParams, 0, router);
-    if (response?.data && response?.data?.length > 0) {
-      const data = response.data || [];
+    if (response?.data) {
+      const data = response.data || {};
       setPlantRakesSummary(data);
       if (activeRakeFilter === "All") {
         const plants = [
