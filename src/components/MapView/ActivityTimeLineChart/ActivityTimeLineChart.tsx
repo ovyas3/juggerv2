@@ -96,7 +96,7 @@ export const ActivityTimeLineChart = (props: any) => {
                     <TimelineOppositeContent sx={{
               fontWeight: 900
             }}  color="text.secondary" fontSize={"small"} marginTop={"20px"}>
-                      {firstPing.time_stamp ? service.utcToistTime(firstPing.created_at, 'dd-MM-yyyy HH:mm') : 'Date & Time Not Available'}
+                      {firstPing.time_stamp ? service.utcToistTime(firstPing.time_stamp, 'dd-MM-yyyy HH:mm') : 'Date & Time Not Available'}
                     </TimelineOppositeContent>
                     <TimelineSeparator >
                       <TimelineConnector />
