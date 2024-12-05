@@ -69,7 +69,7 @@ function CustomTabPanel(props: TabPanelProps) {
 
 interface Contact {
   name: string;
-  number: string;
+  mobile_no: string;
 }
 
 interface TimeContainer {
@@ -90,7 +90,7 @@ const WhatsAppNotify = () => {
     fromTime: '',
     toTime: '',
     timeError: '',
-    contacts: [{ name: '', number: '' }]
+    contacts: [{ name: '', mobile_no: '' }]
   }]);
   const [triggerTime, setTriggerTime] = useState('');
 
@@ -127,7 +127,7 @@ const WhatsAppNotify = () => {
   };
 
   const handleContactChange = (containerIndex: number, contactIndex: number, field: keyof Contact, value: string) => {
-    if (field === 'number') {
+    if (field === 'mobile_no') {
       const isValidInput = /^[0-9, ]*$/.test(value);
       if (!isValidInput) {
         return;
@@ -154,7 +154,7 @@ const WhatsAppNotify = () => {
 
   const addContactField = (containerIndex: number) => {
     const newContainers = [...containers];
-    newContainers[containerIndex].contacts.push({ name: '', number: '' });
+    newContainers[containerIndex].contacts.push({ name: '', mobile_no: '' });
     setContainers(newContainers);
   };
 
@@ -169,7 +169,7 @@ const WhatsAppNotify = () => {
       fromTime: '',
       toTime: '',
       timeError: '',
-      contacts: [{ name: '', number: '' }]
+      contacts: [{ name: '', mobile_no: '' }]
     }]);
   };
 
@@ -186,20 +186,20 @@ const WhatsAppNotify = () => {
     const validNumberRegex = /^\d{10}$/;
 
     containers.forEach((container, containerIndex) => {
-      if (!container.fromTime || !container.toTime) {
-        errors.push(`Time range is required for container ${containerIndex + 1}`);
-      }
+      // if (!container.fromTime || !container.toTime) {
+      //   errors.push(`Time range is required for container ${containerIndex + 1}`);
+      // }
 
       container.contacts.forEach((contact, contactIndex) => {
         if (!contact.name.trim()) {
           errors.push(`Name is required for contact ${contactIndex + 1} in container ${containerIndex + 1}`);
         }
-        if (!contact.number.trim()) {
+        if (!contact.mobile_no.trim()) {
           errors.push(`Number is required for contact ${contactIndex + 1} in container ${containerIndex + 1}`);
-        } else if (!validNumberRegex.test(contact.number)) {
-          if (contact.number.length < 10) {
+        } else if (!validNumberRegex.test(contact.mobile_no)) {
+          if (contact.mobile_no.length < 10) {
             errors.push(`Number for ${contact.name || `contact ${contactIndex + 1}`} in container ${containerIndex + 1} is too short`);
-          } else if (contact.number.length > 10) {
+          } else if (contact.mobile_no.length > 10) {
             errors.push(`Number for ${contact.name || `contact ${contactIndex + 1}`} in container ${containerIndex + 1} is too long`);
           } else {
             errors.push(`Number for ${contact.name || `contact ${contactIndex + 1}`} in container ${containerIndex + 1} is invalid`);
@@ -217,7 +217,10 @@ const WhatsAppNotify = () => {
 
   const handleSubmit = () => {
     if (validateInputs()) {
-      showMessage('Validation successful', 'success');
+      const contacts = containers.flatMap(container => 
+        container.contacts.map(({ name, mobile_no }) => ({ name, mobile_no }))
+      );
+      postWhatsAppNumbers(contacts);
     }
   };
 
@@ -226,7 +229,7 @@ const WhatsAppNotify = () => {
       fromTime: '',
       toTime: '',
       timeError: '',
-      contacts: [{ name: '', number: '' }]
+      contacts: [{ name: '', mobile_no: '' }]
     }]);
     setError('');
   };
@@ -235,7 +238,18 @@ const WhatsAppNotify = () => {
     setLoading(true)
     try {
       const response = await httpsGet('get/WhatsApp_numbers', 0, router)
-      console.log(response, "response");
+      if(response?.data 
+        && response?.data?.notification 
+        && response?.data?.notification?.whatsApp 
+        && response?.data?.notification?.whatsApp.length > 0) {
+          const contacts = response?.data?.notification?.whatsApp
+          setContainers([{
+            fromTime: '',
+            toTime: '',
+            timeError: '',
+            contacts: contacts
+          }]);
+        }
     } catch (error) {
       console.error(error)
       showMessage('Failed to fetch WhatsApp numbers', 'error')
@@ -244,12 +258,12 @@ const WhatsAppNotify = () => {
     }
   }
 
-  const postWhatsAppNumbers = async (numbers: string[]) => {
+  const postWhatsAppNumbers = async (contacts: any[]) => {
     setLoading(true)
     try {
-      const response = await httpsPost('set/WhatsApp_numbers', { mobileNos:numbers }, router, 0, false)
+      const response = await httpsPost('set/WhatsApp_numbers', { mobileNos: contacts }, router, 0, false)
       if (response.statusCode === 200) {
-        showMessage(`Successfully notified ${numbers.length} numbers.`, 'success');
+        showMessage(`Successfully notified ${contacts.length} numbers.`, 'success');
       } else {
         showMessage('Failed to notify', 'error')
       }
@@ -368,8 +382,8 @@ const WhatsAppNotify = () => {
                           <input
                             type="text"
                             placeholder="WhatsApp Number"
-                            value={contact.number}
-                            onChange={(e) => handleContactChange(containerIndex, contactIndex, 'number', e.target.value)}
+                            value={contact.mobile_no}
+                            onChange={(e) => handleContactChange(containerIndex, contactIndex, 'mobile_no', e.target.value)}
                             className="whatsApp-notify-input"
                           />
                         </div>
