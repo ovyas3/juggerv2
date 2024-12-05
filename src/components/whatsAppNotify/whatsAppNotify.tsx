@@ -3,12 +3,12 @@
 import React, { useEffect, useState } from "react";
 import { useWindowSize } from "@/utils/hooks";
 import { useSnackbar } from "@/hooks/snackBar";
-import { httpsGet, httpsPost } from "@/utils/Communication";
 import { useRouter } from "next/navigation";
 import { ThreeCircles } from "react-loader-spinner";
 import "./whatsAppNotify.css";
 import { Tabs, Tab, Box } from '@mui/material'
 import { styled } from '@mui/system'
+import { httpsPost, httpsGet } from "@/utils/Communication";
 
 // Custom styled components
 const StyledTabs = styled(Tabs)({
@@ -72,134 +72,198 @@ interface Contact {
   number: string;
 }
 
+interface TimeContainer {
+  fromTime: string;
+  toTime: string;
+  timeError?: string;
+  contacts: Contact[];
+}
+
 const WhatsAppNotify = () => {
   const router = useRouter();
   const { showMessage } = useSnackbar();
   const mobile = useWindowSize(500);
   const [loading, setLoading] = useState(false);
-  const [contacts, setContacts] = useState<Contact[]>([{ name: '', number: '' }]);
-  const [error, setError] = useState<string>('');
   const [value, setValue] = useState(0);
+  const [error, setError] = useState<string>('');
+  const [containers, setContainers] = useState<TimeContainer[]>([{
+    fromTime: '',
+    toTime: '',
+    timeError: '',
+    contacts: [{ name: '', number: '' }]
+  }]);
+  const [triggerTime, setTriggerTime] = useState('');
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
-    setValue(newValue)
-  }
+    setValue(newValue);
+  };
 
-  const handleContactChange = (index: number, field: keyof Contact, value: string) => {
-    // For number field, validate input to only allow numbers, commas, and spaces
+  const handleTimeInputClick = (inputRef: HTMLInputElement) => {
+    inputRef.showPicker();
+  };
+
+  const handleFromTimeChange = (containerIndex: number, newFromTime: string) => {
+    const newContainers = [...containers];
+    newContainers[containerIndex] = {
+      ...newContainers[containerIndex],
+      fromTime: newFromTime,
+      timeError: ''
+    };
+    setContainers(newContainers);
+  };
+
+  const handleToTimeChange = (containerIndex: number, newToTime: string) => {
+    const newContainers = [...containers];
+    const container = newContainers[containerIndex];
+    
+    if (container.fromTime && newToTime <= container.fromTime) {
+      container.timeError = 'To time must be after From time';
+    } else {
+      container.timeError = '';
+    }
+    
+    container.toTime = newToTime;
+    setContainers(newContainers);
+  };
+
+  const handleContactChange = (containerIndex: number, contactIndex: number, field: keyof Contact, value: string) => {
     if (field === 'number') {
       const isValidInput = /^[0-9, ]*$/.test(value);
       if (!isValidInput) {
-        setError('Only numbers, commas, and spaces are allowed for phone numbers.');
         return;
       }
-      // Truncate to 10 digits after removing non-digits
-      value = value.replace(/\D/g, '').slice(0, 10);
-    }
-    
-    // For name field, validate input to only allow alphabetical characters and spaces
-    if (field === 'name') {
-      const isValidInput = /^[A-Za-z ]*$/.test(value);
-      if (!isValidInput) {
-        setError('Only alphabetical characters and spaces are allowed for names.');
-        return;
+
+      // Remove any non-digit characters
+      value = value.replace(/\D/g, '');
+
+      // Limit to 10 digits
+      if (value.length > 10) {
+        value = value.slice(0, 10);
       }
     }
 
-    const newContacts = [...contacts];
-    newContacts[index][field] = value;
-    setContacts(newContacts);
+    const newContainers = [...containers];
+    const container = newContainers[containerIndex];
+    container.contacts[contactIndex] = {
+      ...container.contacts[contactIndex],
+      [field]: value
+    };
+    setContainers(newContainers);
     setError('');
   };
 
-  const addContactField = () => {
-    setContacts([...contacts, { name: '', number: '' }]);
+  const addContactField = (containerIndex: number) => {
+    const newContainers = [...containers];
+    newContainers[containerIndex].contacts.push({ name: '', number: '' });
+    setContainers(newContainers);
   };
 
-  const removeContactField = (index: number) => {
-    const newContacts = contacts.filter((_, i) => i !== index);
-    setContacts(newContacts);
+  const removeContactField = (containerIndex: number, contactIndex: number) => {
+    const newContainers = [...containers];
+    newContainers[containerIndex].contacts.splice(contactIndex, 1);
+    setContainers(newContainers);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const addContainer = () => {
+    setContainers([...containers, {
+      fromTime: '',
+      toTime: '',
+      timeError: '',
+      contacts: [{ name: '', number: '' }]
+    }]);
+  };
 
-    // Validate contacts
-    const validNumberRegex = /^\d{10}$/;
+  const removeContainer = (index: number) => {
+    if (containers.length > 1) {
+      const newContainers = [...containers];
+      newContainers.splice(index, 1);
+      setContainers(newContainers);
+    }
+  };
+
+  const validateInputs = () => {
     const errors: string[] = [];
-    const validContacts = contacts.filter((contact) => contact.number.trim() !== '' || contact.name.trim() !== '');
+    const validNumberRegex = /^\d{10}$/;
 
-    validContacts.forEach((contact, index) => {
-      if (!contact.name.trim()) {
-        errors.push(`Name is required for contact ${index + 1}`);
+    containers.forEach((container, containerIndex) => {
+      if (!container.fromTime || !container.toTime) {
+        errors.push(`Time range is required for container ${containerIndex + 1}`);
       }
-      if (!contact.number.trim()) {
-        errors.push(`Number is required for contact ${index + 1}`);
-      } else if (!validNumberRegex.test(contact.number)) {
-        if (contact.number.length < 10) {
-          errors.push(`Number for ${contact.name || `contact ${index + 1}`} is too short by ${10 - contact.number.length} digits`);
-        } else if (contact.number.length > 10) {
-          errors.push(`Number for ${contact.name || `contact ${index + 1}`} is too long by ${contact.number.length - 10} digits`);
-        } else {
-          errors.push(`Number for ${contact.name || `contact ${index + 1}`} is invalid`);
+
+      container.contacts.forEach((contact, contactIndex) => {
+        if (!contact.name.trim()) {
+          errors.push(`Name is required for contact ${contactIndex + 1} in container ${containerIndex + 1}`);
         }
-      }
+        if (!contact.number.trim()) {
+          errors.push(`Number is required for contact ${contactIndex + 1} in container ${containerIndex + 1}`);
+        } else if (!validNumberRegex.test(contact.number)) {
+          if (contact.number.length < 10) {
+            errors.push(`Number for ${contact.name || `contact ${contactIndex + 1}`} in container ${containerIndex + 1} is too short`);
+          } else if (contact.number.length > 10) {
+            errors.push(`Number for ${contact.name || `contact ${contactIndex + 1}`} in container ${containerIndex + 1} is too long`);
+          } else {
+            errors.push(`Number for ${contact.name || `contact ${contactIndex + 1}`} in container ${containerIndex + 1} is invalid`);
+          }
+        }
+      });
     });
 
     if (errors.length > 0) {
       setError(errors.join('\n'));
-      return;
+      return false;
     }
+    return true;
+  };
 
-    setError('');
-    if (validContacts.length > 0) {
-      postWhatsAppNumbers(validContacts);
-    } else {
-      showMessage('Please enter at least one contact to notify', 'error');
+  const handleSubmit = () => {
+    if (validateInputs()) {
+      showMessage('Validation successful', 'success');
     }
+  };
+
+  const handleClear = () => {
+    setContainers([{
+      fromTime: '',
+      toTime: '',
+      timeError: '',
+      contacts: [{ name: '', number: '' }]
+    }]);
+    setError('');
   };
 
   const getWhatsAppNumbers = async () => {
-    setLoading(true);
+    setLoading(true)
     try {
-      const response = await httpsGet('get/WhatsApp_numbers', 0, router);
-      if (response.statusCode === 200) {
-        const numbers = response?.data?.notification?.whatsApp || [''];
-        setContacts(numbers.map((number: string) => ({
-          name: '',
-          number: number.replace(/\D/g, '').slice(0, 10) // Remove non-digits and truncate to 10 digits
-        })));
-      } else {
-        showMessage('Failed to fetch WhatsApp numbers', 'error');
-      }
+      const response = await httpsGet('get/WhatsApp_numbers', 0, router)
+      console.log(response, "response");
     } catch (error) {
-      console.error(error);
-      showMessage('Failed to fetch WhatsApp numbers', 'error');
+      console.error(error)
+      showMessage('Failed to fetch WhatsApp numbers', 'error')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
-  const postWhatsAppNumbers = async (contacts: Contact[]) => {
-    setLoading(true);
+  const postWhatsAppNumbers = async (numbers: string[]) => {
+    setLoading(true)
     try {
-      const response = await httpsPost('set/WhatsApp_numbers', { contacts }, router, 0, false);
+      const response = await httpsPost('set/WhatsApp_numbers', { mobileNos:numbers }, router, 0, false)
       if (response.statusCode === 200) {
-        showMessage(`Successfully notified ${contacts.length} contacts.`, 'success');
+        showMessage(`Successfully notified ${numbers.length} numbers.`, 'success');
       } else {
-        showMessage('Failed to notify', 'error');
+        showMessage('Failed to notify', 'error')
       }
     } catch (error) {
-      console.error(error);
-      setLoading(false);
-      showMessage('Failed to notify', 'error');
+      console.error(error)
+      setLoading(false)
+      showMessage('Failed to notify', 'error')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   useEffect(() => {
-    getWhatsAppNumbers();
+    getWhatsAppNumbers()
   }, []);
 
   if (loading) {
@@ -232,58 +296,126 @@ const WhatsAppNotify = () => {
           </Box>
           <CustomTabPanel value={value} index={0}>
             <h3 className="whatsApp-notify-title">WhatsApp Notify</h3>
-            <div className="whatsApp-notify-inputContainer">
-              {contacts.map((contact, index) => (
-                <div key={index} className="whatsApp-notify-inputGroup">
-                  <div className="whatsApp-notify-inputWithButton">
-                    <div className="whatsaApp-notify-inputWithLabel">
-                      <label className="whatsApp-notify-indexLabel">Name</label>
+            {containers.map((container, containerIndex) => (
+              <div key={containerIndex} className="whatsApp-notify-contactsContainer">
+                <div className="whatsApp-notify-timeContainer">
+                  <div className="whatsApp-notify-timeField">
+                    <label className="whatsApp-notify-indexLabel">From</label>
+                    <div className="whatsApp-notify-timeInputWrapper">
                       <input
-                        type="text"
-                        placeholder="Contact Name"
-                        value={contact.name}
-                        onChange={(e) => handleContactChange(index, 'name', e.target.value)}
-                        className="whatsApp-notify-input"
+                        type="time"
+                        value={container.fromTime}
+                        onChange={(e) => handleFromTimeChange(containerIndex, e.target.value)}
+                        onClick={(e) => handleTimeInputClick(e.target as HTMLInputElement)}
+                        className="whatsApp-notify-timeInput"
                       />
+                      <span className="whatsApp-notify-timeLabel">hrs</span>
                     </div>
-                    <div className="whatsaApp-notify-inputWithLabel">
-                      <label className="whatsApp-notify-indexLabel">Contact Number</label>
-                      <input
-                        type="text"
-                        placeholder="WhatsApp Number"
-                        value={contact.number}
-                        onChange={(e) => handleContactChange(index, 'number', e.target.value)}
-                        className="whatsApp-notify-input"
-                      />
-                    </div>
-                    {index > 0 && (
-                      <button
-                        type="button"
-                        onClick={() => removeContactField(index)}
-                        className="whatsApp-notify-removeButton"
-                      >
-                        ✕
-                      </button>
-                    )}
                   </div>
+                  <div className="whatsApp-notify-timeField">
+                    <label className="whatsApp-notify-indexLabel">To</label>
+                    <div className="whatsApp-notify-timeInputWrapper">
+                      <input
+                        type="time"
+                        value={container.toTime}
+                        onChange={(e) => handleToTimeChange(containerIndex, e.target.value)}
+                        min={container.fromTime || undefined}
+                        onClick={(e) => {
+                          if (container.fromTime) {
+                            handleTimeInputClick(e.target as HTMLInputElement);
+                          }
+                        }}
+                        className={`whatsApp-notify-timeInput ${!container.fromTime ? 'disabled' : ''}`}
+                        disabled={!container.fromTime}
+                      />
+                      <span className="whatsApp-notify-timeLabel">hrs</span>
+                    </div>
+                    {container.timeError && <div className="whatsApp-notify-timeError">{container.timeError}</div>}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={addContainer}
+                    className="whatsApp-notify-addIconButton"
+                  >
+                    +
+                  </button>
+                  {containerIndex > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => removeContainer(containerIndex)}
+                      className="whatsApp-notify-removeButton"
+                    >
+                      ✕
+                    </button>
+                  )}
                 </div>
-              ))}
+                <div className="whatsApp-notify-inputContainer">
+                  {container.contacts.map((contact, contactIndex) => (
+                    <div key={contactIndex} className="whatsApp-notify-inputGroup">
+                      <div className="whatsApp-notify-inputWithButton">
+                        <div className="whatsaApp-notify-inputWithLabel">
+                          <label className="whatsApp-notify-indexLabel">Name</label>
+                          <input
+                            type="text"
+                            placeholder="Contact Name"
+                            value={contact.name}
+                            onChange={(e) => handleContactChange(containerIndex, contactIndex, 'name', e.target.value)}
+                            className="whatsApp-notify-input"
+                          />
+                        </div>
+                        <div className="whatsaApp-notify-inputWithLabel">
+                          <label className="whatsApp-notify-indexLabel">Contact Number</label>
+                          <input
+                            type="text"
+                            placeholder="WhatsApp Number"
+                            value={contact.number}
+                            onChange={(e) => handleContactChange(containerIndex, contactIndex, 'number', e.target.value)}
+                            className="whatsApp-notify-input"
+                          />
+                        </div>
+                        {contactIndex > 0 && (
+                          <button
+                            type="button"
+                            onClick={() => removeContactField(containerIndex, contactIndex)}
+                            className="whatsApp-notify-removeButton"
+                          >
+                            ✕
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => addContactField(containerIndex)}
+                  className="whatsApp-notify-addButton"
+                >
+                  + Add Another Contact Details
+                </button>
+                {error && <div className="whatsApp-notify-error">{error}</div>}
+              </div>
+            ))}
+            <div className="whatsApp-notify-timeContainer">
+              <div className="whatsApp-notify-timeField">
+                <label className="whatsApp-notify-triggerLabel">Notification Trigger Time</label>
+                <div className="whatsApp-notify-timeInputWrapper">
+                  <input
+                    type="time"
+                    value={triggerTime}
+                    onChange={(e) => setTriggerTime(e.target.value)}
+                    onClick={(e) => handleTimeInputClick(e.target as HTMLInputElement)}
+                    className="whatsApp-notify-timeInput"
+                  />
+                  <span className="whatsApp-notify-timeLabel">hrs</span>
+                </div>
+              </div>
             </div>
-            <button type="button" onClick={addContactField} className="whatsApp-notify-addButton">
-              + Add Another Contact Details
-            </button>
-          
-            {error && <div className="whatsApp-notify-error">{error}</div>}
-
             <div className="whatsApp-notify-buttonContainer">
               <button type="button" onClick={handleSubmit} className="whatsApp-notify-submitButton">
                 Submit
               </button>
-              <button type="button" onClick={() => {
-                getWhatsAppNumbers();
-                setError('');
-                setContacts([{ name: '', number: '' }]);
-              }} className="whatsApp-notify-clearButton">
+              <button type="button" onClick={handleClear} className="whatsApp-notify-clearButton">
                 Clear
               </button>
             </div>  
