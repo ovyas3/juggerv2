@@ -209,7 +209,7 @@ function Filters({ onToFromChange, onChangeStatus, onChangeRakeTypes, reload, sh
     }, [reload]);
 
     return (
-        <div>
+        <div style={{display : 'flex',gap : 20}}>
             <div style={{ display: 'flex', gap: 20, position: 'relative', overflowY: 'hidden' }} >
 
                 <div style={{ display: 'flex', gap: 20}}>
@@ -371,17 +371,16 @@ function Filters({ onToFromChange, onChangeStatus, onChangeRakeTypes, reload, sh
                     </motion.div>
                 </div>
 
-                {/* <div style={{position: 'relative'}}>
-                    <div className="filter-container" onClick={() => setOpenFilterModal(true)}>
-                        <FilterAltIcon className="filter-icon" />
-                        <img src={filter_icon.src} alt='' />
-                    </div>
-                </div> */}
-            
+               
             </div>
-
-            {openFilterModal ?
-                <div style={{ display: 'flex', justifyContent: 'right' }}>
+            <div style={{display:'flex',flexDirection:'column'}}>
+                { <div style={{position: 'relative'}}>
+                        <div className="filter-container" onClick={() => setOpenFilterModal(true)}>
+                            <img src={filter_icon.src} alt='' />
+                        </div>
+                </div> }
+                {openFilterModal ?
+                <div>
                     <div className='search'>
                             <div className="search-container">
                                 <div className='search-container-group'>
@@ -409,6 +408,7 @@ function Filters({ onToFromChange, onChangeStatus, onChangeRakeTypes, reload, sh
                     <div className='overlay-container' onClick={() => setOpenFilterModal(false)} />
                 </div> : <></>
             }
+            </div>
 
         </div>
     );
