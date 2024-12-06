@@ -101,45 +101,12 @@ import indiaGeoJSON from "@/components/MapView/IndiaMap";
 import "leaflet/dist/leaflet.css";
 import "leaflet-boundary-canvas";
 
-//Custom Tooltip
 
 interface StyledTooltipProps extends TooltipProps {
   className?: string;
 }
 
-const CustomTooltip = styled(({ className, ...props }: StyledTooltipProps) => (
-  <Tooltip
-    {...props}
-    classes={{ popper: className }}
-    PopperProps={{
-      popperOptions: {
-        modifiers: [
-          {
-            name: "offset",
-            options: {
-              offset: [14, -10],
-            },
-          },
-        ],
-      },
-    }}
-  />
-))({
-  "& .MuiTooltip-tooltip": {
-    backgroundColor: "#000",
-    color: "#fff",
-    width: "100px",
-    height: "24px",
-    boxShadow: "0px 0px 2px rgba(0,0,0,0.1)",
-    fontSize: "8px",
-    fontFamily: '"Inter", sans-serif',
-  },
-  "& .MuiTooltip-arrow": {
-    color: "#000",
-  },
-});
 
-// Custom Icons
 const customIcon = L.icon({
   iconUrl: "assets/train_on_map_icon_idle.svg",
   iconSize: [38, 38], // adjust icon size as needed
@@ -161,20 +128,6 @@ const customIconIdle = L.icon({
   popupAnchor: [0, -38], // adjust popup anchor as needed
 });
 
-const createClusterCustomIconInTransit = function (cluster: any) {
-  return divIcon({
-    html: `<span class="cluster-icon-in-transit">${cluster.getChildCount()}</span>`,
-    className: "custom-marker-cluster",
-    iconSize: point(33, 33, true),
-  });
-};
-const createClusterCustomIconIdle = function (cluster: any) {
-  return divIcon({
-    html: `<span class="cluster-icon-idle">${cluster.getChildCount()}</span>`,
-    className: "custom-marker-cluster",
-    iconSize: point(33, 33, true),
-  });
-};
 
 const createClusterCustomIconDelivered = function (cluster: any) {
   return divIcon({
@@ -208,19 +161,6 @@ const bgColorOfStatus = (status: string) => {
     default:
       return "info";
   }
-};
-
-const rakeTypes = ["Captive Rakes", "Indian Railway Rakes"];
-
-const MenuProps = {
-  PaperProps: {
-    style: {
-      minWidth: "7%",
-      width: "7%",
-      marginTop: "4px",
-      border: "1px solid grey",
-    },
-  },
 };
 
 interface ShipmentCardProps {
@@ -259,6 +199,7 @@ const ShipmentCard: React.FC<ShipmentCardProps> = ({
         overflow: "hidden",
         backgroundColor: "#F5F5F5",
         position: "relative",
+        borderRadius: "0px",
       }}
       className="cardHover"
       onClick={(e) => {
@@ -273,6 +214,7 @@ const ShipmentCard: React.FC<ShipmentCardProps> = ({
           borderRadius: "12px",
           marginInline: 12,
           marginBottom: 12,
+          boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1), 0px 1px 3px rgba(0, 0, 0, 0.08)",
         }}
       >
         <div
@@ -417,16 +359,6 @@ const ShipmentCard: React.FC<ShipmentCardProps> = ({
 };
 
 type StatusKey = "OB" | "ITNS" | "Delivered" | "none" | "AVE" | "INPL" | "ALL";
-
-const statusMapping: Record<StatusKey, string[]> = {
-  OB: ["", "OB"],
-  ITNS: ["Delivered", "", "OB"],
-  Delivered: ["Delivered"],
-  none: [""],
-  AVE: ["AVE"],
-  INPL: ["INPL"],
-  ALL: ["ALL"],
-};
 
 interface TrackingStatus {
   tracking: number;
@@ -604,48 +536,13 @@ const MapLayers = () => {
     }
   }, [map]);
 
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value;
-    setInputCRValue(value);
-    setFilteredCrOptions(
-      crNames.filter((crName) =>
-        crName.name.toLowerCase().includes(value.toLowerCase())
-      )
-    );
-  };
-
-  const handleOptionClick = (option: any) => {
-    setInputCRValue(option.name);
-    setSelectedCR(option._id);
-    getShipments("", option._id);
-    setIsCROpen(false);
-  };
-
+ 
   const handleClickOutside = (event: MouseEvent) => {
     if (
       dropdownRef.current &&
       !dropdownRef.current.contains(event.target as Node)
     ) {
       setIsCROpen(false);
-    }
-  };
-
-  const handleFNRChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const fnr = event.target.value;
-    setFnrTerm(fnr);
-    if (fnr.length === 11 || fnr.length === 0) {
-      setFnrTerm(fnr);
-      getShipments("", "");
-    }
-  };
-
-  const handleFNRSearch = () => {
-    if (fnrTerm.length === 0) {
-      showMessage("Please enter FNR number", "error");
-    } else if (fnrTerm.length <= 10) {
-      showMessage("Please enter valid FNR number", "error");
-    } else if (fnrTerm.length === 11) {
-      getShipments(fnrTerm, "");
     }
   };
 
@@ -663,18 +560,6 @@ const MapLayers = () => {
   };
 
   const filterTypes = ["FNR No.", "Dest. Code", "CR Names"];
-
-  function handleChange(event: any) {
-    const type = event.target.value;
-    if (type !== selectedType) {
-      setSelectedType(event.target.value);
-      setSearchInput("");
-      setFnrTerm("");
-      setInputCRValue("");
-      setSelectedCR("");
-      getShipments("", "");
-    }
-  }
 
   useEffect(() => {
     if (rakeType.length === 1) {
@@ -710,78 +595,6 @@ const MapLayers = () => {
     setSearchInput("");
   }, [allShipments, filteredShipments]);
 
-  function handleSearchInput(event: any) {
-    const searchQuery = event.target.value;
-    setSearchInput(searchQuery);
-    setShowSearched(true);
-    setShowRakeTypeFiltered(false);
-    if (selectedType === "FNR No.") {
-      if (showFiltered) {
-        const filteredData = filteredShipments.filter((shipment) => {
-          const data = shipment.all_FNRs.filter((fnr: String) =>
-            fnr.toLowerCase().includes(searchQuery.toLowerCase())
-          );
-          return Boolean(data.length);
-        });
-        setSearchedShipments(filteredData);
-        setShowSearched(true);
-      } else if (showAll) {
-        const filteredData = allShipments.filter((shipment) => {
-          const data = shipment?.all_FNRs?.filter((fnr: String) =>
-            fnr.toLowerCase().includes(searchQuery.toLowerCase())
-          );
-          return Boolean(data.length);
-        });
-        setSearchedShipments(filteredData);
-        setShowSearched(true);
-      } else {
-        const filteredData = rakeTypeFilteredShipments.filter((shipment) => {
-          const data = shipment?.all_FNRs?.filter((fnr: String) =>
-            fnr.toLowerCase().includes(searchQuery.toLowerCase())
-          );
-          return Boolean(data.length);
-        });
-        setSearchedShipments(filteredData);
-        setShowSearched(true);
-      }
-    } else if (selectedType === "Dest. Code") {
-      setShowSearched(true);
-      if (showFiltered) {
-        const filteredData = filteredShipments.filter((shipment) =>
-          shipment?.delivery_location?.code
-            ?.toLowerCase()
-            .includes(searchQuery.toLowerCase())
-        );
-        setSearchedShipments(filteredData);
-        setShowSearched(true);
-      } else if (showAll) {
-        const filteredData = allShipments.filter((shipment) =>
-          shipment?.delivery_location?.code
-            ?.toLowerCase()
-            .includes(searchQuery.toLowerCase())
-        );
-        setSearchedShipments(filteredData);
-        setShowSearched(true);
-      } else {
-        const filteredData = rakeTypeFilteredShipments.filter((shipment) =>
-          shipment?.delivery_location?.code
-            ?.toLowerCase()
-            .includes(searchQuery.toLowerCase())
-        );
-        setSearchedShipments(filteredData);
-        setShowSearched(true);
-      }
-    }
-  }
-
-  const geoJSONStyle: L.PathOptions = {
-    color: "black", // Set the color of train tracks
-    weight: 3, // Set the thickness of the tracks
-    opacity: 1, // Set the opacity
-    fill: false, // Ensure the line is not filled
-    dashArray: "2, 10", // Set the dash pattern to mimic railroad ties
-    lineCap: "square" as "square", // This should be a LineCapShape
-  };
 
   const boundaryStyle = (feature: any) => {
     switch (feature.properties.boundary) {
@@ -863,6 +676,7 @@ const MapLayers = () => {
       setHeadingFilters("In Plant");
       setHeadingColors("#3790CC");
       setShowInTransit(false);
+      setShowIdle(true);
       filteredShipments = originalData.filter(
         (shipment: any) => shipment.status === "INPL"
       );
@@ -873,6 +687,7 @@ const MapLayers = () => {
       const idle = getTrackingShipment(filteredShipments);
       setIdleShipments(idle);
     } else if (status === "ITNS") {
+      setShowIdle(false);
       setShowInTransit(true);
       setHiddenTrackingInfo(false);
       setHeadingFilters("In Transit");
@@ -887,6 +702,7 @@ const MapLayers = () => {
       const inTransit = getTrackingShipment(filteredShipments);
       setInTransitShipments(inTransit);
     } else if (status === "ALL") {
+      setShowIdle(true);
       setHiddenTrackingInfo(false);
       setHeadingFilters("Total");
       setHeadingColors("#40BE8A");
@@ -901,12 +717,12 @@ const MapLayers = () => {
       const total = getTrackingShipment(filteredShipments);
       setShowInTransit(true);
       setInTransitShipments(total);
-      setDeliveredShipments(total);
+      setIdleShipments(total);
     }
 
-    setShowIdle(status === "OB");
+    // setShowIdle(status === "OB");
     // setShowInTransit(status === 'ITNS');
-    setShowDelivered(status === "Delivered");
+    // setShowDelivered(status === "Delivered");
     setShowAll(false);
     setShowFiltered(true);
     const filteredWithTracking = filteredShipments.map((shipment) => {
@@ -922,14 +738,6 @@ const MapLayers = () => {
     setFilteredShipments(filteredWithTracking);
     setFilteredShipmentsBackup(filteredWithTracking);
     map?.flyTo(center, 5, { duration: 1 });
-  };
-
-  const handleFromDateChange = (date: dayjs.Dayjs | null) => {
-    setSelectedFromDate(date);
-  };
-
-  const handleToDateChange = (date: dayjs.Dayjs | null) => {
-    setSelectedToDate(date);
   };
 
   const getShipments = async (fnr: string, selectedCRID: string) => {
@@ -1058,45 +866,6 @@ const MapLayers = () => {
     }
   };
 
-  const handleTrackingNonTracking = (isTracking: any) => {
-    if (!isTracking) {
-      setIdleShipments([]);
-      setInTransitShipments([]);
-      setDeliveredShipments([]);
-      setTrackingAvailed(false);
-      setHiddenTrackingInfo(false);
-    }
-    setIsTracking(isTracking ? 1 : 2);
-    let trackingData;
-    if (isTotal) {
-      if (isTracking) {
-        trackingData = allShipments.filter((shipment) => shipment.isTracking);
-      } else
-        trackingData = allShipments.filter((shipment) => !shipment.isTracking);
-    } else {
-      if (isTracking) {
-        trackingData = filteredShipmentsBackup.filter(
-          (shipment) => shipment.isTracking
-        );
-      } else {
-        trackingData = filteredShipmentsBackup.filter(
-          (shipment) => !shipment.isTracking
-        );
-      }
-    }
-    if (isTracking) {
-      setIdleShipments(getTrackingShipment(trackingData));
-      // setDeliveredShipments(getTrackingShipment(trackingData));
-      setInTransitShipments(getTrackingShipment(trackingData));
-      setTrackingAvailed(true);
-      setHiddenTrackingInfo(true);
-    }
-    setTrackingTypeSelected({ fois: false, gps: false });
-
-    setFilteredShipments(trackingData);
-    setShowAll(false);
-    setShowFiltered(true);
-  };
 
   const focusOnShipment = (shipment: any) => {
     const gpsFois =
@@ -1118,55 +887,6 @@ const MapLayers = () => {
         selectedMarkerRef.current.closePopup();
       }
       map?.flyTo(center, 5, { duration: 1 });
-    }
-  };
-
-  const handleTrackingFoisGps = (track: string) => {
-    let trackingShipements;
-    if (track === "FOIS") {
-      setTrackingTypeSelected((prevState: any) => {
-        const newFoisValue = !prevState.fois;
-        if (!newFoisValue) {
-          setFilteredShipments(shipmentMapView);
-        } else {
-          trackingShipements = shipmentMapView.filter((shipment: any) => {
-            return (
-              shipment.trip_tracker?.last_location?.fois?.coordinates.length > 0
-            );
-          });
-          setFilteredShipments(trackingShipements);
-          setIdleShipments(getTrackingShipment(trackingShipements));
-          setInTransitShipments(getTrackingShipment(trackingShipements));
-          // setDeliveredShipments(getTrackingShipment(trackingShipements));
-        }
-        return { ...prevState, fois: newFoisValue, gps: false };
-      });
-    } else {
-      setTrackingTypeSelected((prevState: any) => {
-        const newGpsValue = !prevState.gps;
-        if (!newGpsValue) {
-          setFilteredShipments(shipmentMapView);
-        } else {
-          trackingShipements = shipmentMapView
-            .filter((shipment: any) => {
-              return (
-                shipment.trip_tracker?.last_location?.gps?.coordinates.length >
-                0
-              );
-            })
-            .filter((shipment: any) => {
-              return !(
-                shipment.trip_tracker?.last_location?.fois?.coordinates.length >
-                0
-              );
-            });
-          setFilteredShipments(trackingShipements);
-          setIdleShipments(getTrackingShipment(trackingShipements));
-          setInTransitShipments(getTrackingShipment(trackingShipements));
-          // setDeliveredShipments(getTrackingShipment(trackingShipements));
-        }
-        return { ...prevState, gps: newGpsValue, fois: false };
-      });
     }
   };
 
@@ -1224,72 +944,71 @@ const MapLayers = () => {
 
               {showIdle &&
                 idleShipments.length &&
-                idleShipments.map((shipment, index) => {
-                  const circleIcon = L.divIcon({
-                    className: "circle-icon",
-                    html: `<div style="width: 13px; height: 13px; border-radius: 50%; background-color: #265E76; border: 1px solid white"></div>`,
-                    iconSize: [10, 10],
-                    iconAnchor: [5, 5],
-                    popupAnchor: [0, -10],
-                  });
-                  return (
-                    <Marker
-                      key={index}
-                      icon={currentZoom > 9 ? customIconIdle : circleIcon}
-                      position={[
-                        shipment.gps.coordinates[1],
-                        shipment.gps.coordinates[0],
-                      ]}
-                      ref={(el) => {
-                        if (
-                          selectedShipment &&
-                          selectedShipment._id === shipment._id
-                        ) {
-                          selectedMarkerRef.current = el;
+                idleShipments
+                  .filter((shipment: any) => shipment.status === "INPL")
+                  .map((shipment, index) => {
+                    const circleIconInplant = L.divIcon({
+                      className: "circle-icon",
+                      html: `<div style="width: 13px; height: 13px; border-radius: 50%; background-color: #174D68; border: 1px solid white"></div>`,
+                      iconSize: [10, 10],
+                      iconAnchor: [5, 5],
+                      popupAnchor: [0, -10],
+                    });
+                    return (
+                      <Marker
+                        key={index}
+                        icon={
+                          currentZoom > 9 ? customIconIdle : circleIconInplant
                         }
-                      }}
-                    >
-                      <Popup>
-                        <Typography variant="h6" component="div">
-                          # {shipment.FNR}
-                        </Typography>
-                        <Typography variant="body2" component="div">
-                          <Grid container>
-                            {/* <Grid item xs={12}>
-                                <Typography variant="body2" component="div">
-                                  <Image height={10} alt="pickup" src={pickupIcon} /> - {shipment.pickup}
+                        position={[
+                          shipment.gps.coordinates[1],
+                          shipment.gps.coordinates[0],
+                        ]}
+                        ref={(el) => {
+                          if (
+                            selectedShipment &&
+                            selectedShipment._id === shipment._id
+                          ) {
+                            selectedMarkerRef.current = el;
+                          }
+                        }}
+                      >
+                        <Popup>
+                          <Typography variant="h6" component="div">
+                            # {shipment.FNR}
+                          </Typography>
+                          <Typography variant="body2" component="div">
+                            <Grid container>
+                              <Grid item xs={12}>
+                                <Typography
+                                  variant="body2"
+                                  component="div"
+                                  sx={{ display: "flex" }}
+                                >
+                                  <div className="dropLabel">D</div>
+                                  <div>
+                                    <Image
+                                      height={10}
+                                      alt="drop"
+                                      src={dropIcon}
+                                    />{" "}
+                                    - {shipment.delivery}
+                                  </div>
                                 </Typography>
-                              </Grid> */}
-                            <Grid item xs={12}>
-                              <Typography
-                                variant="body2"
-                                component="div"
-                                sx={{ display: "flex" }}
-                              >
-                                <div className="dropLabel">D</div>
-                                <div>
-                                  <Image
-                                    height={10}
-                                    alt="drop"
-                                    src={dropIcon}
-                                  />{" "}
-                                  - {shipment.delivery}
-                                </div>
-                              </Typography>
-                              <Typography sx={{ fontSize: "12px" }}>
-                                {shipment?.tripTracker}
-                              </Typography>
+                                <Typography sx={{ fontSize: "12px" }}>
+                                  {shipment?.tripTracker}
+                                </Typography>
+                              </Grid>
                             </Grid>
-                          </Grid>
-                        </Typography>
-                      </Popup>
-                    </Marker>
-                  );
-                })}
+                          </Typography>
+                        </Popup>
+                      </Marker>
+                    );
+                  })}
 
               {showInTransit &&
                 inTransitShipments.length &&
-                inTransitShipments.map((shipment, index) => {
+                inTransitShipments.filter((shipment: any) => shipment.status === "ITNS").map((shipment, index) => {
                   const circleIcon = L.divIcon({
                     className: "circle-icon",
                     html: `<div style="width: 13px; height: 13px; border-radius: 50%; background-color: #F6981D; border: 1px solid white"></div>`,
@@ -1314,42 +1033,35 @@ const MapLayers = () => {
                         }
                       }}
                     >
-                      {currentZoom > 9 && (
-                        <Popup>
-                          <Typography variant="h6" component="div">
-                            # {shipment.FNR}
-                          </Typography>
-                          <Typography variant="body2" component="div">
-                            <Grid container>
-                              {/* <Grid item xs={12}>
-                                <Typography variant="body2" component="div">
-                                  <Image height={10} alt="pickup" src={pickupIcon} /> - {shipment.pickup}
-                                </Typography>
-                              </Grid> */}
-                              <Grid item xs={12}>
-                                <Typography
-                                  variant="body2"
-                                  component="div"
-                                  sx={{ display: "flex" }}
-                                >
-                                  <div className="dropLabel">D</div>
-                                  <div>
-                                    <Image
-                                      height={10}
-                                      alt="drop"
-                                      src={dropIcon}
-                                    />{" "}
-                                    - {shipment.delivery}
-                                  </div>
-                                </Typography>
-                                <Typography sx={{ fontSize: "12px" }}>
-                                  {shipment?.tripTracker}
-                                </Typography>
-                              </Grid>
+                      <Popup>
+                        <Typography variant="h6" component="div">
+                          # {shipment.FNR}
+                        </Typography>
+                        <Typography variant="body2" component="div">
+                          <Grid container>
+                            <Grid item xs={12}>
+                              <Typography
+                                variant="body2"
+                                component="div"
+                                sx={{ display: "flex" }}
+                              >
+                                <div className="dropLabel">D</div>
+                                <div>
+                                  <Image
+                                    height={10}
+                                    alt="drop"
+                                    src={dropIcon}
+                                  />{" "}
+                                  - {shipment.delivery}
+                                </div>
+                              </Typography>
+                              <Typography sx={{ fontSize: "12px" }}>
+                                {shipment?.tripTracker}
+                              </Typography>
                             </Grid>
-                          </Typography>
-                        </Popup>
-                      )}
+                          </Grid>
+                        </Typography>
+                      </Popup>
                     </Marker>
                   );
                 })}
@@ -1443,6 +1155,8 @@ const MapLayers = () => {
                     backgroundColor: "white",
                     borderRadius: "6px",
                     width: "100%",
+                    boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1), 0px 1px 3px rgba(0, 0, 0, 0.08)",
+
                   }}
                 >
                   <CustomDatePicker
@@ -1458,6 +1172,8 @@ const MapLayers = () => {
                     backgroundColor: "white",
                     borderRadius: "6px",
                     width: "100%",
+                    boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1), 0px 1px 3px rgba(0, 0, 0, 0.08)",
+
                   }}
                 >
                   <CustomDatePicker
@@ -1477,6 +1193,8 @@ const MapLayers = () => {
                   marginTop: "12px",
                   padding: "12px 12px 0px 12px",
                   marginInline: "12px",
+                  boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1), 0px 1px 3px rgba(0, 0, 0, 0.08)",
+
                 }}
               >
                 <header
@@ -1549,7 +1267,7 @@ const MapLayers = () => {
                 </div>
               </div>
 
-              {/* <div
+              <div
                 style={{
                   height: "40px",
                   minHeight: "40px",
@@ -1557,16 +1275,16 @@ const MapLayers = () => {
                   backgroundColor: "white",
                   marginInline: "12px",
                   borderRadius: "8px",
-                  border: "1px solid #E5E1DA",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "space-between",
+                  boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1), 0px 1px 3px rgba(0, 0, 0, 0.08)",
                 }}
               >
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                   <div
                     style={{
-                      height: "38px",
+                      height: "40px",
                       backgroundColor: "#A4ABFF",
                       borderRadius: "7px 0px 0px 7px",
                       width: "100px",
@@ -1582,7 +1300,7 @@ const MapLayers = () => {
                   </div>
                   <input
                     style={{
-                      height: "36px",
+                      height: "40px",
                       width: "60%",
                       border: "none",
                       outline: "none",
@@ -1599,7 +1317,7 @@ const MapLayers = () => {
                     width={20}
                   />
                 </div>
-              </div> */}
+              </div>
 
               <Box sx={{}} className="shipment-details-container">
                 {showFiltered &&

@@ -21,13 +21,14 @@ import Image from "next/image";
 import MapViewIcon from "@/assets/map_view.svg";
 import calenderIcon from "@/assets/calender_icon_filters.svg";
 import filter_icon from "@/assets/filter_icon.svg";
+import { useRouter, usePathname } from "next/navigation";
 
 const formatDate = (date: any) => {
   const t = service.getLocalTime(new Date(date));
   return t;
 };
 
-function InboundFilters({setInBoundPayload}:any) {
+function InboundFilters({ setInBoundPayload }: any) {
   const [openStartDatePicker, setOpenStartDatePicker] = useState(false);
   const [openEndDatePicker, setOpenEndDatePicker] = useState(false);
   const today = new Date();
@@ -37,11 +38,15 @@ function InboundFilters({setInBoundPayload}:any) {
   const [endDate, setEndDate] = useState(today);
   const [error, setError] = useState("");
   const [disableStartDate, setDisableStartDate] = useState(false);
-  const [openFilterModal, setOpenFilterModal] = useState(false)
+  const [openFilterModal, setOpenFilterModal] = useState(false);
 
   const [captiveRake, setCaptiveRake] = useState(true);
   const [indianRake, setIndianRake] = useState(true);
   const [rakeArray, setRakeArray] = useState<any>(["CR", "IR"]);
+
+  const router = useRouter();
+  const [rakeType, setRakeType] = useState(["IR", "CR"]);
+
 
   function shouldDisableStartDate(date: Date): boolean | undefined {
     const disable = date > new Date() || date > endDate;
@@ -76,6 +81,59 @@ function InboundFilters({setInBoundPayload}:any) {
     setEndDate(newEndDate);
     shouldDisableEndDate(newEndDate);
   };
+
+  const handleChangeRakeType = (value: any) => {
+    switch (value) {
+      case "ALL":
+        setRakeType((prev: any) => {
+          const newState = [...prev];
+          if (newState.includes("ALL")) {
+            return [];
+          } else {
+            return ["ALL", "IR", "CR"];
+          }
+        });
+        break;
+      case "IR":
+        setRakeType((prev: any) => {
+          const newState = [...prev];
+          if (newState.includes("ALL"))
+            newState.splice(newState.indexOf("ALL"), 1);
+          if (newState.includes("IR")) {
+            newState.splice(newState.indexOf("IR"), 1);
+            return newState;
+          } else {
+            newState.push("IR");
+            return newState;
+          }
+        });
+        break;
+      case "CR":
+        setRakeType((prev: any) => {
+          const newState = [...prev];
+          if (newState.includes("ALL"))
+            newState.splice(newState.indexOf("ALL"), 1);
+          if (newState.includes("CR")) {
+            newState.splice(newState.indexOf("CR"), 1);
+            return newState;
+          } else {
+            newState.push("CR");
+            return newState;
+          }
+        });
+        break;
+      default:
+        break;
+    }
+  };
+
+  useEffect(() => {
+    setInBoundPayload((prev: any) => {
+      const newState = { ...prev };
+      newState.rake_types = rakeType;
+      return newState;
+    });
+  }, [rakeType]);
 
   useEffect(() => {
     const rakeArray = [];
@@ -250,21 +308,60 @@ function InboundFilters({setInBoundPayload}:any) {
           </motion.section>
         </div> */}
 
-        {/* <div>
+        <div
+          style={{
+            fontSize: "12px",
+            display: "flex",
+            alignItems: "center",
+            gap: 6,
+            height: 36,
+          }}
+        >
+          <Checkbox
+            size="small"
+            style={{ height: 12, width: 12 }}
+            onChange={() => handleChangeRakeType("CR")}
+            checked={rakeType.includes("CR")}
+          />
+          <div className="">Captive Rakes</div>
+        </div>
+
+        <div
+          style={{
+            fontSize: "12px",
+            display: "flex",
+            alignItems: "center",
+            gap: 6,
+            height: 36,
+          }}
+        >
+          <Checkbox
+            size="small"
+            style={{ height: 12, width: 12 }}
+            onChange={() => handleChangeRakeType("IR")}
+            checked={rakeType.includes("IR")}
+          />
+          <div className="">Indian Railway Rakes</div>
+        </div>
+
+        <div>
           <motion.div
-            id="map-view-btn-orders"
+            className="map-view-btn-orders"
             whileHover={{ scale: 0.95 }}
             whileTap={{ scale: 0.9 }}
             transition={{ type: "spring", stiffness: 400, damping: 10 }}
-            onClick={() => window.open("/shipment_map_view", "_blank")}
+            onClick={() =>
+              router.push(
+                `/shipment_map_view?from=${new Date(startDate)}&to=${new Date(
+                  endDate
+                )}`
+              )
+            }
           >
-            <div>
-              <Image src={MapViewIcon} alt="map view" width={16} height={16} />
-            </div>
-
-            <div id="map-view-btn-header">Map View</div>
+            <Image src={MapViewIcon} alt="map view" width={16} height={16} />
+            <span className="map-view-btn-header">Map View</span>
           </motion.div>
-        </div> */}
+        </div>
 
         {/* <div style={{ position: "relative" }}>
           <div
@@ -275,7 +372,6 @@ function InboundFilters({setInBoundPayload}:any) {
           </div>
         </div> */}
       </div>
-
 
       {/* {openFilterModal && (
        <div >
