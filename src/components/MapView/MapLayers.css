@@ -845,8 +845,116 @@
   border-left: 5px solid transparent;
   border-top: 5px solid #42454E; 
 }
-
+/* 
 #total{
-  background-color: #42454E;
-  flex:1
+  background-color: #ECEFFF;
+  color: #334FFC;
+  border-radius: 8px;
+  padding-inline: 8px;
+  padding-block: 3px;
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+}
+#total-hover:hover{
+  background-color: #ECEFFF;
+  color: #334FFC;
+  border-radius: 8px;
+  padding-inline: 8px;
+  padding-block: 3px;
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+}
+#inpl{
+  background-color: #F4FCFC;
+  color:#174D68;
+  border-radius: 8px;
+  padding-inline: 8px;
+  padding-block: 3px;
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+}
+#inpl-hover:hover{
+  background-color: #F4FCFC;
+  color:#174D68;
+  border-radius: 8px;
+  padding-inline: 8px;
+  padding-block: 3px;
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+}
+#itns{
+  background-color: #FEF3E7;
+  color: #F69805;
+  border-radius: 8px;
+  padding-inline: 8px;
+  padding-block: 3px;
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+}
+#itns-hover:hover{
+  background-color: #FEF3E7;
+  color: #F69805;
+  border-radius: 8px;
+  padding-inline: 8px;
+  padding-block: 3px;
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+} */
+
+#total, #inpl, #itns {
+  /* background-color: #ecefff; */
+  /* color: #334ffc; */
+  border-radius: 8px;
+  padding-inline: 8px;
+  padding-block: 6px;
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+
+}
+
+/* #inpl {
+  background-color: #f4fcfc;
+  color: #174d68;
+}
+
+#itns {
+  background-color: #fef3e7;
+  color: #f69805;
+} */
+
+/* Hover States */
+#total:hover{
+  background-color: #d3e1ff;
+  color: #1d38b8;
+  transform: scale(1.05);
+}
+#inpl:hover{
+  background-color: #e3f7f7;
+  color: #123f55;
+  transform: scale(1.05);
+}
+#itns:hover {
+  background-color: #fdebd0;
+  color: #d87b03;
+  transform: scale(1.05);
+}
+
+/* Active State */
+#total.active {
+  background-color: #d3e1ff;
+  color: #1d38b8;
+}
+
+#inpl.active {
+  background-color: #e3f7f7;
+  color: #123f55;
+}
+
+#itns.active {
+  background-color: #fdebd0;
+  color: #d87b03;
 }

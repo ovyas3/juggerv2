@@ -47,6 +47,8 @@ import {
 import { divIcon, point } from "leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import { useMemo, useCallback } from "react";
+import "leaflet-boundary-canvas";
 
 import {
   Accordion,
@@ -94,6 +96,10 @@ import { Icon, CircleMarker } from "leaflet";
 
 import CurrencyIcon from "@/assets/current_location_icon.svg";
 import deliveryIcon from "@/assets/delivery_location_icon.svg";
+import getIndiaMap from "@/components/MapView/IndiaMap";
+import indiaGeoJSON from "@/components/MapView/IndiaMap";
+import "leaflet/dist/leaflet.css";
+import "leaflet-boundary-canvas";
 
 //Custom Tooltip
 
@@ -352,7 +358,7 @@ const ShipmentCard: React.FC<ShipmentCardProps> = ({
             </div>
           </Typography>
 
-          <Typography sx={{ fontSize: 12 }}  gutterBottom>
+          <Typography sx={{ fontSize: 12 }} gutterBottom>
             <div
               style={{
                 display: "flex",
@@ -404,7 +410,6 @@ const ShipmentCard: React.FC<ShipmentCardProps> = ({
               </div>
             </div>
           </Typography>
-
         </CardContent>
       </div>
     </Card>
@@ -452,7 +457,7 @@ const MapLayers = () => {
 
   const [mobileShow, setMobileShow] = useState<boolean>(true);
   const [currentZoom, setCurrentZoom] = useState<number>(5);
-  const [currentFocusstatus, setCurrentFocusstatus] = useState<any>('TOTAL');
+  const [currentFocusstatus, setCurrentFocusstatus] = useState<any>("TOTAL");
 
   const [selectedShipment, setSelectedShipment] = useState<any | null>(null);
   const [allShipments, setAllShipments] = useState<any[]>([]);
@@ -539,6 +544,43 @@ const MapLayers = () => {
   const [isCROpen, setIsCROpen] = useState(false);
   const [filteredCROptions, setFilteredCrOptions] = useState<any[]>([]);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!map) return;
+
+    const fetchGeoJSON = async () => {
+      try {
+        const { features } = getIndiaMap();
+
+        const indiaGeoJSON = {
+          type: "FeatureCollection",
+          features,
+        };
+
+        // Add boundary masking with the combined GeoJSON
+        const osmLayer = (L.TileLayer as any).boundaryCanvas(
+          "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+          {
+            boundary: indiaGeoJSON,
+            attribution:
+              '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+          }
+        );
+
+        map.addLayer(osmLayer);
+
+        // Add the claimed boundaries as a separate layer
+        const claimedBoundaries = getBoundary();
+        L.geoJSON(claimedBoundaries, {
+          style: boundaryStyle,
+        }).addTo(map);
+      } catch (error) {
+        console.error("Error fetching GeoJSON:", error);
+      }
+    };
+
+    fetchGeoJSON();
+  }, [map]);
 
   useEffect(() => {
     const fetchNames = async () => {
@@ -1127,6 +1169,7 @@ const MapLayers = () => {
       });
     }
   };
+
   return (
     <div>
       <div className="shipment-map-container">
@@ -1165,7 +1208,7 @@ const MapLayers = () => {
               attributionControl={false}
               ref={setMap}
             >
-              <div className={"layersControl"}>
+              {/* <div className={"layersControl"}>
                 <LayersControl>
                   <LayersControl.BaseLayer checked name="Street View">
                     <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
@@ -1177,7 +1220,7 @@ const MapLayers = () => {
                     />
                   </LayersControl.BaseLayer>
                 </LayersControl>
-              </div>
+              </div> */}
 
               {showIdle &&
                 idleShipments.length &&
@@ -1351,7 +1394,7 @@ const MapLayers = () => {
                 position: "absolute",
                 left: "0",
                 height: isMobile ? "100vh" : "40vh",
-                boxShadow: "0px 00px 10px 0px rgba(0,0,0,0.3)",
+                boxShadow: "0px 0px 10px 0px rgba(0,0,0,0.1)",
                 display: "flex",
                 flexDirection: "column",
                 width: isMobile ? "386px" : "100vw",
@@ -1453,51 +1496,60 @@ const MapLayers = () => {
                     alignItems: "center",
                     padding: "12px",
                     borderRadius: "6px",
+                    gap: 10,
                   }}
                 >
                   <div
                     onClick={(e) => {
                       filterShipments("ALL", e);
                       setIsTotal(false);
+                      setCurrentFocusstatus("TOTAL");
                     }}
                     id="total"
+                    className={currentFocusstatus === "TOTAL" ? "active" : ""}
+                    style={{ flex: 1, alignContent: "center" }}
                   >
                     <div style={{ fontWeight: "bold", fontSize: "24px" }}>
                       {idleCount + inTransitCount}
                     </div>
-                    <div style={{ color: "#71747A", fontSize: 12 }}>Total</div>
+                    <div style={{ fontSize: 12 }}>Total</div>
                   </div>
 
                   <div
                     onClick={(e) => {
                       filterShipments("INPL", e);
                       setIsTotal(false);
+                      setCurrentFocusstatus("INPL");
                     }}
+                    id="inpl"
+                    className={currentFocusstatus === "INPL" ? "active" : ""}
+                    style={{ flex: 1 }}
                   >
                     <div style={{ fontWeight: "bold", fontSize: "24px" }}>
                       {idleCount}
                     </div>
-                    <div style={{ color: "#71747A", fontSize: 12 }}>
-                      Inplant
-                    </div>
+                    <div style={{ fontSize: 12 }}>In Plant</div>
                   </div>
+
                   <div
                     onClick={(e) => {
                       filterShipments("ITNS", e);
                       setIsTotal(false);
+                      setCurrentFocusstatus("ITNS");
                     }}
+                    id="itns"
+                    className={currentFocusstatus === "ITNS" ? "active" : ""}
+                    style={{ flex: 1 }}
                   >
                     <div style={{ fontWeight: "bold", fontSize: "24px" }}>
                       {inTransitCount}
                     </div>
-                    <div style={{ color: "#71747A", fontSize: 12 }}>
-                      In Transit
-                    </div>
+                    <div style={{ fontSize: 12 }}>In Transit</div>
                   </div>
                 </div>
               </div>
 
-              <div
+              {/* <div
                 style={{
                   height: "40px",
                   minHeight: "40px",
@@ -1547,127 +1599,7 @@ const MapLayers = () => {
                     width={20}
                   />
                 </div>
-              </div>
-
-              {/* <Box className="tracking-nonTracking-status">
-                <div className="tracking-status-wrapper">
-                  <div className="search-fnr" onClick={() => { setShowSearchFNR(true) }} >Search FNR</div>
-                  <Typography className="heading" style={{ backgroundColor: showSearchFNR ? '#F7EFE5' : headingColors, color: showSearchFNR ? 'black' : 'white' }} onClick={() => { setShowSearchFNR(false) }} >{headingFilters}</Typography>
-                  <div className="content-wrapper" style={{ backgroundColor: headingColors, display: showSearchFNR ? 'none' : 'block' }}>
-                    <div className="content-box">
-                      <div style={{ backgroundColor: 'white', margin: '0px 2px 2px 2px', borderRadius: '4px', }} >
-
-                        <div style={{ display: 'flex', gap: '8px' }}>
-                          <div className={isTracking === 1 ? "tracking_firstSection active-tracking" : "tracking_firstSection"} id="tracking" onClick={() => handleTrackingNonTracking(true)}>
-                            <Image src={IdleIcon} alt="" className="Image_idleIcon" width={32} height={32} />
-                            <div className="">
-                              <div style={{ fontWeight: 600, fontSize: 16 }}>{trackingNonTracking.tracking}</div>
-                              <div style={{ fontSize: 12 }}>Tracking</div>
-                            </div>
-                          </div>
-                          <div className={isTracking === 2 ? "tracking_secondSection active-nontracking" : "tracking_secondSection"} id="nonTracking" onClick={() => handleTrackingNonTracking(false)}>
-                            <Image src={InactiveIcon} alt="" className="Image_idleIcon" width={32} height={32} />
-                            <div className="">
-                              <div style={{ fontWeight: 600, fontSize: 16 }}>{trackingNonTracking.notTracking}</div>
-                              <div style={{ fontSize: 12 }}>Non Tracking</div>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className='rake_heading_title' style={{ display: hiddenTrackingInfo ? 'flex' : 'none' }} >Tracking Information</div>
-                        <div className='rake_head_container' style={{ display: hiddenTrackingInfo ? 'flex' : 'none' }}>
-                          <div className='rake_head indian_rake' onClick={() => {handleTrackingFoisGps('FOIS')}} style={{ cursor:'pointer', backgroundColor: trackingTypeSelected.fois ? '#B3A492' : '#EEE7DA' }}>
-                            <div>Tracking By FOIS</div>
-                            <div>{trackingByFoisGps.foiscount}</div>
-                          </div>
-                          <div className='rake_head indian_rake' onClick={() => {handleTrackingFoisGps('GPS')}} style={{ cursor: 'pointer', backgroundColor: trackingTypeSelected.gps ? '#B3A492' : '#EEE7DA' }}>
-                            <div>Tracking By GPS</div>
-                            <div>{trackingByFoisGps.gpscount}</div>
-                          </div>
-                        </div>
-
-
-                      </div>
-                    </div>
-                  </div>
-                  <div style={{ display: showSearchFNR ? 'block' : 'none' }}>
-                    <div className='search-wrapper'>
-                      <Select
-                        labelId="demo-multiple-checkbox-label"
-                        id="demo-multiple-checkbox"
-                        value={selectedType}
-                        className='status_select'
-                        onChange={handleChange}
-                        style={{ height: '28px', background: 'lightgray', width: "105px", zIndex: '2' }}
-                        sx={{
-                          '&.MuiPaper-root': {
-                            border: '1px solid black'
-                          }
-                        }}
-                        input={<OutlinedInput
-                          sx={{
-                            width: '120px',
-                            '& .MuiOutlinedInput-notchedOutline': {
-                              border: '1px solid #E9E9EB'
-                            },
-                            '&:hover .MuiOutlinedInput-notchedOutline': {
-                              border: '1px solid #E9E9EB'
-                            },
-                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                              border: '1px solid #E9E9EB'
-                            }
-                          }}
-                        />}
-                        MenuProps={MenuProps}
-                      >
-                        {filterTypes.map((name) => (
-                          <MenuItem key={name} value={name} sx={{ padding: 0, paddingLeft: '8px' }} >
-                            <ListItemText primary={name} primaryTypographyProps={{ fontSize: '12px', fontFamily: 'Inter, sans-serif' }} />
-                          </MenuItem>
-                        ))}
-                      </Select>
-                      {selectedType === "CR Names" ? (
-                        <div className="dropdown-container" ref={dropdownRef}>
-                        <input
-                          type="text"
-                          value={inputCRValue}
-                          onChange={handleInputChange}
-                          placeholder="Search"
-                          onFocus={() => setIsCROpen(true)}
-                          className="dropdown-input"
-                        />
-                        {isCROpen && (
-                          <div className="dropdown-menu">
-                            {filteredCROptions.length > 0 ? (
-                              filteredCROptions.map((option, index) => (
-                                <div
-                                  key={index}
-                                  onClick={() => handleOptionClick(option)}
-                                  className="dropdown-option"
-                                >
-                                  {option.name}
-                                </div>
-                              ))
-                            ) : (
-                              <div className="dropdown-no-options">No options found</div>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                      ) : selectedType === "FNR No." ? (
-                        <div className='search-input-container'>
-                          <input placeholder="Search" value={fnrTerm} onInput={handleFNRChange} className='search-input' />
-                          <Image src={SearchIcon} alt="" className='search-icon' onClick={handleFNRSearch} />
-                        </div>
-                      ) : (
-                        <div className='search-input-container'>
-                          <input placeholder="Search" value={searchInput} onInput={handleSearchInput} className='search-input' />
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </Box> */}
+              </div> */}
 
               <Box sx={{}} className="shipment-details-container">
                 {showFiltered &&
