@@ -1267,7 +1267,7 @@ const MapLayers = () => {
                 </div>
               </div>
 
-              <div
+              {/* <div
                 style={{
                   height: "40px",
                   minHeight: "40px",
@@ -1317,7 +1317,7 @@ const MapLayers = () => {
                     width={20}
                   />
                 </div>
-              </div>
+              </div> */}
 
               <Box sx={{}} className="shipment-details-container">
                 {showFiltered &&
