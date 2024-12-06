@@ -1,6 +1,6 @@
 .whatsApp-notify-container {
   width: 100%;
-  height: 100vh;
+  height: 100%;
   display: flex;
 }
 
@@ -40,7 +40,7 @@
 
 .whatsApp-notify-indexLabel {
   margin-right: 0.5rem;
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   font-weight: 500;
   font-family: 'Inter', sans-serif;
   color: #42454E;
@@ -48,8 +48,14 @@
 
 .whatsApp-notify-inputWithButton{
   display: flex;
-  gap: 0.6rem;
+  gap: 1.4rem;
   align-items: center;
+}
+
+.whatsaApp-notify-inputWithLabel{
+  display: flex;
+  gap: 0.3rem;
+  flex-direction: column;
 }
 
 .whatsApp-notify-input {
@@ -70,6 +76,31 @@
   width: 20px;
   height: 20px;
   font-size: 14px;
+  margin-top: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.3s ease;
+}
+
+.whatsApp-notify-addIconButton {
+  background-color: #fff;
+  color: #3351FF;
+  border: 1px solid #3351FF;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  font-size: 18px;
+  margin-top: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.3s ease;
+}
+
+.whatsApp-notify-removeButton:hover,
+.whatsApp-notify-addIconButton:hover {
+  transform: scale(1.1);
   cursor: pointer;
 }
 
@@ -82,6 +113,7 @@
   border: none;
   background: none;
   transition: color 0.3s;
+  text-align: left;
 }
 
 .whatsApp-notify-addButton:hover {
@@ -98,11 +130,12 @@
   background-color: #3351FF;
   color: white;
   border: none;
-  padding: 0.5rem 1rem;
+  padding: 0.5rem 1.2rem;
   font-size: 0.875rem;
   font-weight: 600;
   border-radius: 6px;
   cursor: pointer;
+  text-transform: uppercase;
   transition: all 0.3s ease;
   margin-top: 1rem;
 }
@@ -111,11 +144,12 @@
   background-color: #FFF;
   color: #3351FF;
   border: 1px solid #3351FF;
-  padding: 0.5rem 1rem;
+  padding: 0.5rem 1.2rem;
   font-size: 0.875rem;
   font-weight: 600;
   border-radius: 6px;
   cursor: pointer;
+  text-transform: uppercase;
   transition: all 0.3s ease;
   margin-top: 1rem;
 }
@@ -124,7 +158,6 @@
 .whatsApp-notify-clearButton:hover  {
   transform: scale(1.05);
 }
-
 
 .whatsApp-notify-error {
   color: red;
@@ -136,12 +169,8 @@
 .whatsApp-notify-inputContainer {
   display: flex;
   flex-direction: column;
-  margin-top: 24px;
   gap: 1rem;
-  padding-right: 24px;
-  max-height: 50vh; 
-  overflow-y: auto;
-  scrollbar-width: thin; 
+  width: 100%;
 }
 
 .whatsApp-notify-inputContainer::-webkit-scrollbar {
@@ -155,4 +184,104 @@
 
 .whatsApp-notify-inputContainer::-webkit-scrollbar-track {
   background-color: #f1f1f1; 
+}
+
+.whatsApp-notify-timeContainer {
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  gap: 1.4rem;
+  margin-bottom: 1rem;
+}
+
+.whatsApp-notify-timeField {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.whatsApp-notify-timeInputWrapper {
+  width: 254px;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.whatsApp-notify-timeInput {
+  width: 254px;
+  padding: 0.56rem;
+  font-size: 0.875rem;
+  color: #42454E;
+  border: 1px solid #DFE3EB;
+  border-radius: 6px;
+  outline: none;
+  font-family: 'Inter', sans-serif !important;
+  padding-right: 3.2rem;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+
+.whatsApp-notify-timeInput::-webkit-calendar-picker-indicator {
+  display: none;
+}
+
+.whatsApp-notify-timeInput.disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.whatsApp-notify-timeInput:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.whatsApp-notify-timeLabel {
+  position: absolute;
+  right: 2%;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  padding: 0.4rem 0.8rem;
+  background-color: #F0F3F9;
+  color: #42454E;
+  font-weight: 400;
+  font-size: 0.765rem;
+  border-radius: 6px;
+  pointer-events: none;
+  user-select: none;
+  height: 24px;
+}
+
+.whatsApp-notify-timeError {
+  color: #FF4D4F;
+  font-size: 12px;
+  margin-top: 4px;
+  position: absolute;
+  bottom: -20px;
+  left: 0;
+}
+
+.whatsApp-notify-contactsContainer{
+  display: flex;
+  flex-direction: column;
+  margin-top: 24px;
+  padding-right: 24px;
+  padding-bottom: 24px;
+  max-height: 46vh; 
+  overflow-y: auto;
+  scrollbar-width: thin; 
+  width: 60%;
+  border-bottom: 1px solid #DFE3EB;
+}
+
+.whatsApp-notify-triggerLabel{
+  font-size: 14px;
+  font-weight: 500;
+  color: #3C4852;
+  line-height: 0;
+  margin-bottom: 8px;
+  margin-top: 30px;
 }
