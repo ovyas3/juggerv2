@@ -24,7 +24,7 @@
 }
 
 .status_container {
-  margin-top: 12px;
+  /* margin-top: 12px; */
   margin-bottom: 18px;
 }
 
@@ -425,7 +425,7 @@
 
 .cardHover :hover {
   cursor: pointer;
-  background-color: #f0f3f9;
+  /* background-color: #f0f3f9; */
 }
 
 .cardHover{
@@ -677,6 +677,8 @@
   flex:1;
   overflow-y: scroll !important; 
   scrollbar-width: none; 
+  /* padding-inline: 12px; */
+  margin-block: 12px;
 }
 @media screen and (max-width: 1140px){
   /* .shipment-heads{
@@ -831,4 +833,20 @@
 .dropdown-no-options {
   padding: 8px 12px;
   color: #999;
+}
+
+.card-sudo-element::after{
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-top: 5px solid #42454E; 
+}
+
+#total{
+  background-color: #42454E;
+  flex:1
 }

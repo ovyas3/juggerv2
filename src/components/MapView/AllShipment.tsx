@@ -1,40 +1,52 @@
-'use client'
-import { useRouter } from 'next/navigation';
+"use client";
+import { useRouter } from "next/navigation";
 import React, { useState, useEffect, useRef } from "react";
-import { MapContainer, TileLayer, Marker, LayersControl, Popup, GeoJSON, Polyline } from 'react-leaflet';
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  LayersControl,
+  Popup,
+  GeoJSON,
+  Polyline,
+} from "react-leaflet";
 import MarkerClusterGroup from "react-leaflet-cluster";
-import './MapLayers.css';
+import "./MapLayers.css";
 import { httpsGet, httpsPost } from "@/utils/Communication";
 import getBoundary from "./IndianClaimed";
 import coordsOfTracks from "./IndianTracks";
 import { useWindowSize } from "@/utils/hooks";
-import { MagnifyingGlass } from 'react-loader-spinner';
-import pickupIcon from '../../assets/pickup_icon.svg'
-import dropIcon from '@/assets/drop_icon.svg'
+import { MagnifyingGlass } from "react-loader-spinner";
+import pickupIcon from "../../assets/pickup_icon.svg";
+import dropIcon from "@/assets/drop_icon.svg";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Paper from "@mui/material/Paper";
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import dayjs from 'dayjs';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
-import InputLabel from '@mui/material/InputLabel';
-import captiveRakeIndicator from '@/assets/captive_rakes.svg'
-import { environment } from '@/environments/env.api'
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import dayjs from "dayjs";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
+import InputLabel from "@mui/material/InputLabel";
+import captiveRakeIndicator from "@/assets/captive_rakes.svg";
+import { environment } from "@/environments/env.api";
 
 import IdleIcon from "@/assets/idle_icon.svg";
 import InactiveIcon from "@/assets/inactive_icon.svg";
-import { countTracking, getCaptiveIndianRakes, trackingByFoisGpsHook } from '@/utils/hooks'
+import {
+  countTracking,
+  getCaptiveIndianRakes,
+  trackingByFoisGpsHook,
+} from "@/utils/hooks";
 
-import { Icon, divIcon, point } from "leaflet";
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
+import { divIcon, point } from "leaflet";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
 
 import {
   Accordion,
@@ -53,10 +65,10 @@ import {
   Typography,
   useMediaQuery,
 } from "@mui/material";
-import Switch from '@mui/material/Switch';
-import FormGroup from '@mui/material/FormGroup';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import FormControl from '@mui/material/FormControl';
+import Switch from "@mui/material/Switch";
+import FormGroup from "@mui/material/FormGroup";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import FormControl from "@mui/material/FormControl";
 
 import MobileDrawer from "@/components/Drawer/mobile_drawer";
 import MobileHeader from "@/components/Header/mobileHeader";
@@ -67,13 +79,21 @@ import { DateTime } from "luxon";
 import service from "@/utils/timeService";
 import { statusBuilder } from "./StatusBuilder/StatusBuilder";
 import Image from "next/image";
-import TripTracker from './TripTracker';
+import TripTracker from "./TripTracker";
 
-import SearchIcon from '@/assets/search_icon.svg';
-import { useSnackbar } from '@/hooks/snackBar';
+import SearchIcon from "@/assets/search_icon.svg";
+import { useSnackbar } from "@/hooks/snackBar";
 import Tooltip from "@mui/material/Tooltip";
 import { TooltipProps } from "@mui/material/Tooltip";
-import { styled } from '@mui/material/styles';
+import { styled } from "@mui/material/styles";
+
+import CustomDatePicker from "@/components/UI/CustomDatePicker/CustomDatePicker";
+import searchIcon from "@/assets/search_wagon.svg";
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
+import { Icon, CircleMarker } from "leaflet";
+
+import CurrencyIcon from "@/assets/current_location_icon.svg";
+import deliveryIcon from "@/assets/delivery_location_icon.svg";
 
 //Custom Tooltip
 
@@ -82,16 +102,16 @@ interface StyledTooltipProps extends TooltipProps {
 }
 
 const CustomTooltip = styled(({ className, ...props }: StyledTooltipProps) => (
-  <Tooltip 
-    {...props} 
-    classes={{ popper: className }} 
+  <Tooltip
+    {...props}
+    classes={{ popper: className }}
     PopperProps={{
       popperOptions: {
         modifiers: [
           {
-            name: 'offset',
+            name: "offset",
             options: {
-              offset: [14, -10], 
+              offset: [14, -10],
             },
           },
         ],
@@ -99,55 +119,54 @@ const CustomTooltip = styled(({ className, ...props }: StyledTooltipProps) => (
     }}
   />
 ))({
-  '& .MuiTooltip-tooltip': {
-    backgroundColor: '#000',
-    color: '#fff',
-    width: '100px',
-    height: '24px',
-    boxShadow: '0px 0px 2px rgba(0,0,0,0.1)',
-    fontSize: '8px',
+  "& .MuiTooltip-tooltip": {
+    backgroundColor: "#000",
+    color: "#fff",
+    width: "100px",
+    height: "24px",
+    boxShadow: "0px 0px 2px rgba(0,0,0,0.1)",
+    fontSize: "8px",
     fontFamily: '"Inter", sans-serif',
   },
-  '& .MuiTooltip-arrow': {
-    color: '#000',
+  "& .MuiTooltip-arrow": {
+    color: "#000",
   },
 });
-
 
 // Custom Icons
 const customIcon = L.icon({
   iconUrl: "assets/train_on_map_icon_idle.svg",
   iconSize: [38, 38], // adjust icon size as needed
   iconAnchor: [19, 38], // adjust anchor point as needed
-  popupAnchor: [0, -38] // adjust popup anchor as needed
+  popupAnchor: [0, -38], // adjust popup anchor as needed
 });
 
 const customIconDelivered = L.icon({
   iconUrl: "/assets/train_on_map_icon_in_transit.svg",
   iconSize: [38, 38], // adjust icon size as needed
   iconAnchor: [19, 38], // adjust anchor point as needed
-  popupAnchor: [0, -38] // adjust popup anchor as needed
+  popupAnchor: [0, -38], // adjust popup anchor as needed
 });
 
 const customIconIdle = L.icon({
   iconUrl: "/assets/train_on_map_icon.svg",
   iconSize: [38, 38], // adjust icon size as needed
   iconAnchor: [19, 38], // adjust anchor point as needed
-  popupAnchor: [0, -38] // adjust popup anchor as needed
+  popupAnchor: [0, -38], // adjust popup anchor as needed
 });
 
 const createClusterCustomIconInTransit = function (cluster: any) {
   return divIcon({
     html: `<span class="cluster-icon-in-transit">${cluster.getChildCount()}</span>`,
     className: "custom-marker-cluster",
-    iconSize: point(33, 33, true)
+    iconSize: point(33, 33, true),
   });
 };
 const createClusterCustomIconIdle = function (cluster: any) {
   return divIcon({
     html: `<span class="cluster-icon-idle">${cluster.getChildCount()}</span>`,
     className: "custom-marker-cluster",
-    iconSize: point(33, 33, true)
+    iconSize: point(33, 33, true),
   });
 };
 
@@ -155,34 +174,45 @@ const createClusterCustomIconDelivered = function (cluster: any) {
   return divIcon({
     html: `<span class="cluster-icon-delivered">${cluster.getChildCount()}</span>`,
     className: "custom-marker-cluster",
-    iconSize: point(33, 33, true)
+    iconSize: point(33, 33, true),
   });
-}
+};
 
 const colorOfStatus = (status: string) => {
   switch (status) {
-    case 'In Transit':
-      return 'warning';
-    case 'Delivered':
-      return 'success';
+    case "In Plant":
+      return "#174D68";
+    case "In Transit":
+      return "#F69805";
+    case "Delivered":
+      return "success";
     default:
-      return 'info';
+      return "info";
   }
-}
+};
 
-const rakeTypes = [
-  'Captive Rakes',
-  'Indian Railway Rakes'
-];
+const bgColorOfStatus = (status: string) => {
+  switch (status) {
+    case "In Plant":
+      return "#F4FCFC";
+    case "In Transit":
+      return "#FEF3E7";
+    case "Delivered":
+      return "success";
+    default:
+      return "info";
+  }
+};
 
+const rakeTypes = ["Captive Rakes", "Indian Railway Rakes"];
 
 const MenuProps = {
   PaperProps: {
     style: {
-      minWidth: '7%',
-      width: '7%',
-      marginTop: '4px',
-      border: '1px solid grey'
+      minWidth: "7%",
+      width: "7%",
+      marginTop: "4px",
+      border: "1px solid grey",
     },
   },
 };
@@ -200,113 +230,197 @@ const ShipmentCard: React.FC<ShipmentCardProps> = ({
   handleShipmentSelection,
   handleNavigation,
 }) => {
-  const gpsFOIS = (shipment.trip_tracker?.last_location?.fois?.coordinates.length > 0
-    && shipment.trip_tracker?.last_location?.fois) // Checking FOIS tracking
-    || (shipment.trip_tracker?.last_location?.gps?.coordinates.length > 0
-      && shipment.trip_tracker?.last_location?.gps); // Checking FOIS tracking
+  const gpsFOIS =
+    (shipment.trip_tracker?.last_location?.fois?.coordinates.length > 0 &&
+      shipment.trip_tracker?.last_location?.fois) || // Checking FOIS tracking
+    (shipment.trip_tracker?.last_location?.gps?.coordinates.length > 0 &&
+      shipment.trip_tracker?.last_location?.gps); // Checking FOIS tracking
   const isTracking = gpsFOIS && gpsFOIS.coordinates.length > 0 ? true : false;
 
-  const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+  const handleLinkClick = (
+    e: React.MouseEvent<HTMLAnchorElement, MouseEvent>
+  ) => {
     e.stopPropagation();
-    window.open(`${environment.PROD_BASE_URL}tracker?unique_code=${shipment.unique_code}`, '_blank');
+    window.open(
+      `${environment.PROD_BASE_URL}tracker?unique_code=${shipment.unique_code}`,
+      "_blank"
+    );
   };
 
-  return <Card style={{
-    borderRadius: '10px',
-    // marginTop: index == 0 ? '24px' : '15px',
-    position: 'relative',
-    overflow: 'hidden',
-    marginBottom: '10px',
-  }} className="cardHover" variant="outlined"
-    onClick={(e) => {
-      e.stopPropagation();
-      handleShipmentSelection(shipment)
-    }
-    }
-  >
-    <div className={isTracking ? 'tracking-indication' : 'non-tracking-indication'}>
-      {isTracking ? 'Tracking' : 'Non Tracking'}
-    </div>
-    <CardContent style={{ padding: '20px 20px 24px 20px' }}>
-      <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-        <Grid container className="shipment-list-top">
-          <Grid item xs={8}>
-            <Image height={12} width={12} alt="loc" src={dropIcon} /> {shipment.trip_tracker?.fois_last_location || shipment.trip_tracker?.gps_last_location || shipment.status || 'In Plant'}
-          </Grid>
-          <Grid item xs={4} sx={{
-            display: 'flex',
-            justifyContent: 'flex-end',
-            alignItems: 'flex-start',
-          }}>
-            {/* <Chip label="In Transit" variant="outlined" color="info" /> */}
-            <Chip label={statusBuilder(shipment.status)} variant="outlined" color={colorOfStatus(statusBuilder(shipment.status))} id="chip-label" />
-          </Grid>
-        </Grid>
-      </Typography>
-      <Typography variant="h6" component="div" id="shipment-list-fnr" sx={{ fontFamily: '"Inter", sans-serif !important' }}>
-        # {shipment.all_FNRs ? <a onClick={handleLinkClick} style={{ cursor: 'pointer', textDecoration: 'underline', color: 'blue' }}>
-          {shipment.all_FNRs[0]}
-        </a> : 'N/A'}
-        <span className="extraFnr-indicator">
-          <span className="fnr-count">{shipment.all_FNRs && shipment.all_FNRs.length > 1 ? `+${shipment.all_FNRs.length - 1} more` : ''}</span>
-          <span className="more-fnr-indicator">
-            {shipment.all_FNRs && shipment.all_FNRs.length > 1 ? shipment.all_FNRs.slice(1).map((item: any, index: number) => {
-              return <div key={index} className="each-fnr">{item}</div>
-            }) : ''}
-          </span>
-        </span>
-      </Typography>
-      <Typography variant="body2" component="div">
-        <Grid container >
-          {/* <Grid item xs={12}>
-            <Typography variant="body2" component="div" id="shipment-list-bottom">
-              <Image height={10} alt="pickup" src={pickupIcon} /> - {shipment.pickup_location?.name} ({shipment.pickup_location?.code})
-            </Typography>
-          </Grid> */}
-          <Grid item xs={12}>
-            <Typography variant="body2" component="div" id="shipment-list-bottom">
-              <Image height={10} alt="drop" src={dropIcon} /> - {shipment.delivery_location?.name} ({shipment.delivery_location?.code})
-            </Typography>
-          </Grid>
-          <Grid item xs={12} sx={{
-            display: 'flex',
-            justifyContent: 'flex-end',
-            alignItems: 'flex-start',
-          }}>
-            <CustomTooltip 
-              arrow 
-              title={
-                <div 
-                  style={{
-                    display: 'flex', 
-                    width: '100%',
-                    flexDirection: 'row', 
-                    justifyContent: 'center',
-                    fontSize: '10px',
-                    fontFamily: '"Inter", sans-serif',
-                    fontWeight: 600,
-                    paddingTop: '2px',
-                    gap: '2px'
-                }}>
-                  {shipment.captive_id && shipment.captive_id.name ? shipment.captive_id.name : 'N/A'}
-                </div>}>
-                {shipment.is_captive && <div><Image src={captiveRakeIndicator.src || ''} alt='CR icon' width={24} height={24}/></div>}
-            </CustomTooltip>
-          </Grid>
-        </Grid>
-      </Typography>
-    </CardContent>
-  </Card>
-}
+  return (
+    <Card
+      style={{
+        overflow: "hidden",
+        backgroundColor: "#F5F5F5",
+        position: "relative",
+      }}
+      className="cardHover"
+      onClick={(e) => {
+        e.stopPropagation();
+        handleShipmentSelection(shipment);
+      }}
+    >
+      <div
+        style={{
+          backgroundColor: "white",
+          overflow: "hidden",
+          borderRadius: "12px",
+          marginInline: 12,
+          marginBottom: 12,
+        }}
+      >
+        <div
+          style={{
+            position: "absolute",
+            top: "0px",
+            left: "8px",
+            backgroundColor: "#42454E",
+            fontSize: 12,
+            color: "#fff",
+            paddingInline: 5,
+            paddingBlock: 3,
+          }}
+          className="card-sudo-element"
+        >
+          {shipment?.is_captive ? "Captive Rake" : "Indian Railways Rake"}
+        </div>
 
-type StatusKey = 'OB' | 'ITNS' | 'Delivered' | 'none' | 'AVE';
+        <CardContent>
+          <Typography
+            variant="h6"
+            component="div"
+            id="shipment-list-fnr"
+            sx={{
+              fontFamily: '"Inter", sans-serif !important',
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginTop: "12px",
+              fontSize: "14px",
+            }}
+          >
+            <div>
+              #{" "}
+              {shipment.all_FNRs ? (
+                <a
+                  onClick={handleLinkClick}
+                  style={{
+                    cursor: "pointer",
+                    textDecoration: "underline",
+                    color: "blue",
+                  }}
+                >
+                  {shipment.all_FNRs[0]}
+                </a>
+              ) : (
+                "N/A"
+              )}
+              <span className="extraFnr-indicator">
+                <span className="fnr-count">
+                  {shipment.all_FNRs && shipment.all_FNRs.length > 1
+                    ? `+${shipment.all_FNRs.length - 1} more`
+                    : ""}
+                </span>
+                <span className="more-fnr-indicator">
+                  {shipment.all_FNRs && shipment.all_FNRs.length > 1
+                    ? shipment.all_FNRs
+                        .slice(1)
+                        .map((item: any, index: number) => {
+                          return (
+                            <div key={index} className="each-fnr">
+                              {item}
+                            </div>
+                          );
+                        })
+                    : ""}
+                </span>
+              </span>
+            </div>
+            <div
+              style={{
+                color: colorOfStatus(statusBuilder(shipment.status)),
+                backgroundColor: bgColorOfStatus(
+                  statusBuilder(shipment.status)
+                ),
+                fontSize: 12,
+                paddingInline: "8px",
+                paddingBlock: "2px",
+                width: "fit-content",
+              }}
+            >
+              {statusBuilder(shipment.status)}
+            </div>
+          </Typography>
+
+          <Typography sx={{ fontSize: 12 }}  gutterBottom>
+            <div
+              style={{
+                display: "flex",
+                gap: "6px",
+                marginTop: "10px",
+              }}
+            >
+              <div>
+                <Image
+                  src={CurrencyIcon.src}
+                  alt="currency"
+                  width={16}
+                  height={16}
+                />
+              </div>
+              <div>-</div>
+              <div>
+                <div>Current Location</div>
+                <div style={{ fontWeight: 600 }}>
+                  {shipment?.trip_tracker?.fois_last_location || "--"}
+                </div>
+              </div>
+            </div>
+          </Typography>
+
+          <Typography
+            sx={{ fontSize: 12 }}
+            variant="body2"
+            component="div"
+            id="shipment-list-bottom"
+          >
+            <div
+              style={{
+                display: "flex",
+                gap: "6px",
+                marginTop: "10px",
+              }}
+            >
+              <div>
+                <Image width={16} height={16} alt="drop" src={dropIcon} />
+              </div>
+              <div>-</div>
+              <div>
+                <div>Delivery Location</div>
+                <div style={{ fontWeight: 600 }}>
+                  {shipment.delivery_location?.name} (
+                  {shipment.delivery_location?.code})
+                </div>
+              </div>
+            </div>
+          </Typography>
+
+        </CardContent>
+      </div>
+    </Card>
+  );
+};
+
+type StatusKey = "OB" | "ITNS" | "Delivered" | "none" | "AVE" | "INPL" | "ALL";
 
 const statusMapping: Record<StatusKey, string[]> = {
-  OB: ['', 'OB'],
-  ITNS: ['Delivered', '', 'OB'],
-  Delivered: ['Delivered'],
-  none: [''],
-  AVE: ['AVE']
+  OB: ["", "OB"],
+  ITNS: ["Delivered", "", "OB"],
+  Delivered: ["Delivered"],
+  none: [""],
+  AVE: ["AVE"],
+  INPL: ["INPL"],
+  ALL: ["ALL"],
 };
 
 interface TrackingStatus {
@@ -322,14 +436,24 @@ interface rakeType {
   indian: boolean;
 }
 
+const searchOptions = [
+  { value: "fnr", label: "FNR No." },
+  { value: "dest", label: "Dest. Code" },
+  { value: "crName", label: "CR Names" },
+];
+
 // Main Component for Map Layers
 const MapLayers = () => {
   const { showMessage } = useSnackbar();
-  const mobile = !useMediaQuery("(min-width:800px)");
-  const isMobile = useWindowSize(600);
+  const isMobile = useMediaQuery("(min-width:600px)");
   const [map, setMap] = useState<L.Map | null>(null);
   const center: [number, number] = [24.2654256, 78.9145218];
   const selectedMarkerRef = useRef<L.Marker | null>(null);
+
+  const [mobileShow, setMobileShow] = useState<boolean>(true);
+  const [currentZoom, setCurrentZoom] = useState<number>(5);
+  const [currentFocusstatus, setCurrentFocusstatus] = useState<any>('TOTAL');
+
   const [selectedShipment, setSelectedShipment] = useState<any | null>(null);
   const [allShipments, setAllShipments] = useState<any[]>([]);
   const [totalCount, setTotalCount] = useState<number>(0);
@@ -344,54 +468,82 @@ const MapLayers = () => {
   const [showSearched, setShowSearched] = useState<boolean>(false);
   const [showFiltered, setShowFiltered] = useState<boolean>(false);
   const [showAll, setShowAll] = useState<boolean>(true);
-  const [isTotal, setIsTotal] = useState(true)
+  const [isTotal, setIsTotal] = useState(true);
   const [showIdle, setShowIdle] = useState<boolean>(true);
   const [showInTransit, setShowInTransit] = useState<boolean>(true);
   const [showDelivered, setShowDelivered] = useState<boolean>(true);
-  const [selectedFromDate, setSelectedFromDate] = React.useState<dayjs.Dayjs | null>(dayjs());
-  const [selectedToDate, setSelectedToDate] = React.useState<dayjs.Dayjs | null>(dayjs());
+  const [selectedFromDate, setSelectedFromDate] =
+    React.useState<dayjs.Dayjs | null>(dayjs());
+  const [selectedToDate, setSelectedToDate] =
+    React.useState<dayjs.Dayjs | null>(dayjs());
   const [openFromDatePicker, setOpenFromDatePicker] = useState(false);
   const [openToDatePicker, setOpenToDatePicker] = useState(false);
-  const [trackingNonTracking, setTrackingNonTracking] = useState<TrackingStatus>({ tracking: 0, notTracking: 0 });
-  const [rakeType, setRakeType] = useState(['Captive Rakes', 'Indian Railway Rakes'])
-  const [showRakeTypeFiltered, setShowRakeTypeFiltered] = useState(false)
-  const [rakeTypeFilteredShipments, setRakeTypeFilteredShipments] = useState<any[]>([])
-  const [isTracking, setIsTracking] = useState(0)
-  const [filteredShipmentsBackup, setFilteredShipmentsBackup] = useState<any[]>([])
+  const [trackingNonTracking, setTrackingNonTracking] =
+    useState<TrackingStatus>({ tracking: 0, notTracking: 0 });
+  const [rakeType, setRakeType] = useState([
+    "Captive Rakes",
+    "Indian Railway Rakes",
+  ]);
+  const [showRakeTypeFiltered, setShowRakeTypeFiltered] = useState(false);
+  const [rakeTypeFilteredShipments, setRakeTypeFilteredShipments] = useState<
+    any[]
+  >([]);
+  const [isTracking, setIsTracking] = useState(0);
+  const [filteredShipmentsBackup, setFilteredShipmentsBackup] = useState<any[]>(
+    []
+  );
 
-  const [selectedType, setSelectedType] = useState('FNR No.')
-  const [searchInput, setSearchInput] = useState('')
+  const [selectedType, setSelectedType] = useState("FNR No.");
+  const [searchInput, setSearchInput] = useState("");
   const router = useRouter();
 
-  const [inPlantCaptive, setInPlantCaptive] = useState<captive_rakes>({ captive: 0, indian: 0 });
-  const [inTransitCaptive, setInTransitCaptive] = useState<captive_rakes>({ captive: 0, indian: 0 });
-  const [deliveredCaptive, setDeliveredCaptive] = useState<captive_rakes>({ captive: 0, indian: 0 });
-  const [totalCaptive, setTotalCaptive] = useState<captive_rakes>({ captive: 0, indian: 0 });
+  const [inPlantCaptive, setInPlantCaptive] = useState<captive_rakes>({
+    captive: 0,
+    indian: 0,
+  });
+  const [inTransitCaptive, setInTransitCaptive] = useState<captive_rakes>({
+    captive: 0,
+    indian: 0,
+  });
+  const [deliveredCaptive, setDeliveredCaptive] = useState<captive_rakes>({
+    captive: 0,
+    indian: 0,
+  });
+  const [totalCaptive, setTotalCaptive] = useState<captive_rakes>({
+    captive: 0,
+    indian: 0,
+  });
 
-  const [headingFilters, setHeadingFilters] = useState('');
-  const [headingColors, setHeadingColors] = useState('');
+  const [headingFilters, setHeadingFilters] = useState("");
+  const [headingColors, setHeadingColors] = useState("");
 
-  const [showSearchFNR, setShowSearchFNR] = useState(false)
-  const [trackingByFoisGps, setTrackingByFoisGps] = useState<any>({ foiscount: 0, gpscount: 0 });
+  const [showSearchFNR, setShowSearchFNR] = useState(false);
+  const [trackingByFoisGps, setTrackingByFoisGps] = useState<any>({
+    foiscount: 0,
+    gpscount: 0,
+  });
   const [trackingAvailed, setTrackingAvailed] = useState<any>(false);
   const [shipmentMapView, setShipmentMapView] = useState<any>([]);
-  const [trackingTypeSelected, setTrackingTypeSelected] = useState<any>({ fois: false, gps: false });
+  const [trackingTypeSelected, setTrackingTypeSelected] = useState<any>({
+    fois: false,
+    gps: false,
+  });
   const [originalData, setOriginalData] = useState<any[]>([]);
   const [hiddenTrackingInfo, setHiddenTrackingInfo] = useState<any>(false);
 
-  const [crLabelName, setCrLabelName] = useState('');
-  const [fnrTerm, setFnrTerm] = useState('');
+  const [crLabelName, setCrLabelName] = useState("");
+  const [fnrTerm, setFnrTerm] = useState("");
   const [crNames, setCrNames] = useState<any[]>([]);
-  const [inputCRValue, setInputCRValue] = useState('');
-  const [selectedCR, setSelectedCR] = useState('');
+  const [inputCRValue, setInputCRValue] = useState("");
+  const [selectedCR, setSelectedCR] = useState("");
   const [isCROpen, setIsCROpen] = useState(false);
   const [filteredCROptions, setFilteredCrOptions] = useState<any[]>([]);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const fetchNames = async () => {
-      const names = await httpsGet('get/captive_rakes_names', 0, router);
-      if(names.data && names.data.length > 0) {
+      const names = await httpsGet("get/captive_rakes_names", 0, router);
+      if (names.data && names.data.length > 0) {
         setCrNames(names.data);
         setFilteredCrOptions(names.data);
       } else {
@@ -400,13 +552,23 @@ const MapLayers = () => {
       }
     };
     fetchNames();
-  }, []); 
-  
+  }, []);
+
+  useEffect(() => {
+    if (map) {
+      map.on("zoomend", () => {
+        setCurrentZoom(map.getZoom());
+      });
+    }
+  }, [map]);
+
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
     setInputCRValue(value);
     setFilteredCrOptions(
-      crNames.filter((crName) => crName.name.toLowerCase().includes(value.toLowerCase()))
+      crNames.filter((crName) =>
+        crName.name.toLowerCase().includes(value.toLowerCase())
+      )
     );
   };
 
@@ -418,7 +580,10 @@ const MapLayers = () => {
   };
 
   const handleClickOutside = (event: MouseEvent) => {
-    if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+    if (
+      dropdownRef.current &&
+      !dropdownRef.current.contains(event.target as Node)
+    ) {
       setIsCROpen(false);
     }
   };
@@ -426,26 +591,26 @@ const MapLayers = () => {
   const handleFNRChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const fnr = event.target.value;
     setFnrTerm(fnr);
-    if(fnr.length === 11 || fnr.length === 0) {
+    if (fnr.length === 11 || fnr.length === 0) {
       setFnrTerm(fnr);
       getShipments("", "");
     }
   };
 
   const handleFNRSearch = () => {
-    if(fnrTerm.length === 0) {
-      showMessage('Please enter FNR number', 'error');
+    if (fnrTerm.length === 0) {
+      showMessage("Please enter FNR number", "error");
     } else if (fnrTerm.length <= 10) {
-      showMessage('Please enter valid FNR number', 'error');
+      showMessage("Please enter valid FNR number", "error");
     } else if (fnrTerm.length === 11) {
       getShipments(fnrTerm, "");
     }
   };
 
   useEffect(() => {
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
@@ -458,93 +623,82 @@ const MapLayers = () => {
   const filterTypes = ["FNR No.", "Dest. Code", "CR Names"];
 
   function handleChange(event: any) {
-    const type = event.target.value
+    const type = event.target.value;
     if (type !== selectedType) {
-      setSelectedType(event.target.value)
-      setSearchInput('')
-      setFnrTerm('')
-      setInputCRValue('')
-      setSelectedCR('')
+      setSelectedType(event.target.value);
+      setSearchInput("");
+      setFnrTerm("");
+      setInputCRValue("");
+      setSelectedCR("");
       getShipments("", "");
     }
   }
 
   useEffect(() => {
     if (rakeType.length === 1) {
-      let data
-      let isCaptive = rakeType[0]
+      let data;
+      let isCaptive = rakeType[0];
       if (showSearched) {
         data = searcedShipments.filter((val) => {
-          if (isCaptive === 'Captive Rakes')
-            return val.is_captive === true
-          else
-            return val.is_captive === false
-        })
-        setRakeTypeFilteredShipments(data)
+          if (isCaptive === "Captive Rakes") return val.is_captive === true;
+          else return val.is_captive === false;
+        });
+        setRakeTypeFilteredShipments(data);
       } else if (showFiltered) {
         data = filteredShipments.filter((val) => {
-          if (isCaptive === 'Captive Rakes')
-            return val.is_captive === true
-          else
-            return val.is_captive === false
-        })
-        setRakeTypeFilteredShipments(data)
+          if (isCaptive === "Captive Rakes") return val.is_captive === true;
+          else return val.is_captive === false;
+        });
+        setRakeTypeFilteredShipments(data);
       } else if (showAll) {
         data = allShipments.filter((val) => {
-          if (isCaptive === 'Captive Rakes')
-            return val.is_captive === true
-          else
-            return val.is_captive === false
-        }
-        )
-        setRakeTypeFilteredShipments(data)
+          if (isCaptive === "Captive Rakes") return val.is_captive === true;
+          else return val.is_captive === false;
+        });
+        setRakeTypeFilteredShipments(data);
       }
-      setShowRakeTypeFiltered(true)
+      setShowRakeTypeFiltered(true);
     } else {
-      setShowRakeTypeFiltered(false)
+      setShowRakeTypeFiltered(false);
     }
-  }, [rakeType, allShipments, searcedShipments, filteredShipments])
+  }, [rakeType, allShipments, searcedShipments, filteredShipments]);
 
   useEffect(() => {
-    setShowSearched(false)
-    setSearchInput('')
-  }, [allShipments, filteredShipments])
+    setShowSearched(false);
+    setSearchInput("");
+  }, [allShipments, filteredShipments]);
 
   function handleSearchInput(event: any) {
     const searchQuery = event.target.value;
     setSearchInput(searchQuery);
     setShowSearched(true);
-    setShowRakeTypeFiltered(false)
+    setShowRakeTypeFiltered(false);
     if (selectedType === "FNR No.") {
       if (showFiltered) {
         const filteredData = filteredShipments.filter((shipment) => {
           const data = shipment.all_FNRs.filter((fnr: String) =>
             fnr.toLowerCase().includes(searchQuery.toLowerCase())
-          )
-          return Boolean(data.length)
-        }
-        );
+          );
+          return Boolean(data.length);
+        });
         setSearchedShipments(filteredData);
         setShowSearched(true);
       } else if (showAll) {
         const filteredData = allShipments.filter((shipment) => {
           const data = shipment?.all_FNRs?.filter((fnr: String) =>
             fnr.toLowerCase().includes(searchQuery.toLowerCase())
-          )
-          return Boolean(data.length)
-        }
-        );
+          );
+          return Boolean(data.length);
+        });
         setSearchedShipments(filteredData);
         setShowSearched(true);
-      }
-      else {
+      } else {
         const filteredData = rakeTypeFilteredShipments.filter((shipment) => {
           const data = shipment?.all_FNRs?.filter((fnr: String) =>
             fnr.toLowerCase().includes(searchQuery.toLowerCase())
-          )
-          return Boolean(data.length)
-        }
-        );
+          );
+          return Boolean(data.length);
+        });
         setSearchedShipments(filteredData);
         setShowSearched(true);
       }
@@ -573,116 +727,160 @@ const MapLayers = () => {
             .includes(searchQuery.toLowerCase())
         );
         setSearchedShipments(filteredData);
-        setShowSearched(true)
+        setShowSearched(true);
       }
     }
   }
 
   const geoJSONStyle: L.PathOptions = {
-    color: 'black', // Set the color of train tracks
+    color: "black", // Set the color of train tracks
     weight: 3, // Set the thickness of the tracks
     opacity: 1, // Set the opacity
     fill: false, // Ensure the line is not filled
-    dashArray: '2, 10', // Set the dash pattern to mimic railroad ties
-    lineCap: 'square' as 'square', // This should be a LineCapShape
+    dashArray: "2, 10", // Set the dash pattern to mimic railroad ties
+    lineCap: "square" as "square", // This should be a LineCapShape
   };
 
   const boundaryStyle = (feature: any) => {
     switch (feature.properties.boundary) {
-      case 'claimed':
+      case "claimed":
         return {
-          color: "#C2B3BF", weight: 2
+          color: "#C2B3BF",
+          weight: 2,
         };
       default:
         return {
-          color: "", weight: 0
+          color: "",
+          weight: 0,
         };
     }
-  }
+  };
 
   const addIndiaBoundaries = () => {
     const b = getBoundary();
     if (map instanceof L.Map) {
       L.geoJSON(b, {
-        style: boundaryStyle
+        style: boundaryStyle,
       }).addTo(map);
     } else {
-      console.error('map is not a Leaflet map object');
+      console.error("map is not a Leaflet map object");
     }
-  }
+  };
 
   const getTrackingShipment = (shipments: any[]) => {
-    const shipmentData = shipments.sort((a: any, b: any) => {
-      return a.created_at - b.created_at;
-    }).map((shipment: any) => {
-      return {
-        _id: shipment && shipment._id,
-        FNR: shipment && shipment.all_FNRs ? shipment.all_FNRs.join(', ') : '',
-        pickup: shipment && shipment.pickup_location && shipment.pickup_location.name ? shipment.pickup_location.name + ' (' + shipment.pickup_location.code + ')' : '',
-        delivery: shipment && shipment.delivery_location && shipment.delivery_location.name ? shipment.delivery_location.name + ' (' + shipment.delivery_location.code + ')' : '',
-        status: shipment && shipment.status ? shipment.status : '',
-        gps: shipment && (shipment.trip_tracker?.last_location?.fois?.coordinates.length > 0 && shipment.trip_tracker?.last_location?.fois || shipment.trip_tracker?.last_location?.gps?.coordinates.length > 0 && shipment.trip_tracker?.last_location?.gps),
-        tripTracker: shipment && shipment?.trip_tracker?.fois_last_location,
-      }
-    }).filter((shipment: any) => shipment.gps && shipment.gps.coordinates.length > 0);
+    const shipmentData = shipments
+      .sort((a: any, b: any) => {
+        return a.created_at - b.created_at;
+      })
+      .map((shipment: any) => {
+        return {
+          _id: shipment && shipment._id,
+          FNR:
+            shipment && shipment.all_FNRs ? shipment.all_FNRs.join(", ") : "",
+          pickup:
+            shipment &&
+            shipment.pickup_location &&
+            shipment.pickup_location.name
+              ? shipment.pickup_location.name +
+                " (" +
+                shipment.pickup_location.code +
+                ")"
+              : "",
+          delivery:
+            shipment &&
+            shipment.delivery_location &&
+            shipment.delivery_location.name
+              ? shipment.delivery_location.name +
+                " (" +
+                shipment.delivery_location.code +
+                ")"
+              : "",
+          status: shipment && shipment.status ? shipment.status : "",
+          gps:
+            shipment &&
+            ((shipment.trip_tracker?.last_location?.fois?.coordinates.length >
+              0 &&
+              shipment.trip_tracker?.last_location?.fois) ||
+              (shipment.trip_tracker?.last_location?.gps?.coordinates.length >
+                0 &&
+                shipment.trip_tracker?.last_location?.gps)),
+          tripTracker: shipment && shipment?.trip_tracker?.fois_last_location,
+        };
+      })
+      .filter(
+        (shipment: any) => shipment.gps && shipment.gps.coordinates.length > 0
+      );
     return shipmentData;
-  }
+  };
 
   const filterShipments = (status: StatusKey, event: any) => {
     let filteredShipments: any[] = [];
-    setIsTracking(0)
-    if (status === 'AVE' || status === 'OB') {
+    setIsTracking(0);
+    if (status === "AVE" || status === "OB" || status === "INPL") {
       setHiddenTrackingInfo(false);
-      setHeadingFilters('In Plant');
-      setHeadingColors('#3790CC')
-      filteredShipments = originalData.filter((shipment: any) => shipment.status === 'AVE' || shipment.status === 'OB');
+      setHeadingFilters("In Plant");
+      setHeadingColors("#3790CC");
+      setShowInTransit(false);
+      filteredShipments = originalData.filter(
+        (shipment: any) => shipment.status === "INPL"
+      );
       setTrackingNonTracking(countTracking(filteredShipments));
-      setTrackingByFoisGps(trackingByFoisGpsHook(filteredShipments))
+      setTrackingByFoisGps(trackingByFoisGpsHook(filteredShipments));
       setShipmentMapView(filteredShipments);
       setTrackingTypeSelected({ fois: false, gps: false });
       const idle = getTrackingShipment(filteredShipments);
       setIdleShipments(idle);
-    } else if (status === 'ITNS') {
+    } else if (status === "ITNS") {
+      setShowInTransit(true);
       setHiddenTrackingInfo(false);
-      setHeadingFilters('In Transit');
-      setHeadingColors('#F6981D')
-      filteredShipments = originalData.filter((shipment: any) => shipment.status !== 'Delivered' && shipment.status !== '');
+      setHeadingFilters("In Transit");
+      setHeadingColors("#F6981D");
+      filteredShipments = originalData.filter(
+        (shipment: any) => shipment.status === "ITNS"
+      );
       setTrackingNonTracking(countTracking(filteredShipments));
-      setTrackingByFoisGps(trackingByFoisGpsHook(filteredShipments))
+      setTrackingByFoisGps(trackingByFoisGpsHook(filteredShipments));
       setShipmentMapView(filteredShipments);
       setTrackingTypeSelected({ fois: false, gps: false });
       const inTransit = getTrackingShipment(filteredShipments);
       setInTransitShipments(inTransit);
-    } else if (status === 'Delivered') {
-      setHeadingFilters('In Delivered');
-      setHeadingColors('#40BE8A')
-      filteredShipments = originalData.filter((shipment: any) => shipment.status === 'Delivered');
-      setTrackingNonTracking(countTracking(filteredShipments));
-      setTrackingByFoisGps(trackingByFoisGpsHook(filteredShipments))
+    } else if (status === "ALL") {
+      setHiddenTrackingInfo(false);
+      setHeadingFilters("Total");
+      setHeadingColors("#40BE8A");
+      filteredShipments = originalData.filter(
+        (shipment: any) =>
+          shipment.status === "ITNS" || shipment.status === "INPL"
+      );
+      // setTrackingNonTracking(countTracking(filteredShipments));
+      // setTrackingByFoisGps(trackingByFoisGpsHook(filteredShipments))
       setShipmentMapView(filteredShipments);
       setTrackingTypeSelected({ fois: false, gps: false });
-      const delivered = getTrackingShipment(filteredShipments);
-      setDeliveredShipments(delivered);
+      const total = getTrackingShipment(filteredShipments);
+      setShowInTransit(true);
+      setInTransitShipments(total);
+      setDeliveredShipments(total);
     }
 
-    setShowIdle(status === 'OB');
-    setShowInTransit(status === 'ITNS');
-    setShowDelivered(status === 'Delivered');
+    setShowIdle(status === "OB");
+    // setShowInTransit(status === 'ITNS');
+    setShowDelivered(status === "Delivered");
     setShowAll(false);
     setShowFiltered(true);
     const filteredWithTracking = filteredShipments.map((shipment) => {
-      const gpsFois = shipment.trip_tracker?.last_location?.fois?.coordinates.length > 0
-        && shipment.trip_tracker?.last_location?.fois
-        || shipment.trip_tracker?.last_location?.gps?.coordinates.length > 0
-        && shipment.trip_tracker?.last_location?.gps;
-      const isTracking = gpsFois && gpsFois.coordinates && gpsFois.coordinates.length > 0;
-      return { ...shipment, isTracking }
-    }
-    )
+      const gpsFois =
+        (shipment.trip_tracker?.last_location?.fois?.coordinates.length > 0 &&
+          shipment.trip_tracker?.last_location?.fois) ||
+        (shipment.trip_tracker?.last_location?.gps?.coordinates.length > 0 &&
+          shipment.trip_tracker?.last_location?.gps);
+      const isTracking =
+        gpsFois && gpsFois.coordinates && gpsFois.coordinates.length > 0;
+      return { ...shipment, isTracking };
+    });
     setFilteredShipments(filteredWithTracking);
-    setFilteredShipmentsBackup(filteredWithTracking)
+    setFilteredShipmentsBackup(filteredWithTracking);
     map?.flyTo(center, 5, { duration: 1 });
-  }
+  };
 
   const handleFromDateChange = (date: dayjs.Dayjs | null) => {
     setSelectedFromDate(date);
@@ -692,25 +890,33 @@ const MapLayers = () => {
     setSelectedToDate(date);
   };
 
-  const getShipments = async (fnr: string ,selectedCRID: string) => {
+  const getShipments = async (fnr: string, selectedCRID: string) => {
     let payload: any = {
-      from: selectedFromDate ? service.millies(selectedFromDate.format()) : null,
+      from: selectedFromDate
+        ? service.millies(selectedFromDate.format())
+        : null,
       to: selectedToDate ? service.millies(selectedToDate.format()) : null,
     };
 
-    if(fnr.length === 11) {
-      payload['fnr'] = fnr;
+    if (fnr.length === 11) {
+      payload["fnr"] = fnr;
     }
 
-    if(selectedCRID) {
-      payload['captive'] = selectedCRID;
+    if (selectedCRID) {
+      payload["captive"] = selectedCRID;
     }
 
-    setIsTracking(0)
-    const shipments = await httpsPost('/shipment_map_view', payload, router);
-    const inTransit = shipments.filter((shipment: any) => (shipment.status === 'ITNS' ));
-    const idle = shipments.filter((shipment: any) => (shipment.status === 'INPL'));
-    const delivered = shipments.filter((shipment: any) => (shipment.status === 'Delivered'));
+    setIsTracking(0);
+    const shipments = await httpsPost("/shipment_map_view", payload, router);
+    const inTransit = shipments.filter(
+      (shipment: any) => shipment.status === "ITNS"
+    );
+    const idle = shipments.filter(
+      (shipment: any) => shipment.status === "INPL"
+    );
+    const delivered = shipments.filter(
+      (shipment: any) => shipment.status === "Delivered"
+    );
     setTotalCount(shipments.length);
     setInTransitCount(inTransit.length);
     setIdleCount(idle.length);
@@ -721,8 +927,8 @@ const MapLayers = () => {
     setInPlantCaptive(getCaptiveIndianRakes(idle));
     setTotalCaptive(getCaptiveIndianRakes(shipments));
 
-    setHeadingFilters('In Transit');
-    setHeadingColors('#F6981D');
+    setHeadingFilters("In Transit");
+    setHeadingColors("#F6981D");
     setTrackingByFoisGps(trackingByFoisGpsHook(inTransit));
     setShipmentMapView(inTransit);
     setTrackingTypeSelected({ fois: false, gps: false });
@@ -738,19 +944,21 @@ const MapLayers = () => {
     setShowIdle(true);
     setShowInTransit(true);
     setShowDelivered(true);
-    setTrackingNonTracking(countTracking(inTransit))
+    setTrackingNonTracking(countTracking(inTransit));
 
-    const allShipmentsWithTracking = [...inTransit].map((shipment) => {
-      const gpsFois = shipment.trip_tracker?.last_location?.fois?.coordinates.length > 0
-        && shipment.trip_tracker?.last_location?.fois
-        || shipment.trip_tracker?.last_location?.gps?.coordinates.length > 0
-        && shipment.trip_tracker?.last_location?.gps;
-      const isTracking = gpsFois && gpsFois.coordinates && gpsFois.coordinates.length > 0;
-      return { ...shipment, isTracking }
-    })
-    setOriginalData(allShipmentsWithTracking)
-    setAllShipments(allShipmentsWithTracking)
-  }
+    const allShipmentsWithTracking = [...inTransit, ...idle].map((shipment) => {
+      const gpsFois =
+        (shipment.trip_tracker?.last_location?.fois?.coordinates.length > 0 &&
+          shipment.trip_tracker?.last_location?.fois) ||
+        (shipment.trip_tracker?.last_location?.gps?.coordinates.length > 0 &&
+          shipment.trip_tracker?.last_location?.gps);
+      const isTracking =
+        gpsFois && gpsFois.coordinates && gpsFois.coordinates.length > 0;
+      return { ...shipment, isTracking };
+    });
+    setOriginalData(shipments);
+    setAllShipments(allShipmentsWithTracking);
+  };
 
   useEffect(() => {
     if (map) {
@@ -759,15 +967,19 @@ const MapLayers = () => {
   }, [map]);
 
   useEffect(() => {
-    const toTime = dayjs();
-    const fromTime = toTime.subtract(7, 'day');
-    setSelectedFromDate(fromTime);
-    setSelectedToDate(toTime);
+    const searchParams = new URLSearchParams(window.location.search);
+    const fromParam = searchParams.get("from");
+    const toParam = searchParams.get("to");
+
+    const toTime = toParam ? dayjs(toParam) : dayjs();
+    const fromTime = fromParam ? dayjs(fromParam) : toTime.subtract(30, "day");
+    setSelectedFromDate(fromTime.subtract(1, "day"));
+    setSelectedToDate(toTime.subtract(1, "day"));
   }, []);
 
   useEffect(() => {
     if (selectedFromDate && selectedToDate) {
-      getShipments("","");
+      getShipments("", "");
     }
   }, [selectedFromDate, selectedToDate]);
 
@@ -775,7 +987,7 @@ const MapLayers = () => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Node;
       if (target && target.nodeType === Node.ELEMENT_NODE) {
-        if (!(target as Element).closest('.table-rows-container')) {
+        if (!(target as Element).closest(".table-rows-container")) {
           setSelectedShipment(null);
           if (selectedMarkerRef.current) {
             selectedMarkerRef.current.closePopup();
@@ -784,10 +996,10 @@ const MapLayers = () => {
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
@@ -812,18 +1024,23 @@ const MapLayers = () => {
       setTrackingAvailed(false);
       setHiddenTrackingInfo(false);
     }
-    setIsTracking(isTracking ? 1 : 2)
+    setIsTracking(isTracking ? 1 : 2);
     let trackingData;
     if (isTotal) {
-      if (isTracking) { trackingData = allShipments.filter((shipment) => shipment.isTracking) }
-      else
-        trackingData = allShipments.filter((shipment) => !shipment.isTracking)
+      if (isTracking) {
+        trackingData = allShipments.filter((shipment) => shipment.isTracking);
+      } else
+        trackingData = allShipments.filter((shipment) => !shipment.isTracking);
     } else {
       if (isTracking) {
-        trackingData = filteredShipmentsBackup.filter((shipment) => shipment.isTracking);
-
+        trackingData = filteredShipmentsBackup.filter(
+          (shipment) => shipment.isTracking
+        );
+      } else {
+        trackingData = filteredShipmentsBackup.filter(
+          (shipment) => !shipment.isTracking
+        );
       }
-      else { trackingData = filteredShipmentsBackup.filter((shipment) => !shipment.isTracking); }
     }
     if (isTracking) {
       setIdleShipments(getTrackingShipment(trackingData));
@@ -837,14 +1054,14 @@ const MapLayers = () => {
     setFilteredShipments(trackingData);
     setShowAll(false);
     setShowFiltered(true);
-
-  }
+  };
 
   const focusOnShipment = (shipment: any) => {
-    const gpsFois = shipment.trip_tracker?.last_location?.fois?.coordinates.length > 0
-      && shipment.trip_tracker?.last_location?.fois
-      || shipment.trip_tracker?.last_location?.gps?.coordinates.length > 0
-      && shipment.trip_tracker?.last_location?.gps;
+    const gpsFois =
+      (shipment.trip_tracker?.last_location?.fois?.coordinates.length > 0 &&
+        shipment.trip_tracker?.last_location?.fois) ||
+      (shipment.trip_tracker?.last_location?.gps?.coordinates.length > 0 &&
+        shipment.trip_tracker?.last_location?.gps);
     if (map && gpsFois && gpsFois.coordinates.length > 0) {
       const point = L.latLng(gpsFois.coordinates[1], gpsFois.coordinates[0]);
       map.flyTo(point, 13, { duration: 1 });
@@ -864,54 +1081,94 @@ const MapLayers = () => {
 
   const handleTrackingFoisGps = (track: string) => {
     let trackingShipements;
-    if (track === 'FOIS') {
-
+    if (track === "FOIS") {
       setTrackingTypeSelected((prevState: any) => {
         const newFoisValue = !prevState.fois;
         if (!newFoisValue) {
           setFilteredShipments(shipmentMapView);
         } else {
-          trackingShipements = shipmentMapView.filter((shipment: any) => { return shipment.trip_tracker?.last_location?.fois?.coordinates.length > 0 });
+          trackingShipements = shipmentMapView.filter((shipment: any) => {
+            return (
+              shipment.trip_tracker?.last_location?.fois?.coordinates.length > 0
+            );
+          });
           setFilteredShipments(trackingShipements);
           setIdleShipments(getTrackingShipment(trackingShipements));
           setInTransitShipments(getTrackingShipment(trackingShipements));
           // setDeliveredShipments(getTrackingShipment(trackingShipements));
-
         }
-        return { ...prevState, fois: newFoisValue, gps: false }
+        return { ...prevState, fois: newFoisValue, gps: false };
       });
     } else {
-
       setTrackingTypeSelected((prevState: any) => {
         const newGpsValue = !prevState.gps;
         if (!newGpsValue) {
           setFilteredShipments(shipmentMapView);
         } else {
-          trackingShipements = shipmentMapView.filter((shipment: any) => { return shipment.trip_tracker?.last_location?.gps?.coordinates.length > 0 }).filter((shipment: any) => { return !(shipment.trip_tracker?.last_location?.fois?.coordinates.length > 0) });
+          trackingShipements = shipmentMapView
+            .filter((shipment: any) => {
+              return (
+                shipment.trip_tracker?.last_location?.gps?.coordinates.length >
+                0
+              );
+            })
+            .filter((shipment: any) => {
+              return !(
+                shipment.trip_tracker?.last_location?.fois?.coordinates.length >
+                0
+              );
+            });
           setFilteredShipments(trackingShipements);
           setIdleShipments(getTrackingShipment(trackingShipements));
           setInTransitShipments(getTrackingShipment(trackingShipements));
           // setDeliveredShipments(getTrackingShipment(trackingShipements));
         }
-        return { ...prevState, gps: newGpsValue, fois: false }
+        return { ...prevState, gps: newGpsValue, fois: false };
       });
     }
-  }
-
+  };
   return (
     <div>
       <div className="shipment-map-container">
         {isMobile ? <SideDrawer /> : null}
-        <div style={{ width: '100%', overflow: 'hidden' }}>
-          {isMobile ? <Header title="Shipments Map View" isMapHelper={false} isShipmentMapView={true}></Header> : <MobileHeader />}
-          <div style={{ paddingInline: 24, paddingTop: 24, paddingBottom: 65, position: 'relative' }}>
-            <MapContainer className="map" id="shipment-map" center={center} zoom={5.4} style={{ minHeight: '105%', width: '101%', padding: '0px', zIndex: '0', position: 'fixed' }} attributionControl={false} ref={setMap} >
-              <div className={"layersControl"} style={{ marginTop: '10px' }} >
+        <div style={{ width: "100%", overflow: "hidden" }}>
+          {isMobile ? (
+            <Header
+              title="Shipments Map View"
+              isMapHelper={false}
+              isShipmentMapView={true}
+            ></Header>
+          ) : (
+            <MobileHeader />
+          )}
+          <div
+            style={{
+              position: "relative",
+              backgroundColor: "red",
+              height: "100vh",
+              width: "100vw",
+            }}
+          >
+            <MapContainer
+              className="map"
+              id="shipment-map"
+              center={center}
+              zoomControl={false}
+              zoom={5.4}
+              style={{
+                height: "100%",
+                width: "100%",
+                zIndex: "0",
+                position: "fixed",
+                left: 0,
+              }}
+              attributionControl={false}
+              ref={setMap}
+            >
+              <div className={"layersControl"}>
                 <LayersControl>
                   <LayersControl.BaseLayer checked name="Street View">
-                    <TileLayer
-                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                    />
+                    <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
                   </LayersControl.BaseLayer>
                   <LayersControl.BaseLayer name="Satellite View">
                     <TileLayer
@@ -921,68 +1178,139 @@ const MapLayers = () => {
                   </LayersControl.BaseLayer>
                 </LayersControl>
               </div>
-              <MarkerClusterGroup chunkedLoading iconCreateFunction={createClusterCustomIconIdle}>
-                {showIdle && idleShipments.length && idleShipments.map((shipment, index) => {
-                  return <Marker key={index} position={[shipment.gps.coordinates[1], shipment.gps.coordinates[0]]} icon={customIconIdle} ref={(el) => {
-                    if (selectedShipment && selectedShipment._id === shipment._id) {
-                      selectedMarkerRef.current = el;
-                    }
-                  }}>
-                    <Popup>
-                      <Typography variant="h6" component="div">
-                        # {shipment.FNR}
-                      </Typography>
-                      <Typography variant="body2" component="div">
-                        <Grid container>
-                          {/* <Grid item xs={12}>
+
+              {showIdle &&
+                idleShipments.length &&
+                idleShipments.map((shipment, index) => {
+                  const circleIcon = L.divIcon({
+                    className: "circle-icon",
+                    html: `<div style="width: 13px; height: 13px; border-radius: 50%; background-color: #265E76; border: 1px solid white"></div>`,
+                    iconSize: [10, 10],
+                    iconAnchor: [5, 5],
+                    popupAnchor: [0, -10],
+                  });
+                  return (
+                    <Marker
+                      key={index}
+                      icon={currentZoom > 9 ? customIconIdle : circleIcon}
+                      position={[
+                        shipment.gps.coordinates[1],
+                        shipment.gps.coordinates[0],
+                      ]}
+                      ref={(el) => {
+                        if (
+                          selectedShipment &&
+                          selectedShipment._id === shipment._id
+                        ) {
+                          selectedMarkerRef.current = el;
+                        }
+                      }}
+                    >
+                      <Popup>
+                        <Typography variant="h6" component="div">
+                          # {shipment.FNR}
+                        </Typography>
+                        <Typography variant="body2" component="div">
+                          <Grid container>
+                            {/* <Grid item xs={12}>
                                 <Typography variant="body2" component="div">
                                   <Image height={10} alt="pickup" src={pickupIcon} /> - {shipment.pickup}
                                 </Typography>
                               </Grid> */}
-                          <Grid item xs={12}>
-                            <Typography variant="body2" component="div" sx={{ display: 'flex' }}>
-                              <div className='dropLabel'>D</div><div><Image height={10} alt="drop" src={dropIcon} /> - {shipment.delivery}</div>
-                            </Typography>
-                            <Typography sx={{ fontSize: '12px' }}>{shipment?.tripTracker}</Typography>
+                            <Grid item xs={12}>
+                              <Typography
+                                variant="body2"
+                                component="div"
+                                sx={{ display: "flex" }}
+                              >
+                                <div className="dropLabel">D</div>
+                                <div>
+                                  <Image
+                                    height={10}
+                                    alt="drop"
+                                    src={dropIcon}
+                                  />{" "}
+                                  - {shipment.delivery}
+                                </div>
+                              </Typography>
+                              <Typography sx={{ fontSize: "12px" }}>
+                                {shipment?.tripTracker}
+                              </Typography>
+                            </Grid>
                           </Grid>
-                        </Grid>
-                      </Typography>
-                    </Popup>
-                  </Marker>
-                })
-                }
-              </MarkerClusterGroup>
-              <MarkerClusterGroup chunkedLoading iconCreateFunction={createClusterCustomIconInTransit}>
-                {showInTransit && inTransitShipments.length && inTransitShipments.map((shipment, index) => {
-                  return <Marker key={index} position={[shipment.gps.coordinates[1], shipment.gps.coordinates[0]]} icon={customIcon} ref={(el) => {
-                    if (selectedShipment && selectedShipment._id === shipment._id) {
-                      selectedMarkerRef.current = el;
-                    }
-                  }}>
-                    <Popup>
-                      <Typography variant="h6" component="div">
-                        # {shipment.FNR}
-                      </Typography>
-                      <Typography variant="body2" component="div">
-                        <Grid container>
-                          {/* <Grid item xs={12}>
+                        </Typography>
+                      </Popup>
+                    </Marker>
+                  );
+                })}
+
+              {showInTransit &&
+                inTransitShipments.length &&
+                inTransitShipments.map((shipment, index) => {
+                  const circleIcon = L.divIcon({
+                    className: "circle-icon",
+                    html: `<div style="width: 13px; height: 13px; border-radius: 50%; background-color: #F6981D; border: 1px solid white"></div>`,
+                    iconSize: [10, 10],
+                    iconAnchor: [5, 5],
+                    popupAnchor: [0, -10],
+                  });
+                  return (
+                    <Marker
+                      key={index}
+                      position={[
+                        shipment.gps.coordinates[1],
+                        shipment.gps.coordinates[0],
+                      ]}
+                      icon={currentZoom > 9 ? customIcon : circleIcon}
+                      ref={(el) => {
+                        if (
+                          selectedShipment &&
+                          selectedShipment._id === shipment._id
+                        ) {
+                          selectedMarkerRef.current = el;
+                        }
+                      }}
+                    >
+                      {currentZoom > 9 && (
+                        <Popup>
+                          <Typography variant="h6" component="div">
+                            # {shipment.FNR}
+                          </Typography>
+                          <Typography variant="body2" component="div">
+                            <Grid container>
+                              {/* <Grid item xs={12}>
                                 <Typography variant="body2" component="div">
                                   <Image height={10} alt="pickup" src={pickupIcon} /> - {shipment.pickup}
                                 </Typography>
                               </Grid> */}
-                          <Grid item xs={12}>
-                            <Typography variant="body2" component="div" sx={{ display: 'flex' }}>
-                              <div className='dropLabel'>D</div><div><Image height={10} alt="drop" src={dropIcon} /> - {shipment.delivery}</div>
-                            </Typography>
-                            <Typography sx={{ fontSize: '12px' }}>{shipment?.tripTracker}</Typography>
-                          </Grid>
-                        </Grid>
-                      </Typography>
-                    </Popup>
-                  </Marker>
-                })
-                }
-              </MarkerClusterGroup>
+                              <Grid item xs={12}>
+                                <Typography
+                                  variant="body2"
+                                  component="div"
+                                  sx={{ display: "flex" }}
+                                >
+                                  <div className="dropLabel">D</div>
+                                  <div>
+                                    <Image
+                                      height={10}
+                                      alt="drop"
+                                      src={dropIcon}
+                                    />{" "}
+                                    - {shipment.delivery}
+                                  </div>
+                                </Typography>
+                                <Typography sx={{ fontSize: "12px" }}>
+                                  {shipment?.tripTracker}
+                                </Typography>
+                              </Grid>
+                            </Grid>
+                          </Typography>
+                        </Popup>
+                      )}
+                    </Marker>
+                  );
+                })}
+
               {/* <MarkerClusterGroup chunkedLoading iconCreateFunction={createClusterCustomIconDelivered}>
                 {showDelivered && deliveredShipments.length && deliveredShipments.map((shipment, index) => {
                   return <Marker key={index} position={[shipment.gps.coordinates[1], shipment.gps.coordinates[0]]} icon={customIconDelivered} ref={(el) => {
@@ -1014,150 +1342,214 @@ const MapLayers = () => {
                 }
               </MarkerClusterGroup> */}
             </MapContainer>
-            <Box sx={{
-              position: 'absolute',
-              top: '20%',
-              right: '5%',
-              width: '20%',
-              height: '20%',
-              zIndex: '1',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              backgroundColor: 'rgba(255, 255, 255, 0.5)',
-            }}>
-              InTransit: 20
-            </Box>
-            <Box sx={{
-              marginLeft: '70px',
-              width: '25%',
-              backgroundColor: '#f6f8f8',
-              position: 'absolute',
-              left: '0',
-              height: '100vh',
-              padding: '10px',
-              boxShadow: '0px 00px 10px 0px rgba(0,0,0,0.3)',
-              display: 'flex',
-              flexDirection: 'column',
-            }}
-            >
-              <Box className="date-range-container-heads" style={{width: '345px'}}>
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <DatePicker
-                    label="From"
-                    value={selectedFromDate}
-                    onChange={handleFromDateChange}
-                    format="DD/MM/YYYY"
-                    open={openFromDatePicker}
-                    onOpen={() => setOpenFromDatePicker(true)}
-                    onClose={() => setOpenFromDatePicker(false)}
-                    slotProps={{ textField: { placeholder: 'DD/MM/YYYY', onClick: () => setOpenFromDatePicker(!openFromDatePicker) }, }}
-                    disableFuture={true}
-                    sx={{
-                      '& .MuiInputBase-input::placeholder': {
-                        fontSize: '14px',
-                        fontFamily: '"Inter", sans-serif !important',
-                        fontWeight: '500',
-                      },
-                      '& .MuiInputBase-input': {
-                        fontSize: '14px',
-                        height: '36px',
-                        padding: '8px',
-                        width: '180px',
-                        boxSizing: 'border-box',
-                      },
-                      '& .MuiOutlinedInput-root': {
-                        '& fieldset': {
-                          borderColor: '#E9E9EB',
-                        },
-                      },
-                      '& .MuiButtonBase-root': {
-                        height: '36px',
-                        padding: '8px',
-                        width: '36px',
-                        boxSizing: 'border-box',
-                      },
-                    }}
-                  />
-                </LocalizationProvider>
-                <div className="date-range-divider">
-                  <SwapHorizIcon />
-                </div>
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <DatePicker
-                    label="To"
-                    value={selectedToDate}
-                    onChange={handleToDateChange}
-                    format="DD/MM/YYYY"
-                    open={openToDatePicker}
-                    onOpen={() => setOpenToDatePicker(true)}
-                    onClose={() => setOpenToDatePicker(false)}
-                    slotProps={{ textField: { placeholder: 'DD/MM/YYYY', onClick: () => setOpenToDatePicker(!openToDatePicker) }, }}
-                    disableFuture={true}
-                    sx={{
-                      '& .MuiInputBase-input::placeholder': {
-                        fontSize: '14px',
-                      },
-                      '& .MuiInputBase-input': {
-                        fontSize: '14px',
-                        height: '36px',
-                        padding: '8px',
-                        width: '180px',
-                        boxSizing: 'border-box',
-                      },
-                      '& .MuiOutlinedInput-root': {
-                        '& fieldset': {
-                          borderColor: '#E9E9EB',
-                        },
-                      },
-                      '& .MuiButtonBase-root': {
-                        height: '36px',
-                        padding: '8px',
-                        width: '36px',
-                        boxSizing: 'border-box',
-                      },
-                    }}
-                  />
-                </LocalizationProvider>
-              </Box>
 
-              <Box className="shipment-heads">
-                {/* <div className='shipment-head-fixed'>
-                  <div style={{ backgroundColor: '#333333', position: 'relative' }} className='fixedHeadings'>Total {totalCount}
-                    <div style={{ position: 'absolute', bottom: '6px' }}>
-                      <div style={{ fontSize: '10px', fontWeight: '500', textWrap: 'nowrap', }} >Indian Railway Rakes : {totalCaptive.indian}</div>
-                      <div style={{ fontSize: '10px', fontWeight: '500', textWrap: 'nowrap' }}>Captive Rakes : {totalCaptive.captive}</div>
+            <Box
+              sx={{
+                paddingTop: isMobile ? "56px" : 0,
+                marginLeft: isMobile ? "70px" : 0,
+                backgroundColor: "#F5F5F5",
+                position: "absolute",
+                left: "0",
+                height: isMobile ? "100vh" : "40vh",
+                boxShadow: "0px 00px 10px 0px rgba(0,0,0,0.3)",
+                display: "flex",
+                flexDirection: "column",
+                width: isMobile ? "386px" : "100vw",
+                bottom: 0,
+                minHeight: isMobile ? "100vh" : "300px",
+                borderTopLeftRadius: isMobile ? "0px" : "12px",
+                borderTopRightRadius: isMobile ? "0px" : "12px",
+                transition: "all 0.5s ease-in-out",
+                transform: isMobile
+                  ? ""
+                  : mobileShow
+                  ? "translateY(0)"
+                  : "translateY(92%)",
+                overflowY: "scroll",
+              }}
+            >
+              {!isMobile && (
+                <div
+                  style={{
+                    backgroundColor: "#E5E1DA",
+                    width: "100px",
+                    height: 6,
+                    marginTop: 8,
+                    borderRadius: 12,
+                    marginInline: "auto",
+                  }}
+                  id="slider"
+                  onClick={() => {
+                    setMobileShow(!mobileShow);
+                  }}
+                ></div>
+              )}
+
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: isMobile ? "space-between" : "space-around",
+                  alignItems: "center",
+                  gap: 10,
+                  paddingInline: isMobile ? "12px" : "12px",
+                  marginTop: isMobile ? "12px" : "10px",
+                }}
+              >
+                <div
+                  style={{
+                    backgroundColor: "white",
+                    borderRadius: "6px",
+                    width: "100%",
+                  }}
+                >
+                  <CustomDatePicker
+                    label="From"
+                    value={selectedFromDate ? selectedFromDate.toDate() : null}
+                    onChange={(date) =>
+                      setSelectedFromDate(date ? dayjs(date) : null)
+                    }
+                  />
+                </div>
+                <div
+                  style={{
+                    backgroundColor: "white",
+                    borderRadius: "6px",
+                    width: "100%",
+                  }}
+                >
+                  <CustomDatePicker
+                    label="To"
+                    value={selectedToDate ? selectedToDate.toDate() : null}
+                    onChange={(date) =>
+                      setSelectedToDate(date ? dayjs(date) : null)
+                    }
+                  />
+                </div>
+              </div>
+
+              <div
+                style={{
+                  backgroundColor: "white",
+                  borderRadius: "6px",
+                  marginTop: "12px",
+                  padding: "12px 12px 0px 12px",
+                  marginInline: "12px",
+                }}
+              >
+                <header
+                  style={{
+                    fontSize: "16px",
+                    fontWeight: "bold",
+                    paddingBottom: "10px",
+                    borderBottom: "1px solid #E5E1DA",
+                  }}
+                >
+                  Tracking Status
+                </header>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    padding: "12px",
+                    borderRadius: "6px",
+                  }}
+                >
+                  <div
+                    onClick={(e) => {
+                      filterShipments("ALL", e);
+                      setIsTotal(false);
+                    }}
+                    id="total"
+                  >
+                    <div style={{ fontWeight: "bold", fontSize: "24px" }}>
+                      {idleCount + inTransitCount}
+                    </div>
+                    <div style={{ color: "#71747A", fontSize: 12 }}>Total</div>
+                  </div>
+
+                  <div
+                    onClick={(e) => {
+                      filterShipments("INPL", e);
+                      setIsTotal(false);
+                    }}
+                  >
+                    <div style={{ fontWeight: "bold", fontSize: "24px" }}>
+                      {idleCount}
+                    </div>
+                    <div style={{ color: "#71747A", fontSize: 12 }}>
+                      Inplant
                     </div>
                   </div>
-                  <div style={{ backgroundColor: '#40BE8A', position: 'relative' }} className='fixedHeadings'>Delivered {deliveryCount}
-                    <div style={{ position: 'absolute', bottom: '6px' }}>
-                      <div style={{ fontSize: '10px', fontWeight: '500', textWrap: 'nowrap' }} >Indian Railway Rakes : {deliveredCaptive.indian}</div>
-                      <div style={{ fontSize: '10px', fontWeight: '500', textWrap: 'nowrap' }}>Captive Rakes : {deliveredCaptive.captive}</div>
+                  <div
+                    onClick={(e) => {
+                      filterShipments("ITNS", e);
+                      setIsTotal(false);
+                    }}
+                  >
+                    <div style={{ fontWeight: "bold", fontSize: "24px" }}>
+                      {inTransitCount}
                     </div>
-                  </div>
-                </div> */}
-                <div className='shipment-head-fixed'>
-                  <div style={{ backgroundColor: '#3790CC', position: 'relative', cursor: 'pointer' }} className='fixedHeadings' onClick={(e) => {
-                    filterShipments('AVE', e)
-                    setIsTotal(false)
-                  }} >In Plant {idleCount}
-                    <div style={{ position: 'absolute', bottom: '6px' }}>
-                      <div style={{ fontSize: '10px', fontWeight: '500', textWrap: 'nowrap' }} >Indian Railway Rakes : {inPlantCaptive.indian}</div>
-                      <div style={{ fontSize: '10px', fontWeight: '500', textWrap: 'nowrap' }}>Captive Rakes : {inPlantCaptive.captive}</div>
-                    </div>
-                  </div>
-                  <div style={{ backgroundColor: '#F6981D', position: 'relative', cursor: 'pointer' }} className='fixedHeadings' onClick={(e) => {
-                    filterShipments('ITNS', e);
-                    setIsTotal(false)
-                  }}>In Transit {inTransitCount}
-                    <div style={{ position: 'absolute', bottom: '6px' }}>
-                      <div style={{ fontSize: '10px', fontWeight: '500', textWrap: 'nowrap' }} >Indian Railway Rakes : {inTransitCaptive.indian}</div>
-                      <div style={{ fontSize: '10px', fontWeight: '500', textWrap: 'nowrap' }}>Captive Rakes : {inTransitCaptive.captive}</div>
+                    <div style={{ color: "#71747A", fontSize: 12 }}>
+                      In Transit
                     </div>
                   </div>
                 </div>
-              </Box>
-              <Box className="tracking-nonTracking-status">
+              </div>
+
+              <div
+                style={{
+                  height: "40px",
+                  minHeight: "40px",
+                  marginTop: "12px",
+                  backgroundColor: "white",
+                  marginInline: "12px",
+                  borderRadius: "8px",
+                  border: "1px solid #E5E1DA",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <div
+                    style={{
+                      height: "38px",
+                      backgroundColor: "#A4ABFF",
+                      borderRadius: "7px 0px 0px 7px",
+                      width: "100px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <div style={{ fontSize: 12, cursor: "pointer" }}>
+                      {searchOptions[0].label}
+                    </div>
+                    <ArrowDropDownIcon />
+                  </div>
+                  <input
+                    style={{
+                      height: "36px",
+                      width: "60%",
+                      border: "none",
+                      outline: "none",
+                      padding: "0px 4px",
+                    }}
+                    placeholder="Search"
+                  />
+                </div>
+                <div style={{ marginTop: 4, marginRight: 12 }}>
+                  <Image
+                    src={searchIcon.src}
+                    alt="searchIcon"
+                    height={20}
+                    width={20}
+                  />
+                </div>
+              </div>
+
+              {/* <Box className="tracking-nonTracking-status">
                 <div className="tracking-status-wrapper">
                   <div className="search-fnr" onClick={() => { setShowSearchFNR(true) }} >Search FNR</div>
                   <Typography className="heading" style={{ backgroundColor: showSearchFNR ? '#F7EFE5' : headingColors, color: showSearchFNR ? 'black' : 'white' }} onClick={() => { setShowSearchFNR(false) }} >{headingFilters}</Typography>
@@ -1275,21 +1667,62 @@ const MapLayers = () => {
                     </div>
                   </div>
                 </div>
-              </Box>
-              <Box sx={{
-              }} className="shipment-details-container">
-                {showFiltered && !showSearched && !showRakeTypeFiltered && filteredShipments.map((shipment, index) => {
-                  return <ShipmentCard key={index} index={index} shipment={shipment} handleShipmentSelection={handleShipmentSelection} handleNavigation={handleNavigation} />
-                })}
-                {showAll && !showSearched && !showRakeTypeFiltered && allShipments.map((shipment, index) => {
-                  return <ShipmentCard key={index} index={index} shipment={shipment} handleShipmentSelection={handleShipmentSelection} handleNavigation={handleNavigation}/>
-                })}
-                {showSearched && !showRakeTypeFiltered && searcedShipments.map((shipment, index) => {
-                  return <ShipmentCard key={index} index={index} shipment={shipment} handleShipmentSelection={handleShipmentSelection} handleNavigation={handleNavigation}/>
-                })}
-                {showRakeTypeFiltered && rakeTypeFilteredShipments.map((shipment, index) => {
-                  return <ShipmentCard key={index} index={index} shipment={shipment} handleShipmentSelection={handleShipmentSelection} handleNavigation={handleNavigation}/>
-                })}
+              </Box> */}
+
+              <Box sx={{}} className="shipment-details-container">
+                {showFiltered &&
+                  !showSearched &&
+                  !showRakeTypeFiltered &&
+                  filteredShipments.map((shipment, index) => {
+                    return (
+                      <ShipmentCard
+                        key={index}
+                        index={index}
+                        shipment={shipment}
+                        handleShipmentSelection={handleShipmentSelection}
+                        handleNavigation={handleNavigation}
+                      />
+                    );
+                  })}
+                {showAll &&
+                  !showSearched &&
+                  !showRakeTypeFiltered &&
+                  allShipments.map((shipment, index) => {
+                    return (
+                      <ShipmentCard
+                        key={index}
+                        index={index}
+                        shipment={shipment}
+                        handleShipmentSelection={handleShipmentSelection}
+                        handleNavigation={handleNavigation}
+                      />
+                    );
+                  })}
+                {showSearched &&
+                  !showRakeTypeFiltered &&
+                  searcedShipments.map((shipment, index) => {
+                    return (
+                      <ShipmentCard
+                        key={index}
+                        index={index}
+                        shipment={shipment}
+                        handleShipmentSelection={handleShipmentSelection}
+                        handleNavigation={handleNavigation}
+                      />
+                    );
+                  })}
+                {showRakeTypeFiltered &&
+                  rakeTypeFilteredShipments.map((shipment, index) => {
+                    return (
+                      <ShipmentCard
+                        key={index}
+                        index={index}
+                        shipment={shipment}
+                        handleShipmentSelection={handleShipmentSelection}
+                        handleNavigation={handleNavigation}
+                      />
+                    );
+                  })}
               </Box>
             </Box>
           </div>
@@ -1297,6 +1730,6 @@ const MapLayers = () => {
       </div>
     </div>
   );
-}
+};
 
 export default MapLayers;

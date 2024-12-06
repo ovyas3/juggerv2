@@ -426,7 +426,7 @@ const OrdersPage = () => {
               }
 
              { !mobile && <div id='uploadFile_refreash'>
-                <motion.div id='uploadButton'
+                {/* <motion.div id='uploadButton'
                    whileHover={{ scale: 0.95 }}
                    whileTap={{ scale: 0.9 }}
                    transition={{ type: "spring", stiffness: 400, damping: 10 }}
@@ -434,7 +434,7 @@ const OrdersPage = () => {
                 >
                   <div><Image src={uploadIcon.src} height={24} width={24} alt='upload' /></div>
                   <div>{t('uploadFile')}</div>
-                </motion.div>
+                </motion.div> */}
                 <div className='ageing_reload'>
                 <div className='input_fnr_reload'>
                   <div className={`reload ${reload ? 'loading' : ''}`} onClick={() => {
