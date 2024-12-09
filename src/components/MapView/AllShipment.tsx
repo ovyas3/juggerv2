@@ -200,6 +200,7 @@ const ShipmentCard: React.FC<ShipmentCardProps> = ({
         backgroundColor: "#F5F5F5",
         position: "relative",
         borderRadius: "0px",
+        boxShadow:'none'
       }}
       className="cardHover"
       onClick={(e) => {
