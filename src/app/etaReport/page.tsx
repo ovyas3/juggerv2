@@ -17,6 +17,8 @@ import "./style.css";
 import { useRouter } from "next/navigation";
 import { ThreeCircles } from "react-loader-spinner";
 import { useMediaQuery, useTheme } from '@mui/material';
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
+
 
 function Report() {
   const router = useRouter();
@@ -26,7 +28,7 @@ function Report() {
   const mobile = useMediaQuery(theme.breakpoints.down('md'));
   const [reportType, setReportType] = React.useState("");
   const [fromDate, setFromDate] = React.useState(-1);
-  const [toDate, setToDate] = React.useState(-1);
+  const [toDate, setToDate] = React.useState<number>(-1);
 
   const handleChange = (event: SelectChangeEvent) => {
     setFromDate(-1);
@@ -92,9 +94,11 @@ function Report() {
       )}
 
       <div
-        className={`content_container ${
-          !mobile ? "adjustMargin" : "adjustMarginMobile"
-        }`}
+       style={{
+        padding:24,
+        marginTop:"56px",
+        marginLeft: !mobile ? "70px" : "0px",
+       }} 
       >
         <div className="report_type">
           <div>
@@ -156,7 +160,7 @@ function Report() {
 
         {reportType === "MIS" && (
           <>
-            <div style={{ marginTop: "40px",fontWeight: "bold" }}>E-Demand Date</div>
+            <div style={{ marginTop: "40px",fontWeight: "bold" }}>Drawn Out Date</div>
             <div className="date_container">
               <div>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -164,9 +168,11 @@ function Report() {
                     label="From"
                     sx={{}}
                     format="DD/MM/YYYY"
-                    onChange={(newDate) => {
+                    onChange={(newDate :any) => {
                       if (newDate) {
-                        const epochTime = newDate.valueOf();
+                        const utc = new Date (newDate);
+                        let epochTime = utc.valueOf();
+                        epochTime = epochTime - 1000 - (5 * 60 * 60 * 1000) - (30 * 60 * 1000);
                         setFromDate(epochTime);
                       }
                     }}
@@ -180,9 +186,11 @@ function Report() {
                   <DatePicker
                     label="To"
                     format="DD/MM/YYYY"
-                    onChange={(newDate) => {
+                    onChange={(newDate :any) => {
                       if (newDate) {
-                        const epochTime = newDate.valueOf();
+                        const utc = new Date (newDate);
+                        let epochTime = utc.valueOf();
+                        epochTime = epochTime - (5 * 60 * 60 * 1000) - (30 * 60 * 1000);
                         setToDate(epochTime);
                       }
                     }}

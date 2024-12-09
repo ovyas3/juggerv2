@@ -100,6 +100,8 @@ import getIndiaMap from "@/components/MapView/IndiaMap";
 import indiaGeoJSON from "@/components/MapView/IndiaMap";
 import "leaflet/dist/leaflet.css";
 import "leaflet-boundary-canvas";
+import Placeholder from "./Skeleton/placeholder";
+
 
 
 interface StyledTooltipProps extends TooltipProps {
@@ -216,6 +218,7 @@ const ShipmentCard: React.FC<ShipmentCardProps> = ({
           marginInline: 12,
           marginBottom: 12,
           boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1), 0px 1px 3px rgba(0, 0, 0, 0.08)",
+          cursor: "pointer",
         }}
       >
         <div
@@ -375,9 +378,9 @@ interface rakeType {
 }
 
 const searchOptions = [
-  { value: "fnr", label: "FNR No." },
-  { value: "dest", label: "Dest. Code" },
-  { value: "crName", label: "CR Names" },
+  { value: "fnr", label: "FNR No.", placeholder: "Enter FNR No." },
+  // { value: "dest", label: "Dest. Code", placeholder:'Enter Destination Code' },
+  // { value: "crName", label: "CR Names", placeholder:'Enter CR Name' },
 ];
 
 // Main Component for Map Layers
@@ -411,9 +414,9 @@ const MapLayers = () => {
   const [showInTransit, setShowInTransit] = useState<boolean>(true);
   const [showDelivered, setShowDelivered] = useState<boolean>(true);
   const [selectedFromDate, setSelectedFromDate] =
-    React.useState<dayjs.Dayjs | null>(dayjs());
+    React.useState<dayjs.Dayjs | null>(null);
   const [selectedToDate, setSelectedToDate] =
-    React.useState<dayjs.Dayjs | null>(dayjs());
+    React.useState<dayjs.Dayjs | null>(null);
   const [openFromDatePicker, setOpenFromDatePicker] = useState(false);
   const [openToDatePicker, setOpenToDatePicker] = useState(false);
   const [trackingNonTracking, setTrackingNonTracking] =
@@ -455,7 +458,6 @@ const MapLayers = () => {
   const [headingFilters, setHeadingFilters] = useState("");
   const [headingColors, setHeadingColors] = useState("");
 
-  const [showSearchFNR, setShowSearchFNR] = useState(false);
   const [trackingByFoisGps, setTrackingByFoisGps] = useState<any>({
     foiscount: 0,
     gpscount: 0,
@@ -476,7 +478,12 @@ const MapLayers = () => {
   const [selectedCR, setSelectedCR] = useState("");
   const [isCROpen, setIsCROpen] = useState(false);
   const [filteredCROptions, setFilteredCrOptions] = useState<any[]>([]);
+
   const dropdownRef = useRef<HTMLDivElement | null>(null);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [selectedOption, setSelectedOption] = useState(searchOptions[0]);
+  const [handleSearch, setHandleSearch] = useState<String | null>(null);
+  const [is_outbound, setIs_outbound] = useState(true);
 
   useEffect(() => {
     if (!map) return;
@@ -559,8 +566,6 @@ const MapLayers = () => {
       router.push(`/tracker?unique_code=${unique_code}`);
     }, 0);
   };
-
-  const filterTypes = ["FNR No.", "Dest. Code", "CR Names"];
 
   useEffect(() => {
     if (rakeType.length === 1) {
@@ -747,6 +752,7 @@ const MapLayers = () => {
         ? service.millies(selectedFromDate.format())
         : null,
       to: selectedToDate ? service.millies(selectedToDate.format()) : null,
+      is_outbound,
     };
 
     if (fnr.length === 11) {
@@ -854,6 +860,13 @@ const MapLayers = () => {
     };
   }, []);
 
+  useEffect(()=>{
+    if(handleSearch !== null &&handleSearch.length === 0 ){ 
+      getShipments("", "");
+      setCurrentFocusstatus('TOTAL')
+    }
+  },[handleSearch])
+
   const handleShipmentSelection = (shipment: any) => {
     if (selectedShipment && selectedShipment._id === shipment._id) {
       setSelectedShipment(null);
@@ -866,7 +879,6 @@ const MapLayers = () => {
       focusOnShipment(shipment);
     }
   };
-
 
   const focusOnShipment = (shipment: any) => {
     const gpsFois =
@@ -1268,7 +1280,7 @@ const MapLayers = () => {
                 </div>
               </div>
 
-              {/* <div
+              <div
                 style={{
                   height: "40px",
                   minHeight: "40px",
@@ -1292,12 +1304,31 @@ const MapLayers = () => {
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
+                      cursor: "pointer",
+                      position: "relative",
                     }}
+                    onClick={() => {setIsDropdownOpen(!isDropdownOpen)}} 
                   >
                     <div style={{ fontSize: 12, cursor: "pointer" }}>
-                      {searchOptions[0].label}
+                      {selectedOption?.label}
                     </div>
-                    <ArrowDropDownIcon />
+                    {/* <ArrowDropDownIcon /> */}
+                    {/* ---selection Options--- */}
+                    <div>
+                      {isDropdownOpen && (
+                        <div id='optionsContainer'>
+                          {searchOptions.filter(
+                            (option) => option.value !== selectedOption?.value
+                          ).map((option, index) => (
+                            <div key={index}
+                              style={{ padding: "12px 16px", cursor: "pointer" }}
+                              className="options"
+                              onClick={()=>{setSelectedOption(option);}}
+                            >{option.label}</div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   </div>
                   <input
                     style={{
@@ -1307,10 +1338,20 @@ const MapLayers = () => {
                       outline: "none",
                       padding: "0px 4px",
                     }}
-                    placeholder="Search"
+                    placeholder={selectedOption?.placeholder}
+                    onChange={(e) => setHandleSearch(e.target.value)}
                   />
                 </div>
-                <div style={{ marginTop: 4, marginRight: 12 }}>
+                <div style={{ marginTop: 4, marginRight: 12, cursor: "pointer" }}
+                  onClick={()=>{
+                    if(selectedOption.value === 'fnr'){
+                      getShipments(handleSearch?.toString() ?? '', "");
+                    }else if (selectedOption.value === 'crName') {
+                      getShipments("", handleSearch?.toString() ?? '');
+                    }
+                    setCurrentFocusstatus("");
+                  }}
+                >
                   <Image
                     src={searchIcon.src}
                     alt="searchIcon"
@@ -1318,7 +1359,7 @@ const MapLayers = () => {
                     width={20}
                   />
                 </div>
-              </div> */}
+              </div>
 
               <Box sx={{}} className="shipment-details-container">
                 {showFiltered &&

@@ -18,6 +18,10 @@ import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import captiveRakeIndicator from '@/assets/captive_rakes.svg'
 import Link from "next/link";
 import { useMediaQuery, useTheme } from '@mui/material';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import Popover from "@mui/material/Popover";
+import { useSnackbar } from '@/hooks/snackBar';
+import StackedLineChartIcon from '@mui/icons-material/StackedLineChart';
 
 
 
@@ -37,6 +41,7 @@ const columns: readonly Column[] = [
   { id: "Status", label: "Status", style: "header_Status" },
   { id: "InitialETA", label: "Initial ETA", style: "header_Initialeta" },
   { id: "remarks", label: "Remarks", style: "header_remarks" },
+  { id: "action", label: "Action", style: "header_action_inbound" },
 ];
 
 function contructingData(shipment: any) {
@@ -80,17 +85,18 @@ function contructingData(shipment: any) {
       trip_tracker: any;
       HA: any;
       rr_dates: any;
+      polyline:any;
     }) => {
       return {
-        unique_code: shipment?.unique_code ? shipment?.unique_code : "NA",
-        _id: shipment?._id ? shipment?._id : "NA",
-        edemand: { edemand: shipment?.edemand_no ? shipment?.edemand_no : "NA",},
+        unique_code: shipment?.unique_code ? shipment?.unique_code : "--",
+        _id: shipment?._id ? shipment?._id : "--",
+        edemand: { edemand: shipment?.edemand_no ? shipment?.edemand_no : "--",},
         fnr: {
-            primary:shipment?.FNR ? shipment?.FNR : "NA",
+            primary:shipment?.FNR ? shipment?.FNR : "--",
         },
         Commodities: {
-            commodity: shipment?.others?.demandedCommodity ? shipment?.others?.demandedCommodity : "NA",
-            Stock: shipment?.others?.demandedStock ? shipment?.others?.demandedStock : "NA",
+            commodity: shipment?.others?.demandedCommodity ? shipment?.others?.demandedCommodity : "--",
+            Stock: shipment?.others?.demandedStock ? shipment?.others?.demandedStock : "--",
         },
         pickupLocation: { 
             name: shipment?.pickup_location?.name && shipment?.pickup_location?.name ,
@@ -98,40 +104,79 @@ function contructingData(shipment: any) {
             state: shipment?.pickup_location?.state && shipment?.pickup_location?.state ,
         },
         IndentDate: {
-            date:shipment?.demand_date? service.utcToist(shipment?.demand_date) : "NA",
-            time:shipment?.demand_date? service.utcToistTime(shipment?.demand_date) : "NA",
+            date:shipment?.demand_date? service.utcToist(shipment?.demand_date) : "--",
+            time:shipment?.demand_date? service.utcToistTime(shipment?.demand_date) : "--",
         },
         Status: {
-            raw:shipment?.status ? shipment?.status : "NA",
+            raw:shipment?.status ? shipment?.status : "--",
         },
         InitialETA: {
-            date:  shipment?.past_etas.length > 0 ? service.utcToist(shipment?.past_etas[0]?.eta): "NA",
-            time:shipment?.demand_date? service.utcToistTime(shipment?.past_etas[0]?.eta) : "NA",
+            date:  shipment?.past_etas.length > 0 ? service.utcToist(shipment?.past_etas[0]?.eta): "--",
+            time:shipment?.demand_date? service.utcToistTime(shipment?.past_etas[0]?.eta) : "--",
         },
-        remarks: { remark: shipment?.remarks[0] ? shipment?.remarks[0] : "NA",},
-        HandlingAgent: shipment?.HA[0] ? shipment?.HA : "NA",
-        paidBy: shipment?.paid_by ? shipment?.paid_by : "NA",
+        remarks: { remark: shipment?.remarks[0] ? shipment?.remarks[0] : "--",},
+        HandlingAgent: shipment?.HA[0] ? shipment?.HA : "--",
+        paidBy: shipment?.paid_by ? shipment?.paid_by : "--",
         expLoadingDate: {
-            date : shipment?.expected_loading_date ? service.utcToist(shipment?.expected_loading_date) : "NA",
-            time : shipment?.expected_loading_date ? service.utcToistTime(shipment?.expected_loading_date) : "NA",
+            date : shipment?.expected_loading_date ? service.utcToist(shipment?.expected_loading_date) : "--",
+            time : shipment?.expected_loading_date ? service.utcToistTime(shipment?.expected_loading_date) : "--",
         },
-        no_of_wagons: shipment?.no_of_wagons ? shipment?.no_of_wagons : "NA",
+        no_of_wagons: shipment?.no_of_wagons ? shipment?.no_of_wagons : "--",
         is_captive: shipment?.is_captive ? shipment?.is_captive : false ,
+        polyline: shipment?.polyline ,
       };
     }
   );
 }
 
-function InboundTable({ allShipment, count, setInBoundPayload }: any) {
+function InboundTable({ allShipment, count, setInBoundPayload, getInboundList }: any) {
 
   const theme = useTheme();
   const mobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [showActionBox, setShowActionBox] = useState(-1);
+  const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
+  const { showMessage } = useSnackbar();
+
+
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
   };
+
+  const handleCloseAction = () => {
+    setAnchorEl(null);
+    setShowActionBox(-1);
+  };
+
+  const fetchingTrackDetails = (e: any, row: any) => {
+    e.stopPropagation();
+    setShowActionBox(-1);
+    const payload = {
+      rakeId: row._id
+    }
+    httpsPost('fetch/track_details', payload).then((res) => {
+      if (res && res.statusCode == 200) {
+          showMessage('Track Details Fetched Successfully.', 'success')
+          getInboundList();
+      } else {
+          showMessage('Error Fetching Track Details.', 'error')
+      }
+    }).catch((err) => {
+      showMessage('Error Fetching Track Details.', 'error')
+    })
+  }
+
+  function clickActionBox(
+    e: React.MouseEvent<SVGSVGElement, MouseEvent>,
+    index: number,
+    id: string,
+    locationId: string
+  ) {
+    e.stopPropagation();
+    setShowActionBox((prevIndex) => (prevIndex === index ? -1 : index));
+  }
 
     const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
     setRowsPerPage(+event.target.value);
@@ -230,17 +275,17 @@ function InboundTable({ allShipment, count, setInBoundPayload }: any) {
                                         <div id='paidBy'>{row.paidBy}</div>
                                     </>
                                   )}
-                                  {column.id === "expLoadingDate" && ( row.expLoadingDate.date  !== 'NA' && row.expLoadingDate.time !== 'NA' ?
-                                    <>
+                                  {column.id === "expLoadingDate" && ( row.expLoadingDate.date  !== '--' && row.expLoadingDate.time !== '--' ?
+                                    <div style={{display:'flex', flexDirection:'column', alignItems:'center'}}>
                                         <div style={{fontSize:12}}>{row.expLoadingDate?.date}</div>
                                         <div style={{fontSize:12}}>{row.expLoadingDate?.time}</div>
-                                    </> : 'NA'
+                                    </div> : '--'
                                   )}
-                                  {column.id === "IndentDate" && ( row.IndentDate.date  !== 'NA' && row.IndentDate.time !== 'NA' ?
-                                    <>
+                                  {column.id === "IndentDate" && ( row.IndentDate.date  !== '--' && row.IndentDate.time !== '--' ?
+                                    <div style={{textAlign:'center'}}>
                                         <div style={{fontSize:12}}>{row.IndentDate?.date}</div>
                                         <div style={{fontSize:12}}>{row.IndentDate?.time}</div>
-                                    </> : 'NA'
+                                    </div> : '--'
                                   )}
                                   {column.id === 'Status' && (
                                       <>
@@ -279,18 +324,75 @@ function InboundTable({ allShipment, count, setInBoundPayload }: any) {
                                         <div style={{marginTop:8, color: '#71747A', fontSize:12}}>{row.Commodities.Stock}</div>
                                     </>
                                   )}
-                                  {column.id === 'InitialETA' && ( row.InitialETA.date  !== 'NA' && row.InitialETA.time !== 'NA' ?
-                                    <>
+                                  {column.id === 'InitialETA' && ( row.InitialETA.date  !== '--' && row.InitialETA.time !== '--' ?
+                                    <div style={{textAlign:'center'}}>
                                         <div style={{fontSize:12}}>{row.InitialETA.date}</div>
                                         <div style={{fontSize:12}}>{row.InitialETA.time}</div>
-                                    </> : 'NA'
+                                    </div>: <div style={{textAlign:'center'}} >--</div>
                                   )}
                                   {column.id === 'remarks' && (
                                     <>
-                                        <div style={{fontSize:12}}>{row.remarks.remark}</div>
+                                        <div style={{fontSize:12, textAlign:'center'}}>{row.remarks.remark}</div>
                                     </>
                                   )}
-
+                                  {column.id === 'action' && (
+                                    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center',marginLeft:-10, }}>
+                                      <div 
+                                        style={{
+                                          height:24, 
+                                          width:24, 
+                                          backgroundColor:'#3351FF', 
+                                          display:'flex', 
+                                          justifyContent:'center', 
+                                          alignItems:'center', 
+                                          borderRadius:4, 
+                                          cursor:'pointer'
+                                        }} 
+                                        onClick={(e: any) => {
+                                          clickActionBox(e, rowIndex, "", "");
+                                          setAnchorEl(
+                                            e.currentTarget as unknown as HTMLButtonElement
+                                          );
+                                        }}
+                                      >
+                                        <MoreHorizIcon style={{color:'white'}}/>
+                                      </div>
+                                      <Popover
+                                      open={
+                                        showActionBox === rowIndex
+                                          ? true
+                                          : false
+                                      }
+                                      anchorEl={anchorEl}
+                                      onClose={handleCloseAction}
+                                      anchorOrigin={{
+                                        vertical: 35,
+                                        horizontal: -140,
+                                      }}
+                                    >
+                                      {!row.polyline && (
+                                        <div
+                                        className="action-popover-wagon-inbound"
+                                        onClick={(e) => {
+                                          fetchingTrackDetails(e, row);
+                                        }}
+                                        >
+                                          <div><StackedLineChartIcon style={{color:'#7C7E8C', height:20, width:20 }}/></div>
+                                          <div>{'Fetch Track Details'}</div>
+                                        </div>
+                                      )}
+                                      {/* <div
+                                        className="action-popover-wagon-inbound"
+                                        onClick={(e) => {
+                                          // fetchingTrackDetails(e, row);
+                                        }}
+                                      >
+                                        <div><StackedLineChartIcon style={{color:'#7C7E8C', height:20, width:20 }}/></div>
+                                        <div>{'test case 01'}</div>
+                                      </div> */}
+                                    </Popover>
+                                    </div>
+                                  )}
                                 </TableCell>
                               );
                             })}

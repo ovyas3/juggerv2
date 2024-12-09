@@ -5,7 +5,7 @@ import { getAuth } from "@/services/Authenticator/Auth";
 import { deleteAllCache } from '@/utils/storageService';
 
 const prefix = [
-  environment.DEV_API_URL,
+  environment.PROD_API_URL,
   environment.PROD_API_URL_MANHUNTER
 ]
 
