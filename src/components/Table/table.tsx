@@ -143,7 +143,7 @@ const convertArrayToFilteredArray = (inputArray: any, shipmentPayloads: any) => 
                 code: delivery_location?.code ?? '--'
             },
             material: {
-                name: others.demandedCommodity || '--',
+                name: others?.demandedCommodity || '--',
             },
             materials: materials,
             pickupdate: {
