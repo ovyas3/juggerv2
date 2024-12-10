@@ -279,13 +279,13 @@ function InboundTable({ allShipment, count, setInBoundPayload, getInboundList }:
                                     <div style={{display:'flex', flexDirection:'column', alignItems:'center'}}>
                                         <div style={{fontSize:12}}>{row.expLoadingDate?.date}</div>
                                         <div style={{fontSize:12}}>{row.expLoadingDate?.time}</div>
-                                    </div> : '--'
+                                    </div> : <div style={{textAlign:'center', fontSize:12}} >--</div>
                                   )}
                                   {column.id === "IndentDate" && ( row.IndentDate.date  !== '--' && row.IndentDate.time !== '--' ?
                                     <div style={{textAlign:'center'}}>
                                         <div style={{fontSize:12}}>{row.IndentDate?.date}</div>
                                         <div style={{fontSize:12}}>{row.IndentDate?.time}</div>
-                                    </div> : '--'
+                                    </div> : <div style={{textAlign:'center', fontSize:12}} >--</div>
                                   )}
                                   {column.id === 'Status' && (
                                       <>
