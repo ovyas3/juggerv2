@@ -8,6 +8,8 @@ import Image from "next/image";
 import MapViewIcon from "@/assets/map_view.svg";
 import { useRouter, usePathname } from "next/navigation";
 import CustomDatePicker from "@/components/UI/CustomDatePicker/CustomDatePicker";
+import FilterAltIcon from "@mui/icons-material/FilterAlt";
+import filter_icon from "@/assets/filter_icon.svg";
 
 function Filters({
   onToFromChange,
@@ -221,15 +223,14 @@ function Filters({
           </motion.div>
         </div>
 
-        {/* <div style={{ position: "relative" }}>
+        <div style={{ position: "relative" }}>
           <div
             className="filter-container"
             onClick={() => setOpenFilterModal(true)}
           >
-            <FilterAltIcon className="filter-icon" />
             <img src={filter_icon.src} alt="" />
           </div>
-        </div> */}
+        </div>
       </div>
 
       {openFilterModal && (
