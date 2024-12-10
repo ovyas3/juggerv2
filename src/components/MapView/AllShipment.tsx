@@ -746,7 +746,7 @@ const MapLayers = () => {
     map?.flyTo(center, 5, { duration: 1 });
   };
 
-  const getShipments = async (fnr: string, selectedCRID: string) => {
+  const getShipments = async (fnr: string, selectedCRID: string, is_outbound:boolean) => {
     let payload: any = {
       from: selectedFromDate
         ? service.millies(selectedFromDate.format())
@@ -836,7 +836,7 @@ const MapLayers = () => {
 
   useEffect(() => {
     if (selectedFromDate && selectedToDate) {
-      getShipments("", "");
+      getShipments("", "", true);
     }
   }, [selectedFromDate, selectedToDate]);
 
@@ -862,7 +862,7 @@ const MapLayers = () => {
 
   useEffect(()=>{
     if(handleSearch !== null &&handleSearch.length === 0 ){ 
-      getShipments("", "");
+      getShipments("", "", true);
       setCurrentFocusstatus('TOTAL')
     }
   },[handleSearch])
@@ -902,6 +902,10 @@ const MapLayers = () => {
       map?.flyTo(center, 5, { duration: 1 });
     }
   };
+
+  useEffect(()=>{
+    getShipments("", "", is_outbound);
+  },[is_outbound])
 
   return (
     <div>
@@ -1118,7 +1122,7 @@ const MapLayers = () => {
                 backgroundColor: "#F5F5F5",
                 position: "absolute",
                 left: "0",
-                height: isMobile ? "100vh" : "40vh",
+                height: isMobile ? "100vh" : "60vh",
                 boxShadow: "0px 0px 10px 0px rgba(0,0,0,0.1)",
                 display: "flex",
                 flexDirection: "column",
@@ -1132,7 +1136,7 @@ const MapLayers = () => {
                   ? ""
                   : mobileShow
                   ? "translateY(0)"
-                  : "translateY(92%)",
+                  : "translateY(95%)",
                 overflowY: "scroll",
               }}
             >
@@ -1152,6 +1156,29 @@ const MapLayers = () => {
                   }}
                 ></div>
               )}
+
+              <div style={{
+                display: "flex",
+                justifyContent: "flex-start",
+                alignItems: "center",
+                gap: 16,
+                marginInline:12,
+                marginTop:12,
+                borderBottom: "1px solid #DFE3EB",
+                fontSize: 16,
+                transition:'all 0.3s ease-in-out'
+              }}>
+                <div
+                  onClick={(e)=>{setIs_outbound(true)}}
+                  style={{paddingBottom:6, cursor:'pointer'}}
+                  className={is_outbound ? "activeBound" : ""}
+                >Outbound</div>
+                <div
+                  onClick={(e)=>{setIs_outbound(false)}}
+                  style={{paddingBottom:6, cursor:'pointer'}}
+                  className={!is_outbound ? "activeBound" : ""}
+                >Inbound</div>
+              </div>
 
               <div
                 style={{
@@ -1345,9 +1372,9 @@ const MapLayers = () => {
                 <div style={{ marginTop: 4, marginRight: 12, cursor: "pointer" }}
                   onClick={()=>{
                     if(selectedOption.value === 'fnr'){
-                      getShipments(handleSearch?.toString() ?? '', "");
+                      getShipments(handleSearch?.toString() ?? '', "",true);
                     }else if (selectedOption.value === 'crName') {
-                      getShipments("", handleSearch?.toString() ?? '');
+                      getShipments("", handleSearch?.toString() ?? '', true);
                     }
                     setCurrentFocusstatus("");
                   }}

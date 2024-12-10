@@ -238,3 +238,8 @@
 .options:hover{
   background-color: #F4F4F4;
 }
+.activeBound{
+  color: #3471FF;
+  font-weight: 500;
+  border-bottom: 1px solid #3471FF;
+}
