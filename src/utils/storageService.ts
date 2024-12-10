@@ -13,7 +13,10 @@ const setCookies = (name: string, value: string) => {
 const deleteAllCache = () => {
     const cookies = document.cookie.split(";");
     for (let i = 0; i < cookies.length; i++) {
-        deleteCookie(cookies[i].split("=")[0]);
+        const cookieName = cookies[i].split("=")[0].trim();
+        if (cookieName) {
+            deleteCookie(cookieName);
+        }
     }
 
     localStorage.clear();
