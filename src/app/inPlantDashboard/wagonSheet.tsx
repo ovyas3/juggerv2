@@ -30,7 +30,7 @@ import {
   AssignToMill,
 } from "@/app/inPlantDashboard/actionComponents";
 import captiveRakeIndicator from "@/assets/captive_rakes.svg";
-import SourceOutlinedIcon from "@mui/icons-material/SourceOutlined";
+import wagonsUploaded from "@/assets/wagons_uploaded.svg"
 import { redirect, useRouter, useParams } from "next/navigation";
 import { ThreeCircles } from "react-loader-spinner";
 import uploadIcon from '@/assets/uploadIcon.svg';
@@ -121,6 +121,7 @@ function contructingData(shipment: any) {
             : "--",
         },
         placement_time: {
+          date_time: shipment?.placement_time,
           date: shipment?.placement_time
             ? service.utcToist(shipment?.placement_time)
             : "--",
@@ -646,9 +647,7 @@ function WagonTallySheet({}: any) {
                                           className="SourceOutlinedIcon"
                                           style={{ position: "relative" }}
                                         >
-                                          <SourceOutlinedIcon
-                                            style={{ fontSize: 23 }}
-                                          />
+                                        <Image alt='' src={wagonsUploaded}/>
                                           <div className="wagons-uploaded-wagonSheet">
                                             Wagons Uploaded
                                           </div>
