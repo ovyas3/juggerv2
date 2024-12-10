@@ -47,6 +47,9 @@ function InboundFilters({ setInBoundPayload }: any) {
   const router = useRouter();
   const [rakeType, setRakeType] = useState(["IR", "CR"]);
 
+  const [filterEDemand, setFilterEDemand] = useState("");
+  const [filterDestination, setFilterDestination] = useState("");
+  const [filterMaterial, setFilterMaterial] = useState("");
 
   function shouldDisableStartDate(date: Date): boolean | undefined {
     const disable = date > new Date() || date > endDate;
@@ -126,6 +129,33 @@ function InboundFilters({ setInBoundPayload }: any) {
         break;
     }
   };
+
+  function handleSubmit() {
+    setInBoundPayload((prevState: any) => {
+      const newState = { ...prevState };
+      if (!filterEDemand) delete newState["eDemand"];
+      else newState.eDemand = filterEDemand;
+      if (!filterDestination) delete newState["destination"];
+      else newState.destination = filterDestination;
+      if (!filterMaterial) delete newState["material"];
+      else newState.material = filterMaterial;
+      return newState;
+    });
+    setOpenFilterModal(false);
+  }
+
+  function clearFilter() {
+    setFilterMaterial("");
+    setFilterDestination("");
+    setFilterEDemand("");
+    setInBoundPayload((prevState: any) => {
+      const newState = { ...prevState };
+      delete newState["eDemand"];
+      delete newState["destination"];
+      delete newState["material"];
+      return newState;
+    });
+  }
 
   useEffect(() => {
     setInBoundPayload((prev: any) => {
@@ -267,47 +297,6 @@ function InboundFilters({ setInBoundPayload }: any) {
           </div>
         </div>
 
-        {/* <div id="rakeType">
-          <motion.section
-            animate={{
-              scale: captiveRake ? 0.95 : 1,
-            }}
-            transition={{
-              duration: 0.2,
-              ease: "easeInOut",
-            }}
-            onClick={() => {
-              setCaptiveRake(!captiveRake);
-            }}
-            className="status_text"
-            style={{
-              backgroundColor: captiveRake ? "#21114D" : "#F0F3F9",
-              color: captiveRake ? "#F0F3F9" : "#21114D",
-            }}
-          >
-            Captive Rakes
-          </motion.section>
-          <motion.section
-            animate={{
-              scale: indianRake ? 0.95 : 1,
-            }}
-            transition={{
-              duration: 0.2,
-              ease: "easeInOut",
-            }}
-            onClick={() => {
-              setIndianRake(!indianRake);
-            }}
-            className="status_text"
-            style={{
-              backgroundColor: indianRake ? "#21114D" : "#F0F3F9",
-              color: indianRake ? "#F0F3F9" : "#21114D",
-            }}
-          >
-            Indian Railway Rakes
-          </motion.section>
-        </div> */}
-
         <div
           style={{
             fontSize: "12px",
@@ -363,21 +352,57 @@ function InboundFilters({ setInBoundPayload }: any) {
           </motion.div>
         </div>
 
-        {/* <div style={{ position: "relative" }}>
+        <div style={{ position: "relative" }}>
           <div
             className="filter-container"
-            onClick={() => setOpenFilterModal(!openFilterModal)}
+            onClick={() => setOpenFilterModal(true)}
           >
-            <FilterAltIcon className="filter-icon" />
+            <img src={filter_icon.src} alt="" />
           </div>
-        </div> */}
+        </div>
       </div>
 
-      {/* {openFilterModal && (
-       <div >
-            fghjjhjgdhchdgcd
-       </div>
-        )} */}
+      {openFilterModal && (
+        <div style={{ display: "flex", justifyContent: "right" }}>
+          <div className="search">
+            <div className="search-container">
+              <div className="search-container-group">
+                <label className="search-label">e-Demand Number</label>
+                <input
+                  type="text"
+                  className="search-group"
+                  onChange={(e) => setFilterEDemand(e.target.value)}
+                  value={filterEDemand}
+                />
+              </div>
+              <div className="search-container-group">
+                <label className="search-label">Destination</label>
+                <input
+                  className="search-group"
+                  onChange={(e) => setFilterDestination(e.target.value)}
+                  value={filterDestination}
+                />
+              </div>
+              <div className="search-container-group">
+                <label className="search-label">Material</label>
+                <input
+                  className="search-group"
+                  onChange={(e) => setFilterMaterial(e.target.value)}
+                  value={filterMaterial}
+                />
+              </div>
+            </div>
+            <div className="search-trigger">
+              <button onClick={handleSubmit}>Submit</button>
+              <button onClick={() => clearFilter()}>Clear</button>
+            </div>
+          </div>
+          <div
+            className="overlay-container"
+            onClick={() => setOpenFilterModal(false)}
+          />
+        </div>
+      )}
     </div>
   );
 }
