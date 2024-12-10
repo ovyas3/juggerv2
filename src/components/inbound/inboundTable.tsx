@@ -22,6 +22,10 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import Popover from "@mui/material/Popover";
 import { useSnackbar } from '@/hooks/snackBar';
 import StackedLineChartIcon from '@mui/icons-material/StackedLineChart';
+import rrDocumentIcon from '@/assets/rr_document_icon.svg';
+import {Tooltip} from "@mui/material";
+import RRModal from '../RR Modal/RRModal';
+
 
 
 
@@ -33,11 +37,11 @@ interface Column {
 
 const columns: readonly Column[] = [
   { id: "edemand", label: "e-Demand", style: "header_edemand" },
-  { id: "fnr", label: "FNR No.", style: "header_fnr" },
+  { id: "fnr", label: "", style: "header_fnr" },
   { id: "Commodities", label: "Commodities", style: "header_Commodities" },
   { id:'pickupLocation', label: "Pickup Location", style: "header_pickupLocation" },
-  { id:'expLoadingDate', label: "Exp. Loading Date", style: "header_expLoadingDate" },
-  { id: "IndentDate", label: "Indent Date", style: "header_IndentDate" },
+  // { id:'expLoadingDate', label: "Exp. Loading Date", style: "header_expLoadingDate" },
+  // { id: "IndentDate", label: "Indent Date", style: "header_IndentDate" },
   { id: "Status", label: "Status", style: "header_Status" },
   { id: "InitialETA", label: "Initial ETA", style: "header_Initialeta" },
   { id: "remarks", label: "Remarks", style: "header_remarks" },
@@ -86,6 +90,7 @@ function contructingData(shipment: any) {
       HA: any;
       rr_dates: any;
       polyline:any;
+      captive:any;
     }) => {
       return {
         unique_code: shipment?.unique_code ? shipment?.unique_code : "--",
@@ -123,7 +128,10 @@ function contructingData(shipment: any) {
         },
         no_of_wagons: shipment?.no_of_wagons ? shipment?.no_of_wagons : "--",
         is_captive: shipment?.is_captive ? shipment?.is_captive : false ,
-        polyline: shipment?.polyline ,
+        polyline: shipment?.polyline,
+        rr_document: shipment?.rr_document,
+        all_FNRs: shipment?.all_FNRs,
+        captiveName: shipment?.captive?.name && shipment?.captive.name,
       };
     }
   );
@@ -138,8 +146,13 @@ function InboundTable({ allShipment, count, setInBoundPayload, getInboundList }:
   const [showActionBox, setShowActionBox] = useState(-1);
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const { showMessage } = useSnackbar();
-
-
+  const [searchFNR, setSearchFNR] = useState<number | null>(null);
+  
+  // rr documents variables
+  const [isRRDocOpen, setIsRRDocOpen] = useState(false);
+  const [rrDocument, setRrDocument] = useState<any>(null);
+  const [rrNumbers, setRRNumbers] = useState<any>(null);
+  const [isRRDoc, setIsRRDoc] = useState<boolean>(false);
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
@@ -183,6 +196,15 @@ function InboundTable({ allShipment, count, setInBoundPayload, getInboundList }:
     setPage(0);
     };
 
+    const handleRRDoc = (id: any) => {  // for rr documents
+      setIsRRDocOpen(true);
+      const rrNums = allShipment.filter((shipment: any) => shipment._id === id)[0].all_FNRs;
+      setRRNumbers(rrNums);
+      const rrDocumnets = allShipment.filter((shipment: any) => shipment._id === id)[0].rr_document;
+      const isRRDocument = rrDocumnets && rrDocumnets.length > 0;
+      setIsRRDoc(isRRDocument);
+  }
+
   useEffect(()=>{
     setInBoundPayload((prevPayload: any) => ({
         ...prevPayload,
@@ -191,8 +213,24 @@ function InboundTable({ allShipment, count, setInBoundPayload, getInboundList }:
       }));
   },[page, rowsPerPage])
 
+  useEffect(() => {
+    if(Math.abs(searchFNR ?? 0).toString().length  === 11){
+      setInBoundPayload((prev:any)=>{
+        const newState = {...prev};
+        newState.fnrNumber = searchFNR;
+        return newState
+      })
+    }else if (searchFNR === 0) {
+      setInBoundPayload((prev:any)=>{
+        const newState = {...prev};
+        delete newState.fnrNumber;
+        return newState
+      })
+    }
+  },[searchFNR])
+
   return (
-     <div
+      <div
             id="tableContainer"
             style={{
               width: "100%",
@@ -227,7 +265,6 @@ function InboundTable({ allShipment, count, setInBoundPayload, getInboundList }:
                           key={column.id}
                           className={column.style}
                           style={{
-                            // textAlign: "center",
                             paddingLeft:'10px',
                             paddingBlock:'0px',
                             paddingRight:'0px',
@@ -240,9 +277,28 @@ function InboundTable({ allShipment, count, setInBoundPayload, getInboundList }:
                           {column.id === "pickupLocation" && (
                               <div>Paid By</div>
                           )}
-                          {column.id === 'Commodities' && (
+                          {/* {column.id === 'Commodities' && (
                             <div>Demanded Stock</div>
-                          )}
+                          )} */}
+                          {column.id === 'fnr' && (
+                            <input 
+                              type="number"
+                              placeholder="FNR No."
+                              style={{
+                                maxWidth:'100px',
+                                color:'black',
+                                fontWeight:600,
+                                fontSize:12,
+                                border:'1px solid #E9E9EB',
+                                padding:'4px 8px 4px 8px',
+                                borderRadius:'4px',
+                                outline:'none'
+                              }}
+                              onChange={(e)=>{
+                                setSearchFNR(+e.target.value);
+                              }}
+                            />
+                          )} 
                         </TableCell>
                       ))}
                     </TableRow>
@@ -306,7 +362,7 @@ function InboundTable({ allShipment, count, setInBoundPayload, getInboundList }:
                                       </>
                                   )}
                                   {column.id === 'fnr' && (
-                                    <>  
+                                    <div style={{display:'flex', flexDirection:'column', gap:4}}>  
                                         <div style={{fontSize:12}}>Primary</div>
                                         <Link target="_blank"
                                             href={"/tracker?unique_code=" + row.unique_code}
@@ -314,14 +370,30 @@ function InboundTable({ allShipment, count, setInBoundPayload, getInboundList }:
                                             style={{fontSize:12}}
                                         >{row.fnr.primary}</Link>
                                         <div>
-                                            {row.is_captive && <Image src={captiveRakeIndicator.src} alt="captiveRakeIndicator" height={24} width={24} />}
+                                            {row.is_captive && 
+                                              <Tooltip title={row.captiveName || ''} placement="left" arrow>
+                                                <Image src={captiveRakeIndicator.src} alt="captiveRakeIndicator" height={24} width={24} style={{marginRight:6}} />
+                                              </Tooltip>
+                                            }
+                                            {row.rr_document.length > 0 && 
+                                              <Tooltip title="View RR Document" placement="right" arrow>
+                                                <Image 
+                                                  src={rrDocumentIcon.src} 
+                                                  alt="rrIndicator" 
+                                                  height={24} 
+                                                  width={24} 
+                                                  style={{cursor:'pointer'}}
+                                                  onClick={(e)=>{handleRRDoc(row._id)}}
+                                                />
+                                              </Tooltip>
+                                            }
                                         </div>
-                                    </>
+                                    </div>
                                   )}
                                   {column.id === 'Commodities' && (
                                     <>
                                         <div style={{fontSize:12}}>{row.Commodities.commodity}</div>
-                                        <div style={{marginTop:8, color: '#71747A', fontSize:12}}>{row.Commodities.Stock}</div>
+                                        {/* <div style={{marginTop:8, color: '#71747A', fontSize:12}}>{row.Commodities.Stock}</div> */}
                                     </>
                                   )}
                                   {column.id === 'InitialETA' && ( row.InitialETA.date  !== '--' && row.InitialETA.time !== '--' ?
@@ -415,7 +487,8 @@ function InboundTable({ allShipment, count, setInBoundPayload, getInboundList }:
                     sx={{ height: 40, overflowY: 'hidden', position: 'absolute', top: '-37px', right: '-15px' }}
                 />
             </Paper>
-          </div>
+            <RRModal isOpen={isRRDocOpen} isClose={() => setIsRRDocOpen(false)} rrNumbers={rrNumbers} isRRDoc={isRRDoc} />
+      </div>
   );
 }
 export default InboundTable;
