@@ -212,6 +212,7 @@ const WhatsAppNotify = () => {
       setError(errors.join('\n'));
       return false;
     }
+    setError('');
     return true;
   };
 
@@ -259,6 +260,7 @@ const WhatsAppNotify = () => {
   }
 
   const postWhatsAppNumbers = async (contacts: any[]) => {
+    setError('');
     setLoading(true)
     try {
       const response = await httpsPost('set/WhatsApp_numbers', { mobileNos: contacts }, router, 0, false)
