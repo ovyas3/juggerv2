@@ -781,11 +781,11 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <DateTimePicker
                     open={openPlacementTime}
-                    onClose={() => {
+                    onClose={() => { 
                       setOpenPlacementTime(false);
                     }}
                     // value={dayjs(rakeArrivalAtStationDate)}
-                    value={placementTimeDate ? dayjs(placementTimeDate) : null}
+                    value={placementTimeDate ? dayjs(placementTimeDate) : shipment?.placement_time.date_time && dayjs(shipment?.placement_time?.date_time) || null}
                     sx={{
                       width: "100%",
                       height: "100%",

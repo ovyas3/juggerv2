@@ -1,5 +1,11 @@
 /* ---------------filters--------------- */
-#inboundFiltersContainer {}
+#inboundFiltersContainer {
+  max-width: 100%;
+  overflow-x: auto; 
+  white-space: nowrap;
+  -ms-overflow-style: none !important;
+  scrollbar-width: none; 
+}
 #inboundFilters {
   display: flex;
   gap: 16px;
@@ -8,7 +14,8 @@
 }
 #from-date {
   height: 36px;
-  width: 132px;
+  max-width: 132px;
+  min-width: 132px;
   border: 1px solid #e9e9eb;
   border-radius: 6px;
   display: flex;
@@ -94,7 +101,7 @@
 }
 .header_fnr{
   /* background-color: blueviolet !important; */
-  min-width: 100px !important;
+  min-width: 120px !important;
 }
 .header_Commodities{
   /* background-color: brown !important; */
@@ -103,23 +110,27 @@
 .header_pickupLocation{
   /* background-color: burlywood !important; */
   min-width: 150px !important;
-  width: 250px !important;
+  /* width: 250px !important; */
 }
 .header_IndentDate{
   /* background-color: cadetblue !important; */
   min-width: 100px !important;
+  text-align: center !important;
 }
 .header_Status{
   /* background-color: chartreuse !important; */
   min-width: 120px !important;
+  text-align: center !important;
 }
 .header_Initialeta{
   /* background-color: chocolate !important; */
   min-width: 100px !important;
+  text-align: center !important;
 }
 .header_remarks{
   /* background-color: coral !important; */
   min-width: 130px !important;
+  text-align: center !important;
 }
 .header_HandlingAgent{
   /* background-color: cornflowerblue !important; */
@@ -128,10 +139,11 @@
 .header_expLoadingDate{
   /* background-color: thistle !important; */
   min-width: 125px !important;
+  text-align: center !important;
 }
 #pickupLocationInfo{
   color:#838592;
-  font-size: 12px;
+  font-size: 10px;
   margin-bottom: 8px;
 }
 #paidBy{
@@ -189,6 +201,22 @@
   top: 5px;
   left: 7px;
   color: #334FFC;
+}
+.header_action_inbound{
+  /* background-color: #18BE8A !important; */
+  padding-right: 10px !important;
+}
+.action-popover-wagon-inbound{
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  padding-inline: 14px;
+  gap: 10px;
+  padding-block: 6px;
+  cursor: pointer;
+}
+.action-popover-wagon-inbound:hover{
+  background-color: #DFE3EB;
 }
 
 /* -----------------Dashboard---------------- */
