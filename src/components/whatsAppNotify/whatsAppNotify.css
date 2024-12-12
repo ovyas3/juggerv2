@@ -273,7 +273,7 @@
   max-height: 46vh; 
   overflow-y: auto;
   scrollbar-width: thin; 
-  width: 60%;
+  /* width: 60%; */
   border-bottom: 1px solid #DFE3EB;
 }
 
