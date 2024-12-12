@@ -1,5 +1,6 @@
 "use client";
 
+import { useDebugValue, useRef } from 'react';
 import { MapContainer, TileLayer, Marker, LayersControl, Popup } from 'react-leaflet';
 import "leaflet/dist/leaflet.css";
 import "leaflet-boundary-canvas";
@@ -13,10 +14,12 @@ import { httpsGet, httpsPost } from '@/utils/Communication';
 import { useRouter } from 'next/navigation';
 import getBoundary from '@/components/MapView/IndianClaimed';
 import timeService from '@/utils/timeService';
-import { useMediaQuery, useTheme } from '@mui/material';
+import { Checkbox, useMediaQuery, useTheme } from '@mui/material';
 import { get } from 'http';
 import styles from "./page.module.css";
 import getIndiaMap from "@/components/MapView/IndiaMap";
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 
 interface SchemeData {
   count: number;
@@ -136,6 +139,12 @@ export default function CaptiveRakeMapView() {
   const [totalCRCount, setTotalCRCount] = useState(0)
   const [usedCRCount,setUsedCRCount] = useState(0)
   const [shouldAutoFit, setShouldAutoFit] = useState(true);
+  const [searchListRakes, setSearchListRakes] = useState<any>([]);
+  const [ogListRakes, setOgListRakes] = useState<any>([]);
+  const [openDropDownSearchList, setOpenDropDownSearchList] = useState(false);
+  const searchContainerRef = useRef<HTMLDivElement | null>(null);
+  const [searchTerm, setSearchTerm] = useState<string | null>(null);
+
 
   const fitMapBounds = useCallback((coordinates: any[]) => {
     if (map && coordinates && coordinates.length > 0 && shouldAutoFit) {
@@ -292,6 +301,23 @@ export default function CaptiveRakeMapView() {
         
         // Fit map bounds to the filtered coordinates
         fitMapBounds(coords);
+
+        // Get list for rake search 
+        setSearchListRakes(response.data.data.map((item:any)=> {
+          return{
+            _id: item._id,
+            rakeID: item.rake.rake_id,
+            name: item.rake.name,
+          }
+        }));
+        if(response.data.data.length > 20)
+        setOgListRakes(response.data.data.map((item:any)=> {
+          return{
+            _id: item._id,
+            rakeID: item.rake.rake_id,
+            name: item.rake.name,
+          }
+        }));
       } else {
         console.error('Invalid response format:', response);
       }
@@ -299,6 +325,37 @@ export default function CaptiveRakeMapView() {
       console.error('Error fetching coordinates:', error);
     }
   }
+
+  const searchFunction = async (rake:any) => {
+    if(rake) {
+      let ids = [rake._id];
+      getCoords('', ids);
+    }else{
+      getCoords('', []);
+    }
+  }
+
+  useEffect(()=>{
+    if(searchTerm === '') {
+      getCoords('All');
+    }
+  },[searchTerm])
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        searchContainerRef.current &&
+        searchContainerRef.current !== null &&
+        !searchContainerRef.current.contains(event.target as Node)
+      ) {
+        setOpenDropDownSearchList(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   async function getSchemeWiseCount(scheme: string) {
     try{
@@ -540,6 +597,18 @@ export default function CaptiveRakeMapView() {
     return status === "L" ? customLoadedIcon(stabled) : customEmptyIcon(stabled);
   };
 
+  const filterRakeList = (value:any) => {
+    setSearchTerm(value);
+    if (value !== '') {
+      const filteredList = ogListRakes.filter((item: any) => {
+        return item.name.toLowerCase().includes(value.toLowerCase()) || item.rakeID.toLowerCase().includes(value.toLowerCase());
+      });
+      setSearchListRakes(filteredList);
+    }else{
+      setSearchListRakes(ogListRakes)
+    }
+  }
+
   const boundaryStyle = (feature: any) => {
     switch (feature.properties.boundary) {
       case 'claimed':
@@ -663,6 +732,37 @@ export default function CaptiveRakeMapView() {
                 </span>
               </div>
             </div>
+
+            {/* <div className={styles.searchContainer} ref={searchContainerRef}
+              onClick={(e)=>{e.stopPropagation(); setOpenDropDownSearchList(!openDropDownSearchList)}}
+            >
+              <input
+                type="text"
+                placeholder="Search by Rake ID"
+                className={styles.searchInput}
+                onChange={(e)=>{filterRakeList(e.target.value)}}
+                value={searchTerm ?? ""}              
+              />
+              {openDropDownSearchList ? <ArrowDropUpIcon/> : <ArrowDropDownIcon/> }
+              {openDropDownSearchList && 
+                <div className={styles.searchResultsContainer}>
+                {searchListRakes.map((item:any, index:any)=>{
+                  return(
+                    <div key={index} className={styles.searchItem} 
+                      onClick={() => {
+                        setSearchTerm(`${item.rakeID}   ${item.name}`);
+                        searchFunction(item);
+                      }}
+                    >
+                      <Checkbox className={styles.checkbox} size='small' />
+                      <div className={styles.rakeID}>{item.rakeID}</div> 
+                      <div>{item.name}</div>
+                    </div>
+                  );
+                })}
+              </div>
+              }
+            </div> */}
 
             <div className={styles.rakesStatus}>
               <h2>Captive Rakes Status</h2>

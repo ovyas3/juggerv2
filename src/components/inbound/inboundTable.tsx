@@ -25,6 +25,7 @@ import StackedLineChartIcon from '@mui/icons-material/StackedLineChart';
 import rrDocumentIcon from '@/assets/rr_document_icon.svg';
 import {Tooltip} from "@mui/material";
 import RRModal from '../RR Modal/RRModal';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 
 
 
@@ -148,7 +149,8 @@ function contructingData(shipment: any) {
         rr_date: {
           date: shipment.rr_dates.length > 0 && service.utcToist(shipment.rr_dates[0]) ,
           time: shipment.rr_dates.length > 0 && service.utcToistTime(shipment.rr_dates[0]) ,
-        }
+        },
+        fois_last_location: shipment?.trip_tracker[0]?.fois_last_location,
       };
     }
   );
@@ -332,8 +334,6 @@ function InboundTable({ allShipment, count, setInBoundPayload, getInboundList }:
                   <TableBody>
                     {contructingData(allShipment).map(
                       (row: any, rowIndex: any) => {
-                        console.log(row.rr_date, 'row.rr_date');
-                        console.log(row.fois_updated_at, 'row.fois_updated_at');
                         return (
                           <TableRow
                             hover
@@ -373,12 +373,15 @@ function InboundTable({ allShipment, count, setInBoundPayload, getInboundList }:
                                   )}
                                   {column.id === 'Status' && (
                                       <>
-                                        <div className={row.Status?.raw === 'Delivered' ? 'deliveredStatusraw' : 'transitStatusRaw'} >{row.Status?.raw === 'ITNS' ? 'In Transit' : 'Delivered'}</div>
+                                        <Tooltip title={row.fois_last_location} arrow placement="top-start">
+                                          <div className={row.Status?.raw === 'Delivered' ? 'deliveredStatusraw' : 'transitStatusRaw'} >{row.Status?.raw === 'ITNS' ? 'In Transit' : 'Delivered'}</div>
+                                        </Tooltip>
                                       </>
                                   )}
                                   {column.id === 'edemand' && (
                                       <>
                                         <div style={{marginTop:8, fontSize:12}}>{row.edemand.edemand}</div>
+                                        <div style={{color:'#EB467D', fontSize:12, marginBlock:'4px'}} >{row.captiveName}</div>
                                         <div>
                                             <div id="logoContainer">
                                                 <div><Image src={wagonIcon.src} alt="noOfWagons" height={24} width={24} /></div>
@@ -469,7 +472,7 @@ function InboundTable({ allShipment, count, setInBoundPayload, getInboundList }:
                                         vertical: 35,
                                         horizontal: -140,
                                       }}
-                                    >
+                                      >
                                       {!row.polyline && (
                                         <div
                                         className="action-popover-wagon-inbound"
@@ -481,6 +484,15 @@ function InboundTable({ allShipment, count, setInBoundPayload, getInboundList }:
                                           <div>{'Fetch Track Details'}</div>
                                         </div>
                                       )}
+                                      <div
+                                        className="action-popover-wagon-inbound"
+                                        onClick={(e) => {
+                                          // fetchingTrackDetails(e, row);
+                                        }}
+                                        >
+                                          <div><AddCircleOutlineIcon style={{color:'#7C7E8C', height:20, width:20 }}/></div>
+                                          <div>{'Add Remarks'}</div>
+                                        </div>
                                     </Popover>
                                     </div>
                                   )}

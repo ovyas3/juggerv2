@@ -959,3 +959,62 @@
   border: 2px solid transparent;
   background-clip: padding-box;
 }
+
+.searchContainer{
+  font-size: 12px;
+  height: 40px;
+  margin-bottom: 24px;
+  border: 1px solid #DFE3EB;
+  border-radius: 4px;
+  background-color: white;
+  transition: all 0.3s ease;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1), 0px 1px 3px rgba(0, 0, 0, 0.08);
+  align-content: center;
+  padding-inline: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+}
+
+.searchInput{
+  display: block;
+  height: 38px;
+  width: 80%;
+  min-width: 150px;
+  outline: none;
+  border: none;
+}
+
+.searchItem{
+  display: flex;
+  align-items: center;
+  padding-inline: 10px;
+  padding-block: 6px;
+}
+
+.searchItem:hover{
+  cursor: pointer;
+  background-color: #F0F3F9;
+}
+
+.rakeID{
+  width: 150px;
+}
+
+.searchResultsContainer{
+  position: absolute;
+  z-index: 90;
+  max-height: 250px;
+  overflow-y: auto;
+  background-color: white;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1), 0px 1px 3px rgba(0, 0, 0, 0.08);
+  top: 50px;
+  border-radius: 4px;
+}
+
+.checkbox{
+  height: 24px;
+  width: 24px;
+  margin-right: 12px;
+}
