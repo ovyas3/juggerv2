@@ -159,6 +159,7 @@
   font-size: 12px;
   color: #F69805;
   text-align: center;
+  margin-inline: 10px !important;
 }
 .deliveredStatusraw{
   background-color: #E6F7F2;
@@ -168,6 +169,7 @@
   font-size: 12px;
   color: #18BE8A;
   text-align: center;
+  margin-inline: 10px !important;
 }
 #logoContainer{
   position: relative;

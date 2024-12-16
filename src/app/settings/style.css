@@ -1,6 +1,6 @@
 .content_container_settings {
-  width: calc(100vw - 70px);
-  height: calc(100vh - 56px);
+  width: calc(100% - 70px);
+  height: calc(100% - 56px);
   overflow-y: auto;
 }
 
@@ -12,6 +12,7 @@
 .adjustMarginMobile {
   width: 100vw;
   height: calc(100vh - 56px - 54px);
+  margin-top: 56px;
 }
 
 #settings-container{
