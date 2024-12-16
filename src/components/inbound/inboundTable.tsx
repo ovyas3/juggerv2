@@ -26,6 +26,9 @@ import rrDocumentIcon from '@/assets/rr_document_icon.svg';
 import {Tooltip} from "@mui/material";
 import RRModal from '../RR Modal/RRModal';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import { httpsGet } from "@/utils/Communication";
+import { GET_SHIPMENTS, CAPTIVE_RAKE, REMARKS_LIST } from "@/utils/helper";
+import { RemarksInbound } from "./actionOptions";
 
 
 
@@ -129,7 +132,7 @@ function contructingData(shipment: any) {
             date: shipment?.past_etas.length > 0 ? service.utcToist(shipment?.past_etas[shipment?.past_etas.length - 1]): "--",
             time: shipment?.past_etas.length > 0 ? service.utcToistTime(shipment?.past_etas[shipment?.past_etas.length - 1]) : "--",
         },
-        remarks: { remark: shipment?.remarks[0] ? shipment?.remarks[0] : "--",},
+        remarks: shipment?.remarks,
         HandlingAgent: shipment?.HA[0] ? shipment?.HA : "--",
         paidBy: shipment?.paid_by ? shipment?.paid_by : "--",
         expLoadingDate: {
@@ -173,6 +176,11 @@ function InboundTable({ allShipment, count, setInBoundPayload, getInboundList }:
   const [rrNumbers, setRRNumbers] = useState<any>(null);
   const [isRRDoc, setIsRRDoc] = useState<boolean>(false);
 
+  // remark variables
+  const [isRemarkOpen, setIsRemarkOpen] = useState(false);
+  const [selectedShipmentForRemarks, setSelectedShipmentForRemarks] = useState<any>('');
+  const [remarksList, setRemarksList] = useState({})
+
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
   };
@@ -198,6 +206,21 @@ function InboundTable({ allShipment, count, setInBoundPayload, getInboundList }:
     }).catch((err) => {
       showMessage('Error Fetching Track Details.', 'error')
     })
+  }
+
+  async function getRemarksList() {
+    try{
+      const list_remarks = await httpsGet('get/remark/reasons', 0 );
+      setRemarksList(list_remarks.data.remark_reasons)
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  const addRemarksFunction = (event:any, row:any) => {
+    setIsRemarkOpen(true);
+    setSelectedShipmentForRemarks(row._id);
+    setShowActionBox(-1);
   }
 
   function clickActionBox(
@@ -247,6 +270,16 @@ function InboundTable({ allShipment, count, setInBoundPayload, getInboundList }:
       })
     }
   },[searchFNR])
+
+  function extractTextInsideParentheses(input: string) {
+    if(!input) return null
+    const match = input.match(/\(([^)]+)\)/);
+    return match ? match[1] : null;
+  }
+
+  useEffect(()=>{
+    getRemarksList();
+  },[])
 
   return (
       <div
@@ -376,6 +409,9 @@ function InboundTable({ allShipment, count, setInBoundPayload, getInboundList }:
                                         <Tooltip title={row.fois_last_location} arrow placement="top-start">
                                           <div className={row.Status?.raw === 'Delivered' ? 'deliveredStatusraw' : 'transitStatusRaw'} >{row.Status?.raw === 'ITNS' ? 'In Transit' : 'Delivered'}</div>
                                         </Tooltip>
+                                        <Tooltip title={row.fois_last_location} arrow placement="top-start">
+                                        <div id='fois_last_location_station_code' >{extractTextInsideParentheses(row?.fois_last_location)}</div>
+                                        </Tooltip>
                                       </>
                                   )}
                                   {column.id === 'edemand' && (
@@ -435,7 +471,7 @@ function InboundTable({ allShipment, count, setInBoundPayload, getInboundList }:
                                   )}
                                   {column.id === 'remarks' && (
                                     <>
-                                        <div style={{fontSize:12, textAlign:'center'}}>{row.remarks.remark}</div>
+                                        <div style={{fontSize:12, textAlign:'center'}}>{row.remarks?.length > 0 ? row.remarks[row.remarks?.length-1]?.remark : '--'}</div>
                                     </>
                                   )}
                                   {column.id === 'action' && (
@@ -476,9 +512,7 @@ function InboundTable({ allShipment, count, setInBoundPayload, getInboundList }:
                                       {!row.polyline && (
                                         <div
                                         className="action-popover-wagon-inbound"
-                                        onClick={(e) => {
-                                          fetchingTrackDetails(e, row);
-                                        }}
+                                        onClick={(e) => {fetchingTrackDetails(e, row);}}
                                         >
                                           <div><StackedLineChartIcon style={{color:'#7C7E8C', height:20, width:20 }}/></div>
                                           <div>{'Fetch Track Details'}</div>
@@ -486,9 +520,7 @@ function InboundTable({ allShipment, count, setInBoundPayload, getInboundList }:
                                       )}
                                       <div
                                         className="action-popover-wagon-inbound"
-                                        onClick={(e) => {
-                                          // fetchingTrackDetails(e, row);
-                                        }}
+                                        onClick={(e) => {addRemarksFunction(e, row);}}
                                         >
                                           <div><AddCircleOutlineIcon style={{color:'#7C7E8C', height:20, width:20 }}/></div>
                                           <div>{'Add Remarks'}</div>
@@ -526,6 +558,14 @@ function InboundTable({ allShipment, count, setInBoundPayload, getInboundList }:
                 />
             </Paper>
             <RRModal isOpen={isRRDocOpen} isClose={() => setIsRRDocOpen(false)} rrNumbers={rrNumbers} isRRDoc={isRRDoc} />
+            {isRemarkOpen && 
+              <RemarksInbound
+              setOpen={setIsRemarkOpen}
+              shipmentId={selectedShipmentForRemarks}
+              getAllShipment={getInboundList}
+              remarksList={remarksList}
+              />
+            }
       </div>
   );
 }

@@ -47,6 +47,7 @@ function InboundFilters({ setInBoundPayload }: any) {
   const router = useRouter();
   const [rakeType, setRakeType] = useState(["IR", "CR"]);
 
+  const [showFilterOn, setShowFilterOn] = useState(false);
   const [filterEDemand, setFilterEDemand] = useState("");
   const [filterDestination, setFilterDestination] = useState("");
   const [filterMaterial, setFilterMaterial] = useState("");
@@ -180,6 +181,14 @@ function InboundFilters({ setInBoundPayload }: any) {
       // rake_types: rakeArray,
     }));
   }, [startDate, endDate]);
+
+  useEffect(()=>{
+    if(filterEDemand === '' && filterDestination === '' && filterMaterial === ''){
+      setShowFilterOn(false);
+    }else{
+      setShowFilterOn(true);
+    }
+  },[filterEDemand, filterDestination, filterMaterial])
 
   return (
     <div id="inboundFiltersContainer">
@@ -354,7 +363,7 @@ function InboundFilters({ setInBoundPayload }: any) {
 
         <div style={{ position: "relative" }}>
           <div
-            className="filter-container"
+            className={showFilterOn ? "activeInBoundFilter" : ""}
             onClick={() => setOpenFilterModal(true)}
           >
             <img src={filter_icon.src} alt="" />
@@ -363,7 +372,18 @@ function InboundFilters({ setInBoundPayload }: any) {
       </div>
 
       {openFilterModal && (
-        <div style={{ display: "flex", justifyContent: "right" }}>
+        <div style={{ 
+          position: "fixed",
+          top: "0",
+          left: "0",
+          width: "100%",
+          height: "100%",
+          backgroundColor: "rgba(0, 0, 0, 0.5)",
+          zIndex: "9999",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}>
           <div className="search">
             <div className="search-container">
               <div className="search-container-group">
