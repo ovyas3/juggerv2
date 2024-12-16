@@ -12,6 +12,48 @@
   display: flex;
 }
 
+.filterbox {
+  display: flex;
+  border: 1px solid #E0E0E0;
+  border-radius: 6px;
+  padding:4px;
+}
+
+.in-plant-filterbox {
+  display: flex;
+  column-gap: 4px;
+  border-left: 1px solid #E0E0E0;
+  padding-left: 8px;
+}
+
+.in-plant-filterbox .status-display-boxes {
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background-color: white;
+  color: black;
+  opacity: 1;
+}
+
+.in-plant-filterbox .status-display-boxes:hover {
+  background-color: #fffbeb;
+  color: #92400e;
+}
+
+.in-plant-filterbox .status-display-boxes.active {
+  background-color: #fffbeb;
+  color: #92400e;
+}
+
+.in-plant-filterbox.disabled .status-display-boxes {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.in-plant-filterbox.disabled .status-display-boxes:hover {
+  background-color: white;
+  color: black;
+}
+
 #search-container {
   padding-top: 20px;
   padding-bottom: 20px;
@@ -20,13 +62,17 @@
   height: 82px;
   padding-inline: 24px;
   align-items: center;
-  flex-direction: row;
+  flex-direction: column;
+  row-gap: 8px;
   margin-bottom: 16px;
 }
 
 #status-display{
   display: flex;
   gap: 16px;
+  align-items: center;
+  justify-content: left;
+  width: 100%;
 }
 
 .status-display-boxes{
@@ -124,7 +170,8 @@
   cursor: not-allowed;
 }
 
-.aveStatus{
+.aveStatus,
+.inplStatus {
   background-color: #E6EAFF !important;
   color: #536AFE !important;
   height: 28px;
@@ -132,14 +179,17 @@
   border-radius: 4px;
   align-content: center;
 }
-.inplStatus{
+
+.inplStatus {
   background-color: #F4FCFC !important;
   color: #174D68 !important;
-  height: 28px;
-  padding-inline: 8px;
-  border-radius: 4px;
-  align-content: center;
 }
+
+.aveStatus strong,
+.inplStatus strong {
+  font-weight: 700;
+}
+
 .header_drawnin{
   min-width: 100px
 }
@@ -387,6 +437,18 @@
   opacity: 1;
   visibility: visible;
 }
+.table-container {
+  overflow-x: auto;
+  white-space: nowrap;
+}
+/* 
+.header_action,
+.cell_action {
+  position: sticky;
+  right: 0;
+  background-color: #E0E0E0;
+  z-index: 2;
+} */
 
 .removeAddicons{
   color: white;
@@ -663,3 +725,4 @@
   /* background-color: #00B275 !important; */
   width: 250px !important;
 }
+

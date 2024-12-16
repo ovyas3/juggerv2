@@ -191,6 +191,7 @@ function WagonTallySheet({}: any) {
   );
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [inPlantFilter, setInPlantFilter] = useState("all");
 
   const openAction = Boolean(anchorEl);
   const [showActionBox, setShowActionBox] = React.useState(-1);
@@ -219,6 +220,8 @@ function WagonTallySheet({}: any) {
     useState({});
 
   const [inplantTotal, setInplantTotal] = useState(0);
+  const [inplantTotal24, setInplantTotal24] = useState(0);
+  const [inplantTotal48, setInplantTotal48] = useState(0);
   const [indentTotal, setIndentTotal] = useState(0);
   const [statusCondition, setStatusCondition] = useState(["AVE", "INPL"]);
   const [activeCount, setActiveCount] = useState<any>(0);
@@ -234,6 +237,8 @@ function WagonTallySheet({}: any) {
       );
       setAllWagonsList(response.data.data);
       setTotalCount(response.data.count.totalCount);
+      setInplantTotal24(response.data.count.totalInPlant24);
+      setInplantTotal48(response.data.count.totalInPlant48);
       setInplantTotal(response.data.count.totalInPlant);
       setIndentTotal(response.data.count.totalAVE);
       setActiveCount(response.data?.count?.count);
@@ -373,12 +378,34 @@ function WagonTallySheet({}: any) {
               (item: string) => item !== "INPL"
             );
             setStatusCondition(newState.status);
+            // Deselect all in-plant filter options when in-plant is deselected
+            setInPlantFilter("all");
+            delete newState.plant_ageing;
           }
           return newState;
         });
         break;
     }
   };
+
+  const handleInPlantFilter = (filter: string) => {
+    // Only allow changes if INPL status is selected
+    if (statusCondition.includes("INPL")) {
+      setInPlantFilter(filter);
+      setPayloadForWagons((prev: any) => {
+        let newState = { ...prev };
+        if (filter === "all") {
+          delete newState.plant_ageing;
+        } else if (filter === ">24hrs") {
+          newState.plant_ageing = "24";
+        } else if (filter === ">48hrs") {
+          newState.plant_ageing = "48";
+        }
+        return newState;
+      });
+    }
+  };
+
   const getColorForStatus = (status: any) => {
     let bgColor = "white";
     let textColor = "black";
@@ -403,13 +430,18 @@ function WagonTallySheet({}: any) {
           bgColor = "#000000";
           textColor = "white";
         }
+        break;
+      case "inplantFilter":
+        bgColor = "#fffbeb";
+        textColor = "#92400e";
+        break;
     }
     return { bgColor, textColor };
   };
 
   useEffect(()=>{
     getWagonDetails();
-  },[payloadForWagons])
+  },[payloadForWagons, inPlantFilter])
 
   useEffect(() => {
     const indentNoFromParams = searchParams.get("indent_no");
@@ -453,6 +485,30 @@ function WagonTallySheet({}: any) {
     );
   }
 
+  const getStatusLabel = (status: string, plantAgeing: string) => {
+    let label = "";
+    let additionalText = "";
+    switch (status) {
+      case "INPL":
+        label = "In Plant";
+        if (inPlantFilter === ">24hrs") {
+          additionalText = " with <strong>>24hrs</strong>";
+        } else if (inPlantFilter === ">48hrs") {
+          additionalText = " with <strong>>48hrs</strong>";
+        }
+        break;
+      case "AVE":
+        label = "Available Indent";
+        break;
+      case "Received":
+        label = "Received";
+        break;
+      default:
+        label = status;
+    }
+    return { label, additionalText };
+  };
+
   return (
     <div>
       <div className="wagon-wrapper">
@@ -480,14 +536,7 @@ function WagonTallySheet({}: any) {
             />
           </div>
           <div id="status-display">
-            <div id='uploadRakeHandlingSheetContainer' onClick={(e) => uploadDailyRakeHandlingSheet(e)}>
-            <Tooltip title={'Upload Rake Handling Sheet'} arrow >
-              <div id='rakeHandlingSheetUpload'>
-              <div><Image src={uploadIcon.src} height={24} width={24} alt="uploadIcon"  /></div>
-              <div>{text('upload-rake-handling-sheet')}</div>
-              </div>
-            </Tooltip>
-            </div>
+           
             <div
               className="status-display-boxes"
               style={{
@@ -514,18 +563,51 @@ function WagonTallySheet({}: any) {
               <div style={{ fontSize: "16px" }}>{indentTotal}</div>
               <div>{text("indent")}</div>
             </div>
-            <div
-              className="status-display-boxes"
-              style={{
-                backgroundColor: getColorForStatus("INPL").bgColor,
-                color: getColorForStatus("INPL").textColor,
-              }}
-              onClick={() => {
-                handleStatusClick("inplant");
-              }}
-            >
-              <div style={{ fontSize: "16px" }}>{inplantTotal}</div>
-              <div>{text("inplant")}</div>
+            <div className="filterbox">
+              <div
+                className="status-display-boxes"
+                style={{
+                  backgroundColor: getColorForStatus("INPL").bgColor,
+                  color: getColorForStatus("INPL").textColor,
+                  marginRight: '8px'
+                }}
+                onClick={() => {
+                  handleStatusClick("inplant");
+                }}
+              >
+                <div style={{ fontSize: "16px" }}>{inplantTotal}</div>
+                <div>{text("inplant")}</div>
+              </div>
+              <div className="in-plant-filterbox">
+                <div
+                  className={`status-display-boxes ${inPlantFilter === "all" ? "active" : ""}`}
+                  onClick={() => handleInPlantFilter("all")}
+                >
+                  <div>{text("inplantAll")}</div>
+                </div>
+                <div
+                  className={`status-display-boxes ${inPlantFilter === ">24hrs" ? "active" : ""}`}
+                  onClick={() => handleInPlantFilter(">24hrs")}
+                >
+                 <div style={{ fontSize: "16px" }}>{inplantTotal24}</div>
+                  <div>{text("inplant24")}</div>
+                </div>
+                <div
+                  className={`status-display-boxes ${inPlantFilter === ">48hrs" ? "active" : ""}`}
+                  onClick={() => handleInPlantFilter(">48hrs")}
+                >
+                  <div style={{ fontSize: "16px" }}>{inplantTotal48}</div>
+                  <div>{text("inplant48")}</div>
+                </div>
+              </div>
+            </div>
+            <div id='uploadRakeHandlingSheetContainer' onClick={(e) => uploadDailyRakeHandlingSheet(e)}>
+            <Tooltip title={'Upload Rake Handling Sheet'} arrow >
+              <div id='rakeHandlingSheetUpload'>
+              <div><Image src={uploadIcon.src} height={24} width={24} alt="uploadIcon"  /></div>
+              <div>{text('upload-rake-handling-sheet')}</div>
+              </div>
+            </Tooltip>
             </div>
           </div>
         </div>
@@ -536,7 +618,7 @@ function WagonTallySheet({}: any) {
             height: "calc(100vh - 176px)",
             display: "flex",
             flexDirection: "column",
-            paddingTop: 10,
+            paddingTop: 50,
             paddingInline: 24,
           }}
         >
@@ -626,7 +708,14 @@ function WagonTallySheet({}: any) {
                                           : "inplStatus"
                                       }`}
                                     >
-                                      {row.status.statusLabel}
+                                      {(() => {
+                                        const { label, additionalText } = getStatusLabel(row.status.raw, row.plant_ageing);
+                                        return (
+                                          <span dangerouslySetInnerHTML={{
+                                            __html: `${label}${additionalText}`
+                                          }} />
+                                        );
+                                      })()}
                                     </div>
                                   </>
                                 )}
@@ -842,8 +931,8 @@ function WagonTallySheet({}: any) {
                                       anchorEl={anchorEl}
                                       onClose={handleCloseAction}
                                       anchorOrigin={{
-                                        vertical: 35,
-                                        horizontal: -150,
+                                        vertical: 'bottom',
+                                        horizontal: 'left',
                                       }}
                                     >
                                       <div
@@ -868,13 +957,21 @@ function WagonTallySheet({}: any) {
                                         }
                                         className="action-popover-wagon"
                                       >
+                                        {text("uploadDailyRakeHandlingSheet")}
+                                      </div>
+                                      <div
+                                        onClick={(e) =>
+                                          uploadWagonSheet(e, row)
+                                        }
+                                        className="action-popover-wagon"
+                                      >
                                         {text("uploadWagonTallySheet")}
                                       </div>
                                       <div
-                                        className="action-popover-wagon"
                                         onClick={(e) => {
                                           uploadRakeSheet(e, row);
                                         }}
+                                        className="action-popover-wagon"
                                       >
                                         {text("rakeHandlingSheet")}
                                       </div>
@@ -1083,3 +1180,4 @@ function getStatusLabel(status: string) {
       return status;
   }
 }
+
