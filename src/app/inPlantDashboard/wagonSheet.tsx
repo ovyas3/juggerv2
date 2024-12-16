@@ -48,6 +48,8 @@ const columns: readonly Column[] = [
   { id: "indent", label: "Indent No", style: "header_indent" },
   { id: "edemand", label: "e-Demand No", style: "header_edemand" },
   { id: "destination", label: "Destination", style: "header_destination_inplant"},
+  { id: "plant_ageing", label: "Plant Ageing", style: "header_plant_ageing" },
+  { id: "current_status_ageing", label: "Current Status Ageing", style: "header_current_status_ageing" },
   { id: "plant_codes", label: "Loading Shop", style: "header_plant" },
   { id: "status", label: "Status", style: "header_status" },
   { id: "exp_loading", label: "Expected Loading", style: "header_exp_loading" },
@@ -70,8 +72,15 @@ function contructingData(shipment: any) {
       status: string;
       edemand_no: string;
       placement_time: any;
+      plant_ageing: any;
+      current_status_ageing: any;
       // drawnin_time: any;
       FNR: string;
+      rake_no: string;
+      arrival_pl: any;
+      formation_pl: any;
+      wagon_type: any;
+      weighment: any;
       received_no_of_wagons: any;
       indent_no: string;
       plant_codes: any;
@@ -103,6 +112,13 @@ function contructingData(shipment: any) {
         edemand: {
           edemand_no: shipment?.edemand_no ? shipment?.edemand_no : "--",
         },
+        plant_ageing: shipment?.plant_ageing || '--',
+        rake_no: shipment?.rake_no || '--',
+        current_status_ageing: shipment?.current_status_ageing || '--',
+        weighment: shipment?.weighment || '',
+        arrival_pl: shipment?.arrival_pl || '',
+        formation_pl: shipment?.formation_pl || false,
+        wagon_type: shipment?.wagon_type?.length > 0 && shipment.wagon_type.join(', ') || '',
         exp_loading: {
           date: shipment?.expected_loading_date
             ? service.utcToist(shipment?.expected_loading_date)
@@ -570,6 +586,10 @@ function WagonTallySheet({}: any) {
                         }}
                       >
                         {column.label}
+                        {
+                          (column.id === 'plant_ageing' || column.id === 'current_status_ageing') && 
+                          <div>(HH:MM)</div>
+                        }
                       </TableCell>
                     ))}
                   </TableRow>
@@ -645,9 +665,9 @@ function WagonTallySheet({}: any) {
                                       {row.wagon_data_uploaded && (
                                         <div
                                           className="SourceOutlinedIcon"
-                                          style={{ position: "relative" }}
+                                          style={{ position: "relative",height:'16px',width:'16px' }}
                                         >
-                                        <Image alt='' src={wagonsUploaded}/>
+                                        <Image alt='' src={wagonsUploaded} style={{height:'16px',width:'16px'}}/>
                                           <div className="wagons-uploaded-wagonSheet">
                                             Wagons Uploaded
                                           </div>
