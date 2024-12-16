@@ -18,7 +18,7 @@ import { useRouter } from "next/navigation";
 import './page.css'
 
 const events_names = {
-  rakeArrivalAtStation: "Rake Arrival At Serving Station",
+  rakeArrivalAtStation: "Rake Arrival at Serving Station",
   stabled: "Stabled",
   placementTime: "Placement Time",
   // rakeArrivalAtPlant: "gate-in",
@@ -133,6 +133,9 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
   const [drawnOutObject, setDrawnOutObject] = useState<any>({});
   const [drawnOutDate, setDrawnOutDate] = useState<Date | null>(null);
   const [openDrawnOut, setOpenDrawnOut] = useState(false);
+  const [arrivalPlNo, setArrivalPlNo] = useState('');
+  const [formationPlNo,setFormationPlNo] = useState('')
+  const [weighment,setWeighment] = useState(false);
 
 
   function addMillDetails() {
@@ -219,6 +222,9 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
     let payload = {
       events: [] as any,
       shipment: shipment.id,
+      arrival_pl: '' as any,
+      formation_pl: '' as any,
+      weighment: false,
       hooks: [] as any,
     };
     // for (const plant of workingPlant) {
@@ -294,6 +300,13 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
         id: wagonPlacedAtLoadingPointObject?._id,
       });
     }
+    if (arrivalPlNo) {
+      payload.arrival_pl = arrivalPlNo;
+    }
+    if (formationPlNo) {
+      payload.formation_pl = formationPlNo;
+    }
+    payload.weighment = weighment;
     if (loadRakeFormationDate) {
       payload.events.push({
         shipment: shipment.id,
@@ -434,6 +447,12 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
     getRakeHandlingSheetData();
     plantDetails();
   }, []);
+
+  useEffect(()=>{
+   setArrivalPlNo(shipment?.arrival_pl)
+   setFormationPlNo(shipment?.formation_pl)
+   setWeighment(shipment?.weighment)
+  },[shipment])
 
   useEffect(() => {
     setWorkingPlant((prev: any) => {
@@ -628,6 +647,99 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
         <header id="headerForRakeHandlingSheet">
           {text("rakeHandlingSheet")}
         </header>
+        <div className="rake-details">
+          <div className="detail-item">
+            <div className="item-label-header">{text("IndentNo")}</div>
+            <div className="item-content">
+              {shipment?.indent?.indent_no || "--"}
+            </div>
+          </div>
+          <div className="detail-item">
+            <div className="item-label-header">{text("rakeNumber")}</div>
+            <div className="item-content">{shipment?.rake_no || "--"}</div>
+          </div>
+          <div className="detail-item">
+            <div className="item-label-header">{text("status")}</div>
+            <div className="item-content">
+              {shipment?.status?.statusLabel || "--"}
+            </div>
+          </div>
+          <div className="detail-item">
+            <div className="item-label-header">{text("wagonType")}</div>
+            <div className="item-content">
+              {shipment?.wagon_type || "--"}
+            </div>
+          </div>
+        </div>
+        <div
+          style={{
+            borderBottom: "1px solid #B3B3B3",
+            width: "100%",
+            marginTop: 16,
+            marginBottom: 16,
+          }}
+        ></div>
+        <div
+          className="rake-details"
+          style={{ alignItems: "center", display: "flex", columnGap: "50px" }}
+        >
+          <div className="detail-item">
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              <label
+                htmlFor="arr_pl"
+                style={{ fontSize: "12px", marginBottom: "6px" }}
+              >
+                Arrival P/L No.
+              </label>
+              <input
+                type="input"
+                id="arr_pl"
+                className="inputForRakeSectionHandling"
+                value={arrivalPlNo}
+                onChange={(e)=> setArrivalPlNo(e.target.value)}
+              />
+            </div>
+          </div>
+          <div className="detail-item">
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              <label
+                htmlFor="arr_pl"
+                style={{ fontSize: "12px", marginBottom: "6px" }}
+              >
+                Formation P/L No.
+              </label>
+              <input
+                type="input"
+                id="arr_pl"
+                value={formationPlNo}
+                className="inputForRakeSectionHandling"
+                onChange={(e)=> setFormationPlNo(e.target.value)}
+              />
+            </div>
+          </div>
+          <div className="detail-item">
+            <div style={{ display: "flex", alignItems: "center",marginTop:'16px' }}>
+              <input type="checkbox" id="myCheckbox" style={{cursor:'pointer'}}
+              onChange={(e)=> setWeighment(e.target.checked)}
+              checked={weighment}
+              />
+              <label
+                htmlFor="myCheckbox"
+                style={{ marginLeft: "8px", fontSize: "12px" }}
+              >
+                Weighment done
+              </label>
+            </div>
+          </div>
+        </div>
+        <div
+          style={{
+            borderBottom: "1px solid #B3B3B3",
+            width: "100%",
+            marginTop: 16,
+            marginBottom: 16,
+          }}
+        ></div>
         <div id="scrollAreaforRakeSheet">
           <div id="firstSectionofRakeSheetHandling">
             <div>
@@ -781,11 +893,17 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <DateTimePicker
                     open={openPlacementTime}
-                    onClose={() => { 
+                    onClose={() => {
                       setOpenPlacementTime(false);
                     }}
                     // value={dayjs(rakeArrivalAtStationDate)}
-                    value={placementTimeDate ? dayjs(placementTimeDate) : shipment?.placement_time.date_time && dayjs(shipment?.placement_time?.date_time) || null}
+                    value={
+                      placementTimeDate
+                        ? dayjs(placementTimeDate)
+                        : (shipment?.placement_time.date_time &&
+                            dayjs(shipment?.placement_time?.date_time)) ||
+                          null
+                    }
                     sx={{
                       width: "100%",
                       height: "100%",
@@ -1128,14 +1246,16 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
             </div> */}
           </div>
 
-          <div
-            style={{
-              borderBottom: "1px solid #E0E0E0",
-              width: "100%",
-              marginTop: 24,
-              marginBottom: 16,
-            }}
-          ></div>
+          {workingPlant.length > 0 && (
+            <div
+              style={{
+                borderBottom: "1px solid #E0E0E0",
+                width: "100%",
+                marginTop: 24,
+                marginBottom: 16,
+              }}
+            ></div>
+          )}
 
           {workingPlant.map((item: any, index: any) => {
             let avaiableWagons =
@@ -1237,36 +1357,44 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
                         <div key={hookIndex}>
                           <div>
                             <div className="headerForMillDetails_hooks">
-                              <header style={{fontWeight: 600}}>Hook {hookIndex + 1} </header>
-                             { (<div style={{ display: "flex", gap: 8 }}>                
-           
-                                 { !(hookItem.loading_end || hookItem.loading_start) &&
-                                (
-                                   <div
-                                    onClick={(e) => {
-                                      hookIndex !== 0 &&
-                                      removeHookFromMillDetails(
-                                        e,
-                                        index,
-                                        hookIndex
-                                      );
-                                      hookIndex === 0 &&
-                                      removeLastHookFromMillDetails(e, index);
-                                    }}
-                                    className="removeAddicons"
-                                    style={{ backgroundColor: "#E24D65" }}
-                                  >
-                                    <RemoveIcon
-                                      style={{ height: 20, width: 20 }}
-                                    />
-                                  </div>  
-                                  )
-                                //  : (
-                                //   <div style={{ height: 20, width: 20 }}></div>
-                                // )
-                                }
-                                
-                                {item.hooks.length - 1 === hookIndex && (
+                              <header style={{ fontWeight: 600 }}>
+                                Hook {hookIndex + 1}{" "}
+                              </header>
+                              {
+                                <div style={{ display: "flex", gap: 8 }}>
+                                  {
+                                    !(
+                                      hookItem.loading_end ||
+                                      hookItem.loading_start
+                                    ) && (
+                                      <div
+                                        onClick={(e) => {
+                                          hookIndex !== 0 &&
+                                            removeHookFromMillDetails(
+                                              e,
+                                              index,
+                                              hookIndex
+                                            );
+                                          hookIndex === 0 &&
+                                            removeLastHookFromMillDetails(
+                                              e,
+                                              index
+                                            );
+                                        }}
+                                        className="removeAddicons"
+                                        style={{ backgroundColor: "#E24D65" }}
+                                      >
+                                        <RemoveIcon
+                                          style={{ height: 20, width: 20 }}
+                                        />
+                                      </div>
+                                    )
+                                    //  : (
+                                    //   <div style={{ height: 20, width: 20 }}></div>
+                                    // )
+                                  }
+
+                                  {item.hooks.length - 1 === hookIndex && (
                                     <div
                                       onClick={(e) => {
                                         addHookInMillDetails(e, index);
@@ -1278,9 +1406,9 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
                                         style={{ height: 20, width: 20 }}
                                       />
                                     </div>
-                                  )} 
-                                   
-                              </div>) }
+                                  )}
+                                </div>
+                              }
                             </div>
                             {/* <input
                               className="inputForRakeSectionHandling"
@@ -1312,11 +1440,36 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
                           </div>
                           <div className="loadingTimeContainer">
                             <div>{text("loadingstarttime")}</div>
-                            <div style={{ marginTop: 6 ,color: 'black',fontWeight:600}}>  { timeService.utcToist(hookItem.loading_start)+' '+timeService.utcToistTime(hookItem.loading_start) || '--'}</div>
+                            <div
+                              style={{
+                                marginTop: 6,
+                                color: "black",
+                                fontWeight: 600,
+                              }}
+                            >
+                              {" "}
+                              {timeService.utcToist(hookItem.loading_start) +
+                                " " +
+                                timeService.utcToistTime(
+                                  hookItem.loading_start
+                                ) || "--"}
+                            </div>
                           </div>
                           <div className="loadingTimeContainer">
                             <div>{text("loadingEndTime")}</div>
-                            <div style={{ marginTop: 6 ,color: 'black',fontWeight:600}}>{timeService.utcToist(hookItem.loading_end)+' '+timeService.utcToistTime(hookItem.loading_end) || '--'}</div>
+                            <div
+                              style={{
+                                marginTop: 6,
+                                color: "black",
+                                fontWeight: 600,
+                              }}
+                            >
+                              {timeService.utcToist(hookItem.loading_end) +
+                                " " +
+                                timeService.utcToistTime(
+                                  hookItem.loading_end
+                                ) || "--"}
+                            </div>
                           </div>
                         </div>
                       );
@@ -1339,34 +1492,18 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
             );
           })}
 
-          {/* <Button
-            onClick={(e: any) => {
-              e.stopPropagation();
-              addMillDetails();
-            }}
-            className="buttonMarkPlacement"
-            style={{
-              fontSize: 14,
-              height: 40,
-              color: "white",
-              backgroundColor: "#2862FF",
-              width: 79,
-              border: "1px solid #2862FF",
-              cursor: "pointer",
-              fontWeight: "bold",
-              transition: "all 0.5s ease-in-out",
-            }}
-          >
-            add
-          </Button> */}
-          <div
-            style={{
-              borderBottom: "1px solid #E0E0E0",
-              width: "100%",
-              marginTop: 24,
-              marginBottom: 16,
-            }}
-          ></div>
+          <div>
+            {workingPlant.length > 0 && (
+              <div
+                style={{
+                  borderBottom: "1px solid #E0E0E0",
+                  width: "100%",
+                  marginTop: 24,
+                  marginBottom: 16,
+                }}
+              ></div>
+            )}
+          </div>
           <div id="lastSection">
             <div>
               <header className="headerForRakeSection">

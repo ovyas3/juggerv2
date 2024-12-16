@@ -91,7 +91,7 @@ function BPCNotify() {
         >
           {notifyBefore.map((item, index) => {
             return (
-              <div id="bpc-km-input-container">
+              <div id="bpc-km-input-container" key={index}>
                 <label>Notify Before</label>
                 <div
                   style={{
