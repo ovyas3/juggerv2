@@ -13,7 +13,7 @@ import MobileDrawer from "@/components/Drawer/mobile_drawer";
 import MobileHeader from "@/components/Header/mobileHeader";
 import { useWindowSize } from "@/utils/hooks";
 import { httpsGet, httpsPost } from "@/utils/Communication";
-import { GET_SHIPMENTS, CAPTIVE_RAKE, REMARKS_LIST } from "@/utils/helper";
+import { GET_SHIPMENTS, CAPTIVE_RAKE, REMARKS_LIST, LAST_FOIS_PING } from "@/utils/helper";
 import { useSnackbar } from '@/hooks/snackBar';
 import service from '@/utils/timeService';
 import { color } from 'framer-motion';
@@ -90,7 +90,9 @@ const OrdersPage = () => {
 
   const [showRefreash, setShowRefreash] = useState(false)
   const router = useRouter();
-  const [totalCountrake, setTotalCountrake] = useState<any>([])
+  const [totalCountrake, setTotalCountrake] = useState<any>([]);
+  
+  const [lastFOISPingDate, setLastFOISPingDate] = useState<any>('');
 
   const[query, setQuery] = useState<any>({
     from:'',
@@ -221,6 +223,23 @@ const OrdersPage = () => {
     try{
       const list_remarks = await httpsGet(REMARKS_LIST, 0, router );
       setRemarksList(list_remarks.data.remark_reasons)
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  async function lastFOISPing () {
+    try {
+      const lastFoisPing = await httpsGet(LAST_FOIS_PING, 0, router);
+      if(lastFoisPing.data){
+        if(lastFoisPing.data.time_stamp === null){
+          setLastFOISPingDate('');
+        } else{
+          const lastFOISPingDate = new Date(lastFoisPing.data.time_stamp);
+          setLastFOISPingDate(lastFOISPingDate);
+        }
+      } else {
+        setLastFOISPingDate('');
+      }
     } catch (error) {
       console.log(error);
     }
@@ -374,6 +393,7 @@ const OrdersPage = () => {
   useEffect(() => {
     getCaptiveRake();
     getRemarksList();
+    lastFOISPing(); 
   }, [])
 
   useEffect(() => {
@@ -463,7 +483,18 @@ const OrdersPage = () => {
               <div className='filters_aging'>
 
                 <div className='filters'>
-                  <Filters onToFromChange={handleToFromChange} onChangeStatus={handleChangeStatus} onChangeRakeTypes={handleChangeRakeType} reload={reload} getShipments={getAllShipment} shipmentsPayloadSetter={setShipmentsPayload} setTriggerShipments={setTriggerShipments} triggerShipments={triggerShipments} />
+                  <Filters  
+                    onToFromChange={handleToFromChange} 
+                    onChangeStatus={handleChangeStatus} 
+                    onChangeRakeTypes={handleChangeRakeType} 
+                    reload={reload} 
+                    getShipments={getAllShipment} 
+                    shipmentsPayloadSetter={setShipmentsPayload} 
+                    setTriggerShipments={setTriggerShipments} 
+                    triggerShipments={triggerShipments}
+                    lastFoisPingDate = {lastFOISPingDate}
+                    lastFOISPing = {lastFOISPing} 
+                  />
                 </div>
 
                 <div className='display_status'>
