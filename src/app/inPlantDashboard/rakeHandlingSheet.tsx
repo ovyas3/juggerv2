@@ -137,6 +137,10 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
   const [formationPlNo,setFormationPlNo] = useState('')
   const [weighment,setWeighment] = useState(false);
 
+  useEffect(()=> {
+    console.log(workingPlant)
+  },[workingPlant])
+
 
   function addMillDetails() {
     const newMill = {
