@@ -42,6 +42,7 @@ const columns: readonly Column[] = [
   { id:'pickupLocation', label: "Pickup Location", style: "header_pickupLocation" },
   // { id:'expLoadingDate', label: "Exp. Loading Date", style: "header_expLoadingDate" },
   // { id: "IndentDate", label: "Indent Date", style: "header_IndentDate" },
+  { id: "fois_last_update", label: '', style: "header_lastFoisUpdate" },
   { id: "Status", label: "Status", style: "header_Status" },
   { id: "InitialETA", label: "Initial ETA", style: "header_Initialeta" },
   { id: "remarks", label: "Remarks", style: "header_remarks" },
@@ -92,6 +93,10 @@ function contructingData(shipment: any) {
       polyline:any;
       captive:any;
     }) => {
+      // const {rr_dates} = shipment;
+      // let newRRDate = new Date(rr_dates[0]);
+      // newRRDate.setHours(newRRDate.getHours() - 5);
+      // newRRDate.setMinutes(newRRDate.getMinutes() - 30);
       return {
         unique_code: shipment?.unique_code ? shipment?.unique_code : "--",
         _id: shipment?._id ? shipment?._id : "--",
@@ -116,8 +121,12 @@ function contructingData(shipment: any) {
             raw:shipment?.status ? shipment?.status : "--",
         },
         InitialETA: {
-            date:  shipment?.past_etas.length > 0 ? service.utcToist(shipment?.past_etas[0]?.eta): "--",
-            time:shipment?.demand_date? service.utcToistTime(shipment?.past_etas[0]?.eta) : "--",
+            date: shipment?.past_etas.length > 0 ? service.utcToist(shipment?.past_etas[0]): "--",
+            time: shipment?.past_etas.length > 0 ? service.utcToistTime(shipment?.past_etas[0]) : "--",
+        },
+        currentETA:{
+            date: shipment?.past_etas.length > 0 ? service.utcToist(shipment?.past_etas[shipment?.past_etas.length - 1]): "--",
+            time: shipment?.past_etas.length > 0 ? service.utcToistTime(shipment?.past_etas[shipment?.past_etas.length - 1]) : "--",
         },
         remarks: { remark: shipment?.remarks[0] ? shipment?.remarks[0] : "--",},
         HandlingAgent: shipment?.HA[0] ? shipment?.HA : "--",
@@ -132,6 +141,14 @@ function contructingData(shipment: any) {
         rr_document: shipment?.rr_document,
         all_FNRs: shipment?.all_FNRs,
         captiveName: shipment?.captive?.name && shipment?.captive.name,
+        fois_updated_at: {
+          date: shipment?.trip_tracker[0]?.fois_updated_at && service.utcToist(shipment?.trip_tracker[0]?.fois_updated_at),
+          time: shipment?.trip_tracker[0]?.fois_updated_at && service.utcToistTime(shipment?.trip_tracker[0]?.fois_updated_at),
+        },
+        rr_date: {
+          date: shipment.rr_dates.length > 0 && service.utcToist(shipment.rr_dates[0]) ,
+          time: shipment.rr_dates.length > 0 && service.utcToistTime(shipment.rr_dates[0]) ,
+        }
       };
     }
   );
@@ -299,6 +316,15 @@ function InboundTable({ allShipment, count, setInBoundPayload, getInboundList }:
                               }}
                             />
                           )} 
+                          {column.id === 'InitialETA' && (
+                            <div>Current ETA</div>
+                          )}
+                          {column.id === 'fois_last_update' && (
+                            <div style={{textAlign:'center'}}>
+                              <div>RR Date</div>
+                              <div style={{whiteSpace: 'nowrap' }}>Last <span style={{color:'red'}}>FOIS</span> Ping</div>
+                            </div>
+                          )}
                         </TableCell>
                       ))}
                     </TableRow>
@@ -306,6 +332,8 @@ function InboundTable({ allShipment, count, setInBoundPayload, getInboundList }:
                   <TableBody>
                     {contructingData(allShipment).map(
                       (row: any, rowIndex: any) => {
+                        console.log(row.rr_date, 'row.rr_date');
+                        console.log(row.fois_updated_at, 'row.fois_updated_at');
                         return (
                           <TableRow
                             hover
@@ -397,9 +425,9 @@ function InboundTable({ allShipment, count, setInBoundPayload, getInboundList }:
                                     </>
                                   )}
                                   {column.id === 'InitialETA' && ( row.InitialETA.date  !== '--' && row.InitialETA.time !== '--' ?
-                                    <div style={{textAlign:'center'}}>
-                                        <div style={{fontSize:12}}>{row.InitialETA.date}</div>
-                                        <div style={{fontSize:12}}>{row.InitialETA.time}</div>
+                                    <div style={{textAlign:'center', display:'flex', flexDirection:'column', gap:8,whiteSpace: 'nowrap'}}>
+                                        <div style={{fontSize:12}}>{row.InitialETA.date} {row.InitialETA.time}</div>
+                                        <div style={{fontSize:12}}>{row.currentETA.date} {row.currentETA.time}</div>
                                     </div>: <div style={{textAlign:'center'}} >--</div>
                                   )}
                                   {column.id === 'remarks' && (
@@ -453,17 +481,15 @@ function InboundTable({ allShipment, count, setInBoundPayload, getInboundList }:
                                           <div>{'Fetch Track Details'}</div>
                                         </div>
                                       )}
-                                      {/* <div
-                                        className="action-popover-wagon-inbound"
-                                        onClick={(e) => {
-                                          // fetchingTrackDetails(e, row);
-                                        }}
-                                      >
-                                        <div><StackedLineChartIcon style={{color:'#7C7E8C', height:20, width:20 }}/></div>
-                                        <div>{'test case 01'}</div>
-                                      </div> */}
                                     </Popover>
                                     </div>
+                                  )}
+                                  {column.id === 'fois_last_update'&& (
+                                    row?.rr_date?.date || row.fois_updated_at?.date ?
+                                    <div style={{textAlign:'center' , display:'flex', flexDirection:'column', gap:8, whiteSpace: 'nowrap'}}>
+                                      { row?.rr_date?.date ? <div>{row?.rr_date?.date} {row?.rr_date?.time}</div>:<div>--</div>}
+                                      { row.fois_updated_at?.date ? <div>{row.fois_updated_at?.date } {row.fois_updated_at?.time}</div>:<div>--</div>}
+                                    </div> : <div style={{textAlign:'center'}} >--</div>
                                   )}
                                 </TableCell>
                               );

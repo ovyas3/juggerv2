@@ -9,6 +9,7 @@ import "./whatsAppNotify.css";
 import { Tabs, Tab, Box } from '@mui/material'
 import { styled } from '@mui/system'
 import { httpsPost, httpsGet } from "@/utils/Communication";
+import BPCNotify from "./bpcNotify";
 
 // Custom styled components
 const StyledTabs = styled(Tabs)({
@@ -308,6 +309,7 @@ const WhatsAppNotify = () => {
               <StyledTab label="Delay At Plant" />
               <StyledTab label="Delay At Destination" />
               <StyledTab label="Notification" />
+              {/* <StyledTab label="BPC" /> */}
             </StyledTabs>
           </Box>
           <CustomTabPanel value={value} index={0}>
@@ -435,6 +437,9 @@ const WhatsAppNotify = () => {
                 Clear
               </button>
             </div>  
+          </CustomTabPanel>
+          <CustomTabPanel value={value} index={4}>
+            <BPCNotify/>
           </CustomTabPanel>
         </Box>
       </div>

@@ -69,7 +69,7 @@ function Settings() {
               {activeOption === 'hubRMS' && <HandlingAgent />}
               {activeOption === 'updateETA' && <UpdateETA />}
               {activeOption === 'notification' && <WhatsAppNotify />}
-              {activeOption === 'preferences' && <Preferences/>}
+              {/* {activeOption === 'preferences' && <Preferences/>} */}
             </Suspense>
           </div>
         </div>
