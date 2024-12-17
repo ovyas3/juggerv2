@@ -183,7 +183,7 @@ function WagonTallySheet({}: any) {
   const [payloadForWagons, setPayloadForWagons] = useState<any>({
     skip: 0,
     limit: 10,
-    status: ["AVE", "INPL"],
+    status: ["INPL"],
     ...(indent_no_from_params && { indent_no:indent_no_from_params }),
   });
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(
@@ -223,7 +223,7 @@ function WagonTallySheet({}: any) {
   const [inplantTotal24, setInplantTotal24] = useState(0);
   const [inplantTotal48, setInplantTotal48] = useState(0);
   const [indentTotal, setIndentTotal] = useState(0);
-  const [statusCondition, setStatusCondition] = useState(["AVE", "INPL"]);
+  const [statusCondition, setStatusCondition] = useState(["INPL"]);
   const [activeCount, setActiveCount] = useState<any>(0);
 
   // api calling
@@ -337,12 +337,14 @@ function WagonTallySheet({}: any) {
     setRowsPerPage(+event.target.value);
     setPage(0);
   };
+
   const handleStatusClick = (status: string) => {
     switch (status) {
       case "total":
         setPayloadForWagons((prev: any) => {
           let newState = { ...prev };
-          if (newState.status.length > 0) {
+          console.log(newState.status, "newState.status");
+          if (newState.status.length > 0 && newState.status.includes("AVE")) {
             newState.status = [];
             setStatusCondition(newState.status);
           } else {
