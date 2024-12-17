@@ -158,12 +158,12 @@
     line-height: normal;
     text-transform: capitalize;
   }
-  #scrollAreaforRakeSheet {
+  /* #scrollAreaforRakeSheet {
     overflow-y: scroll;
     max-height: 500px;
     scroll-behavior: smooth;
     margin-top: 24px;
-  }
+  } */
   #firstSectionofRakeSheet {
     display: flex;
     gap: 50px;
@@ -364,10 +364,6 @@
     font-weight: 400;
     color: #3C4852;
     margin-top: 20px;
-  }
-  #lastSection{
-    display: flex;
-    gap:20px
   }
   /* ------------ assign wagon Sheet ------------ */
   #assign-wagon-details{

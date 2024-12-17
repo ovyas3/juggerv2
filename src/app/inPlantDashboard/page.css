@@ -253,6 +253,56 @@
   line-height: normal;
   text-transform: capitalize;
 }
+
+/* Updated styles for alignment */
+.rake-section-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.rake-section-label {
+  font-size: 12px;
+  font-weight: 400;
+  color: #3c4852;
+  margin-right: auto;
+}
+
+.rake-section-input {
+  flex: 1;
+  border: 1px solid #dfe3eb;
+  border-radius: 4px;
+  padding: 8px;
+  font-size: 14px;
+  color: #42454e;
+}
+
+.rake-section-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  width: 36px;
+  background-color: #2196f3;
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.rake-section-button:hover {
+  background-color: #1976d2;
+}
+
+.rake-handling-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
 #scrollAreaforRakeSheet {
   overflow-y: scroll;
   max-height: 350px;
