@@ -115,9 +115,9 @@ function contructingData(shipment: any) {
         plant_ageing: shipment?.plant_ageing || '--',
         rake_no: shipment?.rake_no || '--',
         current_status_ageing: shipment?.current_status_ageing || '--',
-        weighment: shipment?.weighment || '',
+        weighment: shipment?.weighment || false,
         arrival_pl: shipment?.arrival_pl || '',
-        formation_pl: shipment?.formation_pl || false,
+        formation_pl: shipment?.formation_pl || '',
         wagon_type: shipment?.wagon_type?.length > 0 && shipment.wagon_type.join(', ') || '',
         exp_loading: {
           date: shipment?.expected_loading_date
@@ -492,9 +492,9 @@ function WagonTallySheet({}: any) {
       case "INPL":
         label = "In Plant";
         if (inPlantFilter === ">24hrs") {
-          additionalText = " with <strong>>24hrs</strong>";
+          additionalText = " <strong>>24hrs</strong>";
         } else if (inPlantFilter === ">48hrs") {
-          additionalText = " with <strong>>48hrs</strong>";
+          additionalText = " <strong>>48hrs</strong>";
         }
         break;
       case "AVE":
@@ -951,14 +951,14 @@ function WagonTallySheet({}: any) {
                                       >
                                         {text("uploadDailyRakeHandlingSheet")}
                                       </div> */}
-                                      <div
+                                      {/* <div
                                         onClick={(e) =>
                                           uploadWagonSheet(e, row)
                                         }
                                         className="action-popover-wagon"
                                       >
                                         {text("uploadDailyRakeHandlingSheet")}
-                                      </div>
+                                      </div> */}
                                       <div
                                         onClick={(e) =>
                                           uploadWagonSheet(e, row)
