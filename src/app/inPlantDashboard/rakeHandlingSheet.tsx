@@ -139,7 +139,7 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
 
   useEffect(()=> {
     console.log(workingPlant)
-  },[workingPlant])
+  },[workingPlant]) 
 
 
   function addMillDetails() {
