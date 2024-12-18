@@ -12,6 +12,7 @@
   overflow-y: auto;
   background-color: #f5f5f5;
   height: 100%;
+  min-width: 450px;
 }
 
 .rightPanel {
@@ -965,41 +966,74 @@
   height: 40px;
   margin-bottom: 24px;
   border: 1px solid #DFE3EB;
-  border-radius: 4px;
+  border-radius: 8px;
   background-color: white;
   transition: all 0.3s ease;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1), 0px 1px 3px rgba(0, 0, 0, 0.08);
+  /* box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1), 0px 1px 3px rgba(0, 0, 0, 0.08); */
   align-content: center;
   padding-inline: 8px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
   position: relative;
 }
 
 .searchInput{
   display: block;
   height: 38px;
-  width: 80%;
+  width: 90%;
   min-width: 150px;
   outline: none;
   border: none;
+  margin-left: 8px;
 }
+
+.clearIcon {
+  background-color: #f4f4f4;
+  color: #555; 
+  width: 24px; 
+  height: 24px; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center;
+  border-radius: 50%; 
+  cursor: pointer;
+  /* border: 1px solid #ddd; */
+  /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);  */
+  transition: all 0.3s ease-in-out; 
+}
+
+.clearIcon:hover {
+  background-color: #333; 
+  color: #fff; 
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transform: scale(1.05); 
+}
+
+.clearIcon:active {
+  transform: scale(1); 
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
+}
+
 
 .searchItem{
   display: flex;
   align-items: center;
-  padding-inline: 10px;
-  padding-block: 6px;
+  justify-content: space-between;
+  padding-block: 12px;
+  padding-inline: 24px;
+  width: 100%;
+  border-bottom: 1px solid #DFE3EB;
 }
 
 .searchItem:hover{
   cursor: pointer;
   background-color: #F0F3F9;
+  width: 100%;
 }
 
 .rakeID{
-  width: 150px;
+  /* background-color: #7b1fa2; */
+  min-width: 150px;
 }
 
 .searchResultsContainer{
@@ -1010,11 +1044,31 @@
   background-color: white;
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1), 0px 1px 3px rgba(0, 0, 0, 0.08);
   top: 50px;
-  border-radius: 4px;
+  border-radius: 8px;
+  left: 0px;
+  width: 100%;
+}
+
+.checkboxHeader{
+  /* background-color: #334FFC; */
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+  min-width: 80px;
 }
 
 .checkbox{
   height: 24px;
   width: 24px;
-  margin-right: 12px;
+}
+
+.searchHeader{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-inline: 24px;
+  /* background-color: #388e3c; */
+  padding-block: 12px;
+  /* width: 100%; */
+  border-bottom: 1px solid #DFE3EB;
 }
