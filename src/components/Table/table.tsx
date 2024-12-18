@@ -509,6 +509,12 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
         copyToClipboard(message);
     };
 
+    function extractTextInsideParentheses(input: string) {
+        if(!input) return null
+        const match = input.match(/\(([^)]+)\)/);
+        return match ? match[1] : null;
+      }
+
     return (
         <div 
         id='outBoundTableContainer'
@@ -900,8 +906,9 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                         {item.id === 'status' &&
                                                             <div className='status_container'>
                                                                 <div className={`status_resize ${status_class_map[value.raw]}`}>
-                                                                    <div>{value.name}</div>
+                                                                    <div>{value?.name}</div>
                                                                 </div>
+                                                                <div style={{textAlign:'center'}}>{extractTextInsideParentheses(value?.code)}</div>
                                                                 {value.code ? <div className='status_code'>{value.code}</div> : <div className='status_code' style={{textAlign:'center'}}>Status will update soon</div>}
                                                             </div>
                                                         }

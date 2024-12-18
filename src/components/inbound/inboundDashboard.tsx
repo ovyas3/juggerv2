@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import CountUp from 'react-countup';
 
 function InboundDashboard({setInBoundPayload, countInbound}:any) {
-  const [status, setStatus] = useState(['ITNS', 'Delivered']);
+  const [status, setStatus] = useState(['ITNS','Delivered']);
   const t = useTranslations("ORDERS");
 
   const getStatusColor = (statuses: string[], div: string) => {
@@ -12,22 +12,15 @@ function InboundDashboard({setInBoundPayload, countInbound}:any) {
     let textTextColor = '#7C7E8C';
   
     switch (div) {
-      case 'INPL':
-        if (statuses.includes('INPL')) {
-          backgroundColor = '#a3dfe11f';
-          countTextColor = '#134d68'; 
-          textTextColor = '#134d68'; 
-        }
-        break;
       case 'ITNS':
-        if (statuses.includes('ITNS')) {
+        if (statuses.includes('ITNS') && statuses.length === 1) {
           backgroundColor = '#FF98001F';
           countTextColor = '#FF9800'; 
           textTextColor = '#FF9800'; 
         }
         break;
       case 'Delivered':
-        if (statuses.includes('Delivered')) {
+        if (statuses.includes('Delivered') && statuses.length === 1) {
           backgroundColor = '#18BE8A1F';
           countTextColor = '#18BE8A'; 
           textTextColor = '#18BE8A'; 
@@ -61,14 +54,18 @@ function InboundDashboard({setInBoundPayload, countInbound}:any) {
       return {...previous, status}
     })
   },[status])
+
   return (
     <div id="inboundDashboardForStatus">
       <div className="display_status_inner_box" onClick={()=>{
         setStatus((previous :any)=>{
-            if (previous.length > 0) {
+            const newStatus = [...previous];
+            if (newStatus.length > 0) {
+              if(newStatus.length === 1)
+                return ['ITNS', 'Delivered'];
               return []
             }else{
-                return ['ITNS', 'Delivered', 'INPL', 'AVE',];
+                return ['ITNS', 'Delivered'];
             }
         })
       }}
@@ -80,38 +77,20 @@ function InboundDashboard({setInBoundPayload, countInbound}:any) {
         <div style={{ fontSize: 20, fontWeight: 500 }}><CountUp end={countInbound.total} duration={1.2}/></div>
         <div style={{ fontSize: 12 }}>{t("Total")}</div>
       </div>
-      {/* <div className="display_status_inner_box" onClick={()=>{
-        setStatus((previous :any)=>{
-            if(previous.includes('AVE')) return status.filter((item: string) => item !== 'AVE');
-            return ['AVE', ...status];
-        })
-      }} 
-      style={{
-        backgroundColor: getStatusColor(status, 'AVE').backgroundColor,
-        color: getStatusColor(status, 'AVE').textTextColor
-      }}
-      >
-        <div style={{ fontSize: 20, fontWeight: 500 }}>0</div>
-        <div style={{ fontSize: 12 }}>{t("Indent")}</div>
-      </div> */}
-      {/* <div className="display_status_inner_box" onClick={()=>{
-        setStatus((previous :any)=>{
-            if(previous.includes('INPL')) return status.filter((item: string) => item !== 'INPL');
-            return ['INPL', ...status];
-        })
-      }}
-      style={{
-        backgroundColor: getStatusColor(status, 'INPL').backgroundColor,
-        color: getStatusColor(status, 'INPL').textTextColor
-      }}
-      >
-        <div style={{ fontSize: 20, fontWeight: 500 }}>0</div>
-        <div style={{ fontSize: 12 }}>{t("In Plant")}</div>
-      </div> */}
+
       <div className="display_status_inner_box" onClick={()=>{
         setStatus((previous :any)=>{
-            if(previous.includes('ITNS')) return status.filter((item: string) => item !== 'ITNS');
-            return ['ITNS', ...status];
+            let newStatus = [...previous];
+            if(newStatus.includes('ITNS')){
+              if(newStatus.includes('ITNS') && newStatus.length === 1){
+                newStatus = ['ITNS', 'Delivered'];
+                return newStatus;
+              }
+              newStatus = ['ITNS'];
+            }else{
+              newStatus = ['ITNS'];
+            }
+            return newStatus;
         })
       }}
       style={{
@@ -122,10 +101,20 @@ function InboundDashboard({setInBoundPayload, countInbound}:any) {
         <div style={{ fontSize: 20, fontWeight: 500 }}><CountUp end={countInbound.ITNS} duration={1.2}/></div>
         <div style={{ fontSize: 12 }}>{t("In Transit")}</div>
       </div>
+
       <div className="display_status_inner_box" onClick={()=>{
         setStatus((previous :any)=>{
-            if(previous.includes('Delivered')) return status.filter((item: string) => item !== 'Delivered');
-            return ['Delivered', ...status];
+          let newStatus = [...previous];
+          if(newStatus.includes('Delivered')){
+            if(newStatus.includes('Delivered') && newStatus.length === 1){
+              newStatus = ['ITNS', 'Delivered'];
+              return newStatus;
+            }
+            newStatus = ['Delivered'];
+          }else{
+            newStatus = ['Delivered'];
+          }
+          return newStatus;
         })
       }}
       style={{

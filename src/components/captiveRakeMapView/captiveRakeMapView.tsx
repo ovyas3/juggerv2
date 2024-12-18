@@ -1,5 +1,6 @@
 "use client";
 
+import { useDebugValue, useRef } from 'react';
 import { MapContainer, TileLayer, Marker, LayersControl, Popup } from 'react-leaflet';
 import "leaflet/dist/leaflet.css";
 import "leaflet-boundary-canvas";
@@ -13,10 +14,14 @@ import { httpsGet, httpsPost } from '@/utils/Communication';
 import { useRouter } from 'next/navigation';
 import getBoundary from '@/components/MapView/IndianClaimed';
 import timeService from '@/utils/timeService';
-import { useMediaQuery, useTheme } from '@mui/material';
+import { Checkbox, useMediaQuery, useTheme } from '@mui/material';
 import { get } from 'http';
 import styles from "./page.module.css";
 import getIndiaMap from "@/components/MapView/IndiaMap";
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
+import searchIcon from '@/assets/search_icon.svg'
+import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 
 interface SchemeData {
   count: number;
@@ -136,6 +141,15 @@ export default function CaptiveRakeMapView() {
   const [totalCRCount, setTotalCRCount] = useState(0)
   const [usedCRCount,setUsedCRCount] = useState(0)
   const [shouldAutoFit, setShouldAutoFit] = useState(true);
+  
+  const [searchListRakes, setSearchListRakes] = useState<any>([]);
+  const [ogListRakes, setOgListRakes] = useState<any>([]);
+  const [openDropDownSearchList, setOpenDropDownSearchList] = useState(false);
+  const searchContainerRef = useRef<HTMLDivElement | null>(null);
+  const [searchTerm, setSearchTerm] = useState<string | null>(null);
+  const [selectedRakeList, setSelectedRakeList] = useState<any>([]);
+  const [statusType, setStatusType] = useState<any>('All');
+
 
   const fitMapBounds = useCallback((coordinates: any[]) => {
     if (map && coordinates && coordinates.length > 0 && shouldAutoFit) {
@@ -240,6 +254,8 @@ export default function CaptiveRakeMapView() {
     getRakeStatusData(filterType);
     getRakeStats(filterType);
     getSchemeWiseCount(filterType);
+    setStatusType(filterType);
+    setSelectedRakeList([]);
   };
 
   const handleFilterClick = (filter: 'total' | 'loaded' | 'empty') => {
@@ -292,6 +308,35 @@ export default function CaptiveRakeMapView() {
         
         // Fit map bounds to the filtered coordinates
         fitMapBounds(coords);
+
+        // Get list for rake search 
+        setSearchListRakes(
+          (
+            ogListRakes.length === 0
+              ? response.data.data
+              : statusType === 'All'
+              ? ogListRakes
+              : ogListRakes.filter((item: any) => item.scheme === statusType)
+          ).map((item: any) => {
+            return {
+              _id: item._id,
+              rakeID: item.rake.rake_id,
+              name: item.rake.name,
+              checked: selectedRakeList.includes(item._id),
+              scheme: item.scheme,
+            };
+          })
+        );
+        if(ogListRakes.length === 0)
+        setOgListRakes(response.data.data.map((item:any)=> {
+          return{
+            _id: item._id,
+            rakeID: item.rake.rake_id,
+            name: item.rake.name,
+            checked: false,
+            scheme: item.scheme
+          }
+        }));
       } else {
         console.error('Invalid response format:', response);
       }
@@ -299,6 +344,87 @@ export default function CaptiveRakeMapView() {
       console.error('Error fetching coordinates:', error);
     }
   }
+
+  useEffect(()=>{
+    if(searchTerm === '') {
+      getCoords(statusType, selectedRakeList);
+    }
+  },[searchTerm])
+
+  useEffect(() => {
+    setSearchListRakes((prev: any) => {
+      const filteredList = statusType === 'All' 
+        ? ogListRakes 
+        : ogListRakes.filter((item: any) => item.scheme === statusType);
+        
+      return filteredList.map((item: any) => ({
+        ...item,
+        checked: selectedRakeList.includes(item._id),
+      }));
+    });
+  }, [selectedRakeList]); 
+
+  useEffect(()=>{
+    switch(statusType) {
+      case 'All':
+        setSearchListRakes((prev:any)=>{
+          return ogListRakes.map((item: any) => {
+            return {
+              ...item,
+              checked: selectedRakeList.includes(item._id),
+            }
+          })
+        })
+        break;
+      case 'SFTO':
+        setSearchListRakes((prev:any)=>{
+          return ogListRakes.filter((item: any) => item.scheme === 'SFTO').map((item: any) => {
+            return {
+              ...item,
+              checked: selectedRakeList.includes(item._id),
+            }
+          })
+        })
+        break;
+      case 'GPWIS':
+        setSearchListRakes((prev:any)=>{
+          return ogListRakes.filter((item: any) => item.scheme === 'GPWIS').map((item: any) => {
+            return {
+              ...item,
+              checked: selectedRakeList.includes(item._id),
+            }
+          })
+        })
+        break;
+      case 'BFNV':
+        setSearchListRakes((prev:any)=>{
+          return ogListRakes.filter((item: any) => item.scheme === 'BFNV').map((item: any) => {
+            return {
+              ...item,
+              checked: selectedRakeList.includes(item._id),
+            }
+          })
+        })
+        break;
+      default:
+    }
+  },[statusType])
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        searchContainerRef.current &&
+        searchContainerRef.current !== null &&
+        !searchContainerRef.current.contains(event.target as Node)
+      ) {
+        setOpenDropDownSearchList(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   async function getSchemeWiseCount(scheme: string) {
     try{
@@ -540,6 +666,46 @@ export default function CaptiveRakeMapView() {
     return status === "L" ? customLoadedIcon(stabled) : customEmptyIcon(stabled);
   };
 
+  const filterRakeList = (value:any) => {
+    setSearchTerm(value);
+    if (value !== '') {
+      const filteredList = ogListRakes.filter((item:any)=> item.scheme === statusType).filter((item: any) => {
+        return item.name.toLowerCase().includes(value.toLowerCase()) || item.rakeID.toLowerCase().includes(value.toLowerCase());
+      }).map((item: any) => {
+        return {
+          ...item,
+          checked: selectedRakeList.includes(item._id),
+        }
+      })
+      setSearchListRakes(filteredList);
+    }else{
+      setSearchListRakes((prev:any)=>{
+        return ogListRakes.filter((item:any)=> item.scheme === statusType).map((item: any) => {
+          return {
+            ...item,
+            checked: selectedRakeList.includes(item._id),
+          }
+        })
+      })
+    }
+  }
+
+  const modifiedListRakes = (selectedItem:any) => {
+    if(selectedRakeList.includes(selectedItem._id)){
+      setSelectedRakeList((prev: any) => prev.filter((item: any) => item !== selectedItem._id));
+    }else{
+      setSelectedRakeList((prev: any) => [...prev, selectedItem._id]);
+    }
+    setSearchListRakes((prev: any) => {
+      return prev.map((item: any) => {
+        if (item.rakeID === selectedItem.rakeID) {
+          return { ...item, checked: !item.checked };
+        }
+        return item;
+      });
+    });
+  }
+
   const boundaryStyle = (feature: any) => {
     switch (feature.properties.boundary) {
       case 'claimed':
@@ -552,6 +718,14 @@ export default function CaptiveRakeMapView() {
         };
     }
   }
+
+  useEffect(()=>{
+    if(selectedRakeList.length > 0){
+      getCoords(statusType, selectedRakeList);
+    }else{
+      getCoords(statusType,[]);
+    }
+  },[selectedRakeList])
 
   useEffect(() => {
     if (!map) return;
@@ -599,6 +773,9 @@ export default function CaptiveRakeMapView() {
             className={`${styles.leftPanel} ${
               isCollapsed ? styles.collapsed : ""
             }`}
+            style={{
+              minWidth: mobile ? "0px" : "450px",
+            }}
           >
             {mobile && (
               <>
@@ -662,6 +839,63 @@ export default function CaptiveRakeMapView() {
                   {rakeTypeData.GPWIS?.count || 0}
                 </span>
               </div>
+            </div>
+
+            <div className={styles.searchContainer} ref={searchContainerRef}
+              onClick={(e)=>{e.stopPropagation(); setOpenDropDownSearchList(true)}}
+              style={{
+                marginInline: mobile ? "12px" : "0px",
+              }}
+            >
+              <div style={{width:20, height:20}}>
+                <Image src={searchIcon.src} alt="" height={20} width={20}/>
+              </div>
+              <input
+                type="text"
+                placeholder="Search by Rake ID, Rake Name"
+                className={styles.searchInput}
+                onChange={(e)=>{filterRakeList(e.target.value)}}
+              />
+              {selectedRakeList.length > 0 && (
+                <div className={styles.clearIcon}
+                  onClick={(e)=>{
+                    e.stopPropagation();
+                    setSelectedRakeList([]);
+                    setSearchListRakes(ogListRakes);
+                    getCoords('',[]);
+                  }}
+                ><HighlightOffIcon style={{width:32, height:32}}/></div>
+              )}
+              {openDropDownSearchList && 
+                <div className={styles.searchResultsContainer}>
+
+                  <div className={styles.searchHeader}>
+                    <div className={styles.checkboxHeader}>
+                      <div style={{marginLeft:'6px'}}>Select</div>
+                    </div>
+                    <div className={styles.rakeID} >Rake ID</div>
+                    <div style={{minWidth:'100px'}}>Rake Name</div>
+                  </div>
+                  
+                {searchListRakes.map((item:any)=>{
+                  return(
+                    <div key={item._id} className={styles.searchItem} 
+                      onClick={(e)=>{
+                        e.stopPropagation();
+                        setSearchTerm(`${item.rakeID}`);
+                        modifiedListRakes(item);
+                      }}
+                    >
+                      <div className={styles.checkboxHeader}>
+                        <Checkbox className={styles.checkbox} size='small' checked={item.checked} />
+                      </div>
+                      <div className={styles.rakeID}>{item.rakeID}</div> 
+                      <div style={{minWidth:'100px'}}>{item.name}</div>
+                    </div>
+                  );
+                })}
+              </div>
+              }
             </div>
 
             <div className={styles.rakesStatus}>
