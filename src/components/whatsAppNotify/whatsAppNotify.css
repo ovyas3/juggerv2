@@ -285,3 +285,9 @@
   margin-bottom: 8px;
   margin-top: 30px;
 }
+.bpc-header-notify{
+  font-size: 1rem;
+  font-weight: 600;
+  color: #3C4852;
+  /* margin-top: 1.8rem; */
+}

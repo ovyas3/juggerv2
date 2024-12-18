@@ -2,12 +2,53 @@
 import React from "react";
 import RemoveIcon from "@mui/icons-material/Remove";
 import AddIcon from "@mui/icons-material/Add";
+import CloseIcon from "@mui/icons-material/Close";
 
 function BPCNotify() {
   const [notifyBefore, setNotifyBefore] = React.useState([
     { value: 0 },
     { value: 1 },
+    { value: 2 },
   ]);
+  const [emailList, setEmailList] = React.useState([
+    { email: "" },
+    { email: "" },
+  ]);
+  const [whatsAppList, setWhatsAppList] = React.useState([
+    { number: 0, name: "" },
+    { number: 0, name: "" },
+  ]);
+  const addNotifyBefore = () => {
+    const newNotifyBefore = [...notifyBefore];
+    newNotifyBefore.push({ value: 0 });
+    setNotifyBefore(newNotifyBefore);
+  };
+  const removeNotifyBefore = (index: number) => {
+    const newNotifyBefore = [...notifyBefore];
+    newNotifyBefore.splice(index, 1);
+    setNotifyBefore(newNotifyBefore);
+  };
+  const addEmail = () => {
+    const newEmailList = [...emailList];
+    newEmailList.push({ email: "" });
+    setEmailList(newEmailList);
+  };
+  const removeEmail = (index: number) => {
+    const newEmailList = [...emailList];
+    newEmailList.splice(index, 1);
+    setEmailList(newEmailList);
+  };
+  const addWhatappNumberName = () => {
+    const newWhatsAppList = [...whatsAppList];
+    newWhatsAppList.push({ number: 0, name: "" });
+    setWhatsAppList(newWhatsAppList);
+  };
+  const removeWhatappNumberName = (index: number) => {
+    const newWhatsAppList = [...whatsAppList];
+    newWhatsAppList.splice(index, 1);
+    setWhatsAppList(newWhatsAppList);
+  };
+  console.log(emailList);
   return (
     <div
       style={{
@@ -129,6 +170,14 @@ function BPCNotify() {
                       border: "none",
                       outline: "none",
                     }}
+                    value={item.value || ""}
+                    onChange={(e) => {
+                      const value =
+                        e.target.value === "" ? "" : +e.target.value;
+                      const newNotifyBefore = [...notifyBefore];
+                      newNotifyBefore[index].value = +value;
+                      setNotifyBefore(newNotifyBefore);
+                    }}
                   />
                   <div
                     style={{
@@ -155,10 +204,37 @@ function BPCNotify() {
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
-                        right: -25,
+                        right: notifyBefore.length === 1 ? -25 : -50,
+                        cursor: "pointer",
+                      }}
+                      onClick={() => {
+                        addNotifyBefore();
                       }}
                     >
                       <AddIcon style={{ height: 16, width: 16 }} />
+                    </div>
+                  )}
+                  {notifyBefore.length !== 1 && (
+                    <div
+                      id="addButton"
+                      style={{
+                        position: "absolute",
+                        color: "#E6667B",
+                        width: 16,
+                        height: 16,
+                        border: "1px solid #E6667B",
+                        borderRadius: "50%",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        right: -25,
+                        cursor: "pointer",
+                      }}
+                      onClick={() => {
+                        removeNotifyBefore(index);
+                      }}
+                    >
+                      <CloseIcon style={{ height: 16, width: 16 }} />
                     </div>
                   )}
                 </div>
@@ -167,7 +243,250 @@ function BPCNotify() {
           })}
         </div>
       </div>
-      <div id="right-section-bpc">submit area</div>
+      <div id="right-section-bpc" style={{ paddingInline: 24 }}>
+        <h3 className="bpc-header-notify">
+          Notification Through WhatsApp / Email
+        </h3>
+        <div
+          id="bpc-notify-container-email-list"
+          style={{
+            paddingTop: 24,
+            display: "flex",
+            flexDirection: "column",
+            gap: 20,
+          }}
+        >
+          {emailList.map((item, index) => {
+            return (
+              <div
+                key={index}
+                style={{
+                  // backgroundColor: "red",
+                  position: "relative",
+                  width: 250,
+                }}
+              >
+                <label>Email Address</label>
+                <input
+                  type="text"
+                  placeholder="Enter Email Address"
+                  style={{
+                    width: 250,
+                    border: "1px solid #E5E5E5",
+                    borderRadius: 4,
+                    height: 40,
+                    marginTop: 8,
+                    display: "block",
+                    outline: "none",
+                    paddingInline: 12,
+                  }}
+                  value={item.email || ""}
+                  onChange={(e) => {
+                    const newEmailList = [...emailList];
+                    newEmailList[index].email = e.target.value;
+                    setEmailList(newEmailList);
+                  }}
+                />
+                {index === emailList.length - 1 && (
+                  <div
+                    id="addButton"
+                    style={{
+                      position: "absolute",
+                      color: "#334FFC",
+                      width: 16,
+                      height: 16,
+                      border: "1px solid #334FFC",
+                      borderRadius: "50%",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      right: emailList.length === 1 ? -25 : -50,
+                      top: 34,
+                      cursor: "pointer",
+                    }}
+                    onClick={() => {
+                      addEmail();
+                    }}
+                  >
+                    <AddIcon style={{ height: 16, width: 16 }} />
+                  </div>
+                )}
+                {emailList.length !== 1 && (
+                  <div
+                    id="addButton"
+                    style={{
+                      position: "absolute",
+                      color: "#E6667B",
+                      width: 16,
+                      height: 16,
+                      border: "1px solid #E6667B",
+                      borderRadius: "50%",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      right: -25,
+                      cursor: "pointer",
+                      top: 34,
+                    }}
+                    onClick={() => {
+                      removeEmail(index);
+                    }}
+                  >
+                    <CloseIcon style={{ height: 16, width: 16 }} />
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+        <div
+          id="bpc-notify-container-whatsapp-list"
+          style={{
+            marginTop: 20,
+            display: "flex",
+            flexDirection: "column",
+            gap: 20,
+          }}
+        >
+          {whatsAppList.map((item, index) => {
+            return (
+              <div
+                key={index}
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  gap: 20,
+                  position: "relative",
+                  width: "fit-content",
+                  //   backgroundColor:'red'
+                }}
+              >
+                <div>
+                  <label>Name</label>
+                  <input
+                    type="text"
+                    placeholder="Enter Name"
+                    style={{
+                      width: 250,
+                      border: "1px solid #E5E5E5",
+                      borderRadius: 4,
+                      height: 40,
+                      marginTop: 8,
+                      display: "block",
+                      outline: "none",
+                      paddingInline: 12,
+                    }}
+                  />
+                </div>
+                <div>
+                  <label>Phone Number</label>
+                  <input
+                    type="text"
+                    placeholder="Enter Phone Number"
+                    style={{
+                      width: 250,
+                      border: "1px solid #E5E5E5",
+                      borderRadius: 4,
+                      height: 40,
+                      marginTop: 8,
+                      display: "block",
+                      outline: "none",
+                      paddingInline: 12,
+                    }}
+                  />
+                </div>
+                {index === whatsAppList.length - 1 && (
+                  <div
+                    id="addButton"
+                    style={{
+                      position: "absolute",
+                      color: "#334FFC",
+                      width: 16,
+                      height: 16,
+                      border: "1px solid #334FFC",
+                      borderRadius: "50%",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      right: whatsAppList.length === 1 ? -25 : -50,
+                      cursor: "pointer",
+                      top: 35,
+                    }}
+                    onClick={() => {
+                      addWhatappNumberName();
+                    }}
+                  >
+                    <AddIcon style={{ height: 16, width: 16 }} />
+                  </div>
+                )}
+                {whatsAppList.length !== 1 && (
+                  <div
+                    id="addButton"
+                    style={{
+                      position: "absolute",
+                      color: "#E6667B",
+                      width: 16,
+                      height: 16,
+                      border: "1px solid #E6667B",
+                      borderRadius: "50%",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      right: -25,
+                      cursor: "pointer",
+                      top: 35,
+                    }}
+                    onClick={() => {
+                      removeWhatappNumberName(index);
+                    }}
+                  >
+                    <CloseIcon style={{ height: 16, width: 16 }} />
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+        <div id="bpc-notify-container-button-submit"
+          style={{
+            display: "flex",
+            justifyContent: "flex-start",
+            marginTop: 40,
+            gap: 20,
+          }}
+        >
+          <button
+            id="bpc-notify-container-button-submit"
+            style={{
+              width: 200,
+              height: 40,
+              backgroundColor: "#334FFC",
+              borderRadius: 4,
+              color: "white",
+              border: "none",
+              textTransform: "uppercase",
+              cursor: "pointer",
+            }}
+          >
+            submit
+          </button>
+          <button
+            id="bpc-notify-container-button-clear"
+            style={{
+              width: 200,
+              height: 40,
+              backgroundColor: "white",
+              borderRadius: 4,
+              color: "#334FFC",
+              border: "1px solid #334FFC",
+              textTransform: "uppercase",
+              cursor: "pointer",
+            }}
+          >
+            clear
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

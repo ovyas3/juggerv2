@@ -75,6 +75,8 @@ function Filters({
   const [endDate, setEndDate] = useState(today);
   const [error, setError] = useState("");
   const [openFilterModal, setOpenFilterModal] = useState(false);
+
+  const [showFilterOn, setShowFilterOn] = useState(false);
   const [filterEDemand, setFilterEDemand] = useState("");
   const [filterDestination, setFilterDestination] = useState("");
   const [filterMaterial, setFilterMaterial] = useState("");
@@ -180,6 +182,22 @@ function Filters({
       }
   }, [startDate, endDate, error]);
 
+  useEffect(()=>{
+    if(filterEDemand === '' && filterDestination === '' && filterMaterial === ''){
+      setShowFilterOn(false)
+    }else{
+      setShowFilterOn(true)
+    }
+  },[filterEDemand,filterDestination,filterMaterial])
+
+  useEffect(()=>{
+    if(filterEDemand === '' && filterDestination === '' && filterMaterial === ''){
+      setShowFilterOn(false)
+    }else{
+      setShowFilterOn(true)
+    }
+  },[filterEDemand,filterDestination,filterMaterial])
+
   const getTimeDifferenceAndColor = (lastFoisPingDate: Date | string) => {
     const now = new Date();
 
@@ -225,6 +243,7 @@ function Filters({
           gap: 20,
           position: "relative",
           overflowY: "hidden",
+          alignItems:'center'
         }}
       >
         <div style={{ width: "132px", height: 36 }}>
@@ -251,11 +270,6 @@ function Filters({
             maxSelectableDate={today}
           />
         </div>
-
-        {/* <div style={{fontSize:'12px', display:'flex', alignItems:'center',gap:6, height:36, }}>
-            <Checkbox size="small" style={{height:12, width:12}} onChange={() => handleChangeRakeType("ALL")} checked={rakeType.includes("ALL")} />
-            <div className="">ALL</div>
-        </div> */}
 
         <div
           style={{
@@ -306,9 +320,9 @@ function Filters({
           </motion.div>
         </div>
 
-        <div style={{ position: "relative" }}>
+        <div>
           <div
-            className="filter-container"
+            className={showFilterOn ? "active" : ""}
             onClick={() => setOpenFilterModal(true)}
           >
             <img src={filter_icon.src} alt="" />
@@ -344,7 +358,18 @@ function Filters({
       </div>
 
       {openFilterModal && (
-        <div style={{ display: "flex", justifyContent: "right" }}>
+        <div style={{ 
+          display: "flex", 
+          backgroundColor: "rgba(0, 0, 0, 0.5)",
+          width: "100%",
+          height: "100%",
+          position: "fixed",
+          top: 0,
+          left: 0,
+          zIndex: 1000,
+          justifyContent: "center",
+          alignItems: "center",
+        }}>
           <div className="search">
             <div className="search-container">
               <div className="search-container-group">
@@ -384,6 +409,7 @@ function Filters({
           />
         </div>
       )}
+
     </div>
   );
 }
