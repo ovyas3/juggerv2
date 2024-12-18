@@ -213,16 +213,20 @@
 #total.active {
   background-color: #d3e1ff;
   color: #1d38b8;
+  padding-block: 28px;
 }
 
 #inpl.active {
   background-color: #e3f7f7;
   color: #123f55;
+  padding-block: 28px;
+
 }
 
 #itns.active {
   background-color: #fdebd0;
   color: #d87b03;
+  padding-block: 28px;
 }
 #optionsContainer{
   background-color: white;

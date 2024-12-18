@@ -669,18 +669,24 @@ export default function CaptiveRakeMapView() {
   const filterRakeList = (value:any) => {
     setSearchTerm(value);
     if (value !== '') {
-      const filteredList = ogListRakes.filter((item:any)=> item.scheme === statusType).filter((item: any) => {
-        return item.name.toLowerCase().includes(value.toLowerCase()) || item.rakeID.toLowerCase().includes(value.toLowerCase());
-      }).map((item: any) => {
-        return {
-          ...item,
-          checked: selectedRakeList.includes(item._id),
-        }
-      })
+      const filteredList = ogListRakes
+        .filter((item: any) => statusType === 'All' || item.scheme === statusType)
+        .filter((item: any) => {
+          return (
+            item.name.toLowerCase().includes(value.toLowerCase()) || 
+            item.rakeID.toLowerCase().includes(value.toLowerCase())
+          );
+        })
+        .map((item: any) => {
+          return {
+            ...item,
+            checked: selectedRakeList.includes(item._id),
+          };
+        });
       setSearchListRakes(filteredList);
     }else{
       setSearchListRakes((prev:any)=>{
-        return ogListRakes.filter((item:any)=> item.scheme === statusType).map((item: any) => {
+        return ogListRakes.filter((item:any)=> statusType === 'All' || item.scheme === statusType).map((item: any) => {
           return {
             ...item,
             checked: selectedRakeList.includes(item._id),

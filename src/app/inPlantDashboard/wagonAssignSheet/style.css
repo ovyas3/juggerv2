@@ -439,12 +439,12 @@
     margin-bottom: 16px;
   }
 
-  .shipment-details-container{
+  /* .shipment-details-container{
     width: 96%;
     margin: 24px 24px 0px 24px;
     padding: 0px 0px 16px 0px;
     border-bottom: 1px solid #e9eef2;
-  }
+  } */
 
   .train-shipment-container {
     display: flex;
