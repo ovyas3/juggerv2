@@ -10,6 +10,50 @@ import { useRouter, usePathname } from "next/navigation";
 import CustomDatePicker from "@/components/UI/CustomDatePicker/CustomDatePicker";
 import FilterAltIcon from "@mui/icons-material/FilterAlt";
 import filter_icon from "@/assets/filter_icon.svg";
+import Tooltip from "@mui/material/Tooltip";
+import { TooltipProps } from "@mui/material/Tooltip";
+import { styled } from '@mui/material/styles';
+import service from "@/utils/timeService";
+import { Bold } from "lucide-react";
+
+interface StyledTooltipProps extends TooltipProps {
+  className?: string;
+  color?: string;
+}
+
+const CustomTooltip = styled(({ className, color, ...props }: StyledTooltipProps & { color: string }) => (
+  <Tooltip 
+    {...props} 
+    classes={{ popper: className }} 
+    PopperProps={{
+      popperOptions: {
+        modifiers: [
+          {
+            name: 'offset',
+            options: {
+              offset: [2, -8],
+            },
+          },
+        ],
+      },
+    }}
+  />
+))(({ color }) => ({
+  '& .MuiTooltip-tooltip': {
+    backgroundColor: color, // Use the color prop here
+    color: '#fff',
+    width: '100%',
+    height: '36px',
+    boxShadow: '0px 0px 2px rgba(0,0,0,0.1)',
+    fontSize: '8px',
+    fontFamily: '"Plus Jakarta Sans", sans-serif',
+    fontWeight: 600,
+  },
+  '& .MuiTooltip-arrow': {
+    color: color, // Also set the arrow color
+  },
+}));
+
 
 function Filters({
   onToFromChange,
@@ -17,6 +61,8 @@ function Filters({
   onChangeRakeTypes,
   reload,
   shipmentsPayloadSetter,
+  lastFoisPingDate,
+  lastFOISPing,
 }: any) {
   const [rakeType, setRakeType] = useState(["IR", "CR"]);
   const router = useRouter();
@@ -144,6 +190,51 @@ function Filters({
     }
   },[filterEDemand,filterDestination,filterMaterial])
 
+  useEffect(()=>{
+    if(filterEDemand === '' && filterDestination === '' && filterMaterial === ''){
+      setShowFilterOn(false)
+    }else{
+      setShowFilterOn(true)
+    }
+  },[filterEDemand,filterDestination,filterMaterial])
+
+  const getTimeDifferenceAndColor = (lastFoisPingDate: Date | string) => {
+    const now = new Date();
+
+    // Check if lastFoisPingDate is a valid date
+    if (!lastFoisPingDate || !(lastFoisPingDate instanceof Date) || isNaN(lastFoisPingDate.getTime())) {
+        return { timeAgo: 'No Date Found', color: '#CCCCCC' }; 
+    }
+
+    const diffInMs = now.getTime() - new Date(lastFoisPingDate).getTime();
+    const diffInSeconds = Math.floor(diffInMs / 1000); 
+
+    let color = '';
+    let timeAgo = '';
+
+    if (diffInSeconds < 60) { 
+        timeAgo = `${diffInSeconds} seconds ago`;
+        color = '#18BE8A';
+    } else if (diffInSeconds < 3600) {
+        const minutes = Math.floor(diffInSeconds / 60);
+        timeAgo = `${minutes} min${minutes > 1 ? 's' : ''} ago`;
+        color = '#18BE8A';
+    } else if (diffInSeconds < 86400) {
+        const hours = Math.floor(diffInSeconds / 3600);
+        const minutes = Math.floor((diffInSeconds % 3600) / 60); 
+        timeAgo = `${hours} hour${hours > 1 ? 's' : ''}${minutes > 0 ? ` ${minutes} min${minutes > 1 ? 's' : ''}` : ''} ago`;
+        color = '#FF9800';
+    } else { 
+        const days = Math.floor(diffInSeconds / 86400);
+        const hours = Math.floor((diffInSeconds % 86400) / 3600);
+        timeAgo = `${days} day${days > 1 ? 's' : ''}${hours > 0 ? ` ${hours} hour${hours > 1 ? 's' : ''}` : ''} ago`;
+        color = '#FF5C5C';
+    }
+
+    return { timeAgo, color };
+  };
+
+  const { timeAgo, color } = getTimeDifferenceAndColor(lastFoisPingDate);
   return (
     <div>
       <div
@@ -237,6 +328,33 @@ function Filters({
             <img src={filter_icon.src} alt="" />
           </div>
         </div>
+
+        <CustomTooltip 
+          arrow 
+          color={color}
+          title={
+              <div style={{
+                  display: 'flex', 
+                  flexDirection: 'column', 
+                  alignItems: 'center', 
+                  fontSize: '10px',
+                  fontFamily: '"Inter", sans-serif',
+                  fontWeight: 600,
+                  paddingTop: '2px',
+                  gap: '2px'
+              }}>
+                  <div>{service.utcToist(lastFoisPingDate, "dd-MMM-yy HH:mm") || ''}</div>
+                  <div>{timeAgo}</div>
+              </div>
+          }>
+          <div className="fois-indication-circle" style={{ 
+            backgroundColor: color
+          }}>
+              <div className="fois-indication-text">
+                  FOIS
+              </div>
+          </div>
+        </CustomTooltip>
       </div>
 
       {openFilterModal && (
