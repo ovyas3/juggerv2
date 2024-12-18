@@ -195,6 +195,28 @@
 }
 
 
+.fois-indication-circle {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    background-color: #18BE8A;
+    width: 36px; 
+    height: 36px;
+    transition: all 0.3s ease-in-out;
+}
+
+.fois-indication-text{
+    font-size: 10px;
+    font-weight: bold;
+    color: #FFFFFF; 
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.fois-indication-circle:hover {
+    cursor: pointer;
+}
+
 @media screen and (max-width: 600px) {
     .modal-container{
         width: 80vw;
