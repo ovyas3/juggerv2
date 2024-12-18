@@ -288,7 +288,8 @@
     "turnFlashOff": "Turn Flash Off",
     "takePhoto": "Take Photo",
     "upload-rake-handling-sheet":"Upload Rake Handling Sheet",
-    "uploadFile":"Upload File"
+    "uploadFile":"Upload File",
+    "wagonWayBill": "Wagon Way Bill"
   },
   "CONTACT":{
     "contactModalHeaderEdit":"Edit Contact",
@@ -321,6 +322,23 @@
         "description": "The wagon has been loaded with goods."
       }
     ]
+  },
+  "WAGON_WAY_BILL": {
+    "wagonWayBill": "Wagon Way Bill",
+    "rakeNo": "Rake No.",
+    "date": "Date",
+    "from": "From",
+    "to": "To",
+    "lineNo": "Line No.",
+    "commodity": "Commodity",
+    "indentNo": "Indent No.",
+    "SNo": "S.No",
+    "wagonNo": "Wagon No.",
+    "type": "Type",
+    "cc": "CC",
+    "tr": "Tare",
+    "isLoaded": "Ld/E",
+    "print": "Print"
   }
 
 }
