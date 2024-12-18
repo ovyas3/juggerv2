@@ -130,9 +130,28 @@ function WagonAssignSheetContent() {
     });
   };
 
+  const assignAllWagonsToSelectedPlant = () => {
+    if (!SelectedPlant || Object.keys(SelectedPlant).length === 0) {
+        showMessage.showMessage("Please select a plant", "error");
+        return;
+    }
+
+    setWagonsNewData((prevWagons: any) => {
+        return prevWagons.map((wagon: any) => {
+            if (wagon.plant_assigned && wagon.plant_assigned._id !== SelectedPlant._id) {
+                return wagon; 
+            }
+            return {
+                ...wagon,
+                plant_assigned: SelectedPlant
+            };
+        });
+    });
+};
+
   const submitAssignToMill = async () => {
     let payload = {};
-    const assignedData = wagonsNewData.reduce((acc: any, item: any) => {
+    const assignedData = wagonsNewData && wagonsNewData.reduce((acc: any, item: any) => {
       const plantId = item.plant_assigned?._id;
       if (plantId) {
         let plantEntry = acc.find((entry: any) => entry.plant === plantId);
@@ -157,7 +176,7 @@ function WagonAssignSheetContent() {
     payload = {
       shipment: id,
       assigned_data: assignedData,
-      wagon_order: wagonsNewData.map((item: any, index: number) => ({
+      wagon_order: wagonsNewData && wagonsNewData.map((item: any, index: number) => ({
         _id: item._id,
         order_no: index + 1,
       })),
@@ -276,7 +295,7 @@ function WagonAssignSheetContent() {
                   ref={provided.innerRef}
                   className="train-shipment-container"
                 >
-                  {wagonsNewData.map((wagon: any, index: any) => (
+                  {wagonsNewData && wagonsNewData.map((wagon: any, index: any) => (
                     <Draggable
                       key={wagon._id}
                       draggableId={wagon._id}
@@ -365,7 +384,14 @@ function WagonAssignSheetContent() {
 
         <div id="assign-wagon-container-wagon">
           <div>
-            <div className="assign-wagon-container-title">Select a Loading Shop</div>
+            <div className="assign-wagon-container-title-container">
+              <div className="assign-wagon-container-title">Select a Loading Shop</div>
+              <button className="assign-wagon-select-all-button" onClick={() => {
+                assignAllWagonsToSelectedPlant();
+              }}>
+                Select All
+              </button>
+            </div>
             <div id="plantSelectorContainerWagon">
               {plants?.map((plant: any, index: any) => {
                 const isSelected = plant?._id === SelectedPlant?._id;
@@ -407,7 +433,7 @@ function WagonAssignSheetContent() {
                         }}
                       >
                         (
-                        {wagonsNewData.filter((wagon: any) => {
+                        {wagonsNewData && wagonsNewData.filter((wagon: any) => {
                           return wagon?.plant_assigned?.name === plant?.name;
                         }).length || 0}
                         )
@@ -420,7 +446,7 @@ function WagonAssignSheetContent() {
           </div>
 
           <div id="assign-wagon-container-box-selection-container-wagon">
-            {wagonsNewData.map((wagons: any, index: number) => {
+            {wagonsNewData && wagonsNewData.map((wagons: any, index: number) => {
               const isAssignedToSelectedPlant = wagons?.plant_assigned?._id === SelectedPlant?._id;
               const isAssignedToOtherPlant = wagons?.plant_assigned && !isAssignedToSelectedPlant;
               const millIndex = plants.findIndex(
@@ -507,7 +533,7 @@ function WagonAssignSheetContent() {
                 {text("assignedWagons")}
               </p>
               <p className="wagons-assign-not-assigned-content-value">
-                {wagonsNewData?.filter((wagons: any) => wagons.plant_assigned)
+                {wagonsNewData && wagonsNewData?.filter((wagons: any) => wagons.plant_assigned)
                   .length || 0}
               </p>
             </div>
@@ -516,7 +542,7 @@ function WagonAssignSheetContent() {
                 {text("notAssignedWagons")}
               </p>
               <p className="wagons-assign-not-assigned-content-value">
-                {wagonsNewData.filter((wagons: any) => !wagons.plant_assigned)
+                {wagonsNewData && wagonsNewData.filter((wagons: any) => !wagons.plant_assigned)
                   .length || 0}
               </p>
             </div>
@@ -525,7 +551,7 @@ function WagonAssignSheetContent() {
                 {text("sickWagons")}
               </p>
               <p className="wagons-assign-not-assigned-value">
-                {wagonsNewData.filter((wagons: any) => wagons.is_sick).length ||
+                {wagonsNewData && wagonsNewData.filter((wagons: any) => wagons.is_sick).length ||
                   0}
               </p>
             </div>
