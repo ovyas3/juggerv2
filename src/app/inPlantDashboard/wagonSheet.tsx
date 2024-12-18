@@ -36,7 +36,7 @@ import { ThreeCircles } from "react-loader-spinner";
 import uploadIcon from '@/assets/uploadIcon.svg';
 import Tooltip from '@mui/material/Tooltip';
 import { useSearchParams } from 'next/navigation';
-
+import { useSnackbar } from "@/hooks/snackBar";
 
 interface Column {
   id: string;
@@ -183,7 +183,7 @@ function WagonTallySheet({}: any) {
   const [payloadForWagons, setPayloadForWagons] = useState<any>({
     skip: 0,
     limit: 10,
-    status: ["AVE", "INPL"],
+    status: ["INPL"],
     ...(indent_no_from_params && { indent_no:indent_no_from_params }),
   });
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(
@@ -223,8 +223,9 @@ function WagonTallySheet({}: any) {
   const [inplantTotal24, setInplantTotal24] = useState(0);
   const [inplantTotal48, setInplantTotal48] = useState(0);
   const [indentTotal, setIndentTotal] = useState(0);
-  const [statusCondition, setStatusCondition] = useState(["AVE", "INPL"]);
+  const [statusCondition, setStatusCondition] = useState(["INPL"]);
   const [activeCount, setActiveCount] = useState<any>(0);
+  const { showMessage } = useSnackbar();
 
   // api calling
   async function getWagonDetails() {
@@ -261,6 +262,9 @@ function WagonTallySheet({}: any) {
     setShowActionBox((prevIndex) => (prevIndex === index ? -1 : index));
   }
   const assignPlantToWagon = (event: any, row: any) => {
+    if(!row.wagon_data_uploaded) {
+      return showMessage('Please upload wagon sheet to assign plant', 'error');
+    }
     router.push(`/inPlantDashboard/wagonAssignSheet?shipmentId=${row?.id}`);
     // setShowAssignWagon(true);
     // setShipmentForWagonSheet(row);
@@ -307,6 +311,9 @@ function WagonTallySheet({}: any) {
     setAnchorEl(null);
   };
   const assignHooksToLoadingShop = (event: any, row: any) => {
+    if(!row?.hooks || row?.hooks?.length === 0){
+      return showMessage('Please assign wagons to loading shop and try again', 'error');
+    }
     router.push(
       `/inPlantDashboard/assignHooksToLoadingShop?shipmentId=${row?.id}`
     );
@@ -314,8 +321,22 @@ function WagonTallySheet({}: any) {
     setAnchorEl(null);
   };
   const wagonTallySheet = (event: any, row: any) => {
+    if(!row?.showWagonTallySheet){
+      return showMessage('Please upload wagon sheet to view wagon tally sheet', 'error');
+    }
     router.push(
       `/inPlantDashboard/wagonTallySheet?shipmentId=${row?.id}`
+    );
+    setShowActionBox(-1);
+    setAnchorEl(null);
+  };
+  const wagonWayBill = (event: any, row: any) => {
+    if(!row?.wagon_data_uploaded){
+      return showMessage('Please upload wagon sheet to view wagon way bill', 'error');
+    }
+    window.open(
+      `/inPlantDashboard/wagonWayBill?shipmentId=${row?.id}`,
+      "_blank"
     );
     setShowActionBox(-1);
     setAnchorEl(null);
@@ -337,12 +358,14 @@ function WagonTallySheet({}: any) {
     setRowsPerPage(+event.target.value);
     setPage(0);
   };
+
   const handleStatusClick = (status: string) => {
     switch (status) {
       case "total":
         setPayloadForWagons((prev: any) => {
           let newState = { ...prev };
-          if (newState.status.length > 0) {
+          console.log(newState.status, "newState.status");
+          if (newState.status.length > 0 && newState.status.includes("AVE")) {
             newState.status = [];
             setStatusCondition(newState.status);
           } else {
@@ -968,6 +991,14 @@ function WagonTallySheet({}: any) {
                                         {text("uploadWagonTallySheet")}
                                       </div>
                                       <div
+                                          className="action-popover-wagon"
+                                          onClick={(e) => {
+                                            wagonWayBill(e, row)
+                                          }}
+                                        >
+                                          {text("wagonWayBill")}
+                                        </div>
+                                      <div
                                         onClick={(e) => {
                                           uploadRakeSheet(e, row);
                                         }}
@@ -975,41 +1006,23 @@ function WagonTallySheet({}: any) {
                                       >
                                         {text("rakeHandlingSheet")}
                                       </div>
-                                      {row.wagon_data_uploaded ? (
-                                        <div
+                                      <div
                                           className="action-popover-wagon"
                                           onClick={(e) => {
                                             assignPlantToWagon(e, row);
                                           }}
                                         >
                                           {text("assignWagonToPlant")}
-                                        </div>
-                                      ) : (
-                                        <div
-                                          className="action-popover-wagon-disabled"
-                                        >
-                                          {text("assignWagonToPlant")}
-                                        </div>
-                                      )}
-                                      {row?.hooks && row?.hooks?.length >
-                                        0 ? (
-                                        <div
+                                      </div>
+                                      <div
                                           className="action-popover-wagon"
                                           onClick={(e) => {
                                             assignHooksToLoadingShop(e, row);
                                           }}
                                         >
                                           {text("assignsHooksToLoadingShop")}
-                                        </div>
-                                      ) : (
-                                        <div
-                                          className="action-popover-wagon-disabled"
-                                        >
-                                          {text("assignsHooksToLoadingShop")}
-                                        </div>
-                                      )}
-                                      {row?.showWagonTallySheet ? (
-                                        <div
+                                      </div>
+                                      <div
                                           className="action-popover-wagon"
                                           onClick={(e) => {
                                             wagonTallySheet(e, row)
@@ -1017,13 +1030,6 @@ function WagonTallySheet({}: any) {
                                         >
                                           {text("wagonTallySheet")}
                                         </div>
-                                      ) : (
-                                        <div
-                                          className="action-popover-wagon-disabled"
-                                        >
-                                          {text("wagonTallySheet")}
-                                        </div>
-                                      )}
                                       {/* <div
                                         className="action-popover-wagon"
                                         onClick={(e) => {

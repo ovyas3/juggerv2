@@ -20,6 +20,7 @@ export const UPDATE_RAKE_CAPTIVE_ID = 'rake_shipment/update_rake_captive_id';
 export const REMARKS_UPDATE_ID = 'add/remark';
 export const UPDATE_DELIVER_STATUS_WITH_REMARK = 'rake_shipment/updateDeliverStatusWithRemark'
 export const REMARKS_LIST = 'get/remark/reasons';
+export const LAST_FOIS_PING = 'get/last/fois_ping';
 
 export const STATIONS ='get/stations';
 export const ZONES = 'get/zones';
