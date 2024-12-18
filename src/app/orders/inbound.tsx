@@ -23,7 +23,7 @@ function Inbound() {
     is_outbound:false,
     from:'',
     to:'',
-    status:['ITNS', 'Delivered']
+    status:['ITNS']
   });
   const [countInbound, setCountInbound] = useState({
     total:0,

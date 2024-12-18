@@ -80,7 +80,7 @@ const OrdersPage = () => {
   const [selected_bound, setSelected_bound] = useState('outbound')
   const [remarksList, setRemarksList] = useState({})
   const [triggerShipments, setTriggerShipments] = useState(false)
-  const [status, setStatus] = useState(['total']);
+  const [status, setStatus] = useState(['ITNS']);
 
   const [statusTotal, setStatusTotal] = useState(false);
   const [statusAVE, setStatusAVE] = useState(false);
@@ -105,8 +105,8 @@ const OrdersPage = () => {
     is_outbound: true,
     to: '',
     from: '',
-    // status: ['ITNS', 'Delivered'],
-    rake_types: ['CR', 'IR']
+    rake_types: ['CR', 'IR'],
+    status: ['ITNS'],
   })
 
   //adding to and from to shipmentpayload
