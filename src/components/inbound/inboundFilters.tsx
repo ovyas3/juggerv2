@@ -22,6 +22,7 @@ import MapViewIcon from "@/assets/map_view.svg";
 import calenderIcon from "@/assets/calender_icon_filters.svg";
 import filter_icon from "@/assets/filter_icon.svg";
 import { useRouter, usePathname } from "next/navigation";
+import LastFOISPing from "../LastFOISPing/LastFOISPing";
 
 const formatDate = (date: any) => {
   const t = service.getLocalTime(new Date(date));
@@ -369,6 +370,9 @@ function InboundFilters({ setInBoundPayload }: any) {
             <img src={filter_icon.src} alt="" />
           </div>
         </div>
+
+        <LastFOISPing />  
+
       </div>
 
       {openFilterModal && (

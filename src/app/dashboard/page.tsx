@@ -5,7 +5,6 @@ import SideDrawer from "@/components/Drawer/Drawer";
 import MobileDrawer from "@/components/Drawer/mobile_drawer";
 import MobileHeader from "@/components/Header/mobileHeader";
 import Header from "@/components/Header/header";
-import { useWindowSize } from "@/utils/hooks";
 import {useTranslations} from 'next-intl';
 import { useMediaQuery, useTheme } from '@mui/material';
 import { useSearchParams } from 'next/navigation';
