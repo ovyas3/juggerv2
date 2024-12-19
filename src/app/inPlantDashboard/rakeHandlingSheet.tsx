@@ -44,6 +44,8 @@ const eventCodes = {
   eot: "EOT",
   apReady: "APR",
   drawnOut: "DRO",
+  HLS: "HLS",
+  HLC: "HLC"
 };
 
 const styles: { [key: string]: React.CSSProperties } = {
@@ -295,6 +297,33 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
         });
       });
     });
+
+    workingPlant.forEach((plant: any) => {
+      plant.hooks.forEach((hook: any) => {
+        if (hook.loading_start) {
+          payload.events.push({
+            shipment: shipment.id,
+            event_name: `${hook.hook_no} Hook Loading Start`,
+            event_code: "HLS",
+            event_datetime: hook.loading_start,
+            FNR: shipment.fnr,
+            plant: plant.plant._id,
+            hook: hook.hook_no
+          });
+        }
+        if (hook.loading_end) {
+          payload.events.push({
+            shipment: shipment.id,
+            event_name: `${hook.hook_no} Hook Loading Complete`,
+            event_code: "HLC",
+            event_datetime: hook.loading_end,
+            FNR: shipment.fnr,
+            plant: plant.plant._id,
+            hook: hook.hook_no
+          });
+        }
+      });
+    });
     if (rakeArrivalAtStationDate) {
       payload.events.push({
         shipment: shipment.id,
@@ -416,13 +445,10 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
       setLoading(true);
       const response = await httpsPost(`rake_event/add`, payload, router);
       if (response.statusCode === 200) {
-        showMessage.showMessage(
-          "Rake Handling Sheet Added Successfully",
-          "success"
-        );
+        showMessage.showMessage("Rake Handling Sheet Added Successfully", "success");
         setRakeHandlingSheetData((prevData: any) => {
           const updatedData = [...prevData];
-          payload.events.forEach((newEvent: { event_name: any; }) => {
+          payload.events.forEach((newEvent: any) => {
             const index = updatedData.findIndex((event) => event.event_name === newEvent.event_name);
             if (index !== -1) {
               updatedData[index] = { ...updatedData[index], ...newEvent };
@@ -432,16 +458,20 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
           });
           return updatedData;
         });
+        updateEventStates(payload.events);
         setWorkingPlant((prevPlants: any[]) => {
           return prevPlants.map((plant) => ({
             ...plant,
-            hooks: plant.hooks.map((hook: { hook_no: any; loading_start: any; loading_end: any; }) => ({
+            hooks: plant.hooks.map((hook: any) => ({
               ...hook,
-              loading_start: payload.events.find((event: { event_name: string | string[]; }) => event.event_name.includes(`${hook.hook_no} Hook Loading Start`))?.event_datetime || hook.loading_start,
-              loading_end: payload.events.find((event: { event_name: string | string[]; }) => event.event_name.includes(`${hook.hook_no} Hook Loading Complete`))?.event_datetime || hook.loading_end,
+              loading_start: payload.events.find((event: any) => event.event_name.includes(`${hook.hook_no} Hook Loading Start`))?.event_datetime || hook.loading_start,
+              loading_end: payload.events.find((event: any) => event.event_name.includes(`${hook.hook_no} Hook Loading Complete`))?.event_datetime || hook.loading_end,
             }))
           }));
         });
+        // Close the modal after successful submission
+        getWagonDetails()
+        isClose(false);
       }
     } catch (error) {
       setLoading(false);
@@ -458,12 +488,65 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
         `rake_event_by_shipment/get?id=${shipment.id}`, 0, router
       );
       setRakeHandlingSheetData(response?.data);
+      updateEventStates(response?.data);
     } catch (error) {
       setLoading(false);
       console.log(error);
     } finally {
       setLoading(false);
     }
+  };
+
+  const updateEventStates = (events: any[]) => {
+    events.forEach((event: any) => {
+      const eventDate = new Date(event.event_timestamp);
+      switch (event.event_code) {
+        case eventCodes.rakeArrivalAtStation:
+          setRakeArrivalAtStationObject(event);
+          setRakeArrivalAtStationDate(eventDate);
+          break;
+        case eventCodes.stabled:
+          setStabled(event);
+          setStabledDate(eventDate);
+          break;
+        case eventCodes.placementTime:
+          setPlacementTime(event);
+          setPlacementTimeDate(eventDate);
+          break;
+        case eventCodes.bpRelease:
+          setBpReleaseObject(event);
+          setBpReleaseDate(eventDate);
+          break;
+        case eventCodes.wagonPlacedAtLoadingPoint:
+          setWagonPlacedAtLoadingPointObject(event);
+          setWagonPlacedAtLoadingPointDate(eventDate);
+          break;
+        case eventCodes.loadRakeFormation:
+          setLoadRakeFormationObject(event);
+          setLoadRakeFormationDate(eventDate);
+          break;
+        case eventCodes.rakeRelease:
+          setRakeReleaseObject(event);
+          setRakeReleaseDate(eventDate);
+          break;
+        case eventCodes.rlylocoReporting:
+          setRlylocoReportingObject(event);
+          setRlylocoReportingDate(eventDate);
+          break;
+        case eventCodes.eot:
+          setEotObject(event);
+          setEotDate(eventDate);
+          break;
+        case eventCodes.apReady:
+          setApReadyObject(event);
+          setApReadyDate(eventDate);
+          break;
+        case eventCodes.drawnOut:
+          setDrawnOutObject(event);
+          setDrawnOutDate(eventDate);
+          break;
+      }
+    });
   };
 
   const plantDetails = async () => {
@@ -500,30 +583,14 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
   };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        const [rakeEvents, assignedShops] = await Promise.all([
-          httpsGet(`rake_event_by_shipment/get?id=${shipment.id}`, 0, router),
-          httpsGet(`get_assigned_loading_shops?shipment=${shipment.id}`, 0, router)
-        ]);
-        setRakeHandlingSheetData(rakeEvents.data);
-        setPlants(assignedShops.data);
-      } catch (error) {
-        console.log(error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [shipment.id, router]);
-
-  useEffect(() => {
-   setArrivalPlNo(shipment?.arrival_pl)
-   setFormationPlNo(shipment?.formation_pl)
-   setWeighment(shipment?.weighment)
-  }, [shipment])
+    if (shipment) {
+      setArrivalPlNo(shipment.arrival_pl || '');
+      setFormationPlNo(shipment.formation_pl || '');
+      setWeighment(shipment.weighment || false);
+      getRakeHandlingSheetData();
+      plantDetails();
+    }
+  }, [shipment]);
 
   useEffect(() => {
     setWorkingPlant((prev: any) => {
