@@ -35,7 +35,6 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 28%;
 }
 
 .search-wagon-input{
@@ -63,8 +62,17 @@
 }
 
 .wagon-tally-sheet-body{
+  margin-top: 16px;
   width: 100%;
   height: calc(100% - 100px);
+}
+
+.wagon-tally-sheet-body-container{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
 }
 
 .wagon-tally-sheet-body-header{
@@ -206,11 +214,7 @@
   width: 100%;
   justify-content: space-between;
   align-items: center;
-  padding: 24px;
-}
-
-.wagon-tally-sheet-body-content-wagon-details-container:first-child{
-  border-bottom: 1px solid #DBE2FF;
+  padding: 8px 24px;
 }
 
 .wagon-tally-sheet-body-content-wagon-details-contents{
@@ -363,7 +367,7 @@
 .wagon-tally-sheet-body-content-materials-details-body-container{
   margin-top: 24px;
   padding-left: 24px;
-  height: calc(21vh - 20px);
+  height: calc(40vh - 20px);
   overflow-y: auto;
 
   @media screen and (max-width: 1024px){

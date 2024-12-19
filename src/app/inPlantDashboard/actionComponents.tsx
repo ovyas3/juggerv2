@@ -122,6 +122,7 @@ export const MarkPlacement = ({
         e.stopPropagation();
         isClose(false);
       }}
+      aria-hidden="true"
     >
       <div
         style={{
