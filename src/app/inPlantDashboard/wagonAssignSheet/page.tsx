@@ -68,8 +68,8 @@ function WagonAssignSheetContent() {
   const [shipmentData, setShipmentData] = useState<any>({});
   const [loading, setLoading] = useState(false);
   const [selectionRect, setSelectionRect] = useState({ startX: 0, startY: 0, width: 0, height: 0 });
-const [isSelecting, setIsSelecting] = useState(false);
-const containerRef = useRef<HTMLDivElement | null>(null); 
+  const [isSelecting, setIsSelecting] = useState(false);
+  const containerRef = useRef<HTMLDivElement | null>(null); 
 
   const wagonDetails = async () => {
     try {
@@ -150,7 +150,7 @@ const containerRef = useRef<HTMLDivElement | null>(null);
             };
         });
     });
-};
+  };
 
   const submitAssignToMill = async () => {
     let payload = {};
@@ -227,49 +227,48 @@ const containerRef = useRef<HTMLDivElement | null>(null);
         height: 0,
     };
     setSelectionRect(rect);
-};
+  };
 
-const handleMouseMove = (e: React.MouseEvent) => {
-  if (!isSelecting) return;
-  const width = e.clientX - selectionRect.startX;
-  const height = e.clientY - selectionRect.startY;
-  setSelectionRect(prev => ({
-      ...prev,
-      width: width < 0 ? -width : width, // Ensure width is positive
-      height: height < 0 ? -height : height, // Ensure height is positive
-  }));
-};
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isSelecting) return;
+    const width = e.clientX - selectionRect.startX;
+    const height = e.clientY - selectionRect.startY;
+    setSelectionRect(prev => ({
+        ...prev,
+        width: width < 0 ? -width : width, // Ensure width is positive
+        height: height < 0 ? -height : height, // Ensure height is positive
+    }));
+  };
 
-const handleMouseUp = () => {
-  setIsSelecting(false);
-  const wagonElements = document.querySelectorAll('.wagonAssignToMillContainerWagon');
-  wagonElements.forEach((wagonElement, index) => {
-      const rect = wagonElement.getBoundingClientRect();
-      if (
-          rect.left >= selectionRect.startX &&
-          rect.right <= selectionRect.startX + selectionRect.width &&
-          rect.top >= selectionRect.startY &&
-          rect.bottom <= selectionRect.startY + selectionRect.height
-      ) {
-          // Toggle wagon assignment
-          const wagon = wagonsNewData[index];
-          if (wagon.plant_assigned) {
-              wagon.plant_assigned = null;
-          } else {
-              wagon.plant_assigned = SelectedPlant;
-          }
-          setWagonsNewData([...wagonsNewData]);
-      }
-  });
-  setSelectionRect({ startX: 0, startY: 0, width: 0, height: 0 }); // Reset the rectangle
-};
+  const handleMouseUp = () => {
+    setIsSelecting(false);
+    const wagonElements = document.querySelectorAll('.wagonAssignToMillContainerWagon');
+    wagonElements.forEach((wagonElement, index) => {
+        const rect = wagonElement.getBoundingClientRect();
+        if (
+            rect.left >= selectionRect.startX &&
+            rect.right <= selectionRect.startX + selectionRect.width &&
+            rect.top >= selectionRect.startY &&
+            rect.bottom <= selectionRect.startY + selectionRect.height
+        ) {
+            // Toggle wagon assignment
+            const wagon = wagonsNewData[index];
+            if (wagon.plant_assigned) {
+                wagon.plant_assigned = null;
+            } else {
+                wagon.plant_assigned = SelectedPlant;
+            }
+            setWagonsNewData([...wagonsNewData]);
+        }
+    });
+    setSelectionRect({ startX: 0, startY: 0, width: 0, height: 0 }); // Reset the rectangle
+  };
 
-useEffect(() => {
-  if (containerRef.current) {
-      const containerRect = containerRef.current.getBoundingClientRect();
-      // Use containerRect.left and containerRect.top for adjustments
-  }
-}, [wagonsNewData]);
+  useEffect(() => {
+    if (containerRef.current) {
+        const containerRect = containerRef.current.getBoundingClientRect();
+    }
+  }, [wagonsNewData]);
 
   if (loading) {
     return (
