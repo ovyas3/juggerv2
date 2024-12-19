@@ -237,13 +237,13 @@ type FormValues = {
   material: string;
   code: string;
   grade: string;
-  width: number;
-  thick: number;
-  length: number;
-  pieces: number;
+  width: string;
+  thick: string;
+  length: string;
+  pieces: string;
   line_item: string;
-  pgi_tw_wrt: number;
-  actual_weight: number;
+  pgi_tw_wrt: string;
+  actual_weight: string;
   material_images: (any)[];
 };
 
@@ -293,13 +293,13 @@ const WagonTallySheet: React.FC = () => {
       material: '',
       code: '',
       grade: '',
-      width: 0,
-      thick: 0,
-      length: 0,
-      pieces: 0,
+      width: '',
+      thick: '',
+      length: '',
+      pieces: '',
       line_item: '',
-      pgi_tw_wrt: 0,
-      actual_weight: 0,  
+      pgi_tw_wrt: '',
+      actual_weight: '',  
       material_images: [],
     }
   ]);
@@ -337,20 +337,17 @@ const WagonTallySheet: React.FC = () => {
 
 
   // Function to handle input change in form (Material Details)
-  const handleInputChange = (index: number, event: React.ChangeEvent<HTMLInputElement>) => {
-    const name = event.target.name as FormValueKey;
-    const value = event.target.value;
-  
-    setFormValues(prev => {
+  // Function to handle input change in form (Material Details)
+const handleInputChange = (index: number, event: React.ChangeEvent<HTMLInputElement>) => {
+  const name = event.target.name as FormValueKey;
+  const value = event.target.value;
+
+  setFormValues(prev => {
       const newFormValues = [...prev];
-      if (name === 'width' || name === 'thick' || name === 'length' || name === 'pieces' || name === 'pgi_tw_wrt' || name === 'actual_weight') {
-        newFormValues[index][name] = parseFloat(value) as any;
-      } else {
-        newFormValues[index][name] = value;
-      }
+      newFormValues[index][name] = value;
       return newFormValues;
-    });
-  };
+  });
+};
 
   // Function to handle data with batch id
   const handleDataWithBatchId = async (index: number) => {
@@ -401,13 +398,13 @@ const WagonTallySheet: React.FC = () => {
         material: '',
         code: '',
         grade: '',
-        width: 0,
-        thick: 0,
-        length: 0,
-        pieces: 0,
+        width: '',
+        thick: '',
+        length: '',
+        pieces: '',
         line_item: '',
-        pgi_tw_wrt: 0,
-        actual_weight: 0, 
+        pgi_tw_wrt: '',
+        actual_weight: '', 
         material_images: [], 
       }
     ]);
@@ -588,13 +585,13 @@ const WagonTallySheet: React.FC = () => {
         material: '',
         code: '',
         grade: '',
-        width: 0,
-        thick: 0,
-        length: 0,
-        pieces: 0,
+        width: '',
+        thick: '',
+        length: '',
+        pieces: '',
         line_item: '',
-        pgi_tw_wrt: 0,
-        actual_weight: 0, 
+        pgi_tw_wrt: '',
+        actual_weight: '', 
         material_images: [], 
       }
     ]);
@@ -762,13 +759,13 @@ const WagonTallySheet: React.FC = () => {
               material: '',
               code: '',
               grade: '',
-              width: 0,
-              thick: 0,
-              length: 0,
-              pieces: 0,
+              width: '',
+              thick: '',
+              length: '',
+              pieces: '',
               line_item: '',
-              pgi_tw_wrt: 0,
-              actual_weight: 0,
+              pgi_tw_wrt: '',
+              actual_weight: '',
               material_images: [],
             }
           ]);
@@ -813,6 +810,23 @@ const WagonTallySheet: React.FC = () => {
   const postWagonTallySheet = async () => {
     if(selectedWagonDetails && selectedWagonDetails?._id && !isSick) {
       setLoading(true);
+      const formValuesMaterials = formValues.map((material: any) => {
+        return {
+          batch_id: material.batch_id || '',
+          heat_no: material.heat_no || '',
+          material: material.material || '',
+          code: material.code || '',
+          grade: material.grade || '',
+          width: Number(material.width) || 0,
+          thick: Number(material.thick) || 0,
+          length: Number(material.length) || 0,
+          pieces: Number(material.pieces) || 0,
+          line_item: material.line_item || '',
+          pgi_tw_wrt: Number(material.pgi_tw_wrt) || 0,
+          actual_weight: Number(material.actual_weight) || 0,
+          material_images: material.material_images || [],
+        };
+      });
       const filteredDates = dates.filter(
         date => date.event_timestamp);
       const payload = {
