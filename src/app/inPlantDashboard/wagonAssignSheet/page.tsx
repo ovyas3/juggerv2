@@ -230,7 +230,7 @@ function WagonAssignSheetContent() {
           <div></div>
         </div>
 
-        <div className="shipment-details-container">
+        <div className="shipment-details-container-inplant">
         <div id="status-for-assign-sheet-wagon">
           <div>
             <header style={{ fontSize: 12, color: "#42454E", marginBottom: 8 }}>
