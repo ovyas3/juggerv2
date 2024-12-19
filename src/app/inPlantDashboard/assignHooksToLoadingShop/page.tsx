@@ -558,6 +558,14 @@ function AssignHooksToLoadingShopContent() {
           </div>
           <div>
             <header style={{ fontSize: 12, color: "#42454E", marginBottom: 8 }}>
+              {text("IndentNo")}
+            </header>
+            <text style={{ fontSize: 16, color: "#42454E", fontWeight: 600 }}>
+              {shipmentData?.indent_no || ""}
+            </text>
+          </div>
+          <div>
+            <header style={{ fontSize: 12, color: "#42454E", marginBottom: 8 }}>
               {text("receivedWagons")}
             </header>
             <text style={{ fontSize: 16, color: "#42454E", fontWeight: 600 }}>
@@ -568,6 +576,7 @@ function AssignHooksToLoadingShopContent() {
         </div>
         <div className="wagon-tally-sheet-body-content-train" id="train">
               <TrainContainer id="train">
+              <Image src={TrainImage} alt="Train engine" style={{ borderBottom: '1px solid #D0D1D3', marginRight: '-12px' }} />
                 {train ? (
                   train
                     .map((wagon:any, index:any) => {
@@ -587,7 +596,6 @@ function AssignHooksToLoadingShopContent() {
                 ) : (
                   <></>
                 )}
-                <Image src={TrainImage} alt="Train engine" style={{ borderBottom: '1px solid #D0D1D3', marginLeft: '-1px' }} />
               </TrainContainer>
               </div>
 

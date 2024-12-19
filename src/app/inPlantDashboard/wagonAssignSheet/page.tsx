@@ -332,6 +332,14 @@ function WagonAssignSheetContent() {
           </div>
           <div>
             <header style={{ fontSize: 12, color: "#42454E", marginBottom: 8 }}>
+              {text("IndentNo")}
+            </header>
+            <text style={{ fontSize: 16, color: "#42454E", fontWeight: 600 }}>
+              {shipmentData?.indent_no || ""}
+            </text>
+          </div>
+          <div>
+            <header style={{ fontSize: 12, color: "#42454E", marginBottom: 8 }}>
               {text("receivedWagons")}
             </header>
             <text style={{ fontSize: 16, color: "#42454E", fontWeight: 600 }}>
@@ -350,6 +358,18 @@ function WagonAssignSheetContent() {
                   ref={provided.innerRef}
                   className="train-shipment-container"
                 >
+                  <div id="wagon-locomotion-engine">
+                    <div>
+                      <Image
+                        src={locomotive.src}
+                        alt="locomotive"
+                        width={190}
+                        height={48}
+                        style={{ display: "block" }}
+                      />
+                    </div>
+                  </div>
+                  {provided.placeholder}
                   {wagonsNewData && wagonsNewData.map((wagon: any, index: any) => (
                     <Draggable
                       key={wagon._id}
@@ -419,18 +439,8 @@ function WagonAssignSheetContent() {
                       )}
                     </Draggable>
                   ))}
-                  {provided.placeholder}
-                  <div id="wagon-locomotion-engine">
-                    <div>
-                      <Image
-                        src={locomotive.src}
-                        alt="locomotive"
-                        width={190}
-                        height={48}
-                        style={{ display: "block" }}
-                      />
-                    </div>
-                  </div>
+                  
+                  
                 </div>
               )}
             </Droppable>

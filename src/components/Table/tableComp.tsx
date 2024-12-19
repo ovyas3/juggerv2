@@ -1496,7 +1496,7 @@ export const UploadDailyRakeHandlingSheet = ({ getWagonDetails, isClose, shipmen
                 </label>
             </div>
             <div>
-                <p className="sampleFile" onClick={(e)=>{e.stopPropagation();  window.open('https://docs.google.com/spreadsheets/d/1AXhVXT8iHBhpwprUnoK0IAXmZXQuhu9XDW06zKBF6AY/edit?usp=sharing', '_blank'); } } >Download Sample File</p>
+                <p className="sampleFile" onClick={(e)=>{e.stopPropagation();  window.open('https://docs.google.com/spreadsheets/d/1-MYaaTcWG7HSDQssjD--W_nrsELi_kLUpq7a5FsVkHI/edit?usp=sharing', '_blank'); } } >Download Sample File</p>
             </div>
 
 
