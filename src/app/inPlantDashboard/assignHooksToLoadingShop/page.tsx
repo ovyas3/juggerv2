@@ -415,7 +415,7 @@ function AssignHooksToLoadingShopContent() {
   };
 
   useEffect(() => {
-    if (allPlants.length > 0) {
+    if (allPlants && allPlants.length > 0) {
       const updatedPlants = allPlants.map((item: any) => ({
         ...item,
         hooksRecords: [{ hookNumber: 1, wagonsList: [] }],

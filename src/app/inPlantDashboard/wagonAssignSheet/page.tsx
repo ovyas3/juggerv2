@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -67,6 +67,9 @@ function WagonAssignSheetContent() {
   const id = searchParams.get("shipmentId");
   const [shipmentData, setShipmentData] = useState<any>({});
   const [loading, setLoading] = useState(false);
+  const [selectionRect, setSelectionRect] = useState({ startX: 0, startY: 0, width: 0, height: 0 });
+const [isSelecting, setIsSelecting] = useState(false);
+const containerRef = useRef<HTMLDivElement | null>(null); 
 
   const wagonDetails = async () => {
     try {
@@ -214,6 +217,59 @@ function WagonAssignSheetContent() {
   };
 
   const millColors = ["#3351FF", "#0A2540", "#18BE8A", "#6600FF", "#F57600",  "#FFCB47"];
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setIsSelecting(true);
+    const rect = {
+        startX: e.clientX - (containerRef.current ? containerRef.current.getBoundingClientRect().left : 0),
+        startY: e.clientY - (containerRef.current ? containerRef.current.getBoundingClientRect().top : 0),
+        width: 0,
+        height: 0,
+    };
+    setSelectionRect(rect);
+};
+
+const handleMouseMove = (e: React.MouseEvent) => {
+  if (!isSelecting) return;
+  const width = e.clientX - selectionRect.startX;
+  const height = e.clientY - selectionRect.startY;
+  setSelectionRect(prev => ({
+      ...prev,
+      width: width < 0 ? -width : width, // Ensure width is positive
+      height: height < 0 ? -height : height, // Ensure height is positive
+  }));
+};
+
+const handleMouseUp = () => {
+  setIsSelecting(false);
+  const wagonElements = document.querySelectorAll('.wagonAssignToMillContainerWagon');
+  wagonElements.forEach((wagonElement, index) => {
+      const rect = wagonElement.getBoundingClientRect();
+      if (
+          rect.left >= selectionRect.startX &&
+          rect.right <= selectionRect.startX + selectionRect.width &&
+          rect.top >= selectionRect.startY &&
+          rect.bottom <= selectionRect.startY + selectionRect.height
+      ) {
+          // Toggle wagon assignment
+          const wagon = wagonsNewData[index];
+          if (wagon.plant_assigned) {
+              wagon.plant_assigned = null;
+          } else {
+              wagon.plant_assigned = SelectedPlant;
+          }
+          setWagonsNewData([...wagonsNewData]);
+      }
+  });
+  setSelectionRect({ startX: 0, startY: 0, width: 0, height: 0 }); // Reset the rectangle
+};
+
+useEffect(() => {
+  if (containerRef.current) {
+      const containerRect = containerRef.current.getBoundingClientRect();
+      // Use containerRect.left and containerRect.top for adjustments
+  }
+}, [wagonsNewData]);
 
   if (loading) {
     return (
@@ -445,7 +501,28 @@ function WagonAssignSheetContent() {
             </div>
           </div>
 
-          <div id="assign-wagon-container-box-selection-container-wagon">
+          <div 
+            id="assign-wagon-container-box-selection-container-wagon"
+            ref={containerRef}
+            onMouseDown={handleMouseDown}
+            onMouseMove={handleMouseMove}
+            onMouseUp={handleMouseUp}
+            style={{ position: 'relative' }} 
+          >
+            {isSelecting && (
+                <div
+                    style={{
+                        position: 'absolute',
+                        border: '1px dashed blue',
+                        backgroundColor: 'rgba(30, 144, 255, 0.3)',
+                        left: selectionRect.startX - (containerRef.current ? containerRef.current.getBoundingClientRect().left : 0),
+                        top: selectionRect.startY - (containerRef.current ? containerRef.current.getBoundingClientRect().top : 0),
+                        width: selectionRect.width,
+                        height: selectionRect.height,
+                        pointerEvents: 'none',
+                    }}
+                />
+            )}
             {wagonsNewData && wagonsNewData.map((wagons: any, index: number) => {
               const isAssignedToSelectedPlant = wagons?.plant_assigned?._id === SelectedPlant?._id;
               const isAssignedToOtherPlant = wagons?.plant_assigned && !isAssignedToSelectedPlant;
@@ -459,6 +536,7 @@ function WagonAssignSheetContent() {
                   style={{
                     opacity: wagons.is_sick ? 0.4 : 1,
                     cursor: "pointer",
+
                   }}
                 >
                   <div
