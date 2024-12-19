@@ -179,11 +179,11 @@ const TrackingStatus: React.FC<TrackingStatusProps> = ({ handleAllRakesAndTable,
       if (index === 0) {
         return { backgroundColor: '#18be8a1a', borderRadius: '8px', borderRight: '3px solid #334ffc0d'};
       }
-    } else if (statusInfo === 'gpwis') {
+    } else if (statusInfo === 'bfnv') {
       if (index === 1) {
         return { backgroundColor: '#334ffc1a', borderRadius: '8px', borderRight: '3px solid #334ffc0d'};
       } 
-    } else if (statusInfo === 'bfnv') {
+    } else if (statusInfo === 'gpwis') {
       if (index === 2) {
         return { backgroundColor: '#bc4a281a', borderRadius: '8px', borderRight: '3px solid #334ffc0d'};
       }
@@ -228,7 +228,7 @@ const TrackingStatus: React.FC<TrackingStatusProps> = ({ handleAllRakesAndTable,
           <div className="scheme">
             {schemeData
               .sort((a, b) => {
-                const order = ['SFTO', 'GPWIS', 'BFNV'];
+                const order = ['SFTO', 'BFNV', 'GPWIS'];
                 return order.indexOf(a.scheme) - order.indexOf(b.scheme);
               }).map((scheme, index) => (
               <div className="scheme-container"  key={scheme.scheme} onClick={() => handleSchemeTypeAndTable(scheme.scheme)}
@@ -237,7 +237,11 @@ const TrackingStatus: React.FC<TrackingStatusProps> = ({ handleAllRakesAndTable,
                   {scheme.count || 0}
                 </span>
                 <span className={getClassName('scheme-name', statusInfo)}>
-                  {scheme.scheme || ""}
+                  {scheme 
+                    && scheme.scheme === "GPWIS" ? "GPWIS" : 
+                    scheme.scheme === "BFNV" ? "SFTO-BFNV" : 
+                    scheme.scheme === "SFTO" ? "SFTO-BRN" : 
+                  scheme.scheme || ""}
                 </span>
                 <div className="hover-infobox">
                   <span className="no-of-wagons">{scheme.wagons || 0}</span>

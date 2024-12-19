@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import CountUp from 'react-countup';
 
 function InboundDashboard({setInBoundPayload, countInbound}:any) {
-  const [status, setStatus] = useState(['ITNS','Delivered']);
+  const [status, setStatus] = useState(['ITNS']);
   const t = useTranslations("ORDERS");
 
   const getStatusColor = (statuses: string[], div: string) => {

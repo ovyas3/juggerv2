@@ -231,7 +231,9 @@ type DateEvent = {
 };
 
 type FormValues = {
-  batch_id_heat_no: string;
+  // batch_id_heat_no: string;
+  batch_id: string;
+  heat_no: string;
   material: string;
   code: string;
   grade: string;
@@ -245,7 +247,7 @@ type FormValues = {
   material_images: (any)[];
 };
 
-type FormValueKey = 'batch_id_heat_no' | 'material' | 'code' | 'grade' | 'width' | 'thick' | 'length' | 'pieces' | 'line_item' | 'pgi_tw_wrt' | 'actual_weight';
+type FormValueKey = 'batch_id' | 'heat_no' | 'material' | 'code' | 'grade' | 'width' | 'thick' | 'length' | 'pieces' | 'line_item' | 'pgi_tw_wrt' | 'actual_weight';
 
 type PickerKey =
   | "loadingReadinessTime"
@@ -285,7 +287,9 @@ const WagonTallySheet: React.FC = () => {
   const [materialCount, setMaterialCount] = useState(0);
   const [formValues, setFormValues] = useState<FormValues[]>([
     {
-      batch_id_heat_no: '',
+      // batch_id_heat_no: '',
+      batch_id: '',
+      heat_no: '',
       material: '',
       code: '',
       grade: '',
@@ -350,7 +354,8 @@ const WagonTallySheet: React.FC = () => {
 
   // Function to handle data with batch id
   const handleDataWithBatchId = async (index: number) => {
-    const batchId = formValues[index].batch_id_heat_no;
+    // const batchId = formValues[index].batch_id_heat_no;
+    const batchId = formValues[index].batch_id;
     if(batchId && batchId.length === 10) {
       try{
         setLoading(true);
@@ -390,7 +395,9 @@ const WagonTallySheet: React.FC = () => {
   const handleAdd = () => {
     setFormValues([...formValues, 
       {
-        batch_id_heat_no: '',
+        // batch_id_heat_no: '',
+        batch_id: '',
+        heat_no: '',
         material: '',
         code: '',
         grade: '',
@@ -575,7 +582,9 @@ const WagonTallySheet: React.FC = () => {
   const handleClear = () => {
     setFormValues([
       {
-        batch_id_heat_no: '',
+        // batch_id_heat_no: '',
+        batch_id: '',
+        heat_no: '',
         material: '',
         code: '',
         grade: '',
@@ -747,7 +756,9 @@ const WagonTallySheet: React.FC = () => {
         }else {
           setFormValues([
             {
-              batch_id_heat_no: '',
+              // batch_id_heat_no: '',
+              batch_id: '',
+              heat_no: '',
               material: '',
               code: '',
               grade: '',
@@ -1184,14 +1195,27 @@ const WagonTallySheet: React.FC = () => {
                           type="text" 
                           placeholder="" 
                           className="wagon-tally-sheet-body-content-materials-details-body-content-input"
-                          name="batch_id_heat_no"
-                          value={formValue.batch_id_heat_no}
+                          name="batch_id"
+                          // value={formValue.batch_id_heat_no}
+                          value={formValue.batch_id}
                           onChange={(event) => handleInputChange(index, event)}/>
                         <div className="wagon-tally-sheet-body-content-materials-details-body-content-input-icon" onClick={() => {
                           handleDataWithBatchId(index);
                         }}>
                           <Image src={ArrowRight} alt="Arrow right" className="arrow-right-icon" />
                         </div>
+                      </div>
+                    </div>
+                    <div className="wagon-tally-sheet-body-content-materials-details-body-content">
+                      <p className="wagon-tally-sheet-body-content-materials-details-body-content-label">{text('heatNo')}</p>
+                      <div className="wagon-tally-sheet-body-content-materials-details-body-content-input-container">
+                        <input 
+                          type="text" 
+                          placeholder="" 
+                          className="wagon-tally-sheet-body-content-materials-details-body-content-input"
+                          name="heat_no"
+                          value={formValue.heat_no}
+                          onChange={(event) => handleInputChange(index, event)}/>
                       </div>
                     </div>
                     <div className="wagon-tally-sheet-body-content-materials-details-body-content">

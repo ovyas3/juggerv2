@@ -1,7 +1,7 @@
 "use client";
 
-import { useDebugValue, useRef } from 'react';
-import { MapContainer, TileLayer, Marker, LayersControl, Popup } from 'react-leaflet';
+import { useRef } from 'react';
+import { MapContainer, Marker, Popup } from 'react-leaflet';
 import "leaflet/dist/leaflet.css";
 import "leaflet-boundary-canvas";
 import L from "leaflet"; // Import Leaflet for creating custom icons
@@ -15,13 +15,11 @@ import { useRouter } from 'next/navigation';
 import getBoundary from '@/components/MapView/IndianClaimed';
 import timeService from '@/utils/timeService';
 import { Checkbox, useMediaQuery, useTheme } from '@mui/material';
-import { get } from 'http';
 import styles from "./page.module.css";
 import getIndiaMap from "@/components/MapView/IndiaMap";
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import searchIcon from '@/assets/search_icon.svg'
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
+import LastFOISPing from "@/components/LastFOISPing/LastFOISPing";
 
 interface SchemeData {
   count: number;
@@ -1217,6 +1215,15 @@ export default function CaptiveRakeMapView() {
           </div>
           <div className={styles.rightPanel}>
             <div style={{ position: "relative" }}>
+              <div
+               style={{
+                position: "absolute",
+                zIndex: 1000,
+                  right: "50px",
+                  top: "50px",
+               }}>
+                <LastFOISPing />
+              </div>
               <div
                 style={{
                   height: "32px",

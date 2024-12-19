@@ -333,6 +333,48 @@ function AssignHooksToLoadingShopContent() {
     });
   };
 
+  const assignAllWagonsToSelectedPlant = () => {
+    if (!selectedPlant || !selectedHook) {
+        showMessage.showMessage("Please select a plant and hook number", "error");
+        return;
+    }
+
+    const unassignedWagons = workingWagonsList.filter((wagon: any) => !wagon.hook_no);
+
+    if (unassignedWagons.length === 0) {
+        showMessage.showMessage("No wagons available to assign", "info");
+        return; 
+    }
+
+    setWorkingWagonsList((prevWagons: any) => {
+        return prevWagons.map((wagon: any) => {
+            if (unassignedWagons.includes(wagon)) {
+                wagon.hook_no = selectedHook;
+            }
+            return wagon; 
+        });
+    });
+
+    setHookManagement((prevHookManagement: any) => {
+        const newHookManagement = [...prevHookManagement];
+        newHookManagement.forEach((plantObject: any) => {
+            if (plantObject?.plant?._id === selectedPlant?.plant?._id) {
+                plantObject.hooksRecords.forEach((hookObject: any) => {
+                    if (hookObject.hookNumber === selectedHook) {
+                        hookObject.wagonsList = [
+                            ...hookObject.wagonsList,
+                            ...unassignedWagons.map((wagon: any) => wagon._id), 
+                        ];
+                    }
+                });
+            }
+        });
+        return newHookManagement;
+    });
+
+    showMessage.showMessage(`All unselected wagons selected successfully for hook ${selectedHook} of ${selectedPlant?.plant?.name}`, "success");
+  };
+
   const handleAssignHooksToSelectedHook = (
     event: any,
     hook: any,
@@ -415,7 +457,7 @@ function AssignHooksToLoadingShopContent() {
   };
 
   useEffect(() => {
-    if (allPlants.length > 0) {
+    if (allPlants && allPlants.length > 0) {
       const updatedPlants = allPlants.map((item: any) => ({
         ...item,
         hooksRecords: [{ hookNumber: 1, wagonsList: [] }],
@@ -528,15 +570,14 @@ function AssignHooksToLoadingShopContent() {
               <TrainContainer id="train">
                 {train ? (
                   train
-                    .map((wagon:any, wagonIndex:any) => {
-                      console.log(wagon)
+                    .map((wagon:any, index:any) => {
                       return (
-                        <WagonContainer key={wagonIndex}>
+                        <WagonContainer key={wagon._id || index}>
                           <Track>
                             <WagonNumber>{wagon.wagonNumber}</WagonNumber>
                           </Track>
                           <Image src={getWagonImage(wagon.wagonType)} alt={wagon.wagonType} />
-                          {wagonIndex !== train.length - 1 && (
+                          {index !== train.length - 1 && (
                             <Image src={WagonConnector} alt="Wagon connector" className="wagon-connector-icon" />
                           )}
                            {wagon.hook_no && <div className="badge-hook">{wagon.hook_no}</div>}
@@ -550,73 +591,80 @@ function AssignHooksToLoadingShopContent() {
               </TrainContainer>
               </div>
 
-        <div id="filtersForHooksAssignToLoadingShop">
-          <div id="selectAPlant">
-            <label id="selectAPlantLabel">{text("selectAplant")}</label>
-            <div
-              id="dropdownForPlantsMaincontainer"
-              onClick={(e) => {
-                e.stopPropagation();
-                setOpenPlantDropDown(!openPlantDropDown);
-                setOpenHooksDropdown(false);
-              }}
-            >
-              <div>{selectedPlant?.plant?.name || "Select Mill"}</div>
-              <ArrowDropDownIcon />
-            </div>
-            {openPlantDropDown && (
-              <div id="dropdownListForplants">
-                {hookManagement?.map((eachPlant: any, index: number) => {
-                  return (
-                    <div
-                      onClick={(e) => {
-                        handleSelectionOfPlant(e, eachPlant, index);
-                      }}
-                      key={index}
-                      className="dropdownListForPlantsEachItem"
-                    >
-                      {eachPlant?.plant?.name}
-                    </div>
-                  );
-                })}
+        <div className="filter-container-loading-shop">
+          <div id="filtersForHooksAssignToLoadingShop">
+            <div id="selectAPlant">
+              <label id="selectAPlantLabel">{text("selectAplant")}</label>
+              <div
+                id="dropdownForPlantsMaincontainer"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setOpenPlantDropDown(!openPlantDropDown);
+                  setOpenHooksDropdown(false);
+                }}
+              >
+                <div>{selectedPlant?.plant?.name || "Select Mill"}</div>
+                <ArrowDropDownIcon />
               </div>
-            )}
-          </div>
-
-          <div id="hooksFilter">
-            <label id="selectAPlantLabel">{text("assignHooks")}</label>
-            <div
-              id="dropdownForPlantsMaincontainer"
-              onClick={(e) => {
-                e.stopPropagation();
-                setOpenPlantDropDown(false)
-                setOpenHooksDropdown(!openHooksDropdown);
-              }}
-            >
-              <div>{selectedHook ? `Hook ${selectedHook}` : "Select Hook"}</div>
-              <ArrowDropDownIcon />
-            </div>
-            {openHooksDropdown && (
-              <div id="dropdownListForHooks">
-                {selectedPlant?.hooks.map(
-                  (eachhook: any, index: number) => {
+              {openPlantDropDown && (
+                <div id="dropdownListForplants">
+                  {hookManagement?.map((eachPlant: any, index: number) => {
                     return (
                       <div
+                        onClick={(e) => {
+                          handleSelectionOfPlant(e, eachPlant, index);
+                        }}
                         key={index}
                         className="dropdownListForPlantsEachItem"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleAssignHooksToSelectedHook(e, eachhook, index);
-                        }}
                       >
-                        <div>Hook {eachhook.hook_no}</div>
+                        {eachPlant?.plant?.name}
                       </div>
                     );
-                  }
-                )}
+                  })}
+                </div>
+              )}
+            </div>
+
+            <div id="hooksFilter">
+              <label id="selectAPlantLabel">{text("assignHooks")}</label>
+              <div
+                id="dropdownForPlantsMaincontainer"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setOpenPlantDropDown(false)
+                  setOpenHooksDropdown(!openHooksDropdown);
+                }}
+              >
+                <div>{selectedHook ? `Hook ${selectedHook}` : "Select Hook"}</div>
+                <ArrowDropDownIcon />
               </div>
-            )}
+              {openHooksDropdown && (
+                <div id="dropdownListForHooks">
+                  {selectedPlant?.hooks.map(
+                    (eachhook: any, index: number) => {
+                      return (
+                        <div
+                          key={index}
+                          className="dropdownListForPlantsEachItem"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleAssignHooksToSelectedHook(e, eachhook, index);
+                          }}
+                        >
+                          <div>Hook {eachhook.hook_no}</div>
+                        </div>
+                      );
+                    }
+                  )}
+                </div>
+              )}
+            </div>
           </div>
+          <button className="assign-wagon-select-all-button" onClick={() => {
+            assignAllWagonsToSelectedPlant();
+          }}>
+            Select All
+          </button>
         </div>
 
         <div id="wagonListContainer">

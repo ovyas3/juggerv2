@@ -50,7 +50,7 @@
     justify-content: flex-start;
     padding: 24px 24px 0px 24px;
     flex-direction: row;
-    align-items: start;
+    align-items: flex-start;
   }
 
   .search-container-assign-title{
@@ -479,6 +479,8 @@
     width: 50%;
     height: 60px;
     display: flex;
+    margin-top: 12px;
+    padding-left: 32px;
     justify-content: space-between;
     align-items: center;
     position: relative;
@@ -519,11 +521,40 @@
       margin-bottom: 36px;
     }
   }
+  .assign-wagon-container-title-container{
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
   .assign-wagon-container-title{
     font-size: 16px;
     font-weight: 600;
     color: #3C4852;
     margin-bottom: 12px;
+  }
+  .assign-wagon-select-all-button {
+    display: inline-block;
+    position: relative;
+    padding: 6px 12px;
+    text-align: center;
+    font-size: 14px;
+    letter-spacing: 1px;
+    text-decoration: none;
+    color: #725AC1;
+    background: transparent;
+    cursor: pointer;
+    transition: ease-out 0.5s;
+    border: 2px solid #725AC1;
+    border-radius: 6px;
+    box-shadow: inset 0 0 0 0 #725AC1;
+  }
+  .assign-wagon-select-all-button:hover {
+    color: white;
+    box-shadow: inset 0 -100px 0 0 #725AC1;
+  }
+  .assign-wagon-select-all-button:active {
+    transform: scale(0.9);
   }
   #assign-wagon-container-box-selection-container-wagon{
     display: grid;
@@ -533,7 +564,8 @@
     grid-auto-flow: column; 
     column-gap: 32px;
     row-gap: 20px;
-    max-height: calc(100vh - 500px);
+    max-height: calc(100vh - 60vh);
+    padding: 24px;
     overflow-y: scroll;
     scroll-behavior: smooth;
     padding-bottom: 16px;

@@ -47,7 +47,6 @@ const CaptiveRakeSettings = () => {
     };
     
     const handleSchemeTypeAndTable = async (props: any) => {
-      console.log(props,'propssvsbjfdfck')
       const getSchemeType = props;
       const validSchemes = ["SFTO", "GPWIS", "BFNV"];
     
@@ -59,10 +58,10 @@ const CaptiveRakeSettings = () => {
           setStatusNumber(2);
         } else if(getSchemeType === "GPWIS"){
           setStatusInfo("gpwis");
-          setStatusNumber(3);
+          setStatusNumber(4);
         } else if(getSchemeType === "BFNV"){
           setStatusInfo("bfnv");
-          setStatusNumber(4);
+          setStatusNumber(3);
         }
       }
     }

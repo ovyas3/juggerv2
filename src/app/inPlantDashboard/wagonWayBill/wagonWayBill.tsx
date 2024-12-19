@@ -97,34 +97,13 @@ const PrintableWagonWayBill = () => {
                         return {
                             wagonNumber: wagon?.w_no ? wagon?.w_no : "N/A",
                             wagonType: wagon?.wagon_type && wagon?.wagon_type.name ? wagon?.wagon_type.name : "N/A",
-                            isLoaded: wagon?.is_loaded ? wagon?.is_loaded : "N/A",
+                            isLoaded: wagon?.shipment && wagon?.shipment.is_outbound ? "E" : "Ld",
                             ccWeight: wagon?.wagon_type && wagon?.wagon_type.capacity ? wagon?.wagon_type.capacity : "N/A",
                             tareWeight: wagon?.wagon_type && wagon?.wagon_type.tare_weight ? wagon?.wagon_type.tare_weight : "N/A",
                         }
                     })
                 }
-                // if (wagons) {
-                //     const initialWagonDetails = wagons.map((wagon: any) => {
-                //         return {
-                //             wagonNumber: wagon?.w_no ? wagon?.w_no : "N/A",
-                //             wagonType: wagon?.wagon_type && wagon?.wagon_type.name ? wagon?.wagon_type.name : "N/A",
-                //             isLoaded: wagon?.is_loaded ? wagon?.is_loaded : "N/A",
-                //             ccWeight: wagon?.wagon_type && wagon?.wagon_type.capacity ? wagon?.wagon_type.capacity : "N/A",
-                //             tareWeight: wagon?.wagon_type && wagon?.wagon_type.tare_weight ? wagon?.wagon_type.tare_weight : "N/A",
-                //         };
-                //     });
 
-                //     // Duplicate the entries until we have at least 50
-                //     wagonDetails = [];
-                //     while (wagonDetails.length < 60) {
-                //         wagonDetails = wagonDetails.concat(initialWagonDetails);
-                //     }
-
-                //     // Trim to exactly 50 if we have more than 50
-                //     wagonDetails = wagonDetails.slice(0, 60);
-                // }
-                console.log(wagonDetails, "wagonDetails");
-                console.log(shipmentDetails, "shipmentDetails");
                 setShipmentDetails(shipmentDetails);
                 setWagonDetails(wagonDetails);
                 setLoadingDate(new Date());
