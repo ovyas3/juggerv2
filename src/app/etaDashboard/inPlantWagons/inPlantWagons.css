@@ -1,0 +1,153 @@
+.in-plant-wagons-main {
+    padding: 1rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.in-plant-wagons-title {
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    font-weight: 700;
+    margin-bottom: clamp(1rem, 3vw, 2rem);
+    color: #000;
+}
+
+.in-plant-wagons-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+    width: 100%;
+}
+
+.in-plant-wagons-stats-card {
+    background: white;
+    border-radius: 8px;
+    padding: clamp(0.75rem, 2vw, 1rem);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #eee;
+    transition: transform 0.2s ease;
+}
+
+.in-plant-wagons-stats-card:hover {
+    transform: translateY(-2px);
+}
+
+.in-plant-wagons-period {
+    font-size: clamp(0.75rem, 2vw, 0.875rem);
+    color: #666;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.in-plant-wagons-amount {
+    font-size: clamp(1.25rem, 3vw, 1.5rem);
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.in-plant-wagons-trend {
+    font-size: clamp(0.875rem, 2vw, 1rem);
+}
+
+.in-plant-wagons-trend[data-trend="up"] {
+    color: #22c55e;
+}
+
+.in-plant-wagons-trend[data-trend="down"] {
+    color: #ef4444;
+}
+
+.in-plant-wagons-tableContainer {
+    overflow-x: auto;
+    border-radius: 8px;
+    border: 1px solid #eee;
+    width: 100%;
+    background: white;
+    -webkit-overflow-scrolling: touch;
+}
+
+.in-plant-wagons-table {
+    width: 100%;
+    border-collapse: collapse;
+    white-space: nowrap;
+    font-size: clamp(0.75rem, 2vw, 0.875rem);
+}
+
+.in-plant-wagons-table th,
+.in-plant-wagons-table td {
+    padding: clamp(0.5rem, 2vw, 0.75rem) clamp(0.75rem, 2vw, 1rem);
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+.in-plant-wagons-table th {
+    background: #f9fafb;
+    font-weight: 600;
+    color: #374151;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.in-plant-wagons-table tr:last-child td {
+    border-bottom: none;
+}
+
+.in-plant-wagons-table tbody tr:hover {
+    background: #f9fafb;
+}
+
+.in-plant-wagons-charges {
+    color: #ef4444;
+}
+
+.in-plant-wagons-id-column{
+    font-size: 13px;
+    font-weight: 600;
+}
+
+@media (max-width: 640px) {
+    .in-plant-wagons-main {
+        padding: 0.75rem;
+    }
+
+    .in-plant-wagons-stats-grid {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+
+    .in-plant-wagons-tableContainer {
+        margin: 0 -0.75rem;
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+    }
+
+    .in-plant-wagons-table th,
+    .in-plant-wagons-table td {
+        min-width: 120px;
+    }
+
+    .in-plant-wagons-table td:first-child,
+    .in-plant-wagons-table th:first-child {
+        position: sticky;
+        left: 0;
+        background: inherit;
+        z-index: 20;
+    }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+    .in-plant-wagons-stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1025px) {
+    .in-plant-wagons-stats-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
