@@ -22,7 +22,6 @@ const events_names = {
   rakeArrivalAtStation: "Rake Arrival at Serving Station",
   stabled: "Stabled",
   placementTime: "Placement Time",
-  releaseTime: "Release Time",
   bpRelease: "B/P Release",
   wagonPlacedAtLoadingPoint: "Wagons Placed At Loading Point",
   loadRakeFormation: "Load Rake Formation",
@@ -47,7 +46,6 @@ const eventCodes = {
   drawnOut: "DRO",
   HLS: "HLS",
   HLC: "HLC",
-  releaseTime: "RLS",
 };
 
 const styles: { [key: string]: React.CSSProperties } = {
@@ -155,10 +153,6 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
   const [placementTime, setPlacementTime] = useState<any>({});
   const [placementTimeDate, setPlacementTimeDate] = useState<Date | null>(null);
   const [openPlacementTime, setOpenPlacementTime] = useState(false);
-
-  const [openReleaseTime, setOpenReleaseTime] = useState(false);
-  const [releaseTime, setReleaseTime] = useState<any>({});  
-  const [releaseTimeDate, setReleaseTimeDate] = useState<Date | null>(null);
 
   const [bpReleaseObject, setBpReleaseObject] = useState<any>({});
   const [bpReleaseDate, setBpReleaseDate] = useState<Date | null>(null);
@@ -360,16 +354,6 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
         id: placementTime?._id,
       });
     }
-    if(releaseTimeDate) {
-      payload.events.push({
-        shipment: shipment.id,
-        event_name: events_names.releaseTime,
-        event_code: eventCodes.releaseTime,
-        event_datetime: releaseTimeDate,
-        FNR: shipment.fnr,
-        id: releaseTime?._id,
-      });
-    }
     if (bpReleaseDate) {
       payload.events.push({
         shipment: shipment.id,
@@ -528,10 +512,6 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
         case eventCodes.placementTime:
           setPlacementTime(event);
           setPlacementTimeDate(eventDate);
-          break;
-        case eventCodes.releaseTime:
-          setReleaseTime(event);
-          setReleaseTimeDate(eventDate);
           break;
         case eventCodes.bpRelease:
           setBpReleaseObject(event);
@@ -1007,74 +987,6 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
             </div>
             <div>
               <header className="headerForRakeSection">
-                {text("releaseTime")}
-              </header>
-              <div className="inputForRakeSectionHandling">
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <DateTimePicker
-                    open={openReleaseTime}
-                    onClose={() => {
-                      setOpenReleaseTime(false);
-                    }}
-                    value={releaseTimeDate ? dayjs(releaseTimeDate) : null}
-                    sx={{
-                      width: "100%",
-                      height: "100%",
-
-                      ".MuiInputBase-input": {
-                        padding: "7px",
-
-                        paddingLeft: "11px",
-                        fontSize: "14px ",
-                        color: "#42454E",
-                      },
-                      ".MuiInputBase-root": {
-                        padding: 0,
-                        border: "none",
-                        "& fieldset": { border: "none" },
-                      },
-                      "& .MuiOutlinedInput-root": {
-                        "&:hover fieldset": {
-                          border: "none",
-                        },
-                        "&.Mui-focused fieldset": {
-                          border: "none",
-                        },
-                      },
-                      "& .MuiIconButton-root": {
-                        position: "relative",
-                      },
-                    }}
-                    ampm={false}
-                    slotProps={{
-                      textField: {
-                        onClick: () => {
-                          console.log();
-                          setOpenReleaseTime(!openReleaseTime);
-                        },
-                        fullWidth: true,
-                        InputProps: {
-                          endAdornment: null,
-                        },
-                      },
-                    }}
-                    viewRenderers={{
-                      hours: renderTimeViewClock,
-                      minutes: renderTimeViewClock,
-                      seconds: renderTimeViewClock,
-                    }}
-                    onChange={(newDate) => {
-                      if (newDate) {
-                        setReleaseTimeDate(newDate.toDate());
-                      }
-                    }}
-                    format="DD-MM-YYYY HH:mm "
-                  />
-                </LocalizationProvider>
-              </div>
-            </div>
-            <div>
-              <header className="headerForRakeSection">
                 {text("bpRelease")}
               </header>
               <div className="inputForRakeSectionHandling">
@@ -1134,6 +1046,80 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
                     onChange={(newDate) => {
                       if (newDate) {
                         setBpReleaseDate(newDate.toDate());
+                      }
+                    }}
+                    format="DD-MM-YYYY HH:mm "
+                  />
+                </LocalizationProvider>
+              </div>
+            </div>
+            <div>
+              <header className="headerForRakeSection">
+                {text("wagonPlacedAtLoadingPoint")}
+              </header>
+              <div className="inputForRakeSectionHandling">
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DateTimePicker
+                    open={openWagonPlacedAtLoadingPoint}
+                    onClose={() => {
+                      setOpenWagonPlacedAtLoadingPoint(false);
+                    }}
+                    value={
+                      wagonPlacedAtLoadingPointDate
+                        ? dayjs(wagonPlacedAtLoadingPointDate)
+                        : null
+                    }
+                    sx={{
+                      width: "100%",
+                      height: "100%",
+
+                      ".MuiInputBase-input": {
+                        padding: "7px",
+
+                        paddingLeft: "11px",
+                        fontSize: "14px ",
+                        color: "#42454E",
+                      },
+                      ".MuiInputBase-root": {
+                        padding: 0,
+                        border: "none",
+                        "& fieldset":{ border: "none" },
+                      },
+                      "& .MuiOutlinedInput-root": {
+                        "&:hover fieldset": {
+                          border: "none",
+                        },
+                        "&.Mui-focused fieldset": {
+                          border: "none",
+                        },
+                      },
+                      "& .MuiIconButton-root": {
+                        position: "relative",
+                      },
+                    }}
+                    ampm={false}
+                    slotProps={{
+                      textField: {
+                        onClick: () => {
+                          console.log();
+                          setOpenWagonPlacedAtLoadingPoint(
+                            !openWagonPlacedAtLoadingPoint
+                          );
+                        },
+                        fullWidth: true,
+                        InputProps: {
+                          endAdornment: null,
+                        },
+                      },
+                    }}
+                    viewRenderers={{
+                      hours: renderTimeViewClock,
+                      minutes: renderTimeViewClock,
+                      seconds: renderTimeViewClock,
+                    }}
+                    onChange={(newDate) => {
+                      if (newDate) {
+                        setWagonPlacedAtLoadingPointDate(newDate.toDate());
                       }
                     }}
                     format="DD-MM-YYYY HH:mm "
@@ -1278,80 +1264,7 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
             )}
           </div>
           <div id="lastSection">
-          <div>
-              <header className="headerForRakeSection">
-                {text("wagonPlacedAtLoadingPoint")}
-              </header>
-              <div className="inputForRakeSectionHandling">
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <DateTimePicker
-                    open={openWagonPlacedAtLoadingPoint}
-                    onClose={() => {
-                      setOpenWagonPlacedAtLoadingPoint(false);
-                    }}
-                    value={
-                      wagonPlacedAtLoadingPointDate
-                        ? dayjs(wagonPlacedAtLoadingPointDate)
-                        : null
-                    }
-                    sx={{
-                      width: "100%",
-                      height: "100%",
-
-                      ".MuiInputBase-input": {
-                        padding: "7px",
-
-                        paddingLeft: "11px",
-                        fontSize: "14px ",
-                        color: "#42454E",
-                      },
-                      ".MuiInputBase-root": {
-                        padding: 0,
-                        border: "none",
-                        "& fieldset":{ border: "none" },
-                      },
-                      "& .MuiOutlinedInput-root": {
-                        "&:hover fieldset": {
-                          border: "none",
-                        },
-                        "&.Mui-focused fieldset": {
-                          border: "none",
-                        },
-                      },
-                      "& .MuiIconButton-root": {
-                        position: "relative",
-                      },
-                    }}
-                    ampm={false}
-                    slotProps={{
-                      textField: {
-                        onClick: () => {
-                          console.log();
-                          setOpenWagonPlacedAtLoadingPoint(
-                            !openWagonPlacedAtLoadingPoint
-                          );
-                        },
-                        fullWidth: true,
-                        InputProps: {
-                          endAdornment: null,
-                        },
-                      },
-                    }}
-                    viewRenderers={{
-                      hours: renderTimeViewClock,
-                      minutes: renderTimeViewClock,
-                      seconds: renderTimeViewClock,
-                    }}
-                    onChange={(newDate) => {
-                      if (newDate) {
-                        setWagonPlacedAtLoadingPointDate(newDate.toDate());
-                      }
-                    }}
-                    format="DD-MM-YYYY HH:mm "
-                  />
-                </LocalizationProvider>
-              </div>
-            </div>
+            
             <div>
               <header className="headerForRakeSection">
                 {text("loadRakeFormation")}
