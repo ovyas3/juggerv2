@@ -255,6 +255,8 @@
     "wagonType": "Wagon Type",
     "cc": "CC",
     "tr": "TR",
+    "sumOfLoad": "Sum of Load",
+    "remainingLoad": "Remaining Load",
     "isSick": "Is the Wagon Sick?",
     "yes": "Yes",
     "no": "No",

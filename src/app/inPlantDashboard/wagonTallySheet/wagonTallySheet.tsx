@@ -306,6 +306,8 @@ const WagonTallySheet: React.FC = () => {
     }
   ]);
   const [loading, setLoading] = useState(false);
+  const [totalWeights, setTotalWeights] = useState(0);
+  const [remainingWeights, setRemainingWeights] = useState(0);
 
   // Initial state for dates
   const [dates, setDates] = useState<DateEvent[]>(datesArr);
@@ -337,8 +339,6 @@ const WagonTallySheet: React.FC = () => {
     setSelectedWagonDetails(wagon);
   };
 
-
-  // Function to handle input change in form (Material Details)
   // Function to handle input change in form (Material Details)
   const handleInputChange = (index: number, event: React.ChangeEvent<HTMLInputElement>) => {
     const name = event.target.name as FormValueKey;
@@ -350,6 +350,24 @@ const WagonTallySheet: React.FC = () => {
       return newFormValues;
     });
   };
+
+  const handleWeights = (index: number, event: React.FormEvent<HTMLInputElement>) => {
+    const newValue = parseFloat(event.currentTarget.value) || 0; 
+
+    // Calculate totalWeights
+    const totalWeight = formValues.reduce((sum, material, idx) => {
+        if (idx === index) {
+            return sum + newValue; 
+        }
+        return sum + (parseFloat(material.pgi_tw_wrt) || 0);
+    }, 0);
+
+    setTotalWeights(totalWeight);
+
+    // Calculate remainingWeights
+    const capacity = selectedWagonDetails?.wagonObj?.capacity || 0; 
+    setRemainingWeights(capacity - totalWeight);
+};
 
   // Function to handle data with batch id
   const handleDataWithBatchId = async (index: number) => {
@@ -755,7 +773,18 @@ const WagonTallySheet: React.FC = () => {
 
           const maxWagonCount = Math.max(...wagonCounts);
 
+          const totalWeight = materials.reduce((total: number, material: any) => {
+            return total + material.pgi_tw_wrt;
+          }, 0);
+
+          const validTotalWeight = isNaN(totalWeight) || !totalWeight ? 0 : totalWeight;
+
+          const capacity = selectedWagonDetails?.wagonObj?.capacity || 0;
+          const remainingWeights = capacity - validTotalWeight || 0;
+
           setMaterialCount(maxWagonCount);
+          setTotalWeights(validTotalWeight);
+          setRemainingWeights(remainingWeights);
         } else {
           setFormValues([
             {
@@ -1144,6 +1173,18 @@ const WagonTallySheet: React.FC = () => {
                         <p className="wagon-tally-sheet-body-content-wagon-details-content-value">{selectedWagonDetails?.wagonObj?.tare_weight || 0} MT</p>
                       </div>
                       <div className="wagon-tally-sheet-body-content-wagon-details-content">
+                        <p className="wagon-tally-sheet-body-content-wagon-details-content-label">{text('sumOfLoad')}</p>
+                        <p className="wagon-tally-sheet-body-content-wagon-details-content-value"
+                          style={{ color: '#3351FF' }}
+                        >{totalWeights || 0} MT</p>
+                      </div>
+                      <div className="wagon-tally-sheet-body-content-wagon-details-content">
+                        <p className="wagon-tally-sheet-body-content-wagon-details-content-label">{text('remainingLoad')}</p>
+                        <p className="wagon-tally-sheet-body-content-wagon-details-content-value" 
+                          style={{ color: 'red' }}
+                        >{remainingWeights || 0} MT</p>
+                      </div>
+                      <div className="wagon-tally-sheet-body-content-wagon-details-content">
                         <p className="wagon-tally-sheet-body-content-wagon-details-content-label">{text('isSick')}</p>
                         <div className="wagon-tally-sheet-body-content-wagon-details-content-radio">
                           <div className="wagon-tally-sheet-body-content-wagon-details-content-radio-content">
@@ -1364,7 +1405,9 @@ const WagonTallySheet: React.FC = () => {
                               className="wagon-tally-sheet-body-content-materials-details-body-content-input"
                               name="pgi_tw_wrt"
                               value={formValue.pgi_tw_wrt}
-                              onChange={(event) => handleInputChange(index, event)} />
+                              onChange={(event) => handleInputChange(index, event)} 
+                              onInput={(event) => handleWeights(index, event)}
+                            />
                             <div className="wagon-tally-sheet-body-content-materials-details-body-content-input-unit">
                               {text('MT')}
                             </div>
