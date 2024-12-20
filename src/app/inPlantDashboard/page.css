@@ -96,7 +96,7 @@
   padding-inline: 24px;
   flex-direction: row;
   padding-block: 10px;
-  align-items: start;
+  align-items: flex-start;
 }
 
 #space-giver{

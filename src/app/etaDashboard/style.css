@@ -12,6 +12,7 @@
 .adjustMarginMobile {
   width: 100vw;
   height: calc(100vh - 56px - 54px);
+  margin-top: 56px;
 }
 #enRoutesEtaDelay {
   background-color: white;

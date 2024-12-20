@@ -22,6 +22,7 @@ import { Tabs, Tab, Box } from '@mui/material'
 import { styled } from '@mui/system'
 import WagonTypeWiseRakeTrend from "./wagonTypeWiseRakeTrend/wagonTypeWiseRakeTrend";
 import DestinationWiseTrend from "./destinationWiseTrend/destinationWiseTrend";
+import InPlantWagons from "./inPlantWagons/inPlantWagons";
 import { useMediaQuery, useTheme } from '@mui/material';
 
 // Custom styled components
@@ -199,13 +200,19 @@ function EtaDashboard() {
         }`}
       >
         <Box sx={{ width: '100%', backgroundColor: '#fff' }}>
-          <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+          <Box sx={{ 
+            maxWidth: '100%',
+            borderBottom: 1, 
+            borderColor: 'divider', 
+            overflowX: 'auto' 
+          }}>
             <StyledTabs value={value} onChange={handleChange} aria-label="dashboard tabs">
               <StyledTab label="Wagons" />
               <StyledTab label="PT & DW" />
               <StyledTab label="ETA" />
               <StyledTab label="Rake" />
               <StyledTab label="Destination" />
+              <StyledTab label="In Plant Wagons" />
             </StyledTabs>
           </Box>
           <CustomTabPanel value={value} index={0}>
@@ -317,6 +324,9 @@ function EtaDashboard() {
           </CustomTabPanel>
           <CustomTabPanel value={value} index={4}>
             <DestinationWiseTrend />
+          </CustomTabPanel>
+          <CustomTabPanel value={value} index={5}>
+            <InPlantWagons />
           </CustomTabPanel>
         </Box>
         
