@@ -915,7 +915,7 @@ export const HandlingAgentSelection = ({ shipmentId, setOpen, locationId, getAll
 // }));
 
 export const MarkPlacement = ({isClose ,shipment, getAllShipment, different = 'markplacement'}: any) =>{
-    console.log(different, "different");
+    console.log(shipment, "shipment");
     const t = useTranslations("ORDERS");
     const router = useRouter();
     const [currentDate, setCurrentDate] = useState(new Date());
@@ -1011,16 +1011,22 @@ export const MarkPlacement = ({isClose ,shipment, getAllShipment, different = 'm
 
                     <div className="status_edemand_fnr">
                         <div>
-                            <header style={{fontSize:12, color:'#42454E', marginBottom:8}}>{t('status')}</header>
-                            <text style={{fontSize:16, color:"#42454E", fontWeight:600}}>{shipment?.status?.name}</text>
-                        </div>
-                        <div>
-                            <header style={{fontSize:12, color:'#42454E', marginBottom:8}}>{t('FNRno')}</header>
-                            <text style={{fontSize:16, color:"#42454E", fontWeight:600}}>{shipment?.fnr?.primary}</text>
-                        </div>
-                        <div>
                             <header style={{fontSize:12, color:'#42454E', marginBottom:8}}>{t('edemandno')}</header>
                             <text style={{fontSize:16, color:"#42454E", fontWeight:600}}>{shipment?.edemand?.edemand_no}</text>
+                        </div>
+                        
+                        <div>
+                            <header style={{fontSize:12, color:'#42454E', marginBottom:8}}>{t('destination')}</header>
+                            <text style={{fontSize:16, color:"#42454E", fontWeight:600}}>{shipment?.destination?.code}</text>
+                        </div>
+                        
+                        <div>
+                            <header style={{fontSize:12, color:'#42454E', marginBottom:8}}>{t('indentNo')}</header>
+                            <text style={{fontSize:16, color:"#42454E", fontWeight:600}}>{shipment?.intent_no}</text>
+                        </div>
+                        <div>
+                            <header style={{fontSize:12, color:'#42454E', marginBottom:8}}>{t('status')}</header>
+                            <text style={{fontSize:16, color:"#42454E", fontWeight:600}}>{shipment?.status?.name}</text>
                         </div>
                     </div>
 
