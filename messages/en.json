@@ -192,6 +192,7 @@
     "upload":"Upload",
     "rakeHandlingSheet":"Rake Handling Sheet",
     "assignWagonToPlant":"Assign Wagon to Loading Shop",
+    "wagonSheetDetails":"Wagon Sheet Details",
     "rakeArrivalAtStation":"Rake Arrival At Serving Station",
     "stabled":"Stabled",
     "placementTime":"Placement Time",
@@ -292,7 +293,14 @@
     "takePhoto": "Take Photo",
     "upload-rake-handling-sheet":"Upload Rake Handling Sheet",
     "uploadFile":"Upload File",
-    "wagonWayBill": "Wagon Way Bill"
+    "wagonWayBill": "Wagon Way Bill",
+    "wagonTallySheetDetails": "Wagon Tally Sheet Details",
+    "print": "Print",
+    "SNo": "S.No",
+    "type": "Type",
+    "pcs": "Pcs",
+    "soNo": "SO No.",
+    "obdNo": "OBD No."
   },
   "CONTACT":{
     "contactModalHeaderEdit":"Edit Contact",
@@ -313,6 +321,8 @@
     "captiveRakes": "Captive Rakes",
     "station&Contacts": "Station & Contacts",
     "hubRMS": "Hub RMS",
+    "RakeFreeTime": "Rake Free Time",
+    "RakeDCCalculator": "Rake DC Calculator",
     "statusCodes":[
       {
         "code": "MT",

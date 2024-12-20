@@ -79,7 +79,7 @@ const CustomDatePicker: React.FC<CustomDatePickerProps> = ({
         paddingLeft: 8,
         cursor: "pointer",
       }}
-      onClick={() => !open && setOpen(true)} // Ensure it only opens when closed
+      onClick={() => !open && setOpen(true)}
     >
       <div style={{ height: 16, width: 16, marginBottom: 4 }}>
         <Image src={calenderIcon} alt="calendar icon" />

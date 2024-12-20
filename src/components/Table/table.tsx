@@ -433,7 +433,8 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
     useEffect(() => {
         const commonColumns: Column[] = [
             { id: 'fnr', label: '', subLabel: '', class: 'fnr', innerClass: 'inner_fnr' },
-            { id: 'destination', subLabel: 'Paid By', label: 'Destination', class: 'destination', innerClass: '' },
+            // { id: 'destination', subLabel: 'Paid By', label: 'Destination', class: 'destination', innerClass: '' },
+            { id: 'destination', subLabel: '', label: 'Destination', class: 'destination', innerClass: '' },
             { id: 'material', subLabel: '', label: 'Commodities', class: 'material', innerClass: '' },
             { id: 'eld', subLabel: 'Exp. Loading Date', label: 'Indent Date', class: 'eld', innerClass: '' },
             { id: 'pickupdate', subLabel: 'Drawn Out Time', label: 'RR Date', class: 'pickupdate', innerClass: 'inner_pickup' },
@@ -887,11 +888,19 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                                 fontSize: 12
                                                                             }}
                                                                         >
-                                                                            {value.code} {value.name !== '--' ? value.name : value.code}
+                                                                            <span style={{
+                                                                                fontWeight: 'bold',
+                                                                            }}>{value.code}</span> <br />
+                                                                            <span style={{
+                                                                                color: '#7C7E8C',
+                                                                                fontSize: 11
+                                                                            }}>
+                                                                                {value.name !== '--' ? value.name : value.code}
+                                                                            </span>
                                                                         </div>
                                                                     </Tooltip>
                                                                 </div>
-                                                                <div style={{ marginTop: '6px', color: '#7C7E8C', fontSize: 10 }}>{row.paid_by}</div>
+                                                                {/* <div style={{ marginTop: '6px', color: '#7C7E8C', fontSize: 10 }}>{row.paid_by}</div> */}
                                                             </div>
                                                         )}
                                                         {item.id === 'pickupdate' && (

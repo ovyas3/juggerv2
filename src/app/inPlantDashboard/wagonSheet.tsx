@@ -322,7 +322,7 @@ function WagonTallySheet({}: any) {
   };
   const wagonTallySheet = (event: any, row: any) => {
     if(!row?.showWagonTallySheet){
-      return showMessage('Please upload wagon sheet to view wagon tally sheet', 'error');
+      return showMessage('Please complete assign hooks to loading shop and try again', 'error');
     }
     router.push(
       `/inPlantDashboard/wagonTallySheet?shipmentId=${row?.id}`
@@ -336,6 +336,17 @@ function WagonTallySheet({}: any) {
     }
     window.open(
       `/inPlantDashboard/wagonWayBill?shipmentId=${row?.id}`,
+      "_blank"
+    );
+    setShowActionBox(-1);
+    setAnchorEl(null);
+  };
+  const printableWagonTallySheet = (event: any, row: any) => {
+    if(!row?.showWagonTallySheet){
+      return showMessage('Please complete wagon tally sheet and try again', 'error');
+    }
+    window.open(
+      `/inPlantDashboard/printableWagonTallySheet?shipmentId=${row?.id}`,
       "_blank"
     );
     setShowActionBox(-1);
@@ -997,7 +1008,7 @@ function WagonTallySheet({}: any) {
                                           }}
                                         >
                                           {text("wagonWayBill")}
-                                        </div>
+                                      </div>
                                       <div
                                         onClick={(e) => {
                                           uploadRakeSheet(e, row);
@@ -1029,7 +1040,15 @@ function WagonTallySheet({}: any) {
                                           }}
                                         >
                                           {text("wagonTallySheet")}
-                                        </div>
+                                      </div>
+                                      <div
+                                          className="action-popover-wagon"
+                                          onClick={(e) => {
+                                            printableWagonTallySheet(e, row)
+                                          }}
+                                        >
+                                          {text("wagonSheetDetails")}
+                                      </div>
                                       {/* <div
                                         className="action-popover-wagon"
                                         onClick={(e) => {

@@ -13,6 +13,8 @@ import { useMediaQuery, useTheme } from '@mui/material';
 import CaptiveRakeSettings from "@/components/captiveRakeSettings/captiveRakeSettings";
 import StationManagement from "@/components/stationManagement/stationManagement";
 import HandlingAgent from "@/components/handlingAgent/handlingAgent";
+import RakeFreeTimeSetting from "@/components/RakeFreeTimeSetting/RakeFreeTimeSetting";
+import RakeDCCalculator from "@/components/RakeDCCalculator/RakeDCCalculator";
 
 function Settings() {
   const text = useTranslations("SETTINGS");
@@ -52,6 +54,16 @@ function Settings() {
                 {text("updateETA")}
             </div>
             <div 
+              className={activeOption === 'RakeFreeTime' ? 'activeOptionSettings': "normalOptionSettings" } 
+              onClick={()=>setActiveOption('RakeFreeTime')}>
+                {text("RakeFreeTime")}
+            </div>
+            <div 
+              className={activeOption === 'RakeDCCalculator' ? 'activeOptionSettings': "normalOptionSettings" } 
+              onClick={()=>setActiveOption('RakeDCCalculator')}>
+                {text("RakeDCCalculator")}
+            </div>
+            <div 
               className={activeOption === 'notification' ? 'activeOptionSettings': "normalOptionSettings" } 
               onClick={()=>setActiveOption('notification')}>
                 {text("notification")}
@@ -68,6 +80,8 @@ function Settings() {
               {activeOption === 'station&Contacts' && <StationManagement />}
               {activeOption === 'hubRMS' && <HandlingAgent />}
               {activeOption === 'updateETA' && <UpdateETA />}
+              {activeOption === 'RakeFreeTime' && <RakeFreeTimeSetting />}
+              {activeOption === 'RakeDCCalculator' && <RakeDCCalculator />}
               {activeOption === 'notification' && <WhatsAppNotify />}
               {/* {activeOption === 'preferences' && <Preferences/>} */}
             </Suspense>
