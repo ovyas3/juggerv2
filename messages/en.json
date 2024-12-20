@@ -195,6 +195,7 @@
     "wagonSheetDetails":"Wagon Sheet Details",
     "rakeArrivalAtStation":"Rake Arrival At Serving Station",
     "stabled":"Stabled",
+    "releaseTime":"Release Time",
     "placementTime":"Placement Time",
     "gate-in":"Gate-In",
     "bpRelease":"B/P Release",
