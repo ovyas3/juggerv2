@@ -72,6 +72,7 @@
     "In Transit":"In Transit",
     "Delivered":"Delivered",
     "drownOut":"Drawn Out Time",
+    "releaseTime": "Release Time",
     "IndentNo":"Indent No",
     "material": "Material",
     "Cancel":"Cancel",
