@@ -62,6 +62,8 @@ import { MarkComplete } from './tableComp';
 import ImportContactsIcon from '@mui/icons-material/ImportContacts';
 import { useMediaQuery, useTheme } from '@mui/material';
 
+import TrainIcon from '@mui/icons-material/Train';
+
 const status_class_map: { [key: string]: string } = {
     'OB': 'status_title_In_Plant',
     'AVE': 'status_title_In_Plant',
@@ -377,6 +379,12 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
         setOpenMarkPlacement(true);
         setMarkPlacementId(row);
         setDownOut('downOut');
+    }
+
+    const releaseTimeDate = (row: any) => {
+        setOpenMarkPlacement(true);
+        setMarkPlacementId(row);
+        setDownOut('releaseTime');
     }
 
     const uploadWagonSheet = (row: any) => {
@@ -753,12 +761,19 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                              />
                                                                             {/* } */}
                                                                             {/* {row.status.raw === 'INPL' && row.rrDoc && ( */}
+                                                                                <ActionItem
+                                                                                     icon={<TrainIcon style={{ width: "24px", height: '24px', color: '#C72C41' }} />}
+                                                                                     text={t('releaseTime')}
+                                                                                     onClick={()=>{releaseTimeDate(row)}}
+                                                                                     id="releaseTime"
+                                                                                 />
                                                                                  <ActionItem
                                                                                  icon={<UpdateIcon style={{ width: "24px", height: '24px', color: '#0367FF' }} />}
                                                                                  text={t('drownOut')}
                                                                                  onClick={()=>{drownOutDate(row)}}
                                                                                  id="drownOut"
                                                                              />
+                                                                             
                                                                             {/* )} */}
                                                                                 <ActionItem
                                                                                     icon={<DriveFolderUploadIcon style={{ width: "24px", height: '24px', color:'#185519'}} />}

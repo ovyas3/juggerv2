@@ -915,6 +915,7 @@ export const HandlingAgentSelection = ({ shipmentId, setOpen, locationId, getAll
 // }));
 
 export const MarkPlacement = ({isClose ,shipment, getAllShipment, different = 'markplacement'}: any) =>{
+    console.log(shipment, "shipment");
     const t = useTranslations("ORDERS");
     const router = useRouter();
     const [currentDate, setCurrentDate] = useState(new Date());
@@ -978,15 +979,21 @@ export const MarkPlacement = ({isClose ,shipment, getAllShipment, different = 'm
             id: shipment._id,
             drawnout_time: new Date (data.toUTCString()),
         }
+
+        const payloadWithReleaseTime = {
+            id: shipment._id,
+            release_time : new Date (data.toUTCString()),
+        }
        
       try {
         const response = await httpsPost(
-            different === 'downOut' ? 'rake_shipment/mark_drawnout' : 'rake_shipment/mark_placement', 
-            different === 'downOut' ? (payloadWithdrownDate) : (eIndent ? payloadMarkPlacement : payload), router)
+            different === 'downOut' ? 'rake_shipment/mark_drawnout' : different === 'markplacement' ? 'rake_shipment/mark_placement' : 'rake_shipment/mark_release', 
+            different === 'downOut' ? (payloadWithdrownDate) : different === 'markplacement' ? (eIndent ? payloadMarkPlacement : payload) : payloadWithReleaseTime, router)
         if(response.statusCode === 200) {
+            let message = different === 'downOut' ? 'Drawn Out Marked Successfully' : different === 'markplacement' ? 'Placement Marked Successfully' : 'Release Time Marked Successfully';
             isClose(false);
             getAllShipment();
-            showMessage('Placement Marked Successfully', 'success');
+            showMessage(message, 'success');
         }
       } catch (error) {
         console.log(error)
@@ -999,26 +1006,32 @@ export const MarkPlacement = ({isClose ,shipment, getAllShipment, different = 'm
             <div style={{width:800, height: different === 'markplacement' ?  580 : 500, backgroundColor:'white', position:'relative', top:'50%', left:'50%', transform:'translate(-50%,-50%)', borderRadius:20, padding:25}} onClick={(e)=>{e.stopPropagation()}}>
              
                     <div style={{display:'flex', justifyContent:'space-between',}}>
-                        <header style={{fontSize:20, color:'#131722', fontWeight:600}}>{different==='downOut'?'Drawn Out Time':'Mark Placement'}</header>
+                        <header style={{fontSize:20, color:'#131722', fontWeight:600}}>{different==='downOut'? 'Drawn Out Time': different === 'markplacement' ? 'Mark Placement' : 'Release Time'}</header>
                     </div>
 
                     <div className="status_edemand_fnr">
                         <div>
-                            <header style={{fontSize:12, color:'#42454E', marginBottom:8}}>{t('status')}</header>
-                            <text style={{fontSize:16, color:"#42454E", fontWeight:600}}>{shipment?.status?.name}</text>
-                        </div>
-                        <div>
-                            <header style={{fontSize:12, color:'#42454E', marginBottom:8}}>{t('FNRno')}</header>
-                            <text style={{fontSize:16, color:"#42454E", fontWeight:600}}>{shipment?.fnr?.primary}</text>
-                        </div>
-                        <div>
                             <header style={{fontSize:12, color:'#42454E', marginBottom:8}}>{t('edemandno')}</header>
                             <text style={{fontSize:16, color:"#42454E", fontWeight:600}}>{shipment?.edemand?.edemand_no}</text>
+                        </div>
+                        
+                        <div>
+                            <header style={{fontSize:12, color:'#42454E', marginBottom:8}}>{t('destination')}</header>
+                            <text style={{fontSize:16, color:"#42454E", fontWeight:600}}>{shipment?.destination?.code}</text>
+                        </div>
+                        
+                        <div>
+                            <header style={{fontSize:12, color:'#42454E', marginBottom:8}}>{t('indentNo')}</header>
+                            <text style={{fontSize:16, color:"#42454E", fontWeight:600}}>{shipment?.intent_no}</text>
+                        </div>
+                        <div>
+                            <header style={{fontSize:12, color:'#42454E', marginBottom:8}}>{t('status')}</header>
+                            <text style={{fontSize:16, color:"#42454E", fontWeight:600}}>{shipment?.status?.name}</text>
                         </div>
                     </div>
 
                     <div style={{marginTop:24}}>
-                        <header style={{ marginBottom:8, fontSize:12, color:'#42454E'}}>{different === 'downOut'?'Enter Drawn Out Time':'Enter Placement Time'}</header>
+                        <header style={{ marginBottom:8, fontSize:12, color:'#42454E'}}>{different === 'downOut'? 'Enter Drawn Out Time': different === 'markplacement' ? 'Enter Mark Placement Time' : 'Enter Release Time'}</header>
                         <div style={{border:'1px solid #E9E9EB', borderRadius:6, }}>
                             <LocalizationProvider dateAdapter={AdapterDayjs}>
                                 <DateTimePicker
@@ -1082,7 +1095,7 @@ export const MarkPlacement = ({isClose ,shipment, getAllShipment, different = 'm
                     </div>
 
                     {
-                        different !== 'downOut' && (
+                        different !== 'downOut' && different === 'markplacement' && (
                             <>
                                 <div style={{marginTop:24}}>
                                     <header style={{ marginBottom:8, fontSize:12, color:'#42454E'}}>{t('IndentNo')}</header>
@@ -1111,18 +1124,18 @@ export const MarkPlacement = ({isClose ,shipment, getAllShipment, different = 'm
                    
 
                     <div style={{marginTop:24 , display:'flex', alignItems:'center', gap:6}}>
-                        <div><input type="checkbox" style={{width:16, height:16}} onChange={()=>{setAvetoInplant(!avetoInplant)}} /></div>
-                        {different === 'downOut' && (
+                        {different !== 'releaseTime' && <div><input type="checkbox" style={{width:16, height:16}} onChange={()=>{setAvetoInplant(!avetoInplant)}} /></div>}
+                        {different === 'downOut' && different !== 'markplacement' &&  (
                             <text>Change status from <span style={{color:'#134D67',fontWeight:600}}>{t('In Plant')}</span> to <span style={{color:'#FF9800',fontWeight:600}}>{t('In Transit')}</span> </text>
                         )}
-                        {different !== 'downOut' && (
+                        {different !== 'downOut' && different === 'markplacement' && (
                             <text style={{color:'#EB1F52', fontWeight:'300'}}>Changing the Placement Date will update the previous date.</text>
                         )}
                     </div>
 
                     <div className="buttonContaioner">
                         <Button className="buttonMarkPlacement" onClick={(e)=>{ e.stopPropagation();  isClose(false); }} style={{color:'#2862FF', border:'1px solid #2862FF', width:110, cursor:'pointer', fontWeight:'bold', transition:'all 0.5s ease-in-out'}}>{t('Cancel')}</Button>
-                        <Button className="buttonMarkPlacement" onClick={(e)=>{e.stopPropagation();  handlePlacementDate(); }} style={{color:'white', backgroundColor:'#2862FF',width:110, border:'1px solid #2862FF', cursor:'pointer', fontWeight:'bold',transition:'all 0.5s ease-in-out' }}>{different==='downOut'?'Update':'Placement'}</Button>
+                        <Button className="buttonMarkPlacement" onClick={(e)=>{e.stopPropagation();  handlePlacementDate(); }} style={{color:'white', backgroundColor:'#2862FF',width:110, border:'1px solid #2862FF', cursor:'pointer', fontWeight:'bold',transition:'all 0.5s ease-in-out' }}>{different === 'downOut' ? 'Update' : different === 'markplacement' ? 'Placement' : 'Release' }</Button>
                     </div>
 
                     <div className="closeContaioner">

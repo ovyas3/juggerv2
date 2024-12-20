@@ -45,7 +45,7 @@ const eventCodes = {
   apReady: "APR",
   drawnOut: "DRO",
   HLS: "HLS",
-  HLC: "HLC"
+  HLC: "HLC",
 };
 
 const styles: { [key: string]: React.CSSProperties } = {
@@ -1264,6 +1264,7 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
             )}
           </div>
           <div id="lastSection">
+            
             <div>
               <header className="headerForRakeSection">
                 {text("loadRakeFormation")}
