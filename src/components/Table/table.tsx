@@ -761,18 +761,19 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                              />
                                                                             {/* } */}
                                                                             {/* {row.status.raw === 'INPL' && row.rrDoc && ( */}
+                                                                                <ActionItem
+                                                                                     icon={<TrainIcon style={{ width: "24px", height: '24px', color: '#C72C41' }} />}
+                                                                                     text={t('releaseTime')}
+                                                                                     onClick={()=>{releaseTimeDate(row)}}
+                                                                                     id="releaseTime"
+                                                                                 />
                                                                                  <ActionItem
                                                                                  icon={<UpdateIcon style={{ width: "24px", height: '24px', color: '#0367FF' }} />}
                                                                                  text={t('drownOut')}
                                                                                  onClick={()=>{drownOutDate(row)}}
                                                                                  id="drownOut"
                                                                              />
-                                                                             <ActionItem
-                                                                                 icon={<TrainIcon style={{ width: "24px", height: '24px', color: '#C72C41' }} />}
-                                                                                 text={t('releaseTime')}
-                                                                                 onClick={()=>{releaseTimeDate(row)}}
-                                                                                 id="releaseTime"
-                                                                             />
+                                                                             
                                                                             {/* )} */}
                                                                                 <ActionItem
                                                                                     icon={<DriveFolderUploadIcon style={{ width: "24px", height: '24px', color:'#185519'}} />}
