@@ -266,6 +266,14 @@ const RakeFreeTimeSetting = () => {
                                 </Table>
                             </TableContainer>
                         </Paper>
+                        <div className="rake-free-time-setting-content-footer">
+                            <button
+                                className="rake-free-time-setting-content-footer-button"
+                                onClick={postFreeTimeSetting}
+                            >
+                                Save
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -322,6 +322,7 @@
     "station&Contacts": "Station & Contacts",
     "hubRMS": "Hub RMS",
     "RakeFreeTime": "Rake Free Time",
+    "RakeDCCalculator": "Rake DC Calculator",
     "statusCodes":[
       {
         "code": "MT",
