@@ -369,43 +369,52 @@ const WagonTallySheet: React.FC = () => {
     setRemainingWeights(capacity - totalWeight);
 };
 
-  // Function to handle data with batch id
-  const handleDataWithBatchId = async (index: number) => {
-    // const batchId = formValues[index].batch_id_heat_no;
+  // Function to handle data with batch id and heat no
+  const handleDataWithBatchAndHeatNo = async (index: number, isHeatNoFetch: boolean) => {
     const batchId = formValues[index].batch_id;
-    if (batchId && batchId.length === 10) {
-      try {
-        setLoading(true);
-        const response = await httpsGet(`get_material_details?batch_id=${batchId}&plant=${selectedPlant?.plant?._id}`, 0, router);
-        let data = response?.data;
-        if (data) {
-          setFormValues(prev => {
-            const newFormValues = [...prev];
-            newFormValues[index] = {
-              ...newFormValues[index],
-              material: data.material,
-              code: data.material_code,
-              grade: data.grade,
-              width: data.width,
-              thick: data.thickness,
-              length: data.length,
-              size_or_diameter: data.size_or_diameter,
-              pieces: data.pieces !== undefined ? data.pieces : newFormValues[index].pieces,
-              line_item: data.line_item !== undefined ? data.line_item : newFormValues[index].line_item,
-              pgi_tw_wrt: data.pgi_tw_wrt !== undefined ? data.pgi_tw_wrt : newFormValues[index].pgi_tw_wrt,
-              actual_weight: data.actual_weight !== undefined ? data.actual_weight : newFormValues[index].actual_weight,
-            };
-            return newFormValues;
-          });
-        }
-      } catch (error) {
-        setLoading(false);
-        console.log(error);
-      } finally {
-        setLoading(false);
-      }
-    } else {
-      showMessage("Please enter valid Batch ID/Heat No", "error");
+    const heatNo = formValues[index].heat_no;
+
+    if (!batchId || batchId.length !== 10) {
+      showMessage("Please enter valid Batch ID", "error");
+      return;
+    };
+
+    const payload = {
+      batch_id: batchId,
+      plant: selectedPlant?.plant?._id,
+      heat_no: heatNo,
+      is_heat_no_fetch: isHeatNoFetch
+    };
+
+    try {
+      setLoading(true);
+      const response = await httpsPost('get_material_details',  payload, router, 0, false);
+      let data = response?.data;
+      if (data) {
+        setFormValues(prev => {
+          const newFormValues = [...prev];
+          newFormValues[index] = {
+            ...newFormValues[index],
+            material: data.material,
+            code: data.material_code,
+            grade: data.grade,
+            width: data.width,
+            thick: data.thickness,
+            length: data.length,
+            size_or_diameter: data.size_or_diameter,
+            pieces: data.pieces !== undefined ? data.pieces : newFormValues[index].pieces,
+            line_item: data.line_item !== undefined ? data.line_item : newFormValues[index].line_item,
+            pgi_tw_wrt: data.pgi_tw_wrt !== undefined ? data.pgi_tw_wrt : newFormValues[index].pgi_tw_wrt,
+            actual_weight: data.actual_weight !== undefined ? data.actual_weight : newFormValues[index].actual_weight,
+          };
+          return newFormValues;
+        });
+      } 
+    } catch (error) {
+      setLoading(false);
+      console.log(error);
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -1265,6 +1274,11 @@ const WagonTallySheet: React.FC = () => {
                               name="heat_no"
                               value={formValue.heat_no}
                               onChange={(event) => handleInputChange(index, event)} />
+                            <div className="wagon-tally-sheet-body-content-materials-details-body-content-input-icon" onClick={() => {
+                              handleDataWithBatchAndHeatNo(index, true);
+                            }}>
+                              <Image src={ArrowRight} alt="Arrow right" className="arrow-right-icon" />
+                            </div>
                           </div>
                         </div>
                         {/* Batch ID */}
@@ -1280,7 +1294,7 @@ const WagonTallySheet: React.FC = () => {
                               value={formValue.batch_id}
                               onChange={(event) => handleInputChange(index, event)} />
                             <div className="wagon-tally-sheet-body-content-materials-details-body-content-input-icon" onClick={() => {
-                              handleDataWithBatchId(index);
+                              handleDataWithBatchAndHeatNo(index, false);
                             }}>
                               <Image src={ArrowRight} alt="Arrow right" className="arrow-right-icon" />
                             </div>
