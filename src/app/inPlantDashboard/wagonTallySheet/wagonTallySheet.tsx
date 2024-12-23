@@ -4,6 +4,8 @@
 import React, { useState, useEffect } from "react";
 import './wagonTallySheet.css';
 import Header from "@/components/Header/header";
+import MobileHeader from "@/components/Header/mobileHeader";
+import MobileDrawer from "@/components/Drawer/mobile_drawer";
 import SideDrawer from "@/components/Drawer/Drawer";
 import { useTranslations } from "next-intl";
 import SearchIcon from '@/assets/search_icon.svg';
@@ -31,6 +33,7 @@ import { httpsGet, httpsPost } from "@/utils/Communication";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { ThreeCircles } from "react-loader-spinner";
+import { useMediaQuery, useTheme } from '@mui/material';
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialogContent-root": {
@@ -243,12 +246,12 @@ type FormValues = {
   size_or_diameter: string;
   pieces: string;
   line_item: string;
-  pgi_tw_wrt: string;
+  pgi_tw_wt: string;
   actual_weight: string;
   material_images: (any)[];
 };
 
-type FormValueKey = 'batch_id' | 'heat_no' | 'material' | 'code' | 'grade' | 'width' | 'thick' | 'length' | 'size_or_diameter' | 'pieces' | 'line_item' | 'pgi_tw_wrt' | 'actual_weight';
+type FormValueKey = 'batch_id' | 'heat_no' | 'material' | 'code' | 'grade' | 'width' | 'thick' | 'length' | 'size_or_diameter' | 'pieces' | 'line_item' | 'pgi_tw_wt' | 'actual_weight';
 
 type PickerKey =
   | "loadingReadinessTime"
@@ -260,6 +263,8 @@ type PickerKey =
   | "packingEndTime";
 
 const WagonTallySheet: React.FC = () => {
+  const theme = useTheme();
+  const mobile = useMediaQuery(theme.breakpoints.down('md'));
   const router = useRouter();
   const searchParams = useSearchParams();
   const id = searchParams.get("shipmentId");
@@ -300,7 +305,7 @@ const WagonTallySheet: React.FC = () => {
       size_or_diameter: '',
       pieces: '',
       line_item: '',
-      pgi_tw_wrt: '',
+      pgi_tw_wt: '',
       actual_weight: '',
       material_images: [],
     }
@@ -308,6 +313,8 @@ const WagonTallySheet: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [totalWeights, setTotalWeights] = useState(0);
   const [remainingWeights, setRemainingWeights] = useState(0);
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
   // Initial state for dates
   const [dates, setDates] = useState<DateEvent[]>(datesArr);
@@ -359,7 +366,7 @@ const WagonTallySheet: React.FC = () => {
         if (idx === index) {
             return sum + newValue; 
         }
-        return sum + (parseFloat(material.pgi_tw_wrt) || 0);
+        return sum + (parseFloat(material.pgi_tw_wt) || 0);
     }, 0);
 
     setTotalWeights(totalWeight);
@@ -374,10 +381,12 @@ const WagonTallySheet: React.FC = () => {
     const batchId = formValues[index].batch_id;
     const heatNo = formValues[index].heat_no;
 
-    if (!batchId || batchId.length !== 10) {
-      showMessage("Please enter valid Batch ID", "error");
-      return;
-    };
+    // if(!isHeatNoFetch){
+    //   if (!batchId || batchId.length !== 10) {
+    //     showMessage("Please enter valid Batch ID", "error");
+    //     return;
+    //   };
+    // } 
 
     const payload = {
       batch_id: batchId,
@@ -404,7 +413,7 @@ const WagonTallySheet: React.FC = () => {
             size_or_diameter: data.size_or_diameter,
             pieces: data.pieces !== undefined ? data.pieces : newFormValues[index].pieces,
             line_item: data.line_item !== undefined ? data.line_item : newFormValues[index].line_item,
-            pgi_tw_wrt: data.pgi_tw_wrt !== undefined ? data.pgi_tw_wrt : newFormValues[index].pgi_tw_wrt,
+            pgi_tw_wt: data.pgi_tw_wt !== undefined ? data.pgi_tw_wt : newFormValues[index].pgi_tw_wt,
             actual_weight: data.actual_weight !== undefined ? data.actual_weight : newFormValues[index].actual_weight,
           };
           return newFormValues;
@@ -434,7 +443,7 @@ const WagonTallySheet: React.FC = () => {
       size_or_diameter: '',
       pieces: '',
       line_item: '',
-      pgi_tw_wrt: '',
+      pgi_tw_wt: '',
       actual_weight: '',
       material_images: [],
     }
@@ -622,7 +631,7 @@ const WagonTallySheet: React.FC = () => {
         size_or_diameter: '',
         pieces: '',
         line_item: '',
-        pgi_tw_wrt: '',
+        pgi_tw_wt: '',
         actual_weight: '',
         material_images: [],
       }
@@ -707,6 +716,8 @@ const WagonTallySheet: React.FC = () => {
         indent_no: response && response?.shipmentData && response?.shipmentData?.indent_no ? response?.shipmentData?.indent_no : '',
         received_no_of_wagons: response?.wagonData && response?.wagonData?.length ? response?.wagonData?.length : 0,
         fnr_no: response && response?.shipmentData && response?.shipmentData?.FNR ? response?.shipmentData?.FNR : '',
+        pickup_code: response && response?.shipmentData && response?.shipmentData?.pickup_location && response?.shipmentData?.pickup_location?.code ? response?.shipmentData?.pickup_location?.code : '',
+        delivery_code: response && response?.shipmentData && response?.shipmentData?.delivery_location && response?.shipmentData?.delivery_location?.code ? response?.shipmentData?.delivery_location?.code : '',
       }
       setShipmentData(shipmentDataObj);
       setWagonData(response?.wagonData);
@@ -741,6 +752,8 @@ const WagonTallySheet: React.FC = () => {
   }, [wagonData]);
 
   useEffect(() => {
+    console.log(selectedPlant, selectedHook);
+    
     if (selectedPlant && selectedHook) {
       getWagonDetails();
     }
@@ -783,7 +796,7 @@ const WagonTallySheet: React.FC = () => {
           const maxWagonCount = Math.max(...wagonCounts);
 
           const totalWeight = materials.reduce((total: number, material: any) => {
-            return total + material.pgi_tw_wrt;
+            return total + material.pgi_tw_wt;
           }, 0);
 
           const validTotalWeight = isNaN(totalWeight) || !totalWeight ? 0 : totalWeight;
@@ -809,7 +822,7 @@ const WagonTallySheet: React.FC = () => {
               size_or_diameter: '',
               pieces: '',
               line_item: '',
-              pgi_tw_wrt: '',
+              pgi_tw_wt: '',
               actual_weight: '',
               material_images: [],
             }
@@ -868,7 +881,7 @@ const WagonTallySheet: React.FC = () => {
           size_or_diameter: Number(material.size_or_diameter) || 0,
           pieces: Number(material.pieces) || 0,
           line_item: material.line_item || '',
-          pgi_tw_wrt: Number(material.pgi_tw_wrt) || 0,
+          pgi_tw_wt: Number(material.pgi_tw_wt) || 0,
           actual_weight: Number(material.actual_weight) || 0,
           material_images: material.material_images || [],
         };
@@ -880,7 +893,7 @@ const WagonTallySheet: React.FC = () => {
         _id: selectedWagonDetails?._id,
         wagon_images: wagonCapturedImages,
         events: filteredDates,
-        materials: formValues,
+        materials: formValuesMaterials,
         is_sick: isSick,
       }
 
@@ -1008,10 +1021,20 @@ const WagonTallySheet: React.FC = () => {
           wrapperClass=""
         />
       </div>}
-      <Header title={text('wagonTallySheet')} isMapHelper={false} />
-      <div className="wagon-tally-sheet-main">
+      {!mobile ? (
+        <Header title={text('wagonTallySheet')} isMapHelper={false} />
+      ) : (
+        <MobileHeader />
+      )}
+      <div className="wagon-tally-sheet-main" style={{
+        marginLeft: !mobile ? "70px" : "0px",
+        width: !mobile ? "calc(100vw - 70px)" : "100vw",
+        paddingBottom: !mobile ? "0px" : "40px",
+      }}>
         <div className="wagon-tally-sheet-body">
-          <div className="wagon-tally-sheet-body-container">
+          <div className="wagon-tally-sheet-body-container" style={{
+            marginBottom: '12px',
+          }}>
             <div className="wagon-tally-sheet-body-header">
               <div
                 className="wagon-tally-sheet-back-icon"
@@ -1021,6 +1044,30 @@ const WagonTallySheet: React.FC = () => {
               >
                 <ArrowBackIcon />
               </div>
+              <div className="wagon-tally-sheet-body-header-contents">
+                <p className="wagon-tally-sheet-body-header-contents-label">{text('from')}: </p>
+                <p className="wagon-tally-sheet-body-header-contents-value">{shipmentData?.pickup_code || ''}</p>
+              </div>
+              <div className="wagon-tally-sheet-body-header-contents">
+                <p className="wagon-tally-sheet-body-header-contents-label">{text('to')}: </p>
+                <p className="wagon-tally-sheet-body-header-contents-value">{shipmentData?.delivery_code || ''}</p>
+              </div>
+              <div className="wagon-tally-sheet-body-header-contents">
+                <p className="wagon-tally-sheet-body-header-contents-label">{text('totalWagons')}: </p>
+                <p className="wagon-tally-sheet-body-header-contents-value">{shipmentData?.received_no_of_wagons || 0}</p>
+              </div>
+              <div className="wagon-tally-sheet-body-header-contents">
+                <p className="wagon-tally-sheet-body-header-contents-label">{text('eDemand')}: </p>
+                <p className="wagon-tally-sheet-body-header-contents-value">{shipmentData?.edemand_no || ''}</p>
+              </div>
+              <div className="wagon-tally-sheet-body-header-contents">
+                <p className="wagon-tally-sheet-body-header-contents-label">{text('IndentNo')}: </p>
+                <p className="wagon-tally-sheet-body-header-contents-value">{shipmentData?.indent_no || ''}</p>
+              </div>
+            </div>
+          </div>
+          <div className="wagon-tally-sheet-body-container">
+            <div className="wagon-tally-sheet-body-header">
               <div className="wagon-tally-sheet-tabs">
                 <TabsList>
                   <Tab onClick={() => setSelectedTab(0)} className={selectedTab === 0 ? 'selected' : ''}>Wagon</Tab>
@@ -1103,25 +1150,13 @@ const WagonTallySheet: React.FC = () => {
                   onChange={e => setSearchTerm(e.target.value)}
                 />
               </div>
-              <div className="wagon-tally-sheet-body-header-contents">
-                <p className="wagon-tally-sheet-body-header-contents-label">{text('totalWagons')}: </p>
-                <p className="wagon-tally-sheet-body-header-contents-value">{shipmentData?.received_no_of_wagons || 0}</p>
-              </div>
-              <div className="wagon-tally-sheet-body-header-contents">
-                <p className="wagon-tally-sheet-body-header-contents-label">{text('eDemand')}: </p>
-                <p className="wagon-tally-sheet-body-header-contents-value">{shipmentData?.edemand_no || ''}</p>
-              </div>
-              <div className="wagon-tally-sheet-body-header-contents">
-                <p className="wagon-tally-sheet-body-header-contents-label">{text('IndentNo')}: </p>
-                <p className="wagon-tally-sheet-body-header-contents-value">{shipmentData?.indent_no || ''}</p>
-              </div>
             </div>
           </div>
           <div className="wagon-tally-sheet-body-content">
             {selectedTab === 0 &&
               <>
-                <div className="wagon-tally-sheet-body-content-train" id="train">
-                  <TrainContainer id="train">
+                <div className="wagon-tally-sheet-body-content-train train-animation" id="train">
+                  <TrainContainer>
                     <Image src={TrainImage} alt="Train engine" style={{ borderBottom: '1px solid #D0D1D3', marginRight: '-12px' }} />
                     {train ? (
                       train
@@ -1249,6 +1284,16 @@ const WagonTallySheet: React.FC = () => {
                   </div>
                   <div className="wagon-tally-sheet-body-content-materials-details-body-container">
                     {formValues.map((formValue, index) =>
+                    <div 
+                      key={index} 
+                      className={`wagon-tally-sheet-body-content-materials-details-body-container-content ${selectedIndex === index ? 'selected' : ''} ${hoveredIndex === index ? 'hovered' : ''}`}
+                      onMouseEnter={() => setHoveredIndex(index)}
+                      onMouseLeave={() => setHoveredIndex(null)}
+                      onClick={() => setSelectedIndex(index)}
+                    >
+                      <div className="wagon-tally-sheet-body-content-materials-details-body-index">
+                        <p className="wagon-tally-sheet-body-content-materials-details-body-index-value">{index + 1}</p>
+                      </div>
                       <div key={index} className="wagon-tally-sheet-body-content-materials-details-body">
                         {/* Material */}
                         <div className="wagon-tally-sheet-body-content-materials-details-body-content">
@@ -1417,8 +1462,8 @@ const WagonTallySheet: React.FC = () => {
                               type="text"
                               placeholder=""
                               className="wagon-tally-sheet-body-content-materials-details-body-content-input"
-                              name="pgi_tw_wrt"
-                              value={formValue.pgi_tw_wrt}
+                              name="pgi_tw_wt"
+                              value={formValue.pgi_tw_wt}
                               onChange={(event) => handleInputChange(index, event)} 
                               onInput={(event) => handleWeights(index, event)}
                             />
@@ -1490,6 +1535,7 @@ const WagonTallySheet: React.FC = () => {
                           </div>
                         </div>
                       </div>
+                    </div>
                     )}
                   </div>
                 </div>
@@ -1633,7 +1679,13 @@ const WagonTallySheet: React.FC = () => {
           </div>
         </BootstrapDialog>
       </div>
-      <SideDrawer />
+      {!mobile ? (
+        <SideDrawer />
+      ) : (
+        <div >
+          <MobileDrawer />
+        </div>
+      )}
     </div>
   )
 }
