@@ -374,10 +374,12 @@ const WagonTallySheet: React.FC = () => {
     const batchId = formValues[index].batch_id;
     const heatNo = formValues[index].heat_no;
 
-    if (!batchId || batchId.length !== 10) {
-      showMessage("Please enter valid Batch ID", "error");
-      return;
-    };
+    // if(!isHeatNoFetch){
+    //   if (!batchId || batchId.length !== 10) {
+    //     showMessage("Please enter valid Batch ID", "error");
+    //     return;
+    //   };
+    // } 
 
     const payload = {
       batch_id: batchId,
