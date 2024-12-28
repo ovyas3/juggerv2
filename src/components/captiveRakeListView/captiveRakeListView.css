@@ -1,0 +1,146 @@
+.wrapper {
+    padding: 20px;
+    background-color: #fff;
+    min-height: 100vh;
+}
+
+.filter-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-left: -96px;
+    margin-top: -80px;
+    padding: 16px;
+    background: #fff;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.filter-buttons {
+    display: flex;
+    gap: 16px;
+}
+
+.filter-chip {
+    min-width: 120px !important;
+    height: 36px !important;
+}
+
+.loading-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 400px;
+}
+
+.error-alert {
+    margin: 20px;
+}
+
+.table-wrapper {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-left: -96px;
+}
+
+.table-row {
+    transition: background-color 0.2s ease;
+}
+
+.table-row:hover {
+    background-color: rgba(0, 0, 0, 0.04);
+    cursor: pointer;
+}
+
+.status-chip {
+    min-width: 90px !important;
+    text-align: center;
+}
+
+.table-head {
+    background-color: #f5f5f5;
+}
+
+.table-head th {
+    font-weight: 600;
+    color: #333;
+}
+
+.table-pagination {
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.MuiTableCell-root {
+    padding: 12px 16px !important;
+}
+
+.MuiTableHead-root .MuiTableCell-root {
+    font-weight: 600 !important;
+    color: #333 !important;
+}
+
+.MuiChip-root.filter-chip {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+@media screen and (max-width: 768px) {
+    .wrapper {
+        padding: 12px;
+    }
+
+    .filter-container {
+        padding: 12px;
+        margin-bottom: 16px;
+    }
+
+    .filter-buttons {
+        gap: 8px;
+    }
+
+    .MuiTableCell-root {
+        padding: 8px 12px !important;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .wrapper {
+        padding: 8px;
+    }
+
+    .filter-buttons {
+        flex-direction: column;
+        width: 100%;
+        max-width: 200px;
+        margin: 0 auto;
+    }
+
+    .filter-chip {
+        width: 100% !important;
+    }
+    
+    .MuiTableCell-root {
+        padding: 6px 8px !important;
+        font-size: 13px !important;
+    }
+}
+
+.MuiTableCell-root:nth-child(7),
+.MuiTableCell-root:nth-child(9),
+.MuiTableCell-root:nth-child(10),
+.MuiTableCell-root:nth-child(11) {
+    min-width: 150px;
+    width: 150px;
+    max-width: 200px;
+}
+
+.MuiTableCell-root:nth-child(7) span,
+.MuiTableCell-root:nth-child(9) span,
+.MuiTableCell-root:nth-child(10) span,
+.MuiTableCell-root:nth-child(11) span {
+    white-space: normal;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}

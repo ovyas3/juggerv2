@@ -15,6 +15,7 @@ import StationManagement from "@/components/stationManagement/stationManagement"
 import HandlingAgent from "@/components/handlingAgent/handlingAgent";
 import RakeFreeTimeSetting from "@/components/RakeFreeTimeSetting/RakeFreeTimeSetting";
 import RakeDCCalculator from "@/components/RakeDCCalculator/RakeDCCalculator";
+import Route from "@/components/Route/Route";
 
 function Settings() {
   const text = useTranslations("SETTINGS");
@@ -73,6 +74,11 @@ function Settings() {
               onClick={()=>setActiveOption('preferences')}>
                 {text("preferences")}
             </div>
+            <div 
+              className={activeOption === 'Route' ? 'activeOptionSettings': "normalOptionSettings" } 
+              onClick={()=>setActiveOption('Route')}>
+                {text("Route")}
+            </div>
           </div>
           <div id="right-section">
             <Suspense fallback={<div>Loading...</div>}>
@@ -84,6 +90,7 @@ function Settings() {
               {activeOption === 'RakeDCCalculator' && <RakeDCCalculator />}
               {activeOption === 'notification' && <WhatsAppNotify />}
               {/* {activeOption === 'preferences' && <Preferences/>} */}
+              {activeOption === 'Route' && <Route/>}
             </Suspense>
           </div>
         </div>
