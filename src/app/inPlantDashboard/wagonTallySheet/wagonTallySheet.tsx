@@ -218,6 +218,49 @@ const datesArr = [
   }
 ];
 
+const materialsArr = [
+  {
+    name: "Plate",
+    raigarh_code: "Plate_Mill_01",
+    angul_code: "Plate_Mill_06"
+  },
+  {
+    name: "Coil",
+    raigarh_code: "Plate_Mill_01",
+    angul_code: "Plate_Mill_06"
+  },
+  {
+    name: "Billet",
+    raigarh_code: "Semis_01",
+    angul_code: "Semis_06"
+  },
+  {
+    name: "Round",
+    raigarh_code: "Semis_01",
+    angul_code: "Semis_06"
+  },
+  {
+    name: "Rail Mill (R)",
+    raigarh_code: "Rail_Mill_01",
+    angul_code: "Rail_Mill_06"
+  },
+  {
+    name: "Rail Mill (S)",
+    raigarh_code: "Rail_Mill_01",
+    angul_code: "Rail_Mill_06"
+  },
+  {
+    name: "TMT",
+    raigarh_code: "Bar_Mill_01",
+    angul_code: "Bar_Mill_06"
+  },
+  {
+    name: "Slab",
+    raigarh_code: "Plate_Mill_01",
+    angul_code: "Plate_Mill_06"
+  }
+];
+
 type Mill = {
   wagonNumber: string;
   wagonType: string;
@@ -347,16 +390,19 @@ const WagonTallySheet: React.FC = () => {
   };
 
   // Function to handle input change in form (Material Details)
-  const handleInputChange = (index: number, event: React.ChangeEvent<HTMLInputElement>) => {
-    const name = event.target.name as FormValueKey;
+  const handleInputChange = (index: number, event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const name = event.target.name; 
     const value = event.target.value;
 
     setFormValues(prev => {
-      const newFormValues = [...prev];
-      newFormValues[index][name] = value;
-      return newFormValues;
+        const updatedValues = [...prev];
+        updatedValues[index] = {
+            ...updatedValues[index],
+            [name]: value, 
+        };
+        return updatedValues;
     });
-  };
+};
 
   const handleWeights = (index: number, event: React.FormEvent<HTMLInputElement>) => {
     const newValue = parseFloat(event.currentTarget.value) || 0; 
@@ -380,6 +426,19 @@ const WagonTallySheet: React.FC = () => {
   const handleDataWithBatchAndHeatNo = async (index: number, isHeatNoFetch: boolean) => {
     const batchId = formValues[index].batch_id;
     const heatNo = formValues[index].heat_no;
+    const material = formValues[index].material;
+
+    let plant_code;
+    let plant_code_obj = materialsArr.find((item: any) => item.name === material);
+    const shipper = localStorage.getItem("selected_shipper");
+
+    if (shipper === "60ed6187f5930e0411ebeace") {
+      plant_code = plant_code_obj?.raigarh_code || "";
+    } else if (shipper === "623c963e33526eee0419a399") {
+      plant_code = plant_code_obj?.angul_code || "";
+    } else {
+      plant_code = plant_code_obj?.angul_code || "";
+    };
 
     // if(!isHeatNoFetch){
     //   if (!batchId || batchId.length !== 10) {
@@ -392,6 +451,7 @@ const WagonTallySheet: React.FC = () => {
       batch_id: batchId,
       plant: selectedPlant?.plant?._id,
       heat_no: heatNo,
+      plant_code: plant_code,
       is_heat_no_fetch: isHeatNoFetch
     };
 
@@ -895,7 +955,8 @@ const WagonTallySheet: React.FC = () => {
         events: filteredDates,
         materials: formValuesMaterials,
         is_sick: isSick,
-      }
+      };
+      console.log(payload, "payload");
 
       try {
         await httpsPost('post_wagon_details', payload, router);
@@ -1299,13 +1360,19 @@ const WagonTallySheet: React.FC = () => {
                         <div className="wagon-tally-sheet-body-content-materials-details-body-content">
                           <p className="wagon-tally-sheet-body-content-materials-details-body-content-label">{text('material')}</p>
                           <div className="wagon-tally-sheet-body-content-materials-details-body-content-input-container">
-                            <input
-                              type="text"
-                              placeholder=""
+                          <select
                               className="wagon-tally-sheet-body-content-materials-details-body-content-input"
                               name="material"
                               value={formValue.material}
-                              onChange={(event) => handleInputChange(index, event)} />
+                              onChange={(event) => handleInputChange(index, event)} 
+                          >
+                              <option value="" disabled>Select a material</option>
+                              {materialsArr.map((material, idx) => (
+                                  <option key={idx} value={material.name}>
+                                      {material.name}
+                                  </option>
+                              ))}
+                          </select>
                           </div>
                         </div>
                         {/* Heat No */}
