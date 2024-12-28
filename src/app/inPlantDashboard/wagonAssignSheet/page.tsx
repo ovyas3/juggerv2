@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -67,6 +67,9 @@ function WagonAssignSheetContent() {
   const id = searchParams.get("shipmentId");
   const [shipmentData, setShipmentData] = useState<any>({});
   const [loading, setLoading] = useState(false);
+  const [selectionRect, setSelectionRect] = useState({ startX: 0, startY: 0, width: 0, height: 0 });
+  const [isSelecting, setIsSelecting] = useState(false);
+  const containerRef = useRef<HTMLDivElement | null>(null); 
 
   const wagonDetails = async () => {
     try {
@@ -130,9 +133,28 @@ function WagonAssignSheetContent() {
     });
   };
 
+  const assignAllWagonsToSelectedPlant = () => {
+    if (!SelectedPlant || Object.keys(SelectedPlant).length === 0) {
+        showMessage.showMessage("Please select a plant", "error");
+        return;
+    }
+
+    setWagonsNewData((prevWagons: any) => {
+        return prevWagons.map((wagon: any) => {
+            if (wagon.plant_assigned && wagon.plant_assigned._id !== SelectedPlant._id) {
+                return wagon; 
+            }
+            return {
+                ...wagon,
+                plant_assigned: SelectedPlant
+            };
+        });
+    });
+  };
+
   const submitAssignToMill = async () => {
     let payload = {};
-    const assignedData = wagonsNewData.reduce((acc: any, item: any) => {
+    const assignedData = wagonsNewData && wagonsNewData.reduce((acc: any, item: any) => {
       const plantId = item.plant_assigned?._id;
       if (plantId) {
         let plantEntry = acc.find((entry: any) => entry.plant === plantId);
@@ -157,7 +179,7 @@ function WagonAssignSheetContent() {
     payload = {
       shipment: id,
       assigned_data: assignedData,
-      wagon_order: wagonsNewData.map((item: any, index: number) => ({
+      wagon_order: wagonsNewData && wagonsNewData.map((item: any, index: number) => ({
         _id: item._id,
         order_no: index + 1,
       })),
@@ -196,6 +218,58 @@ function WagonAssignSheetContent() {
 
   const millColors = ["#3351FF", "#0A2540", "#18BE8A", "#6600FF", "#F57600",  "#FFCB47"];
 
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setIsSelecting(true);
+    const rect = {
+        startX: e.clientX - (containerRef.current ? containerRef.current.getBoundingClientRect().left : 0),
+        startY: e.clientY - (containerRef.current ? containerRef.current.getBoundingClientRect().top : 0),
+        width: 0,
+        height: 0,
+    };
+    setSelectionRect(rect);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isSelecting) return;
+    const width = e.clientX - selectionRect.startX;
+    const height = e.clientY - selectionRect.startY;
+    setSelectionRect(prev => ({
+        ...prev,
+        width: width < 0 ? -width : width, // Ensure width is positive
+        height: height < 0 ? -height : height, // Ensure height is positive
+    }));
+  };
+
+  const handleMouseUp = () => {
+    setIsSelecting(false);
+    const wagonElements = document.querySelectorAll('.wagonAssignToMillContainerWagon');
+    wagonElements.forEach((wagonElement, index) => {
+        const rect = wagonElement.getBoundingClientRect();
+        if (
+            rect.left >= selectionRect.startX &&
+            rect.right <= selectionRect.startX + selectionRect.width &&
+            rect.top >= selectionRect.startY &&
+            rect.bottom <= selectionRect.startY + selectionRect.height
+        ) {
+            // Toggle wagon assignment
+            const wagon = wagonsNewData[index];
+            if (wagon.plant_assigned) {
+                wagon.plant_assigned = null;
+            } else {
+                wagon.plant_assigned = SelectedPlant;
+            }
+            setWagonsNewData([...wagonsNewData]);
+        }
+    });
+    setSelectionRect({ startX: 0, startY: 0, width: 0, height: 0 }); // Reset the rectangle
+  };
+
+  useEffect(() => {
+    if (containerRef.current) {
+        const containerRect = containerRef.current.getBoundingClientRect();
+    }
+  }, [wagonsNewData]);
+
   if (loading) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
@@ -230,7 +304,7 @@ function WagonAssignSheetContent() {
           <div></div>
         </div>
 
-        <div className="shipment-details-container">
+        <div className="shipment-details-container-inplant">
         <div id="status-for-assign-sheet-wagon">
           <div>
             <header style={{ fontSize: 12, color: "#42454E", marginBottom: 8 }}>
@@ -258,6 +332,14 @@ function WagonAssignSheetContent() {
           </div>
           <div>
             <header style={{ fontSize: 12, color: "#42454E", marginBottom: 8 }}>
+              {text("IndentNo")}
+            </header>
+            <text style={{ fontSize: 16, color: "#42454E", fontWeight: 600 }}>
+              {shipmentData?.indent_no || ""}
+            </text>
+          </div>
+          <div>
+            <header style={{ fontSize: 12, color: "#42454E", marginBottom: 8 }}>
               {text("receivedWagons")}
             </header>
             <text style={{ fontSize: 16, color: "#42454E", fontWeight: 600 }}>
@@ -276,7 +358,19 @@ function WagonAssignSheetContent() {
                   ref={provided.innerRef}
                   className="train-shipment-container"
                 >
-                  {wagonsNewData.map((wagon: any, index: any) => (
+                  <div id="wagon-locomotion-engine">
+                    <div>
+                      <Image
+                        src={locomotive.src}
+                        alt="locomotive"
+                        width={190}
+                        height={48}
+                        style={{ display: "block" }}
+                      />
+                    </div>
+                  </div>
+                  {provided.placeholder}
+                  {wagonsNewData && wagonsNewData.map((wagon: any, index: any) => (
                     <Draggable
                       key={wagon._id}
                       draggableId={wagon._id}
@@ -345,18 +439,8 @@ function WagonAssignSheetContent() {
                       )}
                     </Draggable>
                   ))}
-                  {provided.placeholder}
-                  <div id="wagon-locomotion-engine">
-                    <div>
-                      <Image
-                        src={locomotive.src}
-                        alt="locomotive"
-                        width={190}
-                        height={48}
-                        style={{ display: "block" }}
-                      />
-                    </div>
-                  </div>
+                  
+                  
                 </div>
               )}
             </Droppable>
@@ -365,7 +449,14 @@ function WagonAssignSheetContent() {
 
         <div id="assign-wagon-container-wagon">
           <div>
-            <div className="assign-wagon-container-title">Select a Loading Shop</div>
+            <div className="assign-wagon-container-title-container">
+              <div className="assign-wagon-container-title">Select a Loading Shop</div>
+              <button className="assign-wagon-select-all-button" onClick={() => {
+                assignAllWagonsToSelectedPlant();
+              }}>
+                Select All
+              </button>
+            </div>
             <div id="plantSelectorContainerWagon">
               {plants?.map((plant: any, index: any) => {
                 const isSelected = plant?._id === SelectedPlant?._id;
@@ -407,7 +498,7 @@ function WagonAssignSheetContent() {
                         }}
                       >
                         (
-                        {wagonsNewData.filter((wagon: any) => {
+                        {wagonsNewData && wagonsNewData.filter((wagon: any) => {
                           return wagon?.plant_assigned?.name === plant?.name;
                         }).length || 0}
                         )
@@ -419,8 +510,29 @@ function WagonAssignSheetContent() {
             </div>
           </div>
 
-          <div id="assign-wagon-container-box-selection-container-wagon">
-            {wagonsNewData.map((wagons: any, index: number) => {
+          <div 
+            id="assign-wagon-container-box-selection-container-wagon"
+            ref={containerRef}
+            onMouseDown={handleMouseDown}
+            onMouseMove={handleMouseMove}
+            onMouseUp={handleMouseUp}
+            style={{ position: 'relative' }} 
+          >
+            {isSelecting && (
+                <div
+                    style={{
+                        position: 'absolute',
+                        border: '1px dashed blue',
+                        backgroundColor: 'rgba(30, 144, 255, 0.3)',
+                        left: selectionRect.startX - (containerRef.current ? containerRef.current.getBoundingClientRect().left : 0),
+                        top: selectionRect.startY - (containerRef.current ? containerRef.current.getBoundingClientRect().top : 0),
+                        width: selectionRect.width,
+                        height: selectionRect.height,
+                        pointerEvents: 'none',
+                    }}
+                />
+            )}
+            {wagonsNewData && wagonsNewData.map((wagons: any, index: number) => {
               const isAssignedToSelectedPlant = wagons?.plant_assigned?._id === SelectedPlant?._id;
               const isAssignedToOtherPlant = wagons?.plant_assigned && !isAssignedToSelectedPlant;
               const millIndex = plants.findIndex(
@@ -433,6 +545,7 @@ function WagonAssignSheetContent() {
                   style={{
                     opacity: wagons.is_sick ? 0.4 : 1,
                     cursor: "pointer",
+
                   }}
                 >
                   <div
@@ -507,7 +620,7 @@ function WagonAssignSheetContent() {
                 {text("assignedWagons")}
               </p>
               <p className="wagons-assign-not-assigned-content-value">
-                {wagonsNewData?.filter((wagons: any) => wagons.plant_assigned)
+                {wagonsNewData && wagonsNewData?.filter((wagons: any) => wagons.plant_assigned)
                   .length || 0}
               </p>
             </div>
@@ -516,7 +629,7 @@ function WagonAssignSheetContent() {
                 {text("notAssignedWagons")}
               </p>
               <p className="wagons-assign-not-assigned-content-value">
-                {wagonsNewData.filter((wagons: any) => !wagons.plant_assigned)
+                {wagonsNewData && wagonsNewData.filter((wagons: any) => !wagons.plant_assigned)
                   .length || 0}
               </p>
             </div>
@@ -525,7 +638,7 @@ function WagonAssignSheetContent() {
                 {text("sickWagons")}
               </p>
               <p className="wagons-assign-not-assigned-value">
-                {wagonsNewData.filter((wagons: any) => wagons.is_sick).length ||
+                {wagonsNewData && wagonsNewData.filter((wagons: any) => wagons.is_sick).length ||
                   0}
               </p>
             </div>

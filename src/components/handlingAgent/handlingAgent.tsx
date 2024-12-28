@@ -16,7 +16,7 @@ import ArrowDropDownSharpIcon from '@mui/icons-material/ArrowDropDownSharp';
 import { useTranslations } from 'next-intl';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import { useSnackbar } from '@/hooks/snackBar';
-import ActiveAgentList from '@/app/handlingAgent/activeHAtable';
+import ActiveAgentList from './activeHAtable';
 import { useRouter } from 'next/navigation';
 import { useMediaQuery, useTheme } from '@mui/material';
 
@@ -128,15 +128,12 @@ function HandlingAgent() {
     return (
         <div 
             className='handlingAgent_Container'
-            style={{
-                marginBottom: !mobile ? '0px' : '60px',
-            }}
         >
             {/* ------------header ----------- */}
-            {!mobile ? <Header title={'Handling Agent'} isMapHelper={false} /> : <MobileHeader />}
+            {/* {!mobile ? <Header title={'Handling Agent'} isMapHelper={false} /> : <MobileHeader />} */}
 
             {/* ---------- pageContent---------- */}
-            <div className={`content_container ${!mobile ? 'adjustMargin' : 'adjustMarginMobile'}`}  >
+            <div className="handlingAgent_pageContent">
 
                 <div className='handlingAgent_title'>
                     <div className='handlingAgent_title_container'>
@@ -203,7 +200,7 @@ function HandlingAgent() {
             </div>
 
             {/* ----------sildeDrawer ------------- */}
-            {!mobile ? <SideDrawer /> : <div ><MobileDrawer /></div>}
+            {/* {!mobile ? <SideDrawer /> : <div ><MobileDrawer /></div>} */}
         </div>
     )
 }

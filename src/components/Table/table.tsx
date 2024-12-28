@@ -62,6 +62,8 @@ import { MarkComplete } from './tableComp';
 import ImportContactsIcon from '@mui/icons-material/ImportContacts';
 import { useMediaQuery, useTheme } from '@mui/material';
 
+import TrainIcon from '@mui/icons-material/Train';
+
 const status_class_map: { [key: string]: string } = {
     'OB': 'status_title_In_Plant',
     'AVE': 'status_title_In_Plant',
@@ -143,7 +145,7 @@ const convertArrayToFilteredArray = (inputArray: any, shipmentPayloads: any) => 
                 code: delivery_location?.code ?? '--'
             },
             material: {
-                name: others.demandedCommodity || '--',
+                name: others?.demandedCommodity || '--',
             },
             materials: materials,
             pickupdate: {
@@ -379,6 +381,12 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
         setDownOut('downOut');
     }
 
+    const releaseTimeDate = (row: any) => {
+        setOpenMarkPlacement(true);
+        setMarkPlacementId(row);
+        setDownOut('releaseTime');
+    }
+
     const uploadWagonSheet = (row: any) => {
         setOpenUploadWagonSheet(true);
         setUploadWagonSheetId(row);
@@ -433,7 +441,8 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
     useEffect(() => {
         const commonColumns: Column[] = [
             { id: 'fnr', label: '', subLabel: '', class: 'fnr', innerClass: 'inner_fnr' },
-            { id: 'destination', subLabel: 'Paid By', label: 'Destination', class: 'destination', innerClass: '' },
+            // { id: 'destination', subLabel: 'Paid By', label: 'Destination', class: 'destination', innerClass: '' },
+            { id: 'destination', subLabel: '', label: 'Destination', class: 'destination', innerClass: '' },
             { id: 'material', subLabel: '', label: 'Commodities', class: 'material', innerClass: '' },
             { id: 'eld', subLabel: 'Exp. Loading Date', label: 'Indent Date', class: 'eld', innerClass: '' },
             { id: 'pickupdate', subLabel: 'Drawn Out Time', label: 'RR Date', class: 'pickupdate', innerClass: 'inner_pickup' },
@@ -508,6 +517,12 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
         const message = generateTemplate(rowData);
         copyToClipboard(message);
     };
+
+    function extractTextInsideParentheses(input: string) {
+        if(!input) return null
+        const match = input.match(/\(([^)]+)\)/);
+        return match ? match[1] : null;
+      }
 
     return (
         <div 
@@ -746,12 +761,19 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                              />
                                                                             {/* } */}
                                                                             {/* {row.status.raw === 'INPL' && row.rrDoc && ( */}
+                                                                                <ActionItem
+                                                                                     icon={<TrainIcon style={{ width: "24px", height: '24px', color: '#C72C41' }} />}
+                                                                                     text={t('releaseTime')}
+                                                                                     onClick={()=>{releaseTimeDate(row)}}
+                                                                                     id="releaseTime"
+                                                                                 />
                                                                                  <ActionItem
                                                                                  icon={<UpdateIcon style={{ width: "24px", height: '24px', color: '#0367FF' }} />}
                                                                                  text={t('drownOut')}
                                                                                  onClick={()=>{drownOutDate(row)}}
                                                                                  id="drownOut"
                                                                              />
+                                                                             
                                                                             {/* )} */}
                                                                                 <ActionItem
                                                                                     icon={<DriveFolderUploadIcon style={{ width: "24px", height: '24px', color:'#185519'}} />}
@@ -881,11 +903,19 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                                                 fontSize: 12
                                                                             }}
                                                                         >
-                                                                            {value.code} {value.name !== '--' ? value.name : value.code}
+                                                                            <span style={{
+                                                                                fontWeight: 'bold',
+                                                                            }}>{value.code}</span> <br />
+                                                                            <span style={{
+                                                                                color: '#7C7E8C',
+                                                                                fontSize: 11
+                                                                            }}>
+                                                                                {value.name !== '--' ? value.name : value.code}
+                                                                            </span>
                                                                         </div>
                                                                     </Tooltip>
                                                                 </div>
-                                                                <div style={{ marginTop: '6px', color: '#7C7E8C', fontSize: 10 }}>{row.paid_by}</div>
+                                                                {/* <div style={{ marginTop: '6px', color: '#7C7E8C', fontSize: 10 }}>{row.paid_by}</div> */}
                                                             </div>
                                                         )}
                                                         {item.id === 'pickupdate' && (
@@ -900,8 +930,9 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                         {item.id === 'status' &&
                                                             <div className='status_container'>
                                                                 <div className={`status_resize ${status_class_map[value.raw]}`}>
-                                                                    <div>{value.name}</div>
+                                                                    <div>{value?.name}</div>
                                                                 </div>
+                                                                <div style={{textAlign:'center'}}>{extractTextInsideParentheses(value?.code)}</div>
                                                                 {value.code ? <div className='status_code'>{value.code}</div> : <div className='status_code' style={{textAlign:'center'}}>Status will update soon</div>}
                                                             </div>
                                                         }

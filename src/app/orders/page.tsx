@@ -13,7 +13,7 @@ import MobileDrawer from "@/components/Drawer/mobile_drawer";
 import MobileHeader from "@/components/Header/mobileHeader";
 import { useWindowSize } from "@/utils/hooks";
 import { httpsGet, httpsPost } from "@/utils/Communication";
-import { GET_SHIPMENTS, CAPTIVE_RAKE, REMARKS_LIST } from "@/utils/helper";
+import { GET_SHIPMENTS, CAPTIVE_RAKE, REMARKS_LIST, LAST_FOIS_PING } from "@/utils/helper";
 import { useSnackbar } from '@/hooks/snackBar';
 import service from '@/utils/timeService';
 import { color } from 'framer-motion';
@@ -80,7 +80,7 @@ const OrdersPage = () => {
   const [selected_bound, setSelected_bound] = useState('outbound')
   const [remarksList, setRemarksList] = useState({})
   const [triggerShipments, setTriggerShipments] = useState(false)
-  const [status, setStatus] = useState(['ITNS', 'Delivered']);
+  const [status, setStatus] = useState(['ITNS']);
 
   const [statusTotal, setStatusTotal] = useState(false);
   const [statusAVE, setStatusAVE] = useState(false);
@@ -90,7 +90,7 @@ const OrdersPage = () => {
 
   const [showRefreash, setShowRefreash] = useState(false)
   const router = useRouter();
-  const [totalCountrake, setTotalCountrake] = useState<any>([])
+  const [totalCountrake, setTotalCountrake] = useState<any>([]);
 
   const[query, setQuery] = useState<any>({
     from:'',
@@ -103,8 +103,8 @@ const OrdersPage = () => {
     is_outbound: true,
     to: '',
     from: '',
-    status: ['ITNS', 'Delivered'],
-    rake_types: ['CR', 'IR']
+    rake_types: ['CR', 'IR'],
+    status: ['ITNS'],
   })
 
   //adding to and from to shipmentpayload
@@ -165,21 +165,21 @@ const OrdersPage = () => {
     }));
   }
 
-  const handleChangeStatus = (status: string[]) => {
-    setStatus(status);
-    setShipmentsPayload((prevState: any) => {
-      if (status.length === 0) {
-        const { status, ...newState } = prevState;
-        return newState;
-      } else if(status[0] === 'All'){
-        const { status, ...newState } = prevState;
-        return newState;
-      } else {
-        const modifiedStatus = status.map(getStatusCode);
-        return { ...prevState, status: modifiedStatus };
-      }
-    });
-  }
+  // const handleChangeStatus = (status: string[]) => {
+  //   setStatus(status);
+  //   setShipmentsPayload((prevState: any) => {
+  //     if (status.length === 0) {
+  //       const { status, ...newState } = prevState;
+  //       return newState;
+  //     } else if(status[0] === 'All'){
+  //       const { status, ...newState } = prevState;
+  //       return newState;
+  //     } else {
+  //       const modifiedStatus = status.map(getStatusCode);
+  //       return { ...prevState, status: modifiedStatus };
+  //     }
+  //   });
+  // }
 
   const handleChangeRakeType = (rakeTypes: string[]) => {
     setShipmentsPayload((prevState: any) => {
@@ -291,13 +291,12 @@ const OrdersPage = () => {
       case "total":
         setShipmentsPayload((prevState: any) => {
           let newState = { ...prevState };
-          if(newState.status.length > 0){
+          if(!newState.status){
             newState.status = [];
             setStatus(newState.status);
           }else{
-            // newState.status = [];
-            newState.status = ['AVE', 'INPL', 'ITNS', 'Delivered'];
-            setStatus(newState.status);
+            delete newState.status 
+            setStatus(['total']);
           }
           return newState;
         });
@@ -305,12 +304,37 @@ const OrdersPage = () => {
       case "AVE":
         setShipmentsPayload((prevState: any) => {
           let newState = { ...prevState };
-          if(!newState.status.includes('AVE')){
-            newState.status = [...newState.status, 'AVE'];
-            setStatus(newState.status);
+          if(!status.includes('AVE')){
+            if(newState.status){
+              newState.status.push('AVE');
+            }else{
+              newState.status = ['AVE'];
+            }
+            setStatus((prev:any)=>{
+              const newState = [...prev]
+              newState.push('AVE')
+              const index = newState.indexOf('total');
+              if (index !== -1) {
+                newState.splice(index, 1);
+              }
+              return newState
+            });
           }else{
             newState.status = newState.status.filter((item: string) => item !== 'AVE');
-            setStatus(newState.status);
+            if(newState.status.length === 0){
+              delete newState.status
+            }
+            setStatus((prev:any)=>{
+              const newState = [...prev]
+              const index = newState.indexOf('AVE');
+              if (index !== -1) {
+                newState.splice(index, 1);
+              }
+              if(newState.length === 0){
+                newState.push('total');
+              }
+              return newState
+            });
           }
           return newState;
         });
@@ -318,12 +342,37 @@ const OrdersPage = () => {
       case "INPL":
         setShipmentsPayload((prevState: any) => {
           let newState = { ...prevState };
-          if(!newState.status.includes('INPL')){
-            newState.status = [...newState.status, 'INPL'];
-            setStatus(newState.status);
+          if(!status.includes('INPL')){
+            if(newState.status){
+              newState.status.push('INPL');
+            }else{
+              newState.status = ['INPL'];
+            }
+            setStatus((prev:any)=>{
+              const newState = [...prev]
+              newState.push('INPL')
+              const index = newState.indexOf('total');
+              if (index !== -1) {
+                newState.splice(index, 1);
+              }
+              return newState
+            })
           }else{
             newState.status = newState.status.filter((item: string) => item !== 'INPL');
-            setStatus(newState.status);
+            if(newState.status.length === 0){
+              delete newState.status
+            }
+            setStatus((prev:any)=>{
+              const newState = [...prev];
+              const index = newState.indexOf('INPL');
+              if (index !== -1) {
+                newState.splice(index, 1);
+              }
+              if(newState.length === 0){
+                newState.push('total');
+              }
+              return newState
+            })
           }
           return newState;
         });
@@ -331,12 +380,37 @@ const OrdersPage = () => {
       case "ITNS":
         setShipmentsPayload((prevState: any) => {
           let newState = { ...prevState };
-          if(!newState.status.includes('ITNS')){
-            newState.status = [...newState.status, 'ITNS'];
-            setStatus(newState.status);
+          if(!status.includes('ITNS')){
+            if(newState.status){
+              newState.status.push('ITNS');
+            }else{
+              newState.status = ['ITNS'];
+            }
+            setStatus((prev:any)=>{
+              const newState = [...prev]
+              newState.push('ITNS')
+              const index = newState.indexOf('total');
+              if (index !== -1) {
+                newState.splice(index, 1);
+              }
+              return newState
+            })
           }else{
             newState.status = newState.status.filter((item: string) => item !== 'ITNS');
-            setStatus(newState.status);
+            if(newState.status.length === 0){
+              delete newState.status
+            }
+            setStatus((prev:any)=>{
+              const newState = [...prev]
+              const index = newState.indexOf('ITNS');
+              if (index !== -1) {
+                newState.splice(index, 1);
+              }
+              if(newState.length === 0){
+                newState.push('total');
+              }
+              return newState
+            })
           }
           return newState;
         });
@@ -344,12 +418,37 @@ const OrdersPage = () => {
       case "Delivered":
         setShipmentsPayload((prevState: any) => {
           let newState = { ...prevState };
-          if(!newState.status.includes('Delivered')){
-            newState.status = [...newState.status, 'Delivered'];
-            setStatus(newState.status);
+          if(!status.includes('Delivered')){
+            if(newState.status){
+              newState.status.push('Delivered');
+            }else{
+              newState.status = ['Delivered'];
+            }
+            setStatus((prev:any)=>{
+              const newState = [...prev]
+              newState.push('Delivered')
+              const index = newState.indexOf('total');
+              if (index !== -1) {
+                newState.splice(index, 1);
+              }
+              return newState
+            })
           }else{
             newState.status = newState.status.filter((item: string) => item !== 'Delivered');
-            setStatus(newState.status);
+            if(newState.status.length === 0){
+              delete newState.status
+            }
+            setStatus((prev:any)=>{
+              const newState = [...prev]
+              const index = newState.indexOf('Delivered');
+              if (index !== -1) {
+                newState.splice(index, 1);
+              }
+              if(newState.length === 0){
+                newState.push('total');
+              }
+              return newState
+            })
           }
           return newState;
         });
@@ -357,12 +456,37 @@ const OrdersPage = () => {
       case "CNCL":
         setShipmentsPayload((prevState: any) => {
           let newState = { ...prevState };
-          if(!newState.status.includes('CNCL')){
-            newState.status = [...newState.status, 'CNCL'];
-            setStatus(newState.status);
+          if(!status.includes('CNCL')){
+            if(newState.status){
+              newState.status.push('CNCL');
+            }else{
+              newState.status = ['CNCL'];
+            }
+            setStatus((prev:any)=>{
+              const newState = [...prev]
+              newState.push('CNCL')
+              const index = newState.indexOf('total');
+              if (index !== -1) {
+                newState.splice(index, 1);
+              }
+              return newState
+            })
           }else{
             newState.status = newState.status.filter((item: string) => item !== 'CNCL');
-            setStatus(newState.status);
+            if(newState.status.length === 0){
+              delete newState.status
+            }
+            setStatus((prev:any)=>{
+              const newState = [...prev]
+              const index = newState.indexOf('CNCL');
+              if (index !== -1) {
+                newState.splice(index, 1);
+              }
+              if(newState.length === 0){
+                newState.push('total');
+              }
+              return newState
+            })
           }
           return newState;
         })
@@ -388,6 +512,7 @@ const OrdersPage = () => {
   const cancelledCount = totalCountrake[0]?.statuses?.find((item: any) => item.status === "CNCL")?.count || 0;
 
   const [openUploadFile, setOpenUploadFile] = useState(false);
+
   return (
     <div>
       <div className='orderContainer'>
@@ -426,7 +551,7 @@ const OrdersPage = () => {
               }
 
              { !mobile && <div id='uploadFile_refreash'>
-                <motion.div id='uploadButton'
+                {/* <motion.div id='uploadButton'
                    whileHover={{ scale: 0.95 }}
                    whileTap={{ scale: 0.9 }}
                    transition={{ type: "spring", stiffness: 400, damping: 10 }}
@@ -434,7 +559,7 @@ const OrdersPage = () => {
                 >
                   <div><Image src={uploadIcon.src} height={24} width={24} alt='upload' /></div>
                   <div>{t('uploadFile')}</div>
-                </motion.div>
+                </motion.div> */}
                 <div className='ageing_reload'>
                 <div className='input_fnr_reload'>
                   <div className={`reload ${reload ? 'loading' : ''}`} onClick={() => {
@@ -463,15 +588,24 @@ const OrdersPage = () => {
               <div className='filters_aging'>
 
                 <div className='filters'>
-                  <Filters onToFromChange={handleToFromChange} onChangeStatus={handleChangeStatus} onChangeRakeTypes={handleChangeRakeType} reload={reload} getShipments={getAllShipment} shipmentsPayloadSetter={setShipmentsPayload} setTriggerShipments={setTriggerShipments} triggerShipments={triggerShipments} />
+                  <Filters  
+                    onToFromChange={handleToFromChange} 
+                    // onChangeStatus={handleChangeStatus} 
+                    onChangeRakeTypes={handleChangeRakeType} 
+                    reload={reload} 
+                    getShipments={getAllShipment} 
+                    shipmentsPayloadSetter={setShipmentsPayload} 
+                    setTriggerShipments={setTriggerShipments} 
+                    triggerShipments={triggerShipments}
+                  />
                 </div>
 
                 <div className='display_status'>
                     <div className='display_status_inner_box' style={{
-                      backgroundColor: (status.includes('AVE') && status.includes('ITNS')  && status.includes('Delivered')  && status.includes('INPL') ) ? '#000000' : '#FFFFFF',
+                      backgroundColor: (status.includes('total')) ? '#000000' : '#FFFFFF',
                     }} onClick={()=>{changeStatusByDashBoard('total')}}>
-                      <div style={{fontSize:20, fontWeight:500, color: (status.includes('AVE') && status.includes('ITNS')  && status.includes('Delivered')  && status.includes('INPL') )? '#FFFFFF' : '#000000'}}><CountUp duration={1.5} end={fetchTotalCount}/></div>
-                      <div style={{fontSize:12, color: (status.includes('Available eIndent') && status.includes('Ready for Departure') && status.includes('In Transit') && status.includes('Delivered At Hub') && status.includes('Delivered At Customer')) ? '#FFFFFF' : '#7C7E8C'}}>{t('Total')}</div>
+                      <div style={{fontSize:20, fontWeight:500, color: (status.includes('total')  )? '#FFFFFF' : '#000000'}}><CountUp duration={1.5} end={fetchTotalCount}/></div>
+                      <div style={{fontSize:12, color: (status.includes('total')) ? '#FFFFFF' : '#7C7E8C'}}>{t('Total')}</div>
                     </div>
                     <div className='display_status_inner_box' style={{cursor:'pointer', backgroundColor: getStatusColor(status, 'AVE').backgroundColor}} onClick={()=>{changeStatusByDashBoard('AVE')}}>
                       <div style={{fontSize:20, fontWeight:500, color: getStatusColor(status, 'AVE').countTextColor}}><CountUp duration={1.5} end={availableeIndentCount}/></div>

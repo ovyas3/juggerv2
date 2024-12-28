@@ -16,12 +16,12 @@ import { renderTimeViewClock } from "@mui/x-date-pickers/timeViewRenderers";
 import { ThreeCircles } from "react-loader-spinner";
 import { useRouter } from "next/navigation";
 import './page.css'
+import { Button as MUIButton } from "@mui/material";
 
 const events_names = {
-  rakeArrivalAtStation: "Rake Arrival At Serving Station",
+  rakeArrivalAtStation: "Rake Arrival at Serving Station",
   stabled: "Stabled",
   placementTime: "Placement Time",
-  // rakeArrivalAtPlant: "gate-in",
   bpRelease: "B/P Release",
   wagonPlacedAtLoadingPoint: "Wagons Placed At Loading Point",
   loadRakeFormation: "Load Rake Formation",
@@ -31,11 +31,11 @@ const events_names = {
   apReady: "A.P. Ready",
   drawnOut: "Drawn-out",
 };
+
 const eventCodes = {
   rakeArrivalAtStation: "RAS",
   stabled: "STB",
   placementTime: "PLT",
-  // rakeArrivalAtPlant: "GIN",
   bpRelease: "BPR",
   wagonPlacedAtLoadingPoint: "WLP",
   loadRakeFormation: "LRF",
@@ -44,6 +44,78 @@ const eventCodes = {
   eot: "EOT",
   apReady: "APR",
   drawnOut: "DRO",
+  HLS: "HLS",
+  HLC: "HLC",
+};
+
+const styles: { [key: string]: React.CSSProperties } = {
+  container: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    gap: '16px',
+    fontSize:'12px'
+  },
+  hookCard: {
+    display: 'flex',
+    flexDirection: 'column',
+    flex: '1',
+    maxWidth: '200px',
+    minWidth:'200px',
+    border: '1px solid #ccc',
+    borderRadius: '8px',
+    padding: '16px',
+    gap: '16px',
+  },
+  header: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: '8px',
+  },
+  headerText: {
+    fontWeight: 600,
+  },
+  actionButtonContainer: {
+    display: 'flex',
+    gap: '8px',
+  },
+  addButton: {
+    cursor: 'pointer',
+    backgroundColor: '#007BFF',
+    color: 'white',
+    borderRadius: '50%',
+    width: '24px',
+    height: '24px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  removeButton: {
+    cursor: 'pointer',
+    backgroundColor: '#FF0000',
+    color: 'white',
+    borderRadius: '50%',
+    width: '24px',
+    height: '24px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  icon: {
+    fontSize: '16px',
+  },
+  loadingTimeContainer: {
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+    gap: '8px',
+  },
+  loadingTimeText: {
+    marginTop: '6px',
+    color: 'black',
+    fontWeight: 600,
+  },
 };
 
 function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
@@ -51,9 +123,7 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
   const showMessage = useSnackbar();
   const text = useTranslations("WAGONTALLYSHEET");
   const [loading, setLoading] = useState(false);
-  const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(
-    null
-  );
+  const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
 
   const [showActionBox, setShowActionBox] = React.useState(-1);
   const [rakeHandlingSheetData, setRakeHandlingSheetData] = useState<any>([]);
@@ -72,12 +142,9 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
       ],
     },
   ]);
-  const [rakeArrivalAtStationObject, setRakeArrivalAtStationObject] =
-    useState<any>({});
-  const [rakeArrivalAtStationDate, setRakeArrivalAtStationDate] =
-    useState<Date | null>(null);
-  const [openRakeArrivalAtServingStation, setOpenRakeArrivalAtServingStation] =
-    useState(false);
+  const [rakeArrivalAtStationObject, setRakeArrivalAtStationObject] = useState<any>({});
+  const [rakeArrivalAtStationDate, setRakeArrivalAtStationDate] = useState<Date | null>(null);
+  const [openRakeArrivalAtServingStation, setOpenRakeArrivalAtServingStation] = useState(false);
 
   const [stabled, setStabled] = useState<any>({});
   const [stabledDate, setStabledDate] = useState<Date | null>(null);
@@ -87,29 +154,16 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
   const [placementTimeDate, setPlacementTimeDate] = useState<Date | null>(null);
   const [openPlacementTime, setOpenPlacementTime] = useState(false);
 
-  const [rakeArrivalAtPlantObject, setRakeArrivalAtPlantObject] = useState<any>(
-    {}
-  );
-  const [rakeArrivalAtPlantDate, setRakeArrivalAtPlantDate] =
-    useState<Date | null>(null);
-  const [openRakeArrivalAtPlant, setOpenRakeArrivalAtPlant] = useState(false);
-
   const [bpReleaseObject, setBpReleaseObject] = useState<any>({});
   const [bpReleaseDate, setBpReleaseDate] = useState<Date | null>(null);
   const [openBpRelease, setOpenBpRelease] = useState(false);
 
-  const [wagonPlacedAtLoadingPointObject, setWagonPlacedAtLoadingPointObject] =
-    useState<any>({});
-  const [wagonPlacedAtLoadingPointDate, setWagonPlacedAtLoadingPointDate] =
-    useState<Date | null>(null);
-  const [openWagonPlacedAtLoadingPoint, setOpenWagonPlacedAtLoadingPoint] =
-    useState(false);
+  const [wagonPlacedAtLoadingPointObject, setWagonPlacedAtLoadingPointObject] = useState<any>({});
+  const [wagonPlacedAtLoadingPointDate, setWagonPlacedAtLoadingPointDate] = useState<Date | null>(null);
+  const [openWagonPlacedAtLoadingPoint, setOpenWagonPlacedAtLoadingPoint] = useState(false);
 
-  const [loadRakeFormationObject, setLoadRakeFormationObject] = useState<any>(
-    {}
-  );
-  const [loadRakeFormationDate, setLoadRakeFormationDate] =
-    useState<Date | null>(null);
+  const [loadRakeFormationObject, setLoadRakeFormationObject] = useState<any>({});
+  const [loadRakeFormationDate, setLoadRakeFormationDate] = useState<Date | null>(null);
   const [openLoadRakeFormation, setOpenLoadRakeFormation] = useState(false);
 
   const [rakeReleaseObject, setRakeReleaseObject] = useState<any>({});
@@ -117,9 +171,7 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
   const [openRakeRelease, setOpenRakeRelease] = useState(false);
 
   const [rlylocoReportingObject, setRlylocoReportingObject] = useState<any>({});
-  const [rlylocoReportingDate, setRlylocoReportingDate] = useState<Date | null>(
-    null
-  );
+  const [rlylocoReportingDate, setRlylocoReportingDate] = useState<Date | null>(null);
   const [openRlylocoReporting, setOpenRlylocoReporting] = useState(false);
 
   const [eotObject, setEotObject] = useState<any>({});
@@ -133,7 +185,9 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
   const [drawnOutObject, setDrawnOutObject] = useState<any>({});
   const [drawnOutDate, setDrawnOutDate] = useState<Date | null>(null);
   const [openDrawnOut, setOpenDrawnOut] = useState(false);
-
+  const [arrivalPlNo, setArrivalPlNo] = useState('');
+  const [formationPlNo, setFormationPlNo] = useState('');
+  const [weighment, setWeighment] = useState(false);
 
   function addMillDetails() {
     const newMill = {
@@ -154,10 +208,12 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
       prevMillDetails.filter((_, index) => index !== id)
     );
   }
+
   const handleCloseAction = () => {
     setAnchorEl(null);
     setShowActionBox(-1);
   };
+
   function clickActionBox(
     e: React.MouseEvent<SVGSVGElement, MouseEvent>,
     index: number,
@@ -182,6 +238,7 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
       return updatedMillDetails;
     });
   }
+
   function removeHookFromMillDetails(
     event: any,
     index: number,
@@ -189,13 +246,19 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
   ) {
     setWorkingPlant((prevMillDetails: any) => {
       const updatedMillDetails = [...prevMillDetails];
-      updatedMillDetails[index].hooks.splice(hookIndex, 1);
+      const hookToRemove = updatedMillDetails[index].hooks[hookIndex];
+      if (!hookToRemove.loading_start && !hookToRemove.loading_end) {
+        updatedMillDetails[index].hooks.splice(hookIndex, 1);
+      }
       return updatedMillDetails;
     });
   }
   function addHookInMillDetails(event: any, index: number) {
     setWorkingPlant((prevMillDetails: any) => {
       const updatedMillDetails = [...prevMillDetails];
+      if (!updatedMillDetails[index].hooks) {
+        updatedMillDetails[index].hooks = [];
+      }
       updatedMillDetails[index].hooks.push({
         hook_no: updatedMillDetails[index].hooks.length + 1,
         count: 0,
@@ -203,6 +266,7 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
       return updatedMillDetails;
     });
   }
+
   const inputHooksForplants = (
     event: any,
     plantIndex: number,
@@ -215,33 +279,49 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
       return updatedMillDetails;
     });
   };
+
   const submitRakeHandlingSheet = async () => {
     let payload = {
       events: [] as any,
       shipment: shipment.id,
+      arrival_pl: '' as any,
+      formation_pl: '' as any,
+      weighment: false,
       hooks: [] as any,
     };
-    // for (const plant of workingPlant) {
-    //   if( (plant.count -  plant.hooks.reduce((acc: any, hook: any) => acc + hook.no_of_wagons,0) || 0) < 0 ){
-    //     showMessage.showMessage(`wagons numbers exceed in ${plant.plant.name}`,'error');
-    //     return;
-    //   }
-    //   for (const hook of plant.hooks) {
-    //     if (hook.no_of_wagons === 0) {
-    //       showMessage.showMessage(
-    //         `Please fill the wagon count for hook ${hook.hook_no} in ${plant.plant.name}`,
-    //         "error"
-    //       );
-    //       return;
-    //     }
-    //   }
-    // }
     workingPlant.forEach((plant: any) => {
       plant.hooks.forEach((hook: any) => {
         payload.hooks.push({
           plant: plant.plant._id,
           hook_no: hook.hook_no,
         });
+      });
+    });
+
+    workingPlant.forEach((plant: any) => {
+      plant.hooks.forEach((hook: any) => {
+        if (hook.loading_start) {
+          payload.events.push({
+            shipment: shipment.id,
+            event_name: `${hook.hook_no} Hook Loading Start`,
+            event_code: "HLS",
+            event_datetime: hook.loading_start,
+            FNR: shipment.fnr,
+            plant: plant.plant._id,
+            hook: hook.hook_no
+          });
+        }
+        if (hook.loading_end) {
+          payload.events.push({
+            shipment: shipment.id,
+            event_name: `${hook.hook_no} Hook Loading Complete`,
+            event_code: "HLC",
+            event_datetime: hook.loading_end,
+            FNR: shipment.fnr,
+            plant: plant.plant._id,
+            hook: hook.hook_no
+          });
+        }
       });
     });
     if (rakeArrivalAtStationDate) {
@@ -294,6 +374,13 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
         id: wagonPlacedAtLoadingPointObject?._id,
       });
     }
+    if (arrivalPlNo) {
+      payload.arrival_pl = arrivalPlNo;
+    }
+    if (formationPlNo) {
+      payload.formation_pl = formationPlNo;
+    }
+    payload.weighment = weighment;
     if (loadRakeFormationDate) {
       payload.events.push({
         shipment: shipment.id,
@@ -358,12 +445,33 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
       setLoading(true);
       const response = await httpsPost(`rake_event/add`, payload, router);
       if (response.statusCode === 200) {
-        showMessage.showMessage(
-          "Rake Handling Sheet Added Successfully",
-          "success"
-        );
+        showMessage.showMessage("Rake Handling Sheet Added Successfully", "success");
+        setRakeHandlingSheetData((prevData: any) => {
+          const updatedData = [...prevData];
+          payload.events.forEach((newEvent: any) => {
+            const index = updatedData.findIndex((event) => event.event_name === newEvent.event_name);
+            if (index !== -1) {
+              updatedData[index] = { ...updatedData[index], ...newEvent };
+            } else {
+              updatedData.push(newEvent);
+            }
+          });
+          return updatedData;
+        });
+        updateEventStates(payload.events);
+        setWorkingPlant((prevPlants: any[]) => {
+          return prevPlants.map((plant) => ({
+            ...plant,
+            hooks: plant.hooks.map((hook: any) => ({
+              ...hook,
+              loading_start: payload.events.find((event: any) => event.event_name.includes(`${hook.hook_no} Hook Loading Start`))?.event_datetime || hook.loading_start,
+              loading_end: payload.events.find((event: any) => event.event_name.includes(`${hook.hook_no} Hook Loading Complete`))?.event_datetime || hook.loading_end,
+            }))
+          }));
+        });
+        // Close the modal after successful submission
+        getWagonDetails()
         isClose(false);
-        getWagonDetails();
       }
     } catch (error) {
       setLoading(false);
@@ -373,7 +481,6 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
     }
   };
 
-  // api calling
   const getRakeHandlingSheetData = async () => {
     try {
       setLoading(true);
@@ -381,6 +488,7 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
         `rake_event_by_shipment/get?id=${shipment.id}`, 0, router
       );
       setRakeHandlingSheetData(response?.data);
+      updateEventStates(response?.data);
     } catch (error) {
       setLoading(false);
       console.log(error);
@@ -388,16 +496,59 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
       setLoading(false);
     }
   };
-  // const plantDetails = async () => {
-  //   try {
-  //     const response = await httpsGet(`shipper_constants/get_mills`);
-  //     if (response.statusCode === 200) {
-  //       setPlants(response.data);
-  //     }
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
+
+  const updateEventStates = (events: any[]) => {
+    events.forEach((event: any) => {
+      const eventDate = new Date(event.event_timestamp);
+      switch (event.event_code) {
+        case eventCodes.rakeArrivalAtStation:
+          setRakeArrivalAtStationObject(event);
+          setRakeArrivalAtStationDate(eventDate);
+          break;
+        case eventCodes.stabled:
+          setStabled(event);
+          setStabledDate(eventDate);
+          break;
+        case eventCodes.placementTime:
+          setPlacementTime(event);
+          setPlacementTimeDate(eventDate);
+          break;
+        case eventCodes.bpRelease:
+          setBpReleaseObject(event);
+          setBpReleaseDate(eventDate);
+          break;
+        case eventCodes.wagonPlacedAtLoadingPoint:
+          setWagonPlacedAtLoadingPointObject(event);
+          setWagonPlacedAtLoadingPointDate(eventDate);
+          break;
+        case eventCodes.loadRakeFormation:
+          setLoadRakeFormationObject(event);
+          setLoadRakeFormationDate(eventDate);
+          break;
+        case eventCodes.rakeRelease:
+          setRakeReleaseObject(event);
+          setRakeReleaseDate(eventDate);
+          break;
+        case eventCodes.rlylocoReporting:
+          setRlylocoReportingObject(event);
+          setRlylocoReportingDate(eventDate);
+          break;
+        case eventCodes.eot:
+          setEotObject(event);
+          setEotDate(eventDate);
+          break;
+        case eventCodes.apReady:
+          setApReadyObject(event);
+          setApReadyDate(eventDate);
+          break;
+        case eventCodes.drawnOut:
+          setDrawnOutObject(event);
+          setDrawnOutDate(eventDate);
+          break;
+      }
+    });
+  };
+
   const plantDetails = async () => {
     try {
       setLoading(true);
@@ -412,6 +563,7 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
       setLoading(false);
     }
   };
+
   const addFirstHookToMillDetails = async (event: any, index: any) => {
     setWorkingPlant((prev: any) => {
       let newState = [...prev];
@@ -421,6 +573,7 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
       return newState;
     });
   };
+
   const removeLastHookFromMillDetails = async (event: any, index: any) => {
     setWorkingPlant((prev: any) => {
       let newState = [...prev];
@@ -429,11 +582,15 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
     });
   };
 
-  // useEffect
   useEffect(() => {
-    getRakeHandlingSheetData();
-    plantDetails();
-  }, []);
+    if (shipment) {
+      setArrivalPlNo(shipment.arrival_pl || '');
+      setFormationPlNo(shipment.formation_pl || '');
+      setWeighment(shipment.weighment || false);
+      getRakeHandlingSheetData();
+      plantDetails();
+    }
+  }, [shipment]);
 
   useEffect(() => {
     setWorkingPlant((prev: any) => {
@@ -443,149 +600,40 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
   }, [plants]);
 
   useEffect(() => {
-    setRakeArrivalAtStationDate(
-      (
-        rakeHandlingSheetData.filter((data: any) => {
-          return data.event_name === events_names.rakeArrivalAtStation;
-        })[0] as any
-      )?.event_timestamp
-    );
-    setRakeArrivalAtStationObject(
-      rakeHandlingSheetData.filter((data: any) => {
-        return data.event_name === events_names.rakeArrivalAtStation;
-      })[0]
-    );
+    if (rakeHandlingSheetData.length > 0 && plants.length > 0) {
+      const hookEvents = rakeHandlingSheetData.filter((data: any) => 
+        data.event_category === "Hook Loading"
+      );
 
-    setStabledDate(
-      (
-        rakeHandlingSheetData.filter((data: any) => {
-          return data.event_name === events_names.stabled;
-        })[0] as any
-      )?.event_timestamp
-    );
-    setStabled(
-      rakeHandlingSheetData.filter((data: any) => {
-        return data.event_name === events_names.stabled;
-      })[0]
-    );
+      const updatedWorkingPlant = plants.map((plant: any) => {
+        const plantHookEvents = hookEvents.filter((event: any) => 
+          event.plant === plant.plant._id
+        );
+        
+        const updatedHooks = plant.hooks.map((hook: any) => {
+          const startEvent = plantHookEvents.find((event: any) => 
+            event.hook === hook.hook_no && event.event_name.includes("Loading Start")
+          );
+          const endEvent = plantHookEvents.find((event: any) => 
+            event.hook === hook.hook_no && event.event_name.includes("Loading Complete")
+          );
+          
+          return {
+            ...hook,
+            loading_start: startEvent ? startEvent.event_timestamp : null,
+            loading_end: endEvent ? endEvent.event_timestamp : null
+          };
+        });
+        
+        return {
+          ...plant,
+          hooks: updatedHooks
+        };
+      });
 
-    setPlacementTimeDate(
-      (
-        rakeHandlingSheetData.filter((data: any) => {
-          return data.event_name === events_names.placementTime;
-        })[0] as any
-      )?.event_timestamp
-    );
-    setPlacementTime(
-      rakeHandlingSheetData.filter((data: any) => {
-        return data.event_name === events_names.placementTime;
-      })[0]
-    );
-    
-    setBpReleaseDate(
-      (
-        rakeHandlingSheetData.filter((data: any) => {
-          return data.event_name === events_names.bpRelease;
-        })[0] as any
-      )?.event_timestamp
-    );
-    setBpReleaseObject(
-      rakeHandlingSheetData.filter((data: any) => {
-        return data.event_name === events_names.bpRelease;
-      })[0]
-    );
-
-    setWagonPlacedAtLoadingPointDate(
-      (
-        rakeHandlingSheetData.filter((data: any) => {
-          return data.event_name === events_names.wagonPlacedAtLoadingPoint;
-        })[0] as any
-      )?.event_timestamp
-    );
-    setWagonPlacedAtLoadingPointObject(
-      rakeHandlingSheetData.filter((data: any) => {
-        return data.event_name === events_names.wagonPlacedAtLoadingPoint;
-      })[0]
-    );
-
-    setLoadRakeFormationDate(
-      (
-        rakeHandlingSheetData.filter((data: any) => {
-          return data.event_name === events_names.loadRakeFormation;
-        })[0] as any
-      )?.event_timestamp
-    );
-    setLoadRakeFormationObject(
-      rakeHandlingSheetData.filter((data: any) => {
-        return data.event_name === events_names.loadRakeFormation;
-      })[0]
-    );
-
-    setRakeReleaseDate(
-      (
-        rakeHandlingSheetData.filter((data: any) => {
-          return data.event_name === events_names.rakeRelease;
-        })[0] as any
-      )?.event_timestamp
-    );
-    setRakeReleaseObject(
-      rakeHandlingSheetData.filter((data: any) => {
-        return data.event_name === events_names.rakeRelease;
-      })[0]
-    );
-
-    setRlylocoReportingDate(
-      (
-        rakeHandlingSheetData.filter((data: any) => {
-          return data.event_name === events_names.rlylocoReporting;
-        })[0] as any
-      )?.event_timestamp
-    );
-    setRlylocoReportingObject(
-      rakeHandlingSheetData.filter((data: any) => {
-        return data.event_name === events_names.rlylocoReporting;
-      })[0]
-    );
-
-    setEotDate(
-      (
-        rakeHandlingSheetData.filter((data: any) => {
-          return data.event_name === events_names.eot;
-        })[0] as any
-      )?.event_timestamp
-    );
-    setEotObject(
-      rakeHandlingSheetData.filter((data: any) => {
-        return data.event_name === events_names.eot;
-      })[0]
-    );
-
-    setApReadyDate(
-      (
-        rakeHandlingSheetData.filter((data: any) => {
-          return data.event_name === events_names.apReady;
-        })[0] as any
-      )?.event_timestamp
-    );
-    setApReadyObject(
-      rakeHandlingSheetData.filter((data: any) => {
-        return data.event_name === events_names.apReady;
-      })[0]
-    );
-
-    setDrawnOutDate(
-      (
-        rakeHandlingSheetData.filter((data: any) => {
-          return data.event_name === events_names.drawnOut;
-        })[0] as any
-      )?.event_timestamp
-    );
-    setDrawnOutObject(
-      rakeHandlingSheetData.filter((data: any) => {
-        return data.event_name === events_names.drawnOut;
-      })[0]
-    );
-  }, [rakeHandlingSheetData]);
+      setWorkingPlant(updatedWorkingPlant);
+    }
+  }, [rakeHandlingSheetData, plants]);
 
   if (loading) {
     return (
@@ -628,6 +676,99 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
         <header id="headerForRakeHandlingSheet">
           {text("rakeHandlingSheet")}
         </header>
+        <div className="rake-details">
+          <div className="detail-item">
+            <div className="item-label-header">{text("IndentNo")}</div>
+            <div className="item-content">
+              {shipment?.indent?.indent_no || "--"}
+            </div>
+          </div>
+          <div className="detail-item">
+            <div className="item-label-header">{text("rakeNumber")}</div>
+            <div className="item-content">{shipment?.rake_no || "--"}</div>
+          </div>
+          <div className="detail-item">
+            <div className="item-label-header">{text("status")}</div>
+            <div className="item-content">
+              {shipment?.status?.statusLabel || "--"}
+            </div>
+          </div>
+          <div className="detail-item">
+            <div className="item-label-header">{text("wagonType")}</div>
+            <div className="item-content">
+              {shipment?.wagon_type || "--"}
+            </div>
+          </div>
+        </div>
+        <div
+          style={{
+            borderBottom: "1px solid #B3B3B3",
+            width: "100%",
+            marginTop: 16,
+            marginBottom: 16,
+          }}
+        ></div>
+        <div
+          className="rake-details"
+          style={{ alignItems: "center", display: "flex", columnGap: "50px" }}
+        >
+          <div className="detail-item">
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              <label
+                htmlFor="arr_pl"
+                style={{ fontSize: "12px", marginBottom: "6px" }}
+              >
+                Arrival P/L No.
+              </label>
+              <input
+                type="input"
+                id="arr_pl"
+                className="inputForRakeSectionHandling"
+                value={arrivalPlNo}
+                onChange={(e)=> setArrivalPlNo(e.target.value)}
+              />
+            </div>
+          </div>
+          <div className="detail-item">
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              <label
+                htmlFor="arr_pl"
+                style={{ fontSize: "12px", marginBottom: "6px" }}
+              >
+                Formation P/L No.
+              </label>
+              <input
+                type="input"
+                id="arr_pl"
+                value={formationPlNo}
+                className="inputForRakeSectionHandling"
+                onChange={(e)=> setFormationPlNo(e.target.value)}
+              />
+            </div>
+          </div>
+          <div className="detail-item">
+            <div style={{ display: "flex", alignItems: "center",marginTop:'16px' }}>
+              <input type="checkbox" id="myCheckbox" style={{cursor:'pointer'}}
+              onChange={(e)=> setWeighment(e.target.checked)}
+              checked={weighment}
+              />
+              <label
+                htmlFor="myCheckbox"
+                style={{ marginLeft: "8px", fontSize: "12px" }}
+              >
+                Weighment done
+              </label>
+            </div>
+          </div>
+        </div>
+        <div
+          style={{
+            borderBottom: "1px solid #B3B3B3",
+            width: "100%",
+            marginTop: 16,
+            marginBottom: 16,
+          }}
+        ></div>
         <div id="scrollAreaforRakeSheet">
           <div id="firstSectionofRakeSheetHandling">
             <div>
@@ -641,7 +782,6 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
                     onClose={() => {
                       setOpenRakeArrivalAtServingStation(false);
                     }}
-                    // value={dayjs(rakeArrivalAtStationDate)}
                     value={
                       rakeArrivalAtStationDate
                         ? dayjs(rakeArrivalAtStationDate)
@@ -714,7 +854,6 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
                     onClose={() => {
                       setOpenStabled(false);
                     }}
-                    // value={dayjs(rakeArrivalAtStationDate)}
                     value={stabledDate ? dayjs(stabledDate) : null}
                     sx={{
                       width: "100%",
@@ -772,7 +911,6 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
                 </LocalizationProvider>
               </div>
             </div>
-            {/* --------------------------------- */}
             <div>
               <header className="headerForRakeSection">
                 {text("placementTime")}
@@ -784,8 +922,13 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
                     onClose={() => {
                       setOpenPlacementTime(false);
                     }}
-                    // value={dayjs(rakeArrivalAtStationDate)}
-                    value={placementTimeDate ? dayjs(placementTimeDate) : null}
+                    value={
+                      placementTimeDate
+                        ? dayjs(placementTimeDate)
+                        : (shipment?.placement_time.date_time &&
+                            dayjs(shipment?.placement_time?.date_time)) ||
+                          null
+                    }
                     sx={{
                       width: "100%",
                       height: "100%",
@@ -842,79 +985,6 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
                 </LocalizationProvider>
               </div>
             </div>
-            {/* --------------------------------- */}
-            {/* <div>
-              <header className="headerForRakeSection">
-                {text("gate-in")}
-              </header>
-              <div className="inputForRakeSectionHandling">
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <DateTimePicker
-                    open={openRakeArrivalAtPlant}
-                    onClose={() => {
-                      setOpenRakeArrivalAtPlant(false);
-                    }}
-                    value={
-                      rakeArrivalAtPlantDate
-                        ? dayjs(rakeArrivalAtPlantDate)
-                        : null
-                    }
-                    sx={{
-                      width: "100%",
-                      height: "100%",
-
-                      ".MuiInputBase-input": {
-                        padding: "7px",
-
-                        paddingLeft: "11px",
-                        fontSize: "14px ",
-                        color: "#42454E",
-                      },
-                      ".MuiInputBase-root": {
-                        padding: 0,
-                        border: "none",
-                        "& fieldset": { border: "none" },
-                      },
-                      "& .MuiOutlinedInput-root": {
-                        "&:hover fieldset": {
-                          border: "none",
-                        },
-                        "&.Mui-focused fieldset": {
-                          border: "none",
-                        },
-                      },
-                      "& .MuiIconButton-root": {
-                        position: "relative",
-                      },
-                    }}
-                    ampm={false}
-                    slotProps={{
-                      textField: {
-                        onClick: () => {
-                          console.log();
-                          setOpenRakeArrivalAtPlant(!openRakeArrivalAtPlant);
-                        },
-                        fullWidth: true,
-                        InputProps: {
-                          endAdornment: null,
-                        },
-                      },
-                    }}
-                    viewRenderers={{
-                      hours: renderTimeViewClock,
-                      minutes: renderTimeViewClock,
-                      seconds: renderTimeViewClock,
-                    }}
-                    onChange={(newDate) => {
-                      if (newDate) {
-                        setRakeArrivalAtPlantDate(newDate.toDate());
-                      }
-                    }}
-                    format="DD-MM-YYYY HH:mm "
-                  />
-                </LocalizationProvider>
-              </div>
-            </div> */}
             <div>
               <header className="headerForRakeSection">
                 {text("bpRelease")}
@@ -1013,7 +1083,7 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
                       ".MuiInputBase-root": {
                         padding: 0,
                         border: "none",
-                        "& fieldset": { border: "none" },
+                        "& fieldset":{ border: "none" },
                       },
                       "& .MuiOutlinedInput-root": {
                         "&:hover fieldset": {
@@ -1057,317 +1127,144 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
                 </LocalizationProvider>
               </div>
             </div>
-            {/* <div>
-              <header className="headerForRakeSection">
-                {text("loadRakeFormation")}
-              </header>
-              <div className="inputForRakeSectionHandling">
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <DateTimePicker
-                    open={openLoadRakeFormation}
-                    onClose={() => {
-                        setOpenLoadRakeFormation(false);
-                    }}
-                    value={loadRakeFormationDate ? dayjs(loadRakeFormationDate) : null}
-                    sx={{
-                      width: "100%",
-                      height:'100%',
-                    
-                      ".MuiInputBase-input": {
-                        
-                        padding: "7px",
-                        
-                        paddingLeft: "11px",
-                        fontSize: "14px ",
-                        color: "#42454E",
-                      },
-                      ".MuiInputBase-root": {
-                        padding: 0,
-                        border: "none",
-                        "& fieldset": { border: "none" },
-                      },
-                      "& .MuiOutlinedInput-root": {
-                        "&:hover fieldset": {
-                          border: "none",
-                        },
-                        "&.Mui-focused fieldset": {
-                          border: "none",
-                        },
-                      },
-                      "& .MuiIconButton-root": {
-                        position: "relative",
-                      },
-                    }}
-                    ampm={false}
-                    slotProps={{
-                      textField: {
-                        onClick: () => {
-                          console.log();
-                          setOpenLoadRakeFormation(!openLoadRakeFormation);
-                        },
-                        fullWidth: true,
-                        InputProps: {
-                          endAdornment: null,
-                        },
-                      },
-                    }}
-                    viewRenderers={{
-                      hours: renderTimeViewClock,
-                      minutes: renderTimeViewClock,
-                      seconds: renderTimeViewClock,
-                    }}
-                    onChange={(newDate) => {
-                      if (newDate) {
-                        setLoadRakeFormationDate(newDate.toDate());
-                      }
-                    }}
-                    format="DD-MM-YYYY HH:mm "
-                  />
-                </LocalizationProvider>
-              </div>
-            </div> */}
           </div>
 
-          <div
-            style={{
-              borderBottom: "1px solid #E0E0E0",
-              width: "100%",
-              marginTop: 24,
-              marginBottom: 16,
-            }}
-          ></div>
-
-          {workingPlant.map((item: any, index: any) => {
-            let avaiableWagons =
-              item.count -
-              (item.hooks.reduce(
-                (acc: any, hook: any) => acc + hook.no_of_wagons,
-                0
-              ) || 0);
-            return (
-              <div key={index}>
-                <div
-                  style={{
-                    // backgroundColor:
-                    //   item.count -
-                    //     (item.hooks.reduce(
-                    //       (acc: any, hook: any) => acc + hook.no_of_wagons,
-                    //       0
-                    //     ) || 0) >=
-                    //   0
-                    //     ? "white"
-                    //     : "#FCE3E3",
-                    paddingBlock: "0.5px",
-                    paddingInline: "16px",
-                    borderRadius: "12px",
-                  }}
-                >
-                  <div className="millDetails-dashboard">
-                    <div style={{ width: "200px" }}>
-                      Loading Shop:{" "}
-                      <span
-                        style={{
-                          color: "black",
-                          fontSize: "12px",
-                          fontWeight: 600,
-                        }}
-                      >
-                        {item.plant.name}
-                      </span>
-                    </div>
-                    <div style={{ width: "200px" }}>
-                      No. of Wagons Assigned:{" "}
-                      <span
-                        style={{
-                          color: "black",
-                          fontSize: "12px",
-                          fontWeight: 600,
-                        }}
-                      >
-                        {item.count}
-                      </span>
-                    </div>
-                    {/* <div style={{ width: "200px" }}>
-                      Available Wagons:{" "}
-                      <span
-                        style={{
-                          color: "black",
-                          fontSize: "12px",
-                          fontWeight: 600,
-                        }}
-                      >
-                        {item.count -
-                          (item.hooks.reduce(
-                            (acc: any, hook: any) => acc + hook.no_of_wagons,
-                            0
-                          ) || 0)}
-                      </span>
-                    </div> */}
+          {workingPlant.map((item: any, index: any) => (
+            <div key={index}>
+              <div
+                style={{
+                  paddingBlock: "0.5px",
+                  paddingInline: "16px",
+                  borderRadius: "12px",
+                }}
+              >
+                <div className="millDetails-dashboard">
+                  <div style={{ width: "200px", display: "flex", columnGap: "4px" }}>
+                    Loading Shop:
+                    <span
+                      style={{
+                        color: "black",
+                        fontSize: "12px",
+                        fontWeight: 600,
+                      }}
+                    >
+                      {item.plant.name}
+                    </span>
                   </div>
-
-                  {item.hooks.length === 0 && (
-                    <div
-                      className="addFirstHook"
-                      onClick={(e) => {
-                        addFirstHookToMillDetails(e, index);
+                  <div style={{ width: "200px",display: "flex", columnGap: "4px" }}>
+                    No. of Wagons Assigned:
+                    <span
+                      style={{
+                        color: "black",
+                        fontSize: "12px",
+                        fontWeight: 600,
                       }}
                     >
-                      <div className="addIcon-for-addFirstHook">ADD</div>
-                    </div>
-                  )}
-                  {/* {item.hooks.length === 1 && (
-                    <div
-                      className="addFirstHook"
-                      onClick={(e) => {
-                        removeLastHookFromMillDetails(e, index);
-                      }}
-                    >
-                      <div
-                        className="addIcon-for-addFirstHook"
-                        style={{ backgroundColor: "#E24D65" }}
-                      >
-                        REMOVE
-                      </div>
-                    </div>
-                  )} */}
-
-                  <div id="hookSelectionContainer">
-                    {item.hooks.map((hookItem: any, hookIndex: number) => {
-                      return (
-                        <div key={hookIndex}>
-                          <div>
-                            <div className="headerForMillDetails_hooks">
-                              <header style={{fontWeight: 600}}>Hook {hookIndex + 1} </header>
-                             { (<div style={{ display: "flex", gap: 8 }}>                
-           
-                                 { !(hookItem.loading_end || hookItem.loading_start) &&
-                                (
-                                   <div
-                                    onClick={(e) => {
-                                      hookIndex !== 0 &&
-                                      removeHookFromMillDetails(
-                                        e,
-                                        index,
-                                        hookIndex
-                                      );
-                                      hookIndex === 0 &&
-                                      removeLastHookFromMillDetails(e, index);
-                                    }}
-                                    className="removeAddicons"
-                                    style={{ backgroundColor: "#E24D65" }}
-                                  >
-                                    <RemoveIcon
-                                      style={{ height: 20, width: 20 }}
-                                    />
-                                  </div>  
-                                  )
-                                //  : (
-                                //   <div style={{ height: 20, width: 20 }}></div>
-                                // )
-                                }
-                                
-                                {item.hooks.length - 1 === hookIndex && (
-                                    <div
-                                      onClick={(e) => {
-                                        addHookInMillDetails(e, index);
-                                      }}
-                                      className="removeAddicons"
-                                      style={{ backgroundColor: "#596FFF" }}
-                                    >
-                                      <AddIcon
-                                        style={{ height: 20, width: 20 }}
-                                      />
-                                    </div>
-                                  )} 
-                                   
-                              </div>) }
-                            </div>
-                            {/* <input
-                              className="inputForRakeSectionHandling"
-                              type="number"
-                              value={
-                                hookItem.no_of_wagons === null ||
-                                hookItem.no_of_wagons === undefined
-                                  ? "0"
-                                  : String(hookItem.no_of_wagons)
-                              }
-                              onChange={(e) => {
-                                let value = e.target.value;
-                                value = value.replace(/^0+(?=\d)/, "");
-                                if (value === "") {
-                                  value = "0";
-                                }
-                                inputHooksForplants(
-                                  {
-                                    target: {
-                                      value: Math.max(0, Number(value)),
-                                    },
-                                  },
-                                  index,
-                                  hookIndex
-                                );
-                              }}
-                              min="0"
-                            /> */}
-                          </div>
-                          <div className="loadingTimeContainer">
-                            <div>{text("loadingstarttime")}</div>
-                            <div style={{ marginTop: 6 ,color: 'black',fontWeight:600}}>  { timeService.utcToist(hookItem.loading_start)+' '+timeService.utcToistTime(hookItem.loading_start) || '--'}</div>
-                          </div>
-                          <div className="loadingTimeContainer">
-                            <div>{text("loadingEndTime")}</div>
-                            <div style={{ marginTop: 6 ,color: 'black',fontWeight:600}}>{timeService.utcToist(hookItem.loading_end)+' '+timeService.utcToistTime(hookItem.loading_end) || '--'}</div>
-                          </div>
-                        </div>
-                      );
-                    })}
+                      {item.count}
+                    </span>
                   </div>
                 </div>
 
-                {workingPlant.length === 1 ||
-                index === workingPlant.length - 1 ? null : (
-                  <div
+                {item.hooks.length === 0 ? (
+                  <MUIButton
+                    variant="contained"
+                    color="primary"
+                    onClick={() => addHookInMillDetails(null, index)}
                     style={{
-                      borderBottom: "1px solid #E0E0E0",
-                      width: "100%",
-                      marginTop: 16,
-                      marginBottom: 16,
+                      marginTop: '8px',
+                      backgroundColor: '#2196f3',
+                      color: 'white',
+                      border: '1px solid #2196f3',
+                      fontSize:'10px'
                     }}
-                  ></div>
+                  >
+                    Add Hook
+                  </MUIButton>
+                ) : (
+                  <div id="hookSelectionContainer" style={styles.container}>
+                  {item.hooks.map((hookItem: any, hookIndex: number) => (
+                    <div key={hookIndex} style={styles.hookCard}>
+                      {/* Header Section */}
+                      <div style={styles.header}>
+                        <header style={styles.headerText}>
+                          Hook {hookIndex + 1}
+                        </header>
+                        <div style={styles.actionButtonContainer}>
+                          {/* Add Hook Button */}
+                          {hookIndex === item.hooks.length - 1 && (
+                            <div
+                              onClick={(e) => addHookInMillDetails(e, index)}
+                              style={styles.addButton}
+                            >
+                              <AddIcon style={styles.icon} />
+                            </div>
+                          )}
+                          {/* Remove Hook Button */}
+                          {!hookItem.loading_start &&
+                            !hookItem.loading_end && (
+                              <div
+                                onClick={(e) => removeHookFromMillDetails(e, index, hookIndex)}
+                                style={styles.removeButton}
+                              >
+                                <RemoveIcon style={styles.icon} />
+                              </div>
+                            )}
+                        </div>
+                      </div>
+            
+                      {/* Loading Time Section */}
+                      <div style={styles.loadingTimeContainer}>
+                        <div>
+                          <div>{text("loadingstarttime")}</div>
+                          <div style={styles.loadingTimeText}>
+                            {hookItem.loading_start
+                              ? `${timeService.utcToist(hookItem.loading_start)} ${timeService.utcToistTime(hookItem.loading_start)}`
+                              : "--"}
+                          </div>
+                        </div>
+                        <div>
+                          <div>{text("loadingEndTime")}</div>
+                          <div style={styles.loadingTimeText}>
+                            {hookItem.loading_end
+                              ? `${timeService.utcToist(hookItem.loading_end)} ${timeService.utcToistTime(hookItem.loading_end)}`
+                              : "--"}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
                 )}
               </div>
-            );
-          })}
 
-          {/* <Button
-            onClick={(e: any) => {
-              e.stopPropagation();
-              addMillDetails();
-            }}
-            className="buttonMarkPlacement"
-            style={{
-              fontSize: 14,
-              height: 40,
-              color: "white",
-              backgroundColor: "#2862FF",
-              width: 79,
-              border: "1px solid #2862FF",
-              cursor: "pointer",
-              fontWeight: "bold",
-              transition: "all 0.5s ease-in-out",
-            }}
-          >
-            add
-          </Button> */}
-          <div
-            style={{
-              borderBottom: "1px solid #E0E0E0",
-              width: "100%",
-              marginTop: 24,
-              marginBottom: 16,
-            }}
-          ></div>
+              {workingPlant.length === 1 ||
+              index === workingPlant.length - 1 ? null : (
+                <div
+                  style={{
+                    borderBottom: "1px solid #E0E0E0",
+                    width: "100%",
+                    marginTop: 16,
+                    marginBottom: 16,
+                  }}
+                ></div>
+              )}
+            </div>
+          ))}
+
+          <div>
+            {workingPlant.length > 0 && (
+              <div
+                style={{
+                  borderBottom: "1px solid #E0E0E0",
+                  width: "100%",
+                  marginTop: 24,
+                  marginBottom: 16,
+                }}
+              ></div>
+            )}
+          </div>
           <div id="lastSection">
+            
             <div>
               <header className="headerForRakeSection">
                 {text("loadRakeFormation")}
@@ -1790,6 +1687,7 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
             }}
             style={{
               color: "#2862FF",
+              backgroundColor: "white",
               border: "1px solid #2862FF",
               width: 110,
               cursor: "pointer",
@@ -1797,7 +1695,7 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
               transition: "all 0.5s ease-in-out",
             }}
           >
-            clear
+            Clear
           </Button>
           <Button
             className="buttonMarkPlacement"
@@ -1815,7 +1713,7 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
               transition: "all 0.5s ease-in-out",
             }}
           >
-            submit
+            Submit
           </Button>
         </div>
         <div className="closeContaioner">
@@ -1832,3 +1730,4 @@ function RakeHandlingSheet({ isClose, shipment, getWagonDetails }: any) {
 }
 
 export default RakeHandlingSheet;
+

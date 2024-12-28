@@ -25,7 +25,6 @@ const TrackingStatus: React.FC<TrackingStatusProps> = ({ handleAllRakesAndTable,
   const router = useRouter();
   const t = useTranslations("DASHBOARD");
   const [isHovered, setIsHovered] = useState(false);
-  const [isMapHover, setIsMapHover] = useState(false);
   const [nonTrackingEmptyHovered, setNonTrackingEmptyHovered] = useState(false);
   const [nonTrackingWithLoadHovered, setNonTrackingWithLoadHovered] = useState(false);
   const [totalRakes, setTotalRakes] = useState(0);
@@ -180,11 +179,11 @@ const TrackingStatus: React.FC<TrackingStatusProps> = ({ handleAllRakesAndTable,
       if (index === 0) {
         return { backgroundColor: '#18be8a1a', borderRadius: '8px', borderRight: '3px solid #334ffc0d'};
       }
-    } else if (statusInfo === 'gpwis') {
+    } else if (statusInfo === 'bfnv') {
       if (index === 1) {
         return { backgroundColor: '#334ffc1a', borderRadius: '8px', borderRight: '3px solid #334ffc0d'};
       } 
-    } else if (statusInfo === 'bfnv') {
+    } else if (statusInfo === 'gpwis') {
       if (index === 2) {
         return { backgroundColor: '#bc4a281a', borderRadius: '8px', borderRight: '3px solid #334ffc0d'};
       }
@@ -207,21 +206,8 @@ const TrackingStatus: React.FC<TrackingStatusProps> = ({ handleAllRakesAndTable,
     }
   }
 
-
   return (
     <div className="tracking-status-container">
-      <div className="tracking-status-head">
-        <div className="tracking-status-header">
-          TRACKING STATUS
-        </div>
-        {/* <div className="map-view-btn" 
-             onMouseEnter={() => setIsMapHover(true)} 
-             onMouseLeave={() => setIsMapHover(false)}
-             onClick={() => router.push('/MapsHelper')}>
-          <Image src={isMapHover ? MapViewHoverIcon : MapViewIcon} alt="map view" width={16} height={16}/>
-          <span className="map-view-btn-header">Map View</span>
-        </div> */}
-      </div>
       <div className="status-container">
         <div
           className="status-wrapper"
@@ -242,7 +228,7 @@ const TrackingStatus: React.FC<TrackingStatusProps> = ({ handleAllRakesAndTable,
           <div className="scheme">
             {schemeData
               .sort((a, b) => {
-                const order = ['SFTO', 'GPWIS', 'BFNV'];
+                const order = ['SFTO', 'BFNV', 'GPWIS'];
                 return order.indexOf(a.scheme) - order.indexOf(b.scheme);
               }).map((scheme, index) => (
               <div className="scheme-container"  key={scheme.scheme} onClick={() => handleSchemeTypeAndTable(scheme.scheme)}
@@ -251,7 +237,11 @@ const TrackingStatus: React.FC<TrackingStatusProps> = ({ handleAllRakesAndTable,
                   {scheme.count || 0}
                 </span>
                 <span className={getClassName('scheme-name', statusInfo)}>
-                  {scheme.scheme || ""}
+                  {scheme 
+                    && scheme.scheme === "GPWIS" ? "GPWIS" : 
+                    scheme.scheme === "BFNV" ? "SFTO-BFNV" : 
+                    scheme.scheme === "SFTO" ? "SFTO-BRN" : 
+                  scheme.scheme || ""}
                 </span>
                 <div className="hover-infobox">
                   <span className="no-of-wagons">{scheme.wagons || 0}</span>

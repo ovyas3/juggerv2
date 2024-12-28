@@ -1,11 +1,12 @@
 'use client'
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import { Select, MenuItem, FormControl, SelectChangeEvent } from "@mui/material";
 import dropdownIcon from "../../assets/dropdown_small_icon.svg";
 import "./dropdown.css";
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import {setCookies} from '@/utils/storageService'
+import CustomSelect from "../UI/CustomSelect/CustomSelect";
 
 
 interface shipper {
@@ -28,14 +29,28 @@ const Dropdown = ({ shippers, reload }:{shippers: shipper[], reload: any, getAll
     value: '',
     label: ''
   }]);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const selectRef = useRef<HTMLDivElement>(null);
   const [selectedValue, setSelectedValue] = useState(options.length > 0 ? options[0].value : '');
-  const handleChange = (event: event) => {
-    const newValue = event.target.value as string;
+  const handleChange = (event: any) => {
+    const newValue = event as string;
     setSelectedValue(newValue);
     localStorage.setItem('selected_shipper', newValue);
     setCookies("selected_shipper", newValue);
     window.location.reload();
   };
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (selectRef.current && !selectRef.current.contains(event.target as Node)) {
+        setShowDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   useEffect(() => {
     const selected_shipper = localStorage.getItem('selected_shipper') as string;
@@ -51,29 +66,20 @@ const Dropdown = ({ shippers, reload }:{shippers: shipper[], reload: any, getAll
   }, [shippers]);
 
   return (
-    <FormControl sx={{ minWidth: 166 }}>
-      <Select
-        className="dropdown-select"
-        sx={{ color: "black", background: "#F0F3F9" , '& .MuiOutlinedInput-notchedOutline': {
-          border: 'none',
-        },
-        '&:hover .MuiOutlinedInput-notchedOutline': {
-          border: 'none',
-        },
-        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-          border: 'none',
-        }, fontSize:14 }}
-        label="Choose an option"
-        value={selectedValue}
-        onChange={(event: SelectChangeEvent<string>) => handleChange(event)}
-        IconComponent={() => (<ArrowDropDownIcon/>)}>
-        {options.map((option) => (
-          <MenuItem key={option.value} value={option.value}>
-            {option.label}
-          </MenuItem>
-        ))}
-      </Select>
-    </FormControl>
+    <div id='dropdownContainer' ref={selectRef}>
+      <div id='dropdownLabel' onClick={() => setShowDropdown(!showDropdown)}>
+        {options.map((option) => (selectedValue === option.value ? 
+        (<div key={option.value}>{option.label}</div>) : null))}
+        <div><Image src={dropdownIcon} alt="dropdownIcon" width={12} height={12} /></div>
+      </div>
+      {showDropdown && <div id="dropdownOptions">
+        {options.map((option, index) => {
+          return(
+            <div key={index} id={option.value} className="dropdownOption" onClick={()=>{handleChange(option.value); setShowDropdown(false)}}>{option.label}</div>
+          );
+        })}
+      </div>}
+    </div>
   );
 };
 

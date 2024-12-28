@@ -113,7 +113,7 @@ const Welcome: React.FC<WelcomeProps> = ({ onDashboardClick }) => {
 
   const handleRedirect = (path: string) => {
     if (path === '/dashboard') {
-      router.push('/dashboard?tab=3');
+      router.push('/dashboard?tab=1');
     } else {
       router.push(path);
     }

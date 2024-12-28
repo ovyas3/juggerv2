@@ -23,7 +23,7 @@ function Inbound() {
     is_outbound:false,
     from:'',
     to:'',
-    status:['ITNS', 'Delivered']
+    status:['ITNS']
   });
   const [countInbound, setCountInbound] = useState({
     total:0,
@@ -90,7 +90,7 @@ function Inbound() {
         <InboundDashboard setInBoundPayload={setInBoundPayload} countInbound={countInbound}/>
       </section>
       <section id="inboundTable">
-        <InboundTable allShipment={allShipment} count={count} setInBoundPayload={setInBoundPayload} />
+        <InboundTable allShipment={allShipment} count={count} setInBoundPayload={setInBoundPayload} getInboundList={getInboundList} />
       </section>
     </div>
   );

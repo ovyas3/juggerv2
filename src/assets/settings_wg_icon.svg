@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+  <g id="settings_wg_icon" transform="translate(-26 -443)">
+    <g id="Name_Settings" data-name="Name=Settings" transform="translate(26 443)">
+      <path id="Path_16676" data-name="Path 16676" d="M9.107,3,5.571,5.172C7.821,9.207,4.929,9.828,3,10.138v4.035c4.114.248,3.429,3.207,2.571,4.655L9.107,21c2.571-3.476,4.929-1.448,5.786,0l3.214-2.172c-1.8-3.972,1.179-4.759,2.893-4.655V10.138c-4.179,0-3.643-3.414-2.893-4.965L14.893,3C12.579,6.972,10.071,4.655,9.107,3Z" fill="#20104d"/>
+      <circle id="Ellipse_135" data-name="Ellipse 135" cx="2.5" cy="2.5" r="2.5" transform="translate(9.5 9.5)" fill="#fff"/>
+    </g>
+    <rect id="Rectangle_4573" data-name="Rectangle 4573" width="24" height="24" transform="translate(26 443)" fill="none"/>
+  </g>
+</svg>

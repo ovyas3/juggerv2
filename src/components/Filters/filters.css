@@ -78,6 +78,16 @@
     cursor: pointer;;
 }
 
+.active {
+    background-color: #0168FF;
+    height: 38px;
+    width: 38px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 4px;
+}
+
 .filters-wrapper {
     display: grid;
     grid-template-columns: 220px 220px;
@@ -184,7 +194,6 @@
     z-index: 1000;
 }
 
-
 @media screen and (max-width: 600px) {
     .modal-container{
         width: 80vw;
@@ -243,7 +252,6 @@
     opacity: 1;
     z-index: 3000;
     position: absolute;
-    right: 510px;
   }
   .search-container {
     display: flex;

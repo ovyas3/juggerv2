@@ -79,12 +79,12 @@ const CustomDatePicker: React.FC<CustomDatePickerProps> = ({
         paddingLeft: 8,
         cursor: "pointer",
       }}
-      onClick={() => !open && setOpen(true)} // Ensure it only opens when closed
+      onClick={() => !open && setOpen(true)}
     >
       <div style={{ height: 16, width: 16, marginBottom: 4 }}>
         <Image src={calenderIcon} alt="calendar icon" />
       </div>
-      <div style={{ flex: 1, marginTop: 6, marginLeft: 10 }}>
+      <div style={{ flex: 1, marginTop: 10, marginLeft: 10 }}>
         {label && <div style={{ fontSize: 10, color: "#44475B" }}>{label}</div>}
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <DatePicker

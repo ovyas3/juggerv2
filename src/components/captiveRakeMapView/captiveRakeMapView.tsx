@@ -1,20 +1,25 @@
 "use client";
 
-import { MapContainer, TileLayer, Marker, LayersControl, Popup } from 'react-leaflet';
+import { useRef } from 'react';
+import { MapContainer, Marker, Popup } from 'react-leaflet';
 import "leaflet/dist/leaflet.css";
+import "leaflet-boundary-canvas";
 import L from "leaflet"; // Import Leaflet for creating custom icons
-import styles from "./page.module.css";
 import Image from "next/image";
 import rakesLoadedIcon from "@/assets/rakes_loaded.svg";
 import captiveRakes from '@/assets/cr.svg'
 import emptyRakesIcon from "@/assets/empty_rakes_icon.svg";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { httpsGet, httpsPost } from '@/utils/Communication';
 import { useRouter } from 'next/navigation';
 import getBoundary from '@/components/MapView/IndianClaimed';
 import timeService from '@/utils/timeService';
-import { useMediaQuery, useTheme } from '@mui/material';
-import { get } from 'http';
+import { Checkbox, useMediaQuery, useTheme } from '@mui/material';
+import styles from "./page.module.css";
+import getIndiaMap from "@/components/MapView/IndiaMap";
+import searchIcon from '@/assets/search_icon.svg'
+import HighlightOffIcon from '@mui/icons-material/HighlightOff';
+import LastFOISPing from "@/components/LastFOISPing/LastFOISPing";
 
 interface SchemeData {
   count: number;
@@ -44,15 +49,15 @@ interface RakeStatusData {
 }
 
 interface StatsData {
+  "Today": {
+    count: number;
+    _id: string[];
+  };
   "T+1": {
     count: number;
     _id: string[];
   };
   "T+2": {
-    count: number;
-    _id: string[];
-  };
-  "T+3": {
     count: number;
     _id: string[];
   };
@@ -92,22 +97,16 @@ export default function CaptiveRakeMapView() {
   const [coordsData, setCoordsData] = useState<any[]>([]);
   const [loadedRakes, setLoadedRakes] = useState<any>([]);
   const [emptyRakes, setEmptyRakes] = useState<any>([]);
-  const [summaryData, setSummaryData] = useState([
-    { plant: "JBSK", from: 10, towards: 6, others: 0 },
-    { plant: "JSPP", from: 12, towards: 4, others: 2 },
-    { plant: "PJPD", from: 10, towards: 1, others: 2 },
-    { plant: "Barbil", from: 2, towards: 1, others: 4 },
-  ]);
   const [stats, setStats] = useState<StatsData>({
+    "Today": {
+      count: 0,
+      _id: []
+    },
     "T+1": {
       count: 0,
       _id: []
     },
     "T+2": {
-      count: 0,
-      _id: []
-    },
-    "T+3": {
       count: 0,
       _id: []
     }
@@ -135,28 +134,86 @@ export default function CaptiveRakeMapView() {
   });
   const [selectedArrival, setSelectedArrival] = useState<string | null>(null);
   const [selectedRow, setSelectedRow] = useState<number | null>(null);
+  const [plantRakesSummary,setPlantRakesSummary] = useState<any>({from:{},to:{}})
+  const [plantRakesSummaryPlants,setPlantRakesSummaryPlants] = useState<any>([])
+  const [totalCRCount, setTotalCRCount] = useState(0)
+  const [usedCRCount,setUsedCRCount] = useState(0)
+  const [shouldAutoFit, setShouldAutoFit] = useState(true);
+  
+  const [searchListRakes, setSearchListRakes] = useState<any>([]);
+  const [ogListRakes, setOgListRakes] = useState<any>([]);
+  const [openDropDownSearchList, setOpenDropDownSearchList] = useState(false);
+  const searchContainerRef = useRef<HTMLDivElement | null>(null);
+  const [searchTerm, setSearchTerm] = useState<string | null>(null);
+  const [selectedRakeList, setSelectedRakeList] = useState<any>([]);
+  const [statusType, setStatusType] = useState<any>('All');
 
-  const handleRakeFilterClick = (filterType: string, ids: string[]) => {
-    setActiveRakeFilter(filterType === activeRakeFilter ? "All" : filterType);
-    getCoords(filterType, ids);
-    getRakeStatusData(filterType);
-    getRakeStats(filterType);
-    getSchemeWiseCount(filterType);
-  };
 
-  const handleFilterClick = (filter: 'total' | 'loaded' | 'empty') => {
-    setActiveFilter(filter === activeFilter ? 'total' : filter);
-  };
+  const fitMapBounds = useCallback((coordinates: any[]) => {
+    if (map && coordinates && coordinates.length > 0 && shouldAutoFit) {
+      const validCoords = coordinates.filter(
+        (coord: any) =>
+          coord?.geo_point?.coordinates &&
+          coord.geo_point.coordinates[0] !== 0 &&
+          coord.geo_point.coordinates[1] !== 0
+      );
 
-  const handleArrivalClick = (period: string, ids: string[]) => {
-    setSelectedArrival(selectedArrival === period ? null : period);
-    getCoords(activeRakeFilter, ids);
-  };
+      if (validCoords.length > 0) {
+        const latLngs: L.LatLngExpression[] = validCoords.map((coord: any) => (
+          [
+            coord.geo_point.coordinates[1],
+            coord.geo_point.coordinates[0]
+          ] as L.LatLngTuple
+        ));
 
-  const handleRowClick = (index: number, rowData: RakeStatusData) => {
-    setSelectedRow(selectedRow === index ? null : index);
-    getCoords(activeRakeFilter, rowData._ids);
-  };
+        const bounds = L.latLngBounds(latLngs);
+        
+        if (bounds.isValid()) {
+          // Calculate zoom level based on number of coordinates
+          let zoomLevel;
+          if (validCoords.length === 1) {
+            zoomLevel = 15; // Very high zoom for single point
+          } else if (validCoords.length <= 3) {
+            zoomLevel = 13; // High zoom for few points
+          } else if (validCoords.length <= 10) {
+            zoomLevel = 11; // Medium-high zoom for moderate points
+          } else {
+            zoomLevel = 10; // Medium zoom for many points
+          }
+
+          const paddedBounds = bounds.pad(0.1); // 10% padding
+          map.fitBounds(paddedBounds, {
+            animate: true,
+            duration: 1.2, // Increased duration for smoother transition
+            easeLinearity: 0.5, // Makes the animation more smooth
+            maxZoom: zoomLevel // Apply calculated zoom level
+          });
+        }
+      }
+    } else if (map && shouldAutoFit) {
+      map.setView(center, 5);
+    }
+  }, [map, center, shouldAutoFit]);
+
+  useEffect(() => {
+    if (map) {
+      const handleMapInteraction = () => {
+        setShouldAutoFit(false);
+      };
+
+      map.on('dragstart', handleMapInteraction);
+      map.on('zoomstart', handleMapInteraction);
+
+      return () => {
+        map.off('dragstart', handleMapInteraction);
+        map.off('zoomstart', handleMapInteraction);
+      };
+    }
+  }, [map]);
+
+  useEffect(() => {
+    setShouldAutoFit(true);
+  }, [activeFilter, activeRakeFilter]);
 
   const filteredCoords = useMemo(() => {
     return coordsData && coordsData.length > 0 && coordsData.filter((val: any) => {
@@ -182,6 +239,40 @@ export default function CaptiveRakeMapView() {
       empty: rakeFilteredData.filter((val: any) => val.loading_status !== "L").length
     };
   }, [coordsData, activeRakeFilter]);
+
+  useEffect(() => {
+    if (map && filteredCoords.length > 0) {
+      fitMapBounds(filteredCoords);
+    }
+  }, [filteredCoords, map, fitMapBounds]);
+
+  const handleRakeFilterClick = (filterType: string, ids: string[]) => {
+    setActiveRakeFilter(filterType === activeRakeFilter ? "All" : filterType);
+    getCoords(filterType, ids);
+    getRakeStatusData(filterType);
+    getRakeStats(filterType);
+    getSchemeWiseCount(filterType);
+    setStatusType(filterType);
+    setSelectedRakeList([]);
+  };
+
+  const handleFilterClick = (filter: 'total' | 'loaded' | 'empty') => {
+    setActiveFilter(filter === activeFilter ? 'total' : filter);
+  };
+
+  const handleArrivalClick = (period: string, ids: string[]) => {
+    setSelectedArrival(selectedArrival === period ? null : period);
+    if(ids.length) {
+      getCoords(activeRakeFilter, ids);
+    } else {
+      setCoordsData([])
+    }
+  };
+
+  const handleRowClick = (index: number, rowData: RakeStatusData) => {
+    setSelectedRow(selectedRow === index ? null : index);
+    getCoords(activeRakeFilter, rowData._ids);
+  };
 
   async function getCoords(scheme: string, ids: string[] = []) {
     try {
@@ -212,6 +303,38 @@ export default function CaptiveRakeMapView() {
         setCoordsData(coords);
         setLoadedRakes(loaded);
         setEmptyRakes(empty);
+        
+        // Fit map bounds to the filtered coordinates
+        fitMapBounds(coords);
+
+        // Get list for rake search 
+        setSearchListRakes(
+          (
+            ogListRakes.length === 0
+              ? response.data.data
+              : statusType === 'All'
+              ? ogListRakes
+              : ogListRakes.filter((item: any) => item.scheme === statusType)
+          ).map((item: any) => {
+            return {
+              _id: item._id,
+              rakeID: item.rake.rake_id,
+              name: item.rake.name,
+              checked: selectedRakeList.includes(item._id),
+              scheme: item.scheme,
+            };
+          })
+        );
+        if(ogListRakes.length === 0)
+        setOgListRakes(response.data.data.map((item:any)=> {
+          return{
+            _id: item._id,
+            rakeID: item.rake.rake_id,
+            name: item.rake.name,
+            checked: false,
+            scheme: item.scheme
+          }
+        }));
       } else {
         console.error('Invalid response format:', response);
       }
@@ -220,49 +343,113 @@ export default function CaptiveRakeMapView() {
     }
   }
 
+  useEffect(()=>{
+    if(searchTerm === '') {
+      getCoords(statusType, selectedRakeList);
+    }
+  },[searchTerm])
+
+  useEffect(() => {
+    setSearchListRakes((prev: any) => {
+      const filteredList = statusType === 'All' 
+        ? ogListRakes 
+        : ogListRakes.filter((item: any) => item.scheme === statusType);
+        
+      return filteredList.map((item: any) => ({
+        ...item,
+        checked: selectedRakeList.includes(item._id),
+      }));
+    });
+  }, [selectedRakeList]); 
+
+  useEffect(()=>{
+    switch(statusType) {
+      case 'All':
+        setSearchListRakes((prev:any)=>{
+          return ogListRakes.map((item: any) => {
+            return {
+              ...item,
+              checked: selectedRakeList.includes(item._id),
+            }
+          })
+        })
+        break;
+      case 'SFTO':
+        setSearchListRakes((prev:any)=>{
+          return ogListRakes.filter((item: any) => item.scheme === 'SFTO').map((item: any) => {
+            return {
+              ...item,
+              checked: selectedRakeList.includes(item._id),
+            }
+          })
+        })
+        break;
+      case 'GPWIS':
+        setSearchListRakes((prev:any)=>{
+          return ogListRakes.filter((item: any) => item.scheme === 'GPWIS').map((item: any) => {
+            return {
+              ...item,
+              checked: selectedRakeList.includes(item._id),
+            }
+          })
+        })
+        break;
+      case 'BFNV':
+        setSearchListRakes((prev:any)=>{
+          return ogListRakes.filter((item: any) => item.scheme === 'BFNV').map((item: any) => {
+            return {
+              ...item,
+              checked: selectedRakeList.includes(item._id),
+            }
+          })
+        })
+        break;
+      default:
+    }
+  },[statusType])
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        searchContainerRef.current &&
+        searchContainerRef.current !== null &&
+        !searchContainerRef.current.contains(event.target as Node)
+      ) {
+        setOpenDropDownSearchList(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   async function getSchemeWiseCount(scheme: string) {
     try{
       const url = scheme === "All" ? 'get/schemeWiseCount' : `get/schemeWiseCount?scheme=${scheme}`;
       const response = await httpsGet(url, 0, router);
+      const data = rakeTypeData
       if (response?.statusCode === 200) {
-        const schemeWiseCount: RakeTypeData = {
-          All: {
-            count: 0,
-            _id: []
-          },
-          SFTO: {
-            count: 0,
-            _id: []
-          },
-          GPWIS: {
-            count: 0,
-            _id: []
-          },
-          BFNV: {
-            count: 0,
-            _id: []
-          }
-        };
-
         if(response.data && response.data.length > 0) {
           // Process each scheme data
           response.data.forEach((item: { scheme: keyof RakeTypeData; count: number; ids: string[] }) => {
-            if (item.scheme && schemeWiseCount.hasOwnProperty(item.scheme)) {
-              schemeWiseCount[item.scheme] = {
+            if (item.scheme && data.hasOwnProperty(item.scheme)) {
+              data[item.scheme] = {
                 count: item.count || 0,
                 _id: item.ids || []
               };
             }
           });
-
-          // Calculate total for All
-          schemeWiseCount.All = {
-            count: response.data.reduce((acc: number, val: { count: number }) => acc + (val.count || 0), 0),
+          if(scheme === 'All') {
+            const total = response.data.reduce((acc: number, val: { count: number }) => acc + (val.count || 0), 0)
+           data.All = {
+            count: total,
             _id: response.data.reduce((acc: string[], val: { ids: string[] }) => [...acc, ...(val.ids || [])], [])
-          };
+           };
+          setTotalCRCount(total)
         }
-        
-        setRakeTypeData(schemeWiseCount);
+        }
+        setRakeTypeData(data);
       }
     } catch (error) {
       console.log(error);
@@ -297,15 +484,15 @@ export default function CaptiveRakeMapView() {
 
         if(!statsData) {
           setStats({
+            "Today": {
+              count: 0,
+              _id: []
+            },
             "T+1": {
               count: 0,
               _id: []
             },
             "T+2": {
-              count: 0,
-              _id: []
-            },
-            "T+3": {
               count: 0,
               _id: []
             }
@@ -317,36 +504,126 @@ export default function CaptiveRakeMapView() {
     }
   }
 
+  async function getPlantRakesSummary() {
+    const queryParams =
+      activeRakeFilter !== "All" ? `?scheme=${activeRakeFilter}` : "";
+    const response = await httpsGet("get/ownOrOthers" + queryParams, 0, router);
+    if (response?.data) {
+      const data = response.data || {};
+      setPlantRakesSummary(data);
+      if (activeRakeFilter === "All") {
+        const plants = [
+          ...new Set([
+            ...Object.keys(data.from || {}),
+            ...Object.keys(data.to || {}),
+          ]),
+        ];
+        setPlantRakesSummaryPlants(plants);
+        let totalSum = 0;
+      
+      Object.keys(data.from || {}).forEach((key) => {
+        if (key !== "others") {
+          totalSum += data.from[key]?.count;
+        }
+      });
+
+      Object.keys(data.to || {}).forEach((key) => {
+        if (key !== "others") {
+          totalSum += data.to[key]?.count;
+        }
+      });
+
+      setUsedCRCount(totalSum) 
+      }
+    }
+  }
+
+  const handlePlantRakesMapFilter = (ids: string[] = []) => {
+    if (ids.length) {
+      getCoords(activeRakeFilter, ids);
+    } else {
+      setCoordsData([]);
+      // Reset map to default view when no coordinates
+      if (map) {
+        map.setView(center, 5);
+      }
+    }
+  } 
+
   useEffect(()=>{
    getCoords('All', [])
    getRakeStatusData('All')
    getRakeStats('All')
    getSchemeWiseCount('All');
+   getPlantRakesSummary()
   },[])
+
+
+  useEffect(()=>{
+    getPlantRakesSummary()
+  },[activeRakeFilter])
 
   useEffect(() => {
     if (map) {
       map.on('zoomend', () => {
         setCurrentZoom(map.getZoom());
       });
+  
+      const streetViewControl = document.querySelector('.leaflet-control-layers');
+      
+      if (streetViewControl && streetViewControl instanceof HTMLElement) {
+        streetViewControl.style.top = '42px';  
+        streetViewControl.style.right = '0px';  
+      }
     }
-  }, [map]);
+  }, [map]);  
+ 
+  useEffect(()=>{
+   setSelectedRow(-1)
+  },[selectedArrival])
 
-  const customLoadedIcon = L.divIcon({
-    className: 'custom-div-icon',
-    html: `<div class="${styles.markerDot} ${styles.loaded}"></div>`,
-    iconSize: [16, 16],
-    iconAnchor: [8, 8],
-    popupAnchor: [0, -8]
-  });
+  const customLoadedIcon = (stabled: any) => {
+    const stabledClass = stabled ? styles.stabledBorder : "";
 
-  const customEmptyIcon = L.divIcon({
-    className: 'custom-div-icon',
-    html: `<div class="${styles.markerDot} ${styles.empty}"></div>`,
-    iconSize: [16, 16],
-    iconAnchor: [8, 8],
-    popupAnchor: [0, -8]
-  });
+    return L.divIcon({
+      className: "custom-div-icon",
+      html: `<div class="${styles.markerDot} ${styles.loaded}  ${stabledClass}"></div>`,
+      iconSize: [16, 16],
+      iconAnchor: [8, 8],
+      popupAnchor: [0, -8],
+    });
+  };
+
+
+
+  const customEmptyIcon = (stabled: any) => {
+    const stabledClass = stabled ? styles.stabledBorder : "";
+
+    return L.divIcon({
+      className: "custom-div-icon",
+      html: `<div class="${styles.markerDot} ${styles.empty} ${stabledClass}"></div>`,
+      iconSize: [16, 16],
+      iconAnchor: [8, 8],
+      popupAnchor: [0, -8],
+    });
+  };
+
+  const legendItems = [
+    {
+      label: 'Loaded',
+      class: `${styles.markerDot} ${styles.loaded}`,
+    },
+    {
+      label: 'Empty',
+      class: `${styles.markerDot} ${styles.empty}`,
+    },  {
+      label: 'Stabled(Loaded)',
+      class: `${styles.markerDot} ${styles.loaded} ${styles.stabledBorder}`,
+    },  {
+      label: 'Stabled(Empty)',
+      class: `${styles.markerDot} ${styles.empty} ${styles.stabledBorder}`,
+    }
+  ]
 
   const createTrainIcon = (isLoaded: boolean) => {
     const fillColor = isLoaded ? '#037f58' : '#e31f3f';
@@ -379,12 +656,59 @@ export default function CaptiveRakeMapView() {
     });
   };
 
-  const getIcon = (status: string) => {
+  const getIcon = (status: string,status_code: string) => {
     if (currentZoom > 9) {
       return createTrainIcon(status === "L");
     }
-    return status === "L" ? customLoadedIcon : customEmptyIcon;
+    const stabled = Boolean(status_code === 'ST')
+    return status === "L" ? customLoadedIcon(stabled) : customEmptyIcon(stabled);
   };
+
+  const filterRakeList = (value:any) => {
+    setSearchTerm(value);
+    if (value !== '') {
+      const filteredList = ogListRakes
+        .filter((item: any) => statusType === 'All' || item.scheme === statusType)
+        .filter((item: any) => {
+          return (
+            item.name.toLowerCase().includes(value.toLowerCase()) || 
+            item.rakeID.toLowerCase().includes(value.toLowerCase())
+          );
+        })
+        .map((item: any) => {
+          return {
+            ...item,
+            checked: selectedRakeList.includes(item._id),
+          };
+        });
+      setSearchListRakes(filteredList);
+    }else{
+      setSearchListRakes((prev:any)=>{
+        return ogListRakes.filter((item:any)=> statusType === 'All' || item.scheme === statusType).map((item: any) => {
+          return {
+            ...item,
+            checked: selectedRakeList.includes(item._id),
+          }
+        })
+      })
+    }
+  }
+
+  const modifiedListRakes = (selectedItem:any) => {
+    if(selectedRakeList.includes(selectedItem._id)){
+      setSelectedRakeList((prev: any) => prev.filter((item: any) => item !== selectedItem._id));
+    }else{
+      setSelectedRakeList((prev: any) => [...prev, selectedItem._id]);
+    }
+    setSearchListRakes((prev: any) => {
+      return prev.map((item: any) => {
+        if (item.rakeID === selectedItem.rakeID) {
+          return { ...item, checked: !item.checked };
+        }
+        return item;
+      });
+    });
+  }
 
   const boundaryStyle = (feature: any) => {
     switch (feature.properties.boundary) {
@@ -399,124 +723,252 @@ export default function CaptiveRakeMapView() {
     }
   }
 
-  const addIndiaBoundaries = () => {
-    const b = getBoundary();
-    if (map instanceof L.Map) {
-      L.geoJSON(b, {
-        style: boundaryStyle
-      }).addTo(map);
-    } else {
-      console.error('map is not a Leaflet map object');
+  useEffect(()=>{
+    if(selectedRakeList.length > 0){
+      getCoords(statusType, selectedRakeList);
+    }else{
+      getCoords(statusType,[]);
     }
-  }
+  },[selectedRakeList])
 
   useEffect(() => {
-    addIndiaBoundaries();
+    if (!map) return;
+
+    const fetchGeoJSON = async () => {
+      try {
+        const { features} = getIndiaMap();
+        
+        const indiaGeoJSON = {
+          type: "FeatureCollection",
+          features
+        };
+
+        // Add boundary masking with the combined GeoJSON
+        const osmLayer = (L.TileLayer as any).boundaryCanvas(
+          "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+          {
+            boundary: indiaGeoJSON,
+            attribution:
+              '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+          }
+        );
+
+        map.addLayer(osmLayer);
+
+        // Add the claimed boundaries as a separate layer
+        const claimedBoundaries = getBoundary();
+        L.geoJSON(claimedBoundaries, {
+          style: boundaryStyle
+        }).addTo(map);
+
+      } catch (error) {
+        console.error("Error fetching GeoJSON:", error);
+      }
+    };
+
+    fetchGeoJSON();
   }, [map]);
 
   return (
     <div>
       <div>
-        <div 
-          className={styles.container}
-        >
-          <div className={`${styles.leftPanel} ${isCollapsed ? styles.collapsed : ''}`}>
+        <div className={styles.container}>
+          <div
+            className={`${styles.leftPanel} ${
+              isCollapsed ? styles.collapsed : ""
+            }`}
+            style={{
+              minWidth: mobile ? "0px" : "450px",
+            }}
+          >
             {mobile && (
               <>
-                <div 
+                <div
                   className={styles.collapseHandle}
                   onClick={() => setIsCollapsed(!isCollapsed)}
-                >
-                </div>
+                ></div>
               </>
             )}
 
             <div className={styles.rakeTypeFilters}>
-              <div 
-                className={`${styles.filterChip} ${activeRakeFilter === "All" ? styles.active : ""}`}
-                onClick={() => handleRakeFilterClick("All", rakeTypeData.All?._id)}
+              <div
+                className={`${styles.filterChip} ${
+                  activeRakeFilter === "All" ? styles.active : ""
+                }`}
+                onClick={() =>
+                  handleRakeFilterClick("All", rakeTypeData.All?._id)
+                }
               >
                 <span>All</span>
-                <span className={styles.count}>{rakeTypeData.All?.count || 0}</span>
+                <span className={styles.count}>
+                  {rakeTypeData.All?.count || 0}
+                </span>
               </div>
-              <div 
-                className={`${styles.filterChip} ${activeRakeFilter === "SFTO" ? styles.active : ""}`}
-                onClick={() => handleRakeFilterClick("SFTO", rakeTypeData.SFTO?._id)}
+              <div
+                className={`${styles.filterChip} ${
+                  activeRakeFilter === "SFTO" ? styles.active : ""
+                }`}
+                onClick={() =>
+                  handleRakeFilterClick("SFTO", rakeTypeData.SFTO?._id)
+                }
               >
-                <span>SFTO</span>
-                <span className={styles.count}>{rakeTypeData.SFTO?.count || 0}</span>
+                <span>SFTO-BRN</span>
+                <span className={styles.count}>
+                  {rakeTypeData.SFTO?.count || 0}
+                </span>
               </div>
-              <div 
-                className={`${styles.filterChip} ${activeRakeFilter === "BFNV" ? styles.active : ""}`}
-                onClick={() => handleRakeFilterClick("BFNV", rakeTypeData.BFNV?._id)}
+              <div
+                className={`${styles.filterChip} ${
+                  activeRakeFilter === "BFNV" ? styles.active : ""
+                }`}
+                onClick={() =>
+                  handleRakeFilterClick("BFNV", rakeTypeData.BFNV?._id)
+                }
               >
-                <span>BFNV</span>
-                <span className={styles.count}>{rakeTypeData.BFNV?.count || 0}</span>
+                <span>SFTO-BFNV</span>
+                <span className={styles.count}>
+                  {rakeTypeData.BFNV?.count || 0}
+                </span>
               </div>
-              <div 
-                className={`${styles.filterChip} ${activeRakeFilter === "GPWIS" ? styles.active : ""}`}
-                onClick={() => handleRakeFilterClick("GPWIS", rakeTypeData.GPWIS?._id)}
+              <div
+                className={`${styles.filterChip} ${
+                  activeRakeFilter === "GPWIS" ? styles.active : ""
+                }`}
+                onClick={() =>
+                  handleRakeFilterClick("GPWIS", rakeTypeData.GPWIS?._id)
+                }
               >
                 <span>GPWIS</span>
-                <span className={styles.count}>{rakeTypeData.GPWIS?.count || 0}</span>
+                <span className={styles.count}>
+                  {rakeTypeData.GPWIS?.count || 0}
+                </span>
               </div>
+            </div>
+
+            <div className={styles.searchContainer} ref={searchContainerRef}
+              onClick={(e)=>{e.stopPropagation(); setOpenDropDownSearchList(true)}}
+              style={{
+                marginInline: mobile ? "12px" : "0px",
+              }}
+            >
+              <div style={{width:20, height:20}}>
+                <Image src={searchIcon.src} alt="" height={20} width={20}/>
+              </div>
+              <input
+                type="text"
+                placeholder="Search by Rake ID, Rake Name"
+                className={styles.searchInput}
+                onChange={(e)=>{filterRakeList(e.target.value)}}
+              />
+              {selectedRakeList.length > 0 && (
+                <div className={styles.clearIcon}
+                  onClick={(e)=>{
+                    e.stopPropagation();
+                    setSelectedRakeList([]);
+                    setSearchListRakes(ogListRakes);
+                    getCoords('',[]);
+                  }}
+                ><HighlightOffIcon style={{width:32, height:32}}/></div>
+              )}
+              {openDropDownSearchList && 
+                <div className={styles.searchResultsContainer}>
+
+                  <div className={styles.searchHeader}>
+                    <div className={styles.checkboxHeader}>
+                      <div style={{marginLeft:'6px'}}>Select</div>
+                    </div>
+                    <div className={styles.rakeID} >Rake ID</div>
+                    <div style={{minWidth:'100px'}}>Rake Name</div>
+                  </div>
+                  
+                {searchListRakes.map((item:any)=>{
+                  return(
+                    <div key={item._id} className={styles.searchItem} 
+                      onClick={(e)=>{
+                        e.stopPropagation();
+                        setSearchTerm(`${item.rakeID}`);
+                        modifiedListRakes(item);
+                      }}
+                    >
+                      <div className={styles.checkboxHeader}>
+                        <Checkbox className={styles.checkbox} size='small' checked={item.checked} />
+                      </div>
+                      <div className={styles.rakeID}>{item.rakeID}</div> 
+                      <div style={{minWidth:'100px'}}>{item.name}</div>
+                    </div>
+                  );
+                })}
+              </div>
+              }
             </div>
 
             <div className={styles.rakesStatus}>
               <h2>Captive Rakes Status</h2>
               <div className={styles.statusItems}>
-                <div 
-                  className={`${styles.statusItem} ${styles.totalStatus} ${activeFilter === 'total' ? styles.activeTotal : ''}`}
-                  onClick={() => handleFilterClick('total')}
+                <div
+                  className={`${styles.statusItem} ${styles.totalStatus} ${
+                    activeFilter === "total" ? styles.activeTotal : ""
+                  }`}
+                  onClick={() => handleFilterClick("total")}
                 >
-                  <span className={styles.icon} style={{ 
-                    backgroundColor: '#F8F8F8',
-                    borderRadius: '50%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    padding: '8px'
-                  }}>
-                    <Image src={rakesLoadedIcon} alt=""/>
+                  <span
+                    className={styles.icon}
+                    style={{
+                      backgroundColor: "#F8F8F8",
+                      borderRadius: "50%",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      padding: "8px",
+                    }}
+                  >
+                    <Image src={rakesLoadedIcon} alt="" />
                   </span>
                   <div className={styles.labelCont}>
-                  <span className={styles.label} style={{color: '#334FFC'}}>Total</span>
-                  <span className={styles.value}>
-                    {filteredCounts.total}
-                  </span>
+                    <span className={styles.label} style={{ color: "#334FFC" }}>
+                      Total
+                    </span>
+                    <span className={styles.value}>{filteredCounts.total}</span>
                   </div>
                 </div>
-                <div 
-                  className={`${styles.statusItem} ${styles.loadedStatus} ${activeFilter === 'loaded' ? styles.activeLoaded : ''}`}
-                  onClick={() => handleFilterClick('loaded')}
+                <div
+                  className={`${styles.statusItem} ${styles.loadedStatus} ${
+                    activeFilter === "loaded" ? styles.activeLoaded : ""
+                  }`}
+                  onClick={() => handleFilterClick("loaded")}
                 >
-                  <span className={styles.icon} style={{ 
-                    backgroundColor: '#F8F8F8',
-                    borderRadius: '50%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    padding: '8px'
-                  }}>
-                    <Image src={captiveRakes} alt=""/>
+                  <span
+                    className={styles.icon}
+                    style={{
+                      backgroundColor: "#F8F8F8",
+                      borderRadius: "50%",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      padding: "8px",
+                    }}
+                  >
+                    <Image src={captiveRakes} alt="" />
                   </span>
                   <div className={styles.labelCont}>
-                  <span className={styles.label} style={{color: '#18BE8A'}}>Loaded</span>
-                  <span className={styles.value}>
-                    {filteredCounts.loaded}
-                  </span>
+                    <span className={styles.label} style={{ color: "#18BE8A" }}>
+                      Loaded
+                    </span>
+                    <span className={styles.value}>{filteredCounts.loaded}</span>
                   </div>
                 </div>
-                <div 
-                  className={`${styles.statusItem} ${styles.emptyStatus} ${activeFilter === 'empty' ? styles.activeEmpty : ''}`}
-                  onClick={() => handleFilterClick('empty')}
+                <div
+                  className={`${styles.statusItem} ${styles.emptyStatus} ${
+                    activeFilter === "empty" ? styles.activeEmpty : ""
+                  }`}
+                  onClick={() => handleFilterClick("empty")}
                 >
-                  <Image src={emptyRakesIcon} alt=""/>
+                  <Image src={emptyRakesIcon} alt="" />
                   <div className={styles.labelCont}>
-                  <span className={styles.label} style={{color: '#E6667B'}}>Empty</span>
-                  <span className={styles.value}>
-                    {filteredCounts.empty}
-                  </span>
+                    <span className={styles.label} style={{ color: "#E6667B" }}>
+                      Empty
+                    </span>
+                    <span className={styles.value}>{filteredCounts.empty}</span>
                   </div>
                 </div>
               </div>
@@ -526,40 +978,56 @@ export default function CaptiveRakeMapView() {
               <div className={styles.arrivalHeader}>
                 <h2>Rakes Arrival</h2>
                 {selectedArrival && (
-                  <button 
+                  <button
                     className={styles.clearFilter}
-                    onClick={() => 
-                    {
-                      getCoords(activeRakeFilter, [])
-                      setSelectedArrival(null)
-                    }
-                    }
+                    onClick={() => {
+                      getCoords(activeRakeFilter, []);
+                      setSelectedArrival(null);
+                    }}
                   >
                     Clear
                   </button>
                 )}
               </div>
               <div className={styles.arrivalItems}>
-                <div 
-                  className={`${styles.arrivalItem} ${selectedArrival === "T+1" ? styles.selected : ""}`}
-                  onClick={() => handleArrivalClick("T+1", stats["T+1"]._id || [])}
+                <div
+                  className={`${styles.arrivalItem} ${
+                    selectedArrival === "Today" ? styles.selected : ""
+                  }`}
+                  onClick={() =>
+                    handleArrivalClick("Today", stats["Today"]._id || [])
+                  }
                 >
-                  <span className={styles.value}>{stats["T+1"].count || 0}</span>
+                  <span className={styles.value}>
+                    {stats["Today"]?.count || 0}
+                  </span>
+                  <span className={styles.label}>Today</span>
+                </div>
+                <div
+                  className={`${styles.arrivalItem} ${
+                    selectedArrival === "T+1" ? styles.selected : ""
+                  }`}
+                  onClick={() =>
+                    handleArrivalClick("T+1", stats["T+1"]._id || [])
+                  }
+                >
+                  <span className={styles.value}>
+                    {stats["T+1"].count || 0}
+                  </span>
                   <span className={styles.label}>T+1</span>
                 </div>
-                <div 
-                  className={`${styles.arrivalItem} ${selectedArrival === "T+2" ? styles.selected : ""}`}
-                  onClick={() => handleArrivalClick("T+2", stats["T+2"]._id || [])}
+                <div
+                  className={`${styles.arrivalItem} ${
+                    selectedArrival === "T+2" ? styles.selected : ""
+                  }`}
+                  onClick={() =>
+                    handleArrivalClick("T+2", stats["T+2"]._id || [])
+                  }
                 >
-                  <span className={styles.value}>{stats["T+2"].count || 0}</span>
-                  <span className={styles.label}>T+2</span>
-                </div>
-                <div 
-                  className={`${styles.arrivalItem} ${selectedArrival === "T+3" ? styles.selected : ""}`}
-                  onClick={() => handleArrivalClick("T+3", stats["T+3"]._id || [])}
-                >
-                  <span className={styles.value}>{stats["T+3"].count || 0}</span>
-                  <span className={styles.label}>&gt;T+3</span>
+                  <span className={styles.value}>
+                    {stats["T+2"].count || 0}
+                  </span>
+                  <span className={styles.label}>&gt;T+2</span>
                 </div>
               </div>
             </div>
@@ -571,18 +1039,30 @@ export default function CaptiveRakeMapView() {
                   <table className={styles.rakeStatusTable}>
                     <thead>
                       <tr>
-                        <th style={{
-                          width: '10%',
-                          textAlign: 'center',
-                        }}>S.No</th>
-                        <th style={{
-                          width: '65%',
-                          textAlign: 'left',
-                        }}>Code</th>
-                        <th style={{
-                          width: '25%',
-                          textAlign: 'center',
-                        }}>Counts</th>
+                        <th
+                          style={{
+                            width: "10%",
+                            textAlign: "center",
+                          }}
+                        >
+                          S.No
+                        </th>
+                        <th
+                          style={{
+                            width: "65%",
+                            textAlign: "left",
+                          }}
+                        >
+                          Code
+                        </th>
+                        <th
+                          style={{
+                            width: "25%",
+                            textAlign: "center",
+                          }}
+                        >
+                          Counts
+                        </th>
                       </tr>
                     </thead>
                   </table>
@@ -590,27 +1070,48 @@ export default function CaptiveRakeMapView() {
                 <div className={styles.tableBodyWrapper}>
                   <table className={styles.rakeStatusTable}>
                     <tbody>
-                      {rakeStatusData.map((row: RakeStatusData, index: number) => (
-                        <tr 
-                          key={index}
-                          className={selectedRow === index ? styles.selected : ''}
-                          onClick={() => handleRowClick(index, row)}
-                        >
-                          <td style={{
-                            width: '10%',
-                            textAlign: 'center',
-                            fontWeight:'bold'
-                          }}>{index + 1}</td>
-                          <td style={{
-                            width: '65%',
-                            textAlign: 'left'
-                          }}>{row.code} ({row.text})</td>
-                          <td style={{
-                            width: '25%',
-                            textAlign: 'center'
-                          }}>{row.count}</td>
-                        </tr>
-                      ))}
+                      {rakeStatusData.map(
+                        (row: RakeStatusData, index: number) => (
+                          <tr
+                            key={index}
+                            style={
+                              row.code === "ST"
+                                ? { backgroundColor: "#f5f5f5" }
+                                : { backgroundColor: "" }
+                            }
+                            className={
+                              selectedRow === index ? styles.selected : ""
+                            }
+                            onClick={() => handleRowClick(index, row)}
+                          >
+                            <td
+                              style={{
+                                width: "10%",
+                                textAlign: "center",
+                                fontWeight: "bold",
+                              }}
+                            >
+                              {index + 1}
+                            </td>
+                            <td
+                              style={{
+                                width: "65%",
+                                textAlign: "left",
+                              }}
+                            >
+                              {row.code} ({row.text})
+                            </td>
+                            <td
+                              style={{
+                                width: "25%",
+                                textAlign: "center",
+                              }}
+                            >
+                              {row.count}
+                            </td>
+                          </tr>
+                        )
+                      )}
                     </tbody>
                   </table>
                 </div>
@@ -634,91 +1135,262 @@ export default function CaptiveRakeMapView() {
                 </div>
               </div>
             </div> */}
-
             <div className={styles.plantRakesSummary}>
               <h2>Plant Rakes Summary</h2>
+
               <table className={styles.summaryTable}>
                 <thead>
                   <tr>
-                    <th style={{color:'#18BE8A'}}>Plant</th>
-                    <th>From</th>
-                    <th>Towards</th>
-                    <th>Others</th>
+                    <th style={{ color: "#18BE8A" }}>Category</th>
+                    {plantRakesSummaryPlants
+                      .filter((plant: any) => plant !== "others")
+                      .concat("others")
+                      .map((plant: any, index: any) => (
+                        <th key={index} style={{ fontWeight: "bold" }}>
+                          {plant}
+                        </th>
+                      ))}
                   </tr>
                 </thead>
                 <tbody>
-                  {summaryData.map((row, index) => (
-                    <tr key={index}>
-                      <td style={{fontWeight:'bold',color:''}}>{row.plant}</td>
-                      <td>{row.from}</td>
-                      <td>{row.towards}</td>
-                      <td>{row.others}</td>
-                    </tr>
-                  ))}
+                  <tr>
+                    <td>From</td>
+                    {plantRakesSummaryPlants
+                      .filter((plant: any) => plant !== "others")
+                      .concat("others")
+                      .map((plant: any, index: any) => (
+                        <td key={index}>
+                          <span
+                            onClick={() => {
+                              handlePlantRakesMapFilter(
+                                plantRakesSummary.from[plant]?.ids
+                              );
+                              setSelectedArrival(null);
+                            }}
+                            style={{ cursor: "pointer" }}
+                          >
+                            {plantRakesSummary.from[plant]?.count ?? 0}
+                          </span>
+                        </td>
+                      ))}
+                  </tr>
+                  <tr>
+                    <td>Towards</td>
+                    {plantRakesSummaryPlants
+                      .filter((plant: any) => plant !== "others")
+                      .concat("others")
+                      .map((plant: any, index: any) => (
+                        <td key={index}>
+                          <span
+                            onClick={() => {
+                              handlePlantRakesMapFilter(
+                                plantRakesSummary.to[plant]?.ids
+                              );
+                              setSelectedArrival(null);
+                            }}
+                            style={{ cursor: "pointer" }}
+                          >
+                            {plantRakesSummary.to[plant]?.count ?? 0}
+                          </span>
+                        </td>
+                      ))}
+                  </tr>
                 </tbody>
               </table>
             </div>
+            <div className={styles.captiveRakeCountBox}>
+              <h2>Captive Rakes Utilization</h2>
+              <div className={styles.countWrapper}>
+                <p className={styles.infoCR}>Used Captive Rakes:</p>
+                <p className={styles.usedCount}>{usedCRCount}</p>/
+                <p className={styles.totalCount}>{totalCRCount}</p>
+              </div>
+              <div className={styles.usagePercentageWrapper}>
+                <p className={styles.infoCR}>Utilization Percentage:</p>
+                <p className={styles.usagePercentage}>
+                  {((usedCRCount / totalCRCount) * 100).toFixed(2)}%
+                </p>
+              </div>
+            </div>
           </div>
           <div className={styles.rightPanel}>
+            <div style={{ position: "relative" }}>
+              <div
+               style={{
+                position: "absolute",
+                zIndex: 1000,
+                  right: "50px",
+                  top: "50px",
+               }}>
+                <LastFOISPing />
+              </div>
+              <div
+                style={{
+                  height: "32px",
+                  display: "flex",
+                  justifyContent: "space-evenly",
+                  position: "absolute",
+                  background: "white",
+                  zIndex: 1000,
+                  right: "10px",
+                  top: "10px",
+                  width: "350px",
+                  borderRadius: "6px",
+                  boxShadow: "rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px",
+                  color: "#42454E",
+                }}
+              >
+                {legendItems.map((item: any) => {
+                  return (
+                    <div
+                    key={item}
+                      style={{ 
+                        fontSize: "10px",
+                        display: "flex",
+                        alignItems: "center",
+                        columnGap: "4px",
+                      }}
+                    >
+                      <div className={item.class}></div>
+                      <div>{item.label}</div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
             <MapContainer
               className="map"
               id="map-helpers"
               center={center}
               zoom={5}
-              style={{ 
-                height: "100%", 
-                width: "100%", 
-                padding: "0px", 
-                zIndex: "0" 
+              style={{
+                height: "100%",
+                width: "100%",
+                padding: "0px",
+                zIndex: "0",
               }}
               attributionControl={false}
               ref={setMap}
             >
-              <LayersControl>
+              {/* <LayersControl>
                 <LayersControl.BaseLayer checked name="OpenStreetMap">
                   <TileLayer
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                   />
                 </LayersControl.BaseLayer>
-              </LayersControl>
-                {filteredCoords.map((marker: any, index: number) => {
-                  const icon = getIcon(marker.loading_status);
-                  
-                  return (
-                    <Marker
-                      key={index}
-                      position={[marker.geo_point.coordinates[1], marker.geo_point.coordinates[0]]}
-                      icon={icon}
-                    >
-                      <Popup>
-                        <div style={{
-                          padding: '6px',
-                          minWidth: '230px'
-                        }}>
-                          <div style={{
-                            fontSize: '13px',
-                            color: '#42454E',
-                            display: 'grid',
-                            gap: '4px'
-                          }}>
-                            <p style={{ margin: '2px 0' }}><strong>Rake ID:</strong> {marker.rake?.rake_id || 'N/A'}</p>
-                            <p style={{ margin: '2px 0' }}><strong>Rake Name:</strong> {marker.rake?.name || 'N/A'}</p>
-                            <p style={{ margin: '2px 0' }}><strong>Rake Status:</strong> {marker.stts_code ? rakeStatus[marker.stts_code] : 'N/A'}</p>
-                            <p style={{ margin: '2px 0' }}><strong>From Station:</strong> {marker.from ? `${marker.from.code} ${marker.from.name}` : 'N/A'}</p>
-                            <p style={{ margin: '2px 0' }}><strong>To Station:</strong> {marker.to ? `${marker.to.code} ${marker.to.name}` : 'N/A'}</p>
-                            <p style={{ margin: '2px 0' }}><strong>Current Station:</strong> {marker.current_station ? `${marker.current_station.code} ${marker.current_station.name}` : 'N/A'}</p>
-                            <p style={{ margin: '2px 0' }}><strong>Updated At FOIS:</strong> {marker.updated_on ? `${timeService.utcToist(marker.updated_on, 'dd-MMM')} ${timeService.utcToistTime(marker.updated_on, 'HH:mm')}` : 'N/A'}</p>
-                            <p style={{ margin: '2px 0' }}><strong>Data Fetched At:</strong> {marker.updated_at ? `${timeService.utcToist(marker.updated_at, 'dd-MMM')} ${timeService.utcToistTime(marker.updated_at, 'HH:mm')}` : 'N/A'}</p>
-                            <p style={{ margin: '2px 0' }}><strong>ETA:</strong> {marker.expd_arvl_time ? `${timeService.utcToist(marker.expd_arvl_time, 'dd-MMM')} ${timeService.utcToistTime(marker.expd_arvl_time, 'HH:mm')}` : 'N/A'}</p>
-                            <p style={{ margin: '2px 0' }}><strong>Commodity:</strong> {marker.commodity && marker.commodity.length > 0 ? marker.commodity.join(', ') : 'N/A'}</p>
-                            <p style={{ margin: '2px 0' }}><strong>Remaining Distance:</strong> {marker.rmng_km ? marker.rmng_km : 'N/A'} km</p>
-                          </div>
+              </LayersControl> */}
+              {filteredCoords.map((marker: any, index: number) => {
+                const icon = getIcon(marker.loading_status, marker.stts_code);
+
+                return (
+                  <Marker
+                    key={index}
+                    position={[
+                      marker.geo_point.coordinates[1],
+                      marker.geo_point.coordinates[0],
+                    ]}
+                    icon={icon}
+                  >
+                    <Popup>
+                      <div
+                        style={{
+                          padding: "6px",
+                          minWidth: "230px",
+                        }}
+                      >
+                        <div
+                          style={{
+                            fontSize: "13px",
+                            color: "#42454E",
+                            display: "grid",
+                            gap: "4px",
+                          }}
+                        >
+                          <p style={{ margin: "2px 0" }}>
+                            <strong>Rake ID:</strong>{" "}
+                            {marker.rake?.rake_id || "N/A"}
+                          </p>
+                          <p style={{ margin: "2px 0" }}>
+                            <strong>Rake Name:</strong>{" "}
+                          {marker.rake?.name || "N/A"}
+                          </p>
+                          <p style={{ margin: "2px 0" }}>
+                            <strong>Rake Status:</strong>{" "}
+                            {marker.stts_code
+                              ? rakeStatus[marker.stts_code]
+                              : "N/A"}
+                          </p>
+                          <p style={{ margin: "2px 0" }}>
+                            <strong>From Station:</strong>{" "}
+                            {marker.from
+                              ? `${marker.from.code} ${marker.from.name}`
+                              : "N/A"}
+                          </p>
+                          <p style={{ margin: "2px 0" }}>
+                            <strong>To Station:</strong>{" "}
+                            {marker.to
+                              ? `${marker.to.code} ${marker.to.name}`
+                              : "N/A"}
+                          </p>
+                          <p style={{ margin: "2px 0" }}>
+                            <strong>Current Station:</strong>{" "}
+                            {marker.current_station
+                              ? `${marker.current_station.code} ${marker.current_station.name}`
+                              : "N/A"}
+                          </p>
+                          <p style={{ margin: "2px 0" }}>
+                            <strong>Updated At FOIS:</strong>{" "}
+                            {marker.updated_on
+                              ? `${timeService.utcToist(
+                                  marker.updated_on,
+                                  "dd-MMM"
+                                )} ${timeService.utcToistTime(
+                                  marker.updated_on,
+                                  "HH:mm"
+                                )}`
+                              : "N/A"}
+                          </p>
+                          <p style={{ margin: "2px 0" }}>
+                            <strong>Data Fetched At:</strong>{" "}
+                            {marker.updated_at
+                              ? `${timeService.utcToist(
+                                  marker.updated_at,
+                                  "dd-MMM"
+                                )} ${timeService.utcToistTime(
+                                  marker.updated_at,
+                                  "HH:mm"
+                                )}`
+                              : "N/A"}
+                          </p>
+                          <p style={{ margin: "2px 0" }}>
+                            <strong>ETA:</strong>{" "}
+                            {marker.expd_arvl_time
+                              ? `${timeService.utcToist(
+                                  marker.expd_arvl_time,
+                                  "dd-MMM"
+                                )} ${timeService.utcToistTime(
+                                  marker.expd_arvl_time,
+                                  "HH:mm"
+                                )}`
+                              : "N/A"}
+                          </p>
+                          <p style={{ margin: "2px 0" }}>
+                            <strong>Commodity:</strong>{" "}
+                            {marker.commodity && marker.commodity.length > 0
+                              ? marker.commodity.join(", ")
+                              : "N/A"}
+                          </p>
+                          <p style={{ margin: "2px 0" }}>
+                            <strong>Remaining Distance:</strong>{" "}
+                            {marker.rmng_km ? marker.rmng_km : "N/A"} km
+                          </p>
                         </div>
-                      </Popup>
-                    </Marker>
-                  );
-                })}
+                      </div>
+                    </Popup>
+                  </Marker>
+                );
+              })}
             </MapContainer>
           </div>
         </div>

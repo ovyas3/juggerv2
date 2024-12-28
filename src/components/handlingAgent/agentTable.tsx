@@ -162,7 +162,12 @@ function AgentTable({ agentList, count, setSkipAndLimit,getHandlingAgents }: any
                     onRowsPerPageChange={handleChangeRowsPerPage}
                     sx={{ position: 'absolute', top: -40, zIndex: 100, right: -10 }}
                 />
-                <TableContainer sx={{ overflow: 'auto', borderRadius: '4px', border: '1px solid #E9E9EB' }}>
+                <TableContainer sx={{ 
+                    border: '1px solid #E9E9EB',
+                    borderRadius: '4px', 
+                    maxHeight: '65vh !important',
+                    overflowY: 'auto !important',
+                }}>
                     <Table stickyHeader aria-label="sticky table">
                         <TableHead>
                             <TableRow>

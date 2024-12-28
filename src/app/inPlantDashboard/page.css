@@ -12,6 +12,48 @@
   display: flex;
 }
 
+.filterbox {
+  display: flex;
+  border: 1px solid #E0E0E0;
+  border-radius: 6px;
+  padding:4px;
+}
+
+.in-plant-filterbox {
+  display: flex;
+  column-gap: 4px;
+  border-left: 1px solid #E0E0E0;
+  padding-left: 8px;
+}
+
+.in-plant-filterbox .status-display-boxes {
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background-color: white;
+  color: black;
+  opacity: 1;
+}
+
+.in-plant-filterbox .status-display-boxes:hover {
+  background-color: #fffbeb;
+  color: #92400e;
+}
+
+.in-plant-filterbox .status-display-boxes.active {
+  background-color: #fffbeb;
+  color: #92400e;
+}
+
+.in-plant-filterbox.disabled .status-display-boxes {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.in-plant-filterbox.disabled .status-display-boxes:hover {
+  background-color: white;
+  color: black;
+}
+
 #search-container {
   padding-top: 20px;
   padding-bottom: 20px;
@@ -20,13 +62,17 @@
   height: 82px;
   padding-inline: 24px;
   align-items: center;
-  flex-direction: row;
+  flex-direction: column;
+  row-gap: 8px;
   margin-bottom: 16px;
 }
 
 #status-display{
   display: flex;
   gap: 16px;
+  align-items: center;
+  justify-content: left;
+  width: 100%;
 }
 
 .status-display-boxes{
@@ -50,7 +96,7 @@
   padding-inline: 24px;
   flex-direction: row;
   padding-block: 10px;
-  align-items: start;
+  align-items: flex-start;
 }
 
 #space-giver{
@@ -124,7 +170,8 @@
   cursor: not-allowed;
 }
 
-.aveStatus{
+.aveStatus,
+.inplStatus {
   background-color: #E6EAFF !important;
   color: #536AFE !important;
   height: 28px;
@@ -132,14 +179,17 @@
   border-radius: 4px;
   align-content: center;
 }
-.inplStatus{
+
+.inplStatus {
   background-color: #F4FCFC !important;
   color: #174D68 !important;
-  height: 28px;
-  padding-inline: 8px;
-  border-radius: 4px;
-  align-content: center;
 }
+
+.aveStatus strong,
+.inplStatus strong {
+  font-weight: 700;
+}
+
 .header_drawnin{
   min-width: 100px
 }
@@ -152,6 +202,27 @@
   cursor: pointer;
   display: inline-block;
 }
+
+.rake-details {
+  display: flex;
+  column-gap: 68px;
+  margin-top: 24px;
+  align-items: center;
+
+  .detail-item {
+    row-gap: 8px;
+
+    .item-label-header {
+      font-size: 12px;
+    }
+
+    .item-content {
+      font-size: 16px;
+      font-weight: 600;
+    }
+  }
+}
+
 
 .hidden-plants {
   /* display: none; */
@@ -182,15 +253,65 @@
   line-height: normal;
   text-transform: capitalize;
 }
+
+/* Updated styles for alignment */
+.rake-section-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.rake-section-label {
+  font-size: 12px;
+  font-weight: 400;
+  color: #3c4852;
+  margin-right: auto;
+}
+
+.rake-section-input {
+  flex: 1;
+  border: 1px solid #dfe3eb;
+  border-radius: 4px;
+  padding: 8px;
+  font-size: 14px;
+  color: #42454e;
+}
+
+.rake-section-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  width: 36px;
+  background-color: #2196f3;
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.rake-section-button:hover {
+  background-color: #1976d2;
+}
+
+.rake-handling-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
 #scrollAreaforRakeSheet {
   overflow-y: scroll;
-  max-height: 500px;
+  max-height: 350px;
   scroll-behavior: smooth;
   margin-top: 24px;
 }
 #firstSectionofRakeSheetHandling {
   display: flex;
-  gap: 24px;
+  gap: 50px;
   justify-content: flex-start;
   align-items: center;
   margin-bottom: 24px;
@@ -366,6 +487,18 @@
   opacity: 1;
   visibility: visible;
 }
+.table-container {
+  overflow-x: auto;
+  white-space: nowrap;
+}
+/* 
+.header_action,
+.cell_action {
+  position: sticky;
+  right: 0;
+  background-color: #E0E0E0;
+  z-index: 2;
+} */
 
 .removeAddicons{
   color: white;
@@ -530,7 +663,7 @@
 }
 .wagons-uploaded-wagonSheet{
   position: absolute;
-  top: 21px;
+  top: 18px;
   right: -64px;
   /* cursor: pointer; */
   color: #3C4852;
@@ -642,3 +775,4 @@
   /* background-color: #00B275 !important; */
   width: 250px !important;
 }
+

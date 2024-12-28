@@ -3,7 +3,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import './style.css'
 import CloseIcon from '@mui/icons-material/Close';
 import { httpsGet, httpsPost } from '@/utils/Communication';
-import ThreeDotsWave from '@/app/stationManagement/loaderAnimation';
+import ThreeDotsWave from '@/components/stationManagement/loaderAnimation';
 import { useSnackbar } from '@/hooks/snackBar';
 import { useRouter } from 'next/navigation';
 
