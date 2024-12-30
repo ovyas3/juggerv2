@@ -39,7 +39,9 @@
    "updateAgreementID":"Update Agreement ID",
    "foisDetails":"FOIS Details",
    "Overview":"OVERVIEW",
-   "Insights":"INSIGHTS"
+   "Insights":"INSIGHTS",
+   "ListView":"List View",
+   "MapView":"Map View"
   },
   "HEADER":{
     "shipments":"Shipments",
@@ -330,6 +332,7 @@
     "hubRMS": "Hub RMS",
     "RakeFreeTime": "Rake Free Time",
     "RakeDCCalculator": "Rake DC Calculator",
+    "Route": "Route",
     "statusCodes":[
       {
         "code": "MT",

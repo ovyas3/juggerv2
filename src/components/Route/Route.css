@@ -1,0 +1,20 @@
+.custom-div-icon {
+    border-radius: 50%;
+    border: 2px solid white;
+    box-shadow: 0 0 5px rgba(0,0,0,0.5);
+  }
+  
+  .marker-pin {
+    width: 30px;
+    height: 30px;
+    border-radius: 50% 50% 50% 0;
+    position: absolute;
+    transform: rotate(-45deg);
+    left: 50%;
+    top: 50%;
+    margin: -15px 0 0 -15px;
+  }
+
+  .MuiDialogTitle-root .mui-ypiqx9-MuiDialogContent-root{
+    padding: 0px !important;
+  }
