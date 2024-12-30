@@ -13,13 +13,21 @@ import {
     Box, 
     CircularProgress,
     Alert,
-    Tooltip,
-    TablePagination
+    TablePagination,
+    Grid,
+    Button,
+    DialogTitle,
+    DialogContent,
+    Dialog,
+    DialogContentText,
+    DialogActions
 } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { httpsGet } from "@/utils/Communication";
+import { httpsPost } from "@/utils/Communication";
 import "./captiveRakeListView.css";
 import timeService from "@/utils/timeService";
+import { useSnackbar } from '@/hooks/snackBar';
 
 interface RakeData {
     name: string;
@@ -42,6 +50,14 @@ interface RakeData {
     eta: string;
     updated_at: string;
     fois_date: string;
+    route?: {
+        _id?: string | undefined;
+        name: string;
+        from: string;
+        to: string;
+        via: string[];
+        shipper: string;
+    };
 }
 
 const CaptiveRakeListView = () => {
@@ -51,7 +67,50 @@ const CaptiveRakeListView = () => {
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [page, setPage] = useState(0);
-    const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [rowsPerPage, setRowsPerPage] = useState(5);
+    const { showMessage } = useSnackbar();
+
+    const [linkConfirmationOpen, setLinkConfirmationOpen] = useState(false);
+    const [selectedRakeForLink, setSelectedRakeForLink] = useState<RakeData | null>(null);
+    const [removeConfirmationOpen, setRemoveConfirmationOpen] = useState(false);
+    const [selectedRakeForRemove, setSelectedRakeForRemove] = useState<RakeData | null>(null);
+
+    const handleLinkButtonClick = (rake: RakeData) => {
+        setSelectedRakeForLink(rake);
+        setLinkConfirmationOpen(true);
+    };
+
+    const handleLinkConfirmation = () => {
+        if (selectedRakeForLink) {
+            handleLinkRoute(selectedRakeForLink);
+        }
+        setLinkConfirmationOpen(false);
+        setSelectedRakeForLink(null);
+    };
+
+    const handleLinkCancel = () => {
+        setLinkConfirmationOpen(false);
+        setSelectedRakeForLink(null);
+    };
+
+    const handleRemoveButtonClick = (rake: RakeData) => {
+        setSelectedRakeForRemove(rake);
+        setRemoveConfirmationOpen(true);
+    };
+    
+    const handleRemoveConfirmation = () => {
+        if (selectedRakeForRemove) {
+            handleRemoveRoute(selectedRakeForRemove.route?._id || '');
+        }
+        setRemoveConfirmationOpen(false);
+        setSelectedRakeForRemove(null);
+    };
+    
+    const handleRemoveCancel = () => {
+        setRemoveConfirmationOpen(false);
+        setSelectedRakeForRemove(null);
+    };
+    
 
     const fetchRakeList = async (scheme: string) => {
         try {
@@ -88,10 +147,87 @@ const CaptiveRakeListView = () => {
         setPage(0);
     };
 
+    const getFilterChipStyle = (filter: string, isActive: boolean) => {
+        if (!isActive) {
+            return {
+                backgroundColor: 'rgba(0, 0, 0, 0.08)',
+                color: 'rgba(0, 0, 0, 0.87)',
+                fontWeight: 'normal'
+            };
+        }
+
+        switch (filter) {
+            case 'SFTO':
+                return {
+                    backgroundColor: '#4CAF50',
+                    color: 'white',
+                    fontWeight: 'bold'
+                };
+            case 'BFNV':
+                return {
+                    backgroundColor: '#FF9800',
+                    color: 'white',
+                    fontWeight: 'bold'
+                };
+            case 'GPWIS':
+                return {
+                    backgroundColor: '#9C27B0',
+                    color: 'white',
+                    fontWeight: 'bold'
+                };
+        }
+    };
+
     const paginatedRakeList = rakeList.slice(
         page * rowsPerPage, 
         page * rowsPerPage + rowsPerPage
     );
+
+    const handleLinkRoute = async (rake: RakeData) => {
+        try {
+            if (!rake.route || !rake.route._id) {
+                showMessage('No route information available', 'warning');
+                return;
+            }
+    
+            const routeId = rake.route._id;
+    
+            const response = await httpsPost('cr_rakes/linkRoute', {
+                rake: rake.route._id,
+                route: rake.route.via[0]
+            });
+    
+            if (response.statusCode === 200) {
+                showMessage('Route linked successfully', 'success');
+                
+                await fetchRakeList(activeRakeFilter);
+            } else {
+                showMessage(response.msg || 'Failed to link route', 'error');
+            }
+        } catch (error) {
+            console.error('Error linking route:', error);
+            showMessage('An error occurred while linking route', 'error');
+        }
+    };
+
+    const handleRemoveRoute = async (rakeId: string) => {
+        try {
+            const response = await httpsPost('cr_rakes/removeRoute', {
+                rake: rakeId
+            });
+
+            if (response.statusCode === 200) {
+                showMessage('Route removed successfully', 'success');
+                
+                await fetchRakeList(activeRakeFilter);
+            } else {
+                showMessage(response.msg || 'Failed to remove route', 'error');
+            }
+        } catch (error) {
+            console.error('Error removing route:', error);
+            showMessage('An error occurred while removing route', 'error');
+        }
+    };
 
     return (
         <div className="wrapper">
@@ -102,13 +238,14 @@ const CaptiveRakeListView = () => {
                             key={filter}
                             label={filter === 'GPWIS' ? 'GPWIS' : `SFTO-${filter}`}
                             onClick={() => handleRakeFilterClick(filter)}
-                            color={activeRakeFilter === filter ? 'primary' : 'default'}
+                            style={getFilterChipStyle(filter, activeRakeFilter === filter)}
                             variant={activeRakeFilter === filter ? 'filled' : 'outlined'}
                             className="filter-chip"
                         />
                     ))}
                 </div>
             </div>
+            
 
             {loading ? (
                 <div className="loading-container">
@@ -125,7 +262,7 @@ const CaptiveRakeListView = () => {
                         page={page}
                         onPageChange={handleChangePage}
                         onRowsPerPageChange={handleChangeRowsPerPage}
-                        rowsPerPageOptions={[5, 10, 25]}
+                        rowsPerPageOptions={[5, 10, 25, 100]}
                         className="table-pagination"
                     />
                     <TableContainer>
@@ -144,12 +281,13 @@ const CaptiveRakeListView = () => {
                                     <TableCell>FOIS (Fetch) At</TableCell>
                                     <TableCell>FOIS (Updated) At</TableCell>
                                     <TableCell>Route</TableCell>
+                                    <TableCell>Actions</TableCell>
                                 </TableRow>
                                 <TableRow>
                                     <TableCell colSpan={8}></TableCell>
                                     <TableCell>Expiry Date</TableCell>
                                     <TableCell>Remaining KM</TableCell>
-                                    <TableCell colSpan={3}></TableCell>
+                                    <TableCell colSpan={4}></TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
@@ -168,24 +306,98 @@ const CaptiveRakeListView = () => {
                                         <TableCell>{rake.eta}</TableCell>
                                         <TableCell>{rake.remaining_distance}</TableCell>
                                         <TableCell>
-                                            <Tooltip title={`BPC Type: ${rake.bpc.exp}`}>
                                                 <span>{timeService.utcToist(rake.bpc.exp, 'dd-MM-yyyy HH:mm')}</span>
-                                            </Tooltip>
                                         </TableCell>
                                         <TableCell>
-                                            <Tooltip title={`Expiry: ${rake.bpc.rem_km || 'N/A'}`}>
                                                 <span>{(rake.bpc.rem_km) || 'N/A'}</span>
-                                            </Tooltip>
                                         </TableCell>
                                         <TableCell>{rake.fois_date}</TableCell>
                                         <TableCell>{rake.updated_at}</TableCell>
-                                        <TableCell> -- </TableCell>
+                                        <TableCell>{rake.route ? rake.route.name : 'N/A'}</TableCell>
+                                        <TableCell>
+                                        <Grid container spacing={1} alignItems="center">
+                                            <Grid item>
+                                                <Dialog
+                                                    open={linkConfirmationOpen}
+                                                    onClose={handleLinkCancel}
+                                                    maxWidth="md"
+                                                    BackdropProps={{
+                                                        style: {
+                                                            backgroundColor: 'rgba(0, 0, 0, 0.1)', 
+                                                        }
+                                                    }}
+                                                >
+                                                    <DialogTitle>
+                                                        Confirm Route Linking
+                                                    </DialogTitle>
+                                                    <DialogContent>
+                                                        <DialogContentText>
+                                                            Are you sure you want to link this route to the rake?
+                                                        </DialogContentText>
+                                                    </DialogContent>
+                                                    <DialogActions>
+                                                        <Button onClick={handleLinkCancel} color="secondary">
+                                                            No
+                                                        </Button>
+                                                        <Button onClick={handleLinkConfirmation} color="primary" autoFocus>
+                                                            Yes
+                                                        </Button>
+                                                    </DialogActions>
+                                                </Dialog>
+                                                <Button 
+                                                    variant="outlined" 
+                                                    color="primary" 
+                                                    size="small"
+                                                    onClick={() => handleLinkButtonClick(rake)}
+                                                >
+                                                    Link
+                                                </Button>
+                                                </Grid>
+                                                    <Grid item>
+                                                    <Dialog
+                                                    open={removeConfirmationOpen}
+                                                    onClose={handleRemoveCancel}
+                                                    maxWidth="md"
+                                                    BackdropProps={{
+                                                        style: {
+                                                            backgroundColor: 'rgba(0, 0, 0, 0.1)', 
+                                                        }
+                                                    }}
+                                                >
+                                                    <DialogTitle>
+                                                        Confirm Route Removal
+                                                    </DialogTitle>
+                                                    <DialogContent>
+                                                        <DialogContentText>
+                                                            Are you sure you want to remove the route from this rake?
+                                                        </DialogContentText>
+                                                    </DialogContent>
+                                                    <DialogActions>
+                                                        <Button onClick={handleRemoveCancel} color="secondary">
+                                                            No
+                                                        </Button>
+                                                        <Button onClick={handleRemoveConfirmation} color="primary" autoFocus>
+                                                            Yes
+                                                        </Button>
+                                                    </DialogActions>
+                                                </Dialog>
+                                                    <Button 
+                                                    variant="outlined" 
+                                                    color="secondary" 
+                                                    size="small"
+                                                    onClick={() => handleRemoveButtonClick(rake)}
+                                                >
+                                                    Remove
+                                                </Button>
+                                                </Grid>
+                                            </Grid>
+                                        </TableCell>
                                     </TableRow>
                                 ))}
                             </TableBody>
                         </Table>
                     </TableContainer>
-                </div>
+                </div>         
             )}
         </div>
     );
