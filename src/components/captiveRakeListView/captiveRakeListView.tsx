@@ -298,21 +298,21 @@ const CaptiveRakeListView = () => {
                                         className="table-row"
                                     >
                                         <TableCell>{page * rowsPerPage + index + 1}</TableCell>
-                                        <TableCell>{rake.name}</TableCell>
-                                        <TableCell>{rake.from.join(', ')}</TableCell>
-                                        <TableCell>{rake.to.join(', ')}</TableCell>
-                                        <TableCell>{rake.location.join(', ')}</TableCell>
-                                        <TableCell>{rake.statue}</TableCell>
-                                        <TableCell>{rake.eta}</TableCell>
-                                        <TableCell>{rake.remaining_distance}</TableCell>
+                                        <TableCell>{rake.name || 'N/A'}</TableCell>
+                                        <TableCell>{rake.from.join(', ') || 'N/A'}</TableCell>
+                                        <TableCell>{rake.to.join(', ') || 'N/A'}</TableCell>
+                                        <TableCell>{rake.location.join(', ') || 'N/A'}</TableCell>
+                                        <TableCell>{rake.statue || 'N/A'}</TableCell>
+                                        <TableCell>{rake.eta || 'N/A'}</TableCell>
+                                        <TableCell>{rake.remaining_distance || 'N/A'}</TableCell>
                                         <TableCell>
-                                                <span>{timeService.utcToist(rake.bpc.exp, 'dd-MM-yyyy HH:mm')}</span>
+                                                <span>{timeService.utcToist(rake.bpc.exp, 'dd-MM-yyyy HH:mm') || 'N/A'}</span>
                                         </TableCell>
                                         <TableCell>
                                                 <span>{(rake.bpc.rem_km) || 'N/A'}</span>
                                         </TableCell>
-                                        <TableCell>{rake.fois_date}</TableCell>
-                                        <TableCell>{rake.updated_at}</TableCell>
+                                        <TableCell>{rake.fois_date || 'N/A'}</TableCell>
+                                        <TableCell>{rake.updated_at || 'N/A'}</TableCell>
                                         <TableCell>{rake.route ? rake.route.name : 'N/A'}</TableCell>
                                         <TableCell>
                                         <Grid container spacing={1} alignItems="center">
