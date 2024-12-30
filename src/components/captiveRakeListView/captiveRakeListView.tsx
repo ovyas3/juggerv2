@@ -50,14 +50,14 @@ interface RakeData {
     eta: string;
     updated_at: string;
     fois_date: string;
-    route?: {
+    route?: Array<{
         _id?: string | undefined;
         name: string;
         from: string;
         to: string;
         via: string[];
         shipper: string;
-    };
+    }>;
 }
 
 const CaptiveRakeListView = () => {
@@ -100,7 +100,7 @@ const CaptiveRakeListView = () => {
     
     const handleRemoveConfirmation = () => {
         if (selectedRakeForRemove) {
-            handleRemoveRoute(selectedRakeForRemove.route?._id || '');
+            handleRemoveRoute(selectedRakeForRemove.route?.[0]?._id || '');
         }
         setRemoveConfirmationOpen(false);
         setSelectedRakeForRemove(null);
@@ -185,16 +185,14 @@ const CaptiveRakeListView = () => {
 
     const handleLinkRoute = async (rake: RakeData) => {
         try {
-            if (!rake.route || !rake.route._id) {
+            if (!rake.route || !rake.route[0]._id) {
                 showMessage('No route information available', 'warning');
                 return;
             }
     
-            const routeId = rake.route._id;
-    
             const response = await httpsPost('cr_rakes/linkRoute', {
-                rake: rake.route._id,
-                route: rake.route.via[0]
+                rake: rake.route[0]._id,
+                route: rake.route[0].via[0]
             });
     
             if (response.statusCode === 200) {
@@ -313,7 +311,7 @@ const CaptiveRakeListView = () => {
                                         </TableCell>
                                         <TableCell>{rake.fois_date || 'N/A'}</TableCell>
                                         <TableCell>{rake.updated_at || 'N/A'}</TableCell>
-                                        <TableCell>{rake.route ? rake.route.name : 'N/A'}</TableCell>
+                                        <TableCell>{rake.route ? rake.route[0]?.name : 'N/A'}</TableCell>
                                         <TableCell>
                                         <Grid container spacing={1} alignItems="center">
                                             <Grid item>
@@ -321,6 +319,7 @@ const CaptiveRakeListView = () => {
                                                     open={linkConfirmationOpen}
                                                     onClose={handleLinkCancel}
                                                     maxWidth="md"
+                                                    className="custom-dialog"
                                                     BackdropProps={{
                                                         style: {
                                                             backgroundColor: 'rgba(0, 0, 0, 0.1)', 
@@ -358,6 +357,7 @@ const CaptiveRakeListView = () => {
                                                     open={removeConfirmationOpen}
                                                     onClose={handleRemoveCancel}
                                                     maxWidth="md"
+                                                    className="custom-dialog"
                                                     BackdropProps={{
                                                         style: {
                                                             backgroundColor: 'rgba(0, 0, 0, 0.1)', 

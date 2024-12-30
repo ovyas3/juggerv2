@@ -144,3 +144,7 @@
     word-wrap: break-word;
     overflow-wrap: break-word;
 }
+
+.custom-dialog .MuiDialog-paper {
+    box-shadow: 0 3px 5px rgba(93,93,93,0.9) !important;
+}
