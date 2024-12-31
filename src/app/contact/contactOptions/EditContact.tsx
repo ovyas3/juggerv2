@@ -12,7 +12,7 @@ const reasons = [
   { value: "delay", label: "Delay" },
   { value: "status-update", label: "Status update" },
   { value: "recovery", label: "Recovery of missing wagon" },
-  //   { value: "others", label: "Others" },
+  { value: "others", label: "Others" },
 ];
 
 function EditContact({ contact, isClose,getContactDetails }: any) {
@@ -23,14 +23,17 @@ function EditContact({ contact, isClose,getContactDetails }: any) {
   const [reason, setReason] = useState<null | string>('Select Reason');
   const [rating, setRating] = useState<null | number>(0);
   const { showMessage } = useSnackbar();
-
-
+  const [customReason, setCustomReason] = useState<null | string>(null);
 
   const submitContact = async () => {
+    if(reason === 'Others' && !customReason){
+      showMessage('Please Enter Other Reason', 'error');
+      return;
+    }
     let payload = {
         id: contact.id, 
         comment,
-        reason,
+        reason: reason === 'Others' ? customReason : reason,
         rating,
         phone_no: contact?.contact,
     }
@@ -139,6 +142,14 @@ function EditContact({ contact, isClose,getContactDetails }: any) {
             </div>
           )}
         </div>
+        {reason === "Others" && (
+          <div id='editFiledContainer'>
+            <label id="editHeader">{text("otherReasons")}</label>
+            <div id="stationNameInput">
+              <input onChange={(e)=>{setCustomReason(e.target.value)}} type="text" placeholder="Enter Your Reasons" style={{ width: "100%", border: "none", outline: "none", color: "black", fontSize: "12px", paddingBottom:'4px'}} />
+            </div>
+          </div>
+        )}
 
         <div id="editFiledContainer">
           <label id="editHeader">{text("editComment")}</label>

@@ -321,7 +321,8 @@
     "reasons":"Reasons",
     "rate":"Rate Us",
     "submit":"Submit",
-    "deleteContactHeader":"Delete Contact"
+    "deleteContactHeader":"Delete Contact",
+    "otherReasons":"Other Reasons"
   },
   "SETTINGS": {
     "updateETA": "Update ETA",

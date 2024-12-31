@@ -423,8 +423,6 @@ export default function WagonsDashboard() {
     setYAxisTicks(ticks);
   }, [data, isPercentage, isRupees, isTonnage]);
 
-  // Calculate overall statistics
-
   if (loading) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
@@ -469,6 +467,7 @@ export default function WagonsDashboard() {
               alignItems: 'center',
               gap: '10px',
             }}>
+
             <Typography variant="body1" gutterBottom
             sx={{
               fontSize: '14px',
@@ -479,6 +478,7 @@ export default function WagonsDashboard() {
             }}>
               {text('opportunityLossType')}
             </Typography>
+
             <RadioGroup row value={opportunityLossType} onChange={handleOpportunityLossChange}
             sx={{
               fontFamily: '"Inter", sans-serif',
@@ -508,42 +508,11 @@ export default function WagonsDashboard() {
                 fontFamily: '"Inter", sans-serif',
               }} />
             </RadioGroup>
-            {/* {
-              isPercentage || isRupees || isTonnage ? (
-                <Typography variant="body1" gutterBottom
-                  sx={{
-                    fontSize: '13px',
-                    color: '#ff0000',
-                    paddingTop: '8px',
-                    fontWeight: '500',
-                    fontFamily: '"Inter", sans-serif',
-                    cursor: 'pointer',
 
-                    '&:hover': {
-                      textDecoration: 'underline',
-                    }
-                  }}
-                  onClick={() => {
-                    setOpportunityLossType('');
-                    setIsPercentage(false);
-                    setIsRupees(false);
-                    setIsTonnage(false);
-                    setYAxisLabel('No. of Wagons Ordered');
-                    setBarDataKeys({
-                      totalOrdered: 'totalOrdered',
-                      fullyUtilized: 'fullyUtilized',
-                      partiallyUtilized: 'partiallyUtilized'
-                    });
-                  }}
-                  >
-                    Clear
-                </Typography>
-              ) : (
-                null
-              )
-            } */}
+            
             </div>
           </FormControl>
+
           <Box display="flex" alignItems="center">
             <IconButton onClick={handleDownload}>
               <Image src={DownloadIcon} alt='Download' />
@@ -623,8 +592,8 @@ export default function WagonsDashboard() {
                     </>
                 ) : isRupees ? (
                     <>
-                      <Bar dataKey={barDataKeys?.lossFrieghtAmount} name="Loss Frieght Amount" stackId="a" fill="#A4ABFF"/>
-                      <Bar dataKey={barDataKeys?.actualFrieghtAmount} name="Actual Frieght Amount" stackId="a" fill="#596CFF"/>
+                      <Bar dataKey={barDataKeys?.lossFrieghtAmount} name="Loss Freight Amount" stackId="a" fill="#A4ABFF"/>
+                      <Bar dataKey={barDataKeys?.actualFrieghtAmount} name="Actual Freight Amount" stackId="a" fill="#596CFF"/>
                     </>
                 )
                   : (
@@ -698,13 +667,6 @@ export default function WagonsDashboard() {
             </StatBox>
           </Box>
         </Box>
-      </StyledBox>
-    // <div className='wagon-dashboard-container'>
-    //   <Header title='Wagons Dashboard' isMapHelper={false} />
-    //   <div className='wagon-dashboard-container-main'>
-      
-    //   </div>
-    //   <SideDrawer />
-    // </div>
+    </StyledBox>
   );
 }
