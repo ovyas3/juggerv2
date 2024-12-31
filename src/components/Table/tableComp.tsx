@@ -951,7 +951,7 @@ export const MarkPlacement = ({isClose ,shipment, getAllShipment, different = 'm
             showMessage('Please Select Date', 'error');
             return;
         }
-        if(!avetoInplant){
+        if(!avetoInplant && different !== 'releaseTime'){
             showMessage('Please Allow The Condition', 'error');
             return
         }

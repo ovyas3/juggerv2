@@ -10,8 +10,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import dynamic from 'next/dynamic';
 import Placeholder from '@/components/MapView/Skeleton/placeholder';
 import { useMediaQuery, useTheme } from '@mui/material';
+import CaptiveRakeListView from "@/components/captiveRakeListView/captiveRakeListView";
 
-// Dynamic imports with loading placeholder
 const MapView = dynamic(
   () => import('../mapView/mapView'),
   { 
@@ -41,7 +41,6 @@ const Tabsection: React.FC<TabSectionProps> = ({ initialTab }) => {
   const t = useTranslations("DASHBOARD");
 
   useEffect(() => {
-    // Check for tab parameter in URL
     const tabFromUrl = searchParams.get('tab');
     if (tabFromUrl) {
       setValue(tabFromUrl);
@@ -52,7 +51,6 @@ const Tabsection: React.FC<TabSectionProps> = ({ initialTab }) => {
 
   const handleChange = (event: React.ChangeEvent<{}>, newValue: string) => {
     setValue(newValue);
-    // Update URL with new tab value
     const url = new URL(window.location.href);
     url.searchParams.set('tab', newValue);
     window.history.pushState({}, '', url);
@@ -70,19 +68,15 @@ const Tabsection: React.FC<TabSectionProps> = ({ initialTab }) => {
                 marginTop: !mobile ? '0px' : '48px'
               }}>
                 <TabList onChange={handleChange}>
-                  <Tab label={t("Overview")} value="1" />
-                  <Tab label={t("Insights")} value="2" />
+                  <Tab label={t("ListView")} value="1" />
+                  <Tab label={t("MapView")} value="2" />
                 </TabList>
               </Box>
               <TabPanel value="1" className="tabpanel-container">
-                <div >
-                  <CaptiveRakeMapView />
-                </div>
+                <CaptiveRakeListView />
               </TabPanel>
               <TabPanel value="2" className="tabpanel-container">
-                <div style={{display:'flex',alignItems:'center',justifyContent:'center',height:'50vh'}}>
-                  <h1>Coming Soon</h1>
-                </div>
+                <CaptiveRakeMapView />
               </TabPanel>
             </TabContext>
           </Box>
