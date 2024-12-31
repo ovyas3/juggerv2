@@ -362,11 +362,11 @@ const CaptiveRakeListView = () => {
     };
 
     const handleRemoveRoute = async (rake: any) => {
-        if (!rake || !rake._id) {
+        if (!rake || !rake.rake) {
             showMessage('Please select a rake', 'error');
             return;
         };
-        const rakeId = rake?._id;
+        const rakeId = rake?.rake;
         try {
             const response = await httpsPost('cr_rakes/removeRoute', {
                 rake: rakeId
@@ -374,7 +374,7 @@ const CaptiveRakeListView = () => {
 
             if (response.statusCode === 200) {
                 showMessage('Route removed successfully', 'success');
-
+                handleRemoveRouteClose();
                 await fetchRakeList(activeRakeFilter);
             } else {
                 showMessage(response.msg || 'Failed to remove route', 'error');
@@ -570,12 +570,12 @@ const CaptiveRakeListView = () => {
                                                     <TableCell align="left" className="table-rows">{rake.route ? rake.route[0]?.name : 'N/A'}</TableCell>
                                                     <TableCell align="left" className="table-rows">
                                                         {
-                                                            rake.route ? (
-                                                                <Image src={Plus} alt="Plus" onClick={() => handleLinkButtonClick(rake)} style={{
+                                                            rake.route && rake.route.length > 0 ? (
+                                                                <Image src={Minus} alt="Minus" onClick={() => handleRemoveButtonClick(rake)} style={{
                                                                     cursor: 'pointer'
                                                                 }} />
                                                             ) : (
-                                                                <Image src={Minus} alt="Minus" onClick={() => handleRemoveButtonClick(rake)} style={{
+                                                                <Image src={Plus} alt="Plus" onClick={() => handleLinkButtonClick(rake)} style={{
                                                                     cursor: 'pointer'
                                                                 }} />
                                                             )
