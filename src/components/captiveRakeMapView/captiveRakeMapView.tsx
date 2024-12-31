@@ -1319,7 +1319,7 @@ export default function CaptiveRakeMapView() {
                             <strong>Rake Status:</strong>{" "}
                             {marker.stts_code
                               ? rakeStatus[marker.stts_code]
-                              : "N/A" || "N/A"}
+                              : "N/A"}
                           </p>
                           <p style={{ margin: "2px 0" }}>
                             <strong>From Station:</strong>{" "}

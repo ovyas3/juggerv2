@@ -123,7 +123,7 @@ function StationAdd({ setOpenAddStationModal, getStations, stationPayload, editS
                     setLoaderForStationCode(false);
                     return;
                 }
-                await httpsGet(`get/station_code?stationCode=${value}`, 1, router).then((response) => {
+                await httpsGet(`get/stationDetails?stdCode=${value}`, 0, router).then((response) => {
                     if(response.data.length > 0){
                         setStationList(response.data);
                         setLoaderForStationCode(false);
