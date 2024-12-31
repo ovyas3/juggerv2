@@ -109,6 +109,13 @@
     font-weight: 600;
 }
 
+.no-data-found{
+    text-align: center;
+    font-size: 13px;
+    color: #000;
+    font-weight: 600;
+}
+
 @media (max-width: 640px) {
     .in-plant-wagons-main {
         padding: 0.75rem;

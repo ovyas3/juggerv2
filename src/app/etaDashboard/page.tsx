@@ -328,9 +328,9 @@ function EtaDashboard() {
             <DestinationWiseTrend />
           </CustomTabPanel>
           <CustomTabPanel value={value} index={5}>
-            {/* <InPlantWagons /> */}
+            <InPlantWagons />
             {/* Coming Soon */}
-            <div className="coming_soon">Coming Soon</div>
+            {/* <div className="coming_soon">Coming Soon</div> */}
           </CustomTabPanel>
           {/* <CustomTabPanel value={value} index={6}>
             <RakeCharges />
