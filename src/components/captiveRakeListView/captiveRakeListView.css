@@ -232,7 +232,7 @@
 .list-view-routes-dialog-styles .MuiDialog-container .MuiDialog-paper {
     position: relative;
     border-radius: 12px !important;
-    min-height: 40%;
+    min-height: 74%;
     overflow-y: unset;
     width: 70vw !important;
     max-width: 70vw !important;

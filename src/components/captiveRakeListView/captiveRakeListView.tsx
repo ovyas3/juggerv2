@@ -344,7 +344,7 @@ const CaptiveRakeListView = () => {
         try {
             const payload = {
                 route: selectedRoute._id,
-                rake: selectedRake._id
+                rake: selectedRake.rake
             };
             const response = await httpsPost('cr_rakes/linkRoute', payload);
 
