@@ -321,7 +321,6 @@ export const MarkPlacement = ({
     </div>
   );
 };
-
 export const AssignToMill = ({
   isClose,
   shipmentForWagonSheet,
@@ -746,18 +745,17 @@ export const AddIndentNumber = ({
       setLoading(true);
       const response = await httpsPost("rake_shipment/add_indent_no", payload, router);
       if (response?.statusCode === 200) {
+        showMessage.showMessage('Indent Number Added Successfully.',"success")
         getWagonDetails();
         isClose(false);
       } else {
-        showMessage.showMessage('Something went wrong.',"error")
+        console.log(response.message);
+        showMessage.showMessage(response.message,"error")
         isClose(false);
       }
-
-    } catch (error) {
+    } finally{
       setLoading(false);
-      showMessage.showMessage('Something went wrong.',"error")
-      console.log(error);
-    } 
+    }
   }
 
   if (loading) {

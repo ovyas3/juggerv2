@@ -1064,7 +1064,7 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
             {openUploadWagonSheet && <UploadWagonSheet isClose={setOpenUploadWagonSheet} shipment={uploadWagonSheetId} />  }
             {openModifyStatus && <MarkComplete isClose={setOpenModifyStatus} shipment={modifyStatusId} getAllShipment={getAllShipment} totalCount={totalCount} query={query} setTotalCountrake={setTotalCountrake} />}
             {cancel && 
-             <HandlingEdemand isOpen={cancel} isClose={()=> setCancel(false)} shipment={cancelShipID} getAllShipment={getAllShipment}/>}
+             <HandlingEdemand isOpen={cancel} isClose={()=> setCancel(false)} shipment={cancelShipID} getAllShipment={getAllShipment} totalCount={totalCount} query={query} />}
              {openEtaModel && 
              <HandlingETA isOpen={openEtaModel} isClose={()=> setOpenEtaModal(false)} shipment={updateEtaShipID} getAllShipment={getAllShipment} difference={differenceETA} />}
              {contactModal && <ContactModal isClose={setContactModal} shipment={contactData} />}
