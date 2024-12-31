@@ -640,6 +640,9 @@ const MapLayers = () => {
       setIdleShipments(total);
     }
 
+    setCaptiveRakeCount(filteredShipments.filter((shipment: any) => shipment.status === "INPL" || shipment.status === "ITNS").filter((shipment: any) => shipment.is_captive).length);
+    setIndianRakeCount(filteredShipments.filter((shipment: any) => shipment.status === "INPL" || shipment.status === "ITNS").filter((shipment: any) => !shipment.is_captive).length);
+
     setShowAll(false);
     setShowFiltered(true);
     const filteredWithTracking = filteredShipments.map((shipment) => {
@@ -1301,9 +1304,7 @@ const MapLayers = () => {
                   borderRadius: "8px",
                   boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1), 0px 1px 3px rgba(0, 0, 0, 0.08)",
                   fontSize: "12px",
-                  // fontWeight: "bold",
                   color: "#131722",
-                  // cursor: "pointer",
                   paddingInline: "6px",
                 }}
               >
@@ -1323,16 +1324,15 @@ const MapLayers = () => {
                   <div className={`shipment-type-rakes ${rakeStatusSelected === 'TOTAL' ? 'selectedRakeType' : ''}`}
                   onClick={()=>{
                     setRakeStatusSelected('TOTAL')
-                    setAllShipments(originalData.filter(shipment => shipment.status === 'ITNS' || shipment.status === 'INPL'));
+                    setAllShipments(filteredShipments.filter(shipment => shipment.status === 'ITNS' || shipment.status === 'INPL'));
                     setShowFiltered(false);
                     setShowAll(true);
                     setShowSearched(false);
                     setShowRakeTypeFiltered(false);
-                    setCurrentFocusstatus('');
                     setShowIdle(true);
                     setShowInTransit(true);
-                    setIdleShipments(getTrackingShipment(originalData.filter(shipment => shipment.status === 'ITNS' || shipment.status === 'INPL')));
-                    setInTransitShipments(getTrackingShipment(originalData.filter(shipment => shipment.status === 'ITNS' || shipment.status === 'INPL')));
+                    setIdleShipments(getTrackingShipment(filteredShipments.filter(shipment => shipment.status === 'ITNS' || shipment.status === 'INPL')));
+                    setInTransitShipments(getTrackingShipment(filteredShipments.filter(shipment => shipment.status === 'ITNS' || shipment.status === 'INPL')));
                   }}
                   >
                     <div className="shipment-type-rakes-count">{indianRakeCount + captiveRakeCount}</div>
@@ -1341,16 +1341,15 @@ const MapLayers = () => {
                   <div className={`shipment-type-rakes ${rakeStatusSelected === 'IR' ? 'selectedRakeType' : ''}`}
                   onClick={()=>{
                     setRakeStatusSelected('IR')
-                    setAllShipments(originalData.filter(shipment => shipment.status === 'ITNS' || shipment.status === 'INPL').filter(shipment => !shipment.is_captive));
+                    setAllShipments(filteredShipments.filter(shipment => shipment.status === 'ITNS' || shipment.status === 'INPL').filter(shipment => !shipment.is_captive));
                     setShowFiltered(false);
                     setShowAll(true);
                     setShowSearched(false);
                     setShowRakeTypeFiltered(false);
-                    setCurrentFocusstatus('');
                     setShowIdle(true);
                     setShowInTransit(true);
-                    setIdleShipments(getTrackingShipment(originalData.filter(shipment => shipment.status === 'ITNS' || shipment.status === 'INPL').filter(shipment => !shipment.is_captive)));
-                    setInTransitShipments(getTrackingShipment(originalData.filter(shipment => shipment.status === 'ITNS' || shipment.status === 'INPL').filter(shipment => !shipment.is_captive)));
+                    setIdleShipments(getTrackingShipment(filteredShipments.filter(shipment => shipment.status === 'ITNS' || shipment.status === 'INPL').filter(shipment => !shipment.is_captive)));
+                    setInTransitShipments(getTrackingShipment(filteredShipments.filter(shipment => shipment.status === 'ITNS' || shipment.status === 'INPL').filter(shipment => !shipment.is_captive)));
                   }}
                   >
                     <div className="shipment-type-rakes-count">{indianRakeCount}</div>
@@ -1359,16 +1358,15 @@ const MapLayers = () => {
                   <div className={`shipment-type-rakes ${rakeStatusSelected === 'CR' ? 'selectedRakeType' : ''}`}
                   onClick={()=>{
                     setRakeStatusSelected('CR')
-                    setAllShipments(originalData.filter(shipment => shipment.status === 'ITNS' || shipment.status === 'INPL').filter(shipment => shipment.is_captive));
+                    setAllShipments(filteredShipments.filter(shipment => shipment.status === 'ITNS' || shipment.status === 'INPL').filter(shipment => shipment.is_captive));
                     setShowFiltered(false);
                     setShowAll(true);
                     setShowSearched(false);
                     setShowRakeTypeFiltered(false);
-                    setCurrentFocusstatus('');
                     setShowIdle(true);
                     setShowInTransit(true);
-                    setIdleShipments(getTrackingShipment(originalData.filter(shipment => shipment.status === 'ITNS' || shipment.status === 'INPL').filter(shipment => shipment.is_captive)));
-                    setInTransitShipments(getTrackingShipment(originalData.filter(shipment => shipment.status === 'ITNS' || shipment.status === 'INPL').filter(shipment => shipment.is_captive)));
+                    setIdleShipments(getTrackingShipment(filteredShipments.filter(shipment => shipment.status === 'ITNS' || shipment.status === 'INPL').filter(shipment => shipment.is_captive)));
+                    setInTransitShipments(getTrackingShipment(filteredShipments.filter(shipment => shipment.status === 'ITNS' || shipment.status === 'INPL').filter(shipment => shipment.is_captive)));
                   }}
                   >
                     <div className="shipment-type-rakes-count">{captiveRakeCount}</div>

@@ -24,6 +24,7 @@ import WagonTypeWiseRakeTrend from "./wagonTypeWiseRakeTrend/wagonTypeWiseRakeTr
 import DestinationWiseTrend from "./destinationWiseTrend/destinationWiseTrend";
 import InPlantWagons from "./inPlantWagons/inPlantWagons";
 import { useMediaQuery, useTheme } from '@mui/material';
+import RakeCharges from './rakeCharges/RakeCharges'
 
 // Custom styled components
 const StyledTabs = styled(Tabs)({
@@ -213,6 +214,7 @@ function EtaDashboard() {
               <StyledTab label="Rake" />
               <StyledTab label="Destination" />
               <StyledTab label="In Plant Wagons" />
+              {/* <StyledTab label="Rake Charges" /> */}
             </StyledTabs>
           </Box>
           <CustomTabPanel value={value} index={0}>
@@ -330,6 +332,9 @@ function EtaDashboard() {
             {/* Coming Soon */}
             <div className="coming_soon">Coming Soon</div>
           </CustomTabPanel>
+          {/* <CustomTabPanel value={value} index={6}>
+            <RakeCharges />
+          </CustomTabPanel> */}
         </Box>
         
       </div>
