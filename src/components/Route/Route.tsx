@@ -102,7 +102,7 @@ const Route = () => {
   const router = useRouter();
   const { showMessage } = useSnackbar();
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rowsPerPage, setRowsPerPage] = useState(20);
   const [routeOpen, setRouteOpen] = useState(false);
   const [map, setMap] = useState<L.Map | null>(null);
   const [routeName, setRouteName] = useState('');
@@ -379,7 +379,7 @@ const Route = () => {
         <div className='route-settings-body'>
           <div className='route-settings-table-wrapper'>
             <TablePagination
-              rowsPerPageOptions={[5, 10, 25, 100]}
+              rowsPerPageOptions={[5, 10, 20, 50, 100]}
               component="div"
               count={routeData.length}
               rowsPerPage={rowsPerPage}

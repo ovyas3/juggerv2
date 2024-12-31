@@ -548,15 +548,8 @@ const CaptiveRakeListView = () => {
                                                         }
                                                     </TableCell>
                                                     <TableCell align="left" className="table-rows">
-                                                        {rake.eta ? (
-                                                            <>
-                                                                <span>{rake.eta.split(' ')[0]}</span> {/* Date */}
-                                                                <br />
-                                                                <span>{rake.eta.split(' ')[1]}</span> {/* Time */}
-                                                            </>
-                                                        ) : (
-                                                            'N/A'
-                                                        )}
+                                                        <span>{timeService.utcToist(rake.eta, 'dd-MM-yyyy') || 'N/A'}</span> <br />
+                                                        <span>{timeService.utcToistTime(rake.eta, 'HH:mm') || 'N/A'}</span>
                                                     </TableCell>
                                                     <TableCell align="left" className="table-rows">{rake.remaining_distance || 'N/A'}</TableCell>
                                                     <TableCell align="left" className="table-rows">
@@ -567,26 +560,12 @@ const CaptiveRakeListView = () => {
                                                         <span>{(rake.bpc.rem_km) || 'N/A'}</span>
                                                     </TableCell>
                                                     <TableCell align="left" className="table-rows">
-                                                        {rake.fois_date ? (
-                                                            <>
-                                                                <span>{rake.fois_date.split(' ')[0]}</span> {/* Date */}
-                                                                <br />
-                                                                <span>{rake.fois_date.split(' ')[1]}</span> {/* Time */}
-                                                            </>
-                                                        ) : (
-                                                            'N/A'
-                                                        )}
+                                                        <span>{timeService.utcToist(rake.fois_date, 'dd-MM-yyyy') || 'N/A'}</span> <br />
+                                                        <span>{timeService.utcToistTime(rake.fois_date, 'HH:mm') || 'N/A'}</span>
                                                     </TableCell>
                                                     <TableCell align="left" className="table-rows">
-                                                        {rake.updated_at ? (
-                                                            <>
-                                                                <span>{rake.updated_at.split(' ')[0]}</span> {/* Date */}
-                                                                <br />
-                                                                <span>{rake.updated_at.split(' ')[1]}</span> {/* Time */}
-                                                            </>
-                                                        ) : (
-                                                            'N/A'
-                                                        )}
+                                                        <span>{timeService.utcToist(rake.updated_at, 'dd-MM-yyyy') || 'N/A'}</span> <br />
+                                                        <span>{timeService.utcToistTime(rake.updated_at, 'HH:mm') || 'N/A'}</span>
                                                     </TableCell>
                                                     <TableCell align="left" className="table-rows">{rake.route ? rake.route[0]?.name : 'N/A'}</TableCell>
                                                     <TableCell align="left" className="table-rows">
