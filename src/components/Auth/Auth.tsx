@@ -23,7 +23,7 @@ const AuthController = () => {
   }
 
   const checkSum = async (rms_auth: string) => {
-    const from = localStorage.getItem('isRmsLogin') === 'true' ? 'rms_login' : rms_auth ? 'tms_rms' : '' || '';
+    const from = localStorage.getItem('isRmsLogin') === 'true' ? 'rms_login' : (rms_auth ? 'tms_rms' : '');
     const isAuth = await checkAuth(from,rms_auth);
     if (isAuth) {
       getPreferences()

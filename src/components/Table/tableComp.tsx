@@ -1146,7 +1146,7 @@ export const MarkPlacement = ({isClose ,shipment, getAllShipment, different = 'm
     );
 }
 
-export const HandlingEdemand = ({ isClose, isOpen, getAllShipment, shipment }: any) => {
+export const HandlingEdemand = ({ isClose, isOpen, getAllShipment, shipment, totalCount, query}: any) => {
     const router = useRouter();
     const { showMessage } = useSnackbar();
         const payload = {
@@ -1158,6 +1158,15 @@ export const HandlingEdemand = ({ isClose, isOpen, getAllShipment, shipment }: a
               if (response?.statusCode === 200) {
                 isClose(false);
                 getAllShipment();
+                if (query.from && query.to) {
+                    totalCount(query.from, query.to).then((res: any) => {
+                      if (res && res.statusCode == 200) {
+                        showMessage('Removed successfully', 'success');
+                      }
+                    }).catch((err: any) => {
+                      console.log(err);
+                    });
+                }
                 showMessage('Removed successfully', 'success');
               } else {
                 showMessage('Failed to remove', 'error');

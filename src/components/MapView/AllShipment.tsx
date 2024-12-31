@@ -397,93 +397,35 @@ const MapLayers = () => {
 
   const [selectedShipment, setSelectedShipment] = useState<any | null>(null);
   const [allShipments, setAllShipments] = useState<any[]>([]);
-  const [totalCount, setTotalCount] = useState<number>(0);
+
   const [inTransitCount, setInTransitCount] = useState<number>(0);
   const [idleCount, setIdleCount] = useState<number>(0);
-  const [deliveryCount, setDeliveryCount] = useState<number>(0);
   const [idleShipments, setIdleShipments] = useState<any[]>([]);
   const [inTransitShipments, setInTransitShipments] = useState<any[]>([]);
-  const [deliveredShipments, setDeliveredShipments] = useState<any[]>([]);
   const [filteredShipments, setFilteredShipments] = useState<any[]>([]);
   const [searcedShipments, setSearchedShipments] = useState<any[]>([]);
   const [showSearched, setShowSearched] = useState<boolean>(false);
   const [showFiltered, setShowFiltered] = useState<boolean>(false);
   const [showAll, setShowAll] = useState<boolean>(true);
-  const [isTotal, setIsTotal] = useState(true);
   const [showIdle, setShowIdle] = useState<boolean>(true);
   const [showInTransit, setShowInTransit] = useState<boolean>(true);
-  const [showDelivered, setShowDelivered] = useState<boolean>(true);
-  const [selectedFromDate, setSelectedFromDate] =
-    React.useState<dayjs.Dayjs | null>(null);
-  const [selectedToDate, setSelectedToDate] =
-    React.useState<dayjs.Dayjs | null>(null);
-  const [openFromDatePicker, setOpenFromDatePicker] = useState(false);
-  const [openToDatePicker, setOpenToDatePicker] = useState(false);
-  const [trackingNonTracking, setTrackingNonTracking] =
-    useState<TrackingStatus>({ tracking: 0, notTracking: 0 });
-  const [rakeType, setRakeType] = useState([
-    "Captive Rakes",
-    "Indian Railway Rakes",
-  ]);
+  const [selectedFromDate, setSelectedFromDate] = React.useState<dayjs.Dayjs | null>(null);
+  const [selectedToDate, setSelectedToDate] = React.useState<dayjs.Dayjs | null>(null);
+  const [rakeType, setRakeType] = useState(["Captive Rakes", "Indian Railway Rakes"]);
   const [showRakeTypeFiltered, setShowRakeTypeFiltered] = useState(false);
-  const [rakeTypeFilteredShipments, setRakeTypeFilteredShipments] = useState<
-    any[]
-  >([]);
-  const [isTracking, setIsTracking] = useState(0);
-  const [filteredShipmentsBackup, setFilteredShipmentsBackup] = useState<any[]>(
-    []
-  );
-
-  const [selectedType, setSelectedType] = useState("FNR No.");
-  const [searchInput, setSearchInput] = useState("");
+  const [rakeTypeFilteredShipments, setRakeTypeFilteredShipments] = useState<any[]>([]);
   const router = useRouter();
-
-  const [inPlantCaptive, setInPlantCaptive] = useState<captive_rakes>({
-    captive: 0,
-    indian: 0,
-  });
-  const [inTransitCaptive, setInTransitCaptive] = useState<captive_rakes>({
-    captive: 0,
-    indian: 0,
-  });
-  const [deliveredCaptive, setDeliveredCaptive] = useState<captive_rakes>({
-    captive: 0,
-    indian: 0,
-  });
-  const [totalCaptive, setTotalCaptive] = useState<captive_rakes>({
-    captive: 0,
-    indian: 0,
-  });
-
-  const [headingFilters, setHeadingFilters] = useState("");
-  const [headingColors, setHeadingColors] = useState("");
-
-  const [trackingByFoisGps, setTrackingByFoisGps] = useState<any>({
-    foiscount: 0,
-    gpscount: 0,
-  });
-  const [trackingAvailed, setTrackingAvailed] = useState<any>(false);
-  const [shipmentMapView, setShipmentMapView] = useState<any>([]);
-  const [trackingTypeSelected, setTrackingTypeSelected] = useState<any>({
-    fois: false,
-    gps: false,
-  });
   const [originalData, setOriginalData] = useState<any[]>([]);
-  const [hiddenTrackingInfo, setHiddenTrackingInfo] = useState<any>(false);
-
-  const [crLabelName, setCrLabelName] = useState("");
-  const [fnrTerm, setFnrTerm] = useState("");
-  const [crNames, setCrNames] = useState<any[]>([]);
-  const [inputCRValue, setInputCRValue] = useState("");
-  const [selectedCR, setSelectedCR] = useState("");
   const [isCROpen, setIsCROpen] = useState(false);
-  const [filteredCROptions, setFilteredCrOptions] = useState<any[]>([]);
-
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState(searchOptions[0]);
   const [handleSearch, setHandleSearch] = useState<String | null>(null);
   const [is_outbound, setIs_outbound] = useState(true);
+
+  const [captiveRakeCount, setCaptiveRakeCount] = useState(0);
+  const [indianRakeCount, setIndianRakeCount] = useState(0);
+  const [rakeStatusSelected, setRakeStatusSelected] = useState<any>(null);
 
   useEffect(() => {
     if (!map) return;
@@ -522,19 +464,19 @@ const MapLayers = () => {
     fetchGeoJSON();
   }, [map]);
 
-  useEffect(() => {
-    const fetchNames = async () => {
-      const names = await httpsGet("get/captive_rakes_names", 0, router);
-      if (names.data && names.data.length > 0) {
-        setCrNames(names.data);
-        setFilteredCrOptions(names.data);
-      } else {
-        setCrNames([]);
-        setFilteredCrOptions([]);
-      }
-    };
-    fetchNames();
-  }, []);
+  // useEffect(() => {
+  //   const fetchNames = async () => {
+  //     const names = await httpsGet("get/captive_rakes_names", 0, router);
+  //     if (names.data && names.data.length > 0) {
+  //       setCrNames(names.data);
+  //       setFilteredCrOptions(names.data);
+  //     } else {
+  //       setCrNames([]);
+  //       setFilteredCrOptions([]);
+  //     }
+  //   };
+  //   fetchNames();
+  // }, []);
 
   useEffect(() => {
     if (map) {
@@ -598,7 +540,7 @@ const MapLayers = () => {
 
   useEffect(() => {
     setShowSearched(false);
-    setSearchInput("");
+    // setSearchInput("");
   }, [allShipments, filteredShipments]);
 
 
@@ -676,59 +618,28 @@ const MapLayers = () => {
 
   const filterShipments = (status: StatusKey, event: any) => {
     let filteredShipments: any[] = [];
-    setIsTracking(0);
-    if (status === "AVE" || status === "OB" || status === "INPL") {
-      setHiddenTrackingInfo(false);
-      setHeadingFilters("In Plant");
-      setHeadingColors("#3790CC");
+    setRakeStatusSelected(null);
+    if (status === "INPL") {
       setShowInTransit(false);
       setShowIdle(true);
-      filteredShipments = originalData.filter(
-        (shipment: any) => shipment.status === "INPL"
-      );
-      setTrackingNonTracking(countTracking(filteredShipments));
-      setTrackingByFoisGps(trackingByFoisGpsHook(filteredShipments));
-      setShipmentMapView(filteredShipments);
-      setTrackingTypeSelected({ fois: false, gps: false });
+      filteredShipments = originalData.filter((shipment: any) => shipment.status === "INPL");
       const idle = getTrackingShipment(filteredShipments);
       setIdleShipments(idle);
     } else if (status === "ITNS") {
       setShowIdle(false);
       setShowInTransit(true);
-      setHiddenTrackingInfo(false);
-      setHeadingFilters("In Transit");
-      setHeadingColors("#F6981D");
-      filteredShipments = originalData.filter(
-        (shipment: any) => shipment.status === "ITNS"
-      );
-      setTrackingNonTracking(countTracking(filteredShipments));
-      setTrackingByFoisGps(trackingByFoisGpsHook(filteredShipments));
-      setShipmentMapView(filteredShipments);
-      setTrackingTypeSelected({ fois: false, gps: false });
+      filteredShipments = originalData.filter((shipment: any) => shipment.status === "ITNS");
       const inTransit = getTrackingShipment(filteredShipments);
       setInTransitShipments(inTransit);
     } else if (status === "ALL") {
       setShowIdle(true);
-      setHiddenTrackingInfo(false);
-      setHeadingFilters("Total");
-      setHeadingColors("#40BE8A");
-      filteredShipments = originalData.filter(
-        (shipment: any) =>
-          shipment.status === "ITNS" || shipment.status === "INPL"
-      );
-      // setTrackingNonTracking(countTracking(filteredShipments));
-      // setTrackingByFoisGps(trackingByFoisGpsHook(filteredShipments))
-      setShipmentMapView(filteredShipments);
-      setTrackingTypeSelected({ fois: false, gps: false });
+      filteredShipments = originalData.filter((shipment: any) => shipment.status === "ITNS" || shipment.status === "INPL");
       const total = getTrackingShipment(filteredShipments);
       setShowInTransit(true);
       setInTransitShipments(total);
       setIdleShipments(total);
     }
 
-    // setShowIdle(status === "OB");
-    // setShowInTransit(status === 'ITNS');
-    // setShowDelivered(status === "Delivered");
     setShowAll(false);
     setShowFiltered(true);
     const filteredWithTracking = filteredShipments.map((shipment) => {
@@ -742,7 +653,6 @@ const MapLayers = () => {
       return { ...shipment, isTracking };
     });
     setFilteredShipments(filteredWithTracking);
-    setFilteredShipmentsBackup(filteredWithTracking);
     map?.flyTo(center, 5, { duration: 1 });
   };
 
@@ -763,7 +673,7 @@ const MapLayers = () => {
       payload["captive"] = selectedCRID;
     }
 
-    setIsTracking(0);
+    // setIsTracking(0);
     const shipments = await httpsPost("/shipment_map_view", payload, router);
     const inTransit = shipments.filter(
       (shipment: any) => shipment.status === "ITNS"
@@ -774,34 +684,34 @@ const MapLayers = () => {
     const delivered = shipments.filter(
       (shipment: any) => shipment.status === "Delivered"
     );
-    setTotalCount(shipments.length);
     setInTransitCount(inTransit.length);
     setIdleCount(idle.length);
-    setDeliveryCount(delivered.length);
+    setCaptiveRakeCount(shipments.filter((shipment: any) => shipment.status === "INPL" || shipment.status === "ITNS").filter((shipment: any) => shipment.is_captive).length);
+    setIndianRakeCount(shipments.filter((shipment: any) => shipment.status === "INPL" || shipment.status === "ITNS").filter((shipment: any) => !shipment.is_captive).length);
 
-    setInTransitCaptive(getCaptiveIndianRakes(inTransit));
-    setDeliveredCaptive(getCaptiveIndianRakes(delivered));
-    setInPlantCaptive(getCaptiveIndianRakes(idle));
-    setTotalCaptive(getCaptiveIndianRakes(shipments));
+    // setInTransitCaptive(getCaptiveIndianRakes(inTransit));
+    // setDeliveredCaptive(getCaptiveIndianRakes(delivered));
+    // setInPlantCaptive(getCaptiveIndianRakes(idle));
+    // setTotalCaptive(getCaptiveIndianRakes(shipments));
 
-    setHeadingFilters("In Transit");
-    setHeadingColors("#F6981D");
-    setTrackingByFoisGps(trackingByFoisGpsHook(inTransit));
-    setShipmentMapView(inTransit);
-    setTrackingTypeSelected({ fois: false, gps: false });
+    // setHeadingFilters("In Transit");
+    // setHeadingColors("#F6981D");
+    // setTrackingByFoisGps(trackingByFoisGpsHook(inTransit));
+    // setShipmentMapView(inTransit);
+    // setTrackingTypeSelected({ fois: false, gps: false });
 
     const inTransitShips = getTrackingShipment(inTransit);
     const idleShips = getTrackingShipment(idle);
     const deliveredShips = getTrackingShipment(delivered);
     setInTransitShipments(inTransitShips);
     setIdleShipments(idleShips);
-    setDeliveredShipments(deliveredShips);
+    // setDeliveredShipments(deliveredShips);
     setShowAll(true);
     setShowFiltered(false);
     setShowIdle(true);
     setShowInTransit(true);
-    setShowDelivered(true);
-    setTrackingNonTracking(countTracking(inTransit));
+    // setShowDelivered(true);
+    // setTrackingNonTracking(countTracking(inTransit));
 
     const allShipmentsWithTracking = [...inTransit, ...idle].map((shipment) => {
       const gpsFois =
@@ -830,8 +740,8 @@ const MapLayers = () => {
 
     const toTime = toParam ? dayjs(toParam) : dayjs();
     const fromTime = fromParam ? dayjs(fromParam) : toTime.subtract(30, "day");
-    setSelectedFromDate(fromTime.subtract(1, "day"));
-    setSelectedToDate(toTime.subtract(1, "day"));
+    setSelectedFromDate(fromTime);
+    setSelectedToDate(toTime);
   }, []);
 
   useEffect(() => {
@@ -1260,11 +1170,10 @@ const MapLayers = () => {
                   <div
                     onClick={(e) => {
                       filterShipments("ALL", e);
-                      setIsTotal(false);
                       setCurrentFocusstatus("TOTAL");
                     }}
                     id="total"
-                    className={currentFocusstatus === "TOTAL" ? "active" : ""}
+                    className={currentFocusstatus === "TOTAL" ? "activeShipmentMapView" : ""}
                     style={{ flex: 1, alignContent: "center" }}
                   >
                     <div style={{ fontWeight: "bold", fontSize: "24px" }}>
@@ -1276,11 +1185,10 @@ const MapLayers = () => {
                   <div
                     onClick={(e) => {
                       filterShipments("INPL", e);
-                      setIsTotal(false);
                       setCurrentFocusstatus("INPL");
                     }}
                     id="inpl"
-                    className={currentFocusstatus === "INPL" ? "active" : ""}
+                    className={currentFocusstatus === "INPL" ? "activeShipmentMapView" : ""}
                     style={{ flex: 1 }}
                   >
                     <div style={{ fontWeight: "bold", fontSize: "24px" }}>
@@ -1292,11 +1200,10 @@ const MapLayers = () => {
                   <div
                     onClick={(e) => {
                       filterShipments("ITNS", e);
-                      setIsTotal(false);
                       setCurrentFocusstatus("ITNS");
                     }}
                     id="itns"
-                    className={currentFocusstatus === "ITNS" ? "active" : ""}
+                    className={currentFocusstatus === "ITNS" ? "activeShipmentMapView" : ""}
                     style={{ flex: 1 }}
                   >
                     <div style={{ fontWeight: "bold", fontSize: "24px" }}>
@@ -1339,8 +1246,6 @@ const MapLayers = () => {
                     <div style={{ fontSize: 12, cursor: "pointer" }}>
                       {selectedOption?.label}
                     </div>
-                    {/* <ArrowDropDownIcon /> */}
-                    {/* ---selection Options--- */}
                     <div>
                       {isDropdownOpen && (
                         <div id='optionsContainer'>
@@ -1388,7 +1293,91 @@ const MapLayers = () => {
                 </div>
               </div>
 
-              <Box sx={{}} className="shipment-details-container">
+              <div
+                style={{
+                  marginTop: "12px",
+                  backgroundColor: "white",
+                  marginInline: "12px",
+                  borderRadius: "8px",
+                  boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1), 0px 1px 3px rgba(0, 0, 0, 0.08)",
+                  fontSize: "12px",
+                  // fontWeight: "bold",
+                  color: "#131722",
+                  // cursor: "pointer",
+                  paddingInline: "6px",
+                }}
+              >
+                <header
+                 style={{
+                  fontSize: "16px",
+                  fontWeight: "bold",
+                  paddingBottom: "10px",
+                  borderBottom: "1px solid #E5E1DA",
+                  marginBottom: "12px",
+                  marginTop: "12px",
+                  marginInline: "8px",
+                }}
+                >Rakes Types</header>
+                <div id='rakesTypes'>
+
+                  <div className={`shipment-type-rakes ${rakeStatusSelected === 'TOTAL' ? 'selectedRakeType' : ''}`}
+                  onClick={()=>{
+                    setRakeStatusSelected('TOTAL')
+                    setAllShipments(originalData.filter(shipment => shipment.status === 'ITNS' || shipment.status === 'INPL'));
+                    setShowFiltered(false);
+                    setShowAll(true);
+                    setShowSearched(false);
+                    setShowRakeTypeFiltered(false);
+                    setCurrentFocusstatus('');
+                    setShowIdle(true);
+                    setShowInTransit(true);
+                    setIdleShipments(getTrackingShipment(originalData.filter(shipment => shipment.status === 'ITNS' || shipment.status === 'INPL')));
+                    setInTransitShipments(getTrackingShipment(originalData.filter(shipment => shipment.status === 'ITNS' || shipment.status === 'INPL')));
+                  }}
+                  >
+                    <div className="shipment-type-rakes-count">{indianRakeCount + captiveRakeCount}</div>
+                    <div>Total</div>
+                  </div>
+                  <div className={`shipment-type-rakes ${rakeStatusSelected === 'IR' ? 'selectedRakeType' : ''}`}
+                  onClick={()=>{
+                    setRakeStatusSelected('IR')
+                    setAllShipments(originalData.filter(shipment => shipment.status === 'ITNS' || shipment.status === 'INPL').filter(shipment => !shipment.is_captive));
+                    setShowFiltered(false);
+                    setShowAll(true);
+                    setShowSearched(false);
+                    setShowRakeTypeFiltered(false);
+                    setCurrentFocusstatus('');
+                    setShowIdle(true);
+                    setShowInTransit(true);
+                    setIdleShipments(getTrackingShipment(originalData.filter(shipment => shipment.status === 'ITNS' || shipment.status === 'INPL').filter(shipment => !shipment.is_captive)));
+                    setInTransitShipments(getTrackingShipment(originalData.filter(shipment => shipment.status === 'ITNS' || shipment.status === 'INPL').filter(shipment => !shipment.is_captive)));
+                  }}
+                  >
+                    <div className="shipment-type-rakes-count">{indianRakeCount}</div>
+                    <div>Indian Rakes</div>
+                  </div>
+                  <div className={`shipment-type-rakes ${rakeStatusSelected === 'CR' ? 'selectedRakeType' : ''}`}
+                  onClick={()=>{
+                    setRakeStatusSelected('CR')
+                    setAllShipments(originalData.filter(shipment => shipment.status === 'ITNS' || shipment.status === 'INPL').filter(shipment => shipment.is_captive));
+                    setShowFiltered(false);
+                    setShowAll(true);
+                    setShowSearched(false);
+                    setShowRakeTypeFiltered(false);
+                    setCurrentFocusstatus('');
+                    setShowIdle(true);
+                    setShowInTransit(true);
+                    setIdleShipments(getTrackingShipment(originalData.filter(shipment => shipment.status === 'ITNS' || shipment.status === 'INPL').filter(shipment => shipment.is_captive)));
+                    setInTransitShipments(getTrackingShipment(originalData.filter(shipment => shipment.status === 'ITNS' || shipment.status === 'INPL').filter(shipment => shipment.is_captive)));
+                  }}
+                  >
+                    <div className="shipment-type-rakes-count">{captiveRakeCount}</div>
+                    <div>Captive Rakes</div>
+                  </div>
+                </div>
+              </div>
+
+              <Box sx={{}} className="shipment-details-container">  
                 {showFiltered &&
                   !showSearched &&
                   !showRakeTypeFiltered &&
@@ -1417,7 +1406,7 @@ const MapLayers = () => {
                       />
                     );
                   })}
-                {showSearched &&
+                {/* {showSearched &&
                   !showRakeTypeFiltered &&
                   searcedShipments.map((shipment, index) => {
                     return (
@@ -1429,8 +1418,8 @@ const MapLayers = () => {
                         handleNavigation={handleNavigation}
                       />
                     );
-                  })}
-                {showRakeTypeFiltered &&
+                  })} */}
+                {/* {showRakeTypeFiltered &&
                   rakeTypeFilteredShipments.map((shipment, index) => {
                     return (
                       <ShipmentCard
@@ -1441,7 +1430,7 @@ const MapLayers = () => {
                         handleNavigation={handleNavigation}
                       />
                     );
-                  })}
+                  })} */}
               </Box>
             </Box>
           </div>

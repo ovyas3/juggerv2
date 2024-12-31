@@ -39,37 +39,37 @@ interface StyledTooltipProps extends TooltipProps {
   className?: string;
 }
 
-const CustomDownloadTooltip = styled(({ className, ...props }: StyledTooltipProps) => (
-  <Tooltip 
-    {...props} 
-    classes={{ popper: className }} 
-    PopperProps={{
-      popperOptions: {
-        modifiers: [
-          {
-            name: 'offset',
-            options: {
-              offset: [14, -10], 
-            },
-          },
-        ],
-      },
-    }}
-  />
-))({
-  '& .MuiTooltip-tooltip': {
-    backgroundColor: '#000',
-    color: '#fff',
-    width: '100px',
-    height: '24px',
-    boxShadow: '0px 0px 2px rgba(0,0,0,0.1)',
-    fontSize: '8px',
-    fontFamily: '"Inter", sans-serif',
-  },
-  '& .MuiTooltip-arrow': {
-    color: '#000',
-  },
-});
+// const CustomDownloadTooltip = styled(({ className, ...props }: StyledTooltipProps) => (
+//   <Tooltip 
+//     {...props} 
+//     classes={{ popper: className }} 
+//     PopperProps={{
+//       popperOptions: {
+//         modifiers: [
+//           {
+//             name: 'offset',
+//             options: {
+//               offset: [14, -10], 
+//             },
+//           },
+//         ],
+//       },
+//     }}
+//   />
+// ))({
+//   '& .MuiTooltip-tooltip': {
+//     backgroundColor: '#000',
+//     color: '#fff',
+//     width: '100px',
+//     height: '24px',
+//     boxShadow: '0px 0px 2px rgba(0,0,0,0.1)',
+//     fontSize: '8px',
+//     fontFamily: '"Inter", sans-serif',
+//   },
+//   '& .MuiTooltip-arrow': {
+//     color: '#000',
+//   },
+// });
 
 const WagonDataVisualization: React.FC = () => {
   const componentRef = useRef<HTMLDivElement>(null);
@@ -229,6 +229,25 @@ const WagonDataVisualization: React.FC = () => {
     XLSX.writeFile(workbook, 'wagon-type-wise-rake-departure-trend.xlsx');
   };
 
+  const CustomTooltip = ({ active, payload, label }: any) => {
+    console.log(payload);
+    if (active && payload && payload.length) {
+      const total = payload.reduce((sum: number, item: any) => sum + item.value, 0);
+      return (
+        <div style={{ background: '#fff', border: '1px solid #ccc', padding: '4px', fontSize: '12px', borderRadius:'4px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)' }}>
+          <p><strong>Month:</strong> {label}</p>
+          {payload?.map((item:any, index:any)=>{
+            return(
+              <div key={index} style={{color:item.color}}>{item.name}: <strong>{item.value}</strong></div>
+            );
+          })}
+          <p><strong>Total:</strong> <strong>{total}</strong></p>
+        </div>
+      );
+    }
+    return null;
+  };
+
   if (loading) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
@@ -300,7 +319,8 @@ const WagonDataVisualization: React.FC = () => {
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="month" tickFormatter={formatMonth} />
               <YAxis />
-              <RechartsTooltip />
+              {/* <RechartsTooltip /> */}
+              <RechartsTooltip content={<CustomTooltip />} />
               <Legend />
               {allWagonTypes.map((wagonType: any, index: number) => (
                 <Bar 
@@ -320,12 +340,22 @@ const WagonDataVisualization: React.FC = () => {
               <TableRow>
                 <TableCell>Wagon Type</TableCell>
                 {months.map((month: string) => (
-                  <TableCell key={month} align="right">{formatMonth(month)}</TableCell>
+                  <TableCell key={month} align="right">
+                    <div>{formatMonth(month)}
+                    <span style={{marginLeft: '4px', fontWeight: 700}}>
+                      [{
+                        tableData.reduce((total: number, row: any) => {
+                          return total + (row[month] || 0);
+                        }, 0)
+                      }]
+                    </span>
+                    </div>
+                    </TableCell>
                 ))}
                 <TableCell style={{
                   width: '30px',
                 }}>
-                <CustomDownloadTooltip 
+                {/* <CustomDownloadTooltip 
                   arrow 
                   title={
                     <div 
@@ -347,7 +377,7 @@ const WagonDataVisualization: React.FC = () => {
                         cursor: 'pointer',
                       }} onClick={downloadExcel}
                       />
-                </CustomDownloadTooltip>
+                </CustomDownloadTooltip> */}
                 </TableCell>
               </TableRow>
             </TableHead>

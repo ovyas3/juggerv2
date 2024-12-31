@@ -122,6 +122,8 @@
     left: 50%;
     transform: translate(-50%, -50%);
     padding: 24px;
+    min-width: 450px;
+    min-height: 350px;
 
     @media screen and (max-width: 1024px){
         width: 70vw;

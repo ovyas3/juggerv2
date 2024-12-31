@@ -210,23 +210,23 @@
 }
 
 /* Active State */
-#total.active {
+#total.activeShipmentMapView {
   background-color: #d3e1ff;
   color: #1d38b8;
-  padding-block: 28px;
+  /* padding-block: 28px; */
 }
 
-#inpl.active {
+#inpl.activeShipmentMapView {
   background-color: #e3f7f7;
   color: #123f55;
-  padding-block: 28px;
+  /* padding-block: 28px; */
 
 }
 
-#itns.active {
+#itns.activeShipmentMapView {
   background-color: #fdebd0;
   color: #d87b03;
-  padding-block: 28px;
+  /* padding-block: 28px; */
 }
 #optionsContainer{
   background-color: white;
@@ -246,4 +246,27 @@
   color: #3471FF;
   font-weight: 500;
   border-bottom: 1px solid #3471FF;
+}
+.shipment-type-rakes{
+  /* background-color: #3471FF; */
+  min-width: 100px;
+  text-align: center;
+  padding-block: 6px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+#rakesTypes{
+  /* background-color: red; */
+  display: flex;
+  justify-content: center;
+  gap:12px;
+  margin-bottom: 12px;
+}
+.shipment-type-rakes-count{
+  font-weight: 600;
+  font-size: 24px;
+}
+.selectedRakeType{
+  background-color: #A9BFA8;
 }
