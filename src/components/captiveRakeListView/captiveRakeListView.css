@@ -5,7 +5,8 @@
 }
 
 .filter-container {
-    width: 100%;
+    border: none !important;
+    width: 100% !important;
     display: flex;
     justify-content: center;
     margin-left: -96px;
