@@ -221,43 +221,43 @@ const datesArr = [
 const materialsArr = [
   {
     name: "Plate",
-    raigarh_code: "Plate_Mill_01",
-    angul_code: "Plate_Mill_06"
+    raigarh_code: "PLATE_01",
+    angul_code: "PLATE_06"
   },
   {
     name: "Coil",
-    raigarh_code: "Plate_Mill_01",
-    angul_code: "Plate_Mill_06"
+    raigarh_code: "COIL_01",
+    angul_code: "COIL_06"
   },
   {
     name: "Billet",
-    raigarh_code: "Semis_01",
-    angul_code: "Semis_06"
+    raigarh_code: "SEMIS_01",
+    angul_code: "SEMIS_06"
   },
   {
     name: "Round",
-    raigarh_code: "Semis_01",
-    angul_code: "Semis_06"
+    raigarh_code: "SEMIS_01",
+    angul_code: "SEMIS_06"
   },
   {
     name: "Rail Mill (R)",
-    raigarh_code: "Rail_Mill_01",
-    angul_code: "Rail_Mill_06"
+    raigarh_code: "RAIL_01",
+    angul_code: "RAIL_06"
   },
   {
     name: "Rail Mill (S)",
-    raigarh_code: "Rail_Mill_01",
-    angul_code: "Rail_Mill_06"
+    raigarh_code: "RAIL_01",
+    angul_code: "RAIL_06"
   },
   {
     name: "TMT",
-    raigarh_code: "Bar_Mill_01",
-    angul_code: "Bar_Mill_06"
+    raigarh_code: "BAR_01",
+    angul_code: "BAR_06"
   },
   {
     name: "Slab",
-    raigarh_code: "Plate_Mill_01",
-    angul_code: "Plate_Mill_06"
+    raigarh_code: "PLATE_01",
+    angul_code: "PLATE_06"
   }
 ];
 
@@ -292,9 +292,10 @@ type FormValues = {
   pgi_tw_wt: string;
   actual_weight: string;
   material_images: (any)[];
+  plant_code?: string;
 };
 
-type FormValueKey = 'batch_id' | 'heat_no' | 'material' | 'code' | 'grade' | 'width' | 'thick' | 'length' | 'size_or_diameter' | 'pieces' | 'line_item' | 'pgi_tw_wt' | 'actual_weight';
+type FormValueKey = 'batch_id' | 'heat_no' | 'material' | 'code' | 'grade' | 'width' | 'thick' | 'length' | 'size_or_diameter' | 'pieces' | 'line_item' | 'pgi_tw_wt' | 'actual_weight' | 'plant_code';
 
 type PickerKey =
   | "loadingReadinessTime"
@@ -351,6 +352,7 @@ const WagonTallySheet: React.FC = () => {
       pgi_tw_wt: '',
       actual_weight: '',
       material_images: [],
+      plant_code: ''
     }
   ]);
   const [loading, setLoading] = useState(false);
@@ -422,36 +424,35 @@ const WagonTallySheet: React.FC = () => {
     setRemainingWeights(capacity - totalWeight);
 };
 
+  const getPlantCode = (material: string) => {
+    let plant_code;
+    let plant_code_obj = materialsArr.find((item: any) => item.name === material);
+    const shipper = localStorage.getItem("selected_shipper");
+
+    if (shipper === "60ed6187f5930e0411ebeace") {
+      plant_code = plant_code_obj?.angul_code;
+    } else if (shipper === "623c963e33526eee0419a399") {
+      plant_code = plant_code_obj?.angul_code;
+    } else {
+      plant_code = plant_code_obj?.angul_code;
+    };
+
+    return plant_code;
+  };
+
   // Function to handle data with batch id and heat no
   const handleDataWithBatchAndHeatNo = async (index: number, isHeatNoFetch: boolean) => {
     const batchId = formValues[index].batch_id;
     const heatNo = formValues[index].heat_no;
     const material = formValues[index].material;
 
-    let plant_code;
-    let plant_code_obj = materialsArr.find((item: any) => item.name === material);
-    const shipper = localStorage.getItem("selected_shipper");
-
-    if (shipper === "60ed6187f5930e0411ebeace") {
-      plant_code = plant_code_obj?.raigarh_code || "";
-    } else if (shipper === "623c963e33526eee0419a399") {
-      plant_code = plant_code_obj?.angul_code || "";
-    } else {
-      plant_code = plant_code_obj?.angul_code || "";
-    };
-
-    // if(!isHeatNoFetch){
-    //   if (!batchId || batchId.length !== 10) {
-    //     showMessage("Please enter valid Batch ID", "error");
-    //     return;
-    //   };
-    // } 
+    formValues[index].plant_code = getPlantCode(material);
 
     const payload = {
       batch_id: batchId,
       plant: selectedPlant?.plant?._id,
       heat_no: heatNo,
-      plant_code: plant_code,
+      plant_code: formValues[index].plant_code,
       is_heat_no_fetch: isHeatNoFetch
     };
 
@@ -464,7 +465,8 @@ const WagonTallySheet: React.FC = () => {
           const newFormValues = [...prev];
           newFormValues[index] = {
             ...newFormValues[index],
-            material: data.material,
+            batch_id: data.batch_id || newFormValues[index].batch_id,
+            // material: data.material || newFormValues[index].material,
             code: data.material_code,
             grade: data.grade,
             width: data.width,
@@ -846,6 +848,10 @@ const WagonTallySheet: React.FC = () => {
         const response = await httpsGet(`get_wagon_details?id=${id}`, 0, router);
         const { materials, events, wagon_images } = response?.data;
         if (materials && materials.length > 0) {
+          materials.forEach((material: any) => {
+            material.material_images = [];
+            material.plant_code = getPlantCode(material.material) || '';
+          });
           setFormValues(materials);
 
           const wagonCounts = wagon_images.map((url: string) => {
