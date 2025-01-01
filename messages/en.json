@@ -41,7 +41,19 @@
    "Overview":"OVERVIEW",
    "Insights":"INSIGHTS",
    "ListView":"List View",
-   "MapView":"Map View"
+   "MapView":"Map View",
+   "InPlantWagons":"In Plant Wagons",
+   "#":"#",
+   "Indent":"Indent",
+   "eDemand":"e-Demand",
+   "commodity":"Commodity",
+   "noOfWagons":"No. of Wagons",
+   "PlacementDateTime":"Placement Date Time",
+   "RemainingFreeTime":"Remaining Free Time",
+   "DCSlab":"DC Slab",
+   "TimeElapsed":"Time Elapsed",
+   "DCCharges":"DC Charges (₹)",
+   "noDataFound":"No data found"
   },
   "HEADER":{
     "shipments":"Shipments",

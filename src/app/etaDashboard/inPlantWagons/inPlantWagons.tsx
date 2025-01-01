@@ -34,7 +34,7 @@ const InPlantWagons = () => {
     const [endDate, setEndDate] = useState<any>(today);
 
     const [loading, setLoading] = useState(true);
-    const t = useTranslations("DASHBOARD");
+    const text = useTranslations("DASHBOARD");
     const router = useRouter();
     const [wagonData, setWagonData] = useState<WagonData[]>([]);
     const componentRef = useRef<HTMLDivElement>(null);
@@ -229,7 +229,7 @@ const InPlantWagons = () => {
                         fontFamily: '"Plus Jakarta Sans", sans-serif',
                         textTransform: 'uppercase',
                     }}>
-                    In Plant Wagons
+                    {text("InPlantWagons")}
                 </Typography>
                 <Box sx={{
                     display: 'flex',
@@ -316,26 +316,26 @@ const InPlantWagons = () => {
                         <tr>
                             <th className="in-plant-wagons-id-column" style={{
                                 width: '50px',
-                            }}>#</th>
+                            }}>{text("#")}</th>
                             <th className="in-plant-wagons-id-column">
                                 <span className="in-plant-wagons-id-column" style={{
                                     display: 'inline-block',
                                     paddingBottom: '4px'
-                                }}>Indent #</span> <br />
-                                <span className="in-plant-wagons-id-column">eDemand</span>
+                                }}>{text("Indent")} {text("#")}</span> <br />
+                                <span className="in-plant-wagons-id-column">{text("eDemand")}</span>
                             </th>
                             <th className="in-plant-wagons-id-column">
                                 <span className="in-plant-wagons-id-column" style={{
                                     display: 'inline-block',
                                     paddingBottom: '4px'
-                                }}>Commodity</span> <br />
-                                <span className="in-plant-wagons-id-column">No. of Wagons</span>
+                                }}>{text("commodity")}</span> <br />
+                                <span className="in-plant-wagons-id-column">{text("noOfWagons")}</span>
                             </th>
-                            <th className="in-plant-wagons-id-column">Placement Date Time</th>
-                            <th className="in-plant-wagons-id-column">Remaining Free Time</th>
-                            <th className="in-plant-wagons-id-column">DC Slab</th>
-                            <th className="in-plant-wagons-id-column">Time elapsed beyond free time</th>
-                            <th className="in-plant-wagons-id-column">DC Charges (₹)</th>
+                            <th className="in-plant-wagons-id-column">{text("PlacementDateTime")}</th>
+                            <th className="in-plant-wagons-id-column">{text("RemainingFreeTime")}</th>
+                            <th className="in-plant-wagons-id-column">{text("DCSlab")}</th>
+                            <th className="in-plant-wagons-id-column">{text("TimeElapsed")}</th>
+                            <th className="in-plant-wagons-id-column">{text("DCCharges")}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -372,7 +372,7 @@ const InPlantWagons = () => {
                                 <tr>
                                     <td colSpan={8} style={{ textAlign: 'center' }}>
                                         <div className="no-data-found">
-                                            No data found
+                                            {text("noDataFound")}
                                         </div>
                                     </td>
                                 </tr>
