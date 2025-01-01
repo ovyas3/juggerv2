@@ -118,7 +118,9 @@
     "contactModalHeaderOld":"Previous Contacts Details",
     "currentTime":"Contact Date",
     "viewAllContacts":"View All Contacts",
-    "otherReason":"Other Reasons"
+    "otherReason":"Other Reasons",
+    "Commodity":"Commodity",
+    "NoOfWagonsReceived":"No. of Wagons Received"
   },
   "UPLOAD_ANNEXURE":{
     "SNCKBR_MSG":{
