@@ -20,9 +20,9 @@ interface WagonData {
     commodity: string
     wagonCount: number
     placement: string
-    remainingFreeTime: string
+    free_time: string
     dcSlab: string
-    timeElapsed: string
+    elapsed_time: string
     dcCharges: number
 }
 
@@ -34,7 +34,7 @@ const InPlantWagons = () => {
     const [endDate, setEndDate] = useState<any>(today);
 
     const [loading, setLoading] = useState(true);
-    const t = useTranslations("Dashboard");
+    const text = useTranslations("DASHBOARD");
     const router = useRouter();
     const [wagonData, setWagonData] = useState<WagonData[]>([]);
     const componentRef = useRef<HTMLDivElement>(null);
@@ -56,11 +56,11 @@ const InPlantWagons = () => {
             updatedDate.setHours(0, 0, 0, 0); // Set to 12:00 AM
 
             const updatedDateString = updatedDate.toISOString();
-    
+
             const epochTime = timeService.millies(updatedDateString);
             const newStartDate: any = timeService.millies(startDate);
             const newEndDate: any = timeService.millies(endDate);
-            
+
             if (type === 'start') {
                 setStartDate(updatedDate);
                 if (newEndDate >= epochTime) {
@@ -89,15 +89,6 @@ const InPlantWagons = () => {
             if (response.statusCode === 200) {
                 const data = response.data;
                 const wagonDataArr = data && data.length > 0 && data.map((item: any) => {
-                    let remainingFreeTime = '';
-                    if (item.timeElapsed) {
-                        const hours = Math.floor(item.elapsed_time / 60);
-                        const minutes = item.elapsed_time % 60;
-                        remainingFreeTime = `${hours.toString().padStart(2, '0')}: ${minutes.toString().padStart(2, '0')}`;
-                    } else {
-                        remainingFreeTime = '';
-                    }
-
                     return {
                         _id: item._id,
                         indent: item.indent || '',
@@ -105,9 +96,9 @@ const InPlantWagons = () => {
                         commodity: item.commodity || '',
                         wagonCount: item.wagonCount || 0,
                         placement: item.placement || '',
-                        remainingFreeTime: remainingFreeTime,
+                        free_time: item.free_time || '',
                         dcSlab: item.slab || '',
-                        timeElapsed: item.timeElapsed || '',
+                        elapsed_time: item.elapsed_time || 0,
                         dcCharges: item.dc_charges || 0
                     }
                 });
@@ -120,6 +111,34 @@ const InPlantWagons = () => {
             setLoading(false);
         }
     };
+
+    const calculateRemainingTime = (placement: string, freeTime: string) => {
+        const targetTime = new Date(new Date(placement).getTime() + parseInt(freeTime) * 3600000);
+        const currentTime = new Date();
+        const diff = targetTime.getTime() - currentTime.getTime();
+
+        if (diff <= 0) return "00:00:00";
+
+        const hours = Math.floor(diff / (1000 * 60 * 60)).toString().padStart(2, "0");
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)).toString().padStart(2, "0");
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000).toString().padStart(2, "0");
+
+        return `${hours}:${minutes}:${seconds}`;
+    };
+
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setWagonData((prevData) => {
+                return (Array.isArray(prevData) ? prevData : []).map((row) => ({
+                    ...row,
+                    remainingTime: calculateRemainingTime(row.placement, row.free_time),
+                }));
+            });
+        }, 1000);
+
+        return () => clearInterval(timer);
+    }, []);
+
 
     useEffect(() => {
         if (startDate && endDate) {
@@ -178,19 +197,19 @@ const InPlantWagons = () => {
 
     if (loading) {
         return (
-          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-            <ThreeCircles
-              visible={true}
-              height="100"
-              width="100"
-              color="#20114d"
-              ariaLabel="three-circles-loading"
-              wrapperStyle={{}}
-              wrapperClass=""
-            />
-          </div>
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+                <ThreeCircles
+                    visible={true}
+                    height="100"
+                    width="100"
+                    color="#20114d"
+                    ariaLabel="three-circles-loading"
+                    wrapperStyle={{}}
+                    wrapperClass=""
+                />
+            </div>
         );
-      }
+    }
 
     return (
         <main className="in-plant-wagons-main" ref={componentRef}>
@@ -210,7 +229,7 @@ const InPlantWagons = () => {
                         fontFamily: '"Plus Jakarta Sans", sans-serif',
                         textTransform: 'uppercase',
                     }}>
-                    In Plant Wagons
+                    {text("InPlantWagons")}
                 </Typography>
                 <Box sx={{
                     display: 'flex',
@@ -241,7 +260,7 @@ const InPlantWagons = () => {
                 </Box>
             </Box>
 
-            <div className="in-plant-wagons-stats-grid">
+            {/* <div className="in-plant-wagons-stats-grid">
                 <div className="in-plant-wagons-stats-card">
                     <span className="in-plant-wagons-period">Yesterday</span>
                     <div className="in-plant-wagons-amount">
@@ -289,7 +308,7 @@ const InPlantWagons = () => {
                         <span className="in-plant-wagons-trend" data-trend="up">↑</span>
                     </div>
                 </div>
-            </div>
+            </div> */}
 
             <div className="in-plant-wagons-tableContainer">
                 <table className="in-plant-wagons-table">
@@ -297,31 +316,31 @@ const InPlantWagons = () => {
                         <tr>
                             <th className="in-plant-wagons-id-column" style={{
                                 width: '50px',
-                            }}>#</th>
+                            }}>{text("#")}</th>
                             <th className="in-plant-wagons-id-column">
                                 <span className="in-plant-wagons-id-column" style={{
                                     display: 'inline-block',
                                     paddingBottom: '4px'
-                                }}>Indent #</span> <br />
-                                <span className="in-plant-wagons-id-column">eDemand</span>
+                                }}>{text("Indent")} {text("#")}</span> <br />
+                                <span className="in-plant-wagons-id-column">{text("eDemand")}</span>
                             </th>
                             <th className="in-plant-wagons-id-column">
                                 <span className="in-plant-wagons-id-column" style={{
                                     display: 'inline-block',
                                     paddingBottom: '4px'
-                                }}>Commodity</span> <br />
-                                <span className="in-plant-wagons-id-column">No. of Wagons</span>
+                                }}>{text("commodity")}</span> <br />
+                                <span className="in-plant-wagons-id-column">{text("noOfWagons")}</span>
                             </th>
-                            <th className="in-plant-wagons-id-column">Placement Date Time</th>
-                            <th className="in-plant-wagons-id-column">Remaining Free Time</th>
-                            <th className="in-plant-wagons-id-column">DC Slab</th>
-                            <th className="in-plant-wagons-id-column">Time elapsed beyond free time</th>
-                            <th className="in-plant-wagons-id-column">DC Charges RS</th>
+                            <th className="in-plant-wagons-id-column">{text("PlacementDateTime")}</th>
+                            <th className="in-plant-wagons-id-column">{text("RemainingFreeTime")}</th>
+                            <th className="in-plant-wagons-id-column">{text("DCSlab")}</th>
+                            <th className="in-plant-wagons-id-column">{text("TimeElapsed")}</th>
+                            <th className="in-plant-wagons-id-column">{text("DCCharges")}</th>
                         </tr>
                     </thead>
                     <tbody>
                         {wagonData && wagonData.length > 0 ?
-                            wagonData.map((row: any, index: number) => (
+                            wagonData.sort((a, b) => new Date(b.placement).getTime() - new Date(a.placement).getTime()).map((row: any, index: number) => (
                                 <tr key={row._id}>
                                     <td>{index + 1}</td>
                                     <td>
@@ -343,17 +362,17 @@ const InPlantWagons = () => {
                                         <span>{timeService.utcToistTime(row.placement, 'HH:mm') || 'N/A'}</span>
                                     </td>
                                     <td>
-                                        {row.remainingFreeTime}
+                                        {row.remainingTime || 'Calculating...'}
                                     </td>
                                     <td>{row.dcSlab}</td>
-                                    <td>{row.timeElapsed}</td>
-                                    <td className={row.remainingFreeTime === '00:00' ? 'in-plant-wagons-charges' : ''}>{row.dcCharges.toLocaleString()}</td>
+                                    <td>{row.elapsed_time}</td>
+                                    <td className={row.remainingTime === "00:00:00" ? 'in-plant-wagons-charges' : ''}>{row.dcCharges.toLocaleString()}</td>
                                 </tr>
                             )) : (
                                 <tr>
                                     <td colSpan={8} style={{ textAlign: 'center' }}>
                                         <div className="no-data-found">
-                                            No data found
+                                            {text("noDataFound")}
                                         </div>
                                     </td>
                                 </tr>
