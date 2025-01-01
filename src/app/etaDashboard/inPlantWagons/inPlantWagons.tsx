@@ -241,7 +241,7 @@ const InPlantWagons = () => {
                 </Box>
             </Box>
 
-            <div className="in-plant-wagons-stats-grid">
+            {/* <div className="in-plant-wagons-stats-grid">
                 <div className="in-plant-wagons-stats-card">
                     <span className="in-plant-wagons-period">Yesterday</span>
                     <div className="in-plant-wagons-amount">
@@ -289,7 +289,7 @@ const InPlantWagons = () => {
                         <span className="in-plant-wagons-trend" data-trend="up">↑</span>
                     </div>
                 </div>
-            </div>
+            </div> */}
 
             <div className="in-plant-wagons-tableContainer">
                 <table className="in-plant-wagons-table">
