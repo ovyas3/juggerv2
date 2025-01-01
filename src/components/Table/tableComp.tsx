@@ -915,7 +915,7 @@ export const MarkPlacement = ({isClose ,shipment, getAllShipment, different = 'm
     console.log(shipment, "shipment");
     const t = useTranslations("ORDERS");
     const router = useRouter();
-    const [currentDate, setCurrentDate] = useState(new Date());
+    const [selectedDate, setSelectedDate] = useState(new Date());
     const { showMessage } = useSnackbar();
     const [avetoInplant, setAvetoInplant] = useState(false);
     const [eIndent, setEIndent] = useState('');
@@ -951,7 +951,7 @@ export const MarkPlacement = ({isClose ,shipment, getAllShipment, different = 'm
     }, []);
 
     const handlePlacementDate = async() => {
-        if(!currentDate) {
+        if(!selectedDate) {
             showMessage('Please Select Date', 'error');
             return;
         }
@@ -960,7 +960,7 @@ export const MarkPlacement = ({isClose ,shipment, getAllShipment, different = 'm
             return
         }
 
-        const data = new Date(currentDate);
+        const data = new Date(selectedDate);
         let payloadMarkPlacement: any = {
             id: shipment._id,
             placement_time: new Date(data.toUTCString()),
@@ -1048,7 +1048,7 @@ export const MarkPlacement = ({isClose ,shipment, getAllShipment, different = 'm
                                 <DateTimePicker
                                 open={openStartDatePicker}
                                 onClose={() => {setOpenStartDatePicker(false)}}
-                                value={dayjs(currentDate)}
+                                value={dayjs(selectedDate)}
                                 sx={{
                                     width: '100%',
                                     '.MuiInputBase-input': {
@@ -1096,7 +1096,7 @@ export const MarkPlacement = ({isClose ,shipment, getAllShipment, different = 'm
                                 onChange={(newDate) => { 
                                     if (newDate) {
                                         setWarraning(true);
-                                        setCurrentDate(newDate.toDate());
+                                        setSelectedDate(newDate.toDate());
                                     }
                                 }}
                                 format="DD/MM/YYYY  HH:mm"
