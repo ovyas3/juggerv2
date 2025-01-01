@@ -430,7 +430,7 @@ const WagonTallySheet: React.FC = () => {
     const shipper = localStorage.getItem("selected_shipper");
 
     if (shipper === "60ed6187f5930e0411ebeace") {
-      plant_code = plant_code_obj?.angul_code;
+      plant_code = plant_code_obj?.raigarh_code;
     } else if (shipper === "623c963e33526eee0419a399") {
       plant_code = plant_code_obj?.angul_code;
     } else {
