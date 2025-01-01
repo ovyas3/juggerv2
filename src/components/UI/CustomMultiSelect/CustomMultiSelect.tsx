@@ -43,8 +43,19 @@ const CustomMultiSelect: React.FC<MultiSelectProps> = ({ value, onValueChange, p
             ? value.map(v => options.find(option => option.value === v)?.label).join(', ')
             : placeholder}
         </span>
-        <svg className={`arrow ${isOpen ? 'open' : ''}`} width="24" height="24">
-          <polyline points="6 9 12 15 18 9" />
+        <svg
+          className={`arrow ${isOpen ? 'open' : ''}`}
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <polyline points="6 9 12 15 18 9"></polyline>
         </svg>
       </div>
       {isOpen && (

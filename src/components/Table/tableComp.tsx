@@ -60,6 +60,7 @@ import WestIcon from '@mui/icons-material/West';
 
 import CustomMultiSelect from "../UI/CustomMultiSelect/CustomMultiSelect";
 import CustomDateTimePicker from '../UI/CustomDateTimePicker/CustomDateTimePicker';
+import CustomSelect from "../UI/CustomSelect/CustomSelect";
 
 import {
     Paper,
@@ -92,10 +93,6 @@ const status_class_map: { [key: string]: string } = {
     'ITNS': 'status_title_In_Transit',
     'Delivered': 'status_title_Delivered'
 }
-
-
-
-
 interface RemarksListType {
     [category: string]: string[];
 }
@@ -926,6 +923,13 @@ export const MarkPlacement = ({isClose ,shipment, getAllShipment, different = 'm
     const [materials, setMaterials] = useState<string[]>([]);
     const [openStartDatePicker, setOpenStartDatePicker] = useState(false);
     const [materialDropdownItems, setMaterialDropdownItems] = useState([]);
+    const [commodity, setCommodity] = useState('');
+    const [commodityDropdownItems, setCommodityDropdownItems] = useState([
+        {label: 'Steel', value: 'Steel'},
+        {label: 'Cement', value: 'Cement'},
+        {label: 'Slag', value: 'Slag'},
+    ]);
+    const [noOfWagon, setNoOfWagon] = useState<string>('');
 
 
     async function getMills() {
@@ -970,6 +974,14 @@ export const MarkPlacement = ({isClose ,shipment, getAllShipment, different = 'm
             payloadMarkPlacement.indent_no = eIndent;
         }
 
+        if(commodity && commodity.length > 0) {
+            payloadMarkPlacement.commodity = commodity;
+        }
+
+        if(noOfWagon && noOfWagon.length > 0) {
+            payloadMarkPlacement.received_no_of_wagons = Number(noOfWagon);
+        }
+
         const payload = {
             id: shipment._id,
             placement_time : new Date (data.toUTCString()),
@@ -998,7 +1010,6 @@ export const MarkPlacement = ({isClose ,shipment, getAllShipment, different = 'm
       } catch (error) {
         console.log(error)
       }
-       
     }
 
     return (
@@ -1097,25 +1108,42 @@ export const MarkPlacement = ({isClose ,shipment, getAllShipment, different = 'm
                     {
                         different !== 'downOut' && different === 'markplacement' && (
                             <>
-                                <div style={{marginTop:24}}>
-                                    <header style={{ marginBottom:8, fontSize:12, color:'#42454E'}}>{t('IndentNo')}</header>
-                                    <div style={{border:'1px solid #E9E9EB', borderRadius:6,height:40.12, display:'flex', alignItems:'center', paddingLeft:12 }}>
-                                        <input onChange={(e)=>{setEIndent(e.target.value)}} value={eIndent} type="text" placeholder='Enter Indent No.' style={{fontWeight:600, fontSize:14, color:'#42454E', border:'none',outline:'none', width:'100%'}} />
+                                <div style={{marginTop:24, display:'flex', columnGap:'48px', width: '100%'}}>
+                                    <div>
+                                        <header style={{ marginBottom:8, fontSize:12, color:'#42454E'}}>{t('IndentNo')}</header>
+                                        <div style={{border:'1px solid #E9E9EB', borderRadius:6,height:40.12, display:'flex', alignItems:'center', paddingLeft:12 }}>
+                                            <input onChange={(e)=>{setEIndent(e.target.value)}} value={eIndent} type="text" placeholder='Enter Indent No.' style={{fontWeight:600, fontSize:14, color:'#42454E', border:'none',outline:'none', width:'100%'}} />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <header style={{ marginBottom:8, fontSize:12, color:'#42454E'}}>{t('Commodity')}</header>
+                                        <CustomSelect
+                                          value={commodity}
+                                          onValueChange={setCommodity}
+                                          placeholder="Select Commodity"
+                                          options={commodityDropdownItems}
+                                        />
+                                    </div>
+                                    <div>
+                                        <header style={{ marginBottom:8, fontSize:12, color:'#42454E'}}>{t('NoOfWagonsReceived')}</header>
+                                        <div style={{border:'1px solid #E9E9EB', borderRadius:6,height:40.12, display:'flex', alignItems:'center', paddingLeft:12 }}>
+                                            <input onChange={(e)=>{setNoOfWagon(e.target.value)}} value={noOfWagon} type="text" placeholder='' style={{fontWeight:600, fontSize:14, color:'#42454E', border:'none',outline:'none', width:'100%'}} />
+                                        </div>
                                     </div>
                                 </div>
-                                <div style={{marginTop:24,display:'flex',columnGap:'52px'}}>
+                                <div style={{marginTop:24,display:'flex',columnGap:'48px'}}>
                                     <div>
-                                    <header style={{ marginBottom:8, fontSize:12, color:'#42454E'}}>{t('material')}</header>
-                                    <CustomMultiSelect
-                                      value={materials}
-                                      onValueChange={setMaterials}
-                                      placeholder="Select Materials"
-                                      options={materialDropdownItems}
-                                    />
+                                        <header style={{ marginBottom:8, fontSize:12, color:'#42454E'}}>{t('material')}</header>
+                                        <CustomMultiSelect
+                                          value={materials}
+                                          onValueChange={setMaterials}
+                                          placeholder="Select Materials"
+                                          options={materialDropdownItems}
+                                        />
                                     </div>
                                     <div>
-                                     <header style={{ marginBottom:8, fontSize:12, color:'#42454E'}}>{"Materials Selection Saved Previously"}</header>
-                                     <div style={{fontSize:'14px',marginTop:'4px'}}>{shipment.materials?.join(', ')}</div>
+                                        <header style={{ marginBottom:8, fontSize:12, color:'#42454E'}}>{"Materials Selection Saved Previously"}</header>
+                                        <div style={{fontSize:'14px',marginTop:'4px'}}>{shipment.materials?.join(', ')}</div>
                                     </div>
                                 </div>
                             </>

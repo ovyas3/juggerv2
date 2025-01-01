@@ -10,8 +10,9 @@ import {
   Dialog,
   TablePagination,
 } from '@mui/material';
-import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
+import { MapContainer, Marker, Popup } from 'react-leaflet';
+import "leaflet/dist/leaflet.css";
+import "leaflet-boundary-canvas";
 import L from 'leaflet';
 import { httpsGet, httpsPost } from '@/utils/Communication';
 import { useSnackbar } from '@/hooks/snackBar';
@@ -22,6 +23,9 @@ import { styled } from "@mui/material/styles";
 import CloseButtonIcon from "@/assets/close_icon.svg";
 import Image from 'next/image';
 import Minus from '@/assets/minus.svg';
+import getIndiaMap from "@/components/MapView/IndiaMap";
+import getBoundary from '@/components/MapView/IndianClaimed';
+import { useTranslations } from "next-intl";
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialogContent-root": {
@@ -106,6 +110,7 @@ const Route = () => {
   const [routeOpen, setRouteOpen] = useState(false);
   const [map, setMap] = useState<L.Map | null>(null);
   const [routeName, setRouteName] = useState('');
+  const text = useTranslations("ROUTESETTING");
 
   // From Station States
   const [fromStationId, setFromStationId] = useState<string | null>(null);
@@ -369,12 +374,63 @@ const Route = () => {
     };
   }, []);
 
+  const boundaryStyle = (feature: any) => {
+    switch (feature.properties.boundary) {
+      case 'claimed':
+        return {
+          color: "#C2B3BF", weight: 2
+        };
+      default:
+        return {
+          color: "", weight: 0
+        };
+    }
+  }
+
+  useEffect(() => {
+    if (!map) return;
+
+    const fetchGeoJSON = async () => {
+      try {
+        const { features} = getIndiaMap();
+        
+        const indiaGeoJSON = {
+          type: "FeatureCollection",
+          features
+        };
+
+        // Add boundary masking with the combined GeoJSON
+        const osmLayer = (L.TileLayer as any).boundaryCanvas(
+          "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+          {
+            boundary: indiaGeoJSON,
+            attribution:
+              '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+          }
+        );
+
+        map.addLayer(osmLayer);
+
+        // Add the claimed boundaries as a separate layer
+        const claimedBoundaries = getBoundary();
+        L.geoJSON(claimedBoundaries, {
+          style: boundaryStyle
+        }).addTo(map);
+
+      } catch (error) {
+        console.error("Error fetching GeoJSON:", error);
+      }
+    };
+
+    fetchGeoJSON();
+  }, [map]);
+
   return (
     <>
       <div className='route-settings-container'>
         <div className='route-settings-header'>
-          <div className='route-settings-title'>Routes</div>
-          <button className='route-settings-add-button' onClick={handleAddRouteClick}>Add Route</button>
+          <div className='route-settings-title'>{text('routes')}</div>
+          <button className='route-settings-add-button' onClick={handleAddRouteClick}>{text('addRoute')}</button>
         </div>
         <div className='route-settings-body'>
           <div className='route-settings-table-wrapper'>
@@ -402,10 +458,10 @@ const Route = () => {
                   >
                     <TableRow>
                       <TableCell align="left" className="table-columns">#</TableCell>
-                      <TableCell align="left" className="table-columns">Route Name</TableCell>
-                      <TableCell align="left" className="table-columns">From</TableCell>
-                      <TableCell align="left" className="table-columns">To</TableCell>
-                      <TableCell align="left" className="table-columns">Via</TableCell>
+                      <TableCell align="left" className="table-columns">{text('routeName')}</TableCell>
+                      <TableCell align="left" className="table-columns">{text('fromStationCode')}</TableCell>
+                      <TableCell align="left" className="table-columns">{text('toStationCode')}</TableCell>
+                      <TableCell align="left" className="table-columns">{text('viaStationCode')}</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -458,7 +514,7 @@ const Route = () => {
                               fontFamily: '"Inter", sans-serif',
                             }}
                           >
-                            No Routes found
+                            {text('noRoutesFound')}
                           </TableCell>
                         </TableRow>
                       )}
@@ -469,19 +525,16 @@ const Route = () => {
           </div>
           <div className='route-settings-map-view'>
             <MapContainer
+              className="map"
               center={[20.5937, 78.9629]}
               zoom={5}
               style={{
-                height: '400px',
+                height: '500px',
                 width: '100%'
               }}
               attributionControl={false}
               ref={setMap}
             >
-              <TileLayer
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-              />
               {selectedRoute?.data?.[0] && (
                 <>
                   {selectedRoute.data[0].from?.[0]?.geo_point?.coordinates && (
@@ -492,7 +545,7 @@ const Route = () => {
                       ]}
                       icon={blueIcon}
                     >
-                      <Popup>From: {selectedRoute.data[0].from[0].name}</Popup>
+                      <Popup>{text('from')}: {selectedRoute.data[0].from[0].name}</Popup>
                     </Marker>
                   )}
                   {selectedRoute.data[0].to?.[0]?.geo_point?.coordinates && (
@@ -503,7 +556,7 @@ const Route = () => {
                       ]}
                       icon={redIcon}
                     >
-                      <Popup>To: {selectedRoute.data[0].to[0].name}</Popup>
+                      <Popup>{text('to')}: {selectedRoute.data[0].to[0].name}</Popup>
                     </Marker>
                   )}
                   {selectedRoute.data[0].via?.map((viaPoint: any, index: number) => (
@@ -516,7 +569,7 @@ const Route = () => {
                         ]}
                         icon={greenIcon}
                       >
-                        <Popup>Via: {viaPoint.name}</Popup>
+                        <Popup>{text('via')}: {viaPoint.name}</Popup>
                       </Marker>
                     )
                   ))}
@@ -545,10 +598,10 @@ const Route = () => {
         </div>
 
         <div className="routes-settings-dialog-body">
-          <div className="routes-settings-dialog-title">Add Route</div>
+          <div className="routes-settings-dialog-title">{text('addRoute')}</div>
           <div className="routes-settings-dialog-form">
             <div className="routes-settings-autocomplete-dropdown">
-              <label htmlFor="routes-settings-station-input">Route Name</label>
+              <label htmlFor="routes-settings-station-input">{text('routeName')}</label>
               <input
                 type="text"
                 placeholder="Enter Route Name"
@@ -558,7 +611,7 @@ const Route = () => {
               />
             </div>
             <div className="routes-settings-autocomplete-dropdown" ref={fromStationShowDropdownRef}>
-              <label htmlFor="routes-settings-station-input">From</label>
+              <label htmlFor="routes-settings-station-input">{text('from')}</label>
               <input
                 id="routes-settings-station-input"
                 type="text"
@@ -570,7 +623,7 @@ const Route = () => {
               {fromStationShowDropdown && (
                 <div className="routes-settings-dropdown">
                   <div className="routes-settings-dropdown-header">
-                    {fromStationSuggestions.length} result(s) found
+                    {fromStationSuggestions.length} {text('resultsFound')}
                   </div>
                   <ul>
                     {fromStationSuggestions.map((suggestion) => (
@@ -587,7 +640,7 @@ const Route = () => {
               )}
             </div>
             <div className="routes-settings-autocomplete-dropdown" ref={toStationShowDropdownRef}>
-              <label htmlFor="routes-settings-station-input">To</label>
+              <label htmlFor="routes-settings-station-input">{text('to')}</label>
               <input
                 id="routes-settings-station-input"
                 type="text"
@@ -599,7 +652,7 @@ const Route = () => {
               {toStationShowDropdown && (
                 <div className="routes-settings-dropdown">
                   <div className="routes-settings-dropdown-header">
-                    {toStationSuggestions.length} result(s) found
+                    {toStationSuggestions.length} {text('resultsFound')}
                   </div>
                   <ul>
                     {toStationSuggestions.map((suggestion) => (
@@ -616,7 +669,7 @@ const Route = () => {
               )}
             </div>
             <div className="routes-settings-autocomplete-dropdown" ref={viaStationShowDropdownRef}>
-              <label htmlFor="routes-settings-station-input">Via</label>
+              <label htmlFor="routes-settings-station-input">{text('via')}</label>
               <input
                 id="routes-settings-station-input"
                 type="text"
@@ -628,7 +681,7 @@ const Route = () => {
               {viaStationShowDropdown && (
                 <div className="routes-settings-dropdown">
                   <div className="routes-settings-dropdown-header">
-                    {viaStationSuggestions.length} result(s) found
+                    {viaStationSuggestions.length} {text('resultsFound')}
                   </div>
                   <ul>
                     {viaStationSuggestions.map((suggestion) => (
@@ -648,21 +701,21 @@ const Route = () => {
           <div className='routes-settings-display-routes'>
             <div className='routes-settings-display-routes-left-contents'>
               <div className='routes-settings-display-routes-left-content'>
-                <div className='routes-settings-display-routes-left-content-title'>Route Name</div>
+                <div className='routes-settings-display-routes-left-content-title'>{text('routeName')}</div>
                 <div className='routes-settings-display-routes-left-content-value'>{routeName}</div>
               </div>
               <div className='routes-settings-display-routes-left-content'>
-                <div className='routes-settings-display-routes-left-content-title'>From Station</div>
+                <div className='routes-settings-display-routes-left-content-title'>{text('fromStation')}</div>
                 <div className='routes-settings-display-routes-left-content-value'>{fromStationCode} - {fromStationName}</div>
               </div>
               <div className='routes-settings-display-routes-left-content'>
-                <div className='routes-settings-display-routes-left-content-title'>To Station</div>
+                <div className='routes-settings-display-routes-left-content-title'>{text('toStation')}</div>
                 <div className='routes-settings-display-routes-left-content-value'>{toStationCode} - {toStationName}</div>
               </div>
             </div>
             <div className='routes-settings-display-routes-right-contents'>
               <div className='routes-settings-display-routes-right-content'>
-                <div className='routes-settings-display-routes-right-content-title'>Via Stations</div>
+                <div className='routes-settings-display-routes-right-content-title'>{text('viaStations')}</div>
                 <div className='routes-settings-display-routes-right-content-value'>
                   {viaStations && viaStations.length > 0 &&
                     viaStations.map((viaStation: any, index: number) => {
@@ -684,7 +737,7 @@ const Route = () => {
                   {viaStations && viaStations.length === 0 &&
                     <div className='routes-settings-display-routes-right-content-value-container'>
                       <div className='routes-settings-display-routes-right-content-value-index'>
-                        No Via Stations
+                        {text('noViaStations')}
                       </div>
                     </div>
                   }
@@ -696,13 +749,13 @@ const Route = () => {
             <button
               className="routes-settings-dialog-footer-cancel-button"
               onClick={handleRouteClose}>
-              Cancel
+              {text('cancel')}
             </button>
             <button
               className="routes-settings-dialog-footer-confirm-button"
               onClick={handleAddRoute}
             >
-              Save
+              {text('save')}
             </button>
           </div>
         </div>
