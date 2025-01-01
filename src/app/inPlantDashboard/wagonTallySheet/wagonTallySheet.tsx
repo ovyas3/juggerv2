@@ -258,6 +258,11 @@ const materialsArr = [
     name: "Slab",
     raigarh_code: "PLATE_01",
     angul_code: "PLATE_06"
+  },
+  {
+    name: "SPM",
+    raigarh_code: "BSM_01",
+    angul_code: "BSM_06"
   }
 ];
 
