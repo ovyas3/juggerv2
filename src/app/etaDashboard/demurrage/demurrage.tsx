@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ThreeCircles } from "react-loader-spinner";
 import { httpsGet } from "@/utils/Communication";
-import './inPlantWagons.css';
+import './demurrage.css';
 import timeService from "@/utils/timeService";
 import ScreenShotIcon from '@/assets/screenshot_icon.svg';
 import { toPng } from 'html-to-image';
@@ -26,7 +26,7 @@ interface WagonData {
     dcCharges: number
 }
 
-const InPlantWagons = () => {
+const Demurrage = () => {
     const today: any = new Date();
     const oneDayAgo: any = new Date();
     oneDayAgo.setDate(today.getDate() - 1);
@@ -384,4 +384,4 @@ const InPlantWagons = () => {
     );
 };
 
-export default InPlantWagons;
+export default Demurrage;
