@@ -213,7 +213,7 @@ function EtaDashboard() {
               <StyledTab label="ETA" />
               <StyledTab label="Rake" />
               <StyledTab label="Destination" />
-              <StyledTab label="In Plant Wagons" />
+              <StyledTab label="Demurrage" />
               {/* <StyledTab label="Rake Charges" /> */}
             </StyledTabs>
           </Box>

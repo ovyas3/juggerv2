@@ -229,7 +229,7 @@ const InPlantWagons = () => {
                         fontFamily: '"Plus Jakarta Sans", sans-serif',
                         textTransform: 'uppercase',
                     }}>
-                    {text("InPlantWagons")}
+                    {text("demurrage")}
                 </Typography>
                 <Box sx={{
                     display: 'flex',
