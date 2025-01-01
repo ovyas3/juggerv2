@@ -375,7 +375,27 @@
     "tr": "Tare",
     "isLoaded": "Ld/E",
     "print": "Print"
+  },
+  "ROUTESETTING":{
+    "routes": "Routes",
+    "addRoute": "Add Route",
+    "routeName": "Route Name",
+    "fromStationCode": "From Station Code",
+    "toStationCode": "To Station Code",
+    "viaStationCode": "Via Station Code",
+    "shipper": "Shipper",
+    "save": "Save",
+    "cancel": "Cancel",
+    "routeDetails": "Route Details",
+    "noRoutesFound": "No Routes Found",
+    "from": "From",
+    "to": "To",
+    "via": "Via",
+    "resultsFound": "result(s) found",
+    "fromStation": "From Station",
+    "toStation": "To Station",
+    "viaStations": "Via Stations",
+    "noViaStations": "No Via Stations"
   }
-
 }
 
