@@ -214,7 +214,7 @@ function EtaDashboard() {
               <StyledTab label="Rake" />
               <StyledTab label="Destination" />
               <StyledTab label="In Plant Wagons" />
-              {/* <StyledTab label="Rake Charges" /> */}
+              <StyledTab label="Rake Charges" />
             </StyledTabs>
           </Box>
           <CustomTabPanel value={value} index={0}>
@@ -332,9 +332,9 @@ function EtaDashboard() {
             {/* Coming Soon */}
             <div className="coming_soon">Coming Soon</div>
           </CustomTabPanel>
-          {/* <CustomTabPanel value={value} index={6}>
+          <CustomTabPanel value={value} index={6}>
             <RakeCharges />
-          </CustomTabPanel> */}
+          </CustomTabPanel>
         </Box>
         
       </div>
