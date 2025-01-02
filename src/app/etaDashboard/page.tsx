@@ -213,8 +213,8 @@ function EtaDashboard() {
               <StyledTab label="ETA" />
               <StyledTab label="Rake" />
               <StyledTab label="Destination" />
-              <StyledTab label="Demurrage" />
               <StyledTab label="Rake Charges" />
+              <StyledTab label="Demurrage" />
             </StyledTabs>
           </Box>
           <CustomTabPanel value={value} index={0}>
@@ -328,12 +328,10 @@ function EtaDashboard() {
             <DestinationWiseTrend />
           </CustomTabPanel>
           <CustomTabPanel value={value} index={5}>
-            <Demurrage />
-            {/* Coming Soon */}
-            {/* <div className="coming_soon">Coming Soon</div> */}
+            <RakeCharges />
           </CustomTabPanel>
           <CustomTabPanel value={value} index={6}>
-            <RakeCharges />
+            <Demurrage />
           </CustomTabPanel>
         </Box>
         

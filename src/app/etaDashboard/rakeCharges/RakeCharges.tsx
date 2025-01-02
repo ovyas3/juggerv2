@@ -89,8 +89,8 @@ const RakeCharges = () => {
 
   const processChartData = (data: any[]) => {
     const normalizedData = data.map((item) => ({
-      ...item,
-      totalFreightSum: parseFloat((item.totalFreightSum / 1e7).toFixed(2)),
+        ...item,
+        totalFreightSum: Math.floor((item.totalFreightSum / 1e7) * 100) / 100,
     }));
     const sortedData = normalizedData.sort((a, b) => a._id - b._id);
     const maxFreight = Math.max(...sortedData.map((d) => d.totalFreightSum));
@@ -106,14 +106,14 @@ const RakeCharges = () => {
     return sortedData;
   };
 
-    const processMonthlyChartData = (data: any[]) => {
-      const normalizedData = data.map((item) => ({
+  const processMonthlyChartData = (data: any[]) => {
+    const normalizedData = data.map((item) => ({
         ...item,
-        totalFreightSum: parseFloat((item.totalFreightSum / 1e7).toFixed(2)),
-      }));
-      console.log(normalizedData);
-      const sortedData = normalizedData.sort((a, b) => monthMap[a._id] - monthMap[b._id]);
-      const maxFreight = Math.max(...sortedData.map((d) => d.totalFreightSum));
+        totalFreightSum: Math.floor((item.totalFreightSum / 1e7) * 100) / 100,
+    }));
+    console.log(normalizedData);
+    const sortedData = normalizedData.sort((a, b) => monthMap[a._id] - monthMap[b._id]);
+    const maxFreight = Math.max(...sortedData.map((d) => d.totalFreightSum));
       const adjustedMaxFreight = maxFreight + 100;
       const newDomain = [0, Math.ceil(adjustedMaxFreight)];
       const tickInterval = Math.ceil(adjustedMaxFreight / 7);
@@ -124,12 +124,12 @@ const RakeCharges = () => {
       setMonthlyYAxisDomain(newDomain);
       setMonthlyYAxisTicks(newTicks);
       return sortedData;
-    };
+  };
 
   const processDayChartData = (data: any[]) => {
     const normalizedData = data.map((item) => ({
-      ...item,
-      totalFreightSum: parseFloat((item.totalFreightSum / 1e7).toFixed(2)),
+        ...item,
+        totalFreightSum: Math.floor((item.totalFreightSum / 1e7) * 100) / 100,
     }));
     const sortedData = normalizedData.sort((a, b) => a._id - b._id);
     const maxFreight = Math.max(...sortedData.map((d) => d.totalFreightSum));
