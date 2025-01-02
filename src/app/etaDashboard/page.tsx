@@ -22,7 +22,7 @@ import { Tabs, Tab, Box } from '@mui/material'
 import { styled } from '@mui/system'
 import WagonTypeWiseRakeTrend from "./wagonTypeWiseRakeTrend/wagonTypeWiseRakeTrend";
 import DestinationWiseTrend from "./destinationWiseTrend/destinationWiseTrend";
-import InPlantWagons from "./inPlantWagons/inPlantWagons";
+import Demurrage from "./demurrage/demurrage";
 import { useMediaQuery, useTheme } from '@mui/material';
 import RakeCharges from './rakeCharges/RakeCharges'
 
@@ -215,6 +215,7 @@ function EtaDashboard() {
               <StyledTab label="Destination" />
               <StyledTab label="In Plant Wagons" />
               <StyledTab label="Rake Charges" />
+              <StyledTab label="Demurrage" />
             </StyledTabs>
           </Box>
           <CustomTabPanel value={value} index={0}>
@@ -328,9 +329,9 @@ function EtaDashboard() {
             <DestinationWiseTrend />
           </CustomTabPanel>
           <CustomTabPanel value={value} index={5}>
-            {/* <InPlantWagons /> */}
+            <Demurrage />
             {/* Coming Soon */}
-            <div className="coming_soon">Coming Soon</div>
+            {/* <div className="coming_soon">Coming Soon</div> */}
           </CustomTabPanel>
           <CustomTabPanel value={value} index={6}>
             <RakeCharges />

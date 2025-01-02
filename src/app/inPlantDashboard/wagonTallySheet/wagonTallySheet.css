@@ -1173,3 +1173,83 @@ padding: 16px;
 .train-animation {
   animation: moveTrain 3s ease forwards;
 }
+
+.wagon-tally-sheet-body-content-materials-details-body-content-custom-dropdown {
+  width: 170px;
+  height: 40px;
+  border: 1px solid #DFE3EB;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #3C4852;
+  background-color: #fff;
+  position: relative;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  z-index: 1;
+}
+
+.wagon-tally-sheet-body-content-materials-details-body-content-custom-dropdown:focus {
+  outline: none;
+}
+
+.wagon-tally-sheet-body-content-materials-details-body-content-dropdown-selected {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #333;
+  width: 100%;
+}
+
+.wagon-tally-sheet-body-content-materials-details-body-content-custom-dropdown.open {
+  outline: none;
+}
+
+.wagon-tally-sheet-body-content-materials-details-body-content-custom-dropdown-arrow {
+  margin-left: 8px;
+  transition: transform 0.3s ease;
+}
+
+.wagon-tally-sheet-body-content-materials-details-body-content-custom-dropdown-arrow.open {
+  transform: rotate(180deg); 
+}
+
+.wagon-tally-sheet-body-content-materials-details-body-content-custom-dropdown-options {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  max-height: 120px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #888 #f1f1f1;
+}
+
+.wagon-tally-sheet-body-content-materials-details-body-content-custom-dropdown.open .wagon-tally-sheet-body-content-materials-details-body-content-custom-dropdown-options {
+  display: block;
+}
+
+.wagon-tally-sheet-body-content-materials-details-body-content-dropdown-option {
+  padding: 8px 12px;
+  font-size: 13px;
+  color: #333;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.wagon-tally-sheet-body-content-materials-details-body-content-dropdown-option:hover {
+  background-color: #f0f0f0;
+}
+
+.wagon-tally-sheet-body-content-materials-details-body-content-dropdown-fetch-icon{
+  z-index: 2;
+}

@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react'
 import { 
-  Box, Typography, Grid, Paper, InputAdornment, IconButton } from '@mui/material';
+  Box, Typography, IconButton } from '@mui/material';
 import { PieChart, Pie, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Sector, ResponsiveContainer, Cell } from 'recharts'
 import './commodityTable.css'
 import { httpsGet } from '@/utils/Communication'
@@ -57,50 +57,6 @@ const commodityColors = commodities.reduce((acc: any, commodity, index) => {
   acc[commodity] = COLORS[index];
   return acc;
 }, {});
-
-// Mock data based on the API response structure
-const mockData = [
-  {
-    commodity: "IS (IRON & STEEL)",
-    withinETA: { count: 85, percentage: 45 },
-    beyondETA: { count: 65, percentage: 55 }
-  },
-  {
-    commodity: "CEMT (CEMENT)",
-    withinETA: { count: 45, percentage: 30 },
-    beyondETA: { count: 55, percentage: 70 }
-  },
-  {
-    commodity: "COAL (COAL)",
-    withinETA: { count: 95, percentage: 65 },
-    beyondETA: { count: 35, percentage: 35 }
-  },
-  {
-    commodity: "IMCL (IMPORTED COAL)",
-    withinETA: { count: 75, percentage: 50 },
-    beyondETA: { count: 45, percentage: 50 }
-  },
-  {
-    commodity: "IMOR (IMPORTED IRON ORE)",
-    withinETA: { count: 60, percentage: 40 },
-    beyondETA: { count: 90, percentage: 60 }
-  },
-  {
-    commodity: "MIXD (MIXED)",
-    withinETA: { count: 40, percentage: 35 },
-    beyondETA: { count: 75, percentage: 65 }
-  },
-  {
-    commodity: "ORES (ORES)",
-    withinETA: { count: 90, percentage: 75 },
-    beyondETA: { count: 30, percentage: 25 }
-  },
-  {
-    commodity: "RMSP (RAW MATERIAL FOR STEEL PLANT)",
-    withinETA: { count: 70, percentage: 60 },
-    beyondETA: { count: 50, percentage: 40 }
-  }
-]
 
 const tooltipStyle: React.CSSProperties = {
   backgroundColor: '#E8F4FF',
@@ -162,19 +118,6 @@ const CommodityTable: React.FC = () => {
   
   const [withinTrendData, setWithinTrendData] = useState<any[]>([]);
   const [beyondTrendData, setBeyondTrendData] = useState<any[]>([]);
-
-  // Prepare data for trend lines
-  const trendData = [
-    { date: 'Oct 1', ...mockData.reduce((acc, item) => ({ ...acc, [item.commodity]: item.withinETA.count }), {}) },
-    { date: 'Oct 15', ...mockData.reduce((acc, item) => ({ ...acc, [item.commodity]: item.withinETA.count * 0.8 }), {}) },
-    { date: 'Oct 31', ...mockData.reduce((acc, item) => ({ ...acc, [item.commodity]: item.withinETA.count * 0.9 }), {}) },
-  ]
-
-  const beyondTrendDataA = [
-    { date: 'Oct 1', ...mockData.reduce((acc, item) => ({ ...acc, [item.commodity]: item.beyondETA.count }), {}) },
-    { date: 'Oct 15', ...mockData.reduce((acc, item) => ({ ...acc, [item.commodity]: item.beyondETA.count * 1.2 }), {}) },
-    { date: 'Oct 31', ...mockData.reduce((acc, item) => ({ ...acc, [item.commodity]: item.beyondETA.count * 0.95 }), {}) },
-  ]
 
   const handleStartDateChange = (date: Date | null) => {
     setStartDate(date);

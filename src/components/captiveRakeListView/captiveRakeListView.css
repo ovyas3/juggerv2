@@ -149,17 +149,18 @@
 .list-view-table .MuiTableCell-root:nth-child(9),
 .list-view-table .MuiTableCell-root:nth-child(10),
 .list-view-table .MuiTableCell-root:nth-child(11),
-.list-view-table .MuiTableCell-root:nth-child(12) {
+.list-view-table .MuiTableCell-root:nth-child(12),
+.list-view-table .MuiTableCell-root:nth-child(13) {
     min-width: 140px;
     width: 140px;
     max-width: 150px;
 }
 
-.list-view-table .MuiTableCell-root:nth-child(7) span,
 .list-view-table .MuiTableCell-root:nth-child(9) span,
 .list-view-table .MuiTableCell-root:nth-child(10) span,
 .list-view-table .MuiTableCell-root:nth-child(11) span,
-.list-view-table .MuiTableCell-root:nth-child(12) span {
+.list-view-table .MuiTableCell-root:nth-child(12) span,
+.list-view-table .MuiTableCell-root:nth-child(13) span {
     white-space: normal;
     word-wrap: break-word;
     overflow-wrap: break-word;
@@ -224,17 +225,19 @@
     display: inline-block;
     border-radius: 12px !important;
     overflow-y: unset;
-    width: 700px !important;
+    width: 70vw !important;
+    max-width: 70vw !important;
     background-color: white;
 }
 
 .list-view-routes-dialog-styles .MuiDialog-container .MuiDialog-paper {
+    position: relative;
     border-radius: 12px !important;
-    width: 100% !important;
-    min-height: 40%;
+    min-height: 74%;
     overflow-y: unset;
+    width: 70vw !important;
+    max-width: 70vw !important;
 }
-
 
 .list-view-routes-dialog-styles .list-view-routes-dialog-close-icon {
     position: absolute;
@@ -243,3 +246,185 @@
     cursor: pointer;
     z-index: 1000;
 }
+
+.list-view-routes-dialog-body{
+    display: flex;
+    width: 100%;
+    height: 100%;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 24px;
+}
+
+.list-view-routes-dialog-title{
+    font-size: 20px;
+    font-weight: 600;
+    color: #000;
+    padding-left: 24px;
+}
+
+.list-view-routes-dialog-table{
+    width: 95%;
+    border: 1px solid #DFE3EB;
+    border-radius: 12px;
+    overflow-y: auto;
+    scrollbar-width: none; 
+    -ms-overflow-style: none; 
+    max-height: 400px;
+    margin: 24px 24px;
+}
+
+.list-view-routes-dialog-footer{
+    display: flex;
+    justify-content: flex-end;
+    margin-right: 32px;
+}
+
+.list-view-routes-dialog-footer-button{
+    outline: none;
+    padding: 10px 16px;
+    background: #3351FF;
+    border-radius: 6px;
+    color: #FFFFFF;
+    font-size: 14px;
+    font-weight: bold;
+    display: flex;
+    border: none;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+.list-view-routes-dialog-footer-button:hover{
+    cursor: pointer;
+    background: #334FFC;
+    scale: 1.05;
+    transform: translateY(-2px);
+    box-shadow: 0px 4px 8px rgba(51, 81, 255, 0.2);
+}
+
+.list-view-routes-dialog-footer-button-disabled{
+    outline: none;
+    padding: 10px 16px;
+    background: #DFE3EB;
+    border-radius: 6px;
+    color: #71747A;
+    font-size: 14px;
+    font-weight: bold;
+    display: flex;
+    border: none;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.3s ease;
+    cursor: not-allowed;
+}   
+
+.list-view-routes-confirm-dialog-styles{
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.list-view-routes-confirm-dialog-styles .list-view-routes-confirm-dialog-container{
+    position: relative;
+    display: inline-block;
+    border-radius: 12px !important;
+    overflow-y: unset;
+    width: 400px !important;
+    background-color: white;
+}
+
+.list-view-routes-confirm-dialog-styles .MuiDialog-container .MuiDialog-paper{
+    position: relative;
+    border-radius: 12px !important;
+    min-height: 26%;
+    overflow-y: unset;
+    width: 400px !important;
+}
+
+.list-view-routes-confirm-dialog-styles .list-view-routes-confirm-dialog-close-icon{
+    position: absolute;
+    top: -40px;
+    right: -2px;
+    cursor: pointer;
+    z-index: 1000;
+}
+
+.list-view-routes-confirm-dialog-body{
+    display: flex;
+    width: 100%;
+    height: 100%;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    margin-top: 24px;
+    padding: 0 24px;
+}
+
+.list-view-routes-confirm-dialog-text{
+    font-size: 16px;
+    font-weight: 400;
+    color: #000;
+    text-align: center;
+}
+
+.list-view-routes-confirm-dialog-title{
+    margin-top: 24px;    
+    font-size: 20px;
+    font-weight: 600;
+    color: #000;
+    padding-left: 24px;
+}
+
+.list-view-routes-confirm-dialog-footer{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    margin-top: 16px;    
+}
+
+.list-view-routes-confirm-dialog-footer-confirm-button{
+    outline: none;
+    padding: 10px 16px;
+    background: #3351FF;
+    border-radius: 6px;
+    color: #FFFFFF;
+    font-size: 14px;
+    font-weight: bold;
+    display: flex;
+    border: none;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+.list-view-routes-confirm-dialog-footer-confirm-button:hover{
+    cursor: pointer;
+    background: #334FFC;
+    scale: 1.05;
+    transform: translateY(-2px);
+    box-shadow: 0px 4px 8px rgba(51, 81, 255, 0.2);
+}
+
+.list-view-routes-confirm-dialog-footer-cancel-button{
+    outline: none;
+    padding: 10px 16px;
+    background: #DFE3EB;
+    border-radius: 6px;
+    color: #71747A;
+    font-size: 14px;
+    font-weight: bold;
+    display: flex;
+    border: none;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.3s ease;
+}   
+
+.list-view-routes-confirm-dialog-footer-cancel-button:hover{
+    cursor: pointer;
+    background: #DFE3EB;
+    scale: 1.05;
+    transform: translateY(-2px);
+    box-shadow: 0px 4px 8px rgba(51, 81, 255, 0.2);
+}   
