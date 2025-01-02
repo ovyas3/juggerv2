@@ -26,6 +26,16 @@ interface WagonData {
     dcCharges: number
 }
 
+interface DCChargesData {
+    todayValue: number
+    yesterdayValue: number
+    lastMonthvalue: number
+    thisMonthValue: number
+    ytdValue: number
+    dayTrend: Boolean
+    monthTrend: Boolean
+}
+
 const Demurrage = () => {
     const today: any = new Date();
     const oneDayAgo: any = new Date();
@@ -38,6 +48,16 @@ const Demurrage = () => {
     const router = useRouter();
     const [wagonData, setWagonData] = useState<WagonData[]>([]);
     const componentRef = useRef<HTMLDivElement>(null);
+
+    const [dcChargesData, setDcChargesData] = useState<DCChargesData>({
+        todayValue: 0,
+        yesterdayValue: 0,
+        lastMonthvalue: 0,
+        thisMonthValue: 0,
+        ytdValue: 0,
+        dayTrend: false,
+        monthTrend: false
+    });
 
     const handleStartDateChange = (date: Date | null) => {
         setStartDate(date);
@@ -112,6 +132,39 @@ const Demurrage = () => {
         }
     };
 
+    const fetchDCCharges = async () => {
+        try {
+            setLoading(true);
+            const response = await httpsGet(`dashboard/dcCharges`, 0, router);
+            if (response.statusCode === 200) {
+                const data = response.data;
+
+                const todayValue = parseFloat((data.todayValue / 100000).toFixed(2));
+                const yesterdayValue = parseFloat((data.yesterdayValue / 100000).toFixed(2));
+                const lastMonthvalue = parseFloat((data.lastMonthvalue / 100000).toFixed(2));
+                const thisMonthValue = parseFloat((data.thisMonthValue / 100000).toFixed(2));
+                const ytdValue = parseFloat((data.ytdValue / 100000).toFixed(2));
+    
+                const DCChargesData: DCChargesData = {
+                    todayValue,
+                    yesterdayValue,
+                    lastMonthvalue,
+                    thisMonthValue,
+                    ytdValue,
+                    dayTrend: todayValue - yesterdayValue >= 0,
+                    monthTrend: thisMonthValue - lastMonthvalue >= 0,
+                };
+    
+                setDcChargesData(DCChargesData);
+                setLoading(false);
+            }
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const calculateRemainingTime = (placement: string, freeTime: string) => {
         const targetTime = new Date(new Date(placement).getTime() + parseInt(freeTime) * 3600000);
         const currentTime = new Date();
@@ -154,10 +207,13 @@ const Demurrage = () => {
             const epochStartDate: any = timeService.millies(startDateString);
             const epochEndDate: any = timeService.millies(endDateString);
 
-            console.log(epochStartDate, epochEndDate, "newStartDate, newEndDate");
             fetchWagonTableData(epochStartDate, epochEndDate);
         }
     }, [startDate, endDate]);
+
+    useEffect(() => {
+        fetchDCCharges();
+    }, []);
 
     const handleScreenshot = async () => {
         if (componentRef.current) {
@@ -260,55 +316,64 @@ const Demurrage = () => {
                 </Box>
             </Box>
 
-            {/* <div className="in-plant-wagons-stats-grid">
+            <div className="in-plant-wagons-stats-grid">
                 <div className="in-plant-wagons-stats-card">
                     <span className="in-plant-wagons-period">Yesterday</span>
                     <div className="in-plant-wagons-amount">
-                        Rs.12L
-                        <span className="in-plant-wagons-trend" data-trend="up">↑</span>
+                        ₹{dcChargesData.yesterdayValue}L
                     </div>
                 </div>
 
                 <div className="in-plant-wagons-stats-card">
                     <span className="in-plant-wagons-period">Today</span>
                     <div className="in-plant-wagons-amount">
-                        Rs.3L
-                        <span className="in-plant-wagons-trend" data-trend="up">↑</span>
+                        ₹{dcChargesData.todayValue}L
+                        <span className="in-plant-wagons-trend" data-trend={
+                            dcChargesData.dayTrend ? 'up' : 'down'
+                        }
+                        >{
+                            dcChargesData.dayTrend ? '↑' : '↓'
+                        }
+                        </span>
                     </div>
                 </div>
 
                 <div className="in-plant-wagons-stats-card">
                     <span className="in-plant-wagons-period">Last month</span>
                     <div className="in-plant-wagons-amount">
-                        Rs.15L
-                        <span className="in-plant-wagons-trend" data-trend="down">↓</span>
+                        ₹{dcChargesData.lastMonthvalue}L
                     </div>
                 </div>
 
                 <div className="in-plant-wagons-stats-card">
                     <span className="in-plant-wagons-period">This month</span>
                     <div className="in-plant-wagons-amount">
-                        Rs.15L
-                        <span className="in-plant-wagons-trend" data-trend="up">↑</span>
+                        ₹{dcChargesData.thisMonthValue}L
+                        <span className="in-plant-wagons-trend" data-trend={
+                            dcChargesData.monthTrend ? 'up' : 'down'
+                        }>
+                            {
+                                dcChargesData.monthTrend ? '↑' : '↓'
+                            }
+                        </span>
                     </div>
                 </div>
 
-                <div className="in-plant-wagons-stats-card">
+                {/* <div className="in-plant-wagons-stats-card">
                     <span className="in-plant-wagons-period">Last month This time</span>
                     <div className="in-plant-wagons-amount">
                         Rs.3L
                         <span className="in-plant-wagons-trend" data-trend="down">↓</span>
                     </div>
-                </div>
+                </div> */}
 
                 <div className="in-plant-wagons-stats-card">
                     <span className="in-plant-wagons-period">YTD</span>
                     <div className="in-plant-wagons-amount">
-                        Rs.250L
-                        <span className="in-plant-wagons-trend" data-trend="up">↑</span>
+                        ₹{dcChargesData.ytdValue}L
                     </div>
                 </div>
-            </div> */}
+            </div>
 
             <div className="in-plant-wagons-tableContainer">
                 <table className="in-plant-wagons-table">
