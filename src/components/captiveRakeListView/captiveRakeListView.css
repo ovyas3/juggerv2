@@ -149,17 +149,18 @@
 .list-view-table .MuiTableCell-root:nth-child(9),
 .list-view-table .MuiTableCell-root:nth-child(10),
 .list-view-table .MuiTableCell-root:nth-child(11),
-.list-view-table .MuiTableCell-root:nth-child(12) {
+.list-view-table .MuiTableCell-root:nth-child(12),
+.list-view-table .MuiTableCell-root:nth-child(13) {
     min-width: 140px;
     width: 140px;
     max-width: 150px;
 }
 
-.list-view-table .MuiTableCell-root:nth-child(7) span,
 .list-view-table .MuiTableCell-root:nth-child(9) span,
 .list-view-table .MuiTableCell-root:nth-child(10) span,
 .list-view-table .MuiTableCell-root:nth-child(11) span,
-.list-view-table .MuiTableCell-root:nth-child(12) span {
+.list-view-table .MuiTableCell-root:nth-child(12) span,
+.list-view-table .MuiTableCell-root:nth-child(13) span {
     white-space: normal;
     word-wrap: break-word;
     overflow-wrap: break-word;
