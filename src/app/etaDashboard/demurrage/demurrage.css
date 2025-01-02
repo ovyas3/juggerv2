@@ -14,7 +14,7 @@
 
 .in-plant-wagons-stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
+    grid-template-columns: repeat(5, 1fr);
     gap: 1rem;
     margin-bottom: 2rem;
     width: 100%;
@@ -66,7 +66,7 @@
     border: 1px solid #eee;
     width: 100%;
     background: white;
-    max-height: calc(100vh - 300px);
+    max-height: calc(100vh - 380px);
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
@@ -157,12 +157,12 @@
 
 @media (min-width: 641px) and (max-width: 1024px) {
     .in-plant-wagons-stats-grid {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(3, 1fr);
     }
 }
 
 @media (min-width: 1025px) {
     .in-plant-wagons-stats-grid {
-        grid-template-columns: repeat(4, 1fr);
+        grid-template-columns: repeat(5, 1fr);
     }
 }
