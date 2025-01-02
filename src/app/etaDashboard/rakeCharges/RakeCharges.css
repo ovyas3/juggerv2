@@ -1,0 +1,22 @@
+.close-button-rake-charges {
+    position: absolute;
+    top: -50px;
+    right: 0;
+    cursor: pointer;
+    background-color: white;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: transform 1.2s ease;
+  }
+  
+  .close-button-rake-charges:hover {
+    transform: rotate(180deg);
+  }
+
+  .rake-charges-popup{
+    background-color: white;
+  }
