@@ -2160,13 +2160,13 @@ export const ViewContactModal = ({isClose, shipmentData}:any) => {
             <div className="closeContaioner"><CloseIcon onClick={(e) => { e.stopPropagation(); isClose(false) }}/></div>
             <header id="contactModalHeader">{text('contactModalHeader')} - #{shipmentData?.fnr?.primary}</header>
             <div
-      style={{
-        width: "100%",
-        height: "90%",
-        display: "flex",
-        flexDirection: "column",
-      }}
-    >
+                style={{
+                    width: "100%",
+                    height: "90%",
+                    display: "flex",
+                    flexDirection: "column",
+                }}
+            >
       <Paper
         sx={{
           position: "relative",

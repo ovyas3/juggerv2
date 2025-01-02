@@ -203,6 +203,7 @@ export default function WagonsDashboard() {
   const [isTonnage, setIsTonnage] = useState(false);
   const [yAxisLabel, setYAxisLabel] = useState('No. of Wagons');
   const [barDataKeys, setBarDataKeys] = useState<any>({});
+  const [chartType, setChartType] = useState('bar');
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -528,9 +529,10 @@ export default function WagonsDashboard() {
           </Box>
         </Box>
         <Box display="flex" flexDirection={isMobile ? 'column' : 'row'}>
-          <Box width={isMobile ? '100%' : '70%'} mr={isMobile ? 0 : 3} mb={isMobile ? 3 : 0}>
+
+          <Box width={isMobile ? '100%' : '70%'} mr={isMobile ? 0 : 3} mb={isMobile ? 3 : 0} >
             <ResponsiveContainer width="100%" height={400}>
-            <BarChart
+              <BarChart
               data={data}
               margin={{
                 top: 20,
@@ -604,9 +606,15 @@ export default function WagonsDashboard() {
                     </>
                 )
               }
-            </BarChart>
+              </BarChart>
             </ResponsiveContainer>
+            {/* <div id='toggle-container-various-charts'>
+              <button onClick={() => setChartType('bar')}>Bar Chart</button>
+              <button onClick={() => setChartType('line')}>Line Chart</button>
+              <button onClick={() => setChartType('pie')}>Pie Chart</button>
+            </div> */}
           </Box>
+
           <Box width={isMobile ? '100%' : '30%'}>
             <Typography 
               variant="h6" 
@@ -666,6 +674,7 @@ export default function WagonsDashboard() {
               </StatLabel>
             </StatBox>
           </Box>
+
         </Box>
     </StyledBox>
   );

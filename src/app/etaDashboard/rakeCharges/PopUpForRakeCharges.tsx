@@ -2,7 +2,7 @@
 import "./RakeCharges.css";
 import { useEffect, useState, useRef } from "react";
 import React from "react";
-import service from '@/utils/timeService';
+import service from "@/utils/timeService";
 import { httpsPost, httpsGet } from "@/utils/Communication";
 import CloseIcon from "@mui/icons-material/Close";
 
@@ -99,23 +99,39 @@ function contructingData(shipment: any) {
       idealFreight: any;
       status: any;
     }) => {
+      const fnrsArray = shipment.fnrs.split(",");
       return {
         sno: shipment?.sno ? shipment?.sno : "--",
         edemand: shipment?.edemand ? shipment?.edemand : "--",
-        fnrs: shipment?.fnrs ? shipment?.fnrs : "--",
+        fnrs: shipment?.fnrs ? fnrsArray : "--",
         rrs: shipment?.rrs ? shipment?.rrs : "--",
         consignee: shipment?.consignee ? shipment?.consignee : "--",
         from: shipment?.from ? shipment?.from : "--",
         to: shipment?.to ? shipment?.to : "--",
         material: shipment?.material ? shipment?.material : "--",
-        actualWeight: shipment?.actualWeight === "N/A" ? "--" : shipment?.actualWeight?.toFixed(2),
-        chargeablWeight: shipment?.chargeablWeight === "N/A" ? "--" : shipment?.chargeablWeight?.toFixed(2),
+        actualWeight:
+          shipment?.actualWeight === "N/A"
+            ? "--"
+            : shipment?.actualWeight?.toFixed(2),
+        chargeablWeight:
+          shipment?.chargeablWeight === "N/A"
+            ? "--"
+            : shipment?.chargeablWeight?.toFixed(2),
         rate: shipment?.rate ? shipment?.rate : "--",
         freight: shipment?.freight ? shipment?.freight : "--",
         invoiceNumber: shipment?.invoiceNumber ? shipment?.invoiceNumber : "--",
-        invoiceDate: shipment?.invoiceDate === "Invalid DateTime" ? "--" : service.utcToist(shipment?.invoiceDate, "dd/MM/yyyy"),
-        idealWeight: shipment?.idealWeight === "N/A" ? "--" : shipment?.idealWeight?.toFixed(2),
-        idealFreight: shipment?.idealFreight === "N/A" ? "--" : shipment?.idealFreight?.toFixed(2),
+        invoiceDate:
+          shipment?.invoiceDate === "Invalid DateTime"
+            ? "--"
+            : service.utcToist(shipment?.invoiceDate, "dd/MM/yyyy"),
+        idealWeight:
+          shipment?.idealWeight === "N/A"
+            ? "--"
+            : shipment?.idealWeight?.toFixed(2),
+        idealFreight:
+          shipment?.idealFreight === "N/A"
+            ? "--"
+            : shipment?.idealFreight?.toFixed(2),
         status: shipment?.status ? shipment?.status : "--",
       };
     }
@@ -179,120 +195,120 @@ function PopUpForRakeCharges({
           fontSize: "12px",
           position: "relative",
           marginInline: "60px",
-          
+          width: "80vw",
+          minWidth: "450px",
+          height: "60vh",
+          minHeight: "450px",
         }}
       >
         <header
           style={{
-            fontSize:'14px',
-            display:'flex',
-            justifyContent:'space-between',
-            marginBottom:'12px'
+            fontSize: "14px",
+            display: "flex",
+            justifyContent: "space-between",
+            marginBottom: "12px",
           }}
         >
           <div>
-            Rake Charges On <strong>{new Date(payloadDataForPopup.from).toDateString()}</strong>
+            Rake Charges On{" "}
+            <strong>{new Date(payloadDataForPopup.from).toDateString()}</strong>
           </div>
-          <div>Total Freight (in Cr &#8377;): <strong>{payloadDataForPopup.amt}</strong></div>
+          <div>
+            Total Freight (in Cr &#8377;):{" "}
+            <strong>{payloadDataForPopup.amt}</strong>
+          </div>
         </header>
 
-        <div>
-          <div
-            style={{
+        <div
+          style={{
+            width: "100%",
+            height: "calc(100% - 26px)",
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
+          <Paper
+            sx={{
+              position: "relative",
               width: "100%",
-              height: "90%",
+              height: "100%",
               display: "flex",
               flexDirection: "column",
+              boxShadow: "none",
             }}
           >
-            <Paper
+            <TableContainer
               sx={{
-                position: "relative",
-                width: "100%",
-                height: "100%",
-                display: "flex",
-                flexDirection: "column",
-                boxShadow: "none",
+                overflow: "auto",
+                borderRadius: "4px",
+                border: "1px solid #E9E9EB",
               }}
             >
-              {/* <TablePagination
-          rowsPerPageOptions={[5, 10, 25, 50, 100]}
-          component="div"
-          count={viewContactsList.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-          labelRowsPerPage="Contacts per page:"
-          sx={{ position: "absolute", top: -40, zIndex: 100, right: -10 }}
-        /> */}
-              <TableContainer
-                sx={{
-                  overflow: "auto",
-                  borderRadius: "4px",
-                  border: "1px solid #E9E9EB",
-                }}
-              >
-                <Table stickyHeader aria-label="sticky table">
-                  <TableHead>
-                    <TableRow>
-                      {columns.map((column) => (
-                        <TableCell
-                          key={column.id}
-                          className={column.style}
-                          style={{
-                            textAlign: "center",
-                            padding: "8px 10px 8px 10px",
-                            fontSize: 11,
-                            fontWeight: 600,
-                            color: "#484A57",
-                            whiteSpace: "nowrap",
-                            paddingInline: 10,
-                          }}
+              <Table stickyHeader aria-label="sticky table">
+                <TableHead>
+                  <TableRow>
+                    {columns.map((column) => (
+                      <TableCell
+                        key={column.id}
+                        className={column.style}
+                        style={{
+                          textAlign: "center",
+                          padding: "8px 10px 8px 10px",
+                          fontSize: 11,
+                          fontWeight: 600,
+                          color: "#484A57",
+                          whiteSpace: "nowrap",
+                          paddingInline: 10,
+                        }}
+                      >
+                        {column.label}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {contructingData(rakeChargesList)?.map(
+                    (row: any, rowIndex: any) => {
+                      return (
+                        <TableRow
+                          hover
+                          role="checkbox"
+                          tabIndex={-1}
+                          key={rowIndex}
                         >
-                          {column.label}
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {contructingData(rakeChargesList)?.map(
-                      (row: any, rowIndex: any) => {
-                        return (
-                          <TableRow
-                            hover
-                            role="checkbox"
-                            tabIndex={-1}
-                            key={rowIndex}
-                          >
-                            {columns.map((column) => {
-                              const value = row[column.id];
-                            //   console.log(value);
-                              return (
-                                <TableCell
-                                  key={column.id}
-                                  sx={{
-                                    textAlign: "center",
-                                    padding: "8px 10px 8px 10px",
-                                    fontSize: 10,
-                                  }}
-                                >
-                                  {typeof value !== "object" && value}
-                                </TableCell>
-                              );
-                            })}
-                          </TableRow>
-                        );
-                      }
-                    )}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </Paper>
-          </div>
+                          {columns.map((column) => {
+                            const value = row[column.id];
+                            return (
+                              <TableCell
+                                key={column.id}
+                                sx={{
+                                  textAlign: "center",
+                                  padding: "8px 10px 8px 10px",
+                                  fontSize: 10,
+                                }}
+                              >
+                                {typeof value !== "object" && value}
+                                {column.id === "fnrs" && row.fnrs.length > 2 && (
+                                    <div className="fnrs-more-text">
+                                        {row.fnrs.slice(0, 2).join(", ")} +
+                                        {row.fnrs.length - 2} more
+                                        <div className="fnrs-list-popup">
+                                        {row.fnrs.slice(2).join(", ")}
+                                        </div>
+                                    </div>
+                                )}
+                              </TableCell>
+                            );
+                          })}
+                        </TableRow>
+                      );
+                    }
+                  )}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Paper>
         </div>
-
-        <div></div>
 
         <div
           className="close-button-rake-charges"
