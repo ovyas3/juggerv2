@@ -51,6 +51,8 @@ function Report() {
         url = `reports/eta?from=${fromDate}&to=${toDate}`;
       } else if (reportType === "MIS") {
         url = `reports/mis?from=${fromDate}&to=${toDate}`;
+      } else if (reportType === "rakeCharges") {
+        url = `reports/rake_charges?from=${fromDate}&to=${toDate}`;
       }
       setLoading(true);
       const response = await httpsGet(url, 0, router);
@@ -114,10 +116,12 @@ function Report() {
               >
                 <MenuItem value={"ETA"}>ETA</MenuItem>
                 <MenuItem value={"MIS"}>MIS</MenuItem>
+                <MenuItem value={"rakeCharges"}>Rake Charges</MenuItem>
               </Select>
             </FormControl>
           </div>
         </div>
+
         {reportType === "ETA" && (
           <>
             <div style={{ marginTop: "40px" }}>Invoice Generated Date</div>
@@ -161,6 +165,50 @@ function Report() {
         {reportType === "MIS" && (
           <>
             <div style={{ marginTop: "40px",fontWeight: "bold" }}>Drawn Out Date</div>
+            <div className="date_container">
+              <div>
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DatePicker
+                    label="From"
+                    sx={{}}
+                    format="DD/MM/YYYY"
+                    onChange={(newDate :any) => {
+                      if (newDate) {
+                        const utc = new Date (newDate);
+                        let epochTime = utc.valueOf();
+                        epochTime = epochTime - 1000 - (5 * 60 * 60 * 1000) - (30 * 60 * 1000);
+                        setFromDate(epochTime);
+                      }
+                    }}
+                    disableFuture={true}
+                  />
+                </LocalizationProvider>
+              </div>
+
+              <div>
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DatePicker
+                    label="To"
+                    format="DD/MM/YYYY"
+                    onChange={(newDate :any) => {
+                      if (newDate) {
+                        const utc = new Date (newDate);
+                        let epochTime = utc.valueOf();
+                        epochTime = epochTime - (5 * 60 * 60 * 1000) - (30 * 60 * 1000);
+                        setToDate(epochTime);
+                      }
+                    }}
+                    disableFuture={true}
+                  />
+                </LocalizationProvider>
+              </div>
+            </div>
+          </>
+        )}
+
+        {reportType === "rakeCharges" && (
+          <>
+            <div style={{ marginTop: "40px",fontWeight: "bold" }}>Generate Rake Charges Report</div>
             <div className="date_container">
               <div>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
