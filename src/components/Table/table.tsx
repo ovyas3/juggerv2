@@ -109,11 +109,13 @@ const convertArrayToFilteredArray = (inputArray: any, shipmentPayloads: any) => 
             placement_time:any,
             indent_no:any,
             drawnout_time:any,
+            release_time:any,
+            commodity:any,
             captive:any,
             fois_updated_at:any,
             materials?: any
         }) => {
-        const { edemand_no,captive,fois_updated_at, FNR,placement_time,indent_no, drawnout_time, all_FNRs,rr_dates, delivery_location, trip_tracker, others, remarks, unique_code, status, pickup_date, captive_id, is_captive, eta, rr_document, polyline, past_etas, no_of_wagons, received_no_of_wagons, demand_date, paid_by, commodity_desc, expected_loading_date, HA, materials } = item;
+        const { edemand_no,captive,fois_updated_at, FNR,placement_time,indent_no, drawnout_time, all_FNRs,rr_dates, delivery_location, trip_tracker, others, remarks, unique_code, status, pickup_date, captive_id, is_captive, eta, rr_document, polyline, past_etas, no_of_wagons, received_no_of_wagons, demand_date, paid_by, commodity_desc, expected_loading_date, HA, materials, release_time, commodity } = item;
         let newDemandDate = new Date(demand_date);
         newDemandDate.setHours(newDemandDate.getHours() - 5);
         newDemandDate.setMinutes(newDemandDate.getMinutes() - 30);
@@ -185,20 +187,22 @@ const convertArrayToFilteredArray = (inputArray: any, shipmentPayloads: any) => 
             paid_by: paid_by ? paid_by : '--',
             commodity_desc: commodity_desc && commodity_desc,
             expected_loading_date:{
-                ELDdate: service.utcToist(expected_loading_date, 'dd-MMM') || '--',
+                ELDdate: service.utcToist(expected_loading_date, 'dd-MMM-yyyy') || '--',
                 ELDtime: service.utcToistTime(expected_loading_date) || '--'
             },
-            placement_time: service.utcToist(placement_time, 'dd-MMM HH:mm')|| '--',
-            oneRr_date: rr_dates && rr_dates.length > 0 && service.utcToist(newRRDate.toISOString(), 'dd-MMM HH:mm')|| '--',
+            placement_time: service.utcToist(placement_time, 'dd-MMM-yyyy HH:mm')|| '--',
+            oneRr_date: rr_dates && rr_dates.length > 0 && service.utcToist(newRRDate.toISOString(), 'dd-MMM-yyyy HH:mm')|| '--',
             intent_no: indent_no && indent_no,
-            demand_date:demand_date && service.utcToist(newDemandDate.toISOString(), 'dd-MMM HH:mm') || '--',
-            drawnout_time: drawnout_time && service.utcToist(drawnout_time, 'dd-MMM HH:mm') || '--',
+            demand_date:demand_date && service.utcToist(newDemandDate.toISOString(), 'dd-MMM-yyyy HH:mm') || '--',
+            drawnout_time: drawnout_time && service.utcToist(drawnout_time, 'dd-MMM-yyyy HH:mm') || '--',
             captive: {
                 name: captive?.name || '--',
             },
             fois_updated_at:{
-                date: fois_updated_at_date ? service.utcToist(fois_updated_at_date, 'dd-MMM HH:mm') : '--',
-            }
+                date: fois_updated_at_date ? service.utcToist(fois_updated_at_date, 'dd-MMM-yyyy HH:mm') : '--',
+            },
+            release_time: release_time && service.utcToist(release_time, 'dd-MMM-yyyy HH:mm') || '--',
+            commodity: commodity || '--'
         }
     });
 };
@@ -920,7 +924,9 @@ export default function TableData({ onSkipLimit, allShipments, rakeCaptiveList, 
                                                         )}
                                                         {item.id === 'pickupdate' && (
                                                             row.oneRr_date === '--' && row.drawnout_time === '--' ? '--' : (
-                                                            <div>
+                                                            <div style={{
+                                                                width: '120px'
+                                                            }}>
                                                                 <div>{row?.oneRr_date}</div>
                                                                 <div style={{marginBlock: '4px'}}>{row?.drawnout_time}</div>
                                                                 <div>{row?.fois_updated_at.date}</div>

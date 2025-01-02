@@ -950,6 +950,28 @@ export const MarkPlacement = ({isClose ,shipment, getAllShipment, different = 'm
       }
     }, []);
 
+    useEffect(() => {
+        if(different === 'markplacement' && shipment.placement_time) {
+            setSelectedDate(new Date(shipment.placement_time));
+        } else if(different === 'downOut' && shipment.drawnout_time) {
+            setSelectedDate(new Date(shipment.drawnout_time));
+        } else if(different === 'releaseTime' && shipment.release_time) {
+            setSelectedDate(new Date(shipment.release_time));
+        };
+
+        if(different === 'markplacement' && shipment.materials && shipment.materials.length > 0) {
+            setMaterials(shipment.materials);
+        };
+
+        if(different === 'markplacement' && shipment.commodity) {
+            setCommodity(shipment.commodity);
+        };
+
+        if(different === 'markplacement' && shipment.received_no_of_wagons) {
+            setNoOfWagon(shipment.received_no_of_wagons);
+        };
+    }, [shipment]);
+
     const handlePlacementDate = async() => {
         if(!selectedDate) {
             showMessage('Please Select Date', 'error');
@@ -1010,7 +1032,7 @@ export const MarkPlacement = ({isClose ,shipment, getAllShipment, different = 'm
       } catch (error) {
         console.log(error)
       }
-    }
+    };
 
     return (
         <div style={{width:'100vw', height:'100vh', position:'fixed', top:0, left:0 ,zIndex:300, backgroundColor:'rgba(0, 0, 0, 0.5)'}} onClick={(e)=>{e.stopPropagation(); isClose(false);}}>
@@ -1143,7 +1165,7 @@ export const MarkPlacement = ({isClose ,shipment, getAllShipment, different = 'm
                                     </div>
                                     <div>
                                         <header style={{ marginBottom:8, fontSize:12, color:'#42454E'}}>{"Materials Selection Saved Previously"}</header>
-                                        <div style={{fontSize:'14px',marginTop:'4px'}}>{shipment.materials?.join(', ')}</div>
+                                        <div style={{fontSize:'14px',marginTop:'4px'}}>{materials  &&  materials.length > 0 && materials?.join(', ')}</div>
                                     </div>
                                 </div>
                             </>

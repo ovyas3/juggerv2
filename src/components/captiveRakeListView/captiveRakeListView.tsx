@@ -507,6 +507,7 @@ const CaptiveRakeListView = () => {
                                                     </FormControl>
                                                 </div>
                                             </TableCell>
+                                            <TableCell align="left" className="table-columns">Route</TableCell>
                                             <TableCell align="left" className="table-columns">ETA</TableCell>
                                             <TableCell align="left" className="table-columns">Remaining
                                                 <br />Distance (Kms)</TableCell>
@@ -516,7 +517,6 @@ const CaptiveRakeListView = () => {
                                                 <br />Remaining (Kms)</TableCell>
                                             <TableCell align="left" className="table-columns">FOIS (Fetch) At</TableCell>
                                             <TableCell align="left" className="table-columns">FOIS (Updated) At</TableCell>
-                                            <TableCell align="left" className="table-columns">Route</TableCell>
                                             <TableCell align="left" className="table-columns">Actions</TableCell>
                                         </TableRow>
                                     </TableHead>
@@ -547,6 +547,7 @@ const CaptiveRakeListView = () => {
                                                             <span style={{ color: '#1ab836' }}>Loaded</span>
                                                         }
                                                     </TableCell>
+                                                    <TableCell align="left" className="table-rows">{rake.route && rake.route.length > 0 ? rake.route[0]?.name : '-'}</TableCell>
                                                     <TableCell align="left" className="table-rows">
                                                         <span>{timeService.utcToist(rake.eta, 'dd-MM-yyyy') || 'N/A'}</span> <br />
                                                         <span>{timeService.utcToistTime(rake.eta, 'HH:mm') || 'N/A'}</span>
@@ -567,7 +568,6 @@ const CaptiveRakeListView = () => {
                                                         <span>{timeService.utcToist(rake.updated_at, 'dd-MM-yyyy') || 'N/A'}</span> <br />
                                                         <span>{timeService.utcToistTime(rake.updated_at, 'HH:mm') || 'N/A'}</span>
                                                     </TableCell>
-                                                    <TableCell align="left" className="table-rows">{rake.route ? rake.route[0]?.name : 'N/A'}</TableCell>
                                                     <TableCell align="left" className="table-rows">
                                                         {
                                                             rake.route && rake.route.length > 0 ? (
