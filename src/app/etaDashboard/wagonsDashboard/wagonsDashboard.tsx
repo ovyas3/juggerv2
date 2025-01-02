@@ -66,8 +66,8 @@ interface DataPoint {
   opportunityLossTonnage: number;
   lossPercentage: number;
   actualPercentage: number;
-  lossFrieghtAmount: number;
-  actualFrieghtAmount: number;
+  lossFreightAmount: number;
+  actualFreightAmount: number;
   lossTonnage: number;
   actualTonnage: number;
 }
@@ -85,8 +85,8 @@ const CustomTooltip = ({ active, payload, label, isPercentage, isRupees, isTonna
     const partiallyUtilizedPercentage = ((partiallyUtilized / totalOrdered) * 100).toFixed(2)
     const lossPercentage = dataPoint.lossPercentage 
     const actualPercentage = dataPoint.actualPercentage;
-    const lossFrieghtAmount = `₹${(dataPoint?.lossFrieghtAmount).toFixed(2)} Cr` || '₹0.00 Cr';
-    const actualFrieghtAmount = `₹${(dataPoint?.actualFrieghtAmount).toFixed(2)} Cr` || '₹0.00 Cr';
+    const lossFreightAmount = `₹${(dataPoint?.lossFreightAmount)?.toFixed(2)} Cr` || '₹0.00 Cr';
+    const actualFreightAmount = `₹${(dataPoint?.actualFreightAmount)?.toFixed(2)} Cr` || '₹0.00 Cr';
     const lossTonnage = dataPoint?.lossTonnage?.toLocaleString('en-IN') + ' MT' || '0.00 MT'
     const actualTonnage = dataPoint?.actualTonnage?.toLocaleString('en-IN') + ' MT' || '0.00 MT'
 
@@ -144,11 +144,11 @@ const CustomTooltip = ({ active, payload, label, isPercentage, isRupees, isTonna
          <div style={tooltipStyle}>
          <div style={sectionTitleStyle}>
             <span style={{ ...colorIndicatorStyle, backgroundColor: '#596CFF' }}></span>
-            {text('actualFreightAmount')} : {actualFrieghtAmount}
+            {text('actualFreightAmount')} : {actualFreightAmount}
           </div>
           <div style={dataRowStyle}>
             <span style={{ ...colorIndicatorStyle, backgroundColor: '#A4ABFF' }}></span>
-            {text('lossFreightAmount')} : {lossFrieghtAmount}
+            {text('lossFreightAmount')} : {lossFreightAmount}
           </div>
         </div>
         </div>
@@ -226,8 +226,8 @@ export default function WagonsDashboard() {
       setIsTonnage(false);
       setYAxisLabel('Opportunity Loss in Rupees (₹)');
       setBarDataKeys({
-        lossFrieghtAmount : 'lossFrieghtAmount',
-        actualFrieghtAmount: 'actualFrieghtAmount',
+        lossFreightAmount : 'lossFreightAmount',
+        actualFreightAmount: 'actualFreightAmount',
       });
     } else if(value === 'Tonnage'){
       setIsPercentage(false);
@@ -322,36 +322,45 @@ export default function WagonsDashboard() {
         const actualWeight = item.totalActualWeight;
         const chargeableWeight = item.totalChargeableWeight;
         const actualFreightAmountTot = item.totalAFreight;
-      
-        // Calculate opportunity loss percentages
+    
         const actualPercentage = Math.round(opportunityLossPercentage);
-        const lossPercentage =  Math.round(((chargeableWeight - actualWeight) / chargeableWeight) * 100);
-      
-        // Calculate opportunity loss rupees
-        const actualFrieghtAmount = actualFreightAmountTot / 10000000;
-        const lossFrieghtAmount = opportunityLossRupees / 10000000;
-      
-        // Calculate opportunity loss tonnage
+        const lossPercentage = Math.round(((chargeableWeight - actualWeight) / chargeableWeight) * 100);
+    
+        const actualFreightAmount = actualFreightAmountTot / 10000000;
+        const lossFreightAmount = opportunityLossRupees / 10000000;
+    
         const actualTonnage = actualWeight;
         const lossTonnage = opportunityLossTonnage;
-      
+    
+        const date = new Date(item._id);
+        const month = date.getMonth(); 
+        const year = date.getFullYear();
+    
         return {
-          month: new Date(item._id).toLocaleString('default', { month: 'short' }),
-          totalOrdered,
-          fullyUtilized,
-          partiallyUtilized,
-          opportunityLossPercentage,
-          opportunityLossRupees,
-          opportunityLossTonnage,
-          lossPercentage,
-          actualPercentage,
-          actualFrieghtAmount,
-          lossFrieghtAmount,
-          lossTonnage,
-          actualTonnage
+            month: date.toLocaleString('default', { month: 'short' }),
+            year,
+            monthYear: date.toLocaleString('default', { month: 'short' }) + ' ' + year,
+            totalOrdered,
+            fullyUtilized,
+            partiallyUtilized,
+            opportunityLossPercentage,
+            opportunityLossRupees,
+            opportunityLossTonnage,
+            lossPercentage,
+            actualPercentage,
+            actualFreightAmount,
+            lossFreightAmount,
+            lossTonnage,
+            actualTonnage,
+            monthIndex: month
         };
-      }).sort((a: any, b: any) => monthMap[a.month] - monthMap[b.month]);
-
+    }).sort((a: any, b: any) => {
+        if (a.year !== b.year) {
+            return a.year - b.year;
+        }
+        return a.monthIndex - b.monthIndex;
+    });
+    
       const totalEntries = wagonData && wagonData.length ? wagonData.length : 0;
       const totalOpportunityLossPercentage = wagonData && wagonData.length ? wagonData.reduce((sum: any, item: any) => sum + item.opportunityLossPercentage, 0) : 0;
       const totalOpportunityLossRupees = wagonData && wagonData.length ? wagonData.reduce((sum: any, item: any) => sum + item.opportunityLossRupees, 0) : 0;
@@ -391,7 +400,7 @@ export default function WagonsDashboard() {
       domain = [0, Math.ceil(maxTotalValue / 10) * 10]; 
       ticks = Array.from({ length: Math.ceil(domain[1] / 10) + 1 }, (_, i) => i * 10); 
     } else if (isRupees) {
-      const maxTotalValue = data && data.length ? Math.max(...data.map((item: any) => item.lossFrieghtAmount + item.actualFrieghtAmount)) : 0;
+      const maxTotalValue = data && data.length ? Math.max(...data.map((item: any) => item.lossFreightAmount + item.actualFreightAmount)) : 0;
       domain = [0, Math.ceil(maxTotalValue)];
 
       const stepSize = Math.ceil(maxTotalValue / 5) * 1;
@@ -545,7 +554,7 @@ export default function WagonsDashboard() {
             >
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e0e0e0" />
               <XAxis 
-                dataKey="month" 
+                dataKey="monthYear" 
                 axisLine={false} 
                 tickLine={false} 
                 tick={{ fill: '#666', fontSize: 12 }}
@@ -594,8 +603,8 @@ export default function WagonsDashboard() {
                     </>
                 ) : isRupees ? (
                     <>
-                      <Bar dataKey={barDataKeys?.lossFrieghtAmount} name="Loss Freight Amount" stackId="a" fill="#A4ABFF"/>
-                      <Bar dataKey={barDataKeys?.actualFrieghtAmount} name="Actual Freight Amount" stackId="a" fill="#596CFF"/>
+                      <Bar dataKey={barDataKeys?.lossFreightAmount} name="Loss Freight Amount" stackId="a" fill="#A4ABFF"/>
+                      <Bar dataKey={barDataKeys?.actualFreightAmount} name="Actual Freight Amount" stackId="a" fill="#596CFF"/>
                     </>
                 )
                   : (

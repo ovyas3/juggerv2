@@ -65,6 +65,24 @@ const CustomDownloadTooltip = styled(({ className, ...props }: StyledTooltipProp
   },
 });
 
+const CustomTooltip = ({ active, payload, label }: any) => {
+  if (active && payload && payload.length) {
+    const total = payload.reduce((sum: number, item: any) => sum + item.value, 0);
+    return (
+      <div style={{ background: '#fff', border: '1px solid #ccc', padding: '4px', fontSize: '12px', borderRadius:'4px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)' }}>
+        <p><strong>Month:</strong> {label}</p>
+        {payload?.map((item:any, index:any)=>{
+          return(
+            <div key={index} style={{color:item.color}}>{item.name}: <strong>{item.value}</strong></div>
+          );
+        })}
+        <p><strong>Total:</strong> <strong>{total}</strong></p>
+      </div>
+    );
+  }
+  return null;
+};
+
 const DestinationWiseTrend: React.FC = () => {
   const componentRef = useRef<HTMLDivElement>(null);
   const today: any = new Date();
@@ -296,7 +314,7 @@ const DestinationWiseTrend: React.FC = () => {
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="month" tickFormatter={formatMonth} />
               <YAxis />
-              <RechartsTooltip />
+              <RechartsTooltip  content={<CustomTooltip />}/>
               <Legend />
               {allDestinationDatas.map((destination: any, index: number) => (
                 <Bar 
