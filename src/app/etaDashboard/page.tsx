@@ -213,9 +213,8 @@ function EtaDashboard() {
               <StyledTab label="ETA" />
               <StyledTab label="Rake" />
               <StyledTab label="Destination" />
-              <StyledTab label="In Plant Wagons" />
-              <StyledTab label="Rake Charges" />
               <StyledTab label="Demurrage" />
+              <StyledTab label="Rake Charges" />
             </StyledTabs>
           </Box>
           <CustomTabPanel value={value} index={0}>
