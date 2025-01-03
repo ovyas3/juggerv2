@@ -301,8 +301,8 @@ function PopUpForRakeCharges({
                                  {column.id === "status" && (
                                    <div>
                                     {row.status === 'INPL' && 'In Plant'}
-                                    {row.status === 'INTS' && 'In Transit'}
-                                    {row.status !== 'INPL' && row.status !== 'INTS' && row.status}
+                                    {row.status === 'ITNS' && 'In Transit'}
+                                    {row.status !== 'INPL' && row.status !== 'ITNS' && row.status}
                                    </div>
                                 )}
                                 {column.id === "rrs" && row.rrs.length > 2 && (
