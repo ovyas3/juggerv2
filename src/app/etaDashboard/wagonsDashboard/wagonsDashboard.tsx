@@ -89,7 +89,7 @@ interface DataPoint {
 
 function processedPieData (data:any = []){
   return data.map((item: any) => ({
-    name: item?.month,
+    name: item?.monthYear,
     value: item?.totalOrdered,
     fullyUtilized: item?.fullyUtilized,
     partiallyUtilized: item?.partiallyUtilized,
@@ -474,6 +474,8 @@ export default function WagonsDashboard() {
     );
   }
 
+  console.log('---->>>>>',data)
+
   return (
     <StyledBox 
     ref={componentRef}
@@ -645,7 +647,7 @@ export default function WagonsDashboard() {
             { chartType === 'line' && <ResponsiveContainer width="100%" height={400}>
               <LineChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e0e0e0" />
-                <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: '#666', fontSize: 12 }} />
+                <XAxis dataKey="monthYear" axisLine={false} tickLine={false} tick={{ fill: '#666', fontSize: 12 }} />
                 <YAxis axisLine={false} tickLine={false} tickCount={7} domain={yAxisDomain} ticks={yAxisTicks} label={{ value: yAxisLabel, angle: -90, position: 'insideLeft', offset: 10, dx: -20, dy: 0, style: { fontSize: '14px', letterSpacing: '0.5px', color: '#71747A', fontWeight: '500', fontFamily: '"Inter", sans-serif', textAnchor: 'middle' } }} />
                 <Tooltip content={<CustomTooltip isPercentage={isPercentage} isRupees={isRupees} isTonnage={isTonnage}/>}/>
                 <Legend verticalAlign="bottom" height={36} iconType="square" iconSize={12} formatter={(value) => <span style={{ color: '#666', fontSize: 14, textAlign: 'center', marginRight: '32px' }}>{value}</span>} />

@@ -24,6 +24,8 @@ interface WagonData {
     dcSlab: string
     elapsed_time: string
     dcCharges: number
+    destination: any
+    release: any
 }
 
 interface DCChargesData {
@@ -31,6 +33,7 @@ interface DCChargesData {
     yesterdayValue: number
     lastMonthvalue: number
     thisMonthValue: number
+    wtdValue: number
     ytdValue: number
     dayTrend: Boolean
     monthTrend: Boolean
@@ -54,9 +57,10 @@ const Demurrage = () => {
         yesterdayValue: 0,
         lastMonthvalue: 0,
         thisMonthValue: 0,
+        wtdValue: 0,
         ytdValue: 0,
         dayTrend: false,
-        monthTrend: false
+        monthTrend: false,
     });
 
     const handleStartDateChange = (date: Date | null) => {
@@ -119,7 +123,9 @@ const Demurrage = () => {
                         free_time: item.free_time || '',
                         dcSlab: item.slab || '',
                         elapsed_time: item.elapsed_time || 0,
-                        dcCharges: item.dc_charges || 0
+                        dcCharges: item.dc_charges || 0,
+                        destination: item.destination || '--',
+                        release: item.release || '--',
                     }
                 });
                 setWagonData(wagonDataArr);
@@ -144,12 +150,14 @@ const Demurrage = () => {
                 const lastMonthvalue = parseFloat((data.lastMonthvalue / 100000).toFixed(2));
                 const thisMonthValue = parseFloat((data.thisMonthValue / 100000).toFixed(2));
                 const ytdValue = parseFloat((data.ytdValue / 100000).toFixed(2));
+                const wtdValue = parseFloat((data?.wtdValue / 100000).toFixed(2));
     
                 const DCChargesData: DCChargesData = {
                     todayValue,
                     yesterdayValue,
                     lastMonthvalue,
                     thisMonthValue,
+                    wtdValue,
                     ytdValue,
                     dayTrend: todayValue - yesterdayValue >= 0,
                     monthTrend: thisMonthValue - lastMonthvalue >= 0,
@@ -318,13 +326,6 @@ const Demurrage = () => {
 
             <div className="in-plant-wagons-stats-grid">
                 <div className="in-plant-wagons-stats-card">
-                    <span className="in-plant-wagons-period">Yesterday</span>
-                    <div className="in-plant-wagons-amount">
-                        ₹{dcChargesData.yesterdayValue}L
-                    </div>
-                </div>
-
-                <div className="in-plant-wagons-stats-card">
                     <span className="in-plant-wagons-period">Today</span>
                     <div className="in-plant-wagons-amount">
                         ₹{dcChargesData.todayValue}L
@@ -335,6 +336,13 @@ const Demurrage = () => {
                             dcChargesData.dayTrend ? '↑' : '↓'
                         }
                         </span>
+                    </div>
+                </div>
+
+                <div className="in-plant-wagons-stats-card">
+                    <span className="in-plant-wagons-period">Yesterday</span>
+                    <div className="in-plant-wagons-amount">
+                        ₹{dcChargesData.yesterdayValue}L
                     </div>
                 </div>
 
@@ -373,6 +381,13 @@ const Demurrage = () => {
                         ₹{dcChargesData.ytdValue}L
                     </div>
                 </div>
+
+                <div className="in-plant-wagons-stats-card">
+                    <span className="in-plant-wagons-period">WTD</span>
+                    <div className="in-plant-wagons-amount">
+                        {dcChargesData.wtdValue ? `₹${dcChargesData.wtdValue}L` : '--'}
+                    </div>
+                </div>
             </div>
 
             <div className="in-plant-wagons-tableContainer">
@@ -396,10 +411,22 @@ const Demurrage = () => {
                                 }}>{text("commodity")}</span> <br />
                                 <span className="in-plant-wagons-id-column">{text("noOfWagons")}</span>
                             </th>
+
+                            <th className="in-plant-wagons-id-column">
+                                <span className="in-plant-wagons-id-column" style={{
+                                    display: 'inline-block',
+                                    paddingBottom: '4px'
+                                }}>{text("RemainingFreeTime")}</span> <br />
+                                <span className="in-plant-wagons-id-column">{text("TimeElapsed")}</span>
+                            </th>
+
+                            <th>{text("destination")}</th>
+                            <th>{text("releaseTime")}</th>
+
                             <th className="in-plant-wagons-id-column">{text("PlacementDateTime")}</th>
-                            <th className="in-plant-wagons-id-column">{text("RemainingFreeTime")}</th>
+                            {/* <th className="in-plant-wagons-id-column">{text("RemainingFreeTime")}</th> */}
                             <th className="in-plant-wagons-id-column">{text("DCSlab")}</th>
-                            <th className="in-plant-wagons-id-column">{text("TimeElapsed")}</th>
+                            {/* <th className="in-plant-wagons-id-column">{text("TimeElapsed")}</th> */}
                             <th className="in-plant-wagons-id-column">{text("DCCharges")}</th>
                         </tr>
                     </thead>
@@ -422,15 +449,31 @@ const Demurrage = () => {
                                         }}>{row.commodity}</span> <br />
                                         <span>{row.wagonCount || 0}</span>
                                     </td>
+
+                                    <td>
+                                        <span style={{
+                                            display: 'inline-block',
+                                            paddingBottom: '4px'
+                                        }}>{row.remainingTime || 'Calculating...'}</span> <br />
+                                        <span>{row.elapsed_time}</span>
+                                    </td>
+
+                                    <td>{row.destination}</td>
+                                    <td>
+                                        {row.release === '--' ? '--' : (<>
+                                        <span>{timeService.utcToist(row.release, 'dd-MM-yyyy') || 'N/A'}</span> <br />
+                                        <span>{timeService.utcToistTime(row.release, 'HH:mm') || 'N/A'}</span></>)}
+                                    </td>
+
                                     <td>
                                         <span>{timeService.utcToist(row.placement, 'dd-MM-yyyy') || 'N/A'}</span> <br />
                                         <span>{timeService.utcToistTime(row.placement, 'HH:mm') || 'N/A'}</span>
                                     </td>
-                                    <td>
+                                    {/* <td>
                                         {row.remainingTime || 'Calculating...'}
-                                    </td>
-                                    <td>{row.dcSlab}</td>
-                                    <td>{row.elapsed_time}</td>
+                                    </td> */}
+                                    <td>{row.dcSlab.split(' ').filter((e:any) => !isNaN(e)).map(Number).length>1 ? row.dcSlab.split(' ').filter((e:any) => !isNaN(e)).map(Number).join(' to ') + ' hours' : row.dcSlab }</td>
+                                    {/* <td>{row.elapsed_time}</td> */}
                                     <td className={row.remainingTime === "00:00:00" ? 'in-plant-wagons-charges' : ''}>{row.dcCharges.toLocaleString()}</td>
                                 </tr>
                             )) : (
