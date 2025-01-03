@@ -33,7 +33,7 @@ const columns: readonly Column[] = [
   { id: "placement_time", label: "Placement Time", style: "header-placement-time-dc-charges" },
   { id: "remainingTime", label: "Remaining Time", style: "header-remaining-time-dc-charges" },
   { id: "slab", label: "Slab", style: "header-slab-dc-charges" },
-  { id: "elapsed", label: "Elapsed", style: "header-elapsed-dc-charges" },
+  { id: "elapsed", label: "Time Elapsed", style: "header-elapsed-dc-charges" },
 //   {
 //     id: "rrs",
 //     label: "RR No",
@@ -46,7 +46,7 @@ const columns: readonly Column[] = [
 //   },
 //   { id: "from", label: "From", style: "header-from-dc-charges" },
 //   { id: "to", label: "To", style: "header-to-dc-charges" },
-  { id: "dc", label: "DC", style: "header-dc-dc-charges" },
+  { id: "dc", label: `DC ₹`, style: "header-dc-dc-charges" },
 
 //   { id: "material", label: "Material", style: "header-material-rake-charges" },
 //   {
@@ -150,14 +150,14 @@ function contructingData(shipment: any) {
             ? "--"
             : shipment?.idealFreight?.toFixed(2),
         status: shipment?.status ? shipment?.status : "--",
-        dc: shipment?.dc === "N/A" ? "--" : shipment?.dc,
+        dc: shipment?.dc === "N/A" ? "--" : new Intl.NumberFormat("en-IN").format(shipment?.dc),
         indent_no: shipment?.indent_no ? shipment?.indent_no : "--",
         commodity: shipment?.commodity ? shipment?.commodity : "--",
         noOfWagons: shipment?.noOfWagons === "N/A" ? "--" : shipment?.noOfWagons,
         placement_time: shipment?.placement_time
           ? service.utcToist(shipment?.placement_time, "dd/MM/yyyy")
           : "--",
-        remainingTime: shipment?.remainingTime === "N/A" ? "--" : service.utcToist(shipment?.remainingTime, "dd/MM/yyyy"),
+        remainingTime: shipment?.remainingTime === "N/A" ? "--" : shipment?.remainingTime,
         slab: shipment?.slab === "N/A" ? "--" : shipment?.slab,
         elapsed: shipment?.elapsed === "N/A" ? "--" : shipment?.elapsed,
       };

@@ -51,7 +51,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
           Year: <strong>{label}</strong>
         </p>
         <p>
-          Total Freight (in Lakh &#8377;): <strong>{payload[0].value}</strong>
+          Total DC Charges (in Lakh &#8377;): <strong>{payload[0].value}</strong>
         </p>
       </div>
     );
