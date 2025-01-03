@@ -508,7 +508,7 @@ const CaptiveRakeListView = () => {
                                                 </div>
                                             </TableCell>
                                             <TableCell align="left" className="table-columns">Route</TableCell>
-                                            <TableCell align="left" className="table-columns">ETA</TableCell>
+                                            <TableCell align="left" className="table-columns eta-column">ETA</TableCell>
                                             <TableCell align="left" className="table-columns">Remaining
                                                 <br />Distance (Kms)</TableCell>
                                             <TableCell align="center" className="table-columns">BPC

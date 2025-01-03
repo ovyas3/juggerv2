@@ -727,7 +727,7 @@ export const AddIndentNumber = ({
 }: any) => {
   const router = useRouter();
   const text = useTranslations("WAGONTALLYSHEET");
-  const [indentNumber, setIndentNumber] = useState<null | string>(null);
+  const [indentNumber, setIndentNumber] = useState<null | string>(shipment?.indent?.indent_no || null);
   const showMessage = useSnackbar();
   const [loading, setLoading] = useState(false);
 
@@ -848,6 +848,7 @@ export const AddIndentNumber = ({
                 setIndentNumber(e.target.value);
               }}
               type="text"
+              value={indentNumber || ''}
               placeholder="Enter Indent No."
               style={{
                 fontWeight: 600,
