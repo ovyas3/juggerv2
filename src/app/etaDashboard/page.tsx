@@ -25,6 +25,7 @@ import DestinationWiseTrend from "./destinationWiseTrend/destinationWiseTrend";
 import Demurrage from "./demurrage/demurrage";
 import { useMediaQuery, useTheme } from '@mui/material';
 import RakeCharges from './rakeCharges/RakeCharges'
+import DcCharges from './dcCharges/DcCharges'
 
 // Custom styled components
 const StyledTabs = styled(Tabs)({
@@ -201,20 +202,21 @@ function EtaDashboard() {
         }`}
       >
         <Box sx={{ width: '100%', backgroundColor: '#fff' }}>
-          <Box sx={{ 
-            maxWidth: '100%',
-            borderBottom: 1, 
-            borderColor: 'divider', 
-            overflowX: 'auto' 
-          }}>
-            <StyledTabs value={value} onChange={handleChange} aria-label="dashboard tabs">
-              <StyledTab label="Wagons" />
-              <StyledTab label="PT & DW" />
-              <StyledTab label="ETA" />
-              <StyledTab label="Rake" />
-              <StyledTab label="Destination" />
-              <StyledTab label="Rake Charges" />
-              <StyledTab label="Demurrage" />
+          <Box style={{ overflowX: 'auto', display: 'flex', flexWrap: 'nowrap',scrollbarWidth: 'none' }}>
+            <StyledTabs
+              value={value}
+              onChange={handleChange}
+              aria-label="dashboard tabs"
+              style={{ whiteSpace: 'nowrap', minWidth: 'max-content' }}
+            >
+              <StyledTab label="Wagons" style={{ fontSize: '12px' }} />
+              <StyledTab label="PT & DW" style={{ fontSize: '12px' }} />
+              <StyledTab label="ETA" style={{ fontSize: '12px' }} />
+              <StyledTab label="Rake" style={{ fontSize: '12px' }} />
+              <StyledTab label="Destination" style={{ fontSize: '12px' }} />
+              <StyledTab label="Rake Charges" style={{ fontSize: '12px' }} />
+              <StyledTab label="Demurrage" style={{ fontSize: '12px' }} />
+              <StyledTab label="DC Charges" style={{ fontSize: '12px' }} />
             </StyledTabs>
           </Box>
           <CustomTabPanel value={value} index={0}>
@@ -332,6 +334,9 @@ function EtaDashboard() {
           </CustomTabPanel>
           <CustomTabPanel value={value} index={6}>
             <Demurrage />
+          </CustomTabPanel>
+          <CustomTabPanel value={value} index={7}>
+            <DcCharges />
           </CustomTabPanel>
         </Box>
         

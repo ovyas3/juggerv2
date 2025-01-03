@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   BarChart,
   Bar,
@@ -12,8 +12,6 @@ import {
   ResponsiveContainer,
   LabelList,
 } from "recharts";
-import { httpsGet } from "@/utils/Communication";
-import PopUpForRakeCharges from "./PopUpForRakeCharges";
 
 const monthMap: { [key: string]: number } = {
   Jan: 0,
@@ -29,6 +27,8 @@ const monthMap: { [key: string]: number } = {
   Nov: 10,
   Dec: 11,
 };
+import { httpsGet } from "@/utils/Communication";
+import PopUpForDcCharges from "./PopUpDcCharge";
 
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
@@ -51,7 +51,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
           Year: <strong>{label}</strong>
         </p>
         <p>
-          Total Freight (in Cr &#8377;): <strong>{payload[0].value}</strong>
+          Total Freight (in Lakh &#8377;): <strong>{payload[0].value}</strong>
         </p>
       </div>
     );
@@ -59,16 +59,24 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   return null;
 };
 
-const RakeCharges = () => {
-  const [yearlyChart, setYearlyChart] = useState<any>(null);
-  const [monthlyChart, setMonthlyChart] = useState<any>(null);
-  const [daysChart, setDaysChart] = useState<any>(null);
-
+function DcCharges() {
+  // yearly chart parameters
+  const [yearlyData, setYearlyData] = useState<any>(null);
   const [yAxisDomain, setYAxisDomain] = useState<number[]>([0, 100]);
   const [yAxisTicks, setYAxisTicks] = useState<number[]>([
     0, 20, 40, 60, 80, 100,
   ]);
 
+  // selection parameters
+  const [selectedBarYear, setSelectedBarYear] = useState<any>(null);
+  const [selectedBarMonth, setSelectedBarMonth] = useState<any>(null);
+  const targetRef = useRef<HTMLDivElement>(null);
+  const secondRef = useRef<HTMLDivElement>(null);
+  const [openPopup, setOpenPopup] = useState(false);
+  const [payloadDataForPopup, setPayloadDataForPopup] = useState<any>(null);
+
+  // monthly chart parameters
+  const [monthlyData, setMonthlyData] = useState<any>(null);
   const [monthlyYAxisDomain, setMonthlyYAxisDomain] = useState<number[]>([
     0, 100,
   ]);
@@ -76,40 +84,21 @@ const RakeCharges = () => {
     0, 20, 40, 60, 80, 100,
   ]);
 
+  // days chart parameters
+  const [daysChart, setDaysChart] = useState<any>(null);
   const [daysYAxisDomain, setDaysYAxisDomain] = useState<number[]>([0, 100]);
   const [daysYAxisTicks, setDaysYAxisTicks] = useState<number[]>([
     0, 20, 40, 60, 80, 100,
   ]);
 
-  const [selectedBarYear, setSelectedBarYear] = useState<any>(null);
-  const [selectedBarMonth, setSelectedBarMonth] = useState<any>(null);
-
-  const [openPopup, setOpenPopup] = useState(false);
-  const [payloadDataForPopup, setPayloadDataForPopup] = useState<any>(null);
-
-  const secondTableRef = React.useRef<HTMLDivElement>(null);
-  const thirdTableRef = React.useRef<HTMLDivElement>(null);
-
-  const handleBarClick = (e: any) => {
-    if (secondTableRef.current) {
-        secondTableRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
-  const handleBarClickThird = (e: any) => {
-    if (thirdTableRef.current) {
-        thirdTableRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
   const processChartData = (data: any[]) => {
     const normalizedData = data.map((item) => ({
-        ...item,
-        totalFreightSum: Math.floor((item.totalFreightSum / 1e7) * 100) / 100,
+      ...item,
+      totalFreightSum: Math.floor((item.totalFreightSum / 1e5) * 100) / 100,
     }));
     const sortedData = normalizedData.sort((a, b) => a._id - b._id);
     const maxFreight = Math.max(...sortedData.map((d) => d.totalFreightSum));
-    const adjustedMaxFreight = maxFreight + 250;
+    const adjustedMaxFreight = maxFreight;
     const newDomain = [0, Math.ceil(adjustedMaxFreight)];
     const tickInterval = Math.ceil(adjustedMaxFreight / 7);
     const newTicks = Array.from(
@@ -123,32 +112,34 @@ const RakeCharges = () => {
 
   const processMonthlyChartData = (data: any[]) => {
     const normalizedData = data.map((item) => ({
-        ...item,
-        totalFreightSum: Math.floor((item.totalFreightSum / 1e7) * 100) / 100,
+      ...item,
+      totalDCPaid: Math.floor((item.totalDCPaid / 1e5) * 100) / 100,
     }));
     console.log(normalizedData);
-    const sortedData = normalizedData.sort((a, b) => monthMap[a._id] - monthMap[b._id]);
-    const maxFreight = Math.max(...sortedData.map((d) => d.totalFreightSum));
-      const adjustedMaxFreight = maxFreight + 100;
-      const newDomain = [0, Math.ceil(adjustedMaxFreight)];
-      const tickInterval = Math.ceil(adjustedMaxFreight / 7);
-      const newTicks = Array.from(
-        { length: Math.ceil(adjustedMaxFreight / tickInterval) + 1 },
-        (_, i) => parseFloat(((i * tickInterval) / 1).toFixed(2))
-      );
-      setMonthlyYAxisDomain(newDomain);
-      setMonthlyYAxisTicks(newTicks);
-      return sortedData;
+    const sortedData = normalizedData.sort(
+      (a, b) => monthMap[a._id] - monthMap[b._id]
+    );
+    const maxFreight = Math.max(...sortedData.map((d) => d.totalDCPaid));
+    const adjustedMaxFreight = maxFreight;
+    const newDomain = [0, Math.ceil(adjustedMaxFreight)];
+    const tickInterval = Math.ceil(adjustedMaxFreight / 7);
+    const newTicks = Array.from(
+      { length: Math.ceil(adjustedMaxFreight / tickInterval) + 1 },
+      (_, i) => parseFloat(((i * tickInterval) / 1).toFixed(2))
+    );
+    setMonthlyYAxisDomain(newDomain);
+    setMonthlyYAxisTicks(newTicks);
+    return sortedData;
   };
 
   const processDayChartData = (data: any[]) => {
     const normalizedData = data.map((item) => ({
-        ...item,
-        totalFreightSum: Math.floor((item.totalFreightSum / 1e7) * 100) / 100,
+      ...item,
+      totalDCPaid: Math.floor((item.totalDCPaid / 1e5) * 100) / 100,
     }));
     const sortedData = normalizedData.sort((a, b) => a._id - b._id);
-    const maxFreight = Math.max(...sortedData.map((d) => d.totalFreightSum));
-    const adjustedMaxFreight = maxFreight + 1;
+    const maxFreight = Math.max(...sortedData.map((d) => d.totalDCPaid));
+    const adjustedMaxFreight = maxFreight;
     const newDomain = [0, Math.ceil(adjustedMaxFreight)];
     const tickInterval = Math.ceil(adjustedMaxFreight / 7);
     const newTicks = Array.from(
@@ -160,12 +151,12 @@ const RakeCharges = () => {
     return sortedData;
   };
 
-  const getChartData = async () => {
+  const getYearlyData = async () => {
     try {
-      const response = await httpsGet("dashboard/rakeChargesYearly", 0, null);
+      const response = await httpsGet(`dashboard/dcYearly`, 0, null);
       if (response.statusCode === 200) {
         const processedData = processChartData(response.data);
-        setYearlyChart(processedData);
+        setYearlyData(processedData);
       }
     } catch (error) {
       console.log(error);
@@ -175,13 +166,13 @@ const RakeCharges = () => {
   const getMonthlyChartData = async () => {
     try {
       const response = await httpsGet(
-        `dashboard/rakeChargesMonthly?year=${selectedBarYear}`,
+        `dashboard/dcMonthly?year=${selectedBarYear}`,
         0,
         null
       );
       if (response.statusCode === 200) {
         const processedData = processMonthlyChartData(response.data);
-        setMonthlyChart(processedData);
+        setMonthlyData(processedData);
       }
     } catch (error) {
       console.log(error);
@@ -191,7 +182,9 @@ const RakeCharges = () => {
   const getDaysChartData = async () => {
     try {
       const response = await httpsGet(
-        `dashboard/rakeChargeDateWise?year=${selectedBarYear}&month=${monthMap[selectedBarMonth] + 1}`,
+        `dashboard/dcDateWise?year=${selectedBarYear}&month=${
+          monthMap[selectedBarMonth] + 1
+        }`,
         0,
         null
       );
@@ -204,8 +197,13 @@ const RakeCharges = () => {
     }
   };
 
+  const handleBarClick = (e: any) => {
+    if (targetRef.current) {
+      targetRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   const openPopUpForDetails = (event: any) => {
-    console.log(event);
     const date = new Date(event.activeLabel);
     const from = Date.UTC(
       date.getUTCFullYear(),
@@ -228,9 +226,13 @@ const RakeCharges = () => {
     setPayloadDataForPopup({
       from: from,
       to: to,
-      amt: event?.activePayload[0]?.payload?.totalFreightSum,
+      amt: event?.activePayload[0]?.payload?.totalDCPaid,
     });
   };
+
+  useEffect(() => {
+    getYearlyData();
+  }, []);
 
   useEffect(() => {
     if (selectedBarYear) {
@@ -243,10 +245,6 @@ const RakeCharges = () => {
       getDaysChartData();
     }
   }, [selectedBarMonth]);
-
-  useEffect(() => {
-    getChartData();
-  }, []);
 
   return (
     <div
@@ -264,7 +262,7 @@ const RakeCharges = () => {
           marginBottom: "10px",
         }}
       >
-        Rake Charges
+        DC Charges
       </header>
 
       <div
@@ -280,7 +278,7 @@ const RakeCharges = () => {
       >
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
-            data={yearlyChart}
+            data={yearlyData}
             margin={{
               top: 5,
               right: 30,
@@ -315,7 +313,7 @@ const RakeCharges = () => {
               domain={yAxisDomain}
               ticks={yAxisTicks}
               label={{
-                value: `Total Freight (Cr ₹)`,
+                value: `Total DC Charges (Lakh ₹)`,
                 angle: -90,
                 position: "insideLeft",
                 textAnchor: "middle",
@@ -339,12 +337,12 @@ const RakeCharges = () => {
             />
             <Bar
               dataKey="totalFreightSum"
-              fill="#8884d8"
+              fill="#0066CC"
               name={"Years"}
               fontSize={"12px"}
               barSize={100}
               activeBar={
-                <Rectangle fill="#8884d8" stroke="#8884d8" opacity={0.8} />
+                <Rectangle fill="#0066CC" stroke="#0066CC" opacity={0.8} />
               }
             >
               <LabelList
@@ -357,8 +355,8 @@ const RakeCharges = () => {
         </ResponsiveContainer>
       </div>
 
-      {selectedBarYear && (
-        <div>
+      {selectedBarYear && monthlyData?.length > 0 && (
+        <div ref={secondRef}>
           <header style={{ fontSize: "16px", fontWeight: "bold" }}>
             For Year {selectedBarYear} :
           </header>
@@ -376,7 +374,7 @@ const RakeCharges = () => {
           >
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
-                data={monthlyChart}
+                data={monthlyData}
                 margin={{
                   top: 5,
                   right: 30,
@@ -385,7 +383,7 @@ const RakeCharges = () => {
                 }}
                 onClick={(e) => {
                   setSelectedBarMonth(e.activeLabel);
-                  handleBarClickThird(e);
+                  handleBarClick(e);
                 }}
               >
                 <CartesianGrid strokeDasharray="3 3" />
@@ -410,7 +408,7 @@ const RakeCharges = () => {
                   domain={monthlyYAxisDomain}
                   ticks={monthlyYAxisTicks}
                   label={{
-                    value: `Total Freight (Cr ₹)`,                
+                    value: `Total DC Charges (Lakh ₹)`,
                     angle: -90,
                     position: "insideLeft",
                     textAnchor: "middle",
@@ -433,17 +431,17 @@ const RakeCharges = () => {
                   }}
                 />
                 <Bar
-                  dataKey="totalFreightSum"
-                  fill="#A7D477"
+                  dataKey="totalDCPaid"
+                  fill="#CA6C0F"
                   name={"Months"}
                   fontSize={"12px"}
                   barSize={100}
                   activeBar={
-                    <Rectangle fill="#A7D477" stroke="#A7D477" opacity={0.8} />
+                    <Rectangle fill="#CA6C0F" stroke="#CA6C0F" opacity={0.8} />
                   }
                 >
                   <LabelList
-                    dataKey="totalFreightSum"
+                    dataKey="totalDCPaid"
                     position="top"
                     style={{ fontSize: "12px", fill: "#666" }}
                   />
@@ -453,10 +451,10 @@ const RakeCharges = () => {
           </div>
         </div>
       )}
-      <div ref={secondTableRef}></div>
 
-      {selectedBarMonth && daysChart?.length > 0 && (
-        <div>
+      <div>
+      {selectedBarYear && selectedBarMonth && daysChart?.length > 0 && (
+        <div >
           <header style={{ fontSize: "16px", fontWeight: "bold" }}>
             For Year {selectedBarYear} ({selectedBarMonth}) :
           </header>
@@ -506,7 +504,7 @@ const RakeCharges = () => {
                   domain={daysYAxisDomain}
                   ticks={daysYAxisTicks}
                   label={{
-                    value: `Total Freight (Cr ₹)`,                
+                    value: `Total Freight (Lakh ₹)`,
                     angle: -90,
                     position: "insideLeft",
                     textAnchor: "middle",
@@ -529,17 +527,17 @@ const RakeCharges = () => {
                   }}
                 />
                 <Bar
-                  dataKey="totalFreightSum"
-                  fill="#D9ABAB"
+                  dataKey="totalDCPaid"
+                  fill="#876FD4"
                   name={"Days"}
                   fontSize={"12px"}
                   barSize={100}
                   activeBar={
-                    <Rectangle fill="#D9ABAB" stroke="#D9ABAB" opacity={0.8} />
+                    <Rectangle fill="#876FD4" stroke="#876FD4" opacity={0.8} />
                   }
                 >
                   <LabelList
-                    dataKey="totalFreightSum"
+                    dataKey="totalDCPaid"
                     position="top"
                     style={{ fontSize: "12px", fill: "#666" }}
                   />
@@ -549,16 +547,18 @@ const RakeCharges = () => {
           </div>
         </div>
       )}
-      <div ref={thirdTableRef}></div>
+      </div>
+      <div ref={targetRef}></div>
 
       {openPopup && (
-        <PopUpForRakeCharges
+        <PopUpForDcCharges
           setOpenPopup={setOpenPopup}
           payloadDataForPopup={payloadDataForPopup}
         />
       )}
+      
     </div>
   );
-};
+}
 
-export default RakeCharges;
+export default DcCharges;
