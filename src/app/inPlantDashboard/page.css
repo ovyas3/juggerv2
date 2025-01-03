@@ -659,11 +659,12 @@
   display: flex;
   margin-bottom: -5px;
   gap:10px;
+  align-items: center;
   justify-content: center;
 }
 .wagons-uploaded-wagonSheet{
   position: absolute;
-  top: 18px;
+  top: 22px;
   right: -64px;
   /* cursor: pointer; */
   color: #3C4852;

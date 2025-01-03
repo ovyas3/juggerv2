@@ -743,11 +743,17 @@ function WagonTallySheet({}: any) {
                                       }`}
                                     >
                                       {(() => {
-                                        const { label, additionalText } = getStatusLabel(row.status.raw, row.plant_ageing);
+                                        const { label, additionalText } =
+                                          getStatusLabel(
+                                            row.status.raw,
+                                            row.plant_ageing
+                                          );
                                         return (
-                                          <span dangerouslySetInnerHTML={{
-                                            __html: `${label}${additionalText}`
-                                          }} />
+                                          <span
+                                            dangerouslySetInnerHTML={{
+                                              __html: `${label}${additionalText}`,
+                                            }}
+                                          />
                                         );
                                       })()}
                                     </div>
@@ -771,10 +777,34 @@ function WagonTallySheet({}: any) {
                                       {row.edemand.edemand_no}
                                     </div>
                                     <div id="captive-rake-indicator-wagon-indicator">
-                                      {row.is_captive && (
+                                      {row.wagon_data_uploaded && (
+                                        <div
+                                          className="SourceOutlinedIcon"
+                                          style={{
+                                            position: "relative",
+                                            height: "16px",
+                                            width: "16px",
+                                          }}
+                                        >
+                                          <Image
+                                            alt=""
+                                            src={wagonsUploaded}
+                                            style={{
+                                              height: "16px",
+                                              width: "16px",
+                                            }}
+                                          />
+                                          <div className="wagons-uploaded-wagonSheet">
+                                            Wagons Uploaded
+                                          </div>
+                                        </div>
+                                      )}
+                                      {/* {!row.is_captive && (
                                         <div
                                           style={{
                                             height: 24,
+                                            display:'flex',
+                                            alignItems:'center'
                                           }}
                                         >
                                           <Image
@@ -784,32 +814,34 @@ function WagonTallySheet({}: any) {
                                             width={24}
                                           />
                                         </div>
-                                      )}
-                                      {row.wagon_data_uploaded && (
-                                        <div
-                                          className="SourceOutlinedIcon"
-                                          style={{ position: "relative",height:'16px',width:'16px' }}
-                                        >
-                                        <Image alt='' src={wagonsUploaded} style={{height:'16px',width:'16px'}}/>
-                                          <div className="wagons-uploaded-wagonSheet">
-                                            Wagons Uploaded
+                                      )} */}
+                                      {row.captive_id?.name &&
+                                        row.is_captive && (
+                                          <div
+                                            style={{
+                                              color: "rgb(233, 30, 99)",
+                                              fontSize: "12px",
+                                              width: "max-content",
+                                            }}
+                                          >
+                                            {row.captive_id?.name || "SFTO-06"}
                                           </div>
-                                        </div>
-                                      )}
+                                        )}
                                     </div>
                                   </>
                                 )}
                                 {column.id === "destination" && (
-                                    <div 
-                                      style={{ 
-                                        fontSize: 12,
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                      }}
-                                    >
-                                      {row.destination_code} {row.destination_name}
-                                    </div>
+                                  <div
+                                    style={{
+                                      fontSize: 12,
+                                      display: "flex",
+                                      alignItems: "center",
+                                      justifyContent: "center",
+                                    }}
+                                  >
+                                    {row.destination_code}
+                                    {row.destination_name}
+                                  </div>
                                 )}
                                 {column.id === "plant" && (
                                   <>
@@ -965,8 +997,8 @@ function WagonTallySheet({}: any) {
                                       anchorEl={anchorEl}
                                       onClose={handleCloseAction}
                                       anchorOrigin={{
-                                        vertical: 'bottom',
-                                        horizontal: 'left',
+                                        vertical: "bottom",
+                                        horizontal: "left",
                                       }}
                                     >
                                       <div
@@ -1002,12 +1034,12 @@ function WagonTallySheet({}: any) {
                                         {text("uploadWagonTallySheet")}
                                       </div>
                                       <div
-                                          className="action-popover-wagon"
-                                          onClick={(e) => {
-                                            wagonWayBill(e, row)
-                                          }}
-                                        >
-                                          {text("wagonWayBill")}
+                                        className="action-popover-wagon"
+                                        onClick={(e) => {
+                                          wagonWayBill(e, row);
+                                        }}
+                                      >
+                                        {text("wagonWayBill")}
                                       </div>
                                       <div
                                         onClick={(e) => {
@@ -1018,36 +1050,36 @@ function WagonTallySheet({}: any) {
                                         {text("rakeHandlingSheet")}
                                       </div>
                                       <div
-                                          className="action-popover-wagon"
-                                          onClick={(e) => {
-                                            assignPlantToWagon(e, row);
-                                          }}
-                                        >
-                                          {text("assignWagonToPlant")}
+                                        className="action-popover-wagon"
+                                        onClick={(e) => {
+                                          assignPlantToWagon(e, row);
+                                        }}
+                                      >
+                                        {text("assignWagonToPlant")}
                                       </div>
                                       <div
-                                          className="action-popover-wagon"
-                                          onClick={(e) => {
-                                            assignHooksToLoadingShop(e, row);
-                                          }}
-                                        >
-                                          {text("assignsHooksToLoadingShop")}
+                                        className="action-popover-wagon"
+                                        onClick={(e) => {
+                                          assignHooksToLoadingShop(e, row);
+                                        }}
+                                      >
+                                        {text("assignsHooksToLoadingShop")}
                                       </div>
                                       <div
-                                          className="action-popover-wagon"
-                                          onClick={(e) => {
-                                            wagonTallySheet(e, row)
-                                          }}
-                                        >
-                                          {text("wagonTallySheet")}
+                                        className="action-popover-wagon"
+                                        onClick={(e) => {
+                                          wagonTallySheet(e, row);
+                                        }}
+                                      >
+                                        {text("wagonTallySheet")}
                                       </div>
                                       <div
-                                          className="action-popover-wagon"
-                                          onClick={(e) => {
-                                            printableWagonTallySheet(e, row)
-                                          }}
-                                        >
-                                          {text("wagonSheetDetails")}
+                                        className="action-popover-wagon"
+                                        onClick={(e) => {
+                                          printableWagonTallySheet(e, row);
+                                        }}
+                                      >
+                                        {text("wagonSheetDetails")}
                                       </div>
                                       {/* <div
                                         className="action-popover-wagon"
@@ -1078,24 +1110,27 @@ function WagonTallySheet({}: any) {
                                 )}
                                 {column.id === "plant_codes" && (
                                   <>
-                                    <div style={{ fontSize: 10, textWrap:'nowrap' }}>
-                                      {
-                                      row?.plants_assigned.length ? (
+                                    <div
+                                      style={{
+                                        fontSize: 10,
+                                        textWrap: "nowrap",
+                                      }}
+                                    >
+                                      {row?.plants_assigned.length ? (
                                         <div>
                                           {row?.plants_assigned
                                             .slice(0, 2)
                                             .map((plant: any, index: any) => (
                                               <div key={index}>{plant}</div>
                                             ))}
-                                          {row?.plants_assigned
-                                            .length > 2 && (
+                                          {row?.plants_assigned.length > 2 && (
                                             <div className="more-plants">
                                               <span
                                                 style={{ color: "#AB886D" }}
                                               >
                                                 +
-                                                {row?.plants_assigned
-                                                  .length - 2}{" "}
+                                                {row?.plants_assigned.length -
+                                                  2}
                                                 more
                                               </span>
                                               <div className="hidden-plants">
