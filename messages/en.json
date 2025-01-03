@@ -53,7 +53,9 @@
     "DCSlab":"DC Slab",
     "TimeElapsed":"Time Elapsed",
     "DCCharges":"DC Charges (₹)",
-    "noDataFound":"No data found"
+    "noDataFound":"No data found",
+    "destination":"Destination",
+    "releaseTime":"Release Time"
   },
   "HEADER":{
     "shipments":"Shipments",
