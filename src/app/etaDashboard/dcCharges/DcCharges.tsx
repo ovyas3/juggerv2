@@ -139,7 +139,7 @@ function DcCharges() {
     }));
     const sortedData = normalizedData.sort((a, b) => a._id - b._id);
     const maxFreight = Math.max(...sortedData.map((d) => d.totalDCPaid));
-    const adjustedMaxFreight = maxFreight;
+    const adjustedMaxFreight = maxFreight + 1;
     const newDomain = [0, Math.ceil(adjustedMaxFreight)];
     const tickInterval = Math.ceil(adjustedMaxFreight / 7);
     const newTicks = Array.from(
@@ -200,6 +200,12 @@ function DcCharges() {
   const handleBarClick = (e: any) => {
     if (targetRef.current) {
       targetRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  const handleBarClickSecond = (e: any) => {
+    if (secondRef.current) {
+      secondRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
@@ -288,7 +294,7 @@ function DcCharges() {
             onClick={(e) => {
               setSelectedBarMonth(null);
               setSelectedBarYear(e.activeLabel);
-              handleBarClick(e);
+              handleBarClickSecond(e);
             }}
           >
             <CartesianGrid strokeDasharray="3 3" />

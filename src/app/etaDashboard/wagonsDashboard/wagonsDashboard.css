@@ -17,3 +17,31 @@
   margin-left: 70px;
   font-family: 'Inter', sans-serif;
 }
+
+#toggle-container-various-charts{
+  margin-top: 24px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content:space-evenly;
+}
+
+#toggle-container-various-charts button{
+  background-color: #006BFF;
+  color: white;
+  padding: 10px 16px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+#toggle-container-various-charts button:hover{
+  background-color: #2B3DBF;
+}
+.activeChartType {
+  box-shadow: 0px 8px 12px rgba(0, 0, 0, 0.3), 0px 4px 6px rgba(0, 0, 0, 0.2);
+  background-color: #2B3DBF !important;
+}

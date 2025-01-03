@@ -25,20 +25,27 @@ interface Column {
 
 const columns: readonly Column[] = [
   { id: "sno", label: "SI No", style: "header-sno-dc-charges" },
+  { id: "indent_no", label: "Indent No", style: "header-indent-no-dc-charges" },
   { id: "edemand", label: "e-Demand", style: "header-edemand-dc-charges" },
-  { id: "fnrs", label: "FNR No", style: "header-fnr-dc-charges" },
-  {
-    id: "rrs",
-    label: "RR No",
-    style: "header-rr-dc-charges",
-  },
+//   { id: "fnrs", label: "FNR No", style: "header-fnr-dc-charges" },
+  { id: "commodity", label: "Commodity", style: "header-commodity-dc-charges" },
+  { id: "noOfWagons", label: "No. of Wagons", style: "header-no-of-wagons-dc-charges" },
+  { id: "placement_time", label: "Placement Time", style: "header-placement-time-dc-charges" },
+  { id: "remainingTime", label: "Remaining Time", style: "header-remaining-time-dc-charges" },
+  { id: "slab", label: "Slab", style: "header-slab-dc-charges" },
+  { id: "elapsed", label: "Elapsed", style: "header-elapsed-dc-charges" },
+//   {
+//     id: "rrs",
+//     label: "RR No",
+//     style: "header-rr-dc-charges",
+//   },
 //   {
 //     id: "consignee",
 //     label: "Consignee",
 //     style: "header-consignee-rake-charges",
 //   },
-  { id: "from", label: "From", style: "header-from-dc-charges" },
-  { id: "to", label: "To", style: "header-to-dc-charges" },
+//   { id: "from", label: "From", style: "header-from-dc-charges" },
+//   { id: "to", label: "To", style: "header-to-dc-charges" },
   { id: "dc", label: "DC", style: "header-dc-dc-charges" },
 
 //   { id: "material", label: "Material", style: "header-material-rake-charges" },
@@ -100,14 +107,21 @@ function contructingData(shipment: any) {
       idealFreight: any;
       status: any;
       dc: any;
+      indent_no: any;
+      commodity: any;
+      noOfWagons: any;
+      placement_time: any;
+      remainingTime: any;
+      slab: any;
+      elapsed: any;
     }) => {
-      const fnrsArray = shipment.fnrs.split(",");
-      const rrsArray = shipment.rrs.split(",");
+    //   const fnrsArray = shipment?.fnrs.split(",");
+    //   const rrsArray = shipment?.rrs.split(",");
       return {
         sno: shipment?.sno ? shipment?.sno : "--",
         edemand: shipment?.edemand ? shipment?.edemand : "--",
-        fnrs: shipment?.fnrs ? fnrsArray : "--",
-        rrs: shipment?.rrs ? rrsArray : "--",
+        // fnrs: shipment?.fnrs ? fnrsArray : "--",
+        // rrs: shipment?.rrs ? rrsArray : "--",
         consignee: shipment?.consignee ? shipment?.consignee : "--",
         from: shipment?.from ? shipment?.from : "--",
         to: shipment?.to ? shipment?.to : "--",
@@ -137,6 +151,15 @@ function contructingData(shipment: any) {
             : shipment?.idealFreight?.toFixed(2),
         status: shipment?.status ? shipment?.status : "--",
         dc: shipment?.dc === "N/A" ? "--" : shipment?.dc,
+        indent_no: shipment?.indent_no ? shipment?.indent_no : "--",
+        commodity: shipment?.commodity ? shipment?.commodity : "--",
+        noOfWagons: shipment?.noOfWagons === "N/A" ? "--" : shipment?.noOfWagons,
+        placement_time: shipment?.placement_time
+          ? service.utcToist(shipment?.placement_time, "dd/MM/yyyy")
+          : "--",
+        remainingTime: shipment?.remainingTime === "N/A" ? "--" : service.utcToist(shipment?.remainingTime, "dd/MM/yyyy"),
+        slab: shipment?.slab === "N/A" ? "--" : shipment?.slab,
+        elapsed: shipment?.elapsed === "N/A" ? "--" : shipment?.elapsed,
       };
     }
   );
@@ -218,7 +241,7 @@ function PopUpForDcCharges({
             <strong>{new Date(payloadDataForPopup.from).toDateString()}</strong>
           </div>
           <div>
-            Total Freight (in Cr &#8377;):{" "}
+            Total DC Charges (in Lakh &#8377;):{" "}
             <strong>{payloadDataForPopup.amt}</strong>
           </div>
         </header>
@@ -292,7 +315,7 @@ function PopUpForDcCharges({
                                 }}
                               >
                                 {typeof value !== "object" && value}
-                                {column.id === "fnrs" && row.fnrs.length > 2 && (
+                                {/* {column.id === "fnrs" && row.fnrs.length > 2 && (
                                     <div className="fnrs-more-text">
                                         {row.fnrs.slice(0, 2).join(", ")} +
                                         {row.fnrs.length - 2} more
@@ -307,7 +330,7 @@ function PopUpForDcCharges({
                                     </div>
                                 )}
                                 {column.id === "rrs" && row.rrs.length > 2 && (
-                                    <div className="fnrs-more-text">
+                                    <div className="fnrs-more-text addtionalWidth">
                                         {row.rrs.slice(0, 2).join(", ")} +
                                         {row.rrs.length - 2} more
                                         <div className="fnrs-list-popup">
@@ -316,10 +339,10 @@ function PopUpForDcCharges({
                                     </div>
                                 )}
                                 {column.id === "rrs" && row.rrs.length <= 2 && (
-                                    <div className="fnrs-more-text">
+                                    <div className="fnrs-more-text addtionalWidth">
                                         {row.rrs.slice(0, 2).join(", ")}
                                     </div>
-                                )}
+                                )} */}
                               </TableCell>
                             );
                           })}

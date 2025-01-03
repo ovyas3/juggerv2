@@ -100,11 +100,12 @@ function contructingData(shipment: any) {
       status: any;
     }) => {
       const fnrsArray = shipment.fnrs.split(",");
+      const rrsArray = shipment.rrs.split(",");
       return {
         sno: shipment?.sno ? shipment?.sno : "--",
         edemand: shipment?.edemand ? shipment?.edemand : "--",
         fnrs: shipment?.fnrs ? fnrsArray : "--",
-        rrs: shipment?.rrs ? shipment?.rrs : "--",
+        rrs: shipment?.rrs ? rrsArray : "--",
         consignee: shipment?.consignee ? shipment?.consignee : "--",
         from: shipment?.from ? shipment?.from : "--",
         to: shipment?.to ? shipment?.to : "--",
@@ -303,6 +304,20 @@ function PopUpForRakeCharges({
                                     {row.status === 'INTS' && 'In Transit'}
                                     {row.status !== 'INPL' && row.status !== 'INTS' && row.status}
                                    </div>
+                                )}
+                                {column.id === "rrs" && row.rrs.length > 2 && (
+                                    <div className="fnrs-more-text">
+                                        {row.rrs.slice(0, 2).join(", ")} + 
+                                        {row.rrs.length - 2} more
+                                        <div className="fnrs-list-popup">
+                                        {row.rrs.slice(2).join(", ")}
+                                        </div>
+                                    </div>
+                                )}
+                                {column.id === "rrs" && row.rrs.length <= 2 && (
+                                    <div className="fnrs-more-text"> 
+                                        {row.rrs.slice(0, 2).join(", ")}
+                                    </div>
                                 )}
                               </TableCell>
                             );
