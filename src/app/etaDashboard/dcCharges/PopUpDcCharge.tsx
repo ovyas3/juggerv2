@@ -237,7 +237,7 @@ function PopUpForDcCharges({
           }}
         >
           <div>
-            Rake Charges On{" "}
+            DC Charges On{" "}
             <strong>{new Date(payloadDataForPopup.from).toDateString()}</strong>
           </div>
           <div>
