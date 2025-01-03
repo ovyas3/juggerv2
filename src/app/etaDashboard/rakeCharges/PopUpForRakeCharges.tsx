@@ -287,15 +287,22 @@ function PopUpForRakeCharges({
                                   fontSize: 10,
                                 }}
                               >
-                                {typeof value !== "object" && value}
-                                {column.id === "fnrs" && row.fnrs.length > 2 && (
+                                {typeof value !== "object" && !(['status'].includes(column.id)) && value}
+                                {column.id === "fnrs" && (
                                     <div className="fnrs-more-text">
-                                        {row.fnrs.slice(0, 2).join(", ")} +
-                                        {row.fnrs.length - 2} more
+                                        {row.fnrs.slice(0, 2).join(", ")}
+                                        {  row.fnrs.length > 2 && (<div>+{row.fnrs.length - 2} more
                                         <div className="fnrs-list-popup">
                                         {row.fnrs.slice(2).join(", ")}
-                                        </div>
+                                        </div></div>)}
                                     </div>
+                                )}
+                                 {column.id === "status" && (
+                                   <div>
+                                    {row.status === 'INPL' && 'In Plant'}
+                                    {row.status === 'INTS' && 'In Transit'}
+                                    {row.status !== 'INPL' && row.status !== 'INTS' && row.status}
+                                   </div>
                                 )}
                               </TableCell>
                             );
