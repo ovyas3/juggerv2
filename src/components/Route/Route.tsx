@@ -333,6 +333,10 @@ const Route = () => {
         setRouteName('');
         setFromStationId(null);
         setToStationId(null);
+        setFromStationName('');
+        setFromStationCode('');
+        setToStationName('');
+        setToStationCode('');
         setViaStations([]);
         setFromStationInput('');
         setToStationInput('');

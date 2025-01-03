@@ -137,6 +137,7 @@
   font-weight: normal;
   padding: 24px 16px 24px 16px;
   border-bottom: 1px solid #DFE3EB;
+  word-break: break-word;
 }
 
 .route-settings-table .MuiTableCell-root .table-rows:last-child {
