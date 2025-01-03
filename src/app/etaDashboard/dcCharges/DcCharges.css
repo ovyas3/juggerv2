@@ -54,5 +54,9 @@
   }
 
   .header-rr-dc-charges{
-    width: 120px !important;
+    width: 70px !important;
+    padding-inline: 100px !important;
+  }
+  .addtionalWidth{
+    padding-inline: 90px !important;
   }
