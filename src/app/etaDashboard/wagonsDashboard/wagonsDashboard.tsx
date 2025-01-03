@@ -13,7 +13,22 @@ import {
   useTheme,
   useMediaQuery,
 } from '@mui/material';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, TooltipProps } from 'recharts';
+import { 
+  BarChart, 
+  Bar, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  Legend, 
+  ResponsiveContainer, 
+  TooltipProps,
+  LineChart,
+  Line,
+  PieChart,
+  Pie,
+  Sector
+} from 'recharts';
 import { styled } from '@mui/system';
 import './wagonsDashboard.css';
 import Header from "@/components/Header/header";
@@ -70,6 +85,16 @@ interface DataPoint {
   actualFrieghtAmount: number;
   lossTonnage: number;
   actualTonnage: number;
+}
+
+function processedPieData (data:any = []){
+  return data.map((item: any) => ({
+    name: item?.month,
+    value: item?.totalOrdered,
+    fullyUtilized: item?.fullyUtilized,
+    partiallyUtilized: item?.partiallyUtilized,
+    totalOrdered: item?.totalOrdered
+  }));
 }
 
 const CustomTooltip = ({ active, payload, label, isPercentage, isRupees, isTonnage }: TooltipProps<number, string> & { isPercentage: boolean, isRupees: boolean, isTonnage: boolean }) => {
@@ -531,7 +556,7 @@ export default function WagonsDashboard() {
         <Box display="flex" flexDirection={isMobile ? 'column' : 'row'}>
 
           <Box width={isMobile ? '100%' : '70%'} mr={isMobile ? 0 : 3} mb={isMobile ? 3 : 0} >
-            <ResponsiveContainer width="100%" height={400}>
+            { chartType === 'bar' && <ResponsiveContainer width="100%" height={400}>
               <BarChart
               data={data}
               margin={{
@@ -607,11 +632,25 @@ export default function WagonsDashboard() {
                 )
               }
               </BarChart>
-            </ResponsiveContainer>
+            </ResponsiveContainer>}
+            { chartType === 'line' && <ResponsiveContainer width="100%" height={400}>
+              <LineChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e0e0e0" />
+                <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: '#666', fontSize: 12 }} />
+                <YAxis axisLine={false} tickLine={false} tickCount={7} domain={yAxisDomain} ticks={yAxisTicks} label={{ value: yAxisLabel, angle: -90, position: 'insideLeft', offset: 10, dx: -20, dy: 0, style: { fontSize: '14px', letterSpacing: '0.5px', color: '#71747A', fontWeight: '500', fontFamily: '"Inter", sans-serif', textAnchor: 'middle' } }} />
+                <Tooltip content={<CustomTooltip isPercentage={isPercentage} isRupees={isRupees} isTonnage={isTonnage}/>}/>
+                <Legend verticalAlign="bottom" height={36} iconType="square" iconSize={12} formatter={(value) => <span style={{ color: '#666', fontSize: 14, textAlign: 'center', marginRight: '32px' }}>{value}</span>} />
+                <Line type="monotone" dataKey={"fullyUtilized"} stroke="#596CFF" activeDot={{ r: 8 }} name="Fully Utilized" />
+                <Line type="monotone" dataKey={"partiallyUtilized"} stroke="#A4ABFF" name="Partially Utilized" />
+              </LineChart>
+            </ResponsiveContainer>}
+            {/* { chartType === 'pie' && <ResponsiveContainer width="100%" height={400}>
+              <CustomPieChart data={processedPieData(data)} />
+            </ResponsiveContainer>} */}
             {/* <div id='toggle-container-various-charts'>
-              <button onClick={() => setChartType('bar')}>Bar Chart</button>
-              <button onClick={() => setChartType('line')}>Line Chart</button>
-              <button onClick={() => setChartType('pie')}>Pie Chart</button>
+              <button className={chartType === 'bar' ? 'activeChartType' : ''} onClick={() => setChartType('bar')}>Bar Chart</button>
+              <button className={chartType === 'line' ? 'activeChartType' : ''} onClick={() => setChartType('line')}>Line Chart</button>
+              <button className={chartType === 'pie' ? 'activeChartType' : ''} onClick={() => setChartType('pie')}>Pie Chart</button>
             </div> */}
           </Box>
 

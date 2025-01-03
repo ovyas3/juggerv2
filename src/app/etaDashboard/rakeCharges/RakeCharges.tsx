@@ -358,7 +358,7 @@ const RakeCharges = () => {
       </div>
 
       {selectedBarYear && (
-        <div>
+        <div ref={secondTableRef}>
           <header style={{ fontSize: "16px", fontWeight: "bold" }}>
             For Year {selectedBarYear} :
           </header>
@@ -453,7 +453,6 @@ const RakeCharges = () => {
           </div>
         </div>
       )}
-      <div ref={secondTableRef}></div>
 
       {selectedBarMonth && daysChart?.length > 0 && (
         <div>
