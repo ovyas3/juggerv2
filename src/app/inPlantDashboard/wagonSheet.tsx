@@ -824,7 +824,7 @@ function WagonTallySheet({}: any) {
                                               width: "max-content",
                                             }}
                                           >
-                                            {row.captive_id?.name || "SFTO-06"}
+                                            {row.captive_id?.name}
                                           </div>
                                         )}
                                     </div>
