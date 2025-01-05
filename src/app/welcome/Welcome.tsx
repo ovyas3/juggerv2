@@ -33,36 +33,8 @@ const items = [
     title: "Dashboard",
     description: "Simplified insights with our intuitive dashboard solutions.",
     color: "linear-gradient(135deg, #8a2be2, #9370db)",
-    redirect: '/etaDashboard'
+    redirect: '/externalParking'
   },
-  {
-    icon: <Package size={24} color="white"/>,
-    title: "Shipments",
-    description: "Effortless shipment tracking and management at your fingertips.",
-    color: "linear-gradient(135deg, #4169e1, #1e90ff)",
-    redirect: '/orders'
-  },
-  {
-    icon: <Train size={24} color="white"/>,
-    title: "Captive Rakes",
-    description: "Map view and rail overview for efficient tracking.",
-    color: "linear-gradient(135deg, #32cd32, #90ee90)",
-    redirect: '/dashboard'
-  },
-  {
-    icon: <MapPin size={24} color="white"/>,
-    title: "Station Management",
-    description: "Efficient control and monitoring of station operations.",
-    color: "linear-gradient(135deg, #ffd700, #ffa500)",
-    redirect: '/stationManagement'
-  },
-  {
-    icon: <Factory size={24} color="white"/>,
-    title: "In-Plant Dashboard",
-    description: "Streamline plant operations with real-time insights.",
-    color: "linear-gradient(135deg, #dc143c, #ff4500)",
-    redirect: '/inPlantDashboard'
-},
 ];
 
 interface WelcomeProps {

@@ -6,20 +6,8 @@ import defaultLogo from '@/assets/logo_default_icon.svg';
 import fullLogo from '@/assets/Smartruck_hover_logo.svg'
 import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import ContactPageIcon from '@mui/icons-material/ContactPage';
-
-import ShipmentInactive from "@/assets/shipments_bg_icon.svg";
-import ShipmentActive from "@/assets/shipments_wg_icon.svg";
 import DashboardInactive from "@/assets/Dashboard_bg_icon.svg";
 import DashboardActive from "@/assets/Dashboard_wg_icon.svg";
-import ReportInactive from "@/assets/reports_bg_icon.svg";
-import ReportActive from "@/assets/reports_wg_icon.svg";
-import SettingsInactive from "@/assets/settings_bg_icon.svg";
-import SettingsActive from "@/assets/settings_wg_icon.svg";
-import CaptiveRakeInactive from "@/assets/captiverakes_bg_icon.svg";
-import CaptiveRakeActive from "@/assets/captiverakes_wg_icon.svg";
-import InPlantDetailsInactive from "@/assets/Inplant_details_bg_icon.svg";
-import InPlantDetailsActive from "@/assets/Inplant_details_wg_icon.svg";
 
 interface NavItem {
     id: string;
@@ -32,54 +20,13 @@ interface NavItem {
 
 const navigationItems: NavItem[] = [
     { 
-        id: 'etaDashboard', 
-        label: 'Dashboard',
+        id: 'externalParking', 
+        label: 'External parking',
         icon: '',
         activeIcon: DashboardActive,
         inactiveIcon: DashboardInactive,
         isImageIcon: true
     },
-    { 
-        id: 'orders', 
-        label: 'Shipments',
-        icon: '',
-        activeIcon: ShipmentActive,
-        inactiveIcon: ShipmentInactive,
-        isImageIcon: true
-    },
-    { 
-        id: 'dashboard', 
-        label: 'Captive Rakes',
-        icon: '',
-        activeIcon: CaptiveRakeActive,
-        inactiveIcon: CaptiveRakeInactive,
-        isImageIcon: true
-    },
-    { 
-        id: 'inPlantDashboard', 
-        label: 'In-Plant Details',
-        icon: '',
-        activeIcon: InPlantDetailsActive,
-        inactiveIcon: InPlantDetailsInactive,
-        isImageIcon: true
-    },
-    { 
-        id: 'etaReport', 
-        label: 'Reports',
-        icon: '',
-        activeIcon: ReportActive,
-        inactiveIcon: ReportInactive,
-        isImageIcon: true
-    },
-    { 
-        id: 'settings', 
-        label: 'Settings',
-        icon: '',
-        activeIcon: SettingsActive,
-        inactiveIcon: SettingsInactive,
-        isImageIcon: true
-    },
-    { id: 'contact', label: 'Contact Logs', icon: ContactPageIcon },
 ];
 
 const NavItem = ({ 
