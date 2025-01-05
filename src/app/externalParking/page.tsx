@@ -23,7 +23,7 @@ const DashboardContent = () => {
       >
         <div style={{ width: '100%', overflowX: 'auto' }}>
             {
-              !mobile ? <Header title={'External Parking'} isMapHelper={false}/> : <MobileHeader />
+              !mobile ? <Header title={'External Parking Dashboard'} isMapHelper={false}/> : <MobileHeader />
             }
         </div>
         <div>

@@ -5,7 +5,7 @@ variables:
 
 dev_build:
   tags:
-    - lucy-dev
+    - juggernaut-dev
   stage: build
   environment:
     name: dev
