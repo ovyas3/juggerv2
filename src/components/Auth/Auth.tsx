@@ -14,19 +14,19 @@ const AuthController = () => {
   const [checkCalled, setCheckCalled] = useState(false);
 
 
-  async function getPreferences() {
-    const response = await httpsGet('/get_preferences', 0, router)
-    if(response.statusCode === 200) {
-      const preferences = response.data?.constant
-      localStorage.setItem('preferences',JSON.stringify(preferences))
-    } 
-  }
+  // async function getPreferences() {
+  //   const response = await httpsGet('/get_preferences', 0, router)
+  //   if(response.statusCode === 200) {
+  //     const preferences = response.data?.constant
+  //     localStorage.setItem('preferences',JSON.stringify(preferences))
+  //   } 
+  // }
 
   const checkSum = async (rms_auth: string) => {
     const from = localStorage.getItem('isRmsLogin') === 'true' ? 'rms_login' : (rms_auth ? 'tms_rms' : '');
     const isAuth = await checkAuth(from,rms_auth);
     if (isAuth) {
-      getPreferences()
+      // getPreferences()
       router.push("/welcome");
     } else {
       const isDev = process.env.NODE_ENV === 'development';

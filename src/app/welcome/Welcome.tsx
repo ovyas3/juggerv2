@@ -30,7 +30,7 @@ const variants = {
 const items = [
   {
     icon: <LayoutDashboard size={24} color="white" />,
-    title: "Dashboard",
+    title: "External Parking Dashboard",
     description: "Simplified insights with our intuitive dashboard solutions.",
     color: "linear-gradient(135deg, #8a2be2, #9370db)",
     redirect: '/externalParking'

@@ -20,13 +20,13 @@ const Signin = () => {
   const [hidePasswordFlag, setHidePasswordFlag] = useState(true);
 
 
-  async function getPreferences() {
-    const response = await httpsGet('/get_preferences', 0, router)
-    if(response.statusCode === 200) {
-      const preferences = response.data?.constant
-      localStorage.setItem('preferences',JSON.stringify(preferences))
-    } 
-  }
+  // async function getPreferences() {
+  //   const response = await httpsGet('/get_preferences', 0, router)
+  //   if(response.statusCode === 200) {
+  //     const preferences = response.data?.constant
+  //     localStorage.setItem('preferences',JSON.stringify(preferences))
+  //   } 
+  // }
 
   const handleLogin = () => {
     const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -46,7 +46,7 @@ const Signin = () => {
             response.data
           );
           if (signedIn) {
-            getPreferences()
+            // getPreferences()
             router.push("/welcome");
           }
         } else {
