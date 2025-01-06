@@ -11,7 +11,7 @@ prod_build:
     name: prod
   script:
     - npm install
-    - npm run dev_build
+    - npm run build
     - echo $prodEnvKey | base64 -d > prodEnvKey.pem
     - chmod 400 prodEnvKey.pem
     - zip -qq -r $CI_JOB_ID.zip ./ -x prodEnvKey.pem
@@ -25,7 +25,9 @@ prod_build:
     - ls
     - rm /home/ubuntu/milkyway/packages/juggernaut-$CI_JOB_ID.zip
     # - rm -rf node_modules
+    - nvm use v22
     - npm ci
+    - nvm use default
     - pm2 reload juggernaut
     - exit
   when: manual
