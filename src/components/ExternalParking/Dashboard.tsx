@@ -36,60 +36,8 @@ const TimeRangeSection: React.FC<TimeRangeSectionProps> = ({
   const [showTable, setShowTable] = useState(false);
   const [selectedData, setSelectedData] = useState<any>(null);
 
-  // const handleClick = async (id: string, data?: any[]) => {
-  //   console.log('data',data);
-  //   if (title === "Shipment Time Range") {
-  //     const shipmentIds = data;
-  //     setSelectedData({
-  //       title: 'Shipment Details',
-  //       endpoint: 'shipment/details',
-  //       columns: [
-  //         { id: 'SIN', label: 'Shipment No.', minWidth: 100 },
-  //         { id: 'do_numbers', label: 'Do Number', minWidth: 100 },
-  //         { id: 'vehicle_no', label: 'Vehicle No.', minWidth: 100 },
-  //         { 
-  //           id: 'carrier',
-  //           label: 'Carrier Name',
-  //           minWidth: 150,
-  //           format: (value: any) => value.name
-  //         },
-  //         { 
-  //           id: 'deliveries',
-  //           label: 'Delivery Location',
-  //           minWidth: 200,
-  //           format: (deliveries: any[]) => {
-  //             if (!deliveries?.[0]?.location) return '';
-  //             const loc = deliveries[0].location;
-  //             return `${loc.reference || ''} - ${loc.name || ''} - ${loc.city || ''}`;
-  //           }
-  //         },
-  //       ],
-  //       payload: { _ids: shipmentIds }
-  //     });
-  //   } else if (title === "Vehicle Wait Time") {
-  //     const driverIds = data;
-  //     setSelectedData({
-  //       title: 'External Parking Details',
-  //       endpoint: 'driver/details',
-  //       columns: [
-  //         { id: 'vehicle_no', label: 'Vehicle No.', minWidth: 100 },
-  //         { 
-  //           id: 'carrier',
-  //           label: 'Carrier Name',
-  //           minWidth: 150,
-  //           format: (value: any) => value.name
-  //         },
-  //         { id: 'created_at', label: 'Created At', minWidth: 170,
-  //           format: (value: any) => new Date(value).toLocaleString() }
-  //       ],
-  //       payload: { _ids: driverIds }
-  //     });
-  //   }
-  //   setShowTable(true);
-  // };
-
   const handleClick = async (id: string, data?: any[]) => {
-    if (id === 'shipment') {
+    if (title === "Shipment Time Range") {
       const shipmentIds = data;
       setSelectedData({
         title: 'Shipment Details',
@@ -117,7 +65,7 @@ const TimeRangeSection: React.FC<TimeRangeSectionProps> = ({
         ],
         payload: { _ids: shipmentIds }
       });
-    } else if (id === 'ep') {
+    } else if (title === "Vehicle Wait Time") {
       const driverIds = data;
       setSelectedData({
         title: 'External Parking Details',
