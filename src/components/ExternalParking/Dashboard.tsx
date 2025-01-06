@@ -1,7 +1,8 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import { httpsGet } from "@/utils/Communication";
+import { httpsGet, httpsPost } from "@/utils/Communication";
 import { useRouter } from "next/navigation";
 import {
   Card,
@@ -244,6 +245,29 @@ const useDashboardData = () => {
     }
   };
 
+  const fetchPostData = async (
+    endpoint: string,
+    data: any,
+    setData: any,
+    setLoading: (loading: boolean) => void
+  ) => {
+    setLoading(true);
+    try {
+      const response = await httpsPost(endpoint, data, router, 1);
+      if (response && response.statusCode === 200) {
+        setData(response.data);
+      } else {
+        console.error(`Failed to fetch data from ${endpoint}`);
+        setData([]);
+      }
+    } catch (error) {
+      console.error(`Error fetching data from ${endpoint}:`, error);
+      setData([]);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   useEffect(() => {
     fetchData(
       "externalParking/vehicleStatus",
@@ -269,7 +293,7 @@ const useDashboardData = () => {
     );
   }, [router]);
   useEffect(() => {
-    fetchData("invoice/Count", setInvoiceCount, setInvoiceCountLoading);
+    fetchPostData("invoice/Count", {}, setInvoiceCount, setInvoiceCountLoading);
   }, [router]);
 
   const refreshAllData = useCallback(() => {
@@ -289,7 +313,7 @@ const useDashboardData = () => {
       setShipmentTimeRangeData,
       setShipmentTimeRangeLoading
     );
-    fetchData("invoice/Count", setInvoiceCount, setInvoiceCountLoading);
+    fetchPostData("invoice/Count", {}, setInvoiceCount, setInvoiceCountLoading);
   }, [condition, fetchData]);
 
   return {
@@ -319,7 +343,7 @@ const useDashboardData = () => {
         setShipmentTimeRangeLoading
       ),
     fetchInvoiceCount: () =>
-      fetchData("invoice/Count", setInvoiceCount, setInvoiceCountLoading),
+      fetchPostData("invoice/Count", {}, setInvoiceCount, setInvoiceCountLoading),
     vehicleStatusLoading,
     vehicleWaitTimeLoading,
     shipmentTimeRangeLoading,
