@@ -6,7 +6,7 @@ import { Suspense, useEffect, useState } from "react";
 import "./Auth.css";
 import Loader from "../Loading/WithBackDrop";
 import { environment } from "@/environments/env.api";
-import { httpsGet } from "@/utils/Communication";
+
 
 const AuthController = () => {
   const searchParams = useSearchParams();
@@ -14,23 +14,14 @@ const AuthController = () => {
   const [checkCalled, setCheckCalled] = useState(false);
 
 
-  // async function getPreferences() {
-  //   const response = await httpsGet('/get_preferences', 0, router)
-  //   if(response.statusCode === 200) {
-  //     const preferences = response.data?.constant
-  //     localStorage.setItem('preferences',JSON.stringify(preferences))
-  //   } 
-  // }
-
-  const checkSum = async (rms_auth: string) => {
-    const from = localStorage.getItem('isRmsLogin') === 'true' ? 'rms_login' : (rms_auth ? 'tms_rms' : '');
-    const isAuth = await checkAuth(from,rms_auth);
+  const checkSum = async (auth: string) => {
+    const from = localStorage.getItem('isSDLogin') === 'true' ? 'sd_login' : (auth ? 'tms_sd' : '');
+    const isAuth = await checkAuth(from,auth);
     if (isAuth) {
-      // getPreferences()
-      router.push("/welcome");
+      router.push("/externalParking");
     } else {
       const isDev = process.env.NODE_ENV === 'development';
-      if(from === 'tms_rms') {
+      if(from === 'tms_sd') {
         router.push(isDev ? environment.DEV_ETMS : environment.PROD_SMART);
       } else {
        router.push("/signin");
@@ -38,10 +29,10 @@ const AuthController = () => {
     }
   };
   useEffect(() => {
-    const rms_auth = searchParams.get("token") as string;
+    const auth = searchParams.get("token") as string;
     if (!checkCalled) {
       setCheckCalled(true);
-      checkSum(rms_auth);
+      checkSum(auth);
     }
   }, []);
 

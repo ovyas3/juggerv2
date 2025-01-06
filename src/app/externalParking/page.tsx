@@ -7,6 +7,7 @@ import Header from "@/components/Header/header";
 import {useTranslations} from 'next-intl';
 import { useMediaQuery, useTheme } from '@mui/material';
 import { useSearchParams } from 'next/navigation';
+import ExternalParkingDashboard from "@/components/ExternalParking/Dashboard";
 
 const DashboardContent = () => {
   const theme = useTheme();
@@ -27,7 +28,7 @@ const DashboardContent = () => {
             }
         </div>
         <div>
-          {/* here will come the new dashboard */}
+          <ExternalParkingDashboard />
         </div>
       </div>
       {!mobile ? <SideDrawer /> : <div >

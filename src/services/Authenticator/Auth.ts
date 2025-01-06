@@ -12,6 +12,7 @@ const authenticate = async (data: any) => {
     roles,
     corporate_shippers,
   } = data;
+  console.log('shipper_data', data);
   localStorage.setItem("user_name", name);
   localStorage.setItem("roles", JSON.stringify(roles));
   setCookies("default_unit", default_unit);
@@ -47,15 +48,15 @@ const authenticate = async (data: any) => {
 
 export const handleAuthentication = async (
   from: string,
-  rms_auth: string = "",
+  auth: string = "",
   rms_data: any = {}
 ) => {
-  if (from === "tms_rms" && rms_auth) {
-    localStorage.removeItem('isRMSLogin')
-    const authenticated = await httpsPost("tms_rms/verify", { rms_auth })
+  if (from === "tms_sd" && auth) {
+    localStorage.removeItem('isSDLogin')
+    const authenticated = await httpsPost("dashboard/auth", { auth }, {}, 1)
       .then((res) => {
         if(res) {
-        authenticate(res);
+        authenticate(res.data);
           return true;
         } else {
           return false;
@@ -66,10 +67,10 @@ export const handleAuthentication = async (
         return false;
       });
     return authenticated;
-  } else if (from === "rms_login" && rms_data) {
+  } else if (from === "sd_login" && rms_data) {
     try {
       authenticate(rms_data);
-      localStorage.setItem("isRmsLogin", "true");
+      localStorage.setItem("isSDLogin", "true");
       return true;
     } catch {
       return false;
@@ -78,11 +79,11 @@ export const handleAuthentication = async (
   return false;
 };
 
-const checkAuth = async (from: string, rms_auth: string) => {
-  if (!(rms_auth && rms_auth.length) && hasCookie("access_token")) {
+const checkAuth = async (from: string, auth: string) => {
+  if (!(auth && auth.length) && hasCookie("access_token")) {
     return true;
   }
-  const isAuth = await handleAuthentication(from, rms_auth);
+  const isAuth = await handleAuthentication(from, auth);
   return isAuth;
 };
 

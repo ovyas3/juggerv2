@@ -41,13 +41,13 @@ const Signin = () => {
       .then(async (response: any) => {
         if (response.statusCode === 200) {
           const signedIn = await handleAuthentication(
-            "rms_login",
+            "sd_login",
             "",
             response.data
           );
           if (signedIn) {
             // getPreferences()
-            router.push("/welcome");
+            router.push("/externalParking");
           }
         } else {
           showMessage(response.message, "error");

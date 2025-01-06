@@ -34,7 +34,7 @@ export default function AccountMenu() {
 
   const handleLogout = () => {
     console.log('logout');
-    const fromRms = Boolean(localStorage.getItem('isRmsLogin'))
+    const fromRms = Boolean(localStorage.getItem('isSDLogin'))
     deleteAllCache();
     if(fromRms) {
       router.push('/signin')

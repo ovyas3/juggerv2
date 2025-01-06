@@ -31,7 +31,7 @@ const httpsGet = async (path: string, type: number = 0, router: any = null) => {
     .catch((err) => {
       if (axios.isAxiosError(err) && err.response?.status === 401 && !redirectInProgress) {
         redirectInProgress = true
-        const fromRms = Boolean(localStorage.getItem('isRmsLogin'))
+        const fromRms = Boolean(localStorage.getItem('isSDLogin'))
         if(fromRms) {
          router.push('/signin')
         } else {
@@ -84,7 +84,7 @@ const httpsPost = async (path: string, data: any, router: any = null, type = 0, 
           if(url.includes('shipper_user/signin')) {
             return err.response.data 
           }
-          const fromRms = Boolean(localStorage.getItem('isRmsLogin'))
+          const fromRms = Boolean(localStorage.getItem('isSDLogin'))
           if(fromRms) {
             router.push('/signin')
           } else {

@@ -38,3 +38,14 @@
     width: 100%;
     font-family: "Inter", sans-serif !important;
 }
+
+.bottom_bar{
+    width: 100%;
+    background-color: #f0f3f9;
+    position: fixed;
+    bottom: 0;
+    height: 65px;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    color: white;
+}

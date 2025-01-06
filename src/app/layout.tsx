@@ -8,8 +8,8 @@ import { SnackbarProvider } from '../hooks/snackBar';
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "RMS",
-  description: "Rail Management System",
+  title: "Instavans",
+  description: "Smart Dashboard",
 };
 
 export default async function RootLayout({
