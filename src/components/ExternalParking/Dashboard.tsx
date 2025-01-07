@@ -36,73 +36,48 @@ const TimeRangeSection: React.FC<TimeRangeSectionProps> = ({
   const [showTable, setShowTable] = useState(false);
   const [selectedData, setSelectedData] = useState<any>(null);
 
-  // const handleClick = async (id: string, data?: any[]) => {
-  //   console.log('data',data);
-  //   if (title === "Shipment Time Range") {
-  //     const shipmentIds = data;
-  //     setSelectedData({
-  //       title: 'Shipment Details',
-  //       endpoint: 'shipment/details',
-  //       columns: [
-  //         { id: 'SIN', label: 'Shipment No.', minWidth: 100 },
-  //         { id: 'do_numbers', label: 'Do Number', minWidth: 100 },
-  //         { id: 'vehicle_no', label: 'Vehicle No.', minWidth: 100 },
-  //         { 
-  //           id: 'carrier',
-  //           label: 'Carrier Name',
-  //           minWidth: 150,
-  //           format: (value: any) => value.name
-  //         },
-  //         { 
-  //           id: 'deliveries',
-  //           label: 'Delivery Location',
-  //           minWidth: 200,
-  //           format: (deliveries: any[]) => {
-  //             if (!deliveries?.[0]?.location) return '';
-  //             const loc = deliveries[0].location;
-  //             return `${loc.reference || ''} - ${loc.name || ''} - ${loc.city || ''}`;
-  //           }
-  //         },
-  //       ],
-  //       payload: { _ids: shipmentIds }
-  //     });
-  //   } else if (title === "Vehicle Wait Time") {
-  //     const driverIds = data;
-  //     setSelectedData({
-  //       title: 'External Parking Details',
-  //       endpoint: 'driver/details',
-  //       columns: [
-  //         { id: 'vehicle_no', label: 'Vehicle No.', minWidth: 100 },
-  //         { 
-  //           id: 'carrier',
-  //           label: 'Carrier Name',
-  //           minWidth: 150,
-  //           format: (value: any) => value.name
-  //         },
-  //         { id: 'created_at', label: 'Created At', minWidth: 170,
-  //           format: (value: any) => new Date(value).toLocaleString() }
-  //       ],
-  //       payload: { _ids: driverIds }
-  //     });
-  //   }
-  //   setShowTable(true);
-  // };
-
   const handleClick = async (id: string, data?: any[]) => {
-    if (id === 'shipment') {
+    if (title === "Shipment Time Range") {
       const shipmentIds = data;
       setSelectedData({
         title: 'Shipment Details',
         endpoint: 'shipment/details',
         columns: [
-          { id: 'SIN', label: 'Shipment No.', minWidth: 100 },
-          { id: 'do_numbers', label: 'Do Number', minWidth: 100 },
-          { id: 'vehicle_no', label: 'Vehicle No.', minWidth: 100 },
+          { 
+            id: 'sl_no', 
+            label: 'S.No', 
+            minWidth: 50,
+            filterable: false,
+            sortable: false
+          },
+          { 
+            id: 'SIN', 
+            label: 'Shipment No.', 
+            minWidth: 100,
+            filterable: true,
+            sortable: true
+          },
+          { 
+            id: 'do_numbers', 
+            label: 'Do Number', 
+            minWidth: 100,
+            filterable: true,
+            sortable: true
+          },
+          { 
+            id: 'vehicle_no', 
+            label: 'Vehicle No.', 
+            minWidth: 100,
+            filterable: true,
+            sortable: true
+          },
           { 
             id: 'carrier',
             label: 'Carrier Name',
             minWidth: 150,
-            format: (value: any) => value.name
+            format: (value: any) => value?.name || '',
+            filterable: true,
+            sortable: true
           },
           { 
             id: 'deliveries',
@@ -112,26 +87,49 @@ const TimeRangeSection: React.FC<TimeRangeSectionProps> = ({
               if (!deliveries?.[0]?.location) return '';
               const loc = deliveries[0].location;
               return `${loc.reference || ''} - ${loc.name || ''} - ${loc.city || ''}`;
-            }
+            },
+            filterable: true,
+            sortable: true
           },
         ],
         payload: { _ids: shipmentIds }
       });
-    } else if (id === 'ep') {
+    } else if (title === "Vehicle Wait Time") {
       const driverIds = data;
       setSelectedData({
         title: 'External Parking Details',
         endpoint: 'driver/details',
         columns: [
-          { id: 'vehicle_no', label: 'Vehicle No.', minWidth: 100 },
+          { 
+            id: 'sl_no', 
+            label: 'S.No', 
+            minWidth: 50,
+            filterable: false,
+            sortable: false
+          },
+          { 
+            id: 'vehicle_no', 
+            label: 'Vehicle No.', 
+            minWidth: 100,
+            filterable: true,
+            sortable: true
+          },
           { 
             id: 'carrier',
             label: 'Carrier Name',
             minWidth: 150,
-            format: (value: any) => value.name
+            format: (value: any) => value?.name || '',
+            filterable: true,
+            sortable: true
           },
-          { id: 'created_at', label: 'Created At', minWidth: 170,
-            format: (value: any) => new Date(value).toLocaleString() }
+          { 
+            id: 'created_at', 
+            label: 'Created At', 
+            minWidth: 170,
+            format: (value: any) => value ? new Date(value).toLocaleString() : '',
+            filterable: true,
+            sortable: true
+          }
         ],
         payload: { _ids: driverIds }
       });
@@ -511,14 +509,41 @@ const Dashboard = () => {
         title: 'Shipment Details',
         endpoint: 'shipment/details',
         columns: [
-          { id: 'SIN', label: 'Shipment No.', minWidth: 100 },
-          { id: 'do_numbers', label: 'Do Number', minWidth: 100 },
-          { id: 'vehicle_no', label: 'Vehicle No.', minWidth: 100 },
+          { 
+            id: 'sl_no', 
+            label: 'S.No', 
+            minWidth: 50,
+            filterable: false,
+            sortable: false
+          },
+          { 
+            id: 'SIN', 
+            label: 'Shipment No.', 
+            minWidth: 100,
+            filterable: true,
+            sortable: true
+          },
+          { 
+            id: 'do_numbers', 
+            label: 'Do Number', 
+            minWidth: 100,
+            filterable: true,
+            sortable: true
+          },
+          { 
+            id: 'vehicle_no', 
+            label: 'Vehicle No.', 
+            minWidth: 100,
+            filterable: true,
+            sortable: true
+          },
           { 
             id: 'carrier',
             label: 'Carrier Name',
             minWidth: 150,
-            format: (value: any) => value.name
+            format: (value: any) => value?.name || '',
+            filterable: true,
+            sortable: true
           },
           { 
             id: 'deliveries',
@@ -528,7 +553,9 @@ const Dashboard = () => {
               if (!deliveries?.[0]?.location) return '';
               const loc = deliveries[0].location;
               return `${loc.reference || ''} - ${loc.name || ''} - ${loc.city || ''}`;
-            }
+            },
+            filterable: true,
+            sortable: true
           },
         ],
         payload: { _ids: shipmentIds }
@@ -539,15 +566,36 @@ const Dashboard = () => {
         title: 'External Parking Details',
         endpoint: 'driver/details',
         columns: [
-          { id: 'vehicle_no', label: 'Vehicle No.', minWidth: 100 },
+          { 
+            id: 'sl_no', 
+            label: 'S.No', 
+            minWidth: 50,
+            filterable: false,
+            sortable: false
+          },
+          { 
+            id: 'vehicle_no', 
+            label: 'Vehicle No.', 
+            minWidth: 100,
+            filterable: true,
+            sortable: true
+          },
           { 
             id: 'carrier',
             label: 'Carrier Name',
             minWidth: 150,
-            format: (value: any) => value.name
+            format: (value: any) => value?.name || '',
+            filterable: true,
+            sortable: true
           },
-          { id: 'created_at', label: 'Created At', minWidth: 170,
-            format: (value: any) => new Date(value).toLocaleString() }
+          { 
+            id: 'created_at', 
+            label: 'Created At', 
+            minWidth: 170,
+            format: (value: any) => value ? new Date(value).toLocaleString() : '',
+            filterable: true,
+            sortable: true
+          }
         ],
         payload: { _ids: driverIds }
       });
@@ -687,12 +735,12 @@ const Dashboard = () => {
                 <Card
                   className="glassy-card"
                   sx={{
-                    cursor: "pointer",
+                    cursor: data.name !== "Total Registration" ? "pointer" : "default",
                     transition: "box-shadow 0.3s",
-                    "&:hover": { boxShadow: 4 },
+                    "&:hover": { boxShadow: data.name !== "Total Registration" ? 4 : 0 },
                     boxShadow: "0px 2px 4px rgba(0,0,0,0.16)",
                   }}
-                     onClick={() => handleClick(data._id,data.shipments)}
+                  onClick={() => data.name !== "Total Registration" && handleClick(data._id, data.shipments)}
                 >
                   <CardContent sx={{ padding: "10px" }}>
                     <Box
