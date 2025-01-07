@@ -18,6 +18,7 @@ import {
 import RefreshIcon from "@mui/icons-material/Refresh";
 import CustomSelect from "../UI/CustomSelect/CustomSelect";
 import "./dashboard.css";
+import CommonTable from "../CommonTable/common-table";
 
 // Reusable Time Range Section Component
 interface TimeRangeSectionProps {
@@ -33,9 +34,108 @@ const TimeRangeSection: React.FC<TimeRangeSectionProps> = ({
   loading,
   onRefresh,
 }) => {
-  const handleClick = (id: string) => {
-    console.log("clicked", id);
-    // Add your logic here for handling the click event
+  const [showTable, setShowTable] = useState(false);
+  const [selectedData, setSelectedData] = useState<any>(null);
+
+  const handleClick = async (id: string, data?: any[]) => {
+    if (title === "Shipment Time Range") {
+      const shipmentIds = data;
+      setSelectedData({
+        title: 'Shipment Details',
+        endpoint: 'shipment/details',
+        columns: [
+          { 
+            id: 'sl_no', 
+            label: 'S.No', 
+            minWidth: 50,
+            filterable: false,
+            sortable: false
+          },
+          { 
+            id: 'SIN', 
+            label: 'Shipment No.', 
+            minWidth: 100,
+            filterable: true,
+            sortable: true
+          },
+          { 
+            id: 'do_numbers', 
+            label: 'Do Number', 
+            minWidth: 100,
+            filterable: true,
+            sortable: true
+          },
+          { 
+            id: 'vehicle_no', 
+            label: 'Vehicle No.', 
+            minWidth: 100,
+            filterable: true,
+            sortable: true
+          },
+          { 
+            id: 'carrier',
+            label: 'Carrier Name',
+            minWidth: 150,
+            format: (value: any) => value?.name || '',
+            filterable: true,
+            sortable: true
+          },
+          { 
+            id: 'deliveries',
+            label: 'Delivery Location',
+            minWidth: 200,
+            format: (deliveries: any[]) => {
+              if (!deliveries?.[0]?.location) return '';
+              const loc = deliveries[0].location;
+              return `${loc.reference || ''} - ${loc.name || ''} - ${loc.city || ''}`;
+            },
+            filterable: true,
+            sortable: true
+          },
+        ],
+        payload: { _ids: shipmentIds }
+      });
+    } else if (title === "Vehicle Wait Time") {
+      const driverIds = data;
+      setSelectedData({
+        title: 'External Parking Details',
+        endpoint: 'driver/details',
+        columns: [
+          { 
+            id: 'sl_no', 
+            label: 'S.No', 
+            minWidth: 50,
+            filterable: false,
+            sortable: false
+          },
+          { 
+            id: 'vehicle_no', 
+            label: 'Vehicle No.', 
+            minWidth: 100,
+            filterable: true,
+            sortable: true
+          },
+          { 
+            id: 'carrier',
+            label: 'Carrier Name',
+            minWidth: 150,
+            format: (value: any) => value?.name || '',
+            filterable: true,
+            sortable: true
+          },
+          { 
+            id: 'created_at', 
+            label: 'Created At', 
+            minWidth: 170,
+            format: (value: any) => value ? new Date(value).toLocaleString() : '',
+            filterable: true,
+            sortable: true
+          }
+        ],
+        payload: { _ids: driverIds }
+      });
+    }
+    setShowTable(true);
   };
 
   return (
@@ -117,7 +217,7 @@ const TimeRangeSection: React.FC<TimeRangeSectionProps> = ({
                   "&:hover": { boxShadow: 4 },
                   boxShadow: "0px 2px 4px rgba(0,0,0,0.16)",
                 }}
-                onClick={() => handleClick(item.id)}
+                 onClick={() => handleClick(item._id,item.shipments)}
               >
                 <CardContent sx={{ padding: "10px" }}>
                   <Box
@@ -152,6 +252,17 @@ const TimeRangeSection: React.FC<TimeRangeSectionProps> = ({
           ))
         )}
       </Grid>
+        {selectedData && (
+        <CommonTable
+          title={selectedData.title}
+          endpoint={selectedData.endpoint}
+          columns={selectedData.columns}
+          payload={selectedData.payload}
+          initialData={selectedData.initialData}
+          open={showTable}
+          onClose={() => setShowTable(false)}
+        />
+      )}
     </>
   );
 };
@@ -192,6 +303,7 @@ const useDashboardData = () => {
 
   const mapTimeRangeData = (data: any[]) => {
     return data.map((timeRange: any) => ({
+        _id: timeRange._id,
       id: timeRange._id,
       name: timeRangeIDNameMap[timeRange._id] || ">64 Hours",
       count: timeRange.count,
@@ -215,6 +327,7 @@ const useDashboardData = () => {
       if (response && response.statusCode === 200) {
         if (endpoint.includes("vehicleStatus")) {
           const vehicleData = Object.keys(response.data).map((key) => ({
+            _id: key,
             id: key,
             name: idNameMap[key],
             count: response.data[key][0]?.count?.[0],
@@ -375,7 +488,9 @@ const Dashboard = () => {
   const [autoRefreshInterval, setAutoRefreshInterval] = useState<number | null>(
     null
   );
-
+   const [showTable, setShowTable] = useState(false);
+  const [selectedData, setSelectedData] = useState<any>(null);
+  
   useEffect(() => {
     let intervalId: NodeJS.Timeout | null = null;
     if (autoRefreshInterval) {
@@ -388,10 +503,107 @@ const Dashboard = () => {
     };
   }, [autoRefreshInterval, refreshAllData]);
 
-  const handleClick = (id: string) => {
-    console.log("clicked", id);
-    // Add your logic here for handling the click event
+  const handleClick = async (id: string, data?: any[]) => {
+    if (id === 'shipment') {
+      const shipmentIds = data;
+      setSelectedData({
+        title: 'Shipment Details',
+        endpoint: 'shipment/details',
+        columns: [
+          { 
+            id: 'sl_no', 
+            label: 'S.No', 
+            minWidth: 50,
+            filterable: false,
+            sortable: false
+          },
+          { 
+            id: 'SIN', 
+            label: 'Shipment No.', 
+            minWidth: 100,
+            filterable: true,
+            sortable: true
+          },
+          { 
+            id: 'do_numbers', 
+            label: 'Do Number', 
+            minWidth: 100,
+            filterable: true,
+            sortable: true
+          },
+          { 
+            id: 'vehicle_no', 
+            label: 'Vehicle No.', 
+            minWidth: 100,
+            filterable: true,
+            sortable: true
+          },
+          { 
+            id: 'carrier',
+            label: 'Carrier Name',
+            minWidth: 150,
+            format: (value: any) => value?.name || '',
+            filterable: true,
+            sortable: true
+          },
+          { 
+            id: 'deliveries',
+            label: 'Delivery Location',
+            minWidth: 200,
+            format: (deliveries: any[]) => {
+              if (!deliveries?.[0]?.location) return '';
+              const loc = deliveries[0].location;
+              return `${loc.reference || ''} - ${loc.name || ''} - ${loc.city || ''}`;
+            },
+            filterable: true,
+            sortable: true
+          },
+        ],
+        payload: { _ids: shipmentIds }
+      });
+    } else if (id === 'ep') {
+      const driverIds = data;
+      setSelectedData({
+        title: 'External Parking Details',
+        endpoint: 'driver/details',
+        columns: [
+          { 
+            id: 'sl_no', 
+            label: 'S.No', 
+            minWidth: 50,
+            filterable: false,
+            sortable: false
+          },
+          { 
+            id: 'vehicle_no', 
+            label: 'Vehicle No.', 
+            minWidth: 100,
+            filterable: true,
+            sortable: true
+          },
+          { 
+            id: 'carrier',
+            label: 'Carrier Name',
+            minWidth: 150,
+            format: (value: any) => value?.name || '',
+            filterable: true,
+            sortable: true
+          },
+          { 
+            id: 'created_at', 
+            label: 'Created At', 
+            minWidth: 170,
+            format: (value: any) => value ? new Date(value).toLocaleString() : '',
+            filterable: true,
+            sortable: true
+          }
+        ],
+        payload: { _ids: driverIds }
+      });
+    }
+    setShowTable(true);
   };
+
 
   const conditionOptions = [
     { value: "24", label: "Last 24 hours" },
@@ -524,12 +736,12 @@ const Dashboard = () => {
                 <Card
                   className="glassy-card"
                   sx={{
-                    cursor: "pointer",
+                    cursor: data.name !== "Total Registration" ? "pointer" : "default",
                     transition: "box-shadow 0.3s",
-                    "&:hover": { boxShadow: 4 },
+                    "&:hover": { boxShadow: data.name !== "Total Registration" ? 4 : 0 },
                     boxShadow: "0px 2px 4px rgba(0,0,0,0.16)",
                   }}
-                  onClick={() => handleClick(data.id)}
+                  onClick={() => data.name !== "Total Registration" && handleClick(data._id, data.shipments)}
                 >
                   <CardContent sx={{ padding: "10px" }}>
                     <Box
@@ -564,6 +776,17 @@ const Dashboard = () => {
             ))
           )}
         </Grid>
+        {selectedData && (
+        <CommonTable
+          title={selectedData.title}
+          endpoint={selectedData.endpoint}
+          columns={selectedData.columns}
+          payload={selectedData.payload}
+          initialData={selectedData.initialData}
+          open={showTable}
+          onClose={() => setShowTable(false)}
+        />
+      )}
         <Divider
           sx={{
             my: 2,
