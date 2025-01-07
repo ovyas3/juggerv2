@@ -75,7 +75,7 @@ const operators = {
   date: ['equals', 'after', 'before', 'between'],
 };
 
-function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
+function descendingComparator<T>(a: T, b: T, orderBy: keyof T): number {
   if (orderBy === 'sl_no') {
     return (b[orderBy] as number) - (a[orderBy] as number);
   }
@@ -83,16 +83,23 @@ function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
   const aValue = a[orderBy];
   const bValue = b[orderBy];
 
-  // Handle formatted values
-  if (typeof aValue === 'object' && aValue?.name) {
-    if (bValue?.name < aValue?.name) return -1;
-    if (bValue?.name > aValue?.name) return 1;
+  // Handle formatted values with `name` property
+  if (typeof aValue === 'object' && aValue !== null && 'name' in aValue) {
+    const aName = (aValue as { name: string }).name;
+    const bName = (bValue as { name: string }).name;
+    if (bName < aName) return -1;
+    if (bName > aName) return 1;
     return 0;
   }
 
   // Handle date values
-  if (aValue && bValue && !isNaN(Date.parse(aValue as string)) && !isNaN(Date.parse(bValue as string))) {
-    return new Date(bValue as string).getTime() - new Date(aValue as string).getTime();
+  if (
+    typeof aValue === 'string' &&
+    typeof bValue === 'string' &&
+    !isNaN(Date.parse(aValue)) &&
+    !isNaN(Date.parse(bValue))
+  ) {
+    return new Date(bValue).getTime() - new Date(aValue).getTime();
   }
 
   // Handle regular values
