@@ -60,9 +60,10 @@ const TimeRangeSection: React.FC<TimeRangeSectionProps> = ({
           },
           { 
             id: 'do_numbers', 
-            label: 'Do Number', 
+            label: 'DO Number', 
             minWidth: 100,
             filterable: true,
+            format: (value: string[]) => value ? value.join(', ') : '',
             sortable: true
           },
           { 
@@ -76,7 +77,7 @@ const TimeRangeSection: React.FC<TimeRangeSectionProps> = ({
             id: 'carrier',
             label: 'Carrier Name',
             minWidth: 150,
-            format: (value: any) => value?.name || '',
+            format: (value: any) => `${value?.name} - ${value?.parent_name}` || '',
             filterable: true,
             sortable: true
           },
@@ -98,7 +99,7 @@ const TimeRangeSection: React.FC<TimeRangeSectionProps> = ({
     } else if (title === "Vehicle Wait Time") {
       const driverIds = data;
       setSelectedData({
-        title: 'External Parking Details',
+        title: 'SAP TMS Diagnostics Tool',
         endpoint: 'driver/details',
         columns: [
           { 
@@ -125,7 +126,7 @@ const TimeRangeSection: React.FC<TimeRangeSectionProps> = ({
           },
           { 
             id: 'created_at', 
-            label: 'Created At', 
+            label: 'Registration Date', 
             minWidth: 170,
             format: (value: any) => value ? new Date(value).toLocaleString() : '',
             filterable: true,
@@ -526,9 +527,10 @@ const Dashboard = () => {
           },
           { 
             id: 'do_numbers', 
-            label: 'Do Number', 
+            label: 'DO Number', 
             minWidth: 100,
             filterable: true,
+            format: (value: string[]) => value ? value.join(', ') : '',
             sortable: true
           },
           { 
@@ -542,7 +544,7 @@ const Dashboard = () => {
             id: 'carrier',
             label: 'Carrier Name',
             minWidth: 150,
-            format: (value: any) => value?.name || '',
+            format: (value: any) => `${value?.name} - ${value?.parent_name}` || '',
             filterable: true,
             sortable: true
           },
@@ -564,7 +566,7 @@ const Dashboard = () => {
     } else if (id === 'ep') {
       const driverIds = data;
       setSelectedData({
-        title: 'External Parking Details',
+        title: 'SAP TMS Diagnostics Tool',
         endpoint: 'driver/details',
         columns: [
           { 
@@ -591,7 +593,7 @@ const Dashboard = () => {
           },
           { 
             id: 'created_at', 
-            label: 'Created At', 
+            label: 'Registration Date', 
             minWidth: 170,
             format: (value: any) => value ? new Date(value).toLocaleString() : '',
             filterable: true,

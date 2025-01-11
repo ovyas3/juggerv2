@@ -7,7 +7,7 @@ import "./dropdown.css";
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import {setCookies} from '@/utils/storageService'
 import CustomSelect from "../UI/CustomSelect/CustomSelect";
-
+import { ShipperSettingsModal } from '../PlantSchedule/ShipperSettingsModal';
 
 interface shipper {
   _id: string,
@@ -80,6 +80,28 @@ const Dropdown = ({ shippers, reload }:{shippers: shipper[], reload: any, getAll
         })}
       </div>}
     </div>
+  );
+};
+
+const AccountMenu = () => {
+  const [isSettingsModalVisible, setSettingsModalVisible] = useState(false);
+
+  const handleSettingsClick = () => {
+    setSettingsModalVisible(true);
+  };
+
+  return (
+    <>
+      <MenuItem key="settings" onClick={handleSettingsClick}>
+        Settings
+      </MenuItem>
+
+      <ShipperSettingsModal 
+        visible={isSettingsModalVisible}
+        onCancel={() => setSettingsModalVisible(false)}
+        // theme={themes[currentTheme]} // Assuming you have access to themes
+      />
+    </>
   );
 };
 

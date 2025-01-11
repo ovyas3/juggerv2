@@ -1,0 +1,97 @@
+/* Additional styles can be added here if needed */
+.plantScheduleContainer {
+  animation: fadeIn 0.3s ease-in;
+}
+
+.DateDisplay {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  margin-right: 20px;
+}
+
+.DateDisplay .day {
+  color: #666;
+  margin-left: 4px;
+}
+
+.TopSection {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  padding: 0 10px;
+}
+
+.TopSection .left-section {
+  display: flex;
+  align-items: center;
+}
+
+.ShiftTabs {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  margin: 5px auto;
+  padding: 0;
+  width: fit-content;
+}
+
+.tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 160px;
+}
+
+.shift-label {
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+
+.shift-time {
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.TableContainer {
+  margin-top: 8px;
+  width: 100%;
+  overflow-x: auto;
+}
+
+.StyledCard {
+  margin-top: 0;
+  width: 100%;
+}
+
+.StyledRow {
+  width: 100%;
+}
+
+.StyledCell {
+  padding: 8px;
+  text-align: center;
+}
+
+.StyledCell:last-child {
+  padding-right: 8px;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
