@@ -24,7 +24,7 @@ const DashboardContent = () => {
       >
         <div style={{ width: '100%', overflowX: 'auto' }}>
             {
-              !mobile ? <Header title={'External Parking Dashboard'} isMapHelper={false}/> : <MobileHeader />
+              !mobile ? <Header title={'SAP TMS Diagnostics Tool'} isMapHelper={false}/> : <MobileHeader />
             }
         </div>
         <div>
