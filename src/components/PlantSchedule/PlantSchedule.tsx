@@ -41,6 +41,28 @@ import Cookies from 'js-cookie';
 import { useMediaQuery } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { ShipperSettingsModal } from './ShipperSettingsModal';
+import { TargetSettingsModal } from './TargetSettingsModal';
+
+interface ScheduleData {
+  hourGroup: number;
+  timeSlot: string;
+  materialsObj: { [key: string]: any };
+}
+
+type MaterialsObj = { [key: string]: number };
+
+interface TargetResponse {
+  statusCode: number;
+  data: {
+    result: ScheduleData[];
+    target: {
+      plants: Array<{
+        name: string;
+        target: number;
+      }>;
+    };
+  };
+}
 
 // Theme definitions
 const themes = {
@@ -175,7 +197,7 @@ const Container = styled.div<{ theme: typeof themes[ThemeKey] }>`
   right: 0;
   bottom: 0;
   left: 0;
-  padding: 16px; /* Reduced padding */
+  padding: 16px; 
   background: ${props => props.theme.primary};
   background-image: ${props => props.theme.background};
   overflow-y: auto;
@@ -191,7 +213,7 @@ const ContentWrapper = styled.div`
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 10px; /* Reduced gap */
+  gap: 10px; 
     @media (min-width: 768px) {
        flex-direction: column;
      }
@@ -202,14 +224,14 @@ const Header = styled.div<{ theme: typeof themes[ThemeKey] }>`
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 16px; /* Reduced margin */
-    gap: 10px; /* Reduced gap */
+    margin-bottom: 16px; 
+    gap: 10px; 
     flex-wrap: wrap;
     background: rgba(13, 25, 45, 0.8);
     backdrop-filter: blur(8px);
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    padding: 10px; /* Reduced padding */
+    padding: 10px; 
     border: 1px solid rgba(255, 255, 255, 0.1);
 
     @media (min-width: 768px) {
@@ -222,11 +244,11 @@ const Header = styled.div<{ theme: typeof themes[ThemeKey] }>`
 const HeaderLeft = styled.div<{ theme: typeof themes[ThemeKey] }>`
     display: flex;
     align-items: center;
-    gap: 8px; /* Reduced gap */
+    gap: 8px; 
 
     h2 {
         color: #fff;
-        font-size: 1.2rem; /* Reduced font size */
+        font-size: 1.2rem; 
         margin: 0;
     }
 
@@ -234,7 +256,7 @@ const HeaderLeft = styled.div<{ theme: typeof themes[ThemeKey] }>`
        gap: 16px;
 
     h2 {
-        font-size: 1.5rem; /* Normal font size on larger screens */
+        font-size: 1.5rem; 
       }
     }
 `;
@@ -242,15 +264,15 @@ const HeaderLeft = styled.div<{ theme: typeof themes[ThemeKey] }>`
 const HeaderRight = styled.div<{ theme: typeof themes[ThemeKey] }>`
   display: flex;
   align-items: center;
-  gap: 8px; /* Reduced gap */
-  flex-wrap: wrap; /* Allow wrapping on smaller screens */
+  gap: 8px; 
+  flex-wrap: wrap; 
 
   .ant-typography {
     color: ${props => props.theme.textSecondary} !important;
     display: flex;
     align-items: center;
     user-select: none;
-    font-size: 0.85rem; /* Reduced font size */
+    font-size: 0.85rem; 
   }
 
   .ant-typography:hover,
@@ -260,9 +282,9 @@ const HeaderRight = styled.div<{ theme: typeof themes[ThemeKey] }>`
 
   .divider {
     width: 1px;
-    height: 20px; /* Reduced height */
+    height: 20px; 
     background: rgba(255, 255, 255, 0.1);
-    margin: 0 6px; /* Reduced margin */
+    margin: 0 6px; 
   }
    @media (min-width: 768px) {
       gap: 16px;
@@ -316,33 +338,11 @@ const NavPopover = styled.div<{ theme: typeof themes[ThemeKey] }>`
         }
 }
 `;
-// const Title = styled.h1<{ theme: typeof themes[ThemeKey] }>`
-//   font-size: 1.2rem; /* Reduced font size */
-//   color: ${props => props.theme.text};
-//   margin: 0;
-//   display: flex;
-//   align-items: center;
-//   gap: 8px; /* Reduced gap */
-
-//   .anticon {
-//     color: ${props => props.theme.textSecondary};
-//     font-size: 1rem; /* Reduced font size */
-//   }
-//     @media (min-width: 768px) {
-//         font-size: 1.5rem;
-//         gap: 12px;
-
-//         .anticon {
-//             font-size: 20px;
-//         }
-//     }
-// `;
-
 const StyledDatePicker = styled(DatePicker) <{ theme: typeof themes[ThemeKey]; onChange: (date: Dayjs | null, dateString: string | string[]) => void }>`
   border-radius: 8px;
   background: ${props => `${props.theme.cardBg}`};
   border: 1px solid rgba(255, 255, 255, 0.2);
-  min-width: 120px; /* Reduced min-width */
+  min-width: 120px; 
   
   &:hover {
     border-color: ${props => props.theme.accent};
@@ -356,7 +356,7 @@ const StyledDatePicker = styled(DatePicker) <{ theme: typeof themes[ThemeKey]; o
     .ant-picker-input {
       background: transparent;
       position: relative;
-      padding-right: 30px; /* Make room for both icons */
+      padding-right: 30px; 
       
       input {
         color: ${props => props.theme.text};
@@ -372,9 +372,9 @@ const StyledDatePicker = styled(DatePicker) <{ theme: typeof themes[ThemeKey]; o
   /* Calendar icon */
   .ant-picker-suffix {
     color: ${props => props.theme.textSecondary};
-    font-size: 14px; /* Reduced icon size */
+    font-size: 14px; 
     position: absolute;
-    right: 10px; /* Adjusted position */
+    right: 10px; 
     top: 50%;
     transform: translateY(-50%);
     z-index: 1;
@@ -395,10 +395,10 @@ const StyledDatePicker = styled(DatePicker) <{ theme: typeof themes[ThemeKey]; o
     justify-content: center;
     transition: all 0.2s ease;
     position: absolute;
-    right: 28px; /* Position it before the calendar icon */
+    right: 28px; 
     top: 50%;
     transform: translateY(-50%);
-    width: 14px; /* Reduced button size */
+    width: 14px; 
     height: 14px;
     margin: 0;
     z-index: 2;
@@ -490,7 +490,7 @@ const StyledDatePicker = styled(DatePicker) <{ theme: typeof themes[ThemeKey]; o
 
 const StyledCard = styled(Card) <{ theme: typeof themes[ThemeKey] }>`
   border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15); /* Reduced shadow */
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15); 
   background: ${props => props.theme.cardBg};
   backdrop-filter: blur(8px);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -506,21 +506,21 @@ const StyledCard = styled(Card) <{ theme: typeof themes[ThemeKey] }>`
 
 const TableWrapper = styled.div`
   overflow-x: auto;
-  border-radius: 12px; /* Reduced radius */
+  border-radius: 12px; 
   width: 100%;
   
   &::-webkit-scrollbar {
-    height: 6px; /* Reduced scrollbar height */
+    height: 6px; 
   }
   
   &::-webkit-scrollbar-track {
     background: rgba(255, 255, 255, 0.1);
-    border-radius: 3px; /* Reduced radius */
+    border-radius: 3px; 
   }
   
   &::-webkit-scrollbar-thumb {
     background: ${props => props.theme.accent};
-    border-radius: 3px; /* Reduced radius */
+    border-radius: 3px; 
     
     &:hover {
       background: ${props => props.theme.hover};
@@ -555,7 +555,7 @@ const Tr = styled.tr<{
   $istargetrow?: boolean
 }>`
   background: ${props => `${props.theme.cardBg}`};
-  border-top: 1px solid ${props => props.theme.hover}; /* Reduced border size */
+  border-top: 1px solid ${props => props.theme.hover}; 
   border-bottom: ${props => props.$istargetrow ? `1px solid ${props.theme.hover}` : 'none'};
   background: ${props => props.$iscurrenttime ? `${props.theme.accent}25` : 'transparent'};
   
@@ -567,6 +567,9 @@ const Tr = styled.tr<{
     td[data-total="true"] {
       background: ${props => `${props.theme.accent}22`};
     }
+    td[data-target-total="true"] {
+           background: ${props => `${props.theme.accent}22`};
+    }
   }
       @media (min-width: 768px) {
           border-top: 2px solid ${props => props.theme.hover};
@@ -574,101 +577,61 @@ const Tr = styled.tr<{
       }
 `;
 
-const isCurrentTime = (timeSlot: string) => {
-  const now = dayjs();
-  const currentHour = now.hour();
-  const currentMinute = now.minute();
-  const [slotStartStr, slotEndStr] = timeSlot.split(' - ');
-  const [slotStartHourStr, slotStartMinuteStr] = slotStartStr.split(':');
-  const slotStartHour = parseInt(slotStartHourStr, 10);
-  const slotStartMinute = parseInt(slotStartMinuteStr, 10);
-
-  const [slotEndHourStr, slotEndMinuteStr] = slotEndStr.split(':');
-  const slotEndHour = parseInt(slotEndHourStr, 10);
-  const slotEndMinute = parseInt(slotEndMinuteStr, 10);
-
-  const slotStartTime = dayjs().hour(slotStartHour).minute(slotStartMinute);
-  const slotEndTime = dayjs().hour(slotEndHour).minute(slotEndMinute);
-
-
-  if (currentHour >= slotStartHour && currentHour < slotEndHour) {
-    if (currentHour === slotStartHour) {
-      if (currentMinute >= slotStartMinute) {
-
-        const currentTime = dayjs();
-        return currentTime.isBefore(slotEndTime);
-      }
-    } else {
-      const currentTime = dayjs();
-      return currentTime.isBefore(slotEndTime);
-    }
-  }
-  return false;
-};
-
 const Th = styled.th<{
   className?: string;
   theme: typeof themes[ThemeKey]
 }>`
-        padding: 8px; /* Reduced padding */
-        text-align: center;
-        font-weight: 600;
-        color: ${props => props.theme.text};
-        background: ${props => {
-    if (props.className === 'total-cell') return `${props.theme.accent}22`;
-    return props.theme.cardBg;
-  }};
-        border-bottom: 1px solid ${props => props.theme.hover};
-        white-space: nowrap;
-        position: sticky;
-        border-right: 1px solid ${props => props.theme.hover};
-        z-index: 1;
-          font-size: 0.85rem; /* Reduced font size */
-  
-  
-      &.total-cell {
-          color: ${props => props.theme.accent};
-      }
-          &:first-child {
-          border-top-left-radius: 12px; /* Reduced radius */
-      }
-  
-      &:last-child {
-          border-top-right-radius: 12px; /* Reduced radius */
-          border-right: none;
-      }
-          &::after{
-               content: ' (MT)';
-               display: inline-block;
-                font-size: 0.7rem;
-                opacity: 0.7;
-                  @media (min-width: 768px) {
-                        font-size: 0.8rem;
-                    }
-          }
-          @media (min-width: 768px) {
-           padding: 16px;
-            font-size: 1rem;
-          &:first-child {
-              border-top-left-radius: 16px;
-            }
-  
-            &:last-child {
-                border-top-right-radius: 16px;
-            }
-             &::after{
-                      font-size: 0.8rem;
-             }
-        }
-  `;
+  padding: 12px 16px;
+  text-align: left;
+  color: ${props => props.theme.text};
+  font-weight: 500;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  border-bottom: 1px solid ${props => props.theme.hover};
+  background: ${props => props.theme.cardBg};
+
+  &:not(:first-child) {
+    border-left: 1px solid ${props => props.theme.hover};
+  }
+
+  &:last-child {
+    border-right: none;
+  }
+
+  &:not(:first-child)::after {
+    content: ' (MT)';
+    display: inline-block;
+    font-size: 0.7rem;
+    opacity: 0.7;
+    @media (min-width: 768px) {
+      font-size: 0.8rem;
+    }
+  }
+
+  &:first-child::after {
+    content: '';
+    font-size: 0.7rem;
+    opacity: 0.7;
+  }
+
+  @media (min-width: 768px) {
+    padding: 16px 24px;
+    font-size: 0.9rem;
+  }
+
+  &.total-cell {
+    text-align: left;
+    background: ${props => props.theme.cardBg};
+  }
+`;
 
 const Td = styled.td<{
   theme: typeof themes[ThemeKey]
 }>`
-  padding: 6px 8px; /* Reduced padding */
+  padding: 6px 8px; 
   text-align: center;
   border-bottom: 1px solid ${props => props.theme.hover};
-  font-size: 0.75rem; /* Reduced font size */
+  font-size: 0.75rem; 
   color: ${props => props.theme.text};
   background: transparent;
   font-weight: 400;
@@ -704,27 +667,174 @@ const Value = styled.span<{
   value: number;
   theme: typeof themes[ThemeKey]
 }>`
-  color: ${props => props.theme.text}; /*  Set the text color from theme*/
+  color: ${props => props.theme.text}; 
   font-weight: ${props => props.value > 50 ? '500' : '400'};
+`;
+
+const ProgressCell = styled.div<{ achievement: number; theme: typeof themes[ThemeKey] }>`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: 2px;
+
+  .main-line {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    width: 100%;
+
+    .target {
+      color: ${props => props.theme.textSecondary};
+      font-size: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      &:before {
+        content: 'T:';
+      }
+    }
+
+    .actual {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      color: ${props => props.theme.text};
+      &:before {
+        content: 'A:';
+        color: ${props => props.theme.text};
+      }
+    }
+
+    .percentage {
+      color: ${props => props.achievement >= 100 ? '#52c41a' : props.achievement >= 80 ? '#faad14' : '#f5222d'};
+      font-size: 0.7em;
+    }
+  }
+
+  .progress-track {
+    width: 100%;
+    height: 3px;
+    background: ${props => props.theme.hover};
+    border-radius: 1px;
+    overflow: hidden;
+
+    .progress-bar {
+      width: ${props => Math.min(props.achievement, 100)}%;
+      height: 100%;
+      background: ${props =>
+        props.achievement >= 100 ? '#52c41a' :
+        props.achievement >= 80 ? '#faad14' : '#f5222d'
+      };
+      transition: width 0.3s ease;
+    }
+  }
+
+  .remaining {
+    font-size: 0.75em;
+    color: ${props => props.theme.textSecondary};
+    text-align: left;
+    width: 100%;
+  }
+
+  @media (min-width: 768px) {
+    gap: 4px;
+    padding: 4px;
+    .main-line {
+      gap: 8px;
+      .target {
+        font-size: 0.85rem;
+      }
+      .actual {
+        gap: 4px;
+        color: ${props => props.theme.text};
+      }
+      .percentage {
+        font-size: 0.9em;
+      }
+    }
+    .progress-track {
+      height: 4px;
+      border-radius: 2px;
+    }
+    .remaining {
+      font-size: 0.85em;
+    }
+  }
+`;
+
+const StatItem = styled.div<{ theme: typeof themes[ThemeKey] }>`
+  background: ${props => props.theme.cardBg};
+  border-radius: 8px;
+  padding: 8px 10px; 
+  border: 1px solid rgb(187 104 76);
+  text-align: center;
+
+  .stat-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 4px; 
+
+    h3 {
+      margin: 0;
+      font-size: 0.8rem; 
+      color: ${props => props.theme.textSecondary};
+    }
+  }
+
+  .anticon {
+    color: ${props => props.theme.textSecondary};
+    font-size: 0.8rem;
+  }
+
+  .stat-value {
+    font-size: 1.2rem; 
+    margin: 0;
+    color: ${props => props.theme.text};
+  }
+
+  @media (min-width: 768px) {
+    padding: 12px 16px;
+
+    .stat-header {
+      margin-bottom: 8px;
+
+      h3 {
+        font-size: 1rem;
+      }
+    }
+
+    .anticon {
+      font-size: 1rem;
+    }
+
+    .stat-value {
+      font-size: 1.5rem;
+    }
+  }
 `;
 
 const StatsCard = styled.div`
   display: grid;
-  grid-template-columns: 1fr; /* Single column on mobile */
-  gap: 8px; /* Reduced gap */
-  margin-bottom: 8px; /* Reduced margin */
+  grid-template-columns: 1fr;
+  gap: 8px;
+  margin-bottom: 8px;
   width: 100%;
-     @media (max-width: 767px) {
-         margin-bottom: 0;
-     }
-    @media (min-width: 768px) {
-         display: grid;
-         grid-template-columns: repeat(3, 1fr);
-        gap: 16px;
-        margin-bottom: 16px;
-           width: auto;
 
-    }
+  @media (max-width: 767px) {
+    margin-bottom: 0;
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  @media (min-width: 768px) {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 16px;
+    width: auto;
+  }
 `;
 
 const StatsCardWrapper = styled.div`
@@ -740,233 +850,92 @@ const StatsCardWrapper = styled.div`
 `;
 
 
-const StatItem = styled.div<{ theme: typeof themes[ThemeKey] }>`
-  background: ${props => props.theme.cardBg};
-  border-radius: 8px;
-  padding: 8px 10px; /* Reduced padding */
-  border: 1px solid rgb(187 104 76);
-    text-align: center;
-
-  .stat-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 4px; /* Reduced margin */
-
-    h3 {
-      margin: 0;
-      font-size: 0.8rem; /* Reduced font size */
-      color: ${props => props.theme.textSecondary};
-    }
-  }
-       .stat-header h3::after{
-             content: ' (MT)';
-             display: inline-block;
-              font-size: 0.7rem;
-              opacity: 0.7;
-                @media (min-width: 768px) {
-                      font-size: 0.8rem;
-                  }
-        }
-
-  .stat-value {
-    font-size: 1.2rem; /* Reduced font size */
-    margin: 0;
-    color: ${props => props.theme.text};
-  }
-    @media (min-width: 768px) {
-          padding: 12px 16px;
-
-        .stat-header {
-         margin-bottom: 8px;
-        h3 {
-           font-size: 0.9rem;
-        }
-        }
-
-       .stat-value {
-            font-size: 1.5rem;
-         }
-    }
-`;
-
-// const RefreshSettings = styled.div<{ theme: typeof themes[ThemeKey] }>`
-//   display: flex;
-//   align-items: center;
-//   gap: 8px; /* Reduced gap */
-//   margin-bottom: 8px; /* Reduced margin */
-//   padding: 8px 10px; /* Reduced padding */
-//   background: ${props => props.theme.cardBg};
-//   border-radius: 8px;
-//   border: 1px solid rgba(255, 255, 255, 0.1);
-//   width: 100%;
-//   flex-wrap: wrap; /* Allow wrapping on smaller screens */
-
-//   .refresh-title {
-//     display: flex;
-//     align-items: center;
-//     gap: 4px; /* Reduced gap */
-//     color: ${props => props.theme.textSecondary};
-//     font-size: 0.8rem; /* Reduced font size */
-//     white-space: nowrap;
-
-//     .anticon {
-//       font-size: 14px; /* Reduced icon size */
-//     }
-//   }
-
-//   .refresh-controls {
-//     display: flex;
-//     align-items: center;
-//     gap: 6px; /* Reduced gap */
-//     flex-wrap: wrap;
-//     flex: 1;
-
-//     .interval-options {
-//       display: flex;
-//       gap: 4px; /* Reduced gap */
-//       flex-wrap: wrap;
-//     }
-
-//     .interval-option {
-//       padding: 3px 10px; /* Reduced padding */
-//       border-radius: 12px; /* Reduced radius */
-//       font-size: 0.75rem; /* Reduced font size */
-//       background: ${props => props.theme.primary};
-//       border: 1px solid rgba(255, 255, 255, 0.2);
-//       color: ${props => props.theme.text};
-//       cursor: pointer;
-//       transition: all 0.2s ease;
-//       white-space: nowrap;
-
-//       &:hover {
-//         background: ${props => props.theme.hover};
-//         border-color: ${props => props.theme.accent};
-//       }
-
-//       &.active {
-//         background: ${props => props.theme.accent};
-//         border-color: ${props => props.theme.accent};
-//         color: #fff;
-//       }
-//     }
-//   }
-//     @media (min-width: 768px) {
-//         padding: 12px 16px;
-//          gap: 16px;
-//         .refresh-title {
-//               gap: 8px;
-//               font-size: 0.9rem;
-//            .anticon {
-//               font-size: 16px;
-//            }
-//          }
-//       .refresh-controls {
-//             gap: 12px;
-//         .interval-options {
-//             gap: 8px;
-//         }
-//        .interval-option {
-//            padding: 4px 12px;
-//            border-radius: 16px;
-//           font-size: 0.85rem;
-//         }
-//     }
-//   }
-// `;
-
-const TopSection = styled.div`
+const TopSection = styled.div<{ mobile?: boolean }>`
   display: flex;
-  flex-direction: column; /* Stack elements on mobile */
-  align-items: flex-start; /* Align to the start on mobile */
+  flex-direction: column;
+  align-items: flex-start;
   margin-bottom: 8px;
   padding: 0 10px;
   gap: 10px;
 
-
-  @media (min-width: 768px) {
-    flex-direction: row; /* Restore row layout on larger screens */
-    align-items: center; /* Align items to center on larger screens */
-    margin-bottom: 16px;
-    gap: 10px;
-
-  }
-`;
-
-
-const DateDisplay = styled.div<{ theme: typeof themes[ThemeKey] }>`
-  display: flex;
-  align-items: center;
-  gap: 2px; /* Reduced gap */
-  color: ${props => props.theme.text};
-  font-size: 0.8rem; /* Reduced font size */
-    margin-bottom: 8px; /* Reduced margin */
-  justify-content: flex-end;
-
-  .date-icon {
-    color: ${props => props.theme.accent};
-        font-size: 0.9rem;
-  }
-  
-  .day {
-    color: ${props => props.theme.textSecondary};
-        font-size: 0.9rem;
-  }
-    @media (min-width: 768px) {
-      font-size: 0.9rem;
-         margin-bottom: 16px;
-        gap: 4px;
-        .date-icon {
-           font-size: 1rem;
+  @media (max-width: 767px) {
+    .stats-shifts-container {
+      display: flex;
+      flex-direction: row;
+      gap: 12px;
+      width: 100%;
+      
+      .stats-section {
+        flex: 1;
+        min-width: 0;
       }
-
-     .day {
-                   font-size: 1rem;
+      
+      .shifts-section {
+        flex: 1;
+        min-width: 120px;
+        display: flex;
+        flex-direction: column;
       }
     }
+  }
+
+  @media (min-width: 768px) {
+    // flex-direction: row;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    gap: 10px;
+  }
 `;
 
 const ShiftTabs = styled.div<{ theme: typeof themes[ThemeKey] }>`
   display: flex;
+  align-items: center;
   flex-direction: row;
-  gap: 8px; /* Reduced gap */
+  justify-content: space-evenly;
+  gap: 8px;
   padding: 0;
   width: fit-content;
   overflow-x: auto;
   
-      &::-webkit-scrollbar {
-        height: 4px;
-    }
-  
-      &::-webkit-scrollbar-track {
-          background: rgba(255, 255, 255, 0.1);
-          border-radius: 4px;
-    }
-  
-      &::-webkit-scrollbar-thumb {
-          background: ${props => props.theme.accent};
-          border-radius: 4px;
-            &:hover {
-                background: ${props => props.theme.hover};
-            }
+  @media (max-width: 767px) {
+    flex-direction: column;
+    width: 100%;
+    overflow-x: hidden;
+    
+    .tab {
+      min-width: 100%;
+      padding: 8px;
+      
+      .shift-label {
+        margin-bottom: 4px;
+        font-size: 0.85rem;
       }
-        @media (min-width: 768px) {
-          flex-direction: row;
-            gap: 12px;
-             &::-webkit-scrollbar {
-                height: 0;
-            }
+      
+      .shift-stats {
+        font-size: 0.75rem;
+        gap: 4px;
+        
+        span {
+          &:not(:last-child):after {
+            margin: 0 2px;
+          }
         }
-  
+      }
+    }
+  }
+
   .tab {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 8px 10px; /* Reduced padding */
-    border-radius: 10px; /* Reduced radius */
+    padding: 8px 10px;
+    border-radius: 10px;
     cursor: pointer;
     transition: all 0.3s ease;
-    min-width: 120px; /* Reduced min-width */
+    min-width: 120px;
     border: 1px solid rgb(187 104 76);
     background: ${props => props.theme.background};
     color: ${props => props.theme.text};
@@ -981,26 +950,26 @@ const ShiftTabs = styled.div<{ theme: typeof themes[ThemeKey] }>`
 
     .shift-label {
       font-weight: 600;
-      margin-bottom: 2px; /* Reduced margin */
-      font-size: 0.9rem; /* Reduced font size */
+      margin-bottom: 2px;
+      font-size: 0.9rem;
       color: ${props => props.theme.text};
       display: flex;
-        /*  justify-content: space-between; Removed This */
     }
-       .shift-name {
-         white-space: nowrap;
-         overflow: hidden;
-         text-overflow: ellipsis;
-         flex: 1;
+
+    .shift-name {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      flex: 1;
     }
 
     .shift-stats {
-      font-size: 0.7rem; /* Reduced font size */
+      font-size: 0.7rem;
       opacity: 1;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 2px; /* Reduced gap */
+      gap: 2px;
       white-space: nowrap;
       color: ${props => props.theme.textSecondary};
 
@@ -1016,53 +985,68 @@ const ShiftTabs = styled.div<{ theme: typeof themes[ThemeKey] }>`
       font-weight: 500;
       color: ${props => props.theme.textSecondary};
     }
-        .shift-time {
-          font-size: 0.65rem; /* Reduced font size */
-          opacity: 0.6;
-          white-space: nowrap;
-          color: ${props => props.theme.textSecondary};
-          position: absolute;
-          top: 1px;
-          right: 8px;
-        }
-        @media (min-width: 768px) {
-             padding: 12px 16px;
-                border-radius: 12px;
-                min-width: 150px;
 
-               .shift-label {
-                  margin-bottom: 4px;
-                    font-size: 1rem;
-                }
-               .shift-stats {
-                    font-size: 0.85rem;
-                 gap: 4px;
-                }
-                .shift-time {
-                    font-size: 0.75rem;
-                    }
-            }
+    @media (min-width: 768px) {
+      padding: 12px 16px;
+      border-radius: 12px;
+      min-width: 150px;
+
+      .shift-label {
+        margin-bottom: 4px;
+        font-size: 1rem;
+      }
+
+      .shift-stats {
+        font-size: 0.85rem;
+        gap: 4px;
+      }
+    }
   }
-      @media (max-width: 767px) {
-           flex-direction: column;
-             overflow-x: hidden;
-             width: 100%;
-           .tab {
-              min-width: 100%;
+`;
 
-             }
-        }
+const DateDisplay = styled.div<{ theme: typeof themes[ThemeKey] }>`
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  color: ${props => props.theme.text};
+  font-size: 0.8rem;
+  margin-bottom: 8px;
+  justify-content: flex-end;
+
+  .date-icon {
+    color: ${props => props.theme.accent};
+    font-size: 0.9rem;
+  }
+  
+  .day {
+    color: ${props => props.theme.textSecondary};
+    font-size: 0.9rem;
+  }
+
+  @media (min-width: 768px) {
+    font-size: 0.9rem;
+    margin-bottom: 16px;
+    gap: 4px;
+
+    .date-icon {
+      font-size: 1rem;
+    }
+
+    .day {
+      font-size: 1rem;
+    }
+  }
 `;
 
 const TableContainer = styled.div`
-  margin-top: 8px; /* Reduced margin */
+  margin-top: 8px; 
   width: 100%;
   overflow-x: auto;
 `;
 
 const StyledRow = styled.tr<{ theme: typeof themes[ThemeKey]; isTargetRow?: boolean, $iscurrenttime?: boolean; }>`
   background: ${props => `${props.theme.cardBg}`};
-  border-top: 1px solid ${props => props.theme.hover}; /* Reduced border size */
+  border-top: 1px solid ${props => props.theme.hover}; 
   border-bottom: ${props => props.isTargetRow ? `1px solid ${props.theme.hover}` : 'none'};
   background: ${props => props.$iscurrenttime ? `${props.theme.accent}25` : 'transparent'};
   
@@ -1093,17 +1077,17 @@ const StyledCell = styled.td<{
   .indicator-cell {
     display: flex;
     align-items: center;
-    gap: 4px; /* Reduced gap */
-    
+    gap: 4px; 
+  
     .ant-badge {
       .ant-badge-status-dot {
-        width: 6px; /* Reduced size */
-        height: 6px; /* Reduced size */
+        width: 6px; 
+        height: 6px; 
       }
       .ant-badge-status-text {
         color: ${props => props.theme.text};
         font-weight: 600;
-        font-size: 0.75rem; /* Reduced size */
+        font-size: 0.75rem; 
       }
     }
   }
@@ -1112,15 +1096,15 @@ const StyledCell = styled.td<{
     .value-display {
       font-weight: 600;
       color: ${props => props.theme.text};
-      margin-bottom: 2px; /* Reduced margin */
+      margin-bottom: 2px; 
       font-size: 0.85rem;
     }
 
     .compliance-indicator {
       font-size: 0.7em;
-      padding: 2px 4px; /* Reduced padding */
-      border-radius: 3px; /* Reduced radius */
-      
+      padding: 2px 4px; 
+      border-radius: 3px; 
+  
       &.positive {
         color: #52c41a;
         background: rgba(82, 196, 26, 0.1);
@@ -1186,13 +1170,13 @@ const ThemeSelector = styled.div<{ theme: typeof themes[ThemeKey] }>`
     background: ${props => props.theme.cardBg};
     border: 1px solid rgba(255, 255, 255, 0.2);
     color: ${props => props.theme.text};
-    padding: 6px 12px; /* Reduced padding */
-    border-radius: 6px; /* Reduced radius */
+    padding: 6px 12px; 
+    border-radius: 6px; 
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 6px; /* Reduced gap */
-    height: 28px; /* Reduced height */
+    gap: 6px; 
+    height: 28px; 
     transition: all 0.3s ease;
     font-size: 0.8rem;
 
@@ -1222,9 +1206,9 @@ const ThemeOption = styled.div<{ color: string }>`
   
   &:before {
     content: '';
-    width: 14px; /* Reduced size */
-    height: 14px; /* Reduced size */
-    border-radius: 3px; /* Reduced radius */
+    width: 14px; 
+    height: 14px; 
+    border-radius: 3px; 
     background: ${props => props.color};
   }
   
@@ -1247,16 +1231,16 @@ const SignalIndicator = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 4px; /* Reduced gap */
+  gap: 4px; 
   
   .signal-bars {
     display: inline-flex;
-    gap: 1px; /* Reduced gap */
+    gap: 1px; 
     align-items: flex-end;
-    height: 12px; /* Reduced height */
-    
+    height: 12px; 
+  
     .bar {
-      width: 2px; /* Reduced width */
+      width: 2px; 
       background: ${props => props.theme.accent};
       border-radius: 1px;
       
@@ -1290,263 +1274,13 @@ const SignalIndicator = styled.div`
       }
 `;
 
-// const SingleLineContent = styled.div`
-//   display: flex;
-//   align-items: center;
-//   gap: 8px; /* Reduced gap */
-//   color: ${props => props.theme.text};
-
-//   .value-group {
-//     display: flex;
-//     align-items: center;
-//     gap: 4px; /* Reduced gap */
-
-//     .target-value {
-//       font-weight: 600;
-//       font-size: 0.85rem;
-//     }
-
-//     .compliance {
-//       font-size: 0.8em;
-//       padding: 1px 4px; /* Reduced padding */
-//       border-radius: 3px; /* Reduced radius */
-
-//       &.positive {
-//         color: #52c41a;
-//         background: rgba(82, 196, 26, 0.1);
-//       }
-
-//       &.negative {
-//         color: #ff4d4f;
-//         background: rgba(255, 77, 79, 0.1);
-//       }
-//     }
-//   }
-//      @media (min-width: 768px) {
-//         gap: 12px;
-//      .value-group {
-//          gap: 8px;
-//          .target-value {
-//            font-size: 1rem;
-//         }
-//            .compliance {
-//                 font-size: 0.9em;
-//                    padding: 2px 6px;
-//                 border-radius: 4px;
-//         }
-//       }
-//     }
-// `;
-
-const ProgressCell = styled.div<{ achievement: number; theme: typeof themes[ThemeKey] }>`
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 2px; /* Reduced gap */
-  padding: 2px; /* Reduced padding */
-
-  .main-line {
-    display: flex;
-    align-items: center;
-    gap: 4px; /* Reduced gap */
-    width: 100%;
-
-    .target {
-      color: ${props => props.theme.textSecondary};
-      font-size: 0.75rem;
-         display: flex;
-            align-items: center;
-             gap: 2px;
-            &:before {
-             content: 'T:';
-            }
-    }
-
-    .actual {
-      display: flex;
-      align-items: center;
-      gap: 2px; /* Reduced gap */
-          color: ${props => props.theme.text};
-        &:before {
-             content: 'A:';
-              color: ${props => props.theme.text};
-         }
-    }
-
-    .percentage {
-      color: ${props => props.achievement >= 100 ? '#52c41a' : props.achievement >= 80 ? '#faad14' : '#f5222d'};
-      font-size: 0.7em;
-    }
-  }
-
-  .progress-track {
-    width: 100%;
-    height: 3px; /* Reduced height */
-    background: ${props => props.theme.hover};
-    border-radius: 1px; /* Reduced radius */
-    overflow: hidden;
-
-    .progress-bar {
-      width: ${props => Math.min(props.achievement, 100)}%;
-      height: 100%;
-      background: ${props =>
-    props.achievement >= 100 ? '#52c41a' :
-      props.achievement >= 80 ? '#faad14' : '#f5222d'
-  };
-      transition: width 0.3s ease;
-    }
-  }
-
-  .remaining {
-    font-size: 0.75em;
-    color: ${props => props.theme.textSecondary};
-    text-align: left;
-    width: 100%;
-  }
-    @media (min-width: 768px) {
-          gap: 4px;
-           padding: 4px;
-       .main-line {
-         gap: 8px;
-          .target {
-                font-size: 0.85rem;
-            }
-        .actual {
-            gap: 4px;
-             color: ${props => props.theme.text};
-            }
-            .percentage {
-                font-size: 0.9em;
-            }
-        }
-        .progress-track {
-            height: 4px;
-                border-radius: 2px;
-        }
-    .remaining {
-           font-size: 0.85em;
-     }
-    }
-`;
-
-// const SettingsButton = styled.div<{ theme: typeof themes[ThemeKey] }>`
-//   .settings-button {
-//     display: flex;
-//     align-items: center;
-//     gap: 4px; /* Reduced gap */
-//     padding: 4px 8px; /* Reduced padding */
-//     border-radius: 4px; /* Reduced radius */
-//     background: ${props => props.theme.cardBg};
-//     border: 1px solid rgba(255, 255, 255, 0.2);
-//     color: ${props => props.theme.text};
-//     cursor: pointer;
-//     transition: all 0.2s ease;
-//       font-size: 0.75rem;
-
-//     &:hover {
-//       background: ${props => props.theme.hover};
-//       border-color: ${props => props.theme.accent};
-//       color: ${props => props.theme.accent};
-//     }
-
-//     .anticon {
-//       font-size: 14px; /* Reduced icon size */
-//     }
-//   }
-//     @media (min-width: 768px) {
-//      .settings-button {
-//          gap: 8px;
-//            padding: 6px 12px;
-//            border-radius: 6px;
-//              font-size: 1rem;
-
-//          .anticon {
-//            font-size: 16px;
-//         }
-//       }
-//     }
-// `;
-
-// const SettingsModal = styled(Modal) <{ theme: typeof themes[ThemeKey] }>`
-//   .ant-modal-content {
-//     background: ${props => props.theme.cardBg};
-//     border: 1px solid rgba(255, 255, 255, 0.1);
-//        width: 90%; /* take 90% of the screen */
-//     max-width: 500px;
-//   }
-
-//   .ant-modal-header {
-//     background: ${props => props.theme.cardBg};
-//     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-
-//     .ant-modal-title {
-//       color: ${props => props.theme.text};
-//     }
-//   }
-
-//   .ant-modal-body {
-//     color: ${props => props.theme.text};
-//   }
-
-//   .ant-form-item-label > label {
-//     color: ${props => props.theme.textSecondary};
-//   }
-
-//   .ant-input {
-//     background: ${props => props.theme.primary};
-//     border: 1px solid rgba(255, 255, 255, 0.2);
-//     color: ${props => props.theme.text};
-
-//     &:hover, &:focus {
-//       border-color: ${props => props.theme.accent};
-//     }
-//   }
-
-//   .ant-switch {
-//     background: rgba(255, 255, 255, 0.2);
-
-//     &.ant-switch-checked {
-//       background: ${props => props.theme.accent};
-//     }
-//   }
-
-//   .ant-btn {
-//     background: ${props => props.theme.cardBg};
-//     border: 1px solid rgba(255, 255, 255, 0.2);
-//     color: ${props => props.theme.text};
-
-//     &:hover {
-//       background: ${props => props.theme.hover};
-//       border-color: ${props => props.theme.accent};
-//       color: ${props => props.theme.accent};
-//     }
-
-//     &.ant-btn-primary {
-//       background: ${props => props.theme.accent};
-//       color: #fff;
-
-//       &:hover {
-//         background: ${props => props.theme.secondary};
-//         border-color: ${props => props.theme.secondary};
-//         color: #fff;
-//       }
-//     }
-//   }
-//     @media (min-width: 768px) {
-//         .ant-modal-content {
-//          width: auto; /* go back to default width on bigger screens */
-//             max-width: none; /* remove max width on bigger screens */
-//     }
-//    }
-// `;
-
 const RefreshButton = styled.div<{ theme: typeof themes[ThemeKey] }>`
   .refresh-button {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 24px; /* Reduced size */
-    height: 24px; /* Reduced size */
+    width: 24px; 
+    height: 24px; 
     border-radius: 50%;
     background: ${props => props.theme.cardBg};
     border: 1px solid rgba(255, 255, 255, 0.2);
@@ -1565,7 +1299,7 @@ const RefreshButton = styled.div<{ theme: typeof themes[ThemeKey] }>`
     }
 
     .anticon {
-      font-size: 14px; /* Reduced icon size */
+      font-size: 14px; 
     }
   }
 
@@ -1585,58 +1319,13 @@ const RefreshButton = styled.div<{ theme: typeof themes[ThemeKey] }>`
     }
 `;
 
-// const RefreshIntervalButton = styled.div<{ theme: typeof themes[ThemeKey] }>`
-//   .interval-button {
-//     display: flex;
-//     align-items: center;
-//     gap: 4px; /* Reduced gap */
-//     padding: 4px 8px; /* Reduced padding */
-//     border-radius: 4px; /* Reduced radius */
-//     background: ${props => props.theme.cardBg};
-//     border: 1px solid rgba(255, 255, 255, 0.2);
-//     color: ${props => props.theme.text};
-//     cursor: pointer;
-//     transition: all 0.2s ease;
-//       font-size: 0.75rem;
-
-//     &:hover {
-//       background: ${props => props.theme.hover};
-//       border-color: ${props => props.theme.accent};
-//       color: ${props => props.theme.accent};
-//     }
-
-//     .anticon {
-//       font-size: 14px; /* Reduced icon size */
-//     }
-
-//     .interval-text {
-//       font-size: 10px;
-//       opacity: 0.8;
-//     }
-//   }
-//     @media (min-width: 768px) {
-//         .interval-button {
-//            gap: 8px;
-//            padding: 6px 12px;
-//          border-radius: 6px;
-//            font-size: 1rem;
-//             .anticon {
-//                font-size: 16px;
-//             }
-//              .interval-text {
-//                   font-size: 12px;
-//                }
-//         }
-//     }
-// `;
-
 const AccountButton = styled.div<{ theme: typeof themes[ThemeKey] }>`
   .account-button {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 24px; /* Reduced size */
-    height: 24px; /* Reduced size */
+    width: 24px; 
+    height: 24px; 
     border-radius: 50%;
     background: ${props => props.theme.cardBg};
     border: 1px solid rgba(255, 255, 255, 0.2);
@@ -1651,7 +1340,7 @@ const AccountButton = styled.div<{ theme: typeof themes[ThemeKey] }>`
     }
 
     .anticon {
-      font-size: 14px; /* Reduced icon size */
+      font-size: 14px; 
     }
   }
         @media (min-width: 768px) {
@@ -1665,82 +1354,188 @@ const AccountButton = styled.div<{ theme: typeof themes[ThemeKey] }>`
         }
 `;
 
-// const IntervalPopover = styled.div<{ theme: typeof themes[ThemeKey] }>`
-//   padding: 10px;
-//     min-width: 200px;
-//     background: ${props => props.theme.cardBg};
-//     border-radius: 8px;
-//     border: 1px solid rgba(255, 255, 255, 0.1);
-//       .title {
-//     font-size: 12px;
-//     font-weight: 600;
-//     color: ${props => props.theme.text};
-//     margin-bottom: 8px;
-//     display: flex;
-//     align-items: center;
-//     gap: 6px;
-//     }
-//     .interval-input {
-//     margin-bottom: 8px;
-//     }
+const MobileCard = styled.div<{ theme: typeof themes[ThemeKey] }>`
+  background: ${props => props.theme.cardBg};
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 12px;
 
-//     .auto-refresh {
-//       margin-bottom: 6px;
-//     }
-//         @media (min-width: 768px) {
-//              padding: 16px;
-//              min-width: 250px;
-//             .title {
-//                font-size: 14px;
-//                margin-bottom: 12px;
-//                  gap: 8px;
-//             }
-//             .interval-input {
-//                margin-bottom: 12px;
-//             }
-//               .auto-refresh {
-//                 margin-bottom: 8px;
-//               }
-//     }
-// `;
+  .time-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    
+    .clock-icon {
+      color: ${props => props.theme.accent};
+    }
+    
+    .time {
+      color: ${props => props.theme.text};
+      font-weight: 500;
+    }
+  }
 
-// const PageLayout = styled.div`
-//   display: flex;
-//   flex-direction: column;
-//   gap: 10px; /* Reduced gap */
-//   max-width: 1400px;
-//   margin: 0 auto;
-//     @media (min-width: 768px) {
-//       gap: 16px;
-//     }
-// `;
+  .plants-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 12px;
+    margin-bottom: 12px;
 
-type MaterialsObj = {
-  [plant: string]: number;
-};
+    .plant-item {
+      .plant-name {
+        color: ${props => props.theme.textSecondary};
+        font-size: 0.85rem;
+        margin-bottom: 4px;
 
-interface ScheduleData {
-  hourGroup: number;
-  timeSlot: string;
-  materialsObj: MaterialsObj;
-}
+        &::after {
+          content: ' (MT)';
+          font-size: 0.7rem;
+          opacity: 0.7;
+        }
+      }
 
-interface PlantTarget {
-  name: string;
-  target: number;
-}
+      .plant-value {
+        color: ${props => props.theme.text};
+        font-weight: 500;
+        font-size: 1rem;
+      }
+    }
+  }
 
-interface TargetResponse {
-  data: {
-    result: ScheduleData[],
-    target: {
-      _id: string;
-      plants: PlantTarget[];
-    };
-  };
-  msg: string;
-  statusCode: number;
-}
+  .total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 8px;
+    border-top: 1px solid ${props => props.theme.hover};
+
+    .total-label {
+      color: ${props => props.theme.textSecondary};
+      font-size: 0.85rem;
+      
+      &::after {
+        content: ' (MT)';
+        font-size: 0.7rem;
+        opacity: 0.7;
+      }
+    }
+
+    .total-value {
+      color: ${props => props.theme.text};
+      font-weight: 500;
+      font-size: 1rem;
+    }
+  }
+`;
+
+const MobileTargetCard = styled(MobileCard)`
+  background: ${props => props.theme.cardBg};
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+
+  .target-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+    
+    .signal-icon {
+      color: ${props => props.theme.accent};
+    }
+    
+    .header-text {
+      color: ${props => props.theme.text};
+      font-weight: 500;
+    }
+  }
+
+  .target-grid {
+    display: grid;
+    gap: 16px;
+
+    .target-item {
+      &.total {
+        margin-top: 8px;
+        padding-top: 16px;
+        border-top: 1px solid ${props => props.theme.hover};
+
+        .plant-header {
+          .plant-name {
+            color: ${props => props.theme.text};
+            font-weight: 500;
+          }
+        }
+
+        .progress-info {
+          .actual {
+            color: ${props => props.theme.text};
+          }
+        }
+      }
+
+      .plant-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+        
+        .plant-name {
+          color: ${props => props.theme.textSecondary};
+          font-size: 0.9rem;
+
+          &::after {
+            content: ' (MT)';
+            font-size: 0.7rem;
+            opacity: 0.7;
+          }
+        }
+        
+        .target-value {
+          color: ${props => props.theme.textSecondary};
+          font-size: 0.8rem;
+        }
+      }
+
+      .progress-info {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+        
+        .actual {
+          color: ${props => props.theme.textSecondary};
+          font-size: 0.9rem;
+        }
+        
+        .percentage {
+          font-size: 0.8rem;
+        }
+      }
+
+      .progress-track {
+        width: 100%;
+        height: 4px;
+        background: ${props => props.theme.hover};
+        border-radius: 2px;
+        overflow: hidden;
+        margin-bottom: 8px;
+
+        .progress-bar {
+          height: 100%;
+          background: ${props => props.theme.accent};
+          transition: width 0.3s ease;
+        }
+      }
+
+      .balance {
+        color: ${props => props.theme.textSecondary};
+        font-size: 0.8rem;
+      }
+    }
+  }
+`;
 
 const PlantSchedule: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<Dayjs>(dayjs());
@@ -1751,9 +1546,10 @@ const PlantSchedule: React.FC = () => {
   const [activeShift, setActiveShift] = useState<'all' | 'morning' | 'day' | 'night'>('all');
   const [currentStats, setCurrentStats] = useState({ total: 0, average: 0, peak: 0 });
   const router = useRouter();
-  const [plantTargets, setPlantTargets] = useState<{ [plantName: string]: number }>({}); // New state for targets
-  const [mobileNavOpen, setMobileNavOpen] = useState(false); // State for mobile navigation
-  const [isShipperSettingsVisible, setShipperSettingsVisible] = useState(false);
+  const [plantTargets, setPlantTargets] = useState<{ [plantName: string]: number }>({}); 
+  const [mobileNavOpen, setMobileNavOpen] = useState(false); 
+  const [isShipperSettingsVisible, setIsShipperSettingsVisible] = useState(false);
+  const [isTargetSettingsVisible, setIsTargetSettingsVisible] = useState(false);
   const theme = useTheme();
   const mobile = useMediaQuery(theme.breakpoints.down('sm'));
   useEffect(() => {
@@ -1787,25 +1583,50 @@ const PlantSchedule: React.FC = () => {
     { id: 'night', name: 'NC' },
   ];
 
-  const getShiftData = (shift: 'all' | 'morning' | 'day' | 'night') => {
-    if (shift === 'all') return scheduleData;
+  const getShiftData = (shiftId: string) => {
+    if (!scheduleData) return [];
+    
+    let filteredData = scheduleData;
+    
+    if (shiftId !== 'all') {
+      const shiftTimes = {
+        'morning': { start: 6, end: 14 },
+        'day': { start: 14, end: 22 },
+        'night': { start: 22, end: 6 }
+      };
+      
+      filteredData = scheduleData.filter(schedule => {
+        const [startHourStr] = schedule.timeSlot.split(':');
+        const startHour = parseInt(startHourStr, 10);
+        
+        if (shiftId === 'night') {
+          return startHour >= shiftTimes.night.start || startHour < shiftTimes.night.end;
+        }
+        
+        const shift = shiftTimes[shiftId as keyof typeof shiftTimes];
+        return startHour >= shift.start && startHour < shift.end;
+      });
+    }
 
-    const timeRanges = {
-      morning: { start: 6, end: 14 },
-      day: { start: 14, end: 22 },
-      night: { start: 22, end: 6 }
-    };
+    // Sort the data in descending order based on time
+    return filteredData.sort((a, b) => {
+      const [aStartHourStr, aStartMinStr] = a.timeSlot.split(' - ')[0].split(':');
+      const [bStartHourStr, bStartMinStr] = b.timeSlot.split(' - ')[0].split(':');
+      
+      const aStartHour = parseInt(aStartHourStr, 10);
+      const bStartHour = parseInt(bStartHourStr, 10);
+      const aStartMin = parseInt(aStartMinStr, 10);
+      const bStartMin = parseInt(bStartMinStr, 10);
 
-    return scheduleData.filter(item => {
-      const [slotStartStr] = item.timeSlot.split(' - ');
-      const timeStr = slotStartStr.split(':')[0];
-      const hour = parseInt(timeStr, 10);
-      const range = timeRanges[shift];
+      // Handle night shift case where hours might be across midnight
+      if (aStartHour < 6 && bStartHour >= 22) return -1;
+      if (bStartHour < 6 && aStartHour >= 22) return 1;
 
-      if (shift === 'night') {
-        return hour >= range.start || hour < range.end;
+      // Normal comparison
+      if (aStartHour !== bStartHour) {
+        return bStartHour - aStartHour;
       }
-      return hour >= range.start && hour < range.end;
+      return bStartMin - aStartMin;
     });
   };
 
@@ -1937,28 +1758,32 @@ const PlantSchedule: React.FC = () => {
     items: [
       {
         key: '1',
-        label: 'Profile',
-        icon: <ProfileOutlined />,
-        onClick: () => {/* Handle profile click */ },
+        label: 'Settings',
+        icon: <SettingOutlined />,
+        children: [
+          {
+            key: '1-1',
+            label: 'Shipper Mills',
+            onClick: () => setIsShipperSettingsVisible(true),
+          },
+          {
+            key: '1-2',
+            label: 'Plant Targets',
+            onClick: () => setIsTargetSettingsVisible(true),
+          },
+        ],
       },
       {
         key: '2',
-        label: 'Shipper Settings',
-        icon: <SettingOutlined />,
-        onClick: () => {
-          console.log('Settings Clicked');
-          setShipperSettingsVisible(true)
-        },
-      },
-      {
-        type: 'divider',
-        key: 'divider-1'
+        label: 'Profile',
+        icon: <UserOutlined />,
+        onClick: () => {/* Handle profile click */ },
       },
       {
         key: '3',
         label: 'Sign Out',
         icon: <LogoutOutlined />,
-        onClick: () => {/* Handle sign out */ },
+        onClick: () => {localStorage.clear(); window.location.reload(); },
       },
     ],
   };
@@ -1973,6 +1798,36 @@ const PlantSchedule: React.FC = () => {
     setMobileNavOpen(!mobileNavOpen);
   };
 
+  const isCurrentTime = (timeSlot: string) => {
+    const now = dayjs();
+    const currentHour = now.hour();
+    const currentMinute = now.minute();
+    const [slotStartStr, slotEndStr] = timeSlot.split(' - ');
+    const [slotStartHourStr, slotStartMinuteStr] = slotStartStr.split(':');
+    const slotStartHour = parseInt(slotStartHourStr, 10);
+    const slotStartMinute = parseInt(slotStartMinuteStr, 10);
+
+    const [slotEndHourStr, slotEndMinuteStr] = slotEndStr.split(':');
+    const slotEndHour = parseInt(slotEndHourStr, 10);
+    const slotEndMinute = parseInt(slotEndMinuteStr, 10);
+
+    const slotStartTime = dayjs().hour(slotStartHour).minute(slotStartMinute);
+    const slotEndTime = dayjs().hour(slotEndHour).minute(slotEndMinute);
+
+    if (currentHour >= slotStartHour && currentHour < slotEndHour) {
+      if (currentHour === slotStartHour) {
+        if (currentMinute >= slotStartMinute) {
+          const currentTime = dayjs();
+          return currentTime.isBefore(slotEndTime);
+        }
+      } else {
+        const currentTime = dayjs();
+        return currentTime.isBefore(slotEndTime);
+      }
+    }
+    return false;
+  };
+
   if (loading) {
     return (
       <Container
@@ -1985,7 +1840,7 @@ const PlantSchedule: React.FC = () => {
         <ContentWrapper>
           {mobile && (
             <div style={{
-              height: '64px',
+              // height: '64px',
               width: '100%'
             }} />)}
           <Header theme={themes[currentTheme]}>
@@ -2022,14 +1877,14 @@ const PlantSchedule: React.FC = () => {
     <Container
       theme={themes[currentTheme]}
       style={mobile ? {
-        padding: '10px 10px 74px 10px', // Extra padding at bottom for bottom nav
+        padding: '10px 10px 74px 10px', 
         marginBottom: 0
       } : {}}
     >
       <ContentWrapper>
         {mobile && (
           <div style={{
-            height: '64px',
+            // height: '64px',
             width: '100%'
           }} />)}
         <Header theme={themes[currentTheme]}>
@@ -2100,7 +1955,12 @@ const PlantSchedule: React.FC = () => {
                     </Dropdown>
                     <ShipperSettingsModal
                       visible={isShipperSettingsVisible}
-                      onCancel={() => setShipperSettingsVisible(false)}
+                      onCancel={() => setIsShipperSettingsVisible(false)}
+                      theme={themes[currentTheme]}
+                    />
+                    <TargetSettingsModal
+                      visible={isTargetSettingsVisible}
+                      onCancel={() => setIsTargetSettingsVisible(false)}
                       theme={themes[currentTheme]}
                     />
                   </AccountButton>
@@ -2173,7 +2033,12 @@ const PlantSchedule: React.FC = () => {
               </Dropdown>
               <ShipperSettingsModal
                 visible={isShipperSettingsVisible}
-                onCancel={() => setShipperSettingsVisible(false)}
+                onCancel={() => setIsShipperSettingsVisible(false)}
+                theme={themes[currentTheme]}
+              />
+              <TargetSettingsModal
+                visible={isTargetSettingsVisible}
+                onCancel={() => setIsTargetSettingsVisible(false)}
                 theme={themes[currentTheme]}
               />
             </AccountButton>
@@ -2189,170 +2054,353 @@ const PlantSchedule: React.FC = () => {
 
         {!loading && (
           <>
-            <TopSection>
-              <div className="right-section">
+            <TopSection mobile={mobile}>
+              {mobile ? (
+                <div className="stats-shifts-container">
+                  <div className="stats-section">
+                    <StatsCard>
+                      <StatItem theme={themes[currentTheme]}>
+                        <div className="stat-header">
+                          <h3>Total billing (Road)</h3>
+                          <Tooltip title="Total materials scheduled for the selected shift">
+                            <InfoCircleOutlined />
+                          </Tooltip>
+                        </div>
+                        <p className="stat-value">
+                          {currentStats.total.toFixed(0)}
+                        </p>
+                      </StatItem>
+                      <StatItem theme={themes[currentTheme]}>
+                        <div className="stat-header">
+                          <h3>Average per Slot</h3>
+                          <Tooltip title="Average materials per time slot in selected shift">
+                            <InfoCircleOutlined />
+                          </Tooltip>
+                        </div>
+                        <p className="stat-value">
+                          {currentStats.average.toFixed(0)}
+                        </p>
+                      </StatItem>
+                      <StatItem theme={themes[currentTheme]}>
+                        <div className="stat-header">
+                          <h3>Peak Volume</h3>
+                          <Tooltip title="Highest volume in selected shift">
+                            <InfoCircleOutlined />
+                          </Tooltip>
+                        </div>
+                        <p className="stat-value">
+                          {currentStats.peak.toFixed(0)}
+                        </p>
+                      </StatItem>
+                    </StatsCard>
+                  </div>
+                  <div className="shifts-section">
+                    <ShiftTabs theme={themes[currentTheme]}>
+                      {shifts.map(shift => {
+                        const shiftStats = calculateShiftStats(shift.id as 'all' | 'morning' | 'day' | 'night');
+                        return (
+                          <div
+                            key={shift.id}
+                            className={`tab ${activeShift === shift.id ? 'active' : ''}`}
+                            onClick={() => setActiveShift(shift.id as 'all' | 'morning' | 'day' | 'night')}
+                          >
+                            <div className="shift-label">
+                              <span className="shift-name">{shift.name}</span>
 
-                <StatsCard>
-                  <StatItem theme={themes[currentTheme]}>
-                    <div className="stat-header">
-                      <h3>Total billing (Road)</h3>
-                      <Tooltip title="Total materials scheduled for the selected shift">
-                        <InfoCircleOutlined />
-                      </Tooltip>
-                    </div>
-                    <p className="stat-value">
-                      {currentStats.total.toFixed(0)}
-                    </p>
-                  </StatItem>
-                  <StatItem theme={themes[currentTheme]}>
-                    <div className="stat-header">
-                      <h3>Average per Slot</h3>
-                      <Tooltip title="Average materials per time slot in selected shift">
-                        <InfoCircleOutlined />
-                      </Tooltip>
-                    </div>
-                    <p className="stat-value">
-                      {currentStats.average.toFixed(0)}
-                    </p>
-                  </StatItem>
-                  <StatItem theme={themes[currentTheme]}>
-                    <div className="stat-header">
-                      <h3>Peak Volume</h3>
-                      <Tooltip title="Highest volume in selected shift">
-                        <InfoCircleOutlined />
-                      </Tooltip>
-                    </div>
-                    <p className="stat-value">
-                      {currentStats.peak.toFixed(0)}
-                    </p>
-                  </StatItem>
-                </StatsCard>
-              </div>
-              <ShiftTabs theme={themes[currentTheme]}>
-                {shifts.map(shift => {
-                  const shiftStats = calculateShiftStats(shift.id as 'all' | 'morning' | 'day' | 'night');
-                  return (
-                    <div
-                      key={shift.id}
-                      className={`tab ${activeShift === shift.id ? 'active' : ''}`}
-                      onClick={() => setActiveShift(shift.id as 'all' | 'morning' | 'day' | 'night')}
-                    >
-                      <div className="shift-label">
-                        <span className="shift-name">{shift.name}</span>
+                            </div>
+                            <div className="shift-stats">
+                              <span > <span className="stat-label">T:</span> {shiftStats.total.toFixed(0)}</span>
+                              <span > <span className="stat-label">A:</span> {shiftStats.average.toFixed(0)}</span>
+                              <span > <span className="stat-label">P:</span> {shiftStats.peak.toFixed(0)}</span>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </ShiftTabs>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <div className="stats-section">
+                    <StatsCard>
+                      <StatItem theme={themes[currentTheme]}>
+                        <div className="stat-header">
+                          <h3>Total billing (Road)</h3>
+                          <Tooltip title="Total materials scheduled for the selected shift">
+                            <InfoCircleOutlined />
+                          </Tooltip>
+                        </div>
+                        <p className="stat-value">
+                          {currentStats.total.toFixed(0)}
+                        </p>
+                      </StatItem>
+                      <StatItem theme={themes[currentTheme]}>
+                        <div className="stat-header">
+                          <h3>Average per Slot</h3>
+                          <Tooltip title="Average materials per time slot in selected shift">
+                            <InfoCircleOutlined />
+                          </Tooltip>
+                        </div>
+                        <p className="stat-value">
+                          {currentStats.average.toFixed(0)}
+                        </p>
+                      </StatItem>
+                      <StatItem theme={themes[currentTheme]}>
+                        <div className="stat-header">
+                          <h3>Peak Volume</h3>
+                          <Tooltip title="Highest volume in selected shift">
+                            <InfoCircleOutlined />
+                          </Tooltip>
+                        </div>
+                        <p className="stat-value">
+                          {currentStats.peak.toFixed(0)}
+                        </p>
+                      </StatItem>
+                    </StatsCard>
+                  </div>
+                  <ShiftTabs theme={themes[currentTheme]}>
+                    {shifts.map(shift => {
+                      const shiftStats = calculateShiftStats(shift.id as 'all' | 'morning' | 'day' | 'night');
+                      return (
+                        <div
+                          key={shift.id}
+                          className={`tab ${activeShift === shift.id ? 'active' : ''}`}
+                          onClick={() => setActiveShift(shift.id as 'all' | 'morning' | 'day' | 'night')}
+                        >
+                          <div className="shift-label">
+                            <span className="shift-name">{shift.name}</span>
 
-                      </div>
-                      <div className="shift-stats">
-                        <span > <span className="stat-label">T:</span> {shiftStats.total.toFixed(0)}</span>
-                        <span > <span className="stat-label">A:</span> {shiftStats.average.toFixed(0)}</span>
-                        <span > <span className="stat-label">P:</span> {shiftStats.peak.toFixed(0)}</span>
-                      </div>
-                    </div>
-                  );
-                })}
-              </ShiftTabs>
+                          </div>
+                          <div className="shift-stats">
+                            <span > <span className="stat-label">T:</span> {shiftStats.total.toFixed(0)}</span>
+                            <span > <span className="stat-label">A:</span> {shiftStats.average.toFixed(0)}</span>
+                            <span > <span className="stat-label">P:</span> {shiftStats.peak.toFixed(0)}</span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </ShiftTabs>
+                </>
+              )}
             </TopSection>
             <TableContainer>
-              <StyledCard theme={themes[currentTheme]}>
-                <TableWrapper>
-                  <Table>
-                    <thead>
-                      <tr>
-                        <Th theme={themes[currentTheme]}>Time Slot</Th>
-                        {plants.map((plant) => (
-                          <Th key={plant} theme={themes[currentTheme]}>{plant}</Th>
-                        ))}
-                        <Th className="total-cell" theme={themes[currentTheme]}>Total</Th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <StyledRow theme={themes[currentTheme]} isTargetRow>
-                        <StyledCell theme={themes[currentTheme]} className="time-cell">
-                          <SignalIndicator theme={themes[currentTheme]}>
-                            <div className="signal-bars">
-                              <div className="bar" />
-                              <div className="bar" />
-                              <div className="bar" />
-                              <div className="bar" />
+              {mobile ? (
+                <>
+                  <MobileTargetCard theme={themes[currentTheme]}>
+                    <div className="target-header">
+                      <BarChartOutlined className="signal-icon" />
+                      <span className="header-text">Target Analysis</span>
+                    </div>
+                    <div className="target-grid">
+                      {plants.map(plant => {
+                        const columnTotal = calculateColumnTotal(getShiftData(activeShift), plant);
+                        const target = getTargetForPlant(plant);
+                        const achievement = calculateAchievement(columnTotal, target);
+                        const remaining = target - columnTotal;
+
+                        return (
+                          <div key={plant} className="target-item">
+                            <div className="plant-header">
+                              <span className="plant-name">{plant}</span>
+                              <span className="target-value">Target: {target}</span>
                             </div>
-                            <span className="text">Target Analysis</span>
-                          </SignalIndicator>
-                        </StyledCell>
-                        {plants.map(plant => {
-                          const columnTotal = calculateColumnTotal(getShiftData(activeShift), plant);
-                          const target = getTargetForPlant(plant);
-                          const achievement = calculateAchievement(columnTotal, target);
-                          const remaining = target - columnTotal;
+                            <div className="progress-info">
+                              <span className="actual">{columnTotal.toFixed(0)}</span>
+                              <span className="percentage">({achievement.toFixed(0)}%)</span>
+                            </div>
+                            <div className="progress-track">
+                              <div 
+                                className="progress-bar" 
+                                style={{ width: `${Math.min(achievement, 100)}%` }} 
+                              />
+                            </div>
+                            <div className="balance">
+                              Balance qty: {remaining > 0 ? remaining.toFixed(0) : '0'}
+                            </div>
+                          </div>
+                        );
+                      })}
+                      <div className="target-item total">
+                        {(() => {
+                          const totalTarget = plants.reduce((sum, plant) => sum + getTargetForPlant(plant), 0);
+                          const totalActual = plants.reduce((sum, plant) => sum + calculateColumnTotal(getShiftData(activeShift), plant), 0);
+                          const totalAchievement = calculateAchievement(totalActual, totalTarget);
+                          const totalRemaining = totalTarget - totalActual;
 
                           return (
-                            <StyledCell key={plant} theme={themes[currentTheme]}>
-                              <ProgressCell theme={themes[currentTheme]} achievement={achievement}>
-                                <div className="main-line">
-                                  <span className="target">{target}</span>
-                                  <span className="actual">
-                                    <span>{columnTotal.toFixed(0)}</span>
-                                    <span className="percentage">({achievement.toFixed(0)}%)</span>
-                                  </span>
-                                </div>
-                                <div className="progress-track">
-                                  <div className="progress-bar" />
-                                </div>
-                                <div className="remaining">
-                                  Balance qty: {remaining > 0 ? remaining.toFixed(0) : '0'}
-                                </div>
-                              </ProgressCell>
-                            </StyledCell>
+                            <>
+                              <div className="plant-header">
+                                <span className="plant-name">Total</span>
+                                <span className="target-value">Target: {totalTarget}</span>
+                              </div>
+                              <div className="progress-info">
+                                <span className="actual">{totalActual.toFixed(0)}</span>
+                                <span className="percentage">({totalAchievement.toFixed(0)}%)</span>
+                              </div>
+                              <div className="progress-track">
+                                <div 
+                                  className="progress-bar" 
+                                  style={{ width: `${Math.min(totalAchievement, 100)}%` }} 
+                                />
+                              </div>
+                              <div className="balance">
+                                Balance qty: {totalRemaining > 0 ? totalRemaining.toFixed(0) : '0'}
+                              </div>
+                            </>
                           );
-                        })}
-                        <StyledCell data-target-total="true" theme={themes[currentTheme]} />
-                      </StyledRow>
-                      {getShiftData(activeShift).map((schedule, index) => (
-                        <Tr key={index} theme={themes[currentTheme]} $iscurrenttime={isCurrentTime(schedule.timeSlot)}>
-                          <Td data-time="true" theme={themes[currentTheme]}>{schedule.timeSlot}</Td>
+                        })()}
+                      </div>
+                    </div>
+                  </MobileTargetCard>
+                  {getShiftData(activeShift).map((schedule, index) => (
+                    <MobileCard key={index} theme={themes[currentTheme]}>
+                      <div className="time-header">
+                        <ClockCircleOutlined className="clock-icon" />
+                        <span className="time">{schedule.timeSlot}</span>
+                      </div>
+                      <div className="plants-grid">
+                        {plants.map((plant) => (
+                          <div key={plant} className="plant-item">
+                            <div className="plant-name">{plant}</div>
+                            <div className="plant-value">
+                              {(schedule.materialsObj[plant] || 0).toFixed(0)}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="total-row">
+                        <span className="total-label">Total</span>
+                        <span className="total-value">
+                          {calculateRowTotal(schedule.materialsObj).toFixed(0)}
+                        </span>
+                      </div>
+                    </MobileCard>
+                  ))}
+                </>
+              ) : (
+                <StyledCard theme={themes[currentTheme]}>
+                  <TableWrapper>
+                    <Table>
+                      <thead>
+                        <tr>
+                          <Th theme={themes[currentTheme]}>Time Slot</Th>
                           {plants.map((plant) => (
-                            <Td key={plant} theme={themes[currentTheme]}>
+                            <Th key={plant} theme={themes[currentTheme]}>{plant}</Th>
+                          ))}
+                          <Th className="total-cell" theme={themes[currentTheme]}>Total</Th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <StyledRow theme={themes[currentTheme]} isTargetRow>
+                          <StyledCell theme={themes[currentTheme]} className="time-cell">
+                            <SignalIndicator theme={themes[currentTheme]}>
+                              <div className="signal-bars">
+                                <div className="bar" />
+                                <div className="bar" />
+                                <div className="bar" />
+                                <div className="bar" />
+                              </div>
+                              <span className="text">Target Analysis</span>
+                            </SignalIndicator>
+                          </StyledCell>
+                          {plants.map(plant => {
+                            const columnTotal = calculateColumnTotal(getShiftData(activeShift), plant);
+                            const target = getTargetForPlant(plant);
+                            const achievement = calculateAchievement(columnTotal, target);
+                            const remaining = target - columnTotal;
+
+                            return (
+                              <StyledCell key={plant} theme={themes[currentTheme]}>
+                                <ProgressCell theme={themes[currentTheme]} achievement={achievement}>
+                                  <div className="main-line">
+                                    <span className="target">{target}</span>
+                                    <span className="actual">{columnTotal.toFixed(0)}</span>
+                                    <span className="percentage">({achievement.toFixed(0)}%)</span>
+                                  </div>
+                                  <div className="progress-track">
+                                    <div className="progress-bar" />
+                                  </div>
+                                  <div className="remaining">
+                                    Balance qty: {remaining > 0 ? remaining.toFixed(0) : '0'}
+                                  </div>
+                                </ProgressCell>
+                              </StyledCell>
+                            );
+                          })}
+                          <StyledCell theme={themes[currentTheme]} className="total-cell">
+                            {(() => {
+                              const totalTarget = plants.reduce((sum, plant) => sum + getTargetForPlant(plant), 0);
+                              const totalActual = plants.reduce((sum, plant) => sum + calculateColumnTotal(getShiftData(activeShift), plant), 0);
+                              const totalAchievement = calculateAchievement(totalActual, totalTarget);
+                              const totalRemaining = totalTarget - totalActual;
+
+                              return (
+                                <ProgressCell theme={themes[currentTheme]} achievement={totalAchievement}>
+                                  <div className="main-line">
+                                    <span className="target">{totalTarget}</span>
+                                    <span className="actual">{totalActual.toFixed(0)}</span>
+                                    <span className="percentage">({totalAchievement.toFixed(0)}%)</span>
+                                  </div>
+                                  <div className="progress-track">
+                                    <div className="progress-bar" />
+                                  </div>
+                                  <div className="remaining">
+                                    Balance qty: {totalRemaining > 0 ? totalRemaining.toFixed(0) : '0'}
+                                  </div>
+                                </ProgressCell>
+                              );
+                            })()}
+                          </StyledCell>
+                        </StyledRow>
+                        {getShiftData(activeShift).map((schedule, index) => (
+                          <Tr key={index} theme={themes[currentTheme]} $iscurrenttime={isCurrentTime(schedule.timeSlot)}>
+                            <Td data-time="true" theme={themes[currentTheme]}>{schedule.timeSlot}</Td>
+                            {plants.map((plant) => (
+                              <Td key={plant} theme={themes[currentTheme]}>
+                                <Value
+                                  value={schedule.materialsObj[plant] || 0}
+                                  theme={themes[currentTheme]}
+                                >
+                                  {(schedule.materialsObj[plant] || 0).toFixed(0)}
+                                </Value>
+                              </Td>
+                            ))}
+                            <Td data-total="true" theme={themes[currentTheme]}>
                               <Value
-                                value={schedule.materialsObj[plant] || 0}
+                                value={calculateRowTotal(schedule.materialsObj)}
                                 theme={themes[currentTheme]}
                               >
-                                {(schedule.materialsObj[plant] || 0).toFixed(0)}
+                                {calculateRowTotal(schedule.materialsObj).toFixed(0)}
+                              </Value>
+                            </Td>
+                          </Tr>
+                        ))}
+                        <Tr theme={themes[currentTheme]}>
+                          <Td data-time="true" data-total="true" theme={themes[currentTheme]}>Total</Td>
+                          {plants.map((plant) => (
+                            <Td key={plant} data-total="true" theme={themes[currentTheme]}>
+                              <Value
+                                value={calculateColumnTotal(getShiftData(activeShift), plant)}
+                                theme={themes[currentTheme]}
+                              >
+                                {calculateColumnTotal(getShiftData(activeShift), plant).toFixed(0)}
                               </Value>
                             </Td>
                           ))}
                           <Td data-total="true" theme={themes[currentTheme]}>
                             <Value
-                              value={calculateRowTotal(schedule.materialsObj)}
+                              value={calculateGrandTotal(getShiftData(activeShift))}
                               theme={themes[currentTheme]}
                             >
-                              {calculateRowTotal(schedule.materialsObj).toFixed(0)}
+                              {calculateGrandTotal(getShiftData(activeShift)).toFixed(0)}
                             </Value>
                           </Td>
                         </Tr>
-                      ))}
-                      <Tr theme={themes[currentTheme]}>
-                        <Td data-time="true" data-total="true" theme={themes[currentTheme]}>Total</Td>
-                        {plants.map((plant) => (
-                          <Td key={plant} data-total="true" theme={themes[currentTheme]}>
-                            <Value
-                              value={calculateColumnTotal(getShiftData(activeShift), plant)}
-                              theme={themes[currentTheme]}
-                            >
-                              {calculateColumnTotal(getShiftData(activeShift), plant).toFixed(0)}
-                            </Value>
-                          </Td>
-                        ))}
-                        <Td data-total="true" theme={themes[currentTheme]}>
-                          <Value
-                            value={calculateGrandTotal(getShiftData(activeShift))}
-                            theme={themes[currentTheme]}
-                          >
-                            {calculateGrandTotal(getShiftData(activeShift)).toFixed(0)}
-                          </Value>
-                        </Td>
-                      </Tr>
-                    </tbody>
-                  </Table>
-                </TableWrapper>
-              </StyledCard>
+                      </tbody>
+                    </Table>
+                  </TableWrapper>
+                </StyledCard>
+              )}
             </TableContainer>
           </>
         )}
