@@ -165,7 +165,7 @@
 //                 const parsedShippers: Shipper[] = JSON.parse(storedShippers);
 //                   const parentName = localStorage.getItem("selected_shipper")
 //                  if (parentName) {
-//                    const filteredShippers = parsedShippers.filter(shipper => shipper.parent_name === "JSP")
+//                    const filteredShippers = parsedShippers.filter(shipper => shipper.parent_name === "JSPL Angul")
 //                     setShippers(filteredShippers);
 //                 } else {
 //                     setShippers(parsedShippers)
@@ -349,10 +349,12 @@ interface Shipper {
     short_code: string;
     country: string;
 }
+
 interface SelectedShipper {
     _id: string;
     name: string;
 }
+
 interface ShipperSettingsModalProps {
     visible: boolean;
     onCancel: () => void;
@@ -512,12 +514,23 @@ export const ShipperSettingsModal: React.FC<ShipperSettingsModalProps> = ({
             const storedShippers = localStorage.getItem('shippers');
             if (storedShippers) {
                 const parsedShippers: Shipper[] = JSON.parse(storedShippers);
-                const parentName = localStorage.getItem("selected_shipper")
-                if (parentName) {
-                    const filteredShippers = parsedShippers.filter(shipper => shipper.parent_name === "JSP")
-                    setShippers(filteredShippers);
+                const selectedShipper = localStorage.getItem("selected_shipper");
+                if (selectedShipper) {
+                    try {
+                        const selectedShipperData = JSON.parse(selectedShipper);
+                        const parentName = selectedShipperData.parent_name;
+                        if (parentName) {
+                            const filteredShippers = parsedShippers.filter(shipper => shipper.parent_name === parentName);
+                            setShippers(filteredShippers);
+                        } else {
+                            setShippers(parsedShippers);
+                        }
+                    } catch (error) {
+                        console.error('Error parsing selected shipper:', error);
+                        setShippers(parsedShippers);
+                    }
                 } else {
-                    setShippers(parsedShippers)
+                    setShippers(parsedShippers);
                 }
             } else {
                 setFetchError('No shippers found in local storage');
@@ -637,7 +650,7 @@ export const ShipperSettingsModal: React.FC<ShipperSettingsModalProps> = ({
 
     return (
         <StyledModal
-            title="Shipper Settings"
+            title="Shipper Mills Settings"
             open={visible}
             onCancel={onCancel}
             footer={[
@@ -689,13 +702,13 @@ export const ShipperSettingsModal: React.FC<ShipperSettingsModalProps> = ({
             </SelectedShippersContainer>
             <Form layout="vertical">
                 <StyledFormItem
-                    label="Select Shippers"
+                    label="Select Mills"
                     help={fetchError}
                     validateStatus={fetchError ? 'error' : undefined}
                 >
                     <StyledSelect
                         mode="multiple"
-                        placeholder="Search and choose shippers"
+                        placeholder="Search and choose mills"
                         value={null}
                         onChange={handleChange}
                         style={{ width: '100%' }}
