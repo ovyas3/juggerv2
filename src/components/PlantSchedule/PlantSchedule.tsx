@@ -1845,7 +1845,7 @@ const PlantSchedule: React.FC = () => {
             }} />)}
           <Header theme={themes[currentTheme]}>
             <HeaderLeft theme={themes[currentTheme]}>
-              <h2>Road Dispatch Plant</h2>
+              <h2>Road Dispatch Dashboard</h2>
             </HeaderLeft>
             <HeaderRight theme={themes[currentTheme]}>
               <Typography.Text style={{ color: themes[currentTheme].textSecondary }}>
@@ -1889,7 +1889,7 @@ const PlantSchedule: React.FC = () => {
           }} />)}
         <Header theme={themes[currentTheme]}>
           <HeaderLeft theme={themes[currentTheme]}>
-            <h2>Road Dispatch Plant</h2>
+            <h2>Road Dispatch Dashboard</h2>
           </HeaderLeft>
           <MobileNav>
             <Popover
