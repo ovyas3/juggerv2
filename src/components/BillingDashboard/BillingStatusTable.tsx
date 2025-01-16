@@ -10,8 +10,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-import { Card, CardContent } from "@/components/ui/card"
+} from "@/components/UI/table"
+import { Card, CardContent } from "@/components/UI/card"
 import { httpsGet } from "@/utils/Communication"
 
 interface LocationData {
