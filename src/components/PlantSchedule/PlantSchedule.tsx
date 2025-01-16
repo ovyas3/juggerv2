@@ -17,7 +17,8 @@ import {
   Popover,
   InputNumber,
   Select,
-  MenuProps
+  MenuProps,
+  message
 } from 'antd';
 import {
   InfoCircleOutlined,
@@ -1552,6 +1553,8 @@ const PlantSchedule: React.FC = () => {
   const [isTargetSettingsVisible, setIsTargetSettingsVisible] = useState(false);
   const theme = useTheme();
   const mobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const [response, setResponse] = useState<any>(null);
+
   useEffect(() => {
     const savedTheme = Cookies.get('plantScheduleTheme') as ThemeKey;
     if (savedTheme && themes[savedTheme]) {
@@ -1769,7 +1772,19 @@ const PlantSchedule: React.FC = () => {
           {
             key: '1-2',
             label: 'Plant Targets',
-            onClick: () => setIsTargetSettingsVisible(true),
+            onClick: async () => {
+              try{
+                const formatDate = dayjs().format('YYYY-MM-DD');
+                const response = await httpsGet(`invoice/mills_target?from=${formatDate}&isTargetMill=true`, 0, router);
+                setResponse(response);
+              }
+              catch(error){
+                message.error('Failed to fetch mills data');
+              }
+              finally{
+                setIsTargetSettingsVisible(true);
+              }
+            }
           },
         ],
       },
@@ -2040,6 +2055,7 @@ const PlantSchedule: React.FC = () => {
                 visible={isTargetSettingsVisible}
                 onCancel={() => setIsTargetSettingsVisible(false)}
                 theme={themes[currentTheme]}
+                apiResponse={response}
               />
             </AccountButton>
           </HeaderRight>
