@@ -21,6 +21,10 @@ import CaptiveRakeInactive from "@/assets/captiverakes_bg_icon.svg";
 import CaptiveRakeActive from "@/assets/captiverakes_wg_icon.svg";
 import InPlantDetailsInactive from "@/assets/Inplant_details_bg_icon.svg";
 import InPlantDetailsActive from "@/assets/Inplant_details_wg_icon.svg";
+import DispatchIcon from "@/assets/dispatch_icon.svg";
+import DispatchIconActive from "@/assets/dispatch_icon_active.svg";
+import BillingIcon from "@/assets/billing_icon.svg";
+import BillingIconActive from "@/assets/billing_icon_active.svg";
 
 interface NavItem {
     id: string;
@@ -32,14 +36,30 @@ interface NavItem {
 }
 
 const navigationItems: NavItem[] = [
-    // { 
-    //     id: 'etaDashboard', 
-    //     label: 'Dashboard',
-    //     icon: '',
-    //     activeIcon: DashboardActive,
-    //     inactiveIcon: DashboardInactive,
-    //     isImageIcon: true
-    // },
+    { 
+        id: 'externalParking', 
+        label: 'External Parking',
+        icon: '',
+        activeIcon: DashboardActive,
+        inactiveIcon: DashboardInactive,
+        isImageIcon: true
+    },
+    {
+        id: 'plantSchedule',
+        label: 'Road Dispatch Dashboard',
+        icon: '',
+        activeIcon: DispatchIconActive,
+        inactiveIcon: DispatchIcon,
+        isImageIcon: true
+    },
+    {
+        id: 'billingDashboard',
+        label: 'Billing Dashboard',
+        icon: '',
+        activeIcon: BillingIconActive,
+        inactiveIcon: BillingIcon,
+        isImageIcon: true
+    },
     { 
         id: 'orders', 
         label: 'Shipments',
@@ -48,14 +68,6 @@ const navigationItems: NavItem[] = [
         inactiveIcon: ShipmentInactive,
         isImageIcon: true
     },
-    // { 
-    //     id: 'dashboard', 
-    //     label: 'Captive Rakes',
-    //     icon: '',
-    //     activeIcon: CaptiveRakeActive,
-    //     inactiveIcon: CaptiveRakeInactive,
-    //     isImageIcon: true
-    // },
     { 
         id: 'inPlantDashboard', 
         label: 'In-Plant Details',
