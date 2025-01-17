@@ -20,6 +20,7 @@ import BackIcon from "@/assets/back.svg";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
+import dynamic from 'next/dynamic'
 
 const Header = ({ setReloadOnHeaderChange, isMapHelper, getAllShipment, isShipmentMapView }: any) => {
   const isCorporateUser = getCookie("is_corporate_user") === "true";
@@ -46,6 +47,15 @@ const Header = ({ setReloadOnHeaderChange, isMapHelper, getAllShipment, isShipme
       default:
         return ""
     }
+  }
+  
+  if (pathname === "/billingDashboard") {
+    const BillingDashboard = dynamic(() => 
+      import('../BillingDashboard/BillingDashboard'), 
+      { ssr: false }
+    );
+    
+    return <BillingDashboard hideHeader={true} hideTable={true} />;
   }
 
   return (
