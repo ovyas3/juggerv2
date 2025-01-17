@@ -42,6 +42,8 @@ const Header = ({ setReloadOnHeaderChange, isMapHelper, getAllShipment, isShipme
         return "External Parking"
       case "/billingDashboard":
         return "Road Billing & Loading Status"
+      case "/dispatchTrend":
+        return "Dispatch Trend"
       default:
         return ""
     }
