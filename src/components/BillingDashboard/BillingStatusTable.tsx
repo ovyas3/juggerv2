@@ -377,7 +377,7 @@ export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatus
                       <TableHead colSpan={2}>Billed</TableHead>
                       <TableHead colSpan={2}>Vehicle at Extr. Parking</TableHead>
                       <TableHead rowSpan={2}>Total Qty (MT)</TableHead>
-                      <TableHead colSpan={2}>By Type</TableHead>
+                      <TableHead colSpan={2}>Mod Type</TableHead>
                       <TableHead rowSpan={2}>G. Total Qty (MT)</TableHead>
                     </TableRow>
                     <TableRow>
@@ -520,7 +520,7 @@ export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatus
           text-align: center;
           font-size: 0.875rem;
           white-space: nowrap;
-          min-width: 90px;
+          // min-width: 90px;
           background: ${currentTheme.cardBg};
           color: ${currentTheme.text};
         }
