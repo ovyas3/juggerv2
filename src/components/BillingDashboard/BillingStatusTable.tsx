@@ -377,7 +377,7 @@ export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatus
                       <TableHead colSpan={2}>Billed</TableHead>
                       <TableHead colSpan={2}>Vehicle at Extr. Parking</TableHead>
                       <TableHead rowSpan={2}>Total Qty (MT)</TableHead>
-                      <TableHead colSpan={2}>Mod Type</TableHead>
+                      <TableHead colSpan={2}>Mode</TableHead>
                       <TableHead rowSpan={2}>G. Total Qty (MT)</TableHead>
                     </TableRow>
                     <TableRow>
