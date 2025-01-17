@@ -8,6 +8,10 @@ import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import DashboardInactive from "@/assets/Dashboard_bg_icon.svg";
 import DashboardActive from "@/assets/Dashboard_wg_icon.svg";
+import DispatchIcon from "@/assets/dispatch_icon.svg";
+import DispatchIconActive from "@/assets/dispatch_icon_active.svg";
+import BillingIcon from "@/assets/billing_icon.svg";
+import BillingIconActive from "@/assets/billing_icon_active.svg";
 
 interface NavItem {
     id: string;
@@ -27,6 +31,22 @@ const navigationItems: NavItem[] = [
         inactiveIcon: DashboardInactive,
         isImageIcon: true
     },
+    {
+        id: 'plantSchedule',
+        label: 'Road Dispatch Dashboard',
+        icon: '',
+        activeIcon: DispatchIconActive,
+        inactiveIcon: DispatchIcon,
+        isImageIcon: true
+    },
+    {
+        id: 'billingDashboard',
+        label: 'Billing Dashboard',
+        icon: '',
+        activeIcon: BillingIconActive,
+        inactiveIcon: BillingIcon,
+        isImageIcon: true
+    }
 ];
 
 const NavItem = ({ 

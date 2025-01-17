@@ -36,7 +36,7 @@ import {
   Fade,
 } from '@mui/material';
 import { Search, RefreshRounded, FilterList, Close, Add, Clear } from '@mui/icons-material';
-import { httpsGet,httpsPost } from "@/utils/Communication";
+import { httpsGet, httpsPost } from "@/utils/Communication";
 import { useRouter } from "next/navigation";
 
 interface Column {
@@ -75,7 +75,7 @@ const operators = {
   date: ['equals', 'after', 'before', 'between'],
 };
 
-function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
+function descendingComparator<T>(a: T, b: T, orderBy: keyof T): number {
   if (orderBy === 'sl_no') {
     return (b[orderBy] as number) - (a[orderBy] as number);
   }
@@ -83,16 +83,23 @@ function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
   const aValue = a[orderBy];
   const bValue = b[orderBy];
 
-  // Handle formatted values
-  if (typeof aValue === 'object' && aValue?.name) {
-    if (bValue?.name < aValue?.name) return -1;
-    if (bValue?.name > aValue?.name) return 1;
+  // Handle formatted values with `name` property
+  if (typeof aValue === 'object' && aValue !== null && 'name' in aValue) {
+    const aName = (aValue as { name: string }).name;
+    const bName = (bValue as { name: string }).name;
+    if (bName < aName) return -1;
+    if (bName > aName) return 1;
     return 0;
   }
 
   // Handle date values
-  if (aValue && bValue && !isNaN(Date.parse(aValue as string)) && !isNaN(Date.parse(bValue as string))) {
-    return new Date(bValue as string).getTime() - new Date(aValue as string).getTime();
+  if (
+    typeof aValue === 'string' &&
+    typeof bValue === 'string' &&
+    !isNaN(Date.parse(aValue)) &&
+    !isNaN(Date.parse(bValue))
+  ) {
+    return new Date(bValue).getTime() - new Date(aValue).getTime();
   }
 
   // Handle regular values
@@ -100,6 +107,8 @@ function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
   if (bValue > aValue) return 1;
   return 0;
 }
+
+
 
 function getComparator<Key extends keyof any>(
   order: Order,
@@ -138,7 +147,7 @@ const CommonTable: React.FC<CommonTableProps> = ({
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState<string>('');
   const [suggestions, setSuggestions] = useState<string[]>([]);
-  
+
   const router = useRouter();
   const theme = useTheme();
 
@@ -176,7 +185,7 @@ const CommonTable: React.FC<CommonTableProps> = ({
 
   const applyFilters = (filters: Filter[]) => {
     let result = [...data];
-    
+
     // Apply search
     if (searchQuery) {
       result = result.filter((row) => {
@@ -228,14 +237,14 @@ const CommonTable: React.FC<CommonTableProps> = ({
     if (orderBy) {
       result.sort(getComparator(order, orderBy));
     }
-    
+
     setFilteredData(result);
   };
 
   const getColumnType = (columnId: string) => {
     const column = columns.find(col => col.id === columnId);
     if (!column) return 'string';
-    
+
     // Try to determine type based on sample data
     const sampleValue = data[0]?.[columnId];
     if (typeof sampleValue === 'number') return 'number';
@@ -339,9 +348,9 @@ const CommonTable: React.FC<CommonTableProps> = ({
         }
       }}
     >
-      <DialogTitle sx={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
+      <DialogTitle sx={{
+        display: 'flex',
+        justifyContent: 'space-between',
         alignItems: 'center',
         p: 2,
         borderBottom: '1px solid rgba(255, 255, 255, 0.1)'
@@ -486,7 +495,7 @@ const CommonTable: React.FC<CommonTableProps> = ({
                 ))}
               </Select>
             </FormControl>
-            
+
             {currentFilter.column && (
               <FormControl size="small" fullWidth>
                 <InputLabel>Operator</InputLabel>
@@ -506,7 +515,7 @@ const CommonTable: React.FC<CommonTableProps> = ({
                 </Select>
               </FormControl>
             )}
-            
+
             {currentFilter.operator && (
               <TextField
                 size="small"
@@ -519,7 +528,6 @@ const CommonTable: React.FC<CommonTableProps> = ({
                 fullWidth
               />
             )}
-            
             <Button
               variant="contained"
               onClick={handleAddFilter}
@@ -538,31 +546,29 @@ const CommonTable: React.FC<CommonTableProps> = ({
                 {columns.map((column) => (
                   <TableCell
                     key={column.id}
-                    align={column.align}
-                    style={{ minWidth: column.minWidth }}
-                    sortDirection={orderBy === column.id ? order : false}
-                    sx={{
-                      backgroundColor: theme.palette.background.paper,
-                      fontWeight: 'bold',
+                    align={column.align || 'center'}
+                    style={{
+                      minWidth: column.minWidth,
+                      padding: '8px', // Reduce padding
                     }}
                   >
-                    <TableSortLabel
-                      active={orderBy === column.id}
-                      direction={orderBy === column.id ? order : 'asc'}
-                      onClick={() => handleRequestSort(column.id)}
-                      hideSortIcon={!column.sortable}
+                    <Box
                       sx={{
-                        '& .MuiTableSortLabel-icon': {
-                          opacity: column.sortable ? undefined : 0
-                        }
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        width: '100%',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
                       }}
                     >
                       {column.label}
-                    </TableSortLabel>
+                    </Box>
                   </TableCell>
                 ))}
               </TableRow>
             </TableHead>
+
             <TableBody>
               {loading ? (
                 Array.from(new Array(rowsPerPage)).map((_, index) => (
@@ -575,19 +581,19 @@ const CommonTable: React.FC<CommonTableProps> = ({
                   </TableRow>
                 ))
               ) : filteredData
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((row, index) => (
-                    <TableRow hover role="checkbox" tabIndex={-1} key={index}>
-                      {columns.map((column) => {
-                        const value = row[column.id];
-                        return (
-                          <TableCell key={column.id} align={column.align}>
-                            {column.format ? column.format(value, index) : value}
-                          </TableCell>
-                        );
-                      })}
-                    </TableRow>
-                  ))}
+                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                .map((row, index) => (
+                  <TableRow hover role="checkbox" tabIndex={-1} key={index}>
+                    {columns.map((column) => {
+                      const value = row[column.id];
+                      return (
+                        <TableCell key={column.id} align={column.align}>
+                          {column.format ? column.format(value, index) : value}
+                        </TableCell>
+                      );
+                    })}
+                  </TableRow>
+                ))}
             </TableBody>
           </Table>
         </TableContainer>
@@ -602,7 +608,7 @@ const CommonTable: React.FC<CommonTableProps> = ({
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </DialogContent>
-      
+
       <DialogActions sx={{ p: 2, borderTop: '1px solid rgba(255, 255, 255, 0.1)' }}>
         <Button onClick={handleClose} variant="outlined">
           Close
