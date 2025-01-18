@@ -619,9 +619,10 @@ const Dashboard = () => {
     { value: 30, label: "30 min" },
   ];
   return (
-    <div className="dashboard-container">
+    <div className="externalparking-dashboard">
       <Box
         sx={{
+          width: "100%",
           p: 1,
           backdropFilter: "blur(10px)",
           backgroundColor: "rgba(255, 255, 255, 0.1)",

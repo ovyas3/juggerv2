@@ -1,22 +1,18 @@
-.wrapper {
-    margin: 56px 0 0 76px;
-  }
-
-
-.dashboard-container {
-background: url("https://media.istockphoto.com/id/1537825788/photo/abstract-blurred-colorful-background.jpg?s=2048x2048&w=0&k=20&c=0036Z2oG24nLdYk-X4s5y-e_qI1m_j8z7N5d8uV0N30=") no-repeat center center fixed;
-background-size: cover;
-min-height: 100vh;
-padding: 20px;
-margin: 56px 0 0 76px;
+.externalparking-dashboard {
+  background: url("https://media.istockphoto.com/id/1537825788/photo/abstract-blurred-colorful-background.jpg?s=2048x2048&w=0&k=20&c=0036Z2oG24nLdYk-X4s5y-e_qI1m_j8z7N5d8uV0N30=") no-repeat center center fixed;
+  background-size: cover;
+  min-height: 100vh;
+  padding: 20px;
+  margin: 56px 0 0 76px;
 }
 
-.glassy-card{
-    backdrop-filter: blur(10px);
-    background-color: rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    transition: all 0.3s ease-in-out; /* Smooth transitions */
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    padding: 10px;
+.glassy-card {
+  backdrop-filter: blur(10px);
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease-in-out;
+  /* Smooth transitions */
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 10px;
 }
