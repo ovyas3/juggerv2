@@ -12,6 +12,10 @@ import DispatchIcon from "@/assets/dispatch_icon.svg";
 import DispatchIconActive from "@/assets/dispatch_icon_active.svg";
 import BillingIcon from "@/assets/billing_icon.svg";
 import BillingIconActive from "@/assets/billing_icon_active.svg";
+import EWayBillInactive from "@/assets/eway_bill_bg_icon.svg";
+import EWayBillActive from "@/assets/eway_bill_wg_icon.svg";
+import DispatchTrendInactive from "@/assets/dispatch_trend_bg_icon.svg";
+import DispatchTrendActive from "@/assets/dispatch_trend_wg_icon.svg";
 
 interface NavItem {
     id: string;
@@ -51,8 +55,16 @@ const navigationItems: NavItem[] = [
         id: 'dispatchTrend',
         label: 'Dispatch Trend',
         icon: '',
-        activeIcon: DispatchIconActive,
-        inactiveIcon: DispatchIcon,
+        activeIcon: DispatchTrendActive,
+        inactiveIcon: DispatchTrendInactive,
+        isImageIcon: true
+    },
+    {
+        id: 'ewaybillDashboard',
+        label: 'eWaybill Dashboard',
+        icon: '',
+        activeIcon: EWayBillActive,
+        inactiveIcon: EWayBillInactive,
         isImageIcon: true
     }
 ];
@@ -96,6 +108,8 @@ const NavItem = ({
                     style={{ 
                         marginLeft: isOpen ? '10px' : '2px',
                     }}
+                    width={24}
+                    height={24}
                 />
             ) : (
                 <item.icon 

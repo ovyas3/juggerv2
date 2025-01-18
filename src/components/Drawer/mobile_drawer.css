@@ -79,16 +79,16 @@
 /* Bottom Navigation Bar */
 .bottom-nav {
     position: fixed;
-    bottom: -2px;
+    bottom: -1px;
     left: 0;
     right: 0;
-    height: 64px;
+    height: 54px;
+    /* padding: 8px 0px; */
     background: #20114d;
     display: flex;
     justify-content: space-around;
     align-items: center;
     z-index: 998;
-    padding-bottom: env(safe-area-inset-bottom);
     box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.15);
 }
 
@@ -99,6 +99,8 @@
     justify-content: center;
     gap: 4px;
     padding: 8px;
+    margin: 0px 16px;
+    border-radius: 8px;
     background: transparent;
     border: none;
     cursor: pointer;
@@ -109,7 +111,7 @@
 }
 
 .bottom-nav-item.active {
-    color: #ffffff;
+    background-color: #ffffff;
 }
 
 .bottom-nav-item .nav-icon {
@@ -126,15 +128,10 @@
     background: rgba(255, 255, 255, 0.1);
 }
 
-.bottom-nav-item:hover .nav-icon {
-    transform: translateY(-2px);
-}
-
-
 /* Full Navigation Drawer */
 .mobile-drawer {
     position: fixed;
-    bottom: 60px;
+    bottom: 48px;
     left: 0;
     right: 0;
     background: #20114d;
@@ -192,10 +189,6 @@
     transition: all 0.2s ease;
 }
 
-.close-button-mobile-header:hover {
-    transform: scale(1.05);
-}
-
 .close-button-mobile-header:active {
     transform: scale(0.95);
 }
@@ -234,6 +227,7 @@
 .drawer-item.active {
     background: white;
     color: #20114d;
+    justify-content: flex-start;
 }
 
 .drawer-item .nav-icon {
@@ -265,8 +259,25 @@
     border-radius: 4px;
 }
 
-.drawer-content::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.3);
+
+.home-btn-drawer {
+    position: relative;
+    z-index: 1;
+    width: 40px;
+    height: 40px;
+    padding: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    margin: 0 10px;
+}
+
+.home-btn-drawer.home-btn-active{
+    border-radius: 50%;
+    box-shadow: 0 4px 20px rgba(255, 255, 255, 0.6);
+    transition: box-shadow 0.3s ease;
+    background-color: #fff;
 }
 
 /* Safe Area Support */

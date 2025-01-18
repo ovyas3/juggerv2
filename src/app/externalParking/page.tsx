@@ -16,8 +16,7 @@ const DashboardContent = () => {
   
   return (
    <div>
-      <div 
-        className="dashboardContainer"
+      <div
         style={{
           marginBottom: !mobile ? '0px' : '60px',
         }}
