@@ -451,18 +451,18 @@ export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatus
                           .toFixed(2) || "0.00"}
                       </TableCell>
                       <TableCell>
-                        {data?.doIssuedresult.reduce((sum, item) => sum + item.totalCount, 0) || 0}
-                      </TableCell>
-                      <TableCell>
-                        {data?.doIssuedresult
-                          .reduce((sum, item) => sum + item.totalWeight, 0)
-                          .toFixed(2) || "0.00"}
-                      </TableCell>
-                      <TableCell>
                         {data?.billedResult.reduce((sum, item) => sum + item.totalCount, 0) || 0}
                       </TableCell>
                       <TableCell>
                         {data?.billedResult
+                          .reduce((sum, item) => sum + item.totalWeight, 0)
+                          .toFixed(2) || "0.00"}
+                      </TableCell>
+                      <TableCell>
+                        {data?.doIssuedresult.reduce((sum, item) => sum + item.totalCount, 0) || 0}
+                      </TableCell>
+                      <TableCell>
+                        {data?.doIssuedresult
                           .reduce((sum, item) => sum + item.totalWeight, 0)
                           .toFixed(2) || "0.00"}
                       </TableCell>
