@@ -21,6 +21,10 @@ import HomeIcon from "@mui/icons-material/Home";
 import LogoutIcon from "@mui/icons-material/Logout";
 import DispatchTrendInactive from "@/assets/dispatch_trend_bg_icon.svg";
 import DispatchTrendActive from "@/assets/dispatch_trend_wg_icon.svg";
+import LeadDistanceInactive from "@/assets/lead_distance_analysis_bg_icon.svg";
+import LeadDistanceActive from "@/assets/lead_distance_analysis_wg_icon.svg";
+import FreightTrendsInactive from "@/assets/freight_trends_bg_icon.svg";
+import FreightTrendsActive from "@/assets/freight_trends_wg_icon.svg";
 
 import { deleteAllCache } from "@/utils/storageService";
 import { environment } from "@/environments/env.api";
@@ -49,6 +53,22 @@ const navigationItems: NavItem[] = [
         icon: '',
         activeIcon: EWayBillActive,
         inactiveIcon: EWayBillInactive,
+        isImageIcon: true
+    },
+    {
+        id: 'leadDistanceAnalysis',
+        label: 'Lead (Distance) Analysis',
+        icon: '',
+        activeIcon: LeadDistanceActive,
+        inactiveIcon: LeadDistanceInactive,
+        isImageIcon: true
+    },
+    {
+        id: 'freightTrends',
+        label: 'Freight Trends',
+        icon: '',
+        activeIcon: FreightTrendsActive,
+        inactiveIcon: FreightTrendsInactive,
         isImageIcon: true
     }
 ];
