@@ -48,6 +48,8 @@ const Header = ({ setReloadOnHeaderChange, isMapHelper, getAllShipment, isShipme
         return "eWayBill Dashboard"
       case "/leadDistanceAnalysis":
         return "Lead (Distance) Analysis"
+      case "/freightTrends":
+        return "Freight Trends Dashboard"
       default:
         return ""
     }

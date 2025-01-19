@@ -1,3 +1,14 @@
+:root {
+  --primary-color: #2a9d8f;
+  --secondary-color: #e76f51;
+  --tertiary-color: #264653;
+  --background-color: #f8f9fa;
+  --card-background: #ffffff;
+  --text-primary: #1a1a1a;
+  --text-secondary: #6c757d;
+  --border-color: #e9ecef;
+}
+
 * {
   box-sizing: border-box;
   padding: 0;

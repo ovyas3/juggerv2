@@ -18,6 +18,8 @@ import DispatchTrendInactive from "@/assets/dispatch_trend_bg_icon.svg";
 import DispatchTrendActive from "@/assets/dispatch_trend_wg_icon.svg";
 import LeadDistanceInactive from "@/assets/lead_distance_analysis_bg_icon.svg";
 import LeadDistanceActive from "@/assets/lead_distance_analysis_wg_icon.svg";
+import FreightTrendsInactive from "@/assets/freight_trends_bg_icon.svg";
+import FreightTrendsActive from "@/assets/freight_trends_wg_icon.svg";
 
 interface NavItem {
     id: string;
@@ -75,6 +77,14 @@ const navigationItems: NavItem[] = [
         icon: '',
         activeIcon: LeadDistanceActive,
         inactiveIcon: LeadDistanceInactive,
+        isImageIcon: true
+    },
+    {
+        id: 'freightTrends',
+        label: 'Freight Trends Dashboard',
+        icon: '',
+        activeIcon: FreightTrendsActive,
+        inactiveIcon: FreightTrendsInactive,
         isImageIcon: true
     }
 ];
