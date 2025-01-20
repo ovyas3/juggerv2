@@ -231,10 +231,10 @@ export function BillingStatusTable() {
                       <TableHead rowSpan={2}>Shop</TableHead>
                       <TableHead colSpan={2}>Under Loading</TableHead>
                       <TableHead colSpan={2}>Under Billing</TableHead>
-                      <TableHead colSpan={2}>Vehicle at Extr. Parking</TableHead>
                       <TableHead colSpan={2}>Billed</TableHead>
+                      <TableHead colSpan={2}>Vehicle at Extr. Parking</TableHead>
                       <TableHead rowSpan={2}>Total Qty (MT)</TableHead>
-                      <TableHead colSpan={2}>By Type</TableHead>
+                      <TableHead colSpan={2}>Mode</TableHead>
                       <TableHead rowSpan={2}>G. Total Qty (MT)</TableHead>
                     </TableRow>
                     <TableRow>
@@ -268,8 +268,8 @@ export function BillingStatusTable() {
                       const rowTotal =
                         (underLoading?.totalWeight || 0) +
                         (underBilling?.totalWeight || 0) +
-                        (doIssued?.totalWeight || 0) +
-                        (billed?.totalWeight || 0)
+                        (billed?.totalWeight || 0) +
+                        (doIssued?.totalWeight || 0)
 
                       return (
                         <TableRow key={locationName}>
@@ -278,10 +278,10 @@ export function BillingStatusTable() {
                           <TableCell>{underLoading?.totalWeight.toFixed(2) || "0.00"}</TableCell>
                           <TableCell>{underBilling?.totalCount || 0}</TableCell>
                           <TableCell>{underBilling?.totalWeight.toFixed(2) || "0.00"}</TableCell>
-                          <TableCell>{doIssued?.totalCount || 0}</TableCell>
-                          <TableCell>{doIssued?.totalWeight.toFixed(2) || "0.00"}</TableCell>
                           <TableCell>{billed?.totalCount || 0}</TableCell>
                           <TableCell>{billed?.totalWeight.toFixed(2) || "0.00"}</TableCell>
+                          <TableCell>{doIssued?.totalCount || 0}</TableCell>
+                          <TableCell>{doIssued?.totalWeight.toFixed(2) || "0.00"}</TableCell>
                           <TableCell>{rowTotal.toFixed(2)}</TableCell>
                           <TableCell>{rowTotal.toFixed(2)}</TableCell>
                           <TableCell>0.00</TableCell>
@@ -308,18 +308,18 @@ export function BillingStatusTable() {
                           .toFixed(2) || "0.00"}
                       </TableCell>
                       <TableCell>
-                        {data?.doIssuedresult.reduce((sum, item) => sum + item.totalCount, 0) || 0}
-                      </TableCell>
-                      <TableCell>
-                        {data?.doIssuedresult
-                          .reduce((sum, item) => sum + item.totalWeight, 0)
-                          .toFixed(2) || "0.00"}
-                      </TableCell>
-                      <TableCell>
                         {data?.billedResult.reduce((sum, item) => sum + item.totalCount, 0) || 0}
                       </TableCell>
                       <TableCell>
                         {data?.billedResult
+                          .reduce((sum, item) => sum + item.totalWeight, 0)
+                          .toFixed(2) || "0.00"}
+                      </TableCell>
+                      <TableCell>
+                        {data?.doIssuedresult.reduce((sum, item) => sum + item.totalCount, 0) || 0}
+                      </TableCell>
+                      <TableCell>
+                        {data?.doIssuedresult
                           .reduce((sum, item) => sum + item.totalWeight, 0)
                           .toFixed(2) || "0.00"}
                       </TableCell>
