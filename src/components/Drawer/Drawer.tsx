@@ -46,6 +46,14 @@ const navigationItems: NavItem[] = [
         activeIcon: BillingIconActive,
         inactiveIcon: BillingIcon,
         isImageIcon: true
+    },
+    {
+        id: 'dispatchTrend',
+        label: 'Dispatch Trend',
+        icon: '',
+        activeIcon: DispatchIconActive,
+        inactiveIcon: DispatchIcon,
+        isImageIcon: true
     }
 ];
 
@@ -115,7 +123,7 @@ function SideDrawer() {
     const pathName = usePathname();
 
     const handleRouting = (route: string) => {
-        router.push('/' + route);
+        router.push(`/${route}`);
         setActive(route);
     };
 
@@ -135,7 +143,7 @@ function SideDrawer() {
                 transition: 'width 0.2s ease-in'
             }}
         >
-            <div className='img'>
+            <div className='logo-container'>
                 <Image 
                     src={open ? fullLogo : defaultLogo} 
                     alt='logo'
@@ -147,7 +155,6 @@ function SideDrawer() {
                     onClick={() => handleRouting('welcome')}
                 />
             </div>
-
             {navigationItems.map((item) => (
                 <NavItem
                     key={item.id}

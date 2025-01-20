@@ -17,7 +17,8 @@ import {
   Popover,
   InputNumber,
   Select,
-  MenuProps
+  MenuProps,
+  message
 } from 'antd';
 import {
   InfoCircleOutlined,
@@ -42,6 +43,7 @@ import { useMediaQuery } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { ShipperSettingsModal } from './ShipperSettingsModal';
 import { TargetSettingsModal } from './TargetSettingsModal';
+import { CommonHeader } from '../UI/CommonHeader';
 
 interface ScheduleData {
   hourGroup: number;
@@ -298,45 +300,6 @@ const HeaderRight = styled.div<{ theme: typeof themes[ThemeKey] }>`
         margin: 0 8px;
     }
   }
-`;
-const MobileNav = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  
-    @media (min-width: 768px) {
-      display: none;
-  }
-`;
-const NavPopover = styled.div<{ theme: typeof themes[ThemeKey] }>`
-    background: ${props => props.theme.cardBg};
-    border-radius: 8px;
-    padding: 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    min-width: 200px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-
-        .nav-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 6px 12px;
-    border-radius: 6px;
-     color: ${props => props.theme.text};
-    cursor: pointer;
-        transition: all 0.2s ease;
-
-        &:hover {
-         background: ${props => props.theme.hover};
-          color: ${props => props.theme.accent};
-        }
-
-      .anticon {
-            font-size: 16px;
-        }
-}
 `;
 const StyledDatePicker = styled(DatePicker) <{ theme: typeof themes[ThemeKey]; onChange: (date: Dayjs | null, dateString: string | string[]) => void }>`
   border-radius: 8px;
@@ -1165,36 +1128,6 @@ const StyledCell = styled.td<{
         }
 `;
 
-const ThemeSelector = styled.div<{ theme: typeof themes[ThemeKey] }>`
-  .theme-button {
-    background: ${props => props.theme.cardBg};
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: ${props => props.theme.text};
-    padding: 6px 12px; 
-    border-radius: 6px; 
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 6px; 
-    height: 28px; 
-    transition: all 0.3s ease;
-    font-size: 0.8rem;
-
-    &:hover {
-      background: ${props => props.theme.hover};
-      border-color: ${props => props.theme.accent};
-    }
-  }
-     @media (min-width: 768px) {
-        .theme-button {
-            padding: 8px 16px;
-             border-radius: 8px;
-           height: 32px;
-            gap: 8px;
-            font-size: 1rem;
-        }
-     }
-`;
 
 const ThemeOption = styled.div<{ color: string }>`
   padding: 6px 12px;
@@ -1274,85 +1207,6 @@ const SignalIndicator = styled.div`
       }
 `;
 
-const RefreshButton = styled.div<{ theme: typeof themes[ThemeKey] }>`
-  .refresh-button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 24px; 
-    height: 24px; 
-    border-radius: 50%;
-    background: ${props => props.theme.cardBg};
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: ${props => props.theme.text};
-    cursor: pointer;
-    transition: all 0.2s ease;
-
-    &:hover {
-      background: ${props => props.theme.hover};
-      border-color: ${props => props.theme.accent};
-      color: ${props => props.theme.accent};
-    }
-
-    &.spinning {
-      animation: spin 1s linear infinite;
-    }
-
-    .anticon {
-      font-size: 14px; 
-    }
-  }
-
-  @keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-  }
-      @media (min-width: 768px) {
-        .refresh-button {
-                width: 32px;
-             height: 32px;
-         .anticon {
-            font-size: 16px;
-         }
-        }
-
-    }
-`;
-
-const AccountButton = styled.div<{ theme: typeof themes[ThemeKey] }>`
-  .account-button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 24px; 
-    height: 24px; 
-    border-radius: 50%;
-    background: ${props => props.theme.cardBg};
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: ${props => props.theme.text};
-    cursor: pointer;
-    transition: all 0.2s ease;
-
-    &:hover {
-      background: ${props => props.theme.hover};
-      border-color: ${props => props.theme.accent};
-      color: ${props => props.theme.accent};
-    }
-
-    .anticon {
-      font-size: 14px; 
-    }
-  }
-        @media (min-width: 768px) {
-            .account-button {
-                width: 32px;
-                height: 32px;
-                .anticon {
-                    font-size: 16px;
-                }
-            }
-        }
-`;
 
 const MobileCard = styled.div<{ theme: typeof themes[ThemeKey] }>`
   background: ${props => props.theme.cardBg};
@@ -1552,6 +1406,8 @@ const PlantSchedule: React.FC = () => {
   const [isTargetSettingsVisible, setIsTargetSettingsVisible] = useState(false);
   const theme = useTheme();
   const mobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const [response, setResponse] = useState<any>(null);
+
   useEffect(() => {
     const savedTheme = Cookies.get('plantScheduleTheme') as ThemeKey;
     if (savedTheme && themes[savedTheme]) {
@@ -1769,7 +1625,19 @@ const PlantSchedule: React.FC = () => {
           {
             key: '1-2',
             label: 'Plant Targets',
-            onClick: () => setIsTargetSettingsVisible(true),
+            onClick: async () => {
+              try{
+                const formatDate = dayjs().format('YYYY-MM-DD');
+                const response = await httpsGet(`invoice/mills_target?from=${formatDate}&isTargetMill=true`, 0, router);
+                setResponse(response);
+              }
+              catch(error){
+                message.error('Failed to fetch mills data');
+              }
+              finally{
+                setIsTargetSettingsVisible(true);
+              }
+            }
           },
         ],
       },
@@ -1887,163 +1755,22 @@ const PlantSchedule: React.FC = () => {
             // height: '64px',
             width: '100%'
           }} />)}
-        <Header theme={themes[currentTheme]}>
-          <HeaderLeft theme={themes[currentTheme]}>
-            <h2>Road Dispatch Dashboard</h2>
-          </HeaderLeft>
-          <MobileNav>
-            <Popover
-              content={
-                <NavPopover theme={themes[currentTheme]}>
-                  <div
-                    className="nav-item"
-                    onClick={() => {
-                    }}
-                  >
-                    <CalendarOutlined />
-                    <Typography.Text>
-                      Select Date
-                    </Typography.Text>
-                  </div>
-                  <div
-                    className="nav-item"
-                    onClick={() => {
-                    }}
-                  >
-                    <Select
-                      value={settings.refreshInterval}
-                      onChange={(value) => handleRefreshChange(value)}
-                      style={{ width: 120, margin: '0' }}
-                    >
-                      {refreshOptions.map(option => (
-                        <Select.Option key={option.value} value={option.value}>
-                          {option.label}
-                        </Select.Option>
-                      ))}
-                    </Select>
-                  </div>
-                  <div
-                    className="nav-item"
-                    onClick={() => {
-                    }}
-                  >
-                    <RefreshButton theme={themes[currentTheme]}>
-                      <div
-                        className={`refresh-button ${loading ? 'spinning' : ''}`}
-                        onClick={() => !loading && fetchData(selectedDate)}
-                      >
-                        <SyncOutlined />
-                      </div>
-                    </RefreshButton>
-                  </div>
-
-                  <div className="divider" />
-                  <ThemeSelector theme={themes[currentTheme]}>
-                    <Dropdown menu={themeMenuItems} placement="bottomRight">
-                      <div className="theme-button">
-                        <BgColorsOutlined />
-                        {themes[currentTheme].name}
-                      </div>
-                    </Dropdown>
-                  </ThemeSelector>
-                  <div className="divider" />
-                  <AccountButton theme={themes[currentTheme]}>
-                    <Dropdown menu={accountMenu} placement="bottomRight">
-                      <div className="account-button">
-                        <UserOutlined />
-                      </div>
-                    </Dropdown>
-                    <ShipperSettingsModal
-                      visible={isShipperSettingsVisible}
-                      onCancel={() => setIsShipperSettingsVisible(false)}
-                      theme={themes[currentTheme]}
-                    />
-                    <TargetSettingsModal
-                      visible={isTargetSettingsVisible}
-                      onCancel={() => setIsTargetSettingsVisible(false)}
-                      theme={themes[currentTheme]}
-                    />
-                  </AccountButton>
-                </NavPopover>
-              }
-              trigger="click"
-              open={mobileNavOpen}
-              onOpenChange={toggleMobileNav}
-              placement="bottomRight"
-            >
-              <div style={{
-                padding: '8px',
-                display: 'flex',
-                alignItems: 'center',
-                background: themes[currentTheme].cardBg,
-                border: `1px solid rgba(255, 255, 255, 0.2)`,
-                borderRadius: '8px'
-              }}>
-                <MenuOutlined />
-              </div>
-            </Popover>
-          </MobileNav>
-          <HeaderRight theme={themes[currentTheme]}>
-            <Typography.Text style={{ color: themes[currentTheme].textSecondary }}>
-              <CalendarOutlined style={{ marginRight: 8, fontSize: 16 }} />
-              Select Date:
-            </Typography.Text>
-            <StyledDatePicker
-              value={selectedDate}
-              onChange={handleDateChange}
-              format="DD-MM-YYYY"
-              theme={themes[currentTheme]}
-              allowClear={true}
-              placeholder="Select date"
-            />
-            <Select
-              value={settings.refreshInterval}
-              onChange={(value) => handleRefreshChange(value)}
-              style={{ width: 120 }}
-            >
-              {refreshOptions.map(option => (
-                <Select.Option key={option.value} value={option.value}>
-                  {option.label}
-                </Select.Option>
-              ))}
-            </Select>
-            <RefreshButton theme={themes[currentTheme]}>
-              <div
-                className={`refresh-button ${loading ? 'spinning' : ''}`}
-                onClick={() => !loading && fetchData(selectedDate)}
-              >
-                <SyncOutlined />
-              </div>
-            </RefreshButton>
-            <div className="divider" />
-            <ThemeSelector theme={themes[currentTheme]}>
-              <Dropdown menu={themeMenuItems} placement="bottomRight">
-                <div className="theme-button">
-                  <BgColorsOutlined />
-                  {themes[currentTheme].name}
-                </div>
-              </Dropdown>
-            </ThemeSelector>
-            <div className="divider" />
-            <AccountButton theme={themes[currentTheme]}>
-              <Dropdown menu={accountMenu} placement="bottomRight">
-                <div className="account-button">
-                  <UserOutlined />
-                </div>
-              </Dropdown>
-              <ShipperSettingsModal
-                visible={isShipperSettingsVisible}
-                onCancel={() => setIsShipperSettingsVisible(false)}
-                theme={themes[currentTheme]}
-              />
-              <TargetSettingsModal
-                visible={isTargetSettingsVisible}
-                onCancel={() => setIsTargetSettingsVisible(false)}
-                theme={themes[currentTheme]}
-              />
-            </AccountButton>
-          </HeaderRight>
-        </Header>
+        <CommonHeader
+          title="Road Dispatch Dashboard"
+          currentTheme={currentTheme}
+          selectedDate={selectedDate}
+          handleDateChange={handleDateChange}
+          fetchData={fetchData}
+          loading={loading}
+          settings={settings}
+          handleRefreshChange={handleRefreshChange}
+          refreshOptions={refreshOptions}
+          themeMenuItems={themeMenuItems}
+          accountMenu={accountMenu}
+          mobile={mobile} 
+          alwaysShowDatePicker={true}
+          hideDatePickerDuringRefresh={false}
+        />
         <div className="left-section">
           <DateDisplay theme={themes[currentTheme]}>
             <CalendarOutlined style={{ fontSize: '18px', marginRight: '8px' }} />
