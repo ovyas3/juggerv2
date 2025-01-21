@@ -1436,7 +1436,10 @@ const PlantSchedule: React.FC = () => {
     { id: 'all', name: 'All Shifts' },
     { id: 'morning', name: 'ER' },
     { id: 'day', name: 'DB' },
-    { id: 'night', name: 'NC' },
+    // { id: 'night', name: 'NC' },
+    ...(dayjs(selectedDate).isBefore(dayjs(), 'day') 
+      ? [{ id: 'night', name: 'NC' }] 
+      : []),
   ];
 
   const getShiftData = (shiftId: string) => {
@@ -1547,7 +1550,10 @@ const PlantSchedule: React.FC = () => {
   }, [selectedDate]);
 
   const calculateAchievement = (actual: number, target: number) => {
-    return (actual / target) * 100;
+    if(target === 0) 
+      return actual;
+    else
+      return (actual / target) * 100;
   };
 
   useEffect(() => {

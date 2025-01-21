@@ -530,7 +530,7 @@ export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatus
           min-width: 140px;
           max-width: 200px;
           position: sticky;
-          left: 1rem;
+          // left: 1rem;
           z-index: 1;
         }
 
