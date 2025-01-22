@@ -218,10 +218,24 @@ export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatus
 
   // Calculate totals
   const calculateTotalWeight = () => {
-    return data?.billedResult.reduce(
+    const underLoadingTotal = data?.underLoadingresult.reduce(
       (sum, item) => sum + item.totalWeight,
       0
-    ) || 0
+    ) || 0;
+    const underBillingTotal = data?.underBillingresult.reduce(
+      (sum, item) => sum + item.totalWeight,
+      0
+    ) || 0;
+    const doIssuedTotal = data?.doIssuedresult.reduce(
+      (sum, item) => sum + item.totalWeight,
+      0
+    ) || 0;
+    const billedTotal = data?.billedResult.reduce(
+      (sum, item) => sum + item.totalWeight,
+      0
+    ) || 0;
+
+    return underLoadingTotal + underBillingTotal + doIssuedTotal + billedTotal;
   }
 
   if (loading) {
@@ -261,7 +275,11 @@ export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatus
             (item) => item.material === locationName
           )
 
-          const rowTotal = billed?.totalWeight || 0;
+          const rowTotal = 
+            (underLoading?.totalWeight || 0) +
+            (underBilling?.totalWeight || 0) +
+            (doIssued?.totalWeight || 0) +
+            (billed?.totalWeight || 0);
 
           return (
             <div key={locationName} className="mobile-card" style={{ 
@@ -390,7 +408,11 @@ export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatus
                         (item) => item.material === locationName
                       )
 
-                      const rowTotal = billed?.totalWeight || 0;
+                      const rowTotal = 
+                        (underLoading?.totalWeight || 0) +
+                        (underBilling?.totalWeight || 0) +
+                        (doIssued?.totalWeight || 0) +
+                        (billed?.totalWeight || 0);
 
                       return (
                         <TableRow key={locationName}>
@@ -406,7 +428,7 @@ export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatus
                           <TableCell>{Math.round(rowTotal)}</TableCell>
                           <TableCell>{Math.round(billed?.totalWeight || 0)}</TableCell>
                           <TableCell>0</TableCell>
-                          <TableCell>{Math.round(rowTotal)}</TableCell>
+                          <TableCell>{Math.round((billed?.totalWeight || 0) + 0)}</TableCell>
                         </TableRow>
                       )
                     })}
@@ -441,7 +463,9 @@ export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatus
                         {Math.round(data?.billedResult.reduce((sum, item) => sum + item.totalWeight, 0) || 0)}
                       </TableCell>
                       <TableCell>0</TableCell>
-                      <TableCell>{Math.round(calculateTotalWeight())}</TableCell>
+                      <TableCell>
+                        {Math.round((data?.billedResult.reduce((sum, item) => sum + item.totalWeight, 0) || 0) + 0)}
+                      </TableCell>
                     </TableRow>
                   </TableBody>
                 </Table>
