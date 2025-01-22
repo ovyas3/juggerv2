@@ -547,7 +547,7 @@ const Th = styled.th<{
   theme: typeof themes[ThemeKey]
 }>`
   padding: 12px 16px;
-  text-align: left;
+  text-align: center;
   color: ${props => props.theme.text};
   font-weight: 500;
   font-size: 0.85rem;
@@ -566,10 +566,11 @@ const Th = styled.th<{
   &:not(:first-child)::after {
     content: ' (MT)';
     display: inline-block;
-    font-size: 0.7rem;
-    opacity: 0.7;
+    font-size: 0.85rem;
+    padding-left: 4px;
+    opacity: 0.85;
     @media (min-width: 768px) {
-      font-size: 0.8rem;
+      font-size: 0.9rem;
     }
   }
 
@@ -1554,12 +1555,7 @@ const PlantSchedule: React.FC = () => {
   const getTargetForPlant = (plant: string) => {
     return plantTargets[plant] || 0;
   };
-
-  useEffect(() => {
-    fetchData(selectedDate);
-
-  }, [selectedDate]);
-
+  
   const calculateAchievement = (actual: number, target: number) => {
     if (target === 0)
       return actual;
