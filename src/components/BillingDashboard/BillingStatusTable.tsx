@@ -221,21 +221,21 @@ export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatus
     const underLoadingTotal = data?.underLoadingresult.reduce(
       (sum, item) => sum + item.totalWeight,
       0
-    ) || 0
+    ) || 0;
     const underBillingTotal = data?.underBillingresult.reduce(
       (sum, item) => sum + item.totalWeight,
       0
-    ) || 0
+    ) || 0;
     const doIssuedTotal = data?.doIssuedresult.reduce(
       (sum, item) => sum + item.totalWeight,
       0
-    ) || 0
+    ) || 0;
     const billedTotal = data?.billedResult.reduce(
       (sum, item) => sum + item.totalWeight,
       0
-    ) || 0
+    ) || 0;
 
-    return underLoadingTotal + underBillingTotal + doIssuedTotal + billedTotal
+    return underLoadingTotal + underBillingTotal + doIssuedTotal + billedTotal;
   }
 
   if (loading) {
@@ -275,11 +275,11 @@ export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatus
             (item) => item.material === locationName
           )
 
-          const rowTotal =
+          const rowTotal = 
             (underLoading?.totalWeight || 0) +
             (underBilling?.totalWeight || 0) +
             (doIssued?.totalWeight || 0) +
-            (billed?.totalWeight || 0)
+            (billed?.totalWeight || 0);
 
           return (
             <div key={locationName} className="mobile-card" style={{ 
@@ -289,7 +289,7 @@ export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatus
             }}>
               <div className="card-header">
                 <div className="shop-name">{locationName}</div>
-                <div className="total-weight">{rowTotal.toFixed(2)} MT</div>
+                <div className="total-weight">{Math.round(rowTotal).toFixed(2)} MT</div>
               </div>
               <div className="card-sections">
                 <div className="section">
@@ -304,28 +304,28 @@ export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatus
                   <h4>Under Loading</h4>
                   <div className="stats">
                     <div>Vehicles: {underLoading?.totalCount || 0}</div>
-                    <div>Qty: {underLoading?.totalWeight.toFixed(2) || "0.00"} MT</div>
+                    <div>Qty: {Math.round(underLoading?.totalWeight || 0)} MT</div>
                   </div>
                 </div>
                 <div className="section">
                   <h4>Under Billing</h4>
                   <div className="stats">
                     <div>Vehicles: {underBilling?.totalCount || 0}</div>
-                    <div>Qty: {underBilling?.totalWeight.toFixed(2) || "0.00"} MT</div>
+                    <div>Qty: {Math.round(underBilling?.totalWeight || 0)} MT</div>
                   </div>
                 </div>
                 <div className="section">
                   <h4>Billed</h4>
                   <div className="stats">
                     <div>Vehicles: {billed?.totalCount || 0}</div>
-                    <div>Qty: {billed?.totalWeight.toFixed(2) || "0.00"} MT</div>
+                    <div>Qty: {Math.round(billed?.totalWeight || 0)} MT</div>
                   </div>
                 </div>
                 <div className="section">
                   <h4>Vehicle at Extr. Parking</h4>
                   <div className="stats">
                     <div>Vehicles: {doIssued?.totalCount || 0}</div>
-                    <div>Qty: {doIssued?.totalWeight.toFixed(2) || "0.00"} MT</div>
+                    <div>Qty: {Math.round(doIssued?.totalWeight || 0)} MT</div>
                   </div>
                 </div>
               </div>
@@ -338,7 +338,7 @@ export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatus
         }}>
           <div className="card-header">
             <div className="shop-name">TOTAL</div>
-            <div className="total-weight">{calculateTotalWeight().toFixed(2)} MT</div>
+            <div className="total-weight">{Math.round(calculateTotalWeight()).toFixed(2)} MT</div>
           </div>
         </div>
       </div>
@@ -375,7 +375,7 @@ export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatus
                       <TableHead colSpan={2}>Under Loading</TableHead>
                       <TableHead colSpan={2}>Under Billing</TableHead>
                       <TableHead colSpan={2}>Billed</TableHead>
-                      <TableHead colSpan={2}>Vehicle at Extr. Parking</TableHead>
+                      <TableHead colSpan={2}>DO Issued</TableHead>
                       <TableHead rowSpan={2}>Total Qty (MT)</TableHead>
                       <TableHead colSpan={2}>Mode</TableHead>
                       <TableHead rowSpan={2}>G. Total Qty (MT)</TableHead>
@@ -408,27 +408,27 @@ export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatus
                         (item) => item.material === locationName
                       )
 
-                      const rowTotal =
+                      const rowTotal = 
                         (underLoading?.totalWeight || 0) +
                         (underBilling?.totalWeight || 0) +
-                        (billed?.totalWeight || 0) +
-                        (doIssued?.totalWeight || 0)
+                        (doIssued?.totalWeight || 0) +
+                        (billed?.totalWeight || 0);
 
                       return (
                         <TableRow key={locationName}>
                           <TableCell>{locationName}</TableCell>
                           <TableCell>{underLoading?.totalCount || 0}</TableCell>
-                          <TableCell>{underLoading?.totalWeight.toFixed(2) || "0.00"}</TableCell>
+                          <TableCell>{Math.round(underLoading?.totalWeight || 0)}</TableCell>
                           <TableCell>{underBilling?.totalCount || 0}</TableCell>
-                          <TableCell>{underBilling?.totalWeight.toFixed(2) || "0.00"}</TableCell>
+                          <TableCell>{Math.round(underBilling?.totalWeight || 0)}</TableCell>
                           <TableCell>{billed?.totalCount || 0}</TableCell>
-                          <TableCell>{billed?.totalWeight.toFixed(2) || "0.00"}</TableCell>
+                          <TableCell>{Math.round(billed?.totalWeight || 0)}</TableCell>
                           <TableCell>{doIssued?.totalCount || 0}</TableCell>
-                          <TableCell>{doIssued?.totalWeight.toFixed(2) || "0.00"}</TableCell>
-                          <TableCell>{rowTotal.toFixed(2)}</TableCell>
-                          <TableCell>{rowTotal.toFixed(2)}</TableCell>
-                          <TableCell>0.00</TableCell>
-                          <TableCell>{rowTotal.toFixed(2)}</TableCell>
+                          <TableCell>{Math.round(doIssued?.totalWeight || 0)}</TableCell>
+                          <TableCell>{Math.round(rowTotal)}</TableCell>
+                          <TableCell>{Math.round(billed?.totalWeight || 0)}</TableCell>
+                          <TableCell>0</TableCell>
+                          <TableCell>{Math.round((billed?.totalWeight || 0) + 0)}</TableCell>
                         </TableRow>
                       )
                     })}
@@ -438,38 +438,34 @@ export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatus
                         {data?.underLoadingresult.reduce((sum, item) => sum + item.totalCount, 0) || 0}
                       </TableCell>
                       <TableCell>
-                        {data?.underLoadingresult
-                          .reduce((sum, item) => sum + item.totalWeight, 0)
-                          .toFixed(2) || "0.00"}
+                        {Math.round(data?.underLoadingresult.reduce((sum, item) => sum + item.totalWeight, 0) || 0)}
                       </TableCell>
                       <TableCell>
                         {data?.underBillingresult.reduce((sum, item) => sum + item.totalCount, 0) || 0}
                       </TableCell>
                       <TableCell>
-                        {data?.underBillingresult
-                          .reduce((sum, item) => sum + item.totalWeight, 0)
-                          .toFixed(2) || "0.00"}
+                        {Math.round(data?.underBillingresult.reduce((sum, item) => sum + item.totalWeight, 0) || 0)}
                       </TableCell>
                       <TableCell>
                         {data?.billedResult.reduce((sum, item) => sum + item.totalCount, 0) || 0}
                       </TableCell>
                       <TableCell>
-                        {data?.billedResult
-                          .reduce((sum, item) => sum + item.totalWeight, 0)
-                          .toFixed(2) || "0.00"}
+                        {Math.round(data?.billedResult.reduce((sum, item) => sum + item.totalWeight, 0) || 0)}
                       </TableCell>
                       <TableCell>
                         {data?.doIssuedresult.reduce((sum, item) => sum + item.totalCount, 0) || 0}
                       </TableCell>
                       <TableCell>
-                        {data?.doIssuedresult
-                          .reduce((sum, item) => sum + item.totalWeight, 0)
-                          .toFixed(2) || "0.00"}
+                        {Math.round(data?.doIssuedresult.reduce((sum, item) => sum + item.totalWeight, 0) || 0)}
                       </TableCell>
-                      <TableCell>{calculateTotalWeight().toFixed(2)}</TableCell>
-                      <TableCell>{calculateTotalWeight().toFixed(2)}</TableCell>
-                      <TableCell>0.00</TableCell>
-                      <TableCell>{calculateTotalWeight().toFixed(2)}</TableCell>
+                      <TableCell>{Math.round(calculateTotalWeight())}</TableCell>
+                      <TableCell>
+                        {Math.round(data?.billedResult.reduce((sum, item) => sum + item.totalWeight, 0) || 0)}
+                      </TableCell>
+                      <TableCell>0</TableCell>
+                      <TableCell>
+                        {Math.round((data?.billedResult.reduce((sum, item) => sum + item.totalWeight, 0) || 0) + 0)}
+                      </TableCell>
                     </TableRow>
                   </TableBody>
                 </Table>
