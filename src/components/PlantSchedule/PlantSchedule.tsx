@@ -44,6 +44,7 @@ import { useTheme } from '@mui/material/styles';
 import { ShipperSettingsModal } from './ShipperSettingsModal';
 import { TargetSettingsModal } from './TargetSettingsModal';
 import { CommonHeader } from '../UI/CommonHeader';
+import styles from './PlantSchedule.module.css';
 
 interface ScheduleData {
   hourGroup: number;
@@ -56,6 +57,7 @@ type MaterialsObj = { [key: string]: number };
 interface TargetResponse {
   statusCode: number;
   data: {
+    shift: ScheduleData[];
     result: ScheduleData[];
     target: {
       plants: Array<{
@@ -686,9 +688,9 @@ const ProgressCell = styled.div<{ achievement: number; theme: typeof themes[Them
       width: ${props => Math.min(props.achievement, 100)}%;
       height: 100%;
       background: ${props =>
-        props.achievement >= 100 ? '#52c41a' :
-        props.achievement >= 80 ? '#faad14' : '#f5222d'
-      };
+    props.achievement >= 100 ? '#52c41a' :
+      props.achievement >= 80 ? '#faad14' : '#f5222d'
+  };
       transition: width 0.3s ease;
     }
   }
@@ -1394,14 +1396,15 @@ const MobileTargetCard = styled(MobileCard)`
 const PlantSchedule: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<Dayjs>(dayjs());
   const [scheduleData, setScheduleData] = useState<ScheduleData[]>([]);
+  const [totalBillingData, setTotalBillingData] = useState<ScheduleData[]>([]);
   const [loading, setLoading] = useState(false);
   const [plants, setPlants] = useState<string[]>([]);
   const [currentTheme, setCurrentTheme] = useState<ThemeKey>('navy');
   const [activeShift, setActiveShift] = useState<'all' | 'morning' | 'day' | 'night'>('all');
-  const [currentStats, setCurrentStats] = useState({ total: 0, average: 0, peak: 0 });
+  const [totalStats, setTotalStats] = useState({ total: 0, average: 0, peak: 0 });
   const router = useRouter();
-  const [plantTargets, setPlantTargets] = useState<{ [plantName: string]: number }>({}); 
-  const [mobileNavOpen, setMobileNavOpen] = useState(false); 
+  const [plantTargets, setPlantTargets] = useState<{ [plantName: string]: number }>({});
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [isShipperSettingsVisible, setIsShipperSettingsVisible] = useState(false);
   const [isTargetSettingsVisible, setIsTargetSettingsVisible] = useState(false);
   const theme = useTheme();
@@ -1436,32 +1439,29 @@ const PlantSchedule: React.FC = () => {
     { id: 'all', name: 'All Shifts' },
     { id: 'morning', name: 'ER' },
     { id: 'day', name: 'DB' },
-    // { id: 'night', name: 'NC' },
-    ...(dayjs(selectedDate).isBefore(dayjs(), 'day') 
-      ? [{ id: 'night', name: 'NC' }] 
-      : []),
+    { id: 'night', name: 'NC' }
   ];
 
   const getShiftData = (shiftId: string) => {
     if (!scheduleData) return [];
-    
+
     let filteredData = scheduleData;
-    
+
     if (shiftId !== 'all') {
       const shiftTimes = {
         'morning': { start: 6, end: 14 },
         'day': { start: 14, end: 22 },
         'night': { start: 22, end: 6 }
       };
-      
+
       filteredData = scheduleData.filter(schedule => {
         const [startHourStr] = schedule.timeSlot.split(':');
         const startHour = parseInt(startHourStr, 10);
-        
+
         if (shiftId === 'night') {
           return startHour >= shiftTimes.night.start || startHour < shiftTimes.night.end;
         }
-        
+
         const shift = shiftTimes[shiftId as keyof typeof shiftTimes];
         return startHour >= shift.start && startHour < shift.end;
       });
@@ -1471,7 +1471,7 @@ const PlantSchedule: React.FC = () => {
     return filteredData.sort((a, b) => {
       const [aStartHourStr, aStartMinStr] = a.timeSlot.split(' - ')[0].split(':');
       const [bStartHourStr, bStartMinStr] = b.timeSlot.split(' - ')[0].split(':');
-      
+
       const aStartHour = parseInt(aStartHourStr, 10);
       const bStartHour = parseInt(bStartHourStr, 10);
       const aStartMin = parseInt(aStartMinStr, 10);
@@ -1508,6 +1508,17 @@ const PlantSchedule: React.FC = () => {
     }, 0);
   };
 
+  const calculateTotalBillingData = () => {
+    const total = calculateGrandTotal(totalBillingData);
+    const average = total / totalBillingData.length;
+    const peak = Math.max(...totalBillingData.map(schedule => calculateRowTotal(schedule.materialsObj)));
+
+    return {
+      total: Number(total.toFixed(0)),
+      average: Number(average.toFixed(0)),
+      peak: Number(peak.toFixed(0))
+    };
+  }
 
   const calculateStats = (shift: 'all' | 'morning' | 'day' | 'night') => {
     // const data = scheduleData;
@@ -1550,7 +1561,7 @@ const PlantSchedule: React.FC = () => {
   }, [selectedDate]);
 
   const calculateAchievement = (actual: number, target: number) => {
-    if(target === 0) 
+    if (target === 0)
       return actual;
     else
       return (actual / target) * 100;
@@ -1559,7 +1570,7 @@ const PlantSchedule: React.FC = () => {
   useEffect(() => {
     if (!loading) {
       const stats = calculateStats(activeShift);
-      setCurrentStats(stats);
+      // setCurrentStats(stats);
     }
   }, [activeShift, scheduleData, loading]);
 
@@ -1570,12 +1581,13 @@ const PlantSchedule: React.FC = () => {
 
       if (response.statusCode === 200) {
         const targetResponse = response as TargetResponse;
-        const { result, target } = targetResponse.data;
-        setScheduleData(result.sort((a, b) => a.hourGroup - b.hourGroup));
+        const { result, shift, target } = targetResponse.data;
+        setTotalBillingData(result.sort((a, b) => a.hourGroup - b.hourGroup));
+        setScheduleData(shift.sort((a, b) => a.hourGroup - b.hourGroup));
 
         // Extract unique plant names from all materialsObj
         const uniquePlants = new Set<string>();
-        result.forEach((item: ScheduleData) => {
+        shift.forEach((item: ScheduleData) => {
           Object.keys(item.materialsObj).forEach(plant => uniquePlants.add(plant));
         });
         setPlants(Array.from(uniquePlants).sort());
@@ -1584,7 +1596,6 @@ const PlantSchedule: React.FC = () => {
         target.plants.forEach((plant) => {
           targetsMap[plant.name] = plant.target;
         });
-        console.log('targetResponse', targetsMap);
         setPlantTargets(targetsMap);
 
       } else {
@@ -1601,6 +1612,11 @@ const PlantSchedule: React.FC = () => {
     fetchData(selectedDate);
   }, [selectedDate]);
 
+  useEffect(() => {
+    const totalStats = calculateTotalBillingData();
+    setTotalStats(totalStats);
+  }, [selectedDate, scheduleData, totalBillingData]);
+
   const handleDateChange = (date: Dayjs | null, dateString: string | string[]) => {
     if (date) {
       setSelectedDate(date);
@@ -1616,7 +1632,7 @@ const PlantSchedule: React.FC = () => {
     { label: '30 min', value: 30 }
   ];
 
-  const accountMenu : MenuProps = {
+  const accountMenu: MenuProps = {
     items: [
       {
         key: '1',
@@ -1632,15 +1648,15 @@ const PlantSchedule: React.FC = () => {
             key: '1-2',
             label: 'Plant Targets',
             onClick: async () => {
-              try{
+              try {
                 const formatDate = dayjs().format('YYYY-MM-DD');
                 const response = await httpsGet(`invoice/mills_target?from=${formatDate}&isTargetMill=true`, 0, router);
                 setResponse(response);
               }
-              catch(error){
+              catch (error) {
                 message.error('Failed to fetch mills data');
               }
-              finally{
+              finally {
                 setIsTargetSettingsVisible(true);
               }
             }
@@ -1657,7 +1673,7 @@ const PlantSchedule: React.FC = () => {
         key: '3',
         label: 'Sign Out',
         icon: <LogoutOutlined />,
-        onClick: () => {localStorage.clear(); window.location.reload(); },
+        onClick: () => { localStorage.clear(); window.location.reload(); },
       },
     ],
   };
@@ -1751,7 +1767,7 @@ const PlantSchedule: React.FC = () => {
     <Container
       theme={themes[currentTheme]}
       style={mobile ? {
-        padding: '10px 10px 74px 10px', 
+        padding: '10px 10px 74px 10px',
         marginBottom: 0
       } : {}}
     >
@@ -1773,17 +1789,38 @@ const PlantSchedule: React.FC = () => {
           refreshOptions={refreshOptions}
           themeMenuItems={themeMenuItems}
           accountMenu={accountMenu}
-          mobile={mobile} 
+          mobile={mobile}
           alwaysShowDatePicker={true}
           hideDatePickerDuringRefresh={false}
         />
-        <div className="left-section">
-          <DateDisplay theme={themes[currentTheme]}>
-            <CalendarOutlined style={{ fontSize: '18px', marginRight: '8px' }} />
-            <span className="date">{selectedDate.format('DD MMMM YYYY')}</span>
-            <span className="day">({selectedDate.format('ddd')})</span>
-          </DateDisplay>
-        </div>
+        <StatsCard>
+          <div className={styles.leftSection}>
+            <StatItem theme={themes[currentTheme]}>
+              <div className={styles.leftSectionContent}>
+                <DateDisplay theme={themes[currentTheme]}>
+                  <CalendarOutlined style={{ fontSize: '18px' }} />
+                  <span className="date">{selectedDate.format('DD MMM YYYY')} 12:00:00 AM to</span>
+                </DateDisplay>
+                <DateDisplay theme={themes[currentTheme]}>
+                  <CalendarOutlined style={{ fontSize: '18px' }} />
+                  <span className="date">{selectedDate.format('DD MMM YYYY')} 11:59:59 PM</span>
+                </DateDisplay>
+              </div>
+            </StatItem>
+            <StatItem theme={themes[currentTheme]}>
+              <div className={styles.leftSectionContent + ' ' + styles.leftSectionContent2}>
+                <DateDisplay theme={themes[currentTheme]}>
+                  <CalendarOutlined style={{ fontSize: '18px' }} />
+                  <span className="date">{selectedDate.format('DD MMM YYYY')} 06:00:00 AM to</span>
+                </DateDisplay>
+                <DateDisplay theme={themes[currentTheme]}>
+                  <CalendarOutlined style={{ fontSize: '18px' }} />
+                  <span className="date">{selectedDate.clone().add(1, 'day').format('DD MMM YYYY')} 05:59:59 AM</span>
+                </DateDisplay>
+              </div>
+            </StatItem>
+          </div>
+        </StatsCard>
 
         {!loading && (
           <>
@@ -1800,7 +1837,7 @@ const PlantSchedule: React.FC = () => {
                           </Tooltip>
                         </div>
                         <p className="stat-value">
-                          {currentStats.total.toFixed(0)}
+                          {totalStats.total.toFixed(0)}
                         </p>
                       </StatItem>
                       <StatItem theme={themes[currentTheme]}>
@@ -1811,7 +1848,7 @@ const PlantSchedule: React.FC = () => {
                           </Tooltip>
                         </div>
                         <p className="stat-value">
-                          {currentStats.average.toFixed(0)}
+                          {totalStats.average.toFixed(0)}
                         </p>
                       </StatItem>
                       <StatItem theme={themes[currentTheme]}>
@@ -1822,7 +1859,7 @@ const PlantSchedule: React.FC = () => {
                           </Tooltip>
                         </div>
                         <p className="stat-value">
-                          {currentStats.peak.toFixed(0)}
+                          {totalStats.peak.toFixed(0)}
                         </p>
                       </StatItem>
                     </StatsCard>
@@ -1864,7 +1901,7 @@ const PlantSchedule: React.FC = () => {
                           </Tooltip>
                         </div>
                         <p className="stat-value">
-                          {currentStats.total.toFixed(0)}
+                          {totalStats.total.toFixed(0)}
                         </p>
                       </StatItem>
                       <StatItem theme={themes[currentTheme]}>
@@ -1875,7 +1912,7 @@ const PlantSchedule: React.FC = () => {
                           </Tooltip>
                         </div>
                         <p className="stat-value">
-                          {currentStats.average.toFixed(0)}
+                          {totalStats.average.toFixed(0)}
                         </p>
                       </StatItem>
                       <StatItem theme={themes[currentTheme]}>
@@ -1886,7 +1923,7 @@ const PlantSchedule: React.FC = () => {
                           </Tooltip>
                         </div>
                         <p className="stat-value">
-                          {currentStats.peak.toFixed(0)}
+                          {totalStats.peak.toFixed(0)}
                         </p>
                       </StatItem>
                     </StatsCard>
@@ -1942,9 +1979,9 @@ const PlantSchedule: React.FC = () => {
                               <span className="percentage">({achievement.toFixed(0)}%)</span>
                             </div>
                             <div className="progress-track">
-                              <div 
-                                className="progress-bar" 
-                                style={{ width: `${Math.min(achievement, 100)}%` }} 
+                              <div
+                                className="progress-bar"
+                                style={{ width: `${Math.min(achievement, 100)}%` }}
                               />
                             </div>
                             <div className="balance">
@@ -1971,9 +2008,9 @@ const PlantSchedule: React.FC = () => {
                                 <span className="percentage">({totalAchievement.toFixed(0)}%)</span>
                               </div>
                               <div className="progress-track">
-                                <div 
-                                  className="progress-bar" 
-                                  style={{ width: `${Math.min(totalAchievement, 100)}%` }} 
+                                <div
+                                  className="progress-bar"
+                                  style={{ width: `${Math.min(totalAchievement, 100)}%` }}
                                 />
                               </div>
                               <div className="balance">
