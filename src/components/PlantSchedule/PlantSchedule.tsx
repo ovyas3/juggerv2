@@ -547,7 +547,7 @@ const Th = styled.th<{
   theme: typeof themes[ThemeKey]
 }>`
   padding: 12px 16px;
-  text-align: left;
+  text-align: center;
   color: ${props => props.theme.text};
   font-weight: 500;
   font-size: 0.85rem;
@@ -566,10 +566,11 @@ const Th = styled.th<{
   &:not(:first-child)::after {
     content: ' (MT)';
     display: inline-block;
-    font-size: 0.7rem;
-    opacity: 0.7;
+    font-size: 0.85rem;
+    padding-left: 4px;
+    opacity: 0.85;
     @media (min-width: 768px) {
-      font-size: 0.8rem;
+      font-size: 0.9rem;
     }
   }
 
@@ -823,6 +824,27 @@ const TopSection = styled.div<{ mobile?: boolean }>`
   padding: 0 10px;
   gap: 10px;
 
+  .stats-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border-right: 1px solid #E9E9EB;
+    padding-right: 10px;
+    width: 100%;
+  }
+
+  .shifts-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding-left: 10px;
+    width: 100%;
+  }
+
   @media (max-width: 767px) {
     .stats-shifts-container {
       display: flex;
@@ -833,11 +855,14 @@ const TopSection = styled.div<{ mobile?: boolean }>`
       .stats-section {
         flex: 1;
         min-width: 0;
+        gap: 8px;
       }
       
       .shifts-section {
         flex: 1;
+        gap: 8px;
         min-width: 120px;
+        padding-left: 0px;
         display: flex;
         flex-direction: column;
       }
@@ -1555,11 +1580,6 @@ const PlantSchedule: React.FC = () => {
     return plantTargets[plant] || 0;
   };
 
-  useEffect(() => {
-    fetchData(selectedDate);
-
-  }, [selectedDate]);
-
   const calculateAchievement = (actual: number, target: number) => {
     if (target === 0)
       return actual;
@@ -1793,34 +1813,6 @@ const PlantSchedule: React.FC = () => {
           alwaysShowDatePicker={true}
           hideDatePickerDuringRefresh={false}
         />
-        <StatsCard>
-          <div className={styles.leftSection}>
-            <StatItem theme={themes[currentTheme]}>
-              <div className={styles.leftSectionContent}>
-                <DateDisplay theme={themes[currentTheme]}>
-                  <CalendarOutlined style={{ fontSize: '18px' }} />
-                  <span className="date">{selectedDate.format('DD MMM YYYY')} 12:00:00 AM to</span>
-                </DateDisplay>
-                <DateDisplay theme={themes[currentTheme]}>
-                  <CalendarOutlined style={{ fontSize: '18px' }} />
-                  <span className="date">{selectedDate.format('DD MMM YYYY')} 11:59:59 PM</span>
-                </DateDisplay>
-              </div>
-            </StatItem>
-            <StatItem theme={themes[currentTheme]}>
-              <div className={styles.leftSectionContent + ' ' + styles.leftSectionContent2}>
-                <DateDisplay theme={themes[currentTheme]}>
-                  <CalendarOutlined style={{ fontSize: '18px' }} />
-                  <span className="date">{selectedDate.format('DD MMM YYYY')} 06:00:00 AM to</span>
-                </DateDisplay>
-                <DateDisplay theme={themes[currentTheme]}>
-                  <CalendarOutlined style={{ fontSize: '18px' }} />
-                  <span className="date">{selectedDate.clone().add(1, 'day').format('DD MMM YYYY')} 05:59:59 AM</span>
-                </DateDisplay>
-              </div>
-            </StatItem>
-          </div>
-        </StatsCard>
 
         {!loading && (
           <>
@@ -1828,6 +1820,19 @@ const PlantSchedule: React.FC = () => {
               {mobile ? (
                 <div className="stats-shifts-container">
                   <div className="stats-section">
+                    <StatItem theme={themes[currentTheme]}>
+                      <div className={styles.leftSectionContent}>
+                        <DateDisplay theme={themes[currentTheme]}>
+                          <CalendarOutlined style={{ fontSize: '18px' }} />
+                          <span className="date">{selectedDate.format('DD MMM YYYY')} 12:00:00 AM</span>
+                        </DateDisplay>
+                        <span style={{ fontWeight: 600, padding: '0 4px', color: '#FFFAF0', textAlign: 'center', fontSize: '12px' }}>TO</span>
+                        <DateDisplay theme={themes[currentTheme]}>
+                          <CalendarOutlined style={{ fontSize: '18px' }} />
+                          <span className="date">{selectedDate.format('DD MMM YYYY')} 11:59:59 PM</span>
+                        </DateDisplay>
+                      </div>
+                    </StatItem>
                     <StatsCard>
                       <StatItem theme={themes[currentTheme]}>
                         <div className="stat-header">
@@ -1865,6 +1870,21 @@ const PlantSchedule: React.FC = () => {
                     </StatsCard>
                   </div>
                   <div className="shifts-section">
+                    <StatsCard>
+                      <StatItem theme={themes[currentTheme]}>
+                        <div className={styles.leftSectionContent}>
+                          <DateDisplay theme={themes[currentTheme]}>
+                            <CalendarOutlined style={{ fontSize: '18px' }} />
+                            <span className="date">{selectedDate.format('DD MMMM')} 06:00:00 AM</span>
+                          </DateDisplay>
+                          <span style={{ fontWeight: 600, padding: '0 4px', color: '#FFFAF0', textAlign: 'center', fontSize: '12px' }}>TO</span>
+                          <DateDisplay theme={themes[currentTheme]}>
+                            <CalendarOutlined style={{ fontSize: '18px' }} />
+                            <span className="date">{selectedDate.clone().add(1, 'day').format('DD MMMM')} 05:59:59 AM</span>
+                          </DateDisplay>
+                        </div>
+                      </StatItem>
+                    </StatsCard>
                     <ShiftTabs theme={themes[currentTheme]}>
                       {shifts.map(shift => {
                         const shiftStats = calculateShiftStats(shift.id as 'all' | 'morning' | 'day' | 'night');
@@ -1892,6 +1912,19 @@ const PlantSchedule: React.FC = () => {
               ) : (
                 <>
                   <div className="stats-section">
+                    <StatItem theme={themes[currentTheme]}>
+                      <div className={styles.leftSectionContent}>
+                        <DateDisplay theme={themes[currentTheme]}>
+                          <CalendarOutlined style={{ fontSize: '18px' }} />
+                          <span className="date">{selectedDate.format('DD MMM YYYY')} 12:00:00 AM</span>
+                        </DateDisplay>
+                        <span style={{ fontWeight: 600, padding: '0 4px', color: '#FFFAF0', textAlign: 'center', fontSize: '15px' }}>TO</span>
+                        <DateDisplay theme={themes[currentTheme]}>
+                          <CalendarOutlined style={{ fontSize: '18px' }} />
+                          <span className="date">{selectedDate.format('DD MMM YYYY')} 11:59:59 PM</span>
+                        </DateDisplay>
+                      </div>
+                    </StatItem>
                     <StatsCard>
                       <StatItem theme={themes[currentTheme]}>
                         <div className="stat-header">
@@ -1928,28 +1961,43 @@ const PlantSchedule: React.FC = () => {
                       </StatItem>
                     </StatsCard>
                   </div>
-                  <ShiftTabs theme={themes[currentTheme]}>
-                    {shifts.map(shift => {
-                      const shiftStats = calculateShiftStats(shift.id as 'all' | 'morning' | 'day' | 'night');
-                      return (
-                        <div
-                          key={shift.id}
-                          className={`tab ${activeShift === shift.id ? 'active' : ''}`}
-                          onClick={() => setActiveShift(shift.id as 'all' | 'morning' | 'day' | 'night')}
-                        >
-                          <div className="shift-label">
-                            <span className="shift-name">{shift.name}</span>
+                  <div className="shifts-section">
+                    <StatItem theme={themes[currentTheme]}>
+                      <div className={styles.leftSectionContent + ' ' + styles.leftSectionContent2}>
+                        <DateDisplay theme={themes[currentTheme]}>
+                          <CalendarOutlined style={{ fontSize: '18px' }} />
+                          <span className="date">{selectedDate.format('DD MMM YYYY')} 06:00:00 AM</span>
+                        </DateDisplay>
+                        <span style={{ fontWeight: 600, padding: '0 4px', color: '#FFFAF0', textAlign: 'center', fontSize: '15px' }}>TO</span>
+                        <DateDisplay theme={themes[currentTheme]}>
+                          <CalendarOutlined style={{ fontSize: '18px' }} />
+                          <span className="date">{selectedDate.clone().add(1, 'day').format('DD MMM YYYY')} 05:59:59 AM</span>
+                        </DateDisplay>
+                      </div>
+                    </StatItem>
+                    <ShiftTabs theme={themes[currentTheme]}>
+                      {shifts.map(shift => {
+                        const shiftStats = calculateShiftStats(shift.id as 'all' | 'morning' | 'day' | 'night');
+                        return (
+                          <div
+                            key={shift.id}
+                            className={`tab ${activeShift === shift.id ? 'active' : ''}`}
+                            onClick={() => setActiveShift(shift.id as 'all' | 'morning' | 'day' | 'night')}
+                          >
+                            <div className="shift-label">
+                              <span className="shift-name">{shift.name}</span>
 
+                            </div>
+                            <div className="shift-stats">
+                              <span > <span className="stat-label">T:</span> {shiftStats.total.toFixed(0)}</span>
+                              <span > <span className="stat-label">A:</span> {shiftStats.average.toFixed(0)}</span>
+                              <span > <span className="stat-label">P:</span> {shiftStats.peak.toFixed(0)}</span>
+                            </div>
                           </div>
-                          <div className="shift-stats">
-                            <span > <span className="stat-label">T:</span> {shiftStats.total.toFixed(0)}</span>
-                            <span > <span className="stat-label">A:</span> {shiftStats.average.toFixed(0)}</span>
-                            <span > <span className="stat-label">P:</span> {shiftStats.peak.toFixed(0)}</span>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </ShiftTabs>
+                        );
+                      })}
+                    </ShiftTabs>
+                  </div>
                 </>
               )}
             </TopSection>
