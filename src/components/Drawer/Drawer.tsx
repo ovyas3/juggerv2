@@ -57,8 +57,7 @@ const navigationItems: NavItem[] = [
         inactiveIcon: DispatchTrendInactive,
         isImageIcon: true
     },
-        isImageIcon: true
-    }
+
 ];
 
 const NavItem = ({ 
