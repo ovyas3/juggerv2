@@ -38,7 +38,7 @@
   gap: 8px;
   padding-top: 8px;
   width: 32vw;
-  justify-content: flex-start;
+  justify-content: center;
 
   @media screen and (max-width: 600px) {
     flex-direction: column;

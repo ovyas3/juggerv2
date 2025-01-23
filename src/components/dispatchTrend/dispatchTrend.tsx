@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import styles from "./dispatchTrend.module.css"
 import MaterialGraph from "./MaterialGraph"
 import { useMediaQuery, useTheme } from '@mui/material';
-import { httpsPost } from "@/utils/Communication";
+import { httpsGet, httpsPost } from "@/utils/Communication";
 import { useRouter } from "next/navigation";
 import dayjs from "dayjs";
 import { jsontocsv } from "@/utils/jsonToCsv";
@@ -33,15 +33,20 @@ export default function DispatchTrend() {
     const [dateRange, setDateRange] = useState<[Date | null, Date | null]>(defaultDateRange);
     const [selectedCarriers, setSelectedCarriers] = useState<string[]>([]);
     const [selectedCustomers, setSelectedCustomers] = useState<string[]>([]);
-    const [selectedMaterials, setSelectedMaterials] = useState<string[]>([]);
+    const [selectedZone, setSelectedZone] = useState<string | null>(null);
+    const [zonesWithStates, setZonesWithStates] = useState<any[]>([]);
+    const [selectedStates, setSelectedStates] = useState<string[]>([]);
     const [carrierOptions, setCarrierOptions] = useState<
         { value: string; label: string }[]
     >([]);
     const [customerOptions, setCustomerOptions] = useState<
         { value: string; label: string }[]
     >([]);
-    const [materialOptions, setMaterialOptions] = useState<
+    const [zoneOptions, setZoneOptions] = useState<
         { value: string; label: string }[]
+    >([]);
+    const [stateOptions, setStateOptions] = useState<   
+        { value: string; label: string }[]    
     >([]);
     const [downloadData, setDownloadData] = useState<any>(null);
 
@@ -65,8 +70,17 @@ export default function DispatchTrend() {
         if (selectedCustomers.length > 0) {
             payload.customers = selectedCustomers;
         };
-
-        console.log(payload);
+        if(selectedZone) {
+            payload.zone = selectedZone;
+            if(selectedStates.length === 0) {
+                const states = zonesWithStates.find((zone: any) => zone._id === selectedZone)?.lanes.map((lane: any) => lane._id);
+                payload.states = states;
+            };
+        };
+        if(selectedStates.length > 0) {
+            payload.states = selectedStates;
+        };
+        
         try {
             const response = await httpsPost('invoice/dispatchTrend', payload, router, 1, false);
             if (response?.statusCode === 200) {
@@ -89,10 +103,6 @@ export default function DispatchTrend() {
                 if (dispatchTrend && dispatchTrend.length > 0 && shipments > 0) {
                     setDispatchData(dispatchTrend);
                     const materials = Array.from(new Set(dispatchTrend.map((item: any) => item.material.name)));
-                    setMaterialOptions(materials.map((material: any) => ({
-                        value: material,
-                        label: material,
-                    })));
                     const totalInvoicingOty = Math.round(dispatchTrend.reduce((acc: any, item: any) => acc + item.totalWeight, 0));
                     let uniqueDates = Array.from(new Set(dispatchTrend.map((item: any) => item.material.date)));
                     let numberOfDays = uniqueDates.length;
@@ -125,6 +135,32 @@ export default function DispatchTrend() {
         }
     };
 
+    const getZonesData = async () => {
+        try {
+            setLoading(true);
+            const response = await httpsGet('zones/get/', 0, router);
+            if (response?.statusCode === 200) {
+                const { zones } = response.data;
+                setZonesWithStates(zones);
+                const zonesOpts = zones.map((zone: any) => ({
+                    value: zone._id,
+                    label: zone.zone,
+                }));
+                setZoneOptions(zonesOpts);
+            }
+            setLoading(false);
+        } catch (error) {
+            setLoading(false);
+            console.error('Error fetching zones data:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        getZonesData();
+    }, []);
+
     useEffect(() => {
         getMaterialData();
     }, [dateRange]);
@@ -144,6 +180,17 @@ export default function DispatchTrend() {
                 ]
             );
         }
+    };
+
+    const handleSelectZone = (e: any) => {
+        const id = e;
+        setSelectedZone(e);
+        const statesOpts = zonesWithStates.find((zone: any) => zone._id === id)?.lanes.map((lane: any) => ({
+            value: lane._id,
+            label: lane.name,
+        }));
+        setStateOptions(statesOpts);
+        setSelectedStates([]);
     };
 
     const handleClear = () => {
@@ -172,7 +219,7 @@ export default function DispatchTrend() {
                 style={{ margin: !mobile ? '56px 0 0 70px' : '0px' }}
             >
                 {mobile && (
-                    <h1 className={styles.title}>Invoicing Trends</h1>
+                    <h1 className={styles.title}>Trends</h1>
                 )}
                 <div className={styles.header}>
                     <div className={styles.filterGroup}>
@@ -214,6 +261,31 @@ export default function DispatchTrend() {
                             value={selectedCustomers}
                             onChange={setSelectedCustomers}
                             options={customerOptions}
+                            className="w-full"
+                            popupClassName="select-popup"
+                            maxTagCount="responsive"
+                            getPopupContainer={(trigger) => trigger.parentElement!}
+                            size="middle"
+                        />
+                        <Select
+                            placeholder="Select Zone"
+                            value={selectedZone}
+                            onChange={(e: any) => {
+                                handleSelectZone(e)
+                            }}
+                            options={zoneOptions}
+                            className="w-full"
+                            popupClassName="select-popup"
+                            maxTagCount="responsive"
+                            getPopupContainer={(trigger) => trigger.parentElement!}
+                            size="middle"
+                        />
+                        <Select
+                            mode="multiple"
+                            placeholder="Select States"
+                            value={selectedStates}
+                            onChange={setSelectedStates}
+                            options={stateOptions}
                             className="w-full"
                             popupClassName="select-popup"
                             maxTagCount="responsive"

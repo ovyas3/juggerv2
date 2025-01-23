@@ -12,10 +12,11 @@ import DispatchIcon from "@/assets/dispatch_icon.svg";
 import DispatchIconActive from "@/assets/dispatch_icon_active.svg";
 import BillingIcon from "@/assets/billing_icon.svg";
 import BillingIconActive from "@/assets/billing_icon_active.svg";
-import EWayBillInactive from "@/assets/eway_bill_bg_icon.svg";
-import EWayBillActive from "@/assets/eway_bill_wg_icon.svg";
 import DispatchTrendInactive from "@/assets/dispatch_trend_bg_icon.svg";
 import DispatchTrendActive from "@/assets/dispatch_trend_wg_icon.svg";
+import RightArrow from "@/assets/right_arrow_icon.svg";
+import EWayBillInactive from "@/assets/eway_bill_bg_icon.svg";
+import EWayBillActive from "@/assets/eway_bill_wg_icon.svg";
 import LeadDistanceInactive from "@/assets/lead_distance_analysis_bg_icon.svg";
 import LeadDistanceActive from "@/assets/lead_distance_analysis_wg_icon.svg";
 import FreightTrendsInactive from "@/assets/freight_trends_bg_icon.svg";
@@ -28,6 +29,7 @@ interface NavItem {
     activeIcon?: string;
     inactiveIcon?: string;
     isImageIcon?: boolean;
+    children?: NavItem[];
 }
 
 const navigationItems: NavItem[] = [
@@ -40,28 +42,38 @@ const navigationItems: NavItem[] = [
         isImageIcon: true
     },
     {
-        id: 'plantSchedule',
-        label: 'Road Invoicing Dashboard',
+        id: 'invoicing',
+        label: 'Invoicing',
         icon: '',
         activeIcon: DispatchIconActive,
         inactiveIcon: DispatchIcon,
-        isImageIcon: true
-    },
-    {
-        id: 'invoicingDashboard',
-        label: 'Invoicing Dashboard',
-        icon: '',
-        activeIcon: BillingIconActive,
-        inactiveIcon: BillingIcon,
-        isImageIcon: true
-    },
-    {
-        id: 'invoicingTrends',
-        label: 'Invoicing Trends',
-        icon: '',
-        activeIcon: DispatchTrendActive,
-        inactiveIcon: DispatchTrendInactive,
-        isImageIcon: true
+        isImageIcon: true,
+        children: [
+            {
+                id: 'plantSchedule',
+                label: 'Invoicing Day / Shift Wise',
+                icon: '',
+                activeIcon: DispatchIconActive,
+                inactiveIcon: DispatchIcon,
+                isImageIcon: true
+            },
+            {
+                id: 'invoicingDashboard',
+                label: 'Road Invoicing & Loading Status',
+                icon: '',
+                activeIcon: BillingIconActive,
+                inactiveIcon: BillingIcon,
+                isImageIcon: true
+            },
+            {
+                id: 'invoicingTrends',
+                label: 'Trends',
+                icon: '',
+                activeIcon: DispatchTrendActive,
+                inactiveIcon: DispatchTrendInactive,
+                isImageIcon: true
+            },
+        ]
     },
     // {
     //     id: 'ewaybillDashboard',
@@ -96,7 +108,11 @@ const NavItem = ({
     isOpen, 
     onClick, 
     onMouseEnter, 
-    onMouseLeave 
+    onMouseLeave,
+    active, 
+    handleRouting, 
+    setHoveredId, 
+    hoveredId 
 }: {
     item: NavItem;
     isActive: boolean;
@@ -105,46 +121,116 @@ const NavItem = ({
     onClick: () => void;
     onMouseEnter: () => void;
     onMouseLeave: () => void;
+    active: string;
+    handleRouting: (route: string) => void;
+    setHoveredId: (id: string | null) => void;
+    hoveredId: string | null;
 }) => {
     const isHighlighted = isActive || isHovered;
+    const [showChildren, setShowChildren] = useState(false);
+    const [isNestedHovered, setIsNestedHovered] = useState(false);
+
+    const handleMouseEnter = () => {
+        setShowChildren(true);
+        onMouseEnter();
+    };
+
+    const handleMouseLeave = () => {
+        setShowChildren(false);
+        onMouseLeave();
+    };
+
+    const isNestedActive = item.children?.some(child => active === child.id);
+
+    const handleClick = () => {
+        if (!item.children) {
+            onClick();
+        }
+    };
 
     return (
         <div
-            onClick={onClick}
-            onMouseEnter={onMouseEnter}
-            onMouseLeave={onMouseLeave}
-            className='station-code'
-            style={{
-                width: isOpen ? '190px' : '42px',
-                justifyContent: isOpen ? 'start' : 'center',
-                backgroundColor: isHighlighted ? 'white' : '',
-                cursor: 'pointer'
-            }}
+            style={{ position: 'relative' }}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
         >
-            {item.isImageIcon ? (
-                <Image
-                    src={isHighlighted ? item.activeIcon! : item.inactiveIcon!}
-                    alt={item.label}
-                    style={{ 
-                        marginLeft: isOpen ? '10px' : '2px',
-                    }}
-                    width={24}
-                    height={24}
-                />
-            ) : (
-                <item.icon 
-                    style={{ 
-                        marginLeft: isOpen ? '9px' : '', 
-                        color: isHighlighted ? 'black' : 'white' 
-                    }}
-                />
-            )}
             <div
-                className={`${isOpen ? 'fnr_text' : 'fnr_text_none'}`}
-                style={{ color: isHighlighted ? 'black' : 'white' }}
+                onClick={handleClick}
+                className='station-code'
+                style={{
+                    width: isOpen ? '190px' : '42px',
+                    justifyContent: isOpen ? 'start' : 'center',
+                    backgroundColor: isHighlighted || isNestedHovered || isNestedActive ? 'white' : '',
+                    cursor: 'pointer'
+                }}
             >
-                {item.label}
+                {item.isImageIcon ? (
+                    <Image
+                        src={isHighlighted || isNestedHovered || isNestedActive ? item.activeIcon! : item.inactiveIcon!}
+                        alt={item.label}
+                        style={{
+                            marginLeft: isOpen ? '10px' : '2px',
+                        }}
+                        width={24}
+                        height={24}
+                    />
+                ) : (
+                    <item.icon 
+                        style={{ 
+                            marginLeft: isOpen ? '9px' : '', 
+                            color: isHighlighted || isNestedHovered || isNestedActive ? 'black' : 'white' 
+                        }}
+                    />
+                )}
+                <div
+                    className={`${isOpen ? 'fnr_text' : 'fnr_text_none'}`}
+                    style={{ color: isHighlighted || isNestedHovered || isNestedActive ? 'black' : 'white' }}
+                >
+                    {item.label}
+                </div>
+                {item.children && isOpen && (
+                    <Image
+                        src={RightArrow}
+                        alt="right-arrow"
+                        style={{
+                            marginLeft: 'auto',
+                            marginRight: '10px',
+                            filter: isHighlighted || isNestedHovered || isNestedActive ? 'brightness(0)' : 'brightness(1)',
+                            transition: 'filter 0.2s ease-in'
+                        }}
+                        width={16}
+                        height={16}
+                    />
+                )}
             </div>
+            {showChildren && item.children && (
+                <div 
+                    className="submenu"
+                    style={{ top: '-10px' }}
+                >
+                    {item.children.map((child) => (
+                        <div
+                            key={child.id}
+                            onClick={() => handleRouting(child.id)}
+                            className="submenu-option"
+                            style={{
+                                backgroundColor: active === child.id || hoveredId === child.id ? 'white' : 'transparent',
+                                color: active === child.id || hoveredId === child.id ? 'black' : 'white',
+                            }}
+                            onMouseEnter={() => {
+                                setHoveredId(child.id);
+                                setIsNestedHovered(true);
+                            }}
+                            onMouseLeave={() => {
+                                setHoveredId(null);
+                                setIsNestedHovered(false);
+                            }}
+                        >
+                            {child.label}
+                        </div>
+                    ))}
+                </div>
+            )}
         </div>
     );
 };
@@ -199,6 +285,10 @@ function SideDrawer() {
                     onClick={() => handleRouting(item.id)}
                     onMouseEnter={() => setHoveredId(item.id)}
                     onMouseLeave={() => setHoveredId(null)}
+                    active={active}
+                    handleRouting={handleRouting}
+                    setHoveredId={setHoveredId}
+                    hoveredId={hoveredId}
                 />
             ))}
         </div>

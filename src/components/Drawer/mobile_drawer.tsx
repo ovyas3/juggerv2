@@ -41,7 +41,7 @@ interface NavItem {
 const navigationItems: NavItem[] = [
     {
         id: 'invoicingTrends',
-        label: 'Invoicing Trends',
+        label: 'Trends',
         icon: '',
         activeIcon: DispatchTrendActive,
         inactiveIcon: DispatchTrendInactive,

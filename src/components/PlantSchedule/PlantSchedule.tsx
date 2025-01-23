@@ -1755,7 +1755,7 @@ const PlantSchedule: React.FC = () => {
             }} />)}
           <Header theme={themes[currentTheme]}>
             <HeaderLeft theme={themes[currentTheme]}>
-              <h2>Road Invoicing Dashboard</h2>
+              <h2>Invoicing Day / Shift Wise</h2>
             </HeaderLeft>
             <HeaderRight theme={themes[currentTheme]}>
               <Typography.Text style={{ color: themes[currentTheme].textSecondary }}>
@@ -1798,7 +1798,7 @@ const PlantSchedule: React.FC = () => {
             width: '100%'
           }} />)}
         <CommonHeader
-          title="Road Invoicing Dashboard"
+          title="Invoicing Day / Shift Wise"
           currentTheme={currentTheme}
           selectedDate={selectedDate}
           handleDateChange={handleDateChange}
@@ -1963,7 +1963,7 @@ const PlantSchedule: React.FC = () => {
                   </div>
                   <div className="shifts-section">
                     <StatItem theme={themes[currentTheme]}>
-                      <div className={styles.leftSectionContent + ' ' + styles.leftSectionContent2}>
+                      <div className={styles.leftSectionContent}>
                         <DateDisplay theme={themes[currentTheme]}>
                           <CalendarOutlined style={{ fontSize: '18px' }} />
                           <span className="date">{selectedDate.format('DD MMM YYYY')} 06:00:00 AM</span>
