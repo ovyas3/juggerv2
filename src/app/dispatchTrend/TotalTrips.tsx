@@ -194,19 +194,19 @@ export default function TotalTrips() {
         const data = response.data;
 
         if (!carrierOptions.length) {
-          const carriers = [...new Set(data.map((e: any) => e.carrier_names).flat())];
+          const carriers = [...new Set(data.map((e: any) => e.carrier_names).flat())] as string[];
           setCarrierOptions(carriers.map(c => ({ value: c, label: c })));
         }
         if (!cityOptions.length) {
-          const cities = [...new Set(data.map((e: any) => e.city_names).flat())];
+          const cities = [...new Set(data.map((e: any) => e.city_names).flat())] as string[];
           setCityOptions(cities.map(c => ({ value: c, label: c })));
         }
         if (!customerOptions.length) {
-          const customers = [...new Set(data.map((e: any) => e.customer_names).flat())];
+          const customers = [...new Set(data.map((e: any) => e.customer_names).flat())] as string[];
           setCustomerOptions(customers.map(c => ({ value: c, label: c })));
         }
         if (!materialOptions.length) {
-          const materials = [...new Set(data.map((e: any) => e.material_names.map((m: any) => m.join())).flat())];
+          const materials = [...new Set(data.map((e: any) => e.material_names.map((m: any) => m.join())).flat())] as string[];
           setMaterialOptions(materials.map(m => ({ value: m, label: m })));
         }
 
@@ -214,18 +214,18 @@ export default function TotalTrips() {
           name: filterOption === 'DISTANCE' ? Math.round(e._id / 1000).toString() : e._id,
           weight: Math.round(e.total_weight),
           trips: e.no_of_trips
-        })).sort((a, b) => b.weight - a.weight).slice(0, 20);
+        })).sort((a: { weight: number }, b: { weight: number }) => b.weight - a.weight).slice(0, 20);
 
         if (sortType === null) {
-          chartData = chartData.sort((a, b) => a.name.localeCompare(b.name));
+          chartData = chartData.sort((a: { name: string }, b: { name: string }) => a.name.localeCompare(b.name));
         } else if (sortType === 'asc') {
-          chartData = chartData.sort((a, b) => a.weight - b.weight);
+          chartData = chartData.sort((a: { weight: number }, b: { weight: number }) => a.weight - b.weight);
         } else if (sortType === 'desc') {
-          chartData = chartData.sort((a, b) => b.weight - a.weight);
+          chartData = chartData.sort((a: { weight: number }, b: { weight: number }) => b.weight - a.weight);
         }
 
-        const xLineData = chartData.map(e => e.name);
-        const series = chartData.map(e => ({
+        const xLineData = chartData.map((e: { name: string }) => e.name);
+        const series = chartData.map((e: { weight: number; trips: number }) => ({
           value: e.weight,
           trips: e.trips
         }));
@@ -273,7 +273,7 @@ export default function TotalTrips() {
         };
 
         setChartData(chartOptions);
-        setDownloadData(xLineData.map((name, index) => ({
+        setDownloadData(xLineData.map((name: string, index: number) => ({
           name: name,
           value: series[index].value,
         })));
