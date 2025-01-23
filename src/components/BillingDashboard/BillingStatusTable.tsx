@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { format } from "date-fns"
 import { Calendar, Clock } from "lucide-react"
+import { Spin } from 'antd';
 import {
   Table,
   TableBody,
@@ -13,6 +14,20 @@ import {
 } from "@/components/UI/table"
 import { Card, CardContent } from "@/components/UI/card"
 import { httpsGet } from "@/utils/Communication"
+import { styled } from "@mui/material/styles";
+import Dialog from '@mui/material/Dialog';
+import CloseButtonIcon from "@/assets/close_icon.svg";
+import Image from "next/image"
+
+const BootstrapDialog = styled(Dialog)(({ theme }) => ({
+  "& .MuiDialogContent-root": {
+    padding: theme.spacing(2),
+  },
+  "& .MuiDialogActions-root": {
+    padding: theme.spacing(1),
+  },
+}));
+
 
 const themes = {
   navy: {
@@ -170,6 +185,8 @@ export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatus
   const [loading, setLoading] = useState(true)
   const [isMobile, setIsMobile] = useState(false)
   const [currentTime, setCurrentTime] = useState(new Date())
+  const [openGateInfoDialog, setOpenGateInfoDialog] = useState(false)
+  const [selectedGateInfoData, setSelectedGateInfoData] = useState<any>(null)
 
   useEffect(() => {
     const checkMobile = () => {
@@ -221,21 +238,21 @@ export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatus
     const underLoadingTotal = data?.underLoadingresult.reduce(
       (sum, item) => sum + item.totalWeight,
       0
-    ) || 0
+    ) || 0;
     const underBillingTotal = data?.underBillingresult.reduce(
       (sum, item) => sum + item.totalWeight,
       0
-    ) || 0
+    ) || 0;
     const doIssuedTotal = data?.doIssuedresult.reduce(
       (sum, item) => sum + item.totalWeight,
       0
-    ) || 0
+    ) || 0;
     const billedTotal = data?.billedResult.reduce(
       (sum, item) => sum + item.totalWeight,
       0
-    ) || 0
+    ) || 0;
 
-    return underLoadingTotal + underBillingTotal + doIssuedTotal + billedTotal
+    return underLoadingTotal + underBillingTotal + doIssuedTotal + billedTotal;
   }
 
   if (loading) {
@@ -244,13 +261,13 @@ export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatus
 
   const renderMobileView = () => {
     return (
-      <div className="mobile-container"  style={{ 
-        background: currentTheme.background, 
-        color: currentTheme.text 
+      <div className="mobile-container" style={{
+        background: currentTheme.background,
+        color: currentTheme.text
       }}>
-        <div className="datetime-container" style={{ 
-          background: currentTheme.primary, 
-          color: currentTheme.text 
+        <div className="datetime-container" style={{
+          background: currentTheme.primary,
+          color: currentTheme.text
         }}>
           <div className="date-display">
             <Calendar className="datetime-icon" size={16} />
@@ -279,17 +296,17 @@ export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatus
             (underLoading?.totalWeight || 0) +
             (underBilling?.totalWeight || 0) +
             (doIssued?.totalWeight || 0) +
-            (billed?.totalWeight || 0)
+            (billed?.totalWeight || 0);
 
           return (
-            <div key={locationName} className="mobile-card" style={{ 
-              background: currentTheme.cardBg, 
+            <div key={locationName} className="mobile-card" style={{
+              background: currentTheme.cardBg,
               color: currentTheme.textSecondary,
               border: `1px solid ${currentTheme.primary}`
             }}>
               <div className="card-header">
                 <div className="shop-name">{locationName}</div>
-                <div className="total-weight">{rowTotal.toFixed(2)} MT</div>
+                <div className="total-weight">{Math.round(rowTotal).toFixed(2)} MT</div>
               </div>
               <div className="card-sections">
                 <div className="section">
@@ -304,180 +321,247 @@ export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatus
                   <h4>Under Loading</h4>
                   <div className="stats">
                     <div>Vehicles: {underLoading?.totalCount || 0}</div>
-                    <div>Qty: {underLoading?.totalWeight.toFixed(2) || "0.00"} MT</div>
+                    <div>Qty: {Math.round(underLoading?.totalWeight || 0)} MT</div>
                   </div>
                 </div>
                 <div className="section">
-                  <h4>Under Billing</h4>
+                  <h4>Under Invoicing</h4>
                   <div className="stats">
                     <div>Vehicles: {underBilling?.totalCount || 0}</div>
-                    <div>Qty: {underBilling?.totalWeight.toFixed(2) || "0.00"} MT</div>
+                    <div>Qty: {Math.round(underBilling?.totalWeight || 0)} MT</div>
                   </div>
                 </div>
                 <div className="section">
                   <h4>Billed</h4>
                   <div className="stats">
                     <div>Vehicles: {billed?.totalCount || 0}</div>
-                    <div>Qty: {billed?.totalWeight.toFixed(2) || "0.00"} MT</div>
+                    <div>Qty: {Math.round(billed?.totalWeight || 0)} MT</div>
                   </div>
                 </div>
                 <div className="section">
                   <h4>Vehicle at Extr. Parking</h4>
                   <div className="stats">
                     <div>Vehicles: {doIssued?.totalCount || 0}</div>
-                    <div>Qty: {doIssued?.totalWeight.toFixed(2) || "0.00"} MT</div>
+                    <div>Qty: {Math.round(doIssued?.totalWeight || 0)} MT</div>
                   </div>
                 </div>
               </div>
             </div>
           )
         })}
-        <div className="total-card" style={{ 
-          background: currentTheme.primary, 
-          color: currentTheme.text 
+        <div className="total-card" style={{
+          background: currentTheme.primary,
+          color: currentTheme.text
         }}>
           <div className="card-header">
             <div className="shop-name">TOTAL</div>
-            <div className="total-weight">{calculateTotalWeight().toFixed(2)} MT</div>
+            <div className="total-weight">{Math.round(calculateTotalWeight()).toFixed(2)} MT</div>
           </div>
         </div>
       </div>
     )
   }
 
+  const handleCloseGateInfoDialog = () => {
+    setOpenGateInfoDialog(false)
+    setSelectedGateInfoData(null)
+  };
+
+  const handleViewGateInfo = (data: any) => {
+    console.log(data, "data");
+    setSelectedGateInfoData(data)
+    setOpenGateInfoDialog(true)
+  };
+
   return (
-    <div className="billing-table-container">
-      <div className="table-section">
-        <Card className="table-card">
-          <CardContent className="p-0 h-full flex flex-col">
-            {!isMobile && (
-              <div className="table-header">
-                <div className="datetime-container">
-                  <div className="date-display">
-                    <Calendar className="datetime-icon" size={16} />
-                    <span>Date: {format(currentTime, "dd-MMM-yy")}</span>
-                  </div>
-                  <div className="time-display">
-                    <Clock className="datetime-icon" size={16} />
-                    <span>Time: {format(currentTime, "hh:mm a")}</span>
+    <>
+      <div className="billing-table-container">
+        <div className="table-section">
+          <Card className="table-card">
+            <CardContent className="p-0 h-full flex flex-col">
+              {!isMobile && (
+                <div className="table-header">
+                  <div className="datetime-container">
+                    <div className="date-display">
+                      <Calendar className="datetime-icon" size={16} />
+                      <span>Date: {format(currentTime, "dd-MMM-yy")}</span>
+                    </div>
+                    <div className="time-display">
+                      <Clock className="datetime-icon" size={16} />
+                      <span>Time: {format(currentTime, "hh:mm a")}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
-            {isMobile ? (
-              renderMobileView()
-            ) : (
-              <div className="table-wrapper">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead rowSpan={2}>Shop</TableHead>
-                      <TableHead colSpan={2}>Under Loading</TableHead>
-                      <TableHead colSpan={2}>Under Billing</TableHead>
-                      <TableHead colSpan={2}>Billed</TableHead>
-                      <TableHead colSpan={2}>Vehicle at Extr. Parking</TableHead>
-                      <TableHead rowSpan={2}>Total Qty (MT)</TableHead>
-                      <TableHead colSpan={2}>Mode</TableHead>
-                      <TableHead rowSpan={2}>G. Total Qty (MT)</TableHead>
-                    </TableRow>
-                    <TableRow>
-                      <TableHead>No. of Veh.</TableHead>
-                      <TableHead>Qty (MT)</TableHead>
-                      <TableHead>No. of Veh.</TableHead>
-                      <TableHead>Qty (MT)</TableHead>
-                      <TableHead>No. of Veh.</TableHead>
-                      <TableHead>Qty (MT)</TableHead>
-                      <TableHead>No. of Veh.</TableHead>
-                      <TableHead>Qty (MT)</TableHead>
-                      <TableHead>By Road</TableHead>
-                      <TableHead>By Rake</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {allLocations.map((locationName) => {
-                      const underLoading = data?.underLoadingresult.find(
-                        (item) => item.locationName === locationName
-                      )
-                      const underBilling = data?.underBillingresult.find(
-                        (item) => item.locationName === locationName
-                      )
-                      const doIssued = data?.doIssuedresult.find(
-                        (item) => item.locationName === locationName
-                      )
-                      const billed = data?.billedResult.find(
-                        (item) => item.material === locationName
-                      )
+              )}
+              {isMobile ? (
+                renderMobileView()
+              ) : (
+                <div className="table-wrapper">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead rowSpan={2}>Shop</TableHead>
+                        <TableHead colSpan={2}>Under Loading</TableHead>
+                        <TableHead colSpan={2}>Under Invoicing</TableHead>
+                        <TableHead colSpan={2}>Billed</TableHead>
+                        <TableHead colSpan={2}>DO Issued</TableHead>
+                        <TableHead rowSpan={2}>Total Qty (MT)</TableHead>
+                        <TableHead colSpan={2}>Mode</TableHead>
+                        <TableHead rowSpan={2}>G. Total Qty (MT)</TableHead>
+                      </TableRow>
+                      <TableRow>
+                        <TableHead>No. of Veh.</TableHead>
+                        <TableHead>Qty (MT)</TableHead>
+                        <TableHead>No. of Veh.</TableHead>
+                        <TableHead>Qty (MT)</TableHead>
+                        <TableHead>No. of Veh.</TableHead>
+                        <TableHead>Qty (MT)</TableHead>
+                        <TableHead>No. of Veh.</TableHead>
+                        <TableHead>Qty (MT)</TableHead>
+                        <TableHead>By Road (MT)</TableHead>
+                        <TableHead>By Rake</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {allLocations.map((locationName) => {
+                        const underLoading = data?.underLoadingresult.find(
+                          (item) => item.locationName === locationName
+                        )
+                        const underBilling = data?.underBillingresult.find(
+                          (item) => item.locationName === locationName
+                        )
+                        const doIssued = data?.doIssuedresult.find(
+                          (item) => item.locationName === locationName
+                        )
+                        const billed = data?.billedResult.find(
+                          (item) => item.material === locationName
+                        )
 
-                      const rowTotal =
-                        (underLoading?.totalWeight || 0) +
-                        (underBilling?.totalWeight || 0) +
-                        (billed?.totalWeight || 0) +
-                        (doIssued?.totalWeight || 0)
+                        const rowTotal =
+                          (underLoading?.totalWeight || 0) +
+                          (underBilling?.totalWeight || 0) +
+                          (doIssued?.totalWeight || 0) +
+                          (billed?.totalWeight || 0);
 
-                      return (
-                        <TableRow key={locationName}>
-                          <TableCell>{locationName}</TableCell>
-                          <TableCell>{underLoading?.totalCount || 0}</TableCell>
-                          <TableCell>{underLoading?.totalWeight.toFixed(2) || "0.00"}</TableCell>
-                          <TableCell>{underBilling?.totalCount || 0}</TableCell>
-                          <TableCell>{underBilling?.totalWeight.toFixed(2) || "0.00"}</TableCell>
-                          <TableCell>{billed?.totalCount || 0}</TableCell>
-                          <TableCell>{billed?.totalWeight.toFixed(2) || "0.00"}</TableCell>
-                          <TableCell>{doIssued?.totalCount || 0}</TableCell>
-                          <TableCell>{doIssued?.totalWeight.toFixed(2) || "0.00"}</TableCell>
-                          <TableCell>{rowTotal.toFixed(2)}</TableCell>
-                          <TableCell>{rowTotal.toFixed(2)}</TableCell>
-                          <TableCell>0.00</TableCell>
-                          <TableCell>{rowTotal.toFixed(2)}</TableCell>
-                        </TableRow>
-                      )
-                    })}
-                    <TableRow className="total-row">
-                      <TableCell>TOTAL</TableCell>
-                      <TableCell>
-                        {data?.underLoadingresult.reduce((sum, item) => sum + item.totalCount, 0) || 0}
-                      </TableCell>
-                      <TableCell>
-                        {data?.underLoadingresult
-                          .reduce((sum, item) => sum + item.totalWeight, 0)
-                          .toFixed(2) || "0.00"}
-                      </TableCell>
-                      <TableCell>
-                        {data?.underBillingresult.reduce((sum, item) => sum + item.totalCount, 0) || 0}
-                      </TableCell>
-                      <TableCell>
-                        {data?.underBillingresult
-                          .reduce((sum, item) => sum + item.totalWeight, 0)
-                          .toFixed(2) || "0.00"}
-                      </TableCell>
-                      <TableCell>
-                        {data?.billedResult.reduce((sum, item) => sum + item.totalCount, 0) || 0}
-                      </TableCell>
-                      <TableCell>
-                        {data?.billedResult
-                          .reduce((sum, item) => sum + item.totalWeight, 0)
-                          .toFixed(2) || "0.00"}
-                      </TableCell>
-                      <TableCell>
-                        {data?.doIssuedresult.reduce((sum, item) => sum + item.totalCount, 0) || 0}
-                      </TableCell>
-                      <TableCell>
-                        {data?.doIssuedresult
-                          .reduce((sum, item) => sum + item.totalWeight, 0)
-                          .toFixed(2) || "0.00"}
-                      </TableCell>
-                      <TableCell>{calculateTotalWeight().toFixed(2)}</TableCell>
-                      <TableCell>{calculateTotalWeight().toFixed(2)}</TableCell>
-                      <TableCell>0.00</TableCell>
-                      <TableCell>{calculateTotalWeight().toFixed(2)}</TableCell>
-                    </TableRow>
-                  </TableBody>
-                </Table>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+                        return (
+                          <TableRow key={locationName}>
+                            <TableCell>{locationName}</TableCell>
+                            <TableCell
+                              onClick={() => {
+                                handleViewGateInfo(underLoading);
+                              }}
+                              style={{ cursor: "pointer" }}
+                            >{underLoading?.totalCount || 0}
+                            </TableCell>
+                            <TableCell>{Math.round(underLoading?.totalWeight || 0)}</TableCell>
+                            <TableCell
+                              onClick={() => {
+                                handleViewGateInfo(underBilling);
+                              }}
+                              style={{ cursor: "pointer" }}
+                            >{underBilling?.totalCount || 0}</TableCell>
+                            <TableCell>{Math.round(underBilling?.totalWeight || 0)}</TableCell>
+                            <TableCell>{billed?.totalCount || 0}</TableCell>
+                            <TableCell>{Math.round(billed?.totalWeight || 0)}</TableCell>
+                            <TableCell
+                              onClick={() => {
+                                handleViewGateInfo(doIssued);
+                              }}
+                              style={{ cursor: "pointer" }}
+                            >{doIssued?.totalCount || 0}</TableCell>
+                            <TableCell>{Math.round(doIssued?.totalWeight || 0)}</TableCell>
+                            <TableCell>{Math.round(rowTotal)}</TableCell>
+                            <TableCell>{Math.round(billed?.totalWeight || 0)}</TableCell>
+                            <TableCell>0</TableCell>
+                            <TableCell>{Math.round((billed?.totalWeight || 0) + 0)}</TableCell>
+                          </TableRow>
+                        )
+                      })}
+                      <TableRow className="total-row">
+                        <TableCell>TOTAL</TableCell>
+                        <TableCell>
+                          {data?.underLoadingresult.reduce((sum, item) => sum + item.totalCount, 0) || 0}
+                        </TableCell>
+                        <TableCell>
+                          {Math.round(data?.underLoadingresult.reduce((sum, item) => sum + item.totalWeight, 0) || 0)}
+                        </TableCell>
+                        <TableCell>
+                          {data?.underBillingresult.reduce((sum, item) => sum + item.totalCount, 0) || 0}
+                        </TableCell>
+                        <TableCell>
+                          {Math.round(data?.underBillingresult.reduce((sum, item) => sum + item.totalWeight, 0) || 0)}
+                        </TableCell>
+                        <TableCell>
+                          {data?.billedResult.reduce((sum, item) => sum + item.totalCount, 0) || 0}
+                        </TableCell>
+                        <TableCell>
+                          {Math.round(data?.billedResult.reduce((sum, item) => sum + item.totalWeight, 0) || 0)}
+                        </TableCell>
+                        <TableCell>
+                          {data?.doIssuedresult.reduce((sum, item) => sum + item.totalCount, 0) || 0}
+                        </TableCell>
+                        <TableCell>
+                          {Math.round(data?.doIssuedresult.reduce((sum, item) => sum + item.totalWeight, 0) || 0)}
+                        </TableCell>
+                        <TableCell>{Math.round(calculateTotalWeight())}</TableCell>
+                        <TableCell>
+                          {Math.round(data?.billedResult.reduce((sum, item) => sum + item.totalWeight, 0) || 0)}
+                        </TableCell>
+                        <TableCell>0</TableCell>
+                        <TableCell>
+                          {Math.round((data?.billedResult.reduce((sum, item) => sum + item.totalWeight, 0) || 0) + 0)}
+                        </TableCell>
+                      </TableRow>
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
       </div>
+
+      <BootstrapDialog
+        onClose={handleCloseGateInfoDialog}
+        className="billing-status-gate-info-dialog-styles"
+        aria-labelledby="customized-dialog-title"
+        open={openGateInfoDialog}
+      >
+        <div className="billing-status-gate-info-dialog-container">
+          <div
+            aria-label="close"
+            onClick={handleCloseGateInfoDialog}
+            className="billing-status-gate-info-dialog-close-icon"
+          >
+            <Image src={CloseButtonIcon} alt="close" />
+          </div>
+          <div className="billing-status-gate-info-modal-details">
+            <div className="billing-status-gate-info-detail-item">
+              <span className="billing-status-gate-info-detail-label">Location Name:</span>
+              <span className="billing-status-gate-info-detail-value">{selectedGateInfoData?.locationName || ''}</span>
+            </div>
+            <div className="billing-status-gate-info-detail-item">
+              <span className="billing-status-gate-info-detail-label">Total Count:</span>
+              <span className="billing-status-gate-info-detail-value">{selectedGateInfoData?.totalCount || 0}</span>
+            </div>
+            <div className="billing-status-gate-info-detail-item">
+              <span className="billing-status-gate-info-detail-label">Total Weight:</span>
+              <span className="billing-status-gate-info-detail-value">{selectedGateInfoData?.totalWeight || 0} kg</span>
+            </div>
+          </div>
+          <div className="billing-status-gate-info-gate-in-list">
+            <h3>Gate In Numbers</h3>
+            <ul>
+              {selectedGateInfoData &&
+                selectedGateInfoData.gi &&
+                selectedGateInfoData.gi.length > 0 &&
+                selectedGateInfoData?.gi?.map((number: string, index: number) => (
+                  <li key={index}>{number}</li>
+                ))}
+            </ul>
+          </div>
+        </div>
+      </BootstrapDialog>
 
       <style jsx global>{`
         .billing-table-container {
@@ -490,12 +574,6 @@ export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatus
           overflow: hidden;
           position: relative;
           z-index: 1;
-        }
-
-        .table-wrapper {
-          // height: calc(100% - 48px);
-          // overflow: auto;
-          // padding-left: 1rem;
         }
 
         table {
@@ -593,17 +671,120 @@ export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatus
         .datetime-icon {
           color: ${currentTheme.textSecondary};
         }
+      
+               
+        .billing-status-gate-info-dialog-styles {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .billing-status-gate-info-dialog-styles .billing-status-gate-info-dialog-container {
+            position: relative;
+            display: inline-block;
+            border-radius: 12px !important;
+            overflow-y: unset;
+            width: 60vw !important;
+            max-width: 60vw !important;
+            background-color: white;
+        }
+
+        .billing-status-gate-info-dialog-styles .MuiDialog-container .MuiDialog-paper {
+            position: relative;
+            border-radius: 12px !important;
+            max-height: 70%;
+            overflow-y: unset;
+            width: 60vw !important;
+            max-width: 60vw !important;
+        }
+
+        .billing-status-gate-info-dialog-styles .billing-status-gate-info-dialog-close-icon {
+            position: absolute;
+            top: -40px;
+            right: -2px;
+            cursor: pointer;
+            z-index: 1000;
+        }
+
+        .billing-status-gate-info-dialog-container{
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: flex-start;
+            width: 100%;
+            height: 100%;
+            padding: 16px;
+        }
+
+        .billing-status-gate-info-dialog-title {
+            text-align: left;
+            font-size: 20px;
+            font-weight: 600;
+            color: #000;
+        }
+
+        .billing-status-gate-info-modal-details {
+          display: flex;
+          justify-content: space-between;
+          margin-bottom: 1.5rem;
+        }
+
+        .billing-status-gate-info-detail-item {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        }
+
+        .billing-status-gate-info-detail-label {
+          font-size: 0.9rem;
+          color: #666;
+          margin-bottom: 0.25rem;
+        }
+
+        .billing-status-gate-info-detail-value {
+          font-size: 1.2rem;
+          font-weight: bold;
+          color: #333;
+        }
+
+        .billing-status-gate-info-gate-in-list {
+          background-color: #f8f9fa;
+          border-radius: 6px;
+          padding: 1rem;
+        }
+
+        .billing-status-gate-info-gate-in-list h3 {
+          font-size: 1.1rem;
+          color: #333;
+          margin-bottom: 0.5rem;
+        }
+
+        .billing-status-gate-info-gate-in-list ul {
+          list-style-type: none;
+          padding: 0;
+          margin: 0;
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+          gap: 0.5rem;
+        }
+
+        .billing-status-gate-info-gate-in-list li {
+          background-color: #e9ecef;
+          border-radius: 4px;
+          padding: 0.5rem;
+          font-size: 0.9rem;
+          text-align: center;
+          color: #495057;
+        }
 
         @media (max-width: 768px) {
           .billing-table-container {
             // padding: 0.5rem;
             margin-top: 0;
             min-height: 100vh;
-            width: 100vw;
+            width: 100%;
           }
 
           .mobile-container {
-            padding: 10px 16px 50px 16px;
+            padding: 10px 16px 90px 16px;
             display: flex;
             flex-direction: column;
             gap: 12px;
@@ -663,7 +844,7 @@ export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatus
           .total-card {
             background: ${currentTheme.cardBg};
             position: fixed;
-            bottom: 60px;
+            bottom: 52px;
             left: 0;
             right: 0;
             padding: 12px 16px;
@@ -689,6 +870,6 @@ export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatus
           }
         }
       `}</style>
-    </div>
+    </>
   )
 }

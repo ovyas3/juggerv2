@@ -18,6 +18,7 @@ import { jsontocsv } from "@/utils/jsonToCsv";
 import { LineChart } from "@/components/Charts/LineChart";
 import dayjs from "dayjs";
 import "./page.css";
+import TotalTrips from './TotalTrips';
 
 const { RangePicker } = DatePicker;
 
@@ -409,7 +410,10 @@ export default function DispatchTrend() {
             <SideDrawer />
           </div>
         )}
-        <div className="main-content">{mainContent}</div>
+        <div className="main-content">
+          {mainContent}
+          <TotalTrips />
+        </div>
       </div>
       {isMobile && <MobileDrawer />}
     </div>
