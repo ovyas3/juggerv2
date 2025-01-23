@@ -172,7 +172,7 @@ export default function DispatchTrend() {
                 style={{ margin: !mobile ? '56px 0 0 70px' : '0px' }}
             >
                 {mobile && (
-                    <h1 className={styles.title}>Invoicing Trends</h1>
+                    <h1 className={styles.title}>Trends</h1>
                 )}
                 <div className={styles.header}>
                     <div className={styles.filterGroup}>

@@ -400,12 +400,14 @@ export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatus
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead rowSpan={2}>Shop</TableHead>
+                        <TableHead rowSpan={2} style={{
+                          textAlign: "left"
+                        }}>Shop</TableHead>
                         <TableHead colSpan={2}>Under Loading</TableHead>
                         <TableHead colSpan={2}>Under Invoicing</TableHead>
                         <TableHead colSpan={2}>Billed</TableHead>
                         <TableHead colSpan={2}>DO Issued</TableHead>
-                        <TableHead rowSpan={2}>Total Qty (MT)</TableHead>
+                        <TableHead rowSpan={2}>Total Potential (MT)</TableHead>
                         <TableHead colSpan={2}>Mode</TableHead>
                         <TableHead rowSpan={2}>G. Total Qty (MT)</TableHead>
                       </TableRow>
@@ -445,7 +447,9 @@ export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatus
 
                         return (
                           <TableRow key={locationName}>
-                            <TableCell>{locationName}</TableCell>
+                            <TableCell style={{
+                              textAlign: "left"
+                            }}>{locationName}</TableCell>
                             <TableCell
                               onClick={() => {
                                 handleViewGateInfo(underLoading);

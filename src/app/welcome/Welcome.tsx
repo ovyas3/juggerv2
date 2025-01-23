@@ -41,7 +41,7 @@ const items = [
   },
   {
     icon: <Image src={DispatchIcon} alt="Road Invoicing" width={24} height={24} />,
-    title: "Road Invoicing Dashboard",
+    title: "Invoicing Day / Shift Wise",
     description: "Manage and track road invoicing with ease and precision.",
     color: "linear-gradient(135deg, #ff7f50, #ffa07a)",
     redirect: '/plantSchedule'
@@ -55,7 +55,7 @@ const items = [
   },
   {
     icon: <Image src={DispatchTrendInactive} alt="Invoicing Trend" width={24} height={24} />,
-    title: "Invoicing Trends",
+    title: "Trends",
     description: "Visualize and analyze invoicing trends over time.",
     color: "linear-gradient(135deg, #4682b4, #87cefa)",
     redirect: '/invoicingTrends'
