@@ -19,9 +19,12 @@ import {
   ProfileOutlined,
   SettingOutlined
 } from '@ant-design/icons';
-import { Dayjs } from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
 import { ShipperSettingsModal } from '../PlantSchedule/ShipperSettingsModal';
 import { TargetSettingsModal } from '../PlantSchedule/TargetSettingsModal';
+import { httpsGet } from '@/utils/Communication';
+import { useRouter } from 'next/navigation';
+import { convertToUTC } from '@/utils/dateUtils';
 
 const themes = {
   navy: {
@@ -188,11 +191,12 @@ export const CommonHeader: React.FC<CommonHeaderProps> = ({
   alwaysShowDatePicker = false,
   hideDatePickerDuringRefresh = false
 }) => {
-  
+  const router = useRouter();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [isShipperSettingsVisible, setIsShipperSettingsVisible] = useState(false);
   const [isTargetSettingsVisible, setIsTargetSettingsVisible] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [millTargets, setMillTargets] = useState([]);
 
   const handleRefreshClick = () => {
     if (!loading && fetchData && selectedDate) {
@@ -221,8 +225,18 @@ export const CommonHeader: React.FC<CommonHeaderProps> = ({
     setIsShipperSettingsVisible(true);
   };
 
-  const handleTargetSettingsOpen = () => {
-    setIsTargetSettingsVisible(true);
+  const handleTargetSettingsOpen = async () => {
+    console.log('Target Settings clicked');
+    try {
+      const date = dayjs().startOf('day');
+      const formatDate = convertToUTC(date);
+      const response = await httpsGet(`invoice/mills_target?from=${formatDate}&isTargetMill=true`, 0, router);
+      setMillTargets(response.data);
+    } catch (error) {
+      console.error('Failed to fetch mills data');
+    } finally {
+      setIsTargetSettingsVisible(true);
+    }
   };
 
   const modifiedAccountMenu = [
@@ -353,6 +367,7 @@ export const CommonHeader: React.FC<CommonHeaderProps> = ({
           visible={isTargetSettingsVisible}
           onCancel={() => setIsTargetSettingsVisible(false)}
           theme={themes[currentTheme]}
+          initialMillTargets={millTargets} 
         />
       </Header>
     );
@@ -442,6 +457,7 @@ export const CommonHeader: React.FC<CommonHeaderProps> = ({
         visible={isTargetSettingsVisible}
         onCancel={() => setIsTargetSettingsVisible(false)}
         theme={themes[currentTheme]}
+        initialMillTargets={millTargets} 
       />
     </Header>
   );
