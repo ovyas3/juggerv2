@@ -4,6 +4,14 @@
     min-height: 100vh;
 }
 
+.title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 1rem;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
 .header {
     display: flex;
     justify-content: space-between;
@@ -44,8 +52,8 @@
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    padding: 0.75rem 1.5rem;
-    border-radius: 10px;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
     font-weight: 500;
     transition: all 0.2s;
     border: none;
@@ -63,6 +71,16 @@
     background: #2563eb;
 }
 
+.clearButton {
+    composes: button;
+    background: red;
+    color: white;
+}
+
+.clearButton:hover {
+    background: #b91c1c;
+}
+
 .searchButton {
     composes: button;
     background: #34D399;
@@ -70,7 +88,7 @@
 }
 
 .searchButton:hover {
-    background: #10B981; 
+    background: #10B981;
 }
 
 .downloadButton {
@@ -89,10 +107,11 @@
     padding: 2rem;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     margin-top: 2rem;
-    max-height: calc(100vh - 10vh);
+    min-height: 70vh;
 
     @media screen and (max-width: 768px) {
         padding: 0.5rem;
+        min-height: 80vh;
     }
 }
 
@@ -121,6 +140,70 @@
     font-weight: 600;
     color: #1e293b;
 }
+
+.materialSelect {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 1;
+    margin-bottom: 1rem;
+
+    @media (max-width: 768px) {
+        flex-direction: column;
+    }
+}
+
+.controls {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+
+    @media screen and (max-width: 768px) {
+        justify-content: center;
+    }
+}
+
+.timeScaleToggle {
+    display: flex;
+}
+
+.toggleButton {
+    padding: 8px 16px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    color: #333;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.toggleButton:first-child {
+    border-top-left-radius: 20px;
+    border-bottom-left-radius: 20px;
+}
+
+.toggleButton:last-child {
+    border-top-right-radius: 20px;
+    border-bottom-right-radius: 20px;
+}
+
+.toggleButton.active {
+    background-color: #3b82f6;
+    color: #fff;
+    border-color: #3b82f6;
+}
+
+.toggleButton:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.chartContainer {
+    height: 400px;
+}
+
 
 @media (max-width: 768px) {
     .container {

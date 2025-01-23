@@ -3,7 +3,10 @@
   background-size: cover;
   min-height: 100vh;
   padding: 20px;
-  margin: 56px 0 0 76px;
+
+  @media screen and (max-width: 600px) {
+    padding: 12px;
+  }
 }
 
 .glassy-card {

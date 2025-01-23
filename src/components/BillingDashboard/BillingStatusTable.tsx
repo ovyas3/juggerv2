@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { format } from "date-fns"
 import { Calendar, Clock } from "lucide-react"
+import { Spin } from 'antd';
 import {
   Table,
   TableBody,
@@ -17,6 +18,7 @@ import { styled } from "@mui/material/styles";
 import Dialog from '@mui/material/Dialog';
 import CloseButtonIcon from "@/assets/close_icon.svg";
 import Image from "next/image"
+
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialogContent-root": {
     padding: theme.spacing(2),
@@ -25,6 +27,7 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
     padding: theme.spacing(1),
   },
 }));
+
 
 const themes = {
   navy: {
@@ -258,13 +261,13 @@ export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatus
 
   const renderMobileView = () => {
     return (
-      <div className="mobile-container"  style={{ 
-        background: currentTheme.background, 
-        color: currentTheme.text 
+      <div className="mobile-container" style={{
+        background: currentTheme.background,
+        color: currentTheme.text
       }}>
-        <div className="datetime-container" style={{ 
-          background: currentTheme.primary, 
-          color: currentTheme.text 
+        <div className="datetime-container" style={{
+          background: currentTheme.primary,
+          color: currentTheme.text
         }}>
           <div className="date-display">
             <Calendar className="datetime-icon" size={16} />
@@ -289,15 +292,15 @@ export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatus
             (item) => item.material === locationName
           )
 
-          const rowTotal = 
+          const rowTotal =
             (underLoading?.totalWeight || 0) +
             (underBilling?.totalWeight || 0) +
             (doIssued?.totalWeight || 0) +
             (billed?.totalWeight || 0);
 
           return (
-            <div key={locationName} className="mobile-card" style={{ 
-              background: currentTheme.cardBg, 
+            <div key={locationName} className="mobile-card" style={{
+              background: currentTheme.cardBg,
               color: currentTheme.textSecondary,
               border: `1px solid ${currentTheme.primary}`
             }}>
@@ -322,7 +325,7 @@ export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatus
                   </div>
                 </div>
                 <div className="section">
-                  <h4>Under Billing</h4>
+                  <h4>Under Invoicing</h4>
                   <div className="stats">
                     <div>Vehicles: {underBilling?.totalCount || 0}</div>
                     <div>Qty: {Math.round(underBilling?.totalWeight || 0)} MT</div>
@@ -346,9 +349,9 @@ export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatus
             </div>
           )
         })}
-        <div className="total-card" style={{ 
-          background: currentTheme.primary, 
-          color: currentTheme.text 
+        <div className="total-card" style={{
+          background: currentTheme.primary,
+          color: currentTheme.text
         }}>
           <div className="card-header">
             <div className="shop-name">TOTAL</div>
@@ -363,84 +366,86 @@ export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatus
     setOpenGateInfoDialog(false)
     setSelectedGateInfoData(null)
   };
+
   const handleViewGateInfo = (data: any) => {
     console.log(data, "data");
     setSelectedGateInfoData(data)
     setOpenGateInfoDialog(true)
   };
+
   return (
     <>
-    <div className="billing-table-container">
-      <div className="table-section">
-        <Card className="table-card">
-          <CardContent className="p-0 h-full flex flex-col">
-            {!isMobile && (
-              <div className="table-header">
-                <div className="datetime-container">
-                  <div className="date-display">
-                    <Calendar className="datetime-icon" size={16} />
-                    <span>Date: {format(currentTime, "dd-MMM-yy")}</span>
-                  </div>
-                  <div className="time-display">
-                    <Clock className="datetime-icon" size={16} />
-                    <span>Time: {format(currentTime, "hh:mm a")}</span>
+      <div className="billing-table-container">
+        <div className="table-section">
+          <Card className="table-card">
+            <CardContent className="p-0 h-full flex flex-col">
+              {!isMobile && (
+                <div className="table-header">
+                  <div className="datetime-container">
+                    <div className="date-display">
+                      <Calendar className="datetime-icon" size={16} />
+                      <span>Date: {format(currentTime, "dd-MMM-yy")}</span>
+                    </div>
+                    <div className="time-display">
+                      <Clock className="datetime-icon" size={16} />
+                      <span>Time: {format(currentTime, "hh:mm a")}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
-            {isMobile ? (
-              renderMobileView()
-            ) : (
-              <div className="table-wrapper">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead rowSpan={2}>Shop</TableHead>
-                      <TableHead colSpan={2}>Under Loading</TableHead>
-                      <TableHead colSpan={2}>Under Billing</TableHead>
-                      <TableHead colSpan={2}>Billed</TableHead>
-                      <TableHead colSpan={2}>DO Issued</TableHead>
-                      <TableHead rowSpan={2}>Total Qty (MT)</TableHead>
-                      <TableHead colSpan={2}>Mode</TableHead>
-                      <TableHead rowSpan={2}>G. Total Qty (MT)</TableHead>
-                    </TableRow>
-                    <TableRow>
-                      <TableHead>No. of Veh.</TableHead>
-                      <TableHead>Qty (MT)</TableHead>
-                      <TableHead>No. of Veh.</TableHead>
-                      <TableHead>Qty (MT)</TableHead>
-                      <TableHead>No. of Veh.</TableHead>
-                      <TableHead>Qty (MT)</TableHead>
-                      <TableHead>No. of Veh.</TableHead>
-                      <TableHead>Qty (MT)</TableHead>
-                      <TableHead>By Road</TableHead>
-                      <TableHead>By Rake</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {allLocations.map((locationName) => {
-                      const underLoading = data?.underLoadingresult.find(
-                        (item) => item.locationName === locationName
-                      )
-                      const underBilling = data?.underBillingresult.find(
-                        (item) => item.locationName === locationName
-                      )
-                      const doIssued = data?.doIssuedresult.find(
-                        (item) => item.locationName === locationName
-                      )
-                      const billed = data?.billedResult.find(
-                        (item) => item.material === locationName
-                      )
+              )}
+              {isMobile ? (
+                renderMobileView()
+              ) : (
+                <div className="table-wrapper">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead rowSpan={2}>Shop</TableHead>
+                        <TableHead colSpan={2}>Under Loading</TableHead>
+                        <TableHead colSpan={2}>Under Invoicing</TableHead>
+                        <TableHead colSpan={2}>Billed</TableHead>
+                        <TableHead colSpan={2}>DO Issued</TableHead>
+                        <TableHead rowSpan={2}>Total Qty (MT)</TableHead>
+                        <TableHead colSpan={2}>Mode</TableHead>
+                        <TableHead rowSpan={2}>G. Total Qty (MT)</TableHead>
+                      </TableRow>
+                      <TableRow>
+                        <TableHead>No. of Veh.</TableHead>
+                        <TableHead>Qty (MT)</TableHead>
+                        <TableHead>No. of Veh.</TableHead>
+                        <TableHead>Qty (MT)</TableHead>
+                        <TableHead>No. of Veh.</TableHead>
+                        <TableHead>Qty (MT)</TableHead>
+                        <TableHead>No. of Veh.</TableHead>
+                        <TableHead>Qty (MT)</TableHead>
+                        <TableHead>By Road (MT)</TableHead>
+                        <TableHead>By Rake</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {allLocations.map((locationName) => {
+                        const underLoading = data?.underLoadingresult.find(
+                          (item) => item.locationName === locationName
+                        )
+                        const underBilling = data?.underBillingresult.find(
+                          (item) => item.locationName === locationName
+                        )
+                        const doIssued = data?.doIssuedresult.find(
+                          (item) => item.locationName === locationName
+                        )
+                        const billed = data?.billedResult.find(
+                          (item) => item.material === locationName
+                        )
 
-                      const rowTotal = 
-                        (underLoading?.totalWeight || 0) +
-                        (underBilling?.totalWeight || 0) +
-                        (doIssued?.totalWeight || 0) +
-                        (billed?.totalWeight || 0);
+                        const rowTotal =
+                          (underLoading?.totalWeight || 0) +
+                          (underBilling?.totalWeight || 0) +
+                          (doIssued?.totalWeight || 0) +
+                          (billed?.totalWeight || 0);
 
-                      return (
-                        <TableRow key={locationName}>
-                          <TableCell>{locationName}</TableCell>
+                        return (
+                          <TableRow key={locationName}>
+                            <TableCell>{locationName}</TableCell>
                             <TableCell
                               onClick={() => {
                                 handleViewGateInfo(underLoading);
@@ -448,73 +453,74 @@ export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatus
                               style={{ cursor: "pointer" }}
                             >{underLoading?.totalCount || 0}
                             </TableCell>
-                          <TableCell>{Math.round(underLoading?.totalWeight || 0)}</TableCell>
+                            <TableCell>{Math.round(underLoading?.totalWeight || 0)}</TableCell>
                             <TableCell
                               onClick={() => {
                                 handleViewGateInfo(underBilling);
                               }}
                               style={{ cursor: "pointer" }}
                             >{underBilling?.totalCount || 0}</TableCell>
-                          <TableCell>{Math.round(underBilling?.totalWeight || 0)}</TableCell>
-                          <TableCell>{billed?.totalCount || 0}</TableCell>
-                          <TableCell>{Math.round(billed?.totalWeight || 0)}</TableCell>
+                            <TableCell>{Math.round(underBilling?.totalWeight || 0)}</TableCell>
+                            <TableCell>{billed?.totalCount || 0}</TableCell>
+                            <TableCell>{Math.round(billed?.totalWeight || 0)}</TableCell>
                             <TableCell
                               onClick={() => {
                                 handleViewGateInfo(doIssued);
                               }}
                               style={{ cursor: "pointer" }}
                             >{doIssued?.totalCount || 0}</TableCell>
-                          <TableCell>{Math.round(doIssued?.totalWeight || 0)}</TableCell>
-                          <TableCell>{Math.round(rowTotal)}</TableCell>
-                          <TableCell>{Math.round(billed?.totalWeight || 0)}</TableCell>
-                          <TableCell>0</TableCell>
-                          <TableCell>{Math.round((billed?.totalWeight || 0) + 0)}</TableCell>
-                        </TableRow>
-                      )
-                    })}
-                    <TableRow className="total-row">
-                      <TableCell>TOTAL</TableCell>
-                      <TableCell>
-                        {data?.underLoadingresult.reduce((sum, item) => sum + item.totalCount, 0) || 0}
-                      </TableCell>
-                      <TableCell>
-                        {Math.round(data?.underLoadingresult.reduce((sum, item) => sum + item.totalWeight, 0) || 0)}
-                      </TableCell>
-                      <TableCell>
-                        {data?.underBillingresult.reduce((sum, item) => sum + item.totalCount, 0) || 0}
-                      </TableCell>
-                      <TableCell>
-                        {Math.round(data?.underBillingresult.reduce((sum, item) => sum + item.totalWeight, 0) || 0)}
-                      </TableCell>
-                      <TableCell>
-                        {data?.billedResult.reduce((sum, item) => sum + item.totalCount, 0) || 0}
-                      </TableCell>
-                      <TableCell>
-                        {Math.round(data?.billedResult.reduce((sum, item) => sum + item.totalWeight, 0) || 0)}
-                      </TableCell>
-                      <TableCell>
-                        {data?.doIssuedresult.reduce((sum, item) => sum + item.totalCount, 0) || 0}
-                      </TableCell>
-                      <TableCell>
-                        {Math.round(data?.doIssuedresult.reduce((sum, item) => sum + item.totalWeight, 0) || 0)}
-                      </TableCell>
-                      <TableCell>{Math.round(calculateTotalWeight())}</TableCell>
-                      <TableCell>
-                        {Math.round(data?.billedResult.reduce((sum, item) => sum + item.totalWeight, 0) || 0)}
-                      </TableCell>
-                      <TableCell>0</TableCell>
-                      <TableCell>
-                        {Math.round((data?.billedResult.reduce((sum, item) => sum + item.totalWeight, 0) || 0) + 0)}
-                      </TableCell>
-                    </TableRow>
-                  </TableBody>
-                </Table>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+                            <TableCell>{Math.round(doIssued?.totalWeight || 0)}</TableCell>
+                            <TableCell>{Math.round(rowTotal)}</TableCell>
+                            <TableCell>{Math.round(billed?.totalWeight || 0)}</TableCell>
+                            <TableCell>0</TableCell>
+                            <TableCell>{Math.round((billed?.totalWeight || 0) + 0)}</TableCell>
+                          </TableRow>
+                        )
+                      })}
+                      <TableRow className="total-row">
+                        <TableCell>TOTAL</TableCell>
+                        <TableCell>
+                          {data?.underLoadingresult.reduce((sum, item) => sum + item.totalCount, 0) || 0}
+                        </TableCell>
+                        <TableCell>
+                          {Math.round(data?.underLoadingresult.reduce((sum, item) => sum + item.totalWeight, 0) || 0)}
+                        </TableCell>
+                        <TableCell>
+                          {data?.underBillingresult.reduce((sum, item) => sum + item.totalCount, 0) || 0}
+                        </TableCell>
+                        <TableCell>
+                          {Math.round(data?.underBillingresult.reduce((sum, item) => sum + item.totalWeight, 0) || 0)}
+                        </TableCell>
+                        <TableCell>
+                          {data?.billedResult.reduce((sum, item) => sum + item.totalCount, 0) || 0}
+                        </TableCell>
+                        <TableCell>
+                          {Math.round(data?.billedResult.reduce((sum, item) => sum + item.totalWeight, 0) || 0)}
+                        </TableCell>
+                        <TableCell>
+                          {data?.doIssuedresult.reduce((sum, item) => sum + item.totalCount, 0) || 0}
+                        </TableCell>
+                        <TableCell>
+                          {Math.round(data?.doIssuedresult.reduce((sum, item) => sum + item.totalWeight, 0) || 0)}
+                        </TableCell>
+                        <TableCell>{Math.round(calculateTotalWeight())}</TableCell>
+                        <TableCell>
+                          {Math.round(data?.billedResult.reduce((sum, item) => sum + item.totalWeight, 0) || 0)}
+                        </TableCell>
+                        <TableCell>0</TableCell>
+                        <TableCell>
+                          {Math.round((data?.billedResult.reduce((sum, item) => sum + item.totalWeight, 0) || 0) + 0)}
+                        </TableCell>
+                      </TableRow>
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
       </div>
-      </div>
+
       <BootstrapDialog
         onClose={handleCloseGateInfoDialog}
         className="billing-status-gate-info-dialog-styles"
@@ -532,7 +538,7 @@ export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatus
           <div className="billing-status-gate-info-modal-details">
             <div className="billing-status-gate-info-detail-item">
               <span className="billing-status-gate-info-detail-label">Location Name:</span>
-              <span className="billing-status-gate-info-detail-value">{selectedGateInfoData?.locationName || '' }</span>
+              <span className="billing-status-gate-info-detail-value">{selectedGateInfoData?.locationName || ''}</span>
             </div>
             <div className="billing-status-gate-info-detail-item">
               <span className="billing-status-gate-info-detail-label">Total Count:</span>
@@ -546,12 +552,12 @@ export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatus
           <div className="billing-status-gate-info-gate-in-list">
             <h3>Gate In Numbers</h3>
             <ul>
-              {selectedGateInfoData && 
-              selectedGateInfoData.gi && 
-              selectedGateInfoData.gi.length > 0 && 
-              selectedGateInfoData?.gi?.map((number: string, index: number) => (
-                <li key={index}>{number}</li>
-              ))}
+              {selectedGateInfoData &&
+                selectedGateInfoData.gi &&
+                selectedGateInfoData.gi.length > 0 &&
+                selectedGateInfoData?.gi?.map((number: string, index: number) => (
+                  <li key={index}>{number}</li>
+                ))}
             </ul>
           </div>
         </div>
@@ -568,7 +574,6 @@ export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatus
           overflow: hidden;
           position: relative;
           z-index: 1;
-
         }
 
         table {
@@ -666,9 +671,12 @@ export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatus
         .datetime-icon {
           color: ${currentTheme.textSecondary};
         }
+      
+               
         .billing-status-gate-info-dialog-styles {
             font-family: 'Plus Jakarta Sans', sans-serif;
         }
+
         .billing-status-gate-info-dialog-styles .billing-status-gate-info-dialog-container {
             position: relative;
             display: inline-block;
@@ -678,6 +686,7 @@ export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatus
             max-width: 60vw !important;
             background-color: white;
         }
+
         .billing-status-gate-info-dialog-styles .MuiDialog-container .MuiDialog-paper {
             position: relative;
             border-radius: 12px !important;
@@ -686,6 +695,7 @@ export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatus
             width: 60vw !important;
             max-width: 60vw !important;
         }
+
         .billing-status-gate-info-dialog-styles .billing-status-gate-info-dialog-close-icon {
             position: absolute;
             top: -40px;
@@ -693,6 +703,7 @@ export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatus
             cursor: pointer;
             z-index: 1000;
         }
+
         .billing-status-gate-info-dialog-container{
             display: flex;
             flex-direction: column;
@@ -702,42 +713,50 @@ export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatus
             height: 100%;
             padding: 16px;
         }
+
         .billing-status-gate-info-dialog-title {
             text-align: left;
             font-size: 20px;
             font-weight: 600;
             color: #000;
         }
+
         .billing-status-gate-info-modal-details {
           display: flex;
           justify-content: space-between;
           margin-bottom: 1.5rem;
         }
+
         .billing-status-gate-info-detail-item {
           display: flex;
           flex-direction: column;
           align-items: center;
         }
+
         .billing-status-gate-info-detail-label {
           font-size: 0.9rem;
           color: #666;
           margin-bottom: 0.25rem;
         }
+
         .billing-status-gate-info-detail-value {
           font-size: 1.2rem;
           font-weight: bold;
           color: #333;
         }
+
         .billing-status-gate-info-gate-in-list {
           background-color: #f8f9fa;
           border-radius: 6px;
           padding: 1rem;
         }
+
         .billing-status-gate-info-gate-in-list h3 {
           font-size: 1.1rem;
           color: #333;
           margin-bottom: 0.5rem;
         }
+
         .billing-status-gate-info-gate-in-list ul {
           list-style-type: none;
           padding: 0;
@@ -746,6 +765,7 @@ export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatus
           grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
           gap: 0.5rem;
         }
+
         .billing-status-gate-info-gate-in-list li {
           background-color: #e9ecef;
           border-radius: 4px;
@@ -760,11 +780,11 @@ export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatus
             // padding: 0.5rem;
             margin-top: 0;
             min-height: 100vh;
-            width: 100vw;
+            width: 100%;
           }
 
           .mobile-container {
-            padding: 10px 16px 50px 16px;
+            padding: 10px 16px 90px 16px;
             display: flex;
             flex-direction: column;
             gap: 12px;
@@ -824,7 +844,7 @@ export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatus
           .total-card {
             background: ${currentTheme.cardBg};
             position: fixed;
-            bottom: 60px;
+            bottom: 52px;
             left: 0;
             right: 0;
             padding: 12px 16px;

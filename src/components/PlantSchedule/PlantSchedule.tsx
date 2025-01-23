@@ -1755,7 +1755,7 @@ const PlantSchedule: React.FC = () => {
             }} />)}
           <Header theme={themes[currentTheme]}>
             <HeaderLeft theme={themes[currentTheme]}>
-              <h2>Road Dispatch Dashboard</h2>
+              <h2>Road Invoicing Dashboard</h2>
             </HeaderLeft>
             <HeaderRight theme={themes[currentTheme]}>
               <Typography.Text style={{ color: themes[currentTheme].textSecondary }}>
@@ -1798,7 +1798,7 @@ const PlantSchedule: React.FC = () => {
             width: '100%'
           }} />)}
         <CommonHeader
-          title="Road Dispatch Dashboard"
+          title="Road Invoicing Dashboard"
           currentTheme={currentTheme}
           selectedDate={selectedDate}
           handleDateChange={handleDateChange}
@@ -1836,7 +1836,7 @@ const PlantSchedule: React.FC = () => {
                     <StatsCard>
                       <StatItem theme={themes[currentTheme]}>
                         <div className="stat-header">
-                          <h3>Total billing (Road)</h3>
+                          <h3>Total Invoicing (Road) (MT)</h3>
                           <Tooltip title="Total materials scheduled for the selected shift">
                             <InfoCircleOutlined />
                           </Tooltip>
@@ -1847,7 +1847,7 @@ const PlantSchedule: React.FC = () => {
                       </StatItem>
                       <StatItem theme={themes[currentTheme]}>
                         <div className="stat-header">
-                          <h3>Average per Slot</h3>
+                          <h3>Average per Slot (MT)</h3>
                           <Tooltip title="Average materials per time slot in selected shift">
                             <InfoCircleOutlined />
                           </Tooltip>
@@ -1858,7 +1858,7 @@ const PlantSchedule: React.FC = () => {
                       </StatItem>
                       <StatItem theme={themes[currentTheme]}>
                         <div className="stat-header">
-                          <h3>Peak Volume</h3>
+                          <h3>Peak Volume (MT)</h3>
                           <Tooltip title="Highest volume in selected shift">
                             <InfoCircleOutlined />
                           </Tooltip>
@@ -1928,7 +1928,7 @@ const PlantSchedule: React.FC = () => {
                     <StatsCard>
                       <StatItem theme={themes[currentTheme]}>
                         <div className="stat-header">
-                          <h3>Total billing (Road)</h3>
+                          <h3>Total Invoicing (Road) (MT)</h3>
                           <Tooltip title="Total materials scheduled for the selected shift">
                             <InfoCircleOutlined />
                           </Tooltip>
@@ -1939,7 +1939,7 @@ const PlantSchedule: React.FC = () => {
                       </StatItem>
                       <StatItem theme={themes[currentTheme]}>
                         <div className="stat-header">
-                          <h3>Average per Slot</h3>
+                          <h3>Average per Slot (MT)</h3>
                           <Tooltip title="Average materials per time slot in selected shift">
                             <InfoCircleOutlined />
                           </Tooltip>
@@ -1950,7 +1950,7 @@ const PlantSchedule: React.FC = () => {
                       </StatItem>
                       <StatItem theme={themes[currentTheme]}>
                         <div className="stat-header">
-                          <h3>Peak Volume</h3>
+                          <h3>Peak Volume (MT)</h3>
                           <Tooltip title="Highest volume in selected shift">
                             <InfoCircleOutlined />
                           </Tooltip>

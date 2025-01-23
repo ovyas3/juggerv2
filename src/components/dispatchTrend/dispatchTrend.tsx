@@ -17,6 +17,10 @@ import { ThreeCircles } from "react-loader-spinner";
 
 const { RangePicker } = DatePicker;
 
+const defaultDateRange: [Date | null, Date | null] = [
+    new Date(new Date().setDate(new Date().getDate() - 7)),
+    new Date(),
+];
 export default function DispatchTrend() {
     const router = useRouter();
     const { showMessage } = useSnackbar();
@@ -26,10 +30,7 @@ export default function DispatchTrend() {
     const [dispatchData, setDispatchData] = useState([]);
 
     // Filter states
-    const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([
-        new Date(new Date().setDate(new Date().getDate() - 7)),
-        new Date(),
-    ]);
+    const [dateRange, setDateRange] = useState<[Date | null, Date | null]>(defaultDateRange);
     const [selectedCarriers, setSelectedCarriers] = useState<string[]>([]);
     const [selectedCustomers, setSelectedCustomers] = useState<string[]>([]);
     const [selectedMaterials, setSelectedMaterials] = useState<string[]>([]);
@@ -46,9 +47,10 @@ export default function DispatchTrend() {
 
     // Count states
     const [dispatchCount, setDispatchCount] = useState({
-        total: 0,
-        average: 0,
-        material: 0,
+        totalInvoicingOty: 0,
+        totalCountOfGateEntry: 0,
+        avergaeInvoicingPerDay: 0,
+        avergaeGateEntryPerDay: 0,
     });
 
     const getMaterialData = async () => {
@@ -57,10 +59,10 @@ export default function DispatchTrend() {
             from: dateRange[0],
             to: dateRange[1],
         };
-        if(selectedCarriers.length > 0) {
+        if (selectedCarriers.length > 0) {
             payload.transporters = selectedCarriers;
         };
-        if(selectedCustomers.length > 0) {
+        if (selectedCustomers.length > 0) {
             payload.customers = selectedCustomers;
         };
 
@@ -68,7 +70,7 @@ export default function DispatchTrend() {
         try {
             const response = await httpsPost('invoice/dispatchTrend', payload, router, 1, false);
             if (response?.statusCode === 200) {
-                const { carriers, dispatchTrend, locations } = response.data;
+                const { carriers, dispatchTrend, locations, shipments } = response.data;
                 // Carrier Options
                 if (carriers && carriers.length > 0) {
                     setCarrierOptions(carriers.map((carrier: any) => ({
@@ -84,20 +86,24 @@ export default function DispatchTrend() {
                     })));
                 };
                 // Dispatch Trend Data
-                if (dispatchTrend && dispatchTrend.length > 0) {
+                if (dispatchTrend && dispatchTrend.length > 0 && shipments > 0) {
                     setDispatchData(dispatchTrend);
                     const materials = Array.from(new Set(dispatchTrend.map((item: any) => item.material.name)));
                     setMaterialOptions(materials.map((material: any) => ({
                         value: material,
                         label: material,
                     })));
-                    const total = dispatchTrend.reduce((acc: any, item: any) => acc + item.totalWeight, 0);
-                    const average = (total / dispatchTrend.length).toFixed(2);
-                    const materialCount = materials.length;
+                    const totalInvoicingOty = Math.round(dispatchTrend.reduce((acc: any, item: any) => acc + item.totalWeight, 0));
+                    let uniqueDates = Array.from(new Set(dispatchTrend.map((item: any) => item.material.date)));
+                    let numberOfDays = uniqueDates.length;
+                    const shipmentsCount: number = shipments;
+                    const avergaeInvoicingPerDay = Math.round(totalInvoicingOty / numberOfDays);
+                    const avergaeGateEntryPerDay = Math.round(shipmentsCount / numberOfDays);
                     setDispatchCount({
-                        total: total.toFixed(2),
-                        average: parseFloat(average),
-                        material: materialCount,
+                        totalInvoicingOty: totalInvoicingOty,
+                        totalCountOfGateEntry: shipmentsCount,
+                        avergaeInvoicingPerDay: avergaeInvoicingPerDay,
+                        avergaeGateEntryPerDay: avergaeGateEntryPerDay,
                     });
 
                     const downloadData = dispatchTrend.map((series: any) => ({
@@ -140,6 +146,13 @@ export default function DispatchTrend() {
         }
     };
 
+    const handleClear = () => {
+        setSelectedCarriers([]);
+        setSelectedCustomers([]);
+        setDateRange(defaultDateRange);
+        getMaterialData();
+    };
+
     return (
         <>
             {/* Loader */}
@@ -158,6 +171,9 @@ export default function DispatchTrend() {
                 className={styles.container}
                 style={{ margin: !mobile ? '56px 0 0 70px' : '0px' }}
             >
+                {mobile && (
+                    <h1 className={styles.title}>Invoicing Trends</h1>
+                )}
                 <div className={styles.header}>
                     <div className={styles.filterGroup}>
                         <RangePicker
@@ -204,18 +220,6 @@ export default function DispatchTrend() {
                             getPopupContainer={(trigger) => trigger.parentElement!}
                             size="middle"
                         />
-                        {/* <Select
-                            mode="multiple"
-                            placeholder="Select Materials"
-                            value={selectedMaterials}
-                            onChange={setSelectedMaterials}
-                            options={materialOptions}
-                            className="w-full"
-                            popupClassName="select-popup"
-                            maxTagCount="responsive"
-                            getPopupContainer={(trigger) => trigger.parentElement!}
-                            size="middle"
-                        /> */}
                     </div>
                     <div className={styles.buttonGroup}>
                         <button className={styles.searchButton} onClick={() => {
@@ -236,7 +240,7 @@ export default function DispatchTrend() {
                             </svg>
                             Search
                         </button>
-                        <button className={styles.downloadButton} disabled={!downloadData} onClick={handleDownload}>
+                        {/* <button className={styles.downloadButton} disabled={!downloadData} onClick={handleDownload}>
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
                                 width="16"
@@ -253,7 +257,26 @@ export default function DispatchTrend() {
                                 <line x1="12" y1="15" x2="12" y2="3" />
                             </svg>
                             Download
-                        </button>
+                        </button> */}
+                        {selectedCarriers.length > 0 || selectedCustomers.length > 0 ||
+                            dateRange[0]?.getTime() !== defaultDateRange[0]?.getTime() || dateRange[1]?.getTime() !== defaultDateRange[1]?.getTime() ? (
+                            <button className={styles.clearButton} onClick={handleClear}>
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="16"
+                                    height="16"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                >
+                                    <line x1="18" y1="6" x2="6" y2="18" />
+                                    <line x1="6" y1="6" x2="18" y2="18" />
+                                </svg>
+                            </button>
+                        ) : null}
                         <button className={styles.refreshButton} onClick={handleRefresh}>
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -274,21 +297,27 @@ export default function DispatchTrend() {
 
                 <div className={styles.stats}>
                     <div className={styles.statCard}>
-                        <div className={styles.statLabel}>Total Weight</div>
+                        <div className={styles.statLabel}>Total Invoicing Qty. (MT)</div>
                         <div className={styles.statValue}>
-                            {dispatchCount.total} MT
+                            {dispatchCount.totalInvoicingOty}
                         </div>
                     </div>
                     <div className={styles.statCard}>
-                        <div className={styles.statLabel}>Average Weight</div>
+                        <div className={styles.statLabel}>Total Count of Gate Entry</div>
                         <div className={styles.statValue}>
-                            {dispatchCount.average} MT
+                            {dispatchCount.totalCountOfGateEntry}
                         </div>
                     </div>
                     <div className={styles.statCard}>
-                        <div className={styles.statLabel}>Material Types</div>
+                        <div className={styles.statLabel}>Average Invoicing / Day (MT)</div>
                         <div className={styles.statValue}>
-                            {dispatchCount.material}
+                            {dispatchCount.avergaeInvoicingPerDay}
+                        </div>
+                    </div>
+                    <div className={styles.statCard}>
+                        <div className={styles.statLabel}>Average Gate Entry / Day</div>
+                        <div className={styles.statValue}>
+                            {dispatchCount.avergaeGateEntryPerDay}
                         </div>
                     </div>
                 </div>

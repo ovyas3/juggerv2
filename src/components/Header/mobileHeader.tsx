@@ -12,9 +12,9 @@ export default function MobileHeader() {
             case '/externalParking':
                 return 'External Parking'
             case '/plantSchedule':
-                return 'Road Dispatch Dashboard'
-            case '/billingDashboard':
-                return 'Billing Dashboard'
+                return 'Road Invoicing Dashboard'
+            case '/invoicingDashboard':
+                return 'Invoicing Dashboard'
             default:
                 return 'Dashboard'
         }

@@ -12,8 +12,14 @@ import DispatchIcon from "@/assets/dispatch_icon.svg";
 import DispatchIconActive from "@/assets/dispatch_icon_active.svg";
 import BillingIcon from "@/assets/billing_icon.svg";
 import BillingIconActive from "@/assets/billing_icon_active.svg";
+import EWayBillInactive from "@/assets/eway_bill_bg_icon.svg";
+import EWayBillActive from "@/assets/eway_bill_wg_icon.svg";
 import DispatchTrendInactive from "@/assets/dispatch_trend_bg_icon.svg";
 import DispatchTrendActive from "@/assets/dispatch_trend_wg_icon.svg";
+import LeadDistanceInactive from "@/assets/lead_distance_analysis_bg_icon.svg";
+import LeadDistanceActive from "@/assets/lead_distance_analysis_wg_icon.svg";
+import FreightTrendsInactive from "@/assets/freight_trends_bg_icon.svg";
+import FreightTrendsActive from "@/assets/freight_trends_wg_icon.svg";
 
 interface NavItem {
     id: string;
@@ -35,29 +41,52 @@ const navigationItems: NavItem[] = [
     },
     {
         id: 'plantSchedule',
-        label: 'Road Dispatch Dashboard',
+        label: 'Road Invoicing Dashboard',
         icon: '',
         activeIcon: DispatchIconActive,
         inactiveIcon: DispatchIcon,
         isImageIcon: true
     },
     {
-        id: 'billingDashboard',
-        label: 'Billing Dashboard',
+        id: 'invoicingDashboard',
+        label: 'Invoicing Dashboard',
         icon: '',
         activeIcon: BillingIconActive,
         inactiveIcon: BillingIcon,
         isImageIcon: true
     },
     {
-        id: 'dispatchTrend',
-        label: 'Dispatch Trend',
+        id: 'invoicingTrends',
+        label: 'Invoicing Trends',
         icon: '',
         activeIcon: DispatchTrendActive,
         inactiveIcon: DispatchTrendInactive,
         isImageIcon: true
     },
-
+    // {
+    //     id: 'ewaybillDashboard',
+    //     label: 'eWaybill Dashboard',
+    //     icon: '',
+    //     activeIcon: EWayBillActive,
+    //     inactiveIcon: EWayBillInactive,
+    //     isImageIcon: true
+    // },
+    // {
+    //     id: 'leadDistanceAnalysis',
+    //     label: 'Lead (Distance) Analysis',
+    //     icon: '',
+    //     activeIcon: LeadDistanceActive,
+    //     inactiveIcon: LeadDistanceInactive,
+    //     isImageIcon: true
+    // },
+    // {
+    //     id: 'freightTrends',
+    //     label: 'Freight Trends Dashboard',
+    //     icon: '',
+    //     activeIcon: FreightTrendsActive,
+    //     inactiveIcon: FreightTrendsInactive,
+    //     isImageIcon: true
+    // }
 ];
 
 const NavItem = ({ 
