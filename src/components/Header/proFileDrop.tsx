@@ -134,12 +134,12 @@ export default function AccountMenu() {
             </div>
             Profile
         </MenuItem> */}
-        <MenuItem onClick={() => handleNavigation('/handlingAgent')} className="menuItem"  sx={{fontSize:14, fontWeight:500}}>
+        {/* <MenuItem onClick={() => handleNavigation('/handlingAgent')} className="menuItem"  sx={{fontSize:14, fontWeight:500}}>
             <div className="iconContainer">
               <img src={InviteIcon.src} className="translateIcon" style={{height: 14, width: 14}} />
             </div>
              {t('handlingAgent')}
-        </MenuItem>
+        </MenuItem> */}
 
         {/* <MenuItem onClick={handleClose} className="menuItem" sx={{fontSize:14, fontWeight:500}}>
             <div className="iconContainer">
