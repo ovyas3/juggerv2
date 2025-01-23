@@ -1,7 +1,9 @@
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
+// import timezone from 'dayjs/plugin/timezone';
 
 dayjs.extend(utc);
+// dayjs.extend(timezone);
 
 /**
  * Converts a date to UTC and returns it as an ISO string
@@ -55,3 +57,7 @@ export const generateDateRange = (
     
     return dates;
 };
+
+export function convertToUTC(date: string | dayjs.Dayjs): string {
+    return dayjs(date).utc().format();
+}

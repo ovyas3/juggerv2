@@ -1,0 +1,196 @@
+.mobileEwaybillcontainer {
+    padding: 1rem;
+    max-width: 100%;
+    margin: 0 auto;
+    overflow: hidden;
+}
+
+.mobileEwaybillheader {
+    margin-bottom: 0.8rem;
+}
+
+.mobileEwaybillheader h1 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #111827;
+    margin: 0;
+    line-height: 1.4;
+}
+
+.mobileEwaybillsearchContainer {
+    margin-bottom: 1.5rem;
+}
+
+.mobileEwaybillsearchInput {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    background-color: white;
+    margin-bottom: 0.75rem;
+}
+
+.mobileEwaybillsearchInput:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+}
+
+.mobileEwaybillresultCount {
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+.mobileEwaybillmobileCardGrid {
+    max-height: calc(100vh - 30vh);
+    overflow-y: auto;
+    display: grid;
+    gap: 1rem;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    scroll-behavior: smooth;
+
+    @media screen and (max-width: 376px) {
+        max-height: calc(100vh - 35vh);
+    }
+}
+
+.mobileEwaybillmobileCardGrid::-webkit-scrollbar {
+    display: none;
+}
+
+.mobileEwaybillcard {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+    transition: transform 0.2s ease;
+}
+
+.mobileEwaybillcard:active {
+    transform: scale(0.98);
+}
+
+.mobileEwaybillcardHeader {
+    padding: 1rem;
+    background: #f9fafb;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.mobileEwaybillnumber {
+    font-weight: 600;
+    color: #111827;
+    font-size: 0.875rem;
+    margin-bottom: 0.25rem;
+}
+
+.mobileEwaybillexpiryTime {
+    font-size: 0.75rem;
+    color: #6b7280;
+}
+
+.mobileEwaybillcardContent {
+    padding: 1rem;
+}
+
+.mobileEwaybillinfoRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+}
+
+.mobileEwaybillinfoRow:not(:last-child) {
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.mobileEwaybilllabel {
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+.mobileEwaybillvalue {
+    font-size: 0.875rem;
+    color: #111827;
+    font-weight: 500;
+    text-align: right;
+}
+
+.mobileEwaybillcustomerSection {
+    margin-top: 1rem;
+    border-top: 1px solid #e5e7eb;
+    padding-top: 1rem;
+}
+
+.mobileEwaybillcustomerButton {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    color: #374151;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.mobileEwaybillcustomerButton:hover {
+    background: #f3f4f6;
+}
+
+.mobileEwaybillcustomerButton svg {
+    transition: transform 0.2s ease;
+}
+
+.mobileEwaybillcustomerButton .mobileEwaybillrotated {
+    transform: rotate(180deg);
+}
+
+.mobileEwaybillcustomerDetails {
+    margin-top: 0.75rem;
+    padding: 0.75rem;
+    background: #f9fafb;
+    border-radius: 6px;
+    animation: slideDown 0.2s ease;
+}
+
+.mobileEwaybillcustomerName {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #111827;
+    margin-bottom: 0.25rem;
+}
+
+.mobileEwaybillcustomerAddress {
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-0.5rem);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive adjustments */
+@media (min-width: 640px) {
+    .mobileEwaybillmobileCardGrid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 639px) {
+    .mobileEwaybillcontainer {
+        padding: 1rem 0.75rem;
+    }
+}
