@@ -41,52 +41,52 @@ const navigationItems: NavItem[] = [
     },
     {
         id: 'plantSchedule',
-        label: 'Road Dispatch Dashboard',
+        label: 'Road Invoicing Dashboard',
         icon: '',
         activeIcon: DispatchIconActive,
         inactiveIcon: DispatchIcon,
         isImageIcon: true
     },
     {
-        id: 'billingDashboard',
-        label: 'Billing Dashboard',
+        id: 'invoicingDashboard',
+        label: 'Invoicing Dashboard',
         icon: '',
         activeIcon: BillingIconActive,
         inactiveIcon: BillingIcon,
         isImageIcon: true
     },
     {
-        id: 'dispatchTrend',
-        label: 'Dispatch Trend',
+        id: 'invoicingTrends',
+        label: 'Invoicing Trends',
         icon: '',
         activeIcon: DispatchTrendActive,
         inactiveIcon: DispatchTrendInactive,
         isImageIcon: true
     },
-    {
-        id: 'ewaybillDashboard',
-        label: 'eWaybill Dashboard',
-        icon: '',
-        activeIcon: EWayBillActive,
-        inactiveIcon: EWayBillInactive,
-        isImageIcon: true
-    },
-    {
-        id: 'leadDistanceAnalysis',
-        label: 'Lead (Distance) Analysis',
-        icon: '',
-        activeIcon: LeadDistanceActive,
-        inactiveIcon: LeadDistanceInactive,
-        isImageIcon: true
-    },
-    {
-        id: 'freightTrends',
-        label: 'Freight Trends Dashboard',
-        icon: '',
-        activeIcon: FreightTrendsActive,
-        inactiveIcon: FreightTrendsInactive,
-        isImageIcon: true
-    }
+    // {
+    //     id: 'ewaybillDashboard',
+    //     label: 'eWaybill Dashboard',
+    //     icon: '',
+    //     activeIcon: EWayBillActive,
+    //     inactiveIcon: EWayBillInactive,
+    //     isImageIcon: true
+    // },
+    // {
+    //     id: 'leadDistanceAnalysis',
+    //     label: 'Lead (Distance) Analysis',
+    //     icon: '',
+    //     activeIcon: LeadDistanceActive,
+    //     inactiveIcon: LeadDistanceInactive,
+    //     isImageIcon: true
+    // },
+    // {
+    //     id: 'freightTrends',
+    //     label: 'Freight Trends Dashboard',
+    //     icon: '',
+    //     activeIcon: FreightTrendsActive,
+    //     inactiveIcon: FreightTrendsInactive,
+    //     isImageIcon: true
+    // }
 ];
 
 const NavItem = ({ 

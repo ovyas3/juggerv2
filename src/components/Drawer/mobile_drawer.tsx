@@ -40,37 +40,37 @@ interface NavItem {
 
 const navigationItems: NavItem[] = [
     {
-        id: 'dispatchTrend',
-        label: 'Dispatch Trend',
+        id: 'invoicingTrends',
+        label: 'Invoicing Trends',
         icon: '',
         activeIcon: DispatchTrendActive,
         inactiveIcon: DispatchTrendInactive,
         isImageIcon: true
     },
-    {
-        id: 'ewaybillDashboard',
-        label: 'eWaybill Dashboard',
-        icon: '',
-        activeIcon: EWayBillActive,
-        inactiveIcon: EWayBillInactive,
-        isImageIcon: true
-    },
-    {
-        id: 'leadDistanceAnalysis',
-        label: 'Lead (Distance) Analysis',
-        icon: '',
-        activeIcon: LeadDistanceActive,
-        inactiveIcon: LeadDistanceInactive,
-        isImageIcon: true
-    },
-    {
-        id: 'freightTrends',
-        label: 'Freight Trends',
-        icon: '',
-        activeIcon: FreightTrendsActive,
-        inactiveIcon: FreightTrendsInactive,
-        isImageIcon: true
-    }
+    // {
+    //     id: 'ewaybillDashboard',
+    //     label: 'eWaybill Dashboard',
+    //     icon: '',
+    //     activeIcon: EWayBillActive,
+    //     inactiveIcon: EWayBillInactive,
+    //     isImageIcon: true
+    // },
+    // {
+    //     id: 'leadDistanceAnalysis',
+    //     label: 'Lead (Distance) Analysis',
+    //     icon: '',
+    //     activeIcon: LeadDistanceActive,
+    //     inactiveIcon: LeadDistanceInactive,
+    //     isImageIcon: true
+    // },
+    // {
+    //     id: 'freightTrends',
+    //     label: 'Freight Trends',
+    //     icon: '',
+    //     activeIcon: FreightTrendsActive,
+    //     inactiveIcon: FreightTrendsInactive,
+    //     isImageIcon: true
+    // }
 ];
 
 const NavItem = ({
@@ -268,14 +268,14 @@ function MobileDrawer() {
                 >
                     <BottomNavItem
                         item={{
-                            id: "billingDashboard",
+                            id: "invoicingDashboard",
                             icon: "",
                             activeIcon: BillingIconActive,
                             inactiveIcon: BillingIcon,
                             isImageIcon: true,
                         }}
-                        isActive={active === "billingDashboard"}
-                        onClick={() => handleRouting("billingDashboard")}
+                        isActive={active === "invoicingDashboard"}
+                        onClick={() => handleRouting("invoicingDashboard")}
                     />
                 </div>
 

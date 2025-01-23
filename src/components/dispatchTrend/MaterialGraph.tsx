@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -14,7 +14,9 @@ import {
     type ChartOptions,
 } from "chart.js"
 import { Line } from "react-chartjs-2"
-import { parse, format } from "date-fns"
+import { parse, format, differenceInDays, startOfWeek, startOfMonth } from "date-fns"
+import styles from "./dispatchTrend.module.css"
+import { Select } from "antd";
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend)
 
@@ -30,70 +32,130 @@ interface MaterialGraphProps {
     data: Material[]
 }
 
+type TimeScale = "day" | "week" | "month"
+
 const MaterialGraph: React.FC<MaterialGraphProps> = ({ data }) => {
-    const sortedData = [...data].sort(
-        (a, b) =>
-            parse(a.material.date, "dd-MM-yyyy", new Date()).getTime() -
-            parse(b.material.date, "dd-MM-yyyy", new Date()).getTime(),
+    const [selectedMaterial, setSelectedMaterial] = useState<string>("All")
+    const [selectedTimeScale, setSelectedTimeScale] = useState<TimeScale>("day")
+
+    const sortedData = useMemo(
+        () =>
+            [...data].sort(
+                (a, b) =>
+                    parse(a.material.date, "dd-MM-yyyy", new Date()).getTime() -
+                    parse(b.material.date, "dd-MM-yyyy", new Date()).getTime(),
+            ),
+        [data],
     )
 
-    const uniqueMaterials = Array.from(new Set(data.map((item) => item.material.name)))
-    const uniqueDates = Array.from(new Set(sortedData.map((item) => item.material.date)))
+    const uniqueMaterials = useMemo(() => ["All", ...Array.from(new Set(data.map((item) => item.material.name)))], [data])
 
-    const [selectedMaterials, setSelectedMaterials] = useState<Set<string>>(new Set(uniqueMaterials))
+    const { timeScales, groupedData, xAxisLabels } = useMemo(() => {
+        const dates = sortedData.map((item) => parse(item.material.date, "dd-MM-yyyy", new Date()))
+        const minDate = dates[0]
+        const maxDate = dates[dates.length - 1]
+        const daysDiff = differenceInDays(maxDate, minDate)
 
-    const toggleMaterial = (material: string) => {
-        setSelectedMaterials((prev) => {
-            const newSet = new Set(prev)
-            if (newSet.has(material)) {
-                newSet.delete(material)
-            } else {
-                newSet.add(material)
-            }
-            return newSet
-        })
-    }
+        const timeScales: TimeScale[] = ["day"]
+        if (daysDiff > 7) timeScales.push("week")
+        if (daysDiff > 28) timeScales.push("month")
 
-    const toggleAll = () => {
-        if (selectedMaterials.size === uniqueMaterials.length) {
-            setSelectedMaterials(new Set())
-        } else {
-            setSelectedMaterials(new Set(uniqueMaterials))
+        const groupingFunctions = {
+            day: (date: Date) => date,
+            week: (date: Date) => startOfWeek(date),
+            month: (date: Date) => startOfMonth(date),
         }
-    }
 
-    const datasets = uniqueMaterials
-        .filter((material) => selectedMaterials.has(material))
-        .map((material) => {
-            const color = getColorForMaterial(material)
-            return {
-                label: material,
-                data: uniqueDates.map((date) => {
-                    const dataPoint = sortedData.find((item) => item.material.name === material && item.material.date === date)
-                    return dataPoint ? dataPoint.totalWeight : null
+        const formatStrings = {
+            day: "MMM d",
+            week: "'Week of' MMM d",
+            month: "MMM yyyy",
+        }
+
+        const groupedData = sortedData.reduce(
+            (acc, item) => {
+                const date = parse(item.material.date, "dd-MM-yyyy", new Date())
+                timeScales.forEach((scale) => {
+                    const groupKey = format(groupingFunctions[scale](date), formatStrings[scale])
+                    if (!acc[scale]) acc[scale] = {}
+                    if (!acc[scale][groupKey]) acc[scale][groupKey] = {}
+                    if (!acc[scale][groupKey][item.material.name]) acc[scale][groupKey][item.material.name] = 0
+                    acc[scale][groupKey][item.material.name] += item.totalWeight
+                })
+                return acc
+            },
+            {} as Record<TimeScale, Record<string, Record<string, number>>>,
+        )
+
+        const xAxisLabels = {
+            day: Object.keys(groupedData.day || {}),
+            week: Object.keys(groupedData.week || {}),
+            month: Object.keys(groupedData.month || {}),
+        }
+
+        return { timeScales, groupedData, xAxisLabels }
+    }, [sortedData])
+
+    const datasets = useMemo(
+        () =>
+            uniqueMaterials
+                .filter((material) => material === "All" || selectedMaterial === "All" || material === selectedMaterial)
+                .map((material) => {
+                    if (material === "All") {
+                        return {
+                            label: "All Materials",
+                            data: xAxisLabels[selectedTimeScale].map((label) =>
+                                Object.values(groupedData[selectedTimeScale][label]).reduce((sum, weight) => sum + weight, 0),
+                            ),
+                            borderColor: "#000000",
+                            backgroundColor: "#000000",
+                            pointBackgroundColor: "#000000",
+                            pointBorderColor: "#fff",
+                            pointHoverBackgroundColor: "#fff",
+                            pointHoverBorderColor: "#000000",
+                            pointRadius: 6,
+                            pointHoverRadius: 8,
+                            tension: 0.3,
+                            borderWidth: 3,
+                        }
+                    }
+                    const color = getColorForMaterial(material)
+                    return {
+                        label: material,
+                        data: xAxisLabels[selectedTimeScale].map(
+                            (label) => groupedData[selectedTimeScale][label][material] || null,
+                        ),
+                        borderColor: color,
+                        backgroundColor: color,
+                        pointBackgroundColor: color,
+                        pointBorderColor: "#fff",
+                        pointHoverBackgroundColor: "#fff",
+                        pointHoverBorderColor: color,
+                        pointRadius: 6,
+                        pointHoverRadius: 8,
+                        tension: 0.3,
+                        borderWidth: 3,
+                    }
                 }),
-                borderColor: color,
-                backgroundColor: color,
-                pointBackgroundColor: color,
-                pointBorderColor: "#fff",
-                pointHoverBackgroundColor: "#fff",
-                pointHoverBorderColor: color,
-                pointRadius: 6,
-                pointHoverRadius: 8,
-                tension: 0.3,
-            }
-        })
+        [uniqueMaterials, selectedMaterial, xAxisLabels, groupedData, selectedTimeScale],
+    )
 
     const chartData = {
-        labels: uniqueDates.map((date) => format(parse(date, "dd-MM-yyyy", new Date()), "MMM d")),
+        labels: xAxisLabels[selectedTimeScale],
         datasets,
     }
+
     const options: ChartOptions<"line"> = {
-        responsive: true,
         maintainAspectRatio: false,
+        responsive: true,
         plugins: {
             legend: {
-                display: false,
+                position: "top" as const,
+                labels: {
+                    usePointStyle: true,
+                    pointStyle: "circle",
+                    padding: 20,
+                },
             },
             tooltip: {
                 mode: "index",
@@ -105,7 +167,7 @@ const MaterialGraph: React.FC<MaterialGraphProps> = ({ data }) => {
                 bodyFont: {
                     size: 12,
                 },
-                padding: 12,
+                padding: 20,
                 cornerRadius: 8,
             },
         },
@@ -113,7 +175,7 @@ const MaterialGraph: React.FC<MaterialGraphProps> = ({ data }) => {
             x: {
                 title: {
                     display: true,
-                    text: "Date",
+                    text: getXAxisTitle(selectedTimeScale),
                     font: {
                         size: 14,
                         weight: "bold",
@@ -135,6 +197,17 @@ const MaterialGraph: React.FC<MaterialGraphProps> = ({ data }) => {
                 beginAtZero: true,
                 ticks: {
                     precision: 0,
+                    callback: (value) => {
+                        return value.toLocaleString() // Format large numbers with commas
+                    },
+                },
+                suggestedMin: 0,
+                suggestedMax: (context: any) => {
+                    const max = context.chart.data.datasets.reduce((max: any, dataset: any) => {
+                        const dataMax = Math.max(...dataset.data.filter((v: any) => v !== null))
+                        return dataMax > max ? dataMax : max
+                    }, 0)
+                    return Math.ceil(max * 1.1) // Add 10% padding to the top
                 },
             },
         },
@@ -146,54 +219,76 @@ const MaterialGraph: React.FC<MaterialGraphProps> = ({ data }) => {
     }
 
     return (
-        <div style={{ width: "100%", height: "500px", maxWidth: "1200px", margin: "0 auto" }}>
-            <div style={{ marginBottom: "20px" }}>
-                <button
-                    onClick={toggleAll}
+        <>
+            <div className={styles.materialSelect}>
+                <Select
                     style={{
-                        padding: "5px 10px",
-                        marginRight: "10px",
-                        backgroundColor: selectedMaterials.size === uniqueMaterials.length ? "#4CAF50" : "#f1f1f1",
-                        border: "none",
-                        borderRadius: "4px",
-                        cursor: "pointer",
+                        width: 300
                     }}
-                >
-                    {selectedMaterials.size == uniqueMaterials.length ? "Unselect All" : "Select All"}
-                </button>
-                {uniqueMaterials.map((material) => (
-                    <button
-                        key={material}
-                        onClick={() => toggleMaterial(material)}
-                        style={{
-                            padding: "5px 10px",
-                            marginRight: "5px",
-                            backgroundColor: selectedMaterials.has(material) ? getColorForMaterial(material) : "#f1f1f1",
-                            border: "none",
-                            borderRadius: "4px",
-                            cursor: "pointer",
-                            color: selectedMaterials.has(material) ? "#ffffff" : "#000000",
-                        }}
-                    >
-                        {material}
-                    </button>
-                ))}
+                    placeholder="Select Materials"
+                    value={selectedMaterial}
+                    onChange={setSelectedMaterial}
+                    options={uniqueMaterials.map((material) => ({ label: material, value: material }))}
+                    className="w-full"
+                    popupClassName="select-popup"
+                    size="large"
+                />
+                <div className={styles.controls}>
+                    <div className={styles.timeScaleToggle}>
+                        {timeScales.map((scale) => (
+                            <button
+                                key={scale}
+                                className={`${styles.toggleButton} ${selectedTimeScale === scale ? styles.active : ""}`}
+                                onClick={() => setSelectedTimeScale(scale)}
+                                disabled={!timeScales.includes(scale)}
+                            >
+                                {scale.charAt(0).toUpperCase() + scale.slice(1)}
+                            </button>
+                        ))}
+                    </div>
+                </div>
             </div>
-            <Line data={chartData} options={options} />
-        </div>
+            <div className={styles.chartContainer}>
+                <Line data={chartData} options={options} style={{ height: 500 }} />
+            </div>
+        </>
     )
 }
 
+const colorMapping = new Map<string, string>()
+
 function getColorForMaterial(material: string): string {
-    const colors = {
-        "Bar Mill": "#8b5cf6",
-        "Cold Roll F Mill": "#ef4444",
-        "Hot Coil Mill": "#3b82f6",
-        "Plate Mill": "#22c55e",
-        "Semis-PQ Bay": "#f59e0b",
-        "Prefabrication Plant": "#ec4899",
+    const colorsArray = [
+        "#8b5cf6",
+        "#ef4444",
+        "#3b82f6",
+        "#22c55e",
+        "#f59e0b",
+        "#ec4899",
+        "#f97316",
+        "#a855f7",
+        "#34d399",
+        "#fbbf24",
+    ]
+
+    if (!colorMapping.has(material)) {
+        const index = colorMapping.size % colorsArray.length
+        colorMapping.set(material, colorsArray[index])
     }
-    return colors[material as keyof typeof colors] || "#000000"
+
+    return colorMapping.get(material) || colorsArray[Math.floor(Math.random() * colorsArray.length)]
+}
+
+function getXAxisTitle(timeScale: TimeScale): string {
+    switch (timeScale) {
+        case "day":
+            return "Date"
+        case "week":
+            return "Week"
+        case "month":
+            return "Month"
+    }
 }
 
 export default MaterialGraph
+

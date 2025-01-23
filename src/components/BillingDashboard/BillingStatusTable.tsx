@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { format } from "date-fns"
 import { Calendar, Clock } from "lucide-react"
+import { Spin } from 'antd';
 import {
   Table,
   TableBody,
@@ -324,7 +325,7 @@ export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatus
                   </div>
                 </div>
                 <div className="section">
-                  <h4>Under Billing</h4>
+                  <h4>Under Invoicing</h4>
                   <div className="stats">
                     <div>Vehicles: {underBilling?.totalCount || 0}</div>
                     <div>Qty: {Math.round(underBilling?.totalWeight || 0)} MT</div>
@@ -401,7 +402,7 @@ export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatus
                       <TableRow>
                         <TableHead rowSpan={2}>Shop</TableHead>
                         <TableHead colSpan={2}>Under Loading</TableHead>
-                        <TableHead colSpan={2}>Under Billing</TableHead>
+                        <TableHead colSpan={2}>Under Invoicing</TableHead>
                         <TableHead colSpan={2}>Billed</TableHead>
                         <TableHead colSpan={2}>DO Issued</TableHead>
                         <TableHead rowSpan={2}>Total Qty (MT)</TableHead>
@@ -417,7 +418,7 @@ export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatus
                         <TableHead>Qty (MT)</TableHead>
                         <TableHead>No. of Veh.</TableHead>
                         <TableHead>Qty (MT)</TableHead>
-                        <TableHead>By Road</TableHead>
+                        <TableHead>By Road (MT)</TableHead>
                         <TableHead>By Rake</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -537,7 +538,7 @@ export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatus
           <div className="billing-status-gate-info-modal-details">
             <div className="billing-status-gate-info-detail-item">
               <span className="billing-status-gate-info-detail-label">Location Name:</span>
-              <span className="billing-status-gate-info-detail-value">{selectedGateInfoData?.locationName || '' }</span>
+              <span className="billing-status-gate-info-detail-value">{selectedGateInfoData?.locationName || ''}</span>
             </div>
             <div className="billing-status-gate-info-detail-item">
               <span className="billing-status-gate-info-detail-label">Total Count:</span>
@@ -551,12 +552,12 @@ export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatus
           <div className="billing-status-gate-info-gate-in-list">
             <h3>Gate In Numbers</h3>
             <ul>
-              {selectedGateInfoData && 
-              selectedGateInfoData.gi && 
-              selectedGateInfoData.gi.length > 0 && 
-              selectedGateInfoData?.gi?.map((number: string, index: number) => (
-                <li key={index}>{number}</li>
-              ))}
+              {selectedGateInfoData &&
+                selectedGateInfoData.gi &&
+                selectedGateInfoData.gi.length > 0 &&
+                selectedGateInfoData?.gi?.map((number: string, index: number) => (
+                  <li key={index}>{number}</li>
+                ))}
             </ul>
           </div>
         </div>
@@ -779,11 +780,11 @@ export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatus
             // padding: 0.5rem;
             margin-top: 0;
             min-height: 100vh;
-            width: 100vw;
+            width: 100%;
           }
 
           .mobile-container {
-            padding: 10px 16px 50px 16px;
+            padding: 10px 16px 90px 16px;
             display: flex;
             flex-direction: column;
             gap: 12px;
@@ -843,7 +844,7 @@ export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatus
           .total-card {
             background: ${currentTheme.cardBg};
             position: fixed;
-            bottom: 60px;
+            bottom: 52px;
             left: 0;
             right: 0;
             padding: 12px 16px;

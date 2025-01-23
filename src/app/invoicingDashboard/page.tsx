@@ -21,7 +21,7 @@ export default function BillingDashboardPage() {
         }}
       >
         <div style={{ width: '100%' }}>
-          {!isMobile ? <Header /> : <MobileHeader />}
+          {!isMobile ? <Header /> : <></>}
         </div>
         <div>
           <BillingDashboard />
