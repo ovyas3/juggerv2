@@ -208,32 +208,6 @@ const BillingDashboard: React.FC<BillingDashboardProps> = ({ mobile = false, hid
     refreshInterval: 5
   });
 
-  const fetchData = async (date: Dayjs) => {
-    try {
-      setLoading(true);
-      const response = await httpsGet(
-        `invoice/billingDashboard?date=${date.format('YYYY-MM-DD')}`, 
-        1, 
-        router
-      );
-      
-      if (response && response.data) {
-        setBillingData(response.data);
-      }
-    } catch (error) {
-      console.error('Error fetching billing data:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleDateChange = (date: Dayjs | null, dateString: string | string[]) => {
-    if (date) {
-      setSelectedDate(date);
-      fetchData(date);
-    }
-  };
-
   const handleRefreshChange = (value: number) => {
     setSettings(prev => ({
       ...prev,
