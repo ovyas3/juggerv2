@@ -9,13 +9,17 @@ import MobileDrawer from "@/components/Drawer/mobile_drawer";
 import MobileHeader from "@/components/Header/mobileHeader";
 import Header from "@/components/Header/header";
 import { useWindowSize } from "@/utils/hooks";
-import {useTranslations} from 'next-intl';
+import { useTranslations } from 'next-intl';
 import Image from 'next/image'
 import TrainFilled from '@/assets/train-fill.svg';
 import { redirect } from 'next/dist/server/api-utils'
 import { red } from '@mui/material/colors'
 import { useRouter } from 'next/navigation'
 import { useMediaQuery, useTheme } from '@mui/material';
+import DashboardInactive from "@/assets/Dashboard_bg_icon.svg";
+import DispatchIcon from "@/assets/dispatch_icon.svg";
+import BillingIcon from "@/assets/billing_icon.svg";
+import DispatchTrendInactive from "@/assets/dispatch_trend_bg_icon.svg";
 
 const variants = {
   hidden: { opacity: 0 },
@@ -29,12 +33,33 @@ const variants = {
 
 const items = [
   {
-    icon: <LayoutDashboard size={24} color="white" />,
+    icon: <Image src={DashboardInactive} alt="Dashboard" width={24} height={24} />,
     title: "External Parking Dashboard",
     description: "Simplified insights with our intuitive dashboard solutions.",
     color: "linear-gradient(135deg, #8a2be2, #9370db)",
     redirect: '/externalParking'
   },
+  {
+    icon: <Image src={DispatchIcon} alt="Road Invoicing" width={24} height={24} />,
+    title: "Road Invoicing Dashboard",
+    description: "Manage and track road invoicing with ease and precision.",
+    color: "linear-gradient(135deg, #ff7f50, #ffa07a)",
+    redirect: '/plantSchedule'
+  },
+  {
+    icon: <Image src={BillingIcon} alt="Invoicing" width={24} height={24} />,
+    title: "Invoicing Dashboard",
+    description: "Streamline your invoicing processes.",
+    color: "linear-gradient(135deg, #32cd32, #98fb98)",
+    redirect: '/invoicingDashboard'
+  },
+  {
+    icon: <Image src={DispatchTrendInactive} alt="Invoicing Trend" width={24} height={24} />,
+    title: "Invoicing Trends",
+    description: "Visualize and analyze invoicing trends over time.",
+    color: "linear-gradient(135deg, #4682b4, #87cefa)",
+    redirect: '/invoicingTrends'
+  }
 ];
 
 interface WelcomeProps {
@@ -102,7 +127,7 @@ const Welcome: React.FC<WelcomeProps> = ({ onDashboardClick }) => {
   return (
     <div>
       <div className='welcome-main'>
-        <div 
+        <div
           className="welcome-landing-page"
           style={{
             marginBottom: !mobile ? '0px' : '72px',
@@ -178,7 +203,7 @@ const Welcome: React.FC<WelcomeProps> = ({ onDashboardClick }) => {
             </motion.button>
           </div>
         </div>
-      </div> 
+      </div>
       {!mobile ? <SideDrawer /> : <div >
         <MobileDrawer />
       </div>}
