@@ -19,6 +19,7 @@ import RefreshIcon from "@mui/icons-material/Refresh";
 import CustomSelect from "../UI/CustomSelect/CustomSelect";
 import "./dashboard.css";
 import CommonTable from "../CommonTable/common-table";
+import { useMediaQuery, useTheme } from '@mui/material';
 
 // Reusable Time Range Section Component
 interface TimeRangeSectionProps {
@@ -468,6 +469,8 @@ const useDashboardData = () => {
 
 // Main Dashboard Component
 const Dashboard = () => {
+  const theme = useTheme();
+  const mobile = useMediaQuery(theme.breakpoints.down('sm'));
   const {
     vehicleStatusData,
     vehicleWaitTimeData,
@@ -619,7 +622,10 @@ const Dashboard = () => {
     { value: 30, label: "30 min" },
   ];
   return (
-    <div className="externalparking-dashboard">
+    <div 
+      className="externalparking-dashboard"
+      style={{ margin: !mobile ? '56px 0 0 70px' : '0px' }}
+    >
       <Box
         sx={{
           width: "100%",
@@ -632,6 +638,7 @@ const Dashboard = () => {
         <Box
           sx={{
             display: "flex",
+            flexDirection: !mobile ? "row" : "column",
             alignItems: "center",
             justifyContent: "space-between",
             mb: 1,
@@ -664,6 +671,7 @@ const Dashboard = () => {
         <Box
           sx={{
             display: "flex",
+            flexDirection: !mobile ? "row" : "column",
             justifyContent: "space-between",
             alignItems: "center",
             mb: 1,

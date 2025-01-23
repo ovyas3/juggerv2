@@ -294,15 +294,15 @@ const BillingDashboard: React.FC<BillingDashboardProps> = ({ mobile = false, hid
     }
   ];
 
-  useEffect(() => {
-    fetchData(selectedDate);
-  }, []);
+  // useEffect(() => {
+  //   fetchData(selectedDate);
+  // }, []);
 
   return (
     <Container theme={themes[currentTheme]}>
       {!hideHeader && (
         <CommonHeader
-          title="Road Billing & Loading Status"
+          title="Road Invoicing & Loading Status"
           currentTheme={currentTheme}
           // selectedDate={selectedDate}
           // handleDateChange={handleDateChange}
