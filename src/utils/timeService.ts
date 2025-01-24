@@ -8,7 +8,7 @@ const utcToist = (utc: string, format: string = 'dd-MMM-yy') => {
   return date;
 }
 
-const utcToistTime = (utc:string, format = 'HH:mm') => {
+const utcToistTime = (utc: string, format = 'HH:mm') => {
   const date = DateTime.fromJSDate(new Date(utc)).setZone('Asia/Calcutta').toFormat(format);
   if (date === 'Invalid DateTime') {
     return '--';
@@ -17,11 +17,11 @@ const utcToistTime = (utc:string, format = 'HH:mm') => {
 }
 
 const millies = (utc: string) => {
-    return DateTime.fromJSDate(new Date(utc)).setZone('Asia/Calcutta').toMillis();
+  return DateTime.fromJSDate(new Date(utc)).setZone('Asia/Calcutta').toMillis();
 }
 
 const getToday = () => {
-    return DateTime.local().toISODate();
+  return DateTime.local().toISODate();
 }
 
 const convertToISO = (date: Date): string => {
@@ -42,20 +42,20 @@ const getTimeWithAMPM = (utc: string) => {
   return DateTime.fromJSDate(new Date(utc)).setZone('Asia/Calcutta').toFormat('hh:mm a');
 }
 
-const getLocalTime = (date:any, format: string = 'dd MM yyyy') => {
+const getLocalTime = (date: any, format: string = 'dd MM yyyy') => {
   return DateTime.fromJSDate(new Date(date)).setZone('Asia/Calcutta').toFormat('hh:mm a');
 }
 
-const getEpoch = (date:any) => {
+const getEpoch = (date: any) => {
   return DateTime.fromJSDate(new Date(date)).toUTC();
 }
 
 const formatDate = (dateInput: any) => {
-  const days = ["1st", "2nd", "3rd", "4th", "5th", "6th", "7th", "8th", "9th", "10th", 
-                "11th", "12th", "13th", "14th", "15th", "16th", "17th", "18th", "19th", "20th",
-                "21st", "22nd", "23rd", "24th", "25th", "26th", "27th", "28th", "29th", "30th", "31st"];
-  const months = ["January", "February", "March", "April", "May", "June", "July", 
-                  "August", "September", "October", "November", "December"];
+  const days = ["1st", "2nd", "3rd", "4th", "5th", "6th", "7th", "8th", "9th", "10th",
+    "11th", "12th", "13th", "14th", "15th", "16th", "17th", "18th", "19th", "20th",
+    "21st", "22nd", "23rd", "24th", "25th", "26th", "27th", "28th", "29th", "30th", "31st"];
+  const months = ["January", "February", "March", "April", "May", "June", "July",
+    "August", "September", "October", "November", "December"];
   const date = new Date(dateInput);
   const day = date.getDate();
   const month = date.getMonth();
@@ -67,6 +67,16 @@ const formatDate = (dateInput: any) => {
   return ` ${formattedTime}, ${days[day - 1]} ${months[month]} ${year}`;
 }
 
+const padTo2Digits = (num: number) => num.toString().padStart(2, '0');
+
+const convertMsToHM = (milliseconds: number) => {
+  let seconds = Math.floor(milliseconds / 1000);
+  let minutes = Math.floor(seconds / 60);
+  let hours = Math.floor(minutes / 60);
+  seconds %= 60;
+  minutes %= 60;
+  return `${padTo2Digits(hours)}:${padTo2Digits(minutes)}`;
+};
 
 const service = {
   utcToist,
@@ -79,7 +89,8 @@ const service = {
   getLocalTime,
   getEpoch,
   formatDate,
-  convertToISO
+  convertToISO,
+  convertMsToHM
 }
 
 export default service;
