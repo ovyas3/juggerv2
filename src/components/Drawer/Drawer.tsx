@@ -34,6 +34,8 @@ import LeadDistanceInactive from "@/assets/lead_distance_analysis_bg_icon.svg";
 import LeadDistanceActive from "@/assets/lead_distance_analysis_wg_icon.svg";
 import FreightTrendsInactive from "@/assets/freight_trends_bg_icon.svg";
 import FreightTrendsActive from "@/assets/freight_trends_wg_icon.svg";
+import FreightEstimatorIcon from "@/assets/freight_estimator_icon.svg";
+import FreightEstimatorIconActive from "@/assets/freight_estimator_icon_active.svg";
 
 interface NavItem {
     id: string;
@@ -80,6 +82,14 @@ const navigationItems: NavItem[] = [
             },
         ]
     },
+    {
+        id: 'freightEstimator',
+        label: 'Freight Estimator',
+        icon: '',
+        activeIcon: FreightEstimatorIconActive,
+        inactiveIcon: FreightEstimatorIcon,
+        isImageIcon: true
+     },
     {
         id: 'inPlant',
         label: 'In Plant Overview',
