@@ -1,12 +1,15 @@
-import Auth from "@/components/Auth/Auth";
-import styles from "./page.module.css";
+'use client';
+import React, { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
+const Page = () => {
+  const router = useRouter();
 
-export default function Home() {
+  useEffect(() => {
+    router.push('/plantSchedule');
+  }, [router]);
 
-  return (
-    <main className={styles.main}>
-      <Auth />
-    </main>
-  );
-}
+  return null; 
+};
+
+export default Page;
