@@ -7,11 +7,12 @@ import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 import { httpsGet } from '@/utils/Communication';
 import { useRouter } from 'next/navigation';
-
+import { convertToUTC } from '@/utils/dateUtils';
 interface TargetSettingsModalProps {
     visible: boolean;
     onCancel: () => void;
     theme?: any;
+    initialMillTargets: any; 
     apiResponse?: {
       data: Array<{
         date: string;
@@ -505,14 +506,12 @@ export const TargetSettingsModal: React.FC<TargetSettingsModalProps> = ({
     visible,
     onCancel,
     theme,
+    initialMillTargets = { data: [] },
     apiResponse
 }) => {
     const router = useRouter();
     const [form] = Form.useForm();
-    const [millTargets, setMillTargets] = useState<MillTarget[]>([{ 
-        name: '', 
-        targets: {} 
-    }]);
+    const [millTargets, setMillTargets] = useState<MillTarget[]>([]);
     const [mills, setMills] = useState<{ label: string, value: string }[]>([]);
     const [loading, setLoading] = useState(false);
     const [weekDates, setWeekDates] = useState<string[]>([]);
@@ -522,10 +521,42 @@ export const TargetSettingsModal: React.FC<TargetSettingsModalProps> = ({
         if (visible) {
             loadMills();
             generateWeekDates();
-            setMillTargets([{ name: '', targets: {} }]);
+            if (Array.isArray(initialMillTargets) && initialMillTargets.length > 0) {
+              const targetsByPlant = initialMillTargets.reduce((acc, item: any) => {
+                const date = dayjs(item.date).format('YYYY-MM-DD');
+                
+                item.plants.forEach((plant: any) => {
+                  const uniqueKey = `${plant.name}_${date}`;
+                  
+                  if (!acc[plant.name]) {
+                    acc[plant.name] = {};
+                  }
+                  
+                  if (plant.target !== 0) {
+                    acc[plant.name][date] = plant.target;
+                  }
+                });
+                
+                return acc;
+              }, {});
+                const transformedInitialMillTargets = Object.entries(targetsByPlant as Record<string, Record<string, number>>)
+                .filter(([_, targets]) => Object.keys(targets).length > 0)
+                .map(([name, targets]) => ({
+                  name,
+                  targets
+                }));
+               setMillTargets(transformedInitialMillTargets);
+            } else {
+              const emptyTargets: MillTarget[] = [{
+                name: '',
+                targets: {}
+              }];
+              setMillTargets(emptyTargets);
+            }
+            
             setMillTargetDate(null);
         }
-    }, [visible]);
+    }, [visible, initialMillTargets]);
 
     useEffect(() => {
       if(apiResponse && apiResponse.data && apiResponse.statusCode === 200){
@@ -572,46 +603,46 @@ export const TargetSettingsModal: React.FC<TargetSettingsModalProps> = ({
       } 
     }, [apiResponse]);
 
-    const fetchMillTargets = async (date: dayjs.Dayjs) => {
-      try{
-        const formatDate = date.format('YYYY-MM-DD');
-        const response = await httpsGet(`invoice/mills_target?from=${formatDate}&isTargetMill=true`, 0, router);
+    const transformMillTargetsData = (data: any[]) => {
+      const plantTargetsMap = new Map<string, { [date: string]: number }>();
+    
+      data.forEach(item => {
+        const date = dayjs(item.date).format('YYYY-MM-DD');
         
+        item.plants.forEach((plant: any) => {
+          const plantName = plant.name;
+          
+          if (!plantTargetsMap.has(plantName)) {
+            plantTargetsMap.set(plantName, {});
+          }
+          
+          const plantTargets = plantTargetsMap.get(plantName)!;
+          plantTargets[date] = plant.target;
+        });
+      });
+    
+      const transformedData = Array.from(plantTargetsMap.entries()).map(([plantName, targets]) => {
+        const transformedItem = {
+          title: 'Mill',
+          name: plantName,
+          targets
+        };
+        return transformedItem;
+      });
+    
+      return transformedData;
+    };
+    
+    const fetchMillTargets = async (date: dayjs.Dayjs) => {
+      try {
+        const formatDate = convertToUTC(date);
+        const response = await httpsGet(`invoice/mills_target?from=${formatDate}&isTargetMill=true`, 0, router);        
         if(response && response.data && response.statusCode === 200 && response.data.length > 0){
-          const formData = response.data.reduce((acc: any[], item: any) => {
-            const dateTargets = item.plants.map((plant: any) => ({
-              name: plant.name,
-              target: plant.target,
-              date: dayjs(item.date).format('YYYY-MM-DD')
-            }));
-            return [...acc, ...dateTargets];
-          }, []);
-
-          const millTargetsData = response.data.flatMap((item: any) => 
-              item.plants.map((plant: any) => ({
-                  name: plant.name,
-                  targets: {
-                      [dayjs(item.date).format('YYYY-MM-DD')]: plant.target
-                  }
-              }))
-          );
-
-          setMillTargets(millTargetsData);
-
-          form.setFieldsValue({
-              targets: formData
-          });
-          message.success('Mill Targets fetched successfully');
+          const transformedData = transformMillTargetsData(response.data);
+          setMillTargets(transformedData);
         }
-        else {
-          setMillTargets([{ name: '', targets: {} }]);
-          form.setFieldsValue({
-              targets: [{ name: '', target: '', date: formatDate }]
-          });
-        }
-      }
-      catch{
-        message.error('An error occurred while fetching mill targets');
+      } catch (error) {
+        console.error('Error in fetchMillTargets:', error);
       }
     }
 
@@ -637,8 +668,20 @@ export const TargetSettingsModal: React.FC<TargetSettingsModalProps> = ({
         }
     }, [millTargetDate]);
 
-    const loadMills = () => {
-        try {
+    const loadMills = async () => {
+      try {
+          const materialsResponse = await httpsGet('materials/get', 1, router);
+          
+          if (materialsResponse && materialsResponse.data && materialsResponse.statusCode === 200) {
+              const materialsOptions = materialsResponse.data.materials.map((material: any) => ({
+                  label: material.name,
+                  value: material.name
+              }));
+              
+              setMills(materialsOptions);
+              return;
+          }
+
             const storedShippers = localStorage.getItem('shippers');
             console.log('Stored shippers:', storedShippers);
             
@@ -755,7 +798,7 @@ export const TargetSettingsModal: React.FC<TargetSettingsModalProps> = ({
 
             // Transform data for API
             const payload = weekDates.map(date => ({
-                date,
+                date: convertToUTC(date),
                 mills: validMillTargets.map(mill => ({
                     name: mill.name,
                     target: mill.targets[date] || 0
@@ -783,7 +826,7 @@ export const TargetSettingsModal: React.FC<TargetSettingsModalProps> = ({
     };
 
     const calculateDayTotal = (date: string) => {
-        return millTargets.reduce((sum, mill) => sum + (mill.targets[date] || 0), 0);
+      return millTargets.reduce((sum, mill) => sum + (mill.targets?.[date] || 0), 0);
     };
 
     const columns = [

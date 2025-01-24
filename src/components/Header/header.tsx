@@ -40,18 +40,34 @@ const Header = ({ setReloadOnHeaderChange, isMapHelper, getAllShipment, isShipme
     switch (pathname) {
       case "/externalParking":
         return "External Parking"
-      case "/billingDashboard":
-        return "Road Billing & Loading Status"
-      case "/dispatchTrend":
-        return "Dispatch Trend"
-        case "/ewaybillDashboard":
-        return "eWayBill Dashboard"
+      case "/invoicingDashboard":
+        return "Road Invoicing & Loading Status"
+      case "/freightEstimator":
+        return "Freight Estimator"
+      case "/invoicingTrends":
+        return "Trends"
+      case "/TransporterPerformance":
+        return "Transporter Performance"
+      case "/Productivity":
+        return "Productivity"
+      case "/VehicleStagingLive":
+        return "Vehicle Staging Live"
+      case "/TATDashboard":
+        return "TAT Dashboard"
+      case "/TATTrends":
+        return "TAT Trends"
+      // case "/ewaybillDashboard":
+      //   return "eWayBill Dashboard"
+      // case "/leadDistanceAnalysis":
+      //   return "Lead (Distance) Analysis"
+      // case "/freightTrends":
+      //   return "Freight Trends Dashboard"
       default:
         return ""
     }
   }
   
-  if (pathname === "/billingDashboard") {
+  if (pathname === "/invoicingDashboard") {
     const BillingDashboard = dynamic(() => 
       import('../BillingDashboard/BillingDashboard'), 
       { ssr: false }
