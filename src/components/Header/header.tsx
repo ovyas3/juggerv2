@@ -44,6 +44,16 @@ const Header = ({ setReloadOnHeaderChange, isMapHelper, getAllShipment, isShipme
         return "Road Invoicing & Loading Status"
       case "/invoicingTrends":
         return "Trends"
+      case "/TransporterPerformance":
+        return "Transporter Performance"
+      case "/Productivity":
+        return "Productivity"
+      case "/VehicleStagingLive":
+        return "Vehicle Staging Live"
+      case "/TATDashboard":
+        return "TAT Dashboard"
+      case "/TATTrends":
+        return "TAT Trends"
       // case "/ewaybillDashboard":
       //   return "eWayBill Dashboard"
       // case "/leadDistanceAnalysis":
