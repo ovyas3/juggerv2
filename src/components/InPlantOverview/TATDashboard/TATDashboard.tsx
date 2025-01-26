@@ -11,6 +11,9 @@ import { useRouter } from "next/navigation";
 import { useSnackbar } from "@/hooks/snackBar";
 import { ThreeCircles } from "react-loader-spinner";
 import service from "@/utils/timeService";
+import { ArrowDownIcon, ArrowUpIcon } from "lucide-react"
+import { getCookie } from '@/utils/storageService';
+import TATDashboardMobile from "./TATDashboardMobile/TATDashboardMobile";
 
 interface InPlantTatData {
     materials: string;
@@ -55,7 +58,9 @@ interface Payload {
     past_to_date?: DateTime<true> | DateTime<false>;
 }
 
-const stagesWithLabels = {
+const stagesWithLabels: any = {
+    Materials: "Materials",
+    No: "No. of Shipments",
     PO: "PO - GI",
     GI: "GI - TW",
     TW: "TW - GW",
@@ -65,6 +70,18 @@ const stagesWithLabels = {
     IV: "IV - EW",
     EW: "EW - GO",
     GO: "GI - GO"
+}
+
+const stagesWithArrows = {
+    "PO-GI": "arrow_POGI",
+    "GI-GO": "arrow_GIGO",
+    "TW-GW": "arrow_TWGW",
+    "GI-TW": "arrow_GITW",
+    "IV-EW": "arrow_IVEW",
+    "TC-IV": "arrow_TCIV",
+    "PG-TC": "arrow_PGTC",
+    "GW-PG": "arrow_GWPG",
+    "EW-GO": "arrow_EWGO",
 }
 
 export default function TATDashboard() {
@@ -84,11 +101,15 @@ export default function TATDashboard() {
     const mobile = useMediaQuery(theme.breakpoints.down('sm'));
 
     const [inPlantTatData, setInPlantTatData] = useState<InPlantTatData[]>([]);
-    const [selectedMaterialsInPlant, setSelectedMaterialsInPlant] = useState<string[]>([]);
-    const [isJSPLRaigarh, setIsJSPLRaigarh] = useState<boolean>(true);
+    const [averageInPlantTatData, setAverageInPlantTatData] = useState<InPlantTatData[]>([]);
     const [isGateOut, setIsGateOut] = useState<boolean>(false);
-    const [rendered, setRendered] = useState<boolean>(false);
-    const [showLoader, setShowLoader] = useState<boolean>(false);
+
+    const selectedShipper = getCookie("shipper_id");
+    let displayColumns = ['Materials', 'No', 'GI', 'TW', 'GW', 'PG', 'TC', 'IV', 'EW', 'GO'];
+    // Angul Shipper
+    if (selectedShipper === "623c963e33526eee0419a399") {
+        displayColumns = ['Materials', 'No', 'PO', 'GI', 'TW', 'GW', 'PG', 'TC', 'IV', 'EW', 'GO'];
+    }
 
     const handleStartDateChange = (date: Date | null) => {
         setStartDate(date);
@@ -98,11 +119,29 @@ export default function TATDashboard() {
         setEndDate(date);
     }
 
-    const loadInPlantTat = async (stageFromDate: any, stageToDate: any) => {
-        const displayColumnsInPlantTat = isJSPLRaigarh
-            ? ['Materials', 'No. of Shipments', 'GI', 'TW', 'GW', 'PG', 'TC', 'IV', 'EW', 'GO']
-            : ['Materials', 'No. of Shipments', 'PO', 'GI', 'TW', 'GW', 'PG', 'TC', 'IV', 'EW', 'GO'];
+    const getArrowDirection = (stage: string, item: any) => {
+        const arrowKey = Object.entries(stagesWithArrows).find(
+            ([key]) => key.split("-")[0] === stage || key.split("-")[1] === stage,
+        )?.[1]
 
+        if (!arrowKey || !item[arrowKey]) return null
+
+        const value = item[arrowKey]
+        if (value === 0) return null
+
+        return {
+            direction: value > 0 ? "up" : "down",
+            color: value > 0 ? "#ef4444" : "#22c55e",
+        }
+    }
+
+    const formatTime = (milliseconds: number): string => {
+        const hours = Math.floor(milliseconds / (1000 * 60 * 60))
+        const minutes = Math.floor((milliseconds % (1000 * 60 * 60)) / (1000 * 60))
+        return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`
+    };
+
+    const loadInPlantTat = async (stageFromDate: any, stageToDate: any) => {
         const payload: Payload = {
             is_gate_out: isGateOut,
             current_from_date: DateTime.fromJSDate(stageFromDate).startOf('day').toUTC(),
@@ -153,8 +192,6 @@ export default function TATDashboard() {
                         ids: e.shipments,
                     };
 
-                    console.log(temp, "temp");
-
                     if (temp.arrowUporDown && temp.arrowUporDown.length) {
                         const GIGO = temp.arrowUporDown.filter((item: any) => item.stage === 'GI-GO');
                         if (GIGO && GIGO.length) {
@@ -202,7 +239,9 @@ export default function TATDashboard() {
                 const filteredData = statusData.filter((item: any) => selectedMaterialsInPlant.some((c: any) => item.materials === c));
                 const _sumOfShipments = Math.round(filteredData.reduce((a: any, b: any) => a + b.noOfShipments, 0));
 
-                filteredData.push({
+                const averageData = [];
+
+                averageData.push({
                     materials: 'Average',
                     PO: convertMsToHM(filteredData.reduce((a, b) => a + b.poValue * b.noOfShipments, 0) / _sumOfShipments),
                     GI: convertMsToHM(filteredData.reduce((a, b) => a + b.giValue * b.noOfShipments, 0) / _sumOfShipments),
@@ -229,8 +268,8 @@ export default function TATDashboard() {
                 });
 
                 console.log(filteredData, "filteredData");
+                setAverageInPlantTatData(averageData);
                 setInPlantTatData(filteredData);
-                setRendered(true);
             }
             setLoading(false);
         } catch (err) {
@@ -305,7 +344,72 @@ export default function TATDashboard() {
                 </Box>
                 {mobile && (
                     <>
+                        <div className={styles.mobileContainer}>
+                            {inPlantTatData.map((item, index) => (
+                                <TATDashboardMobile key={index} data={item} />
+                            ))}
+                        </div>
                     </>
+                )}
+                {!mobile && (
+                    <div className={styles.tableContainer}>
+                        <table className={styles.table}>
+                            <thead>
+                                <tr>
+                                    {displayColumns.map((col, index) => (
+                                        <th key={col} className={index === 0 ? styles.leftAlign : styles.centerAlign}>
+                                            {stagesWithLabels[col]}
+                                            {index > 1 && <div className={styles.subHeader}>HH:MM</div>}
+                                        </th>
+                                    ))}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {inPlantTatData.map((item: any, rowIndex: number) => (
+                                    <tr key={rowIndex}>
+                                        <td className={styles.leftAlign}>{item.materials}</td>
+                                        <td className={styles.centerAlign}>{item.noOfShipments}</td>
+                                        {displayColumns.slice(2).map((col) => {
+                                            const timeValue = item[col]
+                                            const arrow = getArrowDirection(col, item)
+
+                                            return (
+                                                <td key={col} className={styles.centerAlign}>
+                                                    <div className={styles.cellContent}>
+                                                        {timeValue !== "00:00" &&
+                                                            arrow &&
+                                                            (arrow.direction === "up" ? (
+                                                                <ArrowUpIcon className={styles.arrow} style={{ color: arrow.color }} />
+                                                            ) : (
+                                                                <ArrowDownIcon className={styles.arrow} style={{ color: arrow.color }} />
+                                                            ))}
+                                                        {formatTime(item[`${col.toLowerCase()}Value`] || 0)}
+                                                    </div>
+                                                </td>
+                                            )
+                                        })}
+                                    </tr>
+                                ))}
+                                {averageInPlantTatData.map((item: any, rowIndex: number) => (
+                                    <tr key={rowIndex} className={styles.totalRow}>
+                                        <td className={styles.leftAlign}>{item.materials}</td>
+                                        <td className={styles.centerAlign}>{item.noOfShipments}</td>
+                                        {displayColumns.slice(2).map((col) => {
+                                            const timeValue = item[col];
+
+                                            return (
+                                                <td key={col} className={styles.centerAlign}>
+                                                    <div className={styles.cellContent}>
+                                                        {timeValue}
+                                                    </div>
+                                                </td>
+                                            )
+                                        })}
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
                 )}
             </div>
         </>
