@@ -1,0 +1,139 @@
+.container {
+    padding: 2rem;
+    background: #FFFFFF;
+    min-height: 90vh;
+}
+
+.title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 1rem;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.tableContainer {
+    width: 100%;
+    overflow-x: auto;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    margin: 2rem 0;
+}
+
+.table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    white-space: nowrap;
+    background: white;
+    font-size: 14px;
+}
+
+.table thead {
+    position: sticky;
+    top: 0;
+    z-index: 3;
+    /* Updated z-index */
+    background: white;
+}
+
+.table th {
+    padding: 16px 24px;
+    text-align: left;
+    font-weight: 600;
+    color: #1f2937;
+    border-bottom: 2px solid #e5e7eb;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    white-space: nowrap;
+}
+
+.table th:hover {
+    background-color: #f9fafb;
+}
+
+.table td {
+    padding: 16px 24px;
+    border-bottom: 1px solid #e5e7eb;
+    color: #4b5563;
+}
+
+.table tbody tr {
+    transition: background-color 0.2s;
+}
+
+.table tbody tr:hover {
+    background-color: #f9fafb;
+}
+
+.table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.totalRow {
+    font-weight: 600;
+    background-color: #f8fafc;
+}
+
+.totalRow td {
+    color: #1f2937;
+}
+
+/* Responsive styles */
+@media (min-width: 768px) and (max-width: 1024px) {
+
+    .table th,
+    .table td {
+        padding: 12px 16px;
+        font-size: 13px;
+    }
+}
+
+/* First column sticky for better mobile experience */
+.table th:first-child,
+.table td:first-child {
+    position: sticky;
+    left: 0;
+    background: white;
+    z-index: 2;
+}
+
+.table th:first-child {
+    z-index: 30;
+    /* Higher z-index for header to stay on top */
+    background: white;
+}
+
+/* Update shadow for better visibility */
+.table td:first-child::after,
+.table th:first-child::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: -8px;
+    bottom: 0;
+    width: 8px;
+    background: linear-gradient(to right, rgba(0, 0, 0, 0.08), transparent);
+    pointer-events: none;
+}
+
+/* Ensure proper background for total row */
+.totalRow td:first-child {
+    background: #f8fafc;
+}
+
+.cardContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+@media (max-width: 767px) {
+    .container {
+        padding: 1rem;
+    }
+}

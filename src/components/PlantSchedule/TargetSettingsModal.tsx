@@ -8,6 +8,7 @@ import dayjs from 'dayjs';
 import { httpsGet } from '@/utils/Communication';
 import { useRouter } from 'next/navigation';
 import { convertToUTC } from '@/utils/dateUtils';
+import { getCookie } from '@/utils/storageService';
 interface TargetSettingsModalProps {
     visible: boolean;
     onCancel: () => void;
@@ -694,7 +695,7 @@ export const TargetSettingsModal: React.FC<TargetSettingsModalProps> = ({
             console.log('Parsed shippers:', parsedShippers);
 
             // Get selected shipper from localStorage
-            const selectedShipper = localStorage.getItem("selected_shipper");
+            const selectedShipper = getCookie("shipper_id");
             console.log('Selected shipper:', selectedShipper);
 
             if (!selectedShipper) {

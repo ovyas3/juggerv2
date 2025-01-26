@@ -340,6 +340,7 @@ import { Modal, Form, Select, Button, message, Tag, Space, Typography, SelectPro
 import { httpsPost, httpsGet } from '@/utils/Communication';
 import styled from 'styled-components';
 import { CloseOutlined, CheckOutlined } from '@ant-design/icons';
+import { getCookie } from '@/utils/storageService';
 
 interface Shipper {
     _id: string;
@@ -514,7 +515,7 @@ export const ShipperSettingsModal: React.FC<ShipperSettingsModalProps> = ({
             const storedShippers = localStorage.getItem('shippers');
             if (storedShippers) {
                 const parsedShippers: Shipper[] = JSON.parse(storedShippers);
-                const selectedShipper = localStorage.getItem("selected_shipper");
+                const selectedShipper = getCookie("shipper_id");
                 if (selectedShipper) {
                     try {
                         const selectedShipperData = JSON.parse(selectedShipper);

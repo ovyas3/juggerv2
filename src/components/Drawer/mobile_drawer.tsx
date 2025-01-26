@@ -14,13 +14,22 @@ import DispatchIcon from "@/assets/dispatch_icon.svg";
 import DispatchIconActive from "@/assets/dispatch_icon_active.svg";
 import BillingIcon from "@/assets/billing_icon.svg";
 import BillingIconActive from "@/assets/billing_icon_active.svg";
-import EWayBillInactive from "@/assets/eway_bill_bg_icon.svg";
-import EWayBillActive from "@/assets/eway_bill_wg_icon.svg";
+
 import welcomeIcon from "@/assets/welcome-svg-icon.svg";
 import HomeIcon from "@mui/icons-material/Home";
 import LogoutIcon from "@mui/icons-material/Logout";
 import DispatchTrendInactive from "@/assets/dispatch_trend_bg_icon.svg";
 import DispatchTrendActive from "@/assets/dispatch_trend_wg_icon.svg";
+import InPlantOverviewInactive from "@/assets/in_plant_overview_bg_icon.svg";
+import InPlantOverviewActive from "@/assets/in_plant_overview_wg_icon.svg";
+import ProductivityInactive from "@/assets/productivity_bg_icon.svg";
+import ProductivityActive from "@/assets/productivity_wg_icon.svg";
+import VehicleStagingLiveInactive from "@/assets/vehicle_staging_live_bg_icon.svg";
+import VehicleStagingLiveActive from "@/assets/vehicle_staging_live_wg_icon.svg";
+import TATDashboardInactive from "@/assets/tat_dashboard_bg_icon.svg";
+import TATDashboardActive from "@/assets/tat_dashboard_wg_icon.svg";
+import TATTrendsInactive from "@/assets/tat_trends_bg_icon.svg";
+import TATTrendsActive from "@/assets/tat_trends_wg_icon.svg";
 import LeadDistanceInactive from "@/assets/lead_distance_analysis_bg_icon.svg";
 import LeadDistanceActive from "@/assets/lead_distance_analysis_wg_icon.svg";
 import FreightTrendsInactive from "@/assets/freight_trends_bg_icon.svg";
@@ -45,6 +54,38 @@ const navigationItems: NavItem[] = [
         icon: '',
         activeIcon: DispatchTrendActive,
         inactiveIcon: DispatchTrendInactive,
+        isImageIcon: true
+    },
+    {
+        id: 'VehicleStagingLive',
+        label: 'Vehicle Staging Live',
+        icon: '',
+        activeIcon: VehicleStagingLiveActive,
+        inactiveIcon: VehicleStagingLiveInactive,
+        isImageIcon: true
+    },
+    {
+        id: 'TATDashboard',
+        label: 'TAT Dashboard',
+        icon: '',
+        activeIcon: TATDashboardActive,
+        inactiveIcon: TATDashboardInactive,
+        isImageIcon: true
+    },
+    {
+        id: 'TATTrends',
+        label: 'TAT Trends',
+        icon: '',
+        activeIcon: TATTrendsActive,
+        inactiveIcon: TATTrendsInactive,
+        isImageIcon: true
+    },
+    {
+        id: 'Productivity',
+        label: 'Productivity',
+        icon: '',
+        activeIcon: ProductivityActive,
+        inactiveIcon: ProductivityInactive,
         isImageIcon: true
     },
     // {

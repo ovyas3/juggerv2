@@ -1,0 +1,128 @@
+.container {
+    padding: 2rem;
+    background: #FFFFFF;
+    min-height: 90vh;
+}
+
+.title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 1rem;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.graphContainer {
+    background: white;
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    margin-top: 2rem;
+    min-height: 70vh;
+}
+
+.chartContainer {
+    width: 100%;
+    margin-top: 2rem;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.controls {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.chartTypeToggle,
+.filterToggle {
+    display: flex;
+    background-color: #f0f0f0;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.toggleButton {
+    padding: 8px 16px;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-size: 14px;
+}
+
+.toggleButton.active {
+    background-color: #007bff;
+    color: #ffffff;
+}
+
+.chartWrapper {
+    height: 400px;
+}
+
+@media (max-width: 768px) {
+    .controls {
+        flex-direction: column;
+        gap: 15px;
+        align-items: center;
+    }
+
+    .chartTypeToggle,
+    .filterToggle {
+        justify-content: center;
+        width: 100%;
+        max-width: 300px;
+    }
+
+    .toggleButton {
+        flex: 1;
+        text-align: center;
+    }
+
+    .chartWrapper {
+        height: 300px;
+    }
+}
+
+@media (max-width: 600px) {
+    .chartWrapper {
+        height: 400px;
+    }
+}
+
+@media (max-width: 400px) {
+    .chartWrapper {
+        height: 450px;
+    }
+}
+
+
+@media (max-width: 480px) {
+    .chartWrapper {
+        height: 500px;
+    }
+}
+
+@media (max-width: 360px) {
+    .chartWrapper {
+        height: 550px;
+    }
+}
+
+
+@media (max-width: 767px) {
+    .container {
+        padding: 1rem;
+    }
+
+    .graphContainer {
+        padding: 0.5rem;
+        min-height: 80vh;
+    }
+
+    .chartContainer {
+        margin-top: 1rem;
+    }
+}

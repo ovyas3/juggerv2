@@ -5,7 +5,7 @@ import { Select, MenuItem, FormControl, SelectChangeEvent } from "@mui/material"
 import dropdownIcon from "../../assets/dropdown_small_icon.svg";
 import "./dropdown.css";
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import {setCookies} from '@/utils/storageService'
+import {getCookie, setCookies} from '@/utils/storageService'
 import CustomSelect from "../UI/CustomSelect/CustomSelect";
 import { ShipperSettingsModal } from '../PlantSchedule/ShipperSettingsModal';
 
@@ -35,8 +35,8 @@ const Dropdown = ({ shippers, reload }:{shippers: shipper[], reload: any, getAll
   const handleChange = (event: any) => {
     const newValue = event as string;
     setSelectedValue(newValue);
-    localStorage.setItem('selected_shipper', newValue);
-    setCookies("selected_shipper", newValue);
+    localStorage.setItem('shipper_id', newValue);
+    setCookies("shipper_id", newValue);
     window.location.reload();
   };
 
@@ -53,7 +53,7 @@ const Dropdown = ({ shippers, reload }:{shippers: shipper[], reload: any, getAll
   }, []);
 
   useEffect(() => {
-    const selected_shipper = localStorage.getItem('selected_shipper') as string;
+    const selected_shipper = getCookie("shipper_id") as string;
     const optionsData = shippers.map((shipper) => {
       return { value: shipper._id, label: shipper.name };
     });
