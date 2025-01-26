@@ -1425,7 +1425,7 @@ const PlantSchedule: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [plants, setPlants] = useState<string[]>([]);
   const [currentTheme, setCurrentTheme] = useState<ThemeKey>('navy');
-  const [activeShift, setActiveShift] = useState<'all' | 'morning' | 'day' | 'night'>('all');
+  const [activeShift, setActiveShift] = useState<'' |'all' | 'morning' | 'day' | 'night'>('');
   const [totalStats, setTotalStats] = useState({ total: 0, average: 0, peak: 0 });
   const router = useRouter();
   const [plantTargets, setPlantTargets] = useState<{ [plantName: string]: number }>({});
@@ -1435,6 +1435,9 @@ const PlantSchedule: React.FC = () => {
   const theme = useTheme();
   const mobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [response, setResponse] = useState<any>(null);
+  const [shiftData, setShiftData] = useState<ScheduleData[]>([]);
+  const [resultData, setResultData] = useState<ScheduleData[]>([]);
+  const [totalStatsVisible, setTotalStatsVisible] = useState(false);
 
   useEffect(() => {
     const savedTheme = Cookies.get('plantScheduleTheme') as ThemeKey;
@@ -1467,12 +1470,12 @@ const PlantSchedule: React.FC = () => {
     { id: 'night', name: 'NC' }
   ];
 
-  const getShiftData = (shiftId: string) => {
+  const getScheduleData = (shiftId: string) => {
     if (!scheduleData) return [];
 
     let filteredData = scheduleData;
 
-    if (shiftId !== 'all') {
+    if (shiftId !== 'all' && shiftId !== '') {
       const shiftTimes = {
         'morning': { start: 6, end: 14 },
         'day': { start: 14, end: 22 },
@@ -1480,6 +1483,60 @@ const PlantSchedule: React.FC = () => {
       };
 
       filteredData = scheduleData.filter(schedule => {
+        const [startHourStr] = schedule.timeSlot.split(':');
+        const startHour = parseInt(startHourStr, 10);
+
+        if (shiftId === 'night') {
+          return startHour >= shiftTimes.night.start || startHour < shiftTimes.night.end;
+        }
+
+        const shift = shiftTimes[shiftId as keyof typeof shiftTimes];
+        if(shift){
+          return startHour >= shift.start && startHour < shift.end;
+        } else {
+          return '';
+        }
+      });
+    }
+
+    // Sort the data in descending order based on time
+    const resultData = filteredData.sort((a, b) => {
+      const [aStartHourStr, aStartMinStr] = a.timeSlot.split(' - ')[0].split(':');
+      const [bStartHourStr, bStartMinStr] = b.timeSlot.split(' - ')[0].split(':');
+
+      const aStartHour = parseInt(aStartHourStr, 10);
+      const bStartHour = parseInt(bStartHourStr, 10);
+      const aStartMin = parseInt(aStartMinStr, 10);
+      const bStartMin = parseInt(bStartMinStr, 10);
+
+      // Handle night shift case where hours might be across midnight
+      if (aStartHour < 6 && bStartHour >= 22) return -1;
+      if (bStartHour < 6 && aStartHour >= 22) return 1;
+
+      // Normal comparison
+      if (aStartHour !== bStartHour) {
+        return bStartHour - aStartHour;
+      }
+      return bStartMin - aStartMin;
+    });
+    
+    console.log(resultData, "resultData");
+    return resultData;
+  };
+
+  const getShiftData = (shiftId: string) => {
+    if (!shiftData) return [];
+
+    let filteredData = shiftData;
+
+    if (shiftId !== 'all' && shiftId !== '') {
+      const shiftTimes = {
+        'morning': { start: 6, end: 14 },
+        'day': { start: 14, end: 22 },
+        'night': { start: 22, end: 6 }
+      };
+
+      filteredData = shiftData.filter(schedule => {
         const [startHourStr] = schedule.timeSlot.split(':');
         const startHour = parseInt(startHourStr, 10);
 
@@ -1543,22 +1600,6 @@ const PlantSchedule: React.FC = () => {
       average: Number(average.toFixed(0)),
       peak: Number(peak.toFixed(0))
     };
-  }
-
-  const calculateStats = (shift: 'all' | 'morning' | 'day' | 'night') => {
-    // const data = scheduleData;
-    const data = getShiftData(shift);
-    if (!data.length) return { total: 0, average: 0, peak: 0 };
-
-    const total = calculateGrandTotal(data);
-    const average = total / data.length;
-    const peak = Math.max(...data.map(schedule => calculateRowTotal(schedule.materialsObj)));
-
-    return {
-      total: Number(total.toFixed(0)),
-      average: Number(average.toFixed(0)),
-      peak: Number(peak.toFixed(0))
-    };
   };
 
   const calculateShiftStats = (shift: 'all' | 'morning' | 'day' | 'night') => {
@@ -1587,13 +1628,6 @@ const PlantSchedule: React.FC = () => {
       return (actual / target) * 100;
   };
 
-  useEffect(() => {
-    if (!loading) {
-      const stats = calculateStats(activeShift);
-      // setCurrentStats(stats);
-    }
-  }, [activeShift, scheduleData, loading]);
-
   const fetchData = async (date: Dayjs) => {
     try {
       setLoading(true);
@@ -1602,14 +1636,18 @@ const PlantSchedule: React.FC = () => {
       if (response.statusCode === 200) {
         const targetResponse = response as TargetResponse;
         const { result, shift, target } = targetResponse.data;
+        setShiftData(shift);
+        setResultData(result);
+        setTotalStatsVisible(true);
         setTotalBillingData(result.sort((a, b) => a.hourGroup - b.hourGroup));
         setScheduleData(shift.sort((a, b) => a.hourGroup - b.hourGroup));
 
         // Extract unique plant names from all materialsObj
         const uniquePlants = new Set<string>();
-        shift.forEach((item: ScheduleData) => {
+        result.forEach((item: ScheduleData) => {
           Object.keys(item.materialsObj).forEach(plant => uniquePlants.add(plant));
         });
+
         setPlants(Array.from(uniquePlants).sort());
 
         const targetsMap: { [plantName: string]: number } = {};
@@ -1738,6 +1776,21 @@ const PlantSchedule: React.FC = () => {
     return false;
   };
 
+  useEffect(() => {
+    if (resultData && resultData.length > 0 && shiftData && shiftData.length > 0) {
+        const uniquePlants = new Set<string>();
+        const dataToUse = totalStatsVisible ? resultData : shiftData;
+
+        dataToUse.forEach((item: ScheduleData) => {
+            Object.keys(item.materialsObj).forEach(plant => uniquePlants.add(plant));
+        });
+
+        setScheduleData(dataToUse.sort((a, b) => a.hourGroup - b.hourGroup));
+        setPlants(Array.from(uniquePlants).sort());
+        totalStatsVisible && setActiveShift(''); 
+    }
+}, [totalStatsVisible]);
+
   if (loading) {
     return (
       <Container
@@ -1834,7 +1887,12 @@ const PlantSchedule: React.FC = () => {
                       </div>
                     </StatItem>
                     <StatsCard>
-                      <StatItem theme={themes[currentTheme]}>
+                      <StatItem 
+                        onClick={() => {
+                          setTotalStatsVisible(true);
+                        }}
+                        theme={themes[currentTheme]}
+                      >
                         <div className="stat-header">
                           <h3>Total Invoicing (Road) (MT)</h3>
                           <Tooltip title="Total materials scheduled for the selected shift">
@@ -1892,7 +1950,10 @@ const PlantSchedule: React.FC = () => {
                           <div
                             key={shift.id}
                             className={`tab ${activeShift === shift.id ? 'active' : ''}`}
-                            onClick={() => setActiveShift(shift.id as 'all' | 'morning' | 'day' | 'night')}
+                            onClick={() => {
+                              setTotalStatsVisible(false);
+                              setActiveShift(shift.id as 'all' | 'morning' | 'day' | 'night');
+                            }}
                           >
                             <div className="shift-label">
                               <span className="shift-name">{shift.name}</span>
@@ -1926,7 +1987,12 @@ const PlantSchedule: React.FC = () => {
                       </div>
                     </StatItem>
                     <StatsCard>
-                      <StatItem theme={themes[currentTheme]}>
+                      <StatItem 
+                        theme={themes[currentTheme]}
+                        onClick={() => {
+                          setTotalStatsVisible(true);
+                        }}
+                      >
                         <div className="stat-header">
                           <h3>Total Invoicing (Road) (MT)</h3>
                           <Tooltip title="Total materials scheduled for the selected shift">
@@ -1978,11 +2044,16 @@ const PlantSchedule: React.FC = () => {
                     <ShiftTabs theme={themes[currentTheme]}>
                       {shifts.map(shift => {
                         const shiftStats = calculateShiftStats(shift.id as 'all' | 'morning' | 'day' | 'night');
+                        console.log(shift.id);
+
                         return (
                           <div
                             key={shift.id}
                             className={`tab ${activeShift === shift.id ? 'active' : ''}`}
-                            onClick={() => setActiveShift(shift.id as 'all' | 'morning' | 'day' | 'night')}
+                            onClick={() => {
+                              setTotalStatsVisible(false);
+                              setActiveShift(shift.id as 'all' | 'morning' | 'day' | 'night');
+                            }}
                           >
                             <div className="shift-label">
                               <span className="shift-name">{shift.name}</span>
@@ -2011,7 +2082,7 @@ const PlantSchedule: React.FC = () => {
                     </div>
                     <div className="target-grid">
                       {plants.map(plant => {
-                        const columnTotal = calculateColumnTotal(getShiftData(activeShift), plant);
+                        const columnTotal = calculateColumnTotal(getScheduleData(activeShift), plant);
                         const target = getTargetForPlant(plant);
                         const achievement = calculateAchievement(columnTotal, target);
                         const remaining = target - columnTotal;
@@ -2041,7 +2112,7 @@ const PlantSchedule: React.FC = () => {
                       <div className="target-item total">
                         {(() => {
                           const totalTarget = plants.reduce((sum, plant) => sum + getTargetForPlant(plant), 0);
-                          const totalActual = plants.reduce((sum, plant) => sum + calculateColumnTotal(getShiftData(activeShift), plant), 0);
+                          const totalActual = plants.reduce((sum, plant) => sum + calculateColumnTotal(getScheduleData(activeShift), plant), 0);
                           const totalAchievement = calculateAchievement(totalActual, totalTarget);
                           const totalRemaining = totalTarget - totalActual;
 
@@ -2070,7 +2141,7 @@ const PlantSchedule: React.FC = () => {
                       </div>
                     </div>
                   </MobileTargetCard>
-                  {getShiftData(activeShift).map((schedule, index) => (
+                  {getScheduleData(activeShift).map((schedule, index) => (
                     <MobileCard key={index} theme={themes[currentTheme]}>
                       <div className="time-header">
                         <ClockCircleOutlined className="clock-icon" />
@@ -2122,7 +2193,7 @@ const PlantSchedule: React.FC = () => {
                             </SignalIndicator>
                           </StyledCell>
                           {plants.map(plant => {
-                            const columnTotal = calculateColumnTotal(getShiftData(activeShift), plant);
+                            const columnTotal = calculateColumnTotal(getScheduleData(activeShift), plant);
                             const target = getTargetForPlant(plant);
                             const achievement = calculateAchievement(columnTotal, target);
                             const remaining = target - columnTotal;
@@ -2148,7 +2219,7 @@ const PlantSchedule: React.FC = () => {
                           <StyledCell theme={themes[currentTheme]} className="total-cell">
                             {(() => {
                               const totalTarget = plants.reduce((sum, plant) => sum + getTargetForPlant(plant), 0);
-                              const totalActual = plants.reduce((sum, plant) => sum + calculateColumnTotal(getShiftData(activeShift), plant), 0);
+                              const totalActual = plants.reduce((sum, plant) => sum + calculateColumnTotal(getScheduleData(activeShift), plant), 0);
                               const totalAchievement = calculateAchievement(totalActual, totalTarget);
                               const totalRemaining = totalTarget - totalActual;
 
@@ -2170,7 +2241,7 @@ const PlantSchedule: React.FC = () => {
                             })()}
                           </StyledCell>
                         </StyledRow>
-                        {getShiftData(activeShift).map((schedule, index) => (
+                        {getScheduleData(activeShift).map((schedule, index) => (
                           <Tr key={index} theme={themes[currentTheme]} $iscurrenttime={isCurrentTime(schedule.timeSlot)}>
                             <Td data-time="true" theme={themes[currentTheme]}>{schedule.timeSlot}</Td>
                             {plants.map((plant) => (
@@ -2198,19 +2269,19 @@ const PlantSchedule: React.FC = () => {
                           {plants.map((plant) => (
                             <Td key={plant} data-total="true" theme={themes[currentTheme]}>
                               <Value
-                                value={calculateColumnTotal(getShiftData(activeShift), plant)}
+                                value={calculateColumnTotal(getScheduleData(activeShift), plant)}
                                 theme={themes[currentTheme]}
                               >
-                                {calculateColumnTotal(getShiftData(activeShift), plant).toFixed(0)}
+                                {calculateColumnTotal(getScheduleData(activeShift), plant).toFixed(0)}
                               </Value>
                             </Td>
                           ))}
                           <Td data-total="true" theme={themes[currentTheme]}>
                             <Value
-                              value={calculateGrandTotal(getShiftData(activeShift))}
+                              value={calculateGrandTotal(getScheduleData(activeShift))}
                               theme={themes[currentTheme]}
                             >
-                              {calculateGrandTotal(getShiftData(activeShift)).toFixed(0)}
+                              {calculateGrandTotal(getScheduleData(activeShift)).toFixed(0)}
                             </Value>
                           </Td>
                         </Tr>
