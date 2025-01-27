@@ -46,6 +46,19 @@ import FreightTrendsActive from "@/assets/freight_trends_wg_icon.svg";
 import { deleteAllCache } from "@/utils/storageService";
 import { environment } from "@/environments/env.api";
 
+import LoadActive from "@/assets/load_active_icon.svg";
+import LoadInactive from "@/assets/load_deactive_icon.svg";
+import ShipmentHeaderActive from "@/assets/shipment_header_active.svg";
+import ShipmentHeaderInactive from "@/assets/shipment_header_inactive.svg";
+import AccountingActive from "@/assets/accounting_active.svg";
+import AccountingInactive from "@/assets/accounting_inactive.svg";
+import ReportActive from "@/assets/report_active_icon.svg";
+import ReportInactive from "@/assets/report_deactive_icon.svg";
+import SupportActive from "@/assets/support_active.svg";
+import SupportInactive from "@/assets/support_inactive.svg";
+import HelpActive from "@/assets/help_active.svg";
+import HelpInactive from "@/assets/help_inactive.svg";
+
 interface NavItem {
     id: string;
     label: string;
@@ -53,15 +66,34 @@ interface NavItem {
     activeIcon?: string;
     inactiveIcon?: string;
     isImageIcon?: boolean;
+    route?: string;
 }
 
 const navigationItems: NavItem[] = [
+    {
+        id: 'loadDashboard',
+        label: 'Load Dashboard',
+        icon: '',
+        activeIcon: LoadActive,
+        inactiveIcon: LoadInactive,
+        route: 'loadDashboard',
+        isImageIcon: true
+    },
     {
         id: 'invoicingTrends',
         label: 'Trends',
         icon: '',
         activeIcon: DispatchTrendActive,
         inactiveIcon: DispatchTrendInactive,
+        isImageIcon: true
+    },
+    {
+        id: 'shipments',
+        label: 'Shipments',
+        icon: '',
+        activeIcon: ShipmentHeaderActive,
+        inactiveIcon: ShipmentHeaderInactive,
+        route: 'shipmentsDashboard',
         isImageIcon: true
     },
     {
@@ -86,6 +118,15 @@ const navigationItems: NavItem[] = [
         icon: '',
         activeIcon: TATTrendsActive,
         inactiveIcon: TATTrendsInactive,
+        isImageIcon: true
+    },
+    {
+        id: 'freightAccounting',
+        label: 'Freight Accounting',
+        icon: '',
+        activeIcon: AccountingActive,
+        inactiveIcon: AccountingInactive,
+        route: 'consolidatedInvoices',
         isImageIcon: true
     },
     {
@@ -120,6 +161,33 @@ const navigationItems: NavItem[] = [
         inactiveIcon: OwnVehicleUsageInactive,
         isImageIcon: true
     },
+    {
+        id: 'reports',
+        label: 'Reports',
+        icon: '',
+        activeIcon: ReportActive,
+        inactiveIcon: ReportInactive,
+        route: '/reports',
+        isImageIcon: true
+    },
+    {
+        id: 'support',
+        label: 'Support',
+        icon: '',
+        activeIcon: SupportActive,
+        inactiveIcon: SupportInactive,
+        route: 'support',
+        isImageIcon: true,
+    },
+    {
+        id: 'helpDesk',
+        label: 'Help Desk',
+        icon: '',
+        activeIcon: HelpActive,
+        inactiveIcon: HelpInactive,
+        route: 'help-desk',
+        isImageIcon: true
+    }
     // {
     //     id: 'ewaybillDashboard',
     //     label: 'eWaybill Dashboard',
@@ -210,12 +278,18 @@ function MobileDrawer() {
     const [active, setActive] = useState('orders');
     const router = useRouter();
     const pathName = usePathname();
+    const { PROD_SMART } = environment;
 
     const handleRouting = (route: string) => {
         router.push('/' + route);
         setActive(route);
         setIsOpen(false);
     };
+
+    const handleShipperRouting = (route: string) => {
+        window.open(`${PROD_SMART}${route}`, '_self');
+    };
+
 
     const handleLogout = () => {
         console.log("logout");
@@ -247,7 +321,7 @@ function MobileDrawer() {
                         style={{
                             height: '36px',
                         }}
-                        onClick={() => handleRouting('welcome')}
+                        onClick={() => handleShipperRouting('welcome')}
                     />
                     <button className="close-button-mobile-header" onClick={() => setIsOpen(false)}>
                         <CloseIcon />
@@ -260,7 +334,7 @@ function MobileDrawer() {
                             key={item.id}
                             item={item}
                             isActive={active === item.id}
-                            onClick={() => handleRouting(item.id)}
+                            onClick={() => item.route ? handleShipperRouting(item.route) : handleRouting(item.id)}
                         />
                     ))}
                     <button className="drawer-item" onClick={() => handleLogout()}>
