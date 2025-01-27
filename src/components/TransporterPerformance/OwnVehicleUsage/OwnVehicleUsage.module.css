@@ -1,0 +1,281 @@
+.container {
+    padding: 2rem;
+    background: #fff;
+    min-height: 100vh;
+}
+
+.title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 1rem;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.filterGroup {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    flex: 1;
+
+    @media (max-width: 768px) {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    }
+}
+
+.dateRange {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: white;
+    padding: 0.5rem 1rem;
+    border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.buttonGroup {
+    display: flex;
+    gap: 1rem;
+}
+
+.button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-weight: 500;
+    transition: all 0.2s;
+    border: none;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.clearButton {
+    composes: button;
+    background: red;
+    color: white;
+}
+
+.clearButton:hover {
+    background: #b91c1c;
+}
+
+.searchButton {
+    composes: button;
+    background: #34D399;
+    color: white;
+}
+
+.searchButton:hover {
+    background: #10B981;
+}
+
+
+.toggleWrapper {
+    background: #e2e8f0;
+    border-radius: 1.5rem;
+    padding: 0.25rem;
+    position: relative;
+    width: 80px;
+    height: 36px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.toggleWrapper[data-active="weight"] {
+    background: #3b82f6;
+    /* Blue color for weight mode */
+}
+
+.toggleWrapper[data-active="truck"] {
+    background: #1f2937;
+    /* Dark color for truck mode */
+}
+
+.toggleIcons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 0.5rem;
+    position: relative;
+    z-index: 1;
+    height: 100%;
+}
+
+.icon {
+    color: #fff;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.3s ease;
+}
+
+.activeIcon {
+    color: #ffffff;
+    /* White color for active icon */
+}
+
+.slider {
+    position: absolute;
+    top: 4px;
+    height: 28px;
+    width: 36px;
+    background: white;
+    border-radius: 1rem;
+    transition: transform 0.3s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.sliderRight {
+    transform: translateX(40px);
+}
+
+.tableContainer {
+    position: relative;
+    overflow: auto;
+    max-height: 600px;
+    border-radius: 0.5rem;
+    background: #f8fafc;
+}
+
+.table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    min-width: 800px;
+}
+
+.thead {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: #f8fafc;
+}
+
+
+.th {
+    position: sticky;
+    top: 0;
+    background: #f8fafc;
+    padding: 1rem;
+    text-align: left;
+    font-weight: 500;
+    color: #475569;
+    font-size: 0.875rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.td {
+    padding: 1rem;
+    border-bottom: 1px solid #e2e8f0;
+    background: white;
+    color: #1a1a1a;
+    font-size: 0.875rem;
+}
+
+.progressContainer {
+    position: relative;
+    width: 200px;
+    height: 20px;
+    background: #f1f5f9;
+    border-radius: 4px;
+    overflow: visible;
+}
+
+.progressBar {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+.benchmark {
+    position: absolute;
+    top: -4px;
+    bottom: -4px;
+    width: 2px;
+    background: #000;
+}
+
+.green {
+    background: #22c55e;
+}
+
+.orange {
+    background: #f97316;
+}
+
+.red {
+    background: #ef4444;
+}
+
+.percentageText {
+    color: inherit;
+}
+
+.percentageGreen {
+    color: #22c55e;
+}
+
+.percentageOrange {
+    color: #f97316;
+}
+
+.percentageRed {
+    color: #ef4444;
+}
+
+.contentWrapper {
+    display: flex;
+}
+
+.tableContainer {
+    flex: 1;
+}
+
+.cardContainer {
+    display: none;
+}
+
+@media (max-width: 600px) {
+    .tableContainer {
+        display: none;
+    }
+
+    .cardContainer {
+        display: block;
+        width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 1rem;
+    }
+
+    .header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .buttonGroup {
+        flex-direction: column;
+    }
+
+    .button {
+        width: 100%;
+        justify-content: center;
+    }
+}

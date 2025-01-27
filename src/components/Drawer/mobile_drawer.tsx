@@ -14,7 +14,6 @@ import DispatchIcon from "@/assets/dispatch_icon.svg";
 import DispatchIconActive from "@/assets/dispatch_icon_active.svg";
 import BillingIcon from "@/assets/billing_icon.svg";
 import BillingIconActive from "@/assets/billing_icon_active.svg";
-
 import welcomeIcon from "@/assets/welcome-svg-icon.svg";
 import HomeIcon from "@mui/icons-material/Home";
 import LogoutIcon from "@mui/icons-material/Logout";
@@ -22,6 +21,8 @@ import DispatchTrendInactive from "@/assets/dispatch_trend_bg_icon.svg";
 import DispatchTrendActive from "@/assets/dispatch_trend_wg_icon.svg";
 import InPlantOverviewInactive from "@/assets/in_plant_overview_bg_icon.svg";
 import InPlantOverviewActive from "@/assets/in_plant_overview_wg_icon.svg";
+import TransporterPerformanceInactive from "@/assets/transporter_performance_bg_icon.svg";
+import TransporterPerformanceActive from "@/assets/transporter_performance_wg_icon.svg";
 import ProductivityInactive from "@/assets/productivity_bg_icon.svg";
 import ProductivityActive from "@/assets/productivity_wg_icon.svg";
 import VehicleStagingLiveInactive from "@/assets/vehicle_staging_live_bg_icon.svg";
@@ -30,6 +31,13 @@ import TATDashboardInactive from "@/assets/tat_dashboard_bg_icon.svg";
 import TATDashboardActive from "@/assets/tat_dashboard_wg_icon.svg";
 import TATTrendsInactive from "@/assets/tat_trends_bg_icon.svg";
 import TATTrendsActive from "@/assets/tat_trends_wg_icon.svg";
+import OwnVehicleUsageInactive from "@/assets/own_vehicle_gauge_bg_icon.svg";
+import OwnVehicleUsageActive from "@/assets/own_vehicle_gauge_wg_icon.svg";
+import LoadDetailsInactive from "@/assets/load_details_bg_icon.svg";
+import LoadDetailsActive from "@/assets/load_details_wg_icon.svg";
+
+import EWayBillInactive from "@/assets/eway_bill_bg_icon.svg";
+import EWayBillActive from "@/assets/eway_bill_wg_icon.svg";
 import LeadDistanceInactive from "@/assets/lead_distance_analysis_bg_icon.svg";
 import LeadDistanceActive from "@/assets/lead_distance_analysis_wg_icon.svg";
 import FreightTrendsInactive from "@/assets/freight_trends_bg_icon.svg";
@@ -81,11 +89,35 @@ const navigationItems: NavItem[] = [
         isImageIcon: true
     },
     {
+        id: 'TransporterPerformance',
+        label: 'Transporter Performance',
+        icon: '',
+        activeIcon: TransporterPerformanceActive,
+        inactiveIcon: TransporterPerformanceInactive,
+        isImageIcon: true
+    },
+    {
         id: 'Productivity',
         label: 'Productivity',
         icon: '',
         activeIcon: ProductivityActive,
         inactiveIcon: ProductivityInactive,
+        isImageIcon: true
+    },
+    {
+        id: 'TransporterLoadDetails',
+        label: 'Load Details',
+        icon: '',
+        activeIcon: LoadDetailsActive,
+        inactiveIcon: LoadDetailsInactive,
+        isImageIcon: true
+    },
+    {
+        id: 'OwnVehicleUsage',
+        label: 'Own Vehicle Usage',
+        icon: '',
+        activeIcon: OwnVehicleUsageActive,
+        inactiveIcon: OwnVehicleUsageInactive,
         isImageIcon: true
     },
     // {

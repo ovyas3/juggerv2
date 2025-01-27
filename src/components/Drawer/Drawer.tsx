@@ -17,6 +17,8 @@ import DispatchTrendActive from "@/assets/dispatch_trend_wg_icon.svg";
 import RightArrow from "@/assets/right_arrow_icon.svg";
 import InPlantOverviewInactive from "@/assets/in_plant_overview_bg_icon.svg";
 import InPlantOverviewActive from "@/assets/in_plant_overview_wg_icon.svg";
+import TransporterPerformanceInactive from "@/assets/transporter_performance_bg_icon.svg";
+import TransporterPerformanceActive from "@/assets/transporter_performance_wg_icon.svg";
 import ProductivityInactive from "@/assets/productivity_bg_icon.svg";
 import ProductivityActive from "@/assets/productivity_wg_icon.svg";
 import VehicleStagingLiveInactive from "@/assets/vehicle_staging_live_bg_icon.svg";
@@ -25,12 +27,19 @@ import TATDashboardInactive from "@/assets/tat_dashboard_bg_icon.svg";
 import TATDashboardActive from "@/assets/tat_dashboard_wg_icon.svg";
 import TATTrendsInactive from "@/assets/tat_trends_bg_icon.svg";
 import TATTrendsActive from "@/assets/tat_trends_wg_icon.svg";
+import OwnVehicleUsageInactive from "@/assets/own_vehicle_gauge_bg_icon.svg";
+import OwnVehicleUsageActive from "@/assets/own_vehicle_gauge_wg_icon.svg";
+import LoadDetailsInactive from "@/assets/load_details_bg_icon.svg";
+import LoadDetailsActive from "@/assets/load_details_wg_icon.svg";
+
 import EWayBillInactive from "@/assets/eway_bill_bg_icon.svg";
 import EWayBillActive from "@/assets/eway_bill_wg_icon.svg";
 import LeadDistanceInactive from "@/assets/lead_distance_analysis_bg_icon.svg";
 import LeadDistanceActive from "@/assets/lead_distance_analysis_wg_icon.svg";
 import FreightTrendsInactive from "@/assets/freight_trends_bg_icon.svg";
 import FreightTrendsActive from "@/assets/freight_trends_wg_icon.svg";
+import FreightEstimatorIcon from "@/assets/freight_estimator_icon.svg";
+import FreightEstimatorIconActive from "@/assets/freight_estimator_icon_active.svg";
 
 interface NavItem {
     id: string;
@@ -76,6 +85,15 @@ const navigationItems: NavItem[] = [
                 isImageIcon: true
             },
         ]
+    },
+    {
+        id: 'freightEstimator',
+        label: 'Freight Estimator',
+        icon: '',
+        activeIcon: FreightEstimatorIconActive,
+        inactiveIcon: FreightEstimatorIcon,
+        isImageIcon: true
+    },
     {
         id: 'inPlant',
         label: 'In Plant Overview',
@@ -106,6 +124,32 @@ const navigationItems: NavItem[] = [
                 icon: '',
                 activeIcon: TATTrendsActive,
                 inactiveIcon: TATTrendsInactive,
+                isImageIcon: true
+            },
+        ]
+    },
+    {
+        id: 'TransporterPerformance',
+        label: 'Transporter Performance',
+        icon: '',
+        activeIcon: TransporterPerformanceActive,
+        inactiveIcon: TransporterPerformanceInactive,
+        isImageIcon: true,
+        children: [
+            {
+                id: 'TransporterLoadDetails',
+                label: 'Load Details',
+                icon: '',
+                activeIcon: LoadDetailsActive,
+                inactiveIcon: LoadDetailsInactive,
+                isImageIcon: true
+            },
+            {
+                id: 'OwnVehicleUsage',
+                label: 'Own Vehicle Usage',
+                icon: '',
+                activeIcon: OwnVehicleUsageActive,
+                inactiveIcon: OwnVehicleUsageInactive,
                 isImageIcon: true
             },
         ]
@@ -152,18 +196,18 @@ const navigationItems: NavItem[] = [
     // }
 ];
 
-const NavItem = ({ 
-    item, 
-    isActive, 
-    isHovered, 
-    isOpen, 
-    onClick, 
-    onMouseEnter, 
+const NavItem = ({
+    item,
+    isActive,
+    isHovered,
+    isOpen,
+    onClick,
+    onMouseEnter,
     onMouseLeave,
-    active, 
-    handleRouting, 
-    setHoveredId, 
-    hoveredId 
+    active,
+    handleRouting,
+    setHoveredId,
+    hoveredId
 }: {
     item: NavItem;
     isActive: boolean;
@@ -226,10 +270,10 @@ const NavItem = ({
                         height={24}
                     />
                 ) : (
-                    <item.icon 
-                        style={{ 
-                            marginLeft: isOpen ? '9px' : '', 
-                            color: isHighlighted || isNestedHovered || isNestedActive ? 'black' : 'white' 
+                    <item.icon
+                        style={{
+                            marginLeft: isOpen ? '9px' : '',
+                            color: isHighlighted || isNestedHovered || isNestedActive ? 'black' : 'white'
                         }}
                     />
                 )}
@@ -255,7 +299,7 @@ const NavItem = ({
                 )}
             </div>
             {showChildren && item.children && (
-                <div 
+                <div
                     className="submenu"
                     style={{ top: '-10px' }}
                 >
@@ -322,25 +366,25 @@ function SideDrawer() {
     }, [pathName]);
 
     return (
-        <div 
-            className='containerDrawer' 
-            onMouseEnter={() => setOpen(true)} 
-            onMouseLeave={() => setOpen(false)} 
-            style={{ 
-                alignItems: 'start', 
-                width: open ? '218px' : '70px', 
+        <div
+            className='containerDrawer'
+            onMouseEnter={() => setOpen(true)}
+            onMouseLeave={() => setOpen(false)}
+            style={{
+                alignItems: 'start',
+                width: open ? '218px' : '70px',
                 transition: 'width 0.2s ease-in'
             }}
         >
             <div className='logo-container'>
-                <Image 
-                    src={open ? fullLogo : defaultLogo} 
+                <Image
+                    src={open ? fullLogo : defaultLogo}
                     alt='logo'
-                    style={{ 
-                        height: '56px', 
+                    style={{
+                        height: '56px',
                         marginLeft: open ? '23px' : '0px',
                         marginBottom: '10px'
-                    }} 
+                    }}
                     onClick={() => handleRouting('welcome')}
                 />
             </div>
