@@ -41,6 +41,21 @@ import FreightTrendsActive from "@/assets/freight_trends_wg_icon.svg";
 import FreightEstimatorIcon from "@/assets/freight_estimator_icon.svg";
 import FreightEstimatorIconActive from "@/assets/freight_estimator_icon_active.svg";
 
+import LoadActive from "@/assets/load_active_icon.svg";
+import LoadInactive from "@/assets/load_deactive_icon.svg";
+import ShipmentHeaderActive from "@/assets/shipment_header_active.svg";
+import ShipmentHeaderInactive from "@/assets/shipment_header_inactive.svg";
+import AccountingActive from "@/assets/accounting_active.svg";
+import AccountingInactive from "@/assets/accounting_inactive.svg";
+import ReportActive from "@/assets/report_active_icon.svg";
+import ReportInactive from "@/assets/report_deactive_icon.svg";
+import SupportActive from "@/assets/support_active.svg";
+import SupportInactive from "@/assets/support_inactive.svg";
+import HelpActive from "@/assets/help_active.svg";
+import HelpInactive from "@/assets/help_inactive.svg";
+import { environment } from '@/environments/env.api';
+import { useTranslations } from 'next-intl';
+
 interface NavItem {
     id: string;
     label: string;
@@ -49,9 +64,19 @@ interface NavItem {
     inactiveIcon?: string;
     isImageIcon?: boolean;
     children?: NavItem[];
+    route?: string;
 }
 
 const navigationItems: NavItem[] = [
+    {
+        id: 'loadDashboard',
+        label: 'Load Dashboard',
+        icon: '',
+        activeIcon: LoadActive,
+        inactiveIcon: LoadInactive,
+        route: 'loadDashboard',
+        isImageIcon: true
+    },
     {
         id: 'invoicing',
         label: 'Invoicing',
@@ -87,11 +112,12 @@ const navigationItems: NavItem[] = [
         ]
     },
     {
-        id: 'freightEstimator',
-        label: 'Freight Estimator',
+        id: 'shipments',
+        label: 'Shipments',
         icon: '',
-        activeIcon: FreightEstimatorIconActive,
-        inactiveIcon: FreightEstimatorIcon,
+        activeIcon: ShipmentHeaderActive,
+        inactiveIcon: ShipmentHeaderInactive,
+        route: 'shipmentsDashboard',
         isImageIcon: true
     },
     {
@@ -127,6 +153,23 @@ const navigationItems: NavItem[] = [
                 isImageIcon: true
             },
         ]
+    },
+    // {
+    //     id: 'freightEstimator',
+    //     label: 'Freight Estimator',
+    //     icon: '',
+    //     activeIcon: FreightEstimatorIconActive,
+    //     inactiveIcon: FreightEstimatorIcon,
+    //     isImageIcon: true
+    // },  
+    {
+        id: 'freightAccounting',
+        label: 'Freight Accounting',
+        icon: '',
+        activeIcon: AccountingActive,
+        inactiveIcon: AccountingInactive,
+        route: 'consolidatedInvoices',
+        isImageIcon: true
     },
     {
         id: 'TransporterPerformance',
@@ -170,6 +213,35 @@ const navigationItems: NavItem[] = [
         inactiveIcon: DashboardInactive,
         isImageIcon: true
     },
+    {
+        id: 'reports',
+        label: 'Reports',
+        icon: '',
+        activeIcon: ReportActive,
+        inactiveIcon: ReportInactive,
+        route: 'reports',
+        isImageIcon: true
+    },
+    {
+        id: 'support',
+        label: 'Support',
+        icon: '',
+        activeIcon: SupportActive,
+        inactiveIcon: SupportInactive,
+        route: 'support',
+        isImageIcon: true,
+        children: [
+            {
+                id: 'helpDesk',
+                label: 'Help Desk',
+                icon: '',
+                activeIcon: HelpActive,
+                inactiveIcon: HelpInactive,
+                route: 'help-desk',
+                isImageIcon: true
+            }
+        ]
+    }
     // {
     //     id: 'ewaybillDashboard',
     //     label: 'eWaybill Dashboard',
@@ -206,6 +278,7 @@ const NavItem = ({
     onMouseLeave,
     active,
     handleRouting,
+    handleShipperRouting,
     setHoveredId,
     hoveredId
 }: {
@@ -218,6 +291,7 @@ const NavItem = ({
     onMouseLeave: () => void;
     active: string;
     handleRouting: (route: string) => void;
+    handleShipperRouting: (route: string) => void;
     setHoveredId: (id: string | null) => void;
     hoveredId: string | null;
 }) => {
@@ -306,7 +380,7 @@ const NavItem = ({
                     {item.children.map((child) => (
                         <div
                             key={child.id}
-                            onClick={() => handleRouting(child.id)}
+                            onClick={() => child.route ? handleShipperRouting(child.route) : handleRouting(child.id)}
                             className="submenu-option"
                             style={{
                                 backgroundColor: active === child.id || hoveredId === child.id ? 'white' : 'transparent',
@@ -323,7 +397,7 @@ const NavItem = ({
                         >
                             {child.isImageIcon ? (
                                 <Image
-                                    src={ active === child.id || hoveredId === child.id ?  child.activeIcon! : child.inactiveIcon!}
+                                    src={active === child.id || hoveredId === child.id ? child.activeIcon! : child.inactiveIcon!}
                                     alt={child.label}
                                     style={{
                                         marginLeft: isOpen ? '10px' : '2px',
@@ -335,7 +409,7 @@ const NavItem = ({
                                 <child.icon
                                     style={{
                                         marginLeft: isOpen ? '9px' : '',
-                                        color: active === child.id || hoveredId === child.id  ? 'black' : 'white'
+                                        color: active === child.id || hoveredId === child.id ? 'black' : 'white'
                                     }}
                                 />
                             )}
@@ -354,10 +428,15 @@ function SideDrawer() {
     const [hoveredId, setHoveredId] = useState<string | null>(null);
     const router = useRouter();
     const pathName = usePathname();
+    const { PROD_SMART } = environment;
 
     const handleRouting = (route: string) => {
         router.push(`/${route}`);
         setActive(route);
+    };
+
+    const handleShipperRouting = (route: string) => {
+        window.open(`${PROD_SMART}${route}`, '_self');
     };
 
     useEffect(() => {
@@ -385,7 +464,7 @@ function SideDrawer() {
                         marginLeft: open ? '23px' : '0px',
                         marginBottom: '10px'
                     }}
-                    onClick={() => handleRouting('welcome')}
+                    onClick={() => handleShipperRouting('welcome')}
                 />
             </div>
             {navigationItems.map((item) => (
@@ -395,11 +474,12 @@ function SideDrawer() {
                     isActive={active === item.id}
                     isHovered={hoveredId === item.id}
                     isOpen={open}
-                    onClick={() => handleRouting(item.id)}
+                    onClick={() => item.route ? handleShipperRouting(item.route) : handleRouting(item.id)}
                     onMouseEnter={() => setHoveredId(item.id)}
                     onMouseLeave={() => setHoveredId(null)}
                     active={active}
                     handleRouting={handleRouting}
+                    handleShipperRouting={handleShipperRouting}
                     setHoveredId={setHoveredId}
                     hoveredId={hoveredId}
                 />

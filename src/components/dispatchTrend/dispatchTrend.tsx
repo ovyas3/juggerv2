@@ -269,7 +269,7 @@ export default function DispatchTrend() {
                             getPopupContainer={(trigger) => trigger.parentElement!}
                             size="middle"
                         />
-                        <Select
+                        {/* <Select
                             placeholder="Select Zone"
                             value={selectedZone}
                             onChange={(e: any) => {
@@ -293,7 +293,7 @@ export default function DispatchTrend() {
                             maxTagCount="responsive"
                             getPopupContainer={(trigger) => trigger.parentElement!}
                             size="middle"
-                        />
+                        /> */}
                     </div>
                     <div className={styles.buttonGroup}>
                         <button className={styles.searchButton} onClick={() => {
