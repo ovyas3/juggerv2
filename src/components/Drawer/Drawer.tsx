@@ -219,7 +219,7 @@ const navigationItems: NavItem[] = [
         icon: '',
         activeIcon: ReportActive,
         inactiveIcon: ReportInactive,
-        route: '/reports',
+        route: 'reports',
         isImageIcon: true
     },
     {
