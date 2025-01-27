@@ -196,6 +196,8 @@ export default function DispatchTrend() {
     const handleClear = () => {
         setSelectedCarriers([]);
         setSelectedCustomers([]);
+        setSelectedZone(null);
+        setSelectedStates([]);
         setDateRange(defaultDateRange);
         getMaterialData();
     };

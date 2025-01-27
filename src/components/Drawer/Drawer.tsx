@@ -27,6 +27,10 @@ import TATDashboardInactive from "@/assets/tat_dashboard_bg_icon.svg";
 import TATDashboardActive from "@/assets/tat_dashboard_wg_icon.svg";
 import TATTrendsInactive from "@/assets/tat_trends_bg_icon.svg";
 import TATTrendsActive from "@/assets/tat_trends_wg_icon.svg";
+import OwnVehicleUsageInactive from "@/assets/own_vehicle_gauge_bg_icon.svg";
+import OwnVehicleUsageActive from "@/assets/own_vehicle_gauge_wg_icon.svg";
+import LoadDetailsInactive from "@/assets/load_details_bg_icon.svg";
+import LoadDetailsActive from "@/assets/load_details_wg_icon.svg";
 
 import EWayBillInactive from "@/assets/eway_bill_bg_icon.svg";
 import EWayBillActive from "@/assets/eway_bill_wg_icon.svg";
@@ -130,7 +134,25 @@ const navigationItems: NavItem[] = [
         icon: '',
         activeIcon: TransporterPerformanceActive,
         inactiveIcon: TransporterPerformanceInactive,
-        isImageIcon: true
+        isImageIcon: true,
+        children: [
+            {
+                id: 'TransporterLoadDetails',
+                label: 'Load Details',
+                icon: '',
+                activeIcon: LoadDetailsActive,
+                inactiveIcon: LoadDetailsInactive,
+                isImageIcon: true
+            },
+            {
+                id: 'OwnVehicleUsage',
+                label: 'Own Vehicle Usage',
+                icon: '',
+                activeIcon: OwnVehicleUsageActive,
+                inactiveIcon: OwnVehicleUsageInactive,
+                isImageIcon: true
+            },
+        ]
     },
     {
         id: 'Productivity',
