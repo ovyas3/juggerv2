@@ -229,7 +229,8 @@ export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatus
         ...(data?.underLoadingresult || []),
         ...(data?.underBillingresult || []),
         ...(data?.doIssuedresult || []),
-      ].map((item) => item.locationName)
+        ...(data?.billedResult || [])
+      ].map((item:any) => item.locationName ? item.locationName : item.material)
     )
   )
 
