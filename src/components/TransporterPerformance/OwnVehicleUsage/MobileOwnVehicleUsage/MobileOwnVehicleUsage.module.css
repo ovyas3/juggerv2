@@ -1,0 +1,130 @@
+.card {
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05), 0 6px 6px rgba(0, 0, 0, 0.1);
+    padding: 24px;
+    margin-bottom: 24px;
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1), 0 8px 8px rgba(0, 0, 0, 0.15);
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0;
+}
+
+.badge {
+    display: flex;
+    align-items: center;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+.icon {
+    margin-left: 4px;
+}
+
+.scorecard {
+    margin-bottom: 20px;
+}
+
+.progressContainer {
+    position: relative;
+    width: 100%;
+    height: 8px;
+    background: #f1f5f9;
+    border-radius: 4px;
+    overflow: visible;
+}
+
+.progressBar {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+.benchmark {
+    position: absolute;
+    top: -4px;
+    bottom: -4px;
+    width: 2px;
+    background: #000;
+}
+
+.green {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+}
+
+.orange {
+    background: linear-gradient(135deg, #f97316, #ea580c);
+}
+
+.red {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+}
+
+.row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    padding: 8px 0;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.row:last-child {
+    border-bottom: none;
+}
+
+.label {
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+.value {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+@media (hover: hover) {
+    .row:hover {
+        background-color: #f9fafb;
+        border-radius: 8px;
+    }
+}
+
+@media (max-width: 640px) {
+    .card {
+        padding: 20px;
+    }
+
+    .title {
+        font-size: 1.125rem;
+    }
+
+    .badge {
+        padding: 4px 8px;
+        font-size: 0.75rem;
+    }
+}

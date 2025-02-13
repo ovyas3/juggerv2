@@ -32,13 +32,13 @@ const variants = {
 };
 
 const items = [
-  {
-    icon: <Image src={DashboardInactive} alt="Dashboard" width={24} height={24} />,
-    title: "External Parking Dashboard",
-    description: "Simplified insights with our intuitive dashboard solutions.",
-    color: "linear-gradient(135deg, #8a2be2, #9370db)",
-    redirect: '/externalParking'
-  },
+  // {
+  //   icon: <Image src={DashboardInactive} alt="Dashboard" width={24} height={24} />,
+  //   title: "External Parking Dashboard",
+  //   description: "Simplified insights with our intuitive dashboard solutions.",
+  //   color: "linear-gradient(135deg, #8a2be2, #9370db)",
+  //   redirect: '/externalParking'
+  // },
   {
     icon: <Image src={DispatchIcon} alt="Road Invoicing" width={24} height={24} />,
     title: "Invoicing Day / Shift Wise",

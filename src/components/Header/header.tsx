@@ -46,6 +46,20 @@ const Header = ({ setReloadOnHeaderChange, isMapHelper, getAllShipment, isShipme
         return "Freight Estimator"
       case "/invoicingTrends":
         return "Trends"
+      case "/TransporterPerformance":
+        return "Transporter Performance"
+      case "/Productivity":
+        return "Productivity"
+      case "/VehicleStagingLive":
+        return "Vehicle Staging Live"
+      case "/TATDashboard":
+        return "TAT Dashboard"
+      case "/TATTrends":
+        return "TAT Trends"
+      case "/TransporterLoadDetails":
+        return "Load Details"
+      case "/OwnVehicleUsage":
+        return "Own Vehicle Usage"
       // case "/ewaybillDashboard":
       //   return "eWayBill Dashboard"
       // case "/leadDistanceAnalysis":
