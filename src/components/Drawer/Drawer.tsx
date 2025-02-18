@@ -268,6 +268,45 @@ const navigationItems: NavItem[] = [
     // }
 ];
 
+const myklNavigationItems: NavItem[] = [
+    {
+        id: 'indentManagement',
+        label: 'Indent Management',
+        icon: '',
+        activeIcon: LoadActive,
+        inactiveIcon: LoadInactive,
+        route: 'indentManagement',
+        isImageIcon: true
+    },
+    {
+        id: 'trackAndTrace',
+        label: 'Track & Trace',
+        icon: '',
+        activeIcon: LoadActive,
+        inactiveIcon: LoadInactive,
+        route: 'controlRoom',
+        isImageIcon: true
+    },
+    {
+        id: 'freightBill',
+        label: 'Freight Bill',
+        icon: '',
+        activeIcon: LoadActive,
+        inactiveIcon: LoadInactive,
+        route: 'controlRoom',
+        isImageIcon: true
+    },
+    {
+        id: 'gateTransaction',
+        label: 'Gate Transaction',
+        icon: '',
+        activeIcon: LoadActive,
+        inactiveIcon: LoadInactive,
+        route: 'controlRoom',
+        isImageIcon: true
+    },
+]
+
 const NavItem = ({
     item,
     isActive,
@@ -429,6 +468,25 @@ function SideDrawer() {
     const router = useRouter();
     const pathName = usePathname();
     const { PROD_SMART } = environment;
+    const [isMykl, setIsMykl] = useState<boolean>(false);
+    const [navItems,setNavItems] = useState<NavItem[]>([]);
+
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const parentValue = localStorage.getItem('parent')?.trim();
+            setIsMykl(parentValue == '"MYK Laticrete India Private Limited"');
+        }
+    }, []);
+
+    useEffect(()=>{
+        console.log(isMykl)
+       if(isMykl) {
+        setNavItems(myklNavigationItems)
+       } else {
+        setNavItems(navigationItems)
+       }
+    },[isMykl])
+
 
     const handleRouting = (route: string) => {
         router.push(`/${route}`);
@@ -467,7 +525,7 @@ function SideDrawer() {
                     onClick={() => handleShipperRouting('welcome')}
                 />
             </div>
-            {navigationItems.map((item) => (
+            {navItems.map((item) => (
                 <NavItem
                     key={item.id}
                     item={item}
