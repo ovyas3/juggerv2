@@ -60,6 +60,8 @@ const Header = ({ setReloadOnHeaderChange, isMapHelper, getAllShipment, isShipme
         return "Load Details"
       case "/OwnVehicleUsage":
         return "Own Vehicle Usage"
+      case "/indentManagement":
+        return "Indent Management"
       // case "/ewaybillDashboard":
       //   return "eWayBill Dashboard"
       // case "/leadDistanceAnalysis":
