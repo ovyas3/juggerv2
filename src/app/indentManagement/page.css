@@ -91,6 +91,14 @@
         align-items: center;
       }
 
+      .unit {
+        width: 300px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        margin-right: 50px;
+      }
+
 
     }
   }

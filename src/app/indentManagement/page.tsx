@@ -3,7 +3,7 @@
 import SideDrawer from "@/components/Drawer/Drawer";
 import Header from "@/components/Header/header";
 import React, { useEffect, useState } from "react";
-import { Card, DatePicker, Table } from "antd";
+import { Card, DatePicker, Select, Table } from "antd";
 import "react-datepicker/dist/react-datepicker.css";
 import "./page.css";
 import {
@@ -69,37 +69,6 @@ const IndentWiseDashboard = () => {
           }}
         >
           <div style={{ display: "flex", justifyContent: "center" }}>
-            Invoiced
-          </div>
-          <div
-            style={{
-              fontWeight: "normal",
-              fontSize: "10px",
-              display: "flex",
-              justifyContent: "center",
-            }}
-          >
-            Vehicle count (Weight (MT))
-          </div>
-        </div>
-      ),
-      dataIndex: "invoiced",
-      key: "invoiced",
-      onHeaderCell: () => ({
-        style: { background: "#20114d", color: "white" },
-      }),
-    },
-    {
-      title: (
-        <div
-          style={{
-            fontSize: "12px",
-            display: "flex",
-            justifyContent: "center",
-            flexDirection: "column",
-          }}
-        >
-          <div style={{ display: "flex", justifyContent: "center" }}>
             Indented
           </div>
           <div
@@ -120,37 +89,37 @@ const IndentWiseDashboard = () => {
         style: { background: "#20114d", color: "white" },
       }),
     },
-    {
-      title: (
-        <div
-          style={{
-            fontSize: "12px",
-            display: "flex",
-            justifyContent: "center",
-            flexDirection: "column",
-          }}
-        >
-          <div style={{ display: "flex", justifyContent: "center" }}>
-            Allocated
-          </div>
-          <div
-            style={{
-              fontWeight: "normal",
-              fontSize: "10px",
-              display: "flex",
-              justifyContent: "center",
-            }}
-          >
-            Vehicle count (Weight (MT))
-          </div>
-        </div>
-      ),
-      dataIndex: "allocated",
-      key: "allocated",
-      onHeaderCell: () => ({
-        style: { background: "#20114d", color: "white" },
-      }),
-    },
+    // {
+    //   title: (
+    //     <div
+    //       style={{
+    //         fontSize: "12px",
+    //         display: "flex",
+    //         justifyContent: "center",
+    //         flexDirection: "column",
+    //       }}
+    //     >
+    //       <div style={{ display: "flex", justifyContent: "center" }}>
+    //         Allocated
+    //       </div>
+    //       <div
+    //         style={{
+    //           fontWeight: "normal",
+    //           fontSize: "10px",
+    //           display: "flex",
+    //           justifyContent: "center",
+    //         }}
+    //       >
+    //         Vehicle count (Weight (MT))
+    //       </div>
+    //     </div>
+    //   ),
+    //   dataIndex: "allocated",
+    //   key: "allocated",
+    //   onHeaderCell: () => ({
+    //     style: { background: "#20114d", color: "white" },
+    //   }),
+    // },
     {
       title: (
         <div
@@ -255,6 +224,37 @@ const IndentWiseDashboard = () => {
           }}
         >
           <div style={{ display: "flex", justifyContent: "center" }}>
+            GateIn
+          </div>
+          <div
+            style={{
+              fontWeight: "normal",
+              fontSize: "10px",
+              display: "flex",
+              justifyContent: "center",
+            }}
+          >
+            Vehicle count (Weight (MT))
+          </div>
+        </div>
+      ),
+      dataIndex: "gateIn",
+      key: "gateIn",
+      onHeaderCell: () => ({
+        style: { background: "#20114d", color: "white" },
+      }),
+    },
+    {
+      title: (
+        <div
+          style={{
+            fontSize: "12px",
+            display: "flex",
+            justifyContent: "center",
+            flexDirection: "column",
+          }}
+        >
+          <div style={{ display: "flex", justifyContent: "center" }}>
             Loading
           </div>
           <div
@@ -271,6 +271,37 @@ const IndentWiseDashboard = () => {
       ),
       dataIndex: "reported",
       key: "reported",
+      onHeaderCell: () => ({
+        style: { background: "#20114d", color: "white" },
+      }),
+    },
+    {
+      title: (
+        <div
+          style={{
+            fontSize: "12px",
+            display: "flex",
+            justifyContent: "center",
+            flexDirection: "column",
+          }}
+        >
+          <div style={{ display: "flex", justifyContent: "center" }}>
+            Invoiced
+          </div>
+          <div
+            style={{
+              fontWeight: "normal",
+              fontSize: "10px",
+              display: "flex",
+              justifyContent: "center",
+            }}
+          >
+            Vehicle count (Weight (MT))
+          </div>
+        </div>
+      ),
+      dataIndex: "invoiced",
+      key: "invoiced",
       onHeaderCell: () => ({
         style: { background: "#20114d", color: "white" },
       }),
@@ -317,9 +348,37 @@ const IndentWiseDashboard = () => {
     { name: "Dispatched", value: 0, color: "#4682B4" },
   ]);
 
+  const [selectedShippers, setSelectedShippers] = useState<any>([]);
+  const [shipperOptions, setShipperOptions] = useState<any>([]);
+
+  async function getShipperData() {
+    try {
+      const shippersData = localStorage.getItem('shippers');
+      if (shippersData) {
+        const shippers = JSON.parse(shippersData);
+        const options = shippers.map((shipper: any) => ({
+          value: shipper._id,
+          label: shipper.name
+        }));
+        setShipperOptions(options);
+      }
+    } catch (error) {
+      console.error('Error fetching shipper data from localStorage:', error);
+    }
+  }
+
+  useEffect(() => {
+    getShipperData();
+  }, []);
+
   async function getStatusWiseData() {
+    
+    const shippersQuery = selectedShippers.length > 0 
+    ? selectedShippers.map((id:any) => `&shipperId=${id}`).join('')
+    : '';
+
     const response = await httpsGet(
-      `cr/security/order_shipment?from=${fromDate}&to=${toDate}`,
+      `cr/security/order_shipment?from=${fromDate}&to=${toDate}${shippersQuery}`,
       3,
       router
     );
@@ -329,20 +388,23 @@ const IndentWiseDashboard = () => {
       let totals = {
         key: "Total",
         location: "Total",
-        invoiced: 0,
-        invoicedWeight: 0,
+        
         indented:0,
         indentedWeight: 0,
-        allocated: 0,
-        allocatedWeight: 0,
+        // allocated: 0,
+        // allocatedWeight: 0,
         accepted: 0,
         acceptedWeight: 0,
         assigned: 0,
         assignedWeight: 0,
         reported: 0,
         reportedWeight: 0,
+        gateIn: 0,
+        gateInWeight: 0,
         loading: 0,
         loadingWeight: 0,
+        invoiced: 0,
+        invoicedWeight: 0,
         dispatched: 0,
         dispatchedWeight: 0,
       };
@@ -355,14 +417,11 @@ const IndentWiseDashboard = () => {
           indented: `${val.indented} (${
             val.indented_weight ? val.indented_weight.toFixed(3) : 0
           })`,
-          invoiced: `${val.LO} (${
-            val.LO_weight ? val.LO_weight.toFixed(3) : 0
-          })`,
-          allocated: `${val.allocated} (${
-            val.allocated_weight ? val.allocated_weight.toFixed(3) : 0
-          })`,
+          // allocated: `${val.allocated} (${
+          //   val.allocated_weight ? val.allocated_weight.toFixed(3) : 0
+          // })`,
           accepted: `${val.accepted} (${
-            val.allocated_weight ? val.allocated_weight.toFixed(3) : 0
+            val.accepted_weight ? val.accepted_weight.toFixed(3) : 0
           })`,
           assigned: `${val.assigned} (${
             val.assigned_weight ? val.assigned_weight.toFixed(2) : 0
@@ -370,8 +429,14 @@ const IndentWiseDashboard = () => {
           reported: `${val.reported} (${
             val.reported_weight ? val.reported_weight.toFixed(2) : 0
           })`,
+          gateIn: `${val.GI} (${
+            val.GI_weight ? val.GI_weight.toFixed(2) : 0
+          })`,
           loading: `${val.LI} (${
             val.LI_weight ? val.LI_weight.toFixed(2) : 0
+          })`,
+          invoiced: `${val.LO} (${
+            val.LO_weight ? val.LO_weight.toFixed(3) : 0
           })`,
           dispatched: `${val.GO} (${
             val.GO_weight ? val.GO_weight.toFixed(2) : 0
@@ -384,20 +449,23 @@ const IndentWiseDashboard = () => {
           Weight: val.allocated_weight,
         });
 
-        totals.invoiced += val.LO;
-        totals.invoicedWeight += val.LO_weight;
+        
         totals.indented += val.indented;
         totals.indentedWeight += val.indented_weight;
-        totals.allocated += val.allocated;
-        totals.allocatedWeight += val.allocated_weight;
+        // totals.allocated += val.allocated;
+        // totals.allocatedWeight += val.allocated_weight;
         totals.accepted += val.accepted;
         totals.acceptedWeight += val.accepted_weight;
         totals.assigned += val.assigned;
         totals.assignedWeight += val.assigned_weight;
         totals.reported += val.reported;
         totals.reportedWeight += val.reported_weight;
+        totals.gateIn += val.GI;
+        totals.gateInWeight += val.GI_weight;
         totals.loading += val.LI;
         totals.loadingWeight += val.LI_weight;
+        totals.invoiced += val.LO;
+        totals.invoicedWeight += val.LO_weight;
         totals.dispatched += val.GO;
         totals.dispatchedWeight += val.GO_weight;
       });
@@ -405,15 +473,13 @@ const IndentWiseDashboard = () => {
       dataArr.push({
         key: totals.key,
         location: totals.location,
-        invoiced: `${totals.invoiced} (${
-          totals.invoicedWeight ? totals.invoicedWeight.toFixed(3) : 0
-        })`,
+        
         indented: `${totals.indented} (${
           totals.indentedWeight ? totals.indentedWeight.toFixed(3) : 0
         })`,
-        allocated: `${totals.allocated} (${
-          totals.allocatedWeight ? totals.allocatedWeight.toFixed(3) : 0
-        })`,
+        // allocated: `${totals.allocated} (${
+        //   totals.allocatedWeight ? totals.allocatedWeight.toFixed(3) : 0
+        // })`,
         accepted: `${totals.accepted} (${
           totals.acceptedWeight ? totals.acceptedWeight.toFixed(3) : 0
         })`,
@@ -423,8 +489,14 @@ const IndentWiseDashboard = () => {
         reported: `${totals.reported} (${
           totals.reportedWeight ? totals.reportedWeight.toFixed(3) : 0
         })`,
+        gateIn: `${totals.gateIn} (${
+          totals.gateInWeight ? totals.gateInWeight.toFixed(3) : 0
+        })`,
         loading: `${totals.loading} (${
           totals.loadingWeight ? totals.loadingWeight.toFixed(3) : 0
+        })`,
+        invoiced: `${totals.invoiced} (${
+          totals.invoicedWeight ? totals.invoicedWeight.toFixed(3) : 0
         })`,
         dispatched: `${totals.dispatched} (${
           totals.dispatchedWeight ? totals.dispatchedWeight.toFixed(3) : 0
@@ -481,7 +553,7 @@ const IndentWiseDashboard = () => {
       getStatusWiseData();
       getStats();
     }
-  }, [fromDate, toDate]);
+  }, [fromDate, toDate, selectedShippers]);
 
   return (
     <div>
@@ -517,6 +589,41 @@ const IndentWiseDashboard = () => {
                   value={toDate}
                   onChange={(date) => setToDate(date)}
                 />
+              </div>
+            </div>
+            <div>
+              <div className="label">Select Unit</div>
+              <div className="unit">
+              <Select
+                    mode="multiple"
+                    style={{ width: '100%'}}
+                    placeholder="Select Unit"
+                    options={shipperOptions}
+                    value={selectedShippers}
+                    maxTagCount={1} 
+                    maxTagTextLength={20}
+                    optionRender={(option: any) => (
+                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <input
+                          type="checkbox"
+                          checked={selectedShippers.includes(option.value)}
+                          onChange={() => {}}
+                          style={{ marginRight: 8 }}
+                        />
+                        
+                        <span style={{ 
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis'
+                      }}>
+                        {option.label}
+                      </span>
+                      </div>
+                    )}
+                    onChange={(selectedValues) => {
+                      setSelectedShippers(selectedValues);
+                    }}
+                  />
               </div>
             </div>
           </div>
