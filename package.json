@@ -69,6 +69,7 @@
     "react-leaflet": "^4.2.1",
     "react-leaflet-cluster": "^2.1.0",
     "react-loader-spinner": "^6.1.6",
+    "react-parallax-tilt": "^1.7.282",
     "react-webcam": "^7.2.0",
     "recharts": "^2.15.0",
     "tailwind-merge": "^2.6.0",

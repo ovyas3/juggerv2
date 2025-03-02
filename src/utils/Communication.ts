@@ -7,7 +7,8 @@ import { deleteAllCache } from '@/utils/storageService';
 const prefix = [
   environment.API_URL,
   environment.API_URL_DASHBOARD,
-  environment.API_URL_DASHBOARD2
+  environment.API_URL_DASHBOARD2,
+  environment.API_URL_DASHBOARD3,
 ]
 
 const parent = [
