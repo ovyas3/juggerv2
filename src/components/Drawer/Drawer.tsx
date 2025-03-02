@@ -40,6 +40,8 @@ import FreightTrendsInactive from "@/assets/freight_trends_bg_icon.svg";
 import FreightTrendsActive from "@/assets/freight_trends_wg_icon.svg";
 import FreightEstimatorIcon from "@/assets/freight_estimator_icon.svg";
 import FreightEstimatorIconActive from "@/assets/freight_estimator_icon_active.svg";
+import RouteActiveIcon from "@/assets/route_active.svg";
+import RouteInactiveIcon from "@/assets/route_inactive.svg";
 
 import LoadActive from "@/assets/load_active_icon.svg";
 import LoadInactive from "@/assets/load_deactive_icon.svg";
@@ -153,6 +155,14 @@ const navigationItems: NavItem[] = [
                 isImageIcon: true
             },
         ]
+    },
+    {
+        id: 'topDestination',
+        label: 'Top Destination',
+        icon: '',
+        activeIcon: RouteActiveIcon,
+        inactiveIcon: RouteInactiveIcon,
+        isImageIcon: true
     },
     // {
     //     id: 'freightEstimator',
