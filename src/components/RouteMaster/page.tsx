@@ -30,6 +30,7 @@ import dayjs from "dayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { environment } from '@/environments/env.api';
 
 // Define types for our data structure
 interface ShipperDetail {
@@ -134,6 +135,7 @@ export default function InventoryDataTable() {
   const [fromDate, setFromDate] = useState<number>(dayjs("2023-01-01").valueOf());
   const [toDate, setToDate] = useState<number>(dayjs("2024-12-31").endOf('day').valueOf());
   const [totalCount, setTotalCount] = useState<number>(0);
+  const { PROD_SMART } = environment;
 
 
   // useEffect(() => {
@@ -351,6 +353,7 @@ export default function InventoryDataTable() {
 
   function handleCityClick (cityId: string) {
     console.log("City clicked:", cityId);
+    window.open(`${PROD_SMART}routeMasterList?city_id=${cityId}`, '_self');
     // You can navigate to a new page or show a modal or do anything else here}
   }
 
@@ -505,7 +508,7 @@ export default function InventoryDataTable() {
             {sortedData.map((item, index) => (
               <TableRow key={`${item.city}-${item.sn}`} sx={{ "&:nth-of-type(odd)": { backgroundColor: "#f9f9f9" } }}>
                 <StyledTableCell>{index + 1 + page * rowsPerPage}</StyledTableCell>
-                <StyledTableCell onClick={() => handleCityClick(item.id)} >{item.city}</StyledTableCell>
+                <StyledTableCell style={{cursor: 'pointer'}} onClick={() => handleCityClick(item.id)} >{item.city}</StyledTableCell>
                 <StyledTableCell>{item.trips}</StyledTableCell>
                 <StyledTableCell>{item.tonnage_short}</StyledTableCell>
                 <StyledTableCell>{item.freight_short}</StyledTableCell>
