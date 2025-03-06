@@ -31,6 +31,11 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { environment } from '@/environments/env.api';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 // Define types for our data structure
 interface ShipperDetail {
@@ -132,7 +137,7 @@ export default function InventoryDataTable() {
   const [orderBy, setOrderBy] = useState<any>('trips')
   const [selectedCity, setSelectedCity] = useState<string>('all_cities_id') // Initialized to 'all_cities_id'
   const [cityOptions, setCityOptions] = useState<CityOption[]>([])
-  const [fromDate, setFromDate] = useState<number>(dayjs("2023-01-01").valueOf());
+  const [fromDate, setFromDate] = useState<number>(dayjs("2023-01-01").startOf('day').valueOf());
   const [toDate, setToDate] = useState<number>(dayjs("2024-12-31").endOf('day').valueOf());
   const [totalCount, setTotalCount] = useState<number>(0);
   const { PROD_SMART } = environment;
