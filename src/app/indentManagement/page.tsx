@@ -708,12 +708,20 @@ const IndentWiseDashboard = () => {
                 }
                 pagination={false}
                 sticky
+                // onRow={(record: any) => ({
+                //   onClick: () => {
+                //     router.push(
+                //       // `/plantIndentDashboard/plant?shipper=${record?.shipper}`,
+                //       '/indentManagement/plant',
+                //     );
+                //   },
+                // })}
+
                 onRow={(record: any) => ({
-                  // onClick: () => {
-                  //   router.push(
-                  //     `/plantIndentDashboard/plant?shipper=${record?.shipper}`
-                  //   );
-                  // },
+                  onClick: () => {
+                    localStorage.setItem('plantPageData', JSON.stringify(record));
+                    router.push('/indentManagement/plant');
+                  },
                 })}
               />
             </div>
