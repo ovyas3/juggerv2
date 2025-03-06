@@ -26,6 +26,10 @@ import {
 import { styled } from "@mui/material/styles"
 import * as XLSX from "xlsx"
 import { httpsGet, httpsPost } from "@/utils/Communication"; // Import httpsGet
+import dayjs from "dayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 
 // Define types for our data structure
 interface ShipperDetail {
@@ -40,11 +44,17 @@ interface ShipmentData {
   city: string;
   tonnage: number;
   trips: number;
-  details: ShipperDetail[];
+  shipments?: string[];
   shipper: string;
+  freight: number;
+  geo_point: {
+    type: string;
+    coordinates: [number, number];
+  };
 }
 
 interface ProcessedData {
+  id: string;
   sn: number;
   city: string;
   rate: number;
@@ -116,48 +126,84 @@ export default function InventoryDataTable() {
   const [error, setError] = useState<string | null>(null);
   const [totalCitiesCount, setTotalCitiesCount] = useState<number>(0);
   const [page, setPage] = useState<number>(0)
-  const [rowsPerPage, setRowsPerPage] = useState<number>(10)
+  const [rowsPerPage, setRowsPerPage] = useState<number>(15)
   const [order, setOrder] = useState<Order>("desc")
-  const [orderBy, setOrderBy] = useState<keyof ProcessedData>('trips')
+  const [orderBy, setOrderBy] = useState<any>('trips')
   const [selectedCity, setSelectedCity] = useState<string>('all_cities_id') // Initialized to 'all_cities_id'
   const [cityOptions, setCityOptions] = useState<CityOption[]>([])
+  const [fromDate, setFromDate] = useState<number>(dayjs("2023-01-01").valueOf());
+  const [toDate, setToDate] = useState<number>(dayjs("2024-12-31").endOf('day').valueOf());
+  const [totalCount, setTotalCount] = useState<number>(0);
 
+
+  // useEffect(() => {
+  //   const fetchCityOptions = async () => {
+  //     try {
+  //       console.log("Fetching city options...");
+  //       const response = await httpsGet(
+  //         'city_for_route/getCitesForFilter',
+  //         3,
+  //         null
+  //       );
+  //       console.log("City options API Response:", response);
+  //       if (!response.data) {
+  //         throw new Error(`HTTP error! status: ${response.status}`);
+  //       }
+  //       const json = response;
+  //       console.log("City options JSON:", json);
+  //       const citiesFromApi: CityOption[] = json.data.map((cityData: any) => ({
+  //         city: cityData.city,
+  //         tonnage: cityData.tonnage,
+  //         _id: cityData._id
+  //       }));
+  //       // citiesFromApi.unshift({ city: "All Cities", tonnage: 0, _id: "all_cities_id" });
+  //       setCityOptions(citiesFromApi);
+  //       // Keep setSelectedCity("all_cities_id") here as well to ensure it's set after options load, just in case
+  //       setSelectedCity(citiesFromApi[0]._id);
+  //     } catch (e: any) {
+  //       setError(e.message || "Could not fetch city options");
+  //       console.error("Error fetching city options:", e);
+  //       // Even on error, you might want to ensure a default city is selected or handle it appropriately.
+  //       // For now, let's keep setSelectedCity("all_cities_id") even in the catch block, or you can decide on a different default.
+  //       setSelectedCity("all_cities_id"); // Ensure selectedCity is set even if city options fail (optional - adjust as needed)
+  //     }
+  //   };
+
+  //   fetchCityOptions();
+  // }, []);
+
+  const handleDateChange = (newDate: any, setDate: (value: number) => void) => {
+    if (newDate) {
+      const utc = new Date(newDate);
+      let epochTime = utc.valueOf();
+      epochTime -= (5 * 60 * 60 * 1000) + (30 * 60 * 1000);
+      setDate(epochTime);
+    }
+  };
+
+  const fetchData = async () => {
+    setLoading(true)
+    setError(null)
+    try {
+      const apiUrl = `routes/get_top_destinations?from=${fromDate}&to=${toDate}&skip=${page * rowsPerPage}&limit=${rowsPerPage}`;
+      const response = await httpsGet(apiUrl, 0, null)
+
+      if (!response.data?.data) throw new Error("No data returned");
+
+      setData(response.data.data);
+      setTotalCount(response.data.totalCount || 0);
+    } catch (e: any) {
+      setError(e.message || "Could not fetch data")
+      setData([])
+      setTotalCount(0)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   useEffect(() => {
-    const fetchCityOptions = async () => {
-      try {
-        console.log("Fetching city options...");
-        const response = await httpsGet(
-          'city_for_route/getCitesForFilter',
-          3,
-          null
-        );
-        console.log("City options API Response:", response);
-        if (!response.data) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const json = response;
-        console.log("City options JSON:", json);
-        const citiesFromApi: CityOption[] = json.data.map((cityData: any) => ({
-          city: cityData.city,
-          tonnage: cityData.tonnage,
-          _id: cityData._id
-        }));
-        // citiesFromApi.unshift({ city: "All Cities", tonnage: 0, _id: "all_cities_id" });
-        setCityOptions(citiesFromApi);
-        // Keep setSelectedCity("all_cities_id") here as well to ensure it's set after options load, just in case
-        setSelectedCity(citiesFromApi[0]._id);
-      } catch (e: any) {
-        setError(e.message || "Could not fetch city options");
-        console.error("Error fetching city options:", e);
-        // Even on error, you might want to ensure a default city is selected or handle it appropriately.
-        // For now, let's keep setSelectedCity("all_cities_id") even in the catch block, or you can decide on a different default.
-        setSelectedCity("all_cities_id"); // Ensure selectedCity is set even if city options fail (optional - adjust as needed)
-      }
-    };
-
-    fetchCityOptions();
-  }, []);
+    fetchData();
+  }, [page, rowsPerPage]);
 
 
   const handleCityChange = (event: SelectChangeEvent) => {
@@ -166,131 +212,108 @@ export default function InventoryDataTable() {
   };
 
 
-  const processData = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    setData(null);
-    let fetchedData: ShipmentData[] = [];
-    let totalCount = 0;
+  // const processData = useCallback(async () => {
+  //   setLoading(true);
+  //   setError(null);
+  //   setData(null);
+  //   let fetchedData: ShipmentData[] = [];
+  //   let totalCount = 0;
 
-    try {
-      const cityQuery = selectedCity === "all_cities_id" ? "" : `city=${selectedCity}`;
-      let apiUrl = `city_for_route/getCityForRoute?`;
-      if (cityQuery) {
-        apiUrl += cityQuery;
-      }
-      console.log("Fetching data from API:", apiUrl);
-      const response = await httpsGet(
-        apiUrl,
-        3,
-        null
-      );
-      console.log("Data API Response:", response);
+  //   try {
+  //     const cityQuery = selectedCity === "all_cities_id" ? "" : `city=${selectedCity}`;
+  //     let apiUrl = `city_for_route/getCityForRoute?`;
+  //     if (cityQuery) {
+  //       apiUrl += cityQuery;
+  //     }
+  //     console.log("Fetching data from API:", apiUrl);
+  //     const response = await httpsGet(
+  //       apiUrl,
+  //       3,
+  //       null
+  //     );
+  //     console.log("Data API Response:", response);
 
-      if (!response.data) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const json = response;
-      console.log("Data JSON:", json);
-      fetchedData = json.data.cities || [];
-      totalCount = json.data.total || 0;
-      setTotalCitiesCount(totalCount);
-      setData(fetchedData.map((item: any) => ({
-        ...item,
-        _id: item._id.$oid,
-        shipper: item.shipper?.$oid,
-        details: item.details.map((detail: any) => ({
-          ...detail,
-          shipper: detail.shipper?.$oid,
-        }))
-      })));
+  //     if (!response.data) {
+  //       throw new Error(`HTTP error! status: ${response.status}`);
+  //     }
+  //     const json = response;
+  //     console.log("Data JSON:", json);
+  //     fetchedData = json.data.cities || [];
+  //     totalCount = json.data.total || 0;
+  //     setTotalCitiesCount(totalCount);
+  //     setData(fetchedData.map((item: any) => ({
+  //       ...item,
+  //       _id: item._id.$oid,
+  //       shipper: item.shipper?.$oid,
+  //       details: item.details.map((detail: any) => ({
+  //         ...detail,
+  //         shipper: detail.shipper?.$oid,
+  //       }))
+  //     })));
 
-    } catch (e: any) {
-      setError(e.message || "Could not fetch inventory data");
-      setData(null);
-      setTotalCitiesCount(0);
-      console.error("Error fetching inventory data:", e);
-    } finally {
-      setLoading(false);
-    }
-  }, [selectedCity, page, rowsPerPage]);
+  //   } catch (e: any) {
+  //     setError(e.message || "Could not fetch inventory data");
+  //     setData(null);
+  //     setTotalCitiesCount(0);
+  //     console.error("Error fetching inventory data:", e);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // }, [selectedCity, page, rowsPerPage]);
 
-  useEffect(() => {
-    console.log("Data Fetching useEffect triggered. selectedCity:", selectedCity); // ADDED LOG
-    if (selectedCity) {
-      processData();
-    } else {
-      console.log("Data Fetching useEffect: selectedCity is falsy, skipping API call."); // ADDED LOG
-    }
-  }, [processData, selectedCity]);
+  // useEffect(() => {
+  //   console.log("Data Fetching useEffect triggered. selectedCity:", selectedCity); // ADDED LOG
+  //   if (selectedCity) {
+  //     processData();
+  //   } else {
+  //     console.log("Data Fetching useEffect: selectedCity is falsy, skipping API call."); // ADDED LOG
+  //   }
+  // }, [processData, selectedCity]);
 
 
   const processedData = useMemo(() => {
-    if (!data) {
-      console.log("processedData: data is null or undefined, returning empty array");
+    if (!data || data.length === 0) {
       return [];
     }
-    console.log("Data received for processing:", data);
 
-    return data.flatMap((cityData) => {
-      const processedDetails = cityData.details.filter((detail) => detail.rate !== undefined);
+    const totalTonnage = data.reduce((sum, city) => sum + city.tonnage, 0);
+    const totalFreight = data.reduce((sum, city) => sum + city.freight, 0);
 
-      // Calculate total tonnage and freight for the city
-      const totalTonnage = processedDetails.reduce((sum, detail) => sum + detail.tonnage, 0)
-      const totalFreight = processedDetails.reduce((sum, detail) => sum + (detail.rate || 0), 0)
+    let cumulativeTonnage = 0;
+    let cumulativeFreight = 0;
 
-      let cumulativeTonnage = 0
-      let cumulativeFreight = 0
-      const number_of_details = processedDetails.length;
-      return processedDetails
-        .sort((a, b) => b.tonnage - a.tonnage)
-        .map((detail, index) => {
-          const tonnagePercentage = (detail.tonnage / totalTonnage) * 100
-          const freightValue = detail.rate || 0
-          const freightPercentage = (freightValue / totalFreight) * 100
+    return data.map((city, index) => {
 
-          cumulativeTonnage += tonnagePercentage
-          cumulativeFreight += freightPercentage
+      const tonnagePercentage = totalTonnage ? (city.tonnage / totalTonnage) * 100 : 0;
+      const freightPercentage = totalFreight ? (city.freight / totalFreight) * 100 : 0;
 
-          const tonnage_short = new Intl.NumberFormat("en-IN", {
-            maximumFractionDigits: 2,
-          }).format(detail.tonnage);
-          const rate_short = new Intl.NumberFormat("en-IN", {
-            maximumFractionDigits: 2,
-          }).format(detail.rate || 0);
-          const freight_short = new Intl.NumberFormat("en-IN", {
-            maximumFractionDigits: 2,
-          }).format(freightValue);
-          const cumulativeTonnage_short = new Intl.NumberFormat("en-IN", {
-            maximumFractionDigits: 2,
-          }).format(cumulativeTonnage);
-          const cumulativeFreight_short = new Intl.NumberFormat("en-IN", {
-            maximumFractionDigits: 2,
-          }).format(cumulativeFreight);
+      cumulativeTonnage += tonnagePercentage;
+      cumulativeFreight += freightPercentage;
 
-          return {
-            sn: index + 1,
-            city: cityData.city,
-            rate: detail.rate || 0,
-            rate_short,
-            trips: detail.trips,
-            tonnage: detail.tonnage,
-            tonnage_short,
-            freightValue,
-            freight_short,
-            tonnagePercentage,
-            freightPercentage,
-            cumulativeTonnage: cumulativeTonnage_short,
-            cumulativeFreight: cumulativeFreight_short,
-            is_last: index === number_of_details - 1,
-          }
-        })
+      const tonnage_short = new Intl.NumberFormat("en-IN", { maximumFractionDigits: 2 }).format(city.tonnage);
+      const freight_short = new Intl.NumberFormat("en-IN", { maximumFractionDigits: 2 }).format(city.freight);
+      const cumulativeTonnage_short = new Intl.NumberFormat("en-IN", { maximumFractionDigits: 2 }).format(cumulativeTonnage);
+      const cumulativeFreight_short = new Intl.NumberFormat("en-IN", { maximumFractionDigits: 2 }).format(cumulativeFreight);
+
+      return {
+        id: city._id,
+        sn: index + 1,
+        city: city.city,
+        trips: city.trips,
+        tonnage: city.tonnage,
+        tonnage_short,
+        freightValue: city.freight,
+        freight_short,
+        tonnagePercentage,
+        freightPercentage,
+        cumulativeTonnage: cumulativeTonnage_short,
+        cumulativeFreight: cumulativeFreight_short,
+      };
     })
   }, [data])
 
 
   const sortedData = useMemo(() => {
-    console.log("sortedData: processedData length", processedData.length);
     return [...processedData].sort((a, b) => {
       if (!orderBy) return 0;
       if (orderBy === "tonnage") {
@@ -313,7 +336,7 @@ export default function InventoryDataTable() {
   //   return pData;
   // }, [sortedData, rowsPerPage, page]);
 
-  const handleRequestSort = (property: keyof ProcessedData) => {
+  const handleRequestSort = (property: any) => {
     const isAsc = orderBy === property && order === "asc"
     setOrder(isAsc ? "desc" : "asc")
     setOrderBy(property)
@@ -324,6 +347,11 @@ export default function InventoryDataTable() {
     const workbook = XLSX.utils.book_new()
     XLSX.utils.book_append_sheet(workbook, worksheet, "Inventory Data")
     XLSX.writeFile(workbook, "inventory_data.csv")
+  }
+
+  function handleCityClick (cityId: string) {
+    console.log("City clicked:", cityId);
+    // You can navigate to a new page or show a modal or do anything else here}
   }
 
   if (loading) {
@@ -339,33 +367,86 @@ export default function InventoryDataTable() {
 
   return (
     <Box sx={{ width: "95%", margin: "56px 40px 0 70px", padding: "5px" }}>
-      <Box sx={{ mb: 3, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <Typography variant="h6" component="div" sx={{ fontWeight: "bold" }}>
-          Total Cities: {totalCitiesCount}
-        </Typography>
-        <Button variant="contained" onClick={exportToCSV}>
-          Export to CSV
-        </Button>
-      </Box>
+      <div style={{display: "flex", justifyContent: "space-between", alignItems: "center"}}>
+        <div style={{ minWidth: 200, marginBottom: 0, display: "flex", flexDirection: "column", justifyContent: "space-between", alignItems: "start" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 17 }}>
+            <h3 style={{fontWeight: "bold", marginLeft: 5}}>Select Date Range</h3>
+          </div>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 20 }}>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <div style={{ marginTop: "10px" }}>
+                <DatePicker
+                  label="From"
+                  format="DD/MM/YYYY"
+                  disableFuture
+                  value={dayjs(fromDate)}
+                  onChange={(newDate) => handleDateChange(newDate, setFromDate)}
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      width: "150px",
+                      height: "36px",
+                      fontSize: "14px", 
+                    },
+                    "& .MuiInputLabel-root": {
+                      fontSize: "14px",
+                    },
+                    "& .MuiSvgIcon-root": {
+                      fontSize: "18px", 
+                    },
+                  }}
+                />
+              </div>
+              <div style={{ marginTop: "10px" }}>
+                <DatePicker
+                  label="To"
+                  format="DD/MM/YYYY"
+                  disableFuture
+                  value={dayjs(toDate)}
+                  onChange={(newDate) => handleDateChange(newDate, setToDate)}
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      width: "150px",
+                      height: "36px", 
+                      fontSize: "14px",
+                    },
+                    "& .MuiInputLabel-root": {
+                      fontSize: "14px",
+                    },
+                    "& .MuiSvgIcon-root": {
+                      fontSize: "18px", 
+                    },
+                  }}
+                />
+              </div>
+            </LocalizationProvider>
+            <Button sx={{ textTransform: "none", height: "36px", width: "88px", marginBottom: "-8px" }} variant="contained" onClick={fetchData}>Search</Button>
+          </div>
+        </div>
 
-      <FormControl sx={{ minWidth: 200, mb: 2 }}>
-        <InputLabel id="city-select-label">Select City</InputLabel>
-        <Select
-          labelId="city-select-label"
-          id="city-select"
-          value={selectedCity}
-          label="Select City"
-          onChange={handleCityChange}
-        >
-          {cityOptions.map((option) => (
-            <MenuItem key={option._id} value={option._id}>
-              {option.city} {option.city !== "All Cities" ? `- ${option.tonnage.toFixed(2)}` : ""}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
+        <div style={{ marginBottom: 3, display: "flex", justifyContent: "space-between", alignItems: "center", marginRight: "15px", marginTop: "19px", flexDirection: "column" }}>
+          <Typography variant="h6" component="div" sx={{ fontWeight: "bold" }}>
+            Total Cities: {totalCount}
+          </Typography>
+          <Button variant="contained" sx={{ textTransform: "none", height: "34px", marginBottom: "2px" }} onClick={exportToCSV}>
+            Export to CSV
+          </Button>
+        </div>
+      </div>
 
-      <TableContainer component={Paper} sx={{ maxHeight: 780, border: "1px solid rgba(224, 224, 224, 1)" }}>
+      <TablePagination
+          rowsPerPageOptions={[5, 10, 15, 25, 50, 100]}
+          component="div"
+          count={totalCount}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={(_, newPage) => setPage(newPage)}
+          onRowsPerPageChange={(event) => {
+            setRowsPerPage(parseInt(event.target.value, 10));
+            setPage(0);
+          }}
+      />
+
+      <div style={{ maxHeight: "74vh", border: "1px solid rgba(224, 224, 224, 1)", overflowY: "scroll" }}>
         <Table stickyHeader aria-label="inventory data table">
           <StyledTableHead>
             <TableRow>
@@ -422,9 +503,9 @@ export default function InventoryDataTable() {
           </StyledTableHead>
           <TableBody>
             {sortedData.map((item, index) => (
-              <TableRow key={`${item.city}-${item.sn}`} style={{fontWeight: item.is_last ? 'bolder': '' }} sx={{ "&:nth-of-type(odd)": { backgroundColor: "#f9f9f9" } }}>
+              <TableRow key={`${item.city}-${item.sn}`} sx={{ "&:nth-of-type(odd)": { backgroundColor: "#f9f9f9" } }}>
                 <StyledTableCell>{index + 1 + page * rowsPerPage}</StyledTableCell>
-                <StyledTableCell>{item.city}</StyledTableCell>
+                <StyledTableCell onClick={() => handleCityClick(item.id)} >{item.city}</StyledTableCell>
                 <StyledTableCell>{item.trips}</StyledTableCell>
                 <StyledTableCell>{item.tonnage_short}</StyledTableCell>
                 <StyledTableCell>{item.freight_short}</StyledTableCell>
@@ -436,7 +517,7 @@ export default function InventoryDataTable() {
             ))}
           </TableBody>
         </Table>
-      </TableContainer>
+      </div>
       {/* <TablePagination
         rowsPerPageOptions={[5, 10, 25]}
         component="div"
