@@ -49,7 +49,7 @@ const ProgressTimeline = ({data,index}) => {
       <Grid container spacing={2} onClick={handleOpen}>
         <Grid item xs={12}>
           <Typography variant="body2" color="text.secondary" style={{fontWeight: 'bold'}}>
-            Rail Mill • {data.sin} • {data.transporter}
+            Rail Mill • {data.sin || '--'} • {data.transporter || '--'}
           </Typography>
           <Typography variant="body2" color="text.secondary" style={{fontWeight: 'bold'}}>
             Weight: {data.weight} Kgs
