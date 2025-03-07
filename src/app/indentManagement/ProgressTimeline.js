@@ -29,10 +29,15 @@ const ProgressTimeline = ({data,index}) => {
     }, 300);
   };
 
-  const steps = Object.keys(data.stats).map((key) => ({
-    title: key.charAt(0).toUpperCase() + key.slice(1),
-    description: data.stats[key].on ? service.utcToist(data.stats[key].on, 'dd-MMM-yyyy hh:mm a') : "--",
-  }));
+  const steps = [
+    { title: 'Allocated', description: data.stats.allocated.on ? service.utcToist(data.stats.allocated.on, 'dd-MMM-yyyy hh:mm a') : '--' },
+    { title: 'Accepted', description: data.stats.accepted.on ? service.utcToist(data.stats.accepted.on, 'dd-MMM-yyyy hh:mm a') : '--' },
+    { title: 'Assigned', description: data.stats.assigned.on ? service.utcToist(data.stats.assigned.on, 'dd-MMM-yyyy hh:mm a') : '--' },
+    { title: 'Reported', description: data.stats.reported.on ? service.utcToist(data.stats.reported.on, 'dd-MMM-yyyy hh:mm a') : '--' },
+    { title: 'Load_in', description: data.stats.load_in.on ? service.utcToist(data.stats.load_in.on, 'dd-MMM-yyyy hh:mm a') : '--' },
+    { title: 'Load_out', description: data.stats.load_out.on ? service.utcToist(data.stats.load_out.on, 'dd-MMM-yyyy hh:mm a') : '--' },
+    { title: 'Gate_out', description: data.stats.gate_out.on ? service.utcToist(data.stats.gate_out.on, 'dd-MMM-yyyy hh:mm a') : '--' }
+  ];
 
 
   return (

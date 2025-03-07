@@ -374,7 +374,7 @@ const IndentWiseDashboard = () => {
   async function getStatusWiseData() {
     
     const shippersQuery = selectedShippers.length > 0 
-    ? selectedShippers.map((id:any) => `&shipperId=${id}`).join('')
+    ? `&shipperId=${JSON.stringify(selectedShippers)}`
     : '';
 
     const response = await httpsGet(
