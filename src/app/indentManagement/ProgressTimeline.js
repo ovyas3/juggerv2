@@ -57,7 +57,7 @@ const ProgressTimeline = ({data,index}) => {
             Rail Mill • {data.sin || '--'} • {data.transporter || '--'}
           </Typography>
           <Typography variant="body2" color="text.secondary" style={{fontWeight: 'bold'}}>
-            Weight: {data.weight} Kgs
+            Weight: {data.weight || '--'} Kgs
           </Typography>
         </Grid>
 
