@@ -1,0 +1,242 @@
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    backdrop-filter: blur(4px);
+}
+
+.overlay.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.popup {
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 95vw;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    transform: translateY(20px);
+    opacity: 0;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    padding: 1rem;
+    overflow: unset;
+    position: relative;
+}
+
+.popup.visible {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    border-bottom: 1px solid #eaeaea;
+    background-color: #f8f9fa;
+}
+
+.title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0;
+}
+
+.totalShipment{
+    font-size: 1rem;
+    color: #1a1a1a;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.closeButton {
+    position: absolute;
+    top: -20px;
+    right: -20px;
+    background: #ffffff;
+    border: 2px solid #e0e0e0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    border-radius: 50%;
+    color: #333;
+    transition: background-color 0.2s ease, color 0.2s ease, transform 0.3s ease;
+    z-index: 1100;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+    width: 40px;
+    height: 40px;
+}
+
+.closeButton:hover {
+    background-color: #f0f0f0;
+    color: #000;
+    transform: rotate(90deg);
+}
+
+.content {
+    padding: 0;
+    overflow: auto;
+    flex: 1;
+}
+
+.tableContainer {
+    overflow-x: auto;
+    width: 100%;
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 14px;
+}
+
+.th {
+    position: sticky;
+    top: 0;
+    background-color: #1e3a8a;
+    color: white;
+    font-weight: 500;
+    text-align: left;
+    padding: 14px 16px;
+    white-space: nowrap;
+    border-bottom: 1px solid #2c4999;
+    z-index: 10;
+}
+
+.th:first-child {
+    border-top-left-radius: 4px;
+}
+
+.th:last-child {
+    border-top-right-radius: 4px;
+}
+
+.th:not(:last-child){
+    border-right: 1px solid #e0e0e0;
+}
+
+.tr {
+    transition: background-color 0.2s ease;
+}
+
+.tr:hover {
+    background-color: #f5f8ff;
+}
+
+.tr:nth-child(even) {
+    background-color: #f9fafc;
+}
+
+.tr:nth-child(even):hover {
+    background-color: #f0f5ff;
+}
+
+.td {
+    padding: 14px 16px;
+    border-bottom: 1px solid #eaeaea;
+    vertical-align: top;
+}
+
+.link {
+    color: #2563eb;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+.link:hover {
+    color: #1d4ed8;
+    text-decoration: underline;
+}
+
+.destinationCell,
+.driverCell {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.customer,
+.driverName,
+.dcEventDate {
+    font-weight: 500;
+}
+
+.dcEventDate{
+    display: flex;
+    text-wrap: nowrap;
+}
+
+.obdNo{
+    white-space: wrap;
+    width: 250px;
+    word-break: break-word;
+}
+
+.destination,
+.driverPhone,
+.dcEventTime {
+    color: #666;
+    font-size: 13px;
+}
+
+/* Responsive styles */
+@media (max-width: 1024px) {
+
+    .th,
+    .td {
+        padding: 12px;
+    }
+}
+
+@media (max-width: 768px) {
+    .popup {
+        width: 95%;
+        max-height: 80vh;
+    }
+
+    .th,
+    .td {
+        padding: 10px 12px;
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 640px) {
+    .header {
+        padding: 12px 16px;
+    }
+
+    .title {
+        font-size: 1.1rem;
+    }
+
+    .th,
+    .td {
+        padding: 8px 10px;
+        font-size: 12px;
+    }
+}
