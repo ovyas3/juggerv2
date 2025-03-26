@@ -36,7 +36,8 @@ const ProgressTimeline = ({data,index}) => {
     { title: 'Reported', description: data.stats.reported.on ? service.utcToist(data.stats.reported.on, 'dd-MMM-yyyy hh:mm a') : '--' },
     { title: 'Load_in', description: data.stats.load_in.on ? service.utcToist(data.stats.load_in.on, 'dd-MMM-yyyy hh:mm a') : '--' },
     { title: 'Load_out', description: data.stats.load_out.on ? service.utcToist(data.stats.load_out.on, 'dd-MMM-yyyy hh:mm a') : '--' },
-    { title: 'Gate_out', description: data.stats.gate_out.on ? service.utcToist(data.stats.gate_out.on, 'dd-MMM-yyyy hh:mm a') : '--' }
+    { title: 'Gate_out', description: data.stats.gate_out.on ? service.utcToist(data.stats.gate_out.on, 'dd-MMM-yyyy hh:mm a') : '--' },
+    { title: 'Last Location', description: data.last_location_address || '--' }
   ];
 
 
