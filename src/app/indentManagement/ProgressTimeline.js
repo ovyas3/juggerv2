@@ -6,6 +6,7 @@ import service from "@/utils/timeService";
 const ProgressTimeline = ({data,index}) => {
   const [open, setOpen] = useState(false);
   const [animateChart, setAnimateChart] = useState(false);
+  const [currentStep, setCurrentStep] = useState(0);
 
 
   useEffect(() => {
@@ -14,6 +15,30 @@ const ProgressTimeline = ({data,index}) => {
       const data = JSON.parse(plantPageData);
     }
   }, []);
+
+  useEffect(() => {
+    let lastStep = 0;
+    const stepKeys = [
+      'allocated',
+      'accepted',
+      'assigned',
+      'reported',
+      'load_in',
+      'load_out',
+      'gate_out',
+    ];
+
+    for(let i = 0;i < stepKeys.length;i++) {
+      const key = stepKeys[i];
+      if(data.stats[key] && data.stats[key].on) {
+        lastStep = i + 1;
+      }
+      else {
+        break;
+      }
+    }
+    setCurrentStep(lastStep);
+  }, [data])
 
   const handleOpen = () => {
     setOpen(true);
@@ -40,6 +65,9 @@ const ProgressTimeline = ({data,index}) => {
     { title: 'Last Location', description: data.last_location_address || '--' }
   ];
 
+  const leftPercentages = [
+    12.2857, 25.2857, 37.571, 50.1429, 62.4286, 74.7143,
+  ];
 
   return (
     <Card
@@ -66,8 +94,8 @@ const ProgressTimeline = ({data,index}) => {
            <div className="timeline-container" style={{ position: 'relative', marginTop: '5px' }}>
                       
             <Steps
-              current={4}
-              status="error"
+              current={currentStep}
+              // status="error"
               size="small"
               progressDot
               items={steps}
@@ -77,6 +105,7 @@ const ProgressTimeline = ({data,index}) => {
               if (idx < array.length - 1) {
                 const [key, value] = entry;
                 const timeTaken = value.time_taken || "--";
+                const leftPercentage = leftPercentages[idx];
                 
                 return (
                   <div 
@@ -84,7 +113,7 @@ const ProgressTimeline = ({data,index}) => {
                     className="time-taken-indicator"
                     style={{
                       position: 'absolute',
-                      left: `${(idx + 1) * (100 / array.length)}%`,
+                      left: `${leftPercentage}%`,
                       top: '-25px',
                       transform: 'translateX(-50%)',
                       color: '#52c41a',
