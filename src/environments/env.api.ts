@@ -6,5 +6,6 @@ export const environment = {
     GOOGLE_MAP_API: 'https://www.google.com/',
     BASE_URL:'https://smartdashbaord.instavans.com/',
     DEV_ETMS:'https://etms.instavans.com/',
-    PROD_SMART:'https://smartshipper.instavans.com/'
+    PROD_SMART:'https://smartshipper.instavans.com/',
+    TRACKER_URL: 'https://tracker.instavans.com/track/',
 }
