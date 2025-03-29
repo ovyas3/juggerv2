@@ -30,14 +30,6 @@ import dayjs from "dayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { environment } from '@/environments/env.api';
-import { DateTime } from 'luxon';
-import timeService from "@/utils/timeService";
-// import utc from 'dayjs/plugin/utc';
-// import timezone from 'dayjs/plugin/timezone';
-
-// dayjs.extend(utc);
-// dayjs.extend(timezone);
 
 // Define types for our data structure
 interface ShipperDetail {
@@ -62,7 +54,6 @@ interface ShipmentData {
 }
 
 interface ProcessedData {
-  id: string;
   sn: number;
   city: string;
   rate: number;
@@ -134,16 +125,16 @@ export default function InventoryDataTable() {
   const [error, setError] = useState<string | null>(null);
   const [totalCitiesCount, setTotalCitiesCount] = useState<number>(0);
   const [page, setPage] = useState<number>(0)
-  const [rowsPerPage, setRowsPerPage] = useState<number>(15)
+  const [rowsPerPage, setRowsPerPage] = useState<number>(10)
   const [order, setOrder] = useState<Order>("desc")
   const [orderBy, setOrderBy] = useState<any>('trips')
   const [selectedCity, setSelectedCity] = useState<string>('all_cities_id') // Initialized to 'all_cities_id'
   const [cityOptions, setCityOptions] = useState<CityOption[]>([])
-  const [fromDate, setFromDate] = useState<number>(0);
-  const [toDate, setToDate] = useState<number>(0);
-
+  const today = dayjs().startOf("day");
+  const thirtyDaysAgo = today.subtract(30, "day");
+  const [fromDate, setFromDate] = useState<number>(thirtyDaysAgo.valueOf());
+  const [toDate, setToDate] = useState<number>(today.valueOf());
   const [totalCount, setTotalCount] = useState<number>(0);
-  const { PROD_SMART } = environment;
 
 
   // useEffect(() => {
@@ -182,12 +173,12 @@ export default function InventoryDataTable() {
   //   fetchCityOptions();
   // }, []);
 
-  const handleDateChange = (newDate: any, setDate: (value: number) => void, type="from") => {
+  const handleDateChange = (newDate: any, setDate: (value: number) => void) => {
     if (newDate) {
-      let utc = DateTime.fromJSDate(new Date(newDate))
-      console.log("UTC:", utc.toUTC().toMillis(), type, newDate);
-      if (type == 'from') setDate(utc.startOf('day').toUTC().toMillis());
-      else setDate(utc.endOf('day').toUTC().toMillis());
+      const utc = new Date(newDate);
+      let epochTime = utc.valueOf();
+      epochTime -= (5 * 60 * 60 * 1000) + (30 * 60 * 1000);
+      setDate(epochTime);
     }
   };
 
@@ -211,18 +202,10 @@ export default function InventoryDataTable() {
     }
   }
 
-  // useEffect(() => {
-  //   fetchData();
-  // }, [page, rowsPerPage]);
-
   useEffect(() => {
-    const fromDateNew = DateTime.fromJSDate(new Date()).startOf('month').minus({ months: 1 }).toUTC().toMillis();
-    const toDateNew = DateTime.fromJSDate(new Date()).endOf('month').minus({month: 1}).toUTC().toMillis();
-    setFromDate(fromDateNew);
-    setToDate(toDateNew);
-
     fetchData();
   }, [page, rowsPerPage]);
+
 
   const handleCityChange = (event: SelectChangeEvent) => {
     setSelectedCity(event.target.value as string)
@@ -314,7 +297,6 @@ export default function InventoryDataTable() {
       const cumulativeFreight_short = new Intl.NumberFormat("en-IN", { maximumFractionDigits: 2 }).format(cumulativeFreight);
 
       return {
-        id: city._id,
         sn: index + 1,
         city: city.city,
         trips: city.trips,
@@ -332,12 +314,6 @@ export default function InventoryDataTable() {
 
 
   const sortedData = useMemo(() => {
-    const totalTonnage = processedData.reduce((sum, city) => sum + city.tonnage, 0);
-    const totalFreight = processedData.reduce((sum, city) => sum + city.freightValue, 0);
-
-    let cumulativeTonnage = 0;
-    let cumulativeFreight = 0;
-
     return [...processedData].sort((a, b) => {
       if (!orderBy) return 0;
       if (orderBy === "tonnage") {
@@ -350,34 +326,7 @@ export default function InventoryDataTable() {
         return order === "desc" ? b.freightValue - a.freightValue : a.freightValue - b.freightValue
       }
       return 0;
-    }).map((city, index) => {
-
-      const tonnagePercentage = totalTonnage ? (city.tonnage / totalTonnage) * 100 : 0;
-      const freightPercentage = totalFreight ? (city.freightValue / totalFreight) * 100 : 0;
-
-      cumulativeTonnage += tonnagePercentage;
-      cumulativeFreight += freightPercentage;
-
-      const tonnage_short = new Intl.NumberFormat("en-IN", { maximumFractionDigits: 2 }).format(city.tonnage);
-      const freight_short = new Intl.NumberFormat("en-IN", { maximumFractionDigits: 2 }).format(city.freightValue);
-      const cumulativeTonnage_short = new Intl.NumberFormat("en-IN", { maximumFractionDigits: 2 }).format(cumulativeTonnage);
-      const cumulativeFreight_short = new Intl.NumberFormat("en-IN", { maximumFractionDigits: 2 }).format(cumulativeFreight);
-
-      return {
-        id: city.id,
-        sn: index + 1,
-        city: city.city,
-        trips: city.trips,
-        tonnage: city.tonnage,
-        tonnage_short,
-        freightValue: city.freightValue,
-        freight_short,
-        tonnagePercentage,
-        freightPercentage,
-        cumulativeTonnage: cumulativeTonnage_short,
-        cumulativeFreight: cumulativeFreight_short,
-      };
-    })
+    });
   }, [order, orderBy, processedData]);
 
 
@@ -398,12 +347,6 @@ export default function InventoryDataTable() {
     const workbook = XLSX.utils.book_new()
     XLSX.utils.book_append_sheet(workbook, worksheet, "Inventory Data")
     XLSX.writeFile(workbook, "inventory_data.csv")
-  }
-
-  function handleCityClick (cityId: string) {
-    console.log("City clicked:", cityId);
-    window.open(`${PROD_SMART}routeMasterList?city_id=${cityId}`, '_self');
-    // You can navigate to a new page or show a modal or do anything else here}
   }
 
   if (loading) {
@@ -454,7 +397,7 @@ export default function InventoryDataTable() {
                   format="DD/MM/YYYY"
                   disableFuture
                   value={dayjs(toDate)}
-                  onChange={(newDate) => handleDateChange(newDate, setToDate, 'to')}
+                  onChange={(newDate) => handleDateChange(newDate, setToDate)}
                   sx={{
                     "& .MuiOutlinedInput-root": {
                       width: "150px",
@@ -486,7 +429,7 @@ export default function InventoryDataTable() {
       </div>
 
       <TablePagination
-          rowsPerPageOptions={[5, 10, 15, 25, 50, 100]}
+          rowsPerPageOptions={[5, 10, 25, 50, 100]}
           component="div"
           count={totalCount}
           rowsPerPage={rowsPerPage}
@@ -557,7 +500,7 @@ export default function InventoryDataTable() {
             {sortedData.map((item, index) => (
               <TableRow key={`${item.city}-${item.sn}`} sx={{ "&:nth-of-type(odd)": { backgroundColor: "#f9f9f9" } }}>
                 <StyledTableCell>{index + 1 + page * rowsPerPage}</StyledTableCell>
-                <StyledTableCell style={{cursor: 'pointer'}} onClick={() => handleCityClick(item.id)} >{item.city}</StyledTableCell>
+                <StyledTableCell>{item.city}</StyledTableCell>
                 <StyledTableCell>{item.trips}</StyledTableCell>
                 <StyledTableCell>{item.tonnage_short}</StyledTableCell>
                 <StyledTableCell>{item.freight_short}</StyledTableCell>
