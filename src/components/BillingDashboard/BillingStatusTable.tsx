@@ -466,7 +466,11 @@ export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatus
                               style={{ cursor: "pointer" }}
                             >{underBilling?.totalCount || 0}</TableCell>
                             <TableCell>{Math.round(underBilling?.totalWeight || 0)}</TableCell>
-                            <TableCell>{billed?.totalCount || 0}</TableCell>
+                            <TableCell onClick={() => {
+                                handleViewGateInfo(billed);
+                              }}
+                              style={{ cursor: "pointer" }}
+                            >{billed?.totalCount || 0}</TableCell>
                             <TableCell>{Math.round(billed?.totalWeight || 0)}</TableCell>
                             <TableCell
                               onClick={() => {
