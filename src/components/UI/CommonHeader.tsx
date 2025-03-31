@@ -6,9 +6,10 @@ import {
   Select, 
   Popover, 
   MenuProps,
-  Modal,
-  DatePicker
+  DatePicker,
+  Space
 } from 'antd';
+
 import { 
   CalendarOutlined, 
   BgColorsOutlined, 
@@ -25,12 +26,7 @@ import { TargetSettingsModal } from '../PlantSchedule/TargetSettingsModal';
 import { httpsGet } from '@/utils/Communication';
 import { useRouter } from 'next/navigation';
 import { convertToUTC } from '@/utils/dateUtils';
-import { ScreenShare} from 'lucide-react';
-import { Tooltip } from '@mui/material';
-import html2canvas from 'html2canvas';
-import { saveAs } from 'file-saver';
-import jsPDF from 'jspdf';  
-
+import { ScreenShareModal } from './shareScreen';
 
 const themes = {
   navy: {
@@ -382,53 +378,11 @@ export const CommonHeader: React.FC<CommonHeaderProps> = ({
     );
   }
 
-  const screenShare = async () => {
-    try {
-      if (!componentRef) {
-        console.error("Component ref is null.  Make sure the ref is correctly attached to the element you want to capture.");
-        return;
-      }
-      let element: HTMLDivElement | null = null;
-      if (typeof componentRef === 'function') {
-        console.warn("Cannot capture screen using function ref.  Please use useRef to create a RefObject.");
-        return; 
-      } else {
-        element = componentRef.current;
-      }
-      if (!element) {
-        console.error("The DOM element is not available on the ref.");
-        return;
-      }
-      const canvas = await html2canvas(element, {
-        useCORS: true,
-        logging: true,
-      });
-      const dataURL = canvas.toDataURL('image/png');
-      const pdf = new jsPDF();
-      const img = new Image();
-      img.onload = () => {
-        const aspectRatio = img.width / img.height;
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = pdfWidth / aspectRatio;
-        pdf.addImage(dataURL, 'PNG', 0, 0, pdfWidth, pdfHeight);
-        pdf.save('screen_capture.pdf');
-      };
-      img.onerror = (error) => {
-        console.error("Error loading image for PDF:", error);
-      };
-      img.src = dataURL;
-    } catch (error) {
-      console.error('Error capturing or generating PDF:', error);
-    }
-  };
-  
   return (
     <Header theme={themes[currentTheme]}>
       <HeaderLeft theme={themes[currentTheme]} style={{ display: 'flex', alignItems: 'center' }}>
         <Typography.Title level={2}>{title}</Typography.Title>
-        <Tooltip title={'Screen Share'} placement='bottom'>
-        <div onClick={() => {screenShare()}} style={{display: 'flex', alignItems: 'center', justifyContent:'center', height:16, width:16, marginTop:4}}><ScreenShare style={{ cursor: 'pointer', color: themes[currentTheme].textSecondary }} /></div>
-        </Tooltip>
+        <ScreenShareModal componentRef={componentRef} color={themes[currentTheme].textSecondary} />
       </HeaderLeft>
       
       <HeaderRight theme={themes[currentTheme]}>
