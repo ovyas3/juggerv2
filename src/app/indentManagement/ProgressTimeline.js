@@ -17,7 +17,7 @@ const ProgressTimeline = ({data,index}) => {
   }, []);
 
   useEffect(() => {
-    let lastStep = 0;
+    let lastStep = -1;
     const stepKeys = [
       'allocated',
       'accepted',
@@ -28,16 +28,14 @@ const ProgressTimeline = ({data,index}) => {
       'gate_out',
     ];
 
-    for(let i = 0;i < stepKeys.length;i++) {
+    for(let i = stepKeys.length - 1;i >= 0;i--) {
       const key = stepKeys[i];
-      if(data.stats[key] && data.stats[key].on) {
-        lastStep = i + 1;
-      }
-      else {
+      if(data.stats[key] && data.stats[key]?.on) {
+        lastStep = i;
         break;
       }
     }
-    setCurrentStep(lastStep);
+    setCurrentStep(lastStep == -1 ? 0 : lastStep);
   }, [data])
 
   const handleOpen = () => {
