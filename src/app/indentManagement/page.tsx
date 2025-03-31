@@ -372,16 +372,20 @@ const IndentWiseDashboard = () => {
   }, []);
 
   async function getStatusWiseData() {
-    
-    const shippersQuery = selectedShippers.length > 0 
-    ? selectedShippers.map((id:any) => `&shipperId=${id}`).join('')
-    : '';
 
-    const response = await httpsGet(
-      `cr/security/order_shipment?from=${fromDate}&to=${toDate}${shippersQuery}`,
-      3,
-      router
+    const payload = {
+      from: fromDate,
+      to: toDate,
+      ...(selectedShippers.length > 0 && { shipperId: selectedShippers })
+    };
+    
+    const response = await httpsPost(
+      "cr/security/order_shipment",
+      payload,
+      router,
+      3
     );
+
     if (response.statusCode === 200) {
       let dataArr: any = [];
       let barChartArr: any = [];

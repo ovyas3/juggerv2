@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24.049" height="24" viewBox="0 0 24.049 24">
+  <g id="light_house_icon_active" transform="translate(0.025)">
+    <path id="Path_16578" data-name="Path 16578" d="M0,0H24V24H0Z" fill="none"/>
+    <path id="Path_16579" data-name="Path 16579" d="M12.041,5.713A7.784,7.784,0,0,1,14,6l2,15H8L10,6A8.869,8.869,0,0,1,12.041,5.713Z" fill="none" stroke="#333" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+    <line id="Line_1253" data-name="Line 1253" x2="14" transform="translate(5 21)" fill="none" stroke="#333" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+    <g id="Group_19741" data-name="Group 19741">
+      <line id="Line_1254" data-name="Line 1254" x2="3" transform="translate(20 7)" fill="none" stroke="#333" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+      <line id="Line_1255" data-name="Line 1255" x2="3" transform="translate(20.201 10) rotate(30)" fill="none" stroke="#333" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+      <line id="Line_1256" data-name="Line 1256" x2="3" transform="translate(23 2.5) rotate(150)" fill="none" stroke="#333" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+    </g>
+    <g id="Group_19742" data-name="Group 19742" transform="translate(1 2.5)">
+      <line id="Line_1254-2" data-name="Line 1254" x1="3" transform="translate(0 4.5)" fill="none" stroke="#333" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+      <line id="Line_1255-2" data-name="Line 1255" x2="3" transform="translate(2.799 7.5) rotate(150)" fill="none" stroke="#333" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+      <line id="Line_1256-2" data-name="Line 1256" x2="3" transform="translate(0 0) rotate(30)" fill="none" stroke="#333" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+    </g>
+    <path id="Path_16580" data-name="Path 16580" d="M.1,0H7.9A.1.1,0,0,1,8,.1V4.9a.1.1,0,0,1-.1.1H.1A.1.1,0,0,1,0,4.9V.1A.1.1,0,0,1,.1,0Z" transform="translate(8 4)" fill="#2962ff" stroke="#333" stroke-width="1"/>
+    <path id="Polygon_180" data-name="Polygon 180" d="M4.389.074a.2.2,0,0,1,.222,0L8.45,2.634A.2.2,0,0,1,8.339,3H.661A.2.2,0,0,1,.55,2.634Z" transform="translate(7.5 1)" fill="none" stroke="#333" stroke-width="1"/>
+    <line id="Line_1257" data-name="Line 1257" x2="8" transform="translate(8 7)" fill="none"/>
+    <line id="Line_1258" data-name="Line 1258" x2="2" transform="translate(13.5 7) rotate(90)" fill="none"/>
+    <line id="Line_1259" data-name="Line 1259" x2="2" transform="translate(10.5 7) rotate(90)" fill="none"/>
+  </g>
+</svg>

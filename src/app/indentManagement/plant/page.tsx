@@ -79,7 +79,7 @@ const Plant = () => {
             totalVehicleCount,
             totalWeight
           });
-          setTotalRecords(total);
+          setTotalRecords(totalVehicleCount);
           setInfoItems([
             {
               label: "Location",

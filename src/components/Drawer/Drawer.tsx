@@ -49,6 +49,8 @@ import ShipmentHeaderActive from "@/assets/shipment_header_active.svg";
 import ShipmentHeaderInactive from "@/assets/shipment_header_inactive.svg";
 import AccountingActive from "@/assets/accounting_active.svg";
 import AccountingInactive from "@/assets/accounting_inactive.svg";
+import ControlRoomActive from "../../assets/light_house_icon_active.svg";
+import ControlRoomInactive from "../../assets/light_house_icon_inactive.svg";
 import ReportActive from "@/assets/report_active_icon.svg";
 import ReportInactive from "@/assets/report_deactive_icon.svg";
 import SupportActive from "@/assets/support_active.svg";
@@ -289,33 +291,42 @@ const myklNavigationItems: NavItem[] = [
         isImageIcon: true
     },
     {
-        id: 'trackAndTrace',
-        label: 'Track & Trace',
+        id: 'controlRoom',
+        label: 'Control Room',
         icon: '',
-        activeIcon: LoadActive,
-        inactiveIcon: LoadInactive,
+        activeIcon: ControlRoomActive,
+        inactiveIcon: ControlRoomInactive,
         route: 'controlRoom',
         isImageIcon: true
-    },
-    {
-        id: 'freightBill',
-        label: 'Freight Bill',
-        icon: '',
-        activeIcon: LoadActive,
-        inactiveIcon: LoadInactive,
-        route: 'controlRoom',
-        isImageIcon: true
-    },
-    {
-        id: 'gateTransaction',
-        label: 'Gate Transaction',
-        icon: '',
-        activeIcon: LoadActive,
-        inactiveIcon: LoadInactive,
-        route: 'controlRoom',
-        isImageIcon: true
-    },
-]
+    }
+//     {
+//         id: 'trackAndTrace',
+//         label: 'Track & Trace',
+//         icon: '',
+//         activeIcon: LoadActive,
+//         inactiveIcon: LoadInactive,
+//         route: 'controlRoom',
+//         isImageIcon: true
+//     },
+//     {
+//         id: 'freightBill',
+//         label: 'Freight Bill',
+//         icon: '',
+//         activeIcon: LoadActive,
+//         inactiveIcon: LoadInactive,
+//         route: 'controlRoom',
+//         isImageIcon: true
+//     },
+//     {
+//         id: 'gateTransaction',
+//         label: 'Gate Transaction',
+//         icon: '',
+//         activeIcon: LoadActive,
+//         inactiveIcon: LoadInactive,
+//         route: 'controlRoom',
+//         isImageIcon: true
+//     },
+ ]
 
 const NavItem = ({
     item,
@@ -542,7 +553,16 @@ function SideDrawer() {
                     isActive={active === item.id}
                     isHovered={hoveredId === item.id}
                     isOpen={open}
-                    onClick={() => item.route ? handleShipperRouting(item.route) : handleRouting(item.id)}
+                    onClick={() => {
+                        if (item.id === 'controlRoom') {
+                            router.back();
+                            setActive('controlRoom');
+                        } else if (item.route) {
+                            handleShipperRouting(item.route);
+                        } else {
+                            handleRouting(item.id);
+                        }
+                    }}
                     onMouseEnter={() => setHoveredId(item.id)}
                     onMouseLeave={() => setHoveredId(null)}
                     active={active}
