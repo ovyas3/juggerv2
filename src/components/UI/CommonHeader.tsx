@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef, RefObject } from 'react';
 import styled from 'styled-components';
 import { 
   Typography, 
@@ -6,9 +6,10 @@ import {
   Select, 
   Popover, 
   MenuProps,
-  Modal,
-  DatePicker
+  DatePicker,
+  Space
 } from 'antd';
+
 import { 
   CalendarOutlined, 
   BgColorsOutlined, 
@@ -25,6 +26,7 @@ import { TargetSettingsModal } from '../PlantSchedule/TargetSettingsModal';
 import { httpsGet } from '@/utils/Communication';
 import { useRouter } from 'next/navigation';
 import { convertToUTC } from '@/utils/dateUtils';
+import { ScreenShareModal } from './shareScreen';
 
 const themes = {
   navy: {
@@ -171,6 +173,8 @@ interface CommonHeaderProps {
   showRefreshOptions?: boolean;
   alwaysShowDatePicker?: boolean;
   hideDatePickerDuringRefresh?: boolean;
+  // componentRef?: React.Ref<HTMLDivElement> | undefined | null;
+  componentRef?: RefObject<HTMLDivElement> | ((instance: HTMLDivElement | null) => void) | undefined | null;
 }
 
 export const CommonHeader: React.FC<CommonHeaderProps> = ({
@@ -189,7 +193,8 @@ export const CommonHeader: React.FC<CommonHeaderProps> = ({
   showDatePicker = false,
   showRefreshOptions = false,
   alwaysShowDatePicker = false,
-  hideDatePickerDuringRefresh = false
+  hideDatePickerDuringRefresh = false,
+  componentRef
 }) => {
   const router = useRouter();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
@@ -375,8 +380,9 @@ export const CommonHeader: React.FC<CommonHeaderProps> = ({
 
   return (
     <Header theme={themes[currentTheme]}>
-      <HeaderLeft theme={themes[currentTheme]}>
+      <HeaderLeft theme={themes[currentTheme]} style={{ display: 'flex', alignItems: 'center' }}>
         <Typography.Title level={2}>{title}</Typography.Title>
+        <ScreenShareModal componentRef={componentRef} color={themes[currentTheme].textSecondary} />
       </HeaderLeft>
       
       <HeaderRight theme={themes[currentTheme]}>

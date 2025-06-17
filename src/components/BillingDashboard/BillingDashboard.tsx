@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import dayjs, { Dayjs } from 'dayjs';
 import { MenuProps } from 'antd';
@@ -208,6 +208,8 @@ const BillingDashboard: React.FC<BillingDashboardProps> = ({ mobile = false, hid
     refreshInterval: 5
   });
 
+  const componentBillingRef = useRef<HTMLDivElement>(null);  // Or the appropriate HTML element type
+
   const handleRefreshChange = (value: number) => {
     setSettings(prev => ({
       ...prev,
@@ -273,7 +275,7 @@ const BillingDashboard: React.FC<BillingDashboardProps> = ({ mobile = false, hid
   // }, []);
 
   return (
-    <Container theme={themes[currentTheme]}>
+    <Container theme={themes[currentTheme]} ref={componentBillingRef}>
       {!hideHeader && (
         <CommonHeader
           title="Road Invoicing & Loading Status"
@@ -288,6 +290,7 @@ const BillingDashboard: React.FC<BillingDashboardProps> = ({ mobile = false, hid
           mobile={mobile}
           alwaysShowDatePicker={false}
           hideDatePickerDuringRefresh={true}
+          componentRef={componentBillingRef}
         />
       )}
       
