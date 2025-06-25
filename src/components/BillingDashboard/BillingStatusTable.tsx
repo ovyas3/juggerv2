@@ -20,6 +20,7 @@ import Dialog from '@mui/material/Dialog';
 import CloseButtonIcon from "@/assets/close_icon.svg";
 import Image from "next/image"
 import { environment } from "@/environments/env.api";
+import { Truck } from "lucide-react";
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialogContent-root": {
@@ -253,7 +254,7 @@ export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatus
         ...(data?.underBillingresult || []),
         ...(data?.doIssuedresult || []),
         ...(data?.billedResult || [])
-      ].map((item:any) => item.locationName ? item.locationName : item.material)
+      ].map((item: any) => item.locationName ? item.locationName : item.material)
     )
   )
 
@@ -409,7 +410,7 @@ export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatus
     try {
       const payload = { shipmentIds: gateInfo.shipmentIds }; // API expects "shipment_ids"
       // Pass router to httpsPost as it's a required parameter in Communication.ts
-      const response = await httpsPost("billing/shipments_details", payload, router,1);
+      const response = await httpsPost("billing/shipments_details", payload, router, 1);
 
       if (response && response.data && response.statusCode === 200) {
         setShipmentDetails(response.data);
@@ -435,11 +436,11 @@ export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatus
               {!isMobile && (
                 <div className="table-header">
                   <div className="datetime-container">
-                    <div className="date-display">
+                    <div className="date-display" style={{ color: currentTheme.textSecondary }}>
                       <Calendar className="datetime-icon" size={16} />
                       <span>Date: {format(currentTime, "dd-MMM-yy")}</span>
                     </div>
-                    <div className="time-display">
+                    <div className="time-display" style={{ color: currentTheme.textSecondary }}>
                       <Clock className="datetime-icon" size={16} />
                       <span>Time: {format(currentTime, "hh:mm a")}</span>
                     </div>
@@ -454,27 +455,76 @@ export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatus
                     <TableHeader>
                       <TableRow>
                         <TableHead rowSpan={2} style={{
-                          textAlign: "left"
+                          textAlign: "center",
+                          minWidth: "140px", 
+                          maxWidth: "200px"
                         }}>Shop</TableHead>
                         <TableHead colSpan={2}>Under Loading</TableHead>
                         <TableHead colSpan={2}>Under Invoicing</TableHead>
                         <TableHead colSpan={2}>Billed</TableHead>
                         <TableHead colSpan={2}>DO Issued</TableHead>
-                        <TableHead rowSpan={2}>Total Potential (MT)</TableHead>
+                        <TableHead rowSpan={2} style={{ textAlign: "center" }}>
+                          Total 
+                          <br />
+                          Potential
+                          <br />
+                          (MT)
+                        </TableHead>
                         <TableHead colSpan={2}>Mode</TableHead>
-                        <TableHead rowSpan={2}>G. Total Qty (MT)</TableHead>
+                        <TableHead rowSpan={2} style={{ textAlign: "center" }}>
+                          G. Total
+                          <br />
+                          Qty
+                          <br />
+                          (MT)
+                        </TableHead>
                       </TableRow>
                       <TableRow>
-                        <TableHead>No. of Veh.</TableHead>
-                        <TableHead>Qty (MT)</TableHead>
-                        <TableHead>No. of Veh.</TableHead>
-                        <TableHead>Qty (MT)</TableHead>
-                        <TableHead>No. of Veh.</TableHead>
-                        <TableHead>Qty (MT)</TableHead>
-                        <TableHead>No. of Veh.</TableHead>
-                        <TableHead>Qty (MT)</TableHead>
-                        <TableHead>By Road (MT)</TableHead>
-                        <TableHead>By Rake</TableHead>
+                        {/* Under Loading */}
+                        <TableHead style={{ textAlign: "center", width: "50px", minWidth: "50px" }}><Truck size={16} color={currentTheme.text} /></TableHead>
+                        <TableHead style={{ width: "80px", minWidth: "80px" }}>
+                          Qty
+                          <br />
+                          (MT)
+                        </TableHead>
+                        {/* Under Invoicing */}
+                        <TableHead style={{ textAlign: "center", width: "50px", minWidth: "50px" }}><Truck size={16} color={currentTheme.text} /></TableHead>
+                        <TableHead style={{ width: "80px", minWidth: "80px" }}>
+                          Qty
+                          <br />
+                          (MT)
+                        </TableHead>
+                        {/* Billed */}
+                        <TableHead style={{ textAlign: "center", width: "50px", minWidth: "50px" }}><Truck size={16} color={currentTheme.text} /></TableHead>
+                        <TableHead style={{ width: "80px", minWidth: "80px" }}>
+                          Qty
+                          <br />
+                          (MT)
+                        </TableHead>
+                        {/* DO Issued */}
+                        <TableHead style={{ textAlign: "center", width: "50px", minWidth: "50px" }}><Truck size={16} color={currentTheme.text} /></TableHead>
+                        <TableHead style={{ width: "80px", minWidth: "80px" }}>
+                          Qty
+                          <br />
+                          (MT)
+                        </TableHead>
+                        {/* Total Potential (MT) - This column is rowSpan=2, so no header here in second row */}
+                        {/* Mode */}
+                        <TableHead style={{ minWidth: "80px" }}>
+                          By
+                          <br />
+                          Road
+                          <br />
+                          (MT)
+                        </TableHead>
+                        <TableHead style={{ minWidth: "80px" }}>
+                          By
+                          <br />
+                          Rake
+                          <br />
+                          (MT)
+                        </TableHead>
+                        {/* G. Total Qty (MT) - This column is rowSpan=2, so no header here in second row */}
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -501,40 +551,40 @@ export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatus
                         return (
                           <TableRow key={locationName}>
                             <TableCell style={{
-                              textAlign: "left"
+                              textAlign: "center"
                             }}>{locationName}</TableCell>
                             <TableCell
                               onClick={() => {
                                 handleViewGateInfo(underLoading);
                               }}
-                              style={{ cursor: "pointer" }}
+                              style={{ cursor: "pointer", width: "50px", minWidth: "50px" }}
                             >{underLoading?.totalCount || 0}
                             </TableCell>
-                            <TableCell>{Math.round(underLoading?.totalWeight || 0)}</TableCell>
+                            <TableCell style={{ width: "80px", minWidth: "80px" }}>{Math.round(underLoading?.totalWeight || 0)}</TableCell>
                             <TableCell
                               onClick={() => {
                                 handleViewGateInfo(underBilling);
                               }}
-                              style={{ cursor: "pointer" }}
+                              style={{ cursor: "pointer", width: "50px", minWidth: "50px" }}
                             >{underBilling?.totalCount || 0}</TableCell>
-                            <TableCell>{Math.round(underBilling?.totalWeight || 0)}</TableCell>
+                            <TableCell style={{ width: "80px", minWidth: "80px" }}>{Math.round(underBilling?.totalWeight || 0)}</TableCell>
                             <TableCell onClick={() => {
-                                handleViewGateInfo(billed);
-                              }}
-                              style={{ cursor: "pointer" }}
+                              handleViewGateInfo(billed);
+                            }}
+                              style={{ cursor: "pointer", width: "50px", minWidth: "50px" }}
                             >{billed?.totalCount || 0}</TableCell>
-                            <TableCell>{Math.round(billed?.totalWeight || 0)}</TableCell>
+                            <TableCell style={{ width: "80px", minWidth: "80px" }}>{Math.round(billed?.totalWeight || 0)}</TableCell>
                             <TableCell
                               onClick={() => {
                                 handleViewGateInfo(doIssued);
                               }}
-                              style={{ cursor: "pointer" }}
+                              style={{ cursor: "pointer", width: "50px", minWidth: "50px" }}
                             >{doIssued?.totalCount || 0}</TableCell>
-                            <TableCell>{Math.round(doIssued?.totalWeight || 0)}</TableCell>
-                            <TableCell>{Math.round(rowTotal)}</TableCell>
-                            <TableCell>{Math.round(billed?.totalWeight || 0)}</TableCell>
-                            <TableCell>0</TableCell>
-                            <TableCell>{Math.round((billed?.totalWeight || 0) + 0)}</TableCell>
+                            <TableCell style={{ width: "80px", minWidth: "80px" }}>{Math.round(doIssued?.totalWeight || 0)}</TableCell>
+                            <TableCell style={{ minWidth: "100px" }}>{Math.round(rowTotal)}</TableCell>
+                            <TableCell style={{ minWidth: "80px" }}>{Math.round(billed?.totalWeight || 0)}</TableCell>
+                            <TableCell style={{ minWidth: "80px" }}>0</TableCell>
+                            <TableCell style={{ minWidth: "100px" }}>{Math.round((billed?.totalWeight || 0) + 0)}</TableCell>
                           </TableRow>
                         )
                       })}
@@ -564,12 +614,12 @@ export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatus
                         <TableCell>
                           {Math.round(data?.doIssuedresult.reduce((sum, item) => sum + item.totalWeight, 0) || 0)}
                         </TableCell>
-                        <TableCell>{Math.round(calculateTotalWeight())}</TableCell>
-                        <TableCell>
+                        <TableCell style={{ minWidth: "100px" }}>{Math.round(calculateTotalWeight())}</TableCell>
+                        <TableCell style={{ minWidth: "80px" }}>
                           {Math.round(data?.billedResult.reduce((sum, item) => sum + item.totalWeight, 0) || 0)}
                         </TableCell>
-                        <TableCell>0</TableCell>
-                        <TableCell>
+                        <TableCell style={{ minWidth: "80px" }}>0</TableCell>
+                        <TableCell style={{ minWidth: "100px" }}>
                           {Math.round((data?.billedResult.reduce((sum, item) => sum + item.totalWeight, 0) || 0) + 0)}
                         </TableCell>
                       </TableRow>
@@ -617,35 +667,35 @@ export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatus
             </div>
           ) : shipmentDetails && shipmentDetails.length > 0 ? (
             <>
-            <div className="billing-status-gate-info-legend">
-              <div className="legend-item">
-                <span className="legend-color-box gate-entry-legend-color"></span> Gate Entry Number
+              <div className="billing-status-gate-info-legend">
+                <div className="legend-item">
+                  <span className="legend-color-box gate-entry-legend-color"></span> Gate Entry Number
+                </div>
+                <div className="legend-item">
+                  <span className="legend-color-box vehicle-number-legend-color"></span> Vehicle Number
+                </div>
               </div>
-              <div className="legend-item">
-                <span className="legend-color-box vehicle-number-legend-color"></span> Vehicle Number
+              <div className="billing-status-gate-info-shipment-details-list"> {/* Changed class name for clarity */}
+                <h3>Shipment Details</h3>
+                <ul>
+                  {shipmentDetails.map((shipment: ShipmentDetailItem, index: number) => (
+                    <li key={shipment._id || index}> {/* Use a unique key */}
+                      <a
+                        href={`${getTrackerUrlPrefix()}${shipment.unique_code}`}
+                        target="_blank" // Opens in a new tab
+                        rel="noopener noreferrer" // Security best practice for target="_blank"
+                        title={`View details for ${shipment.vehicle_no}`}
+                      >
+                        <span className="gate-entry-number-style">{shipment.driver?.gate_entry_no || 'N/A'}</span>
+
+                        &nbsp;-&nbsp;
+
+                        <span className="vehicle-number-style">{shipment.vehicle_no || 'N/A'}</span>
+                      </a>
+                    </li>
+                  ))}
+                </ul>
               </div>
-            </div>
-            <div className="billing-status-gate-info-shipment-details-list"> {/* Changed class name for clarity */}
-              <h3>Shipment Details</h3>
-              <ul>
-                {shipmentDetails.map((shipment: ShipmentDetailItem, index: number) => (
-                  <li key={shipment._id || index}> {/* Use a unique key */}
-                    <a
-                      href={`${getTrackerUrlPrefix()}${shipment.unique_code}`}
-                      target="_blank" // Opens in a new tab
-                      rel="noopener noreferrer" // Security best practice for target="_blank"
-                      title={`View details for ${shipment.vehicle_no}`}
-                    >
-                      <span className="gate-entry-number-style">{shipment.driver?.gate_entry_no || 'N/A'}</span>
-                      
-                      &nbsp;-&nbsp;
-                      
-                      <span className="vehicle-number-style">{shipment.vehicle_no || 'N/A'}</span>
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
             </>
           ) : (
 
@@ -661,7 +711,7 @@ export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatus
       <style jsx global>{`
         .billing-table-container {
           min-height: calc(100vh - 64px);
-          background-color: ${currentTheme.cardBg};
+          background-color: ${currentTheme.cardBg}; /* Keep background color */
           background-image: ${currentTheme.background};
           color: ${currentTheme.text};
           margin-top: 64px;
