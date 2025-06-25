@@ -6,7 +6,7 @@ import {
   SendOutlined,
   ShareAltOutlined,
 } from "@ant-design/icons";
-// import html2canvas from "html2canvas";
+import html2canvas from "html2canvas";
 import { saveAs } from "file-saver";
 import jsPDF from "jspdf";
 import { ScreenShare } from "lucide-react";
@@ -45,11 +45,11 @@ export const ScreenShareModal: React.FC<ScreenShareModalProps> = ({
         return;
       }
 
-      // const canvas = await html2canvas(element, {
-      //   useCORS: true,
-      //   logging: true,
-      //   scale: 0.7,
-      // });
+      const canvas = await html2canvas(element, {
+        useCORS: true,
+        logging: true,
+        scale: 0.7,
+      });
 
       const dataURL = canvas?.toDataURL("image/jpeg", 0.6);
 
