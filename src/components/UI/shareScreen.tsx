@@ -51,7 +51,7 @@ export const ScreenShareModal: React.FC<ScreenShareModalProps> = ({
         scale: 0.7,
       });
 
-      const dataURL = canvas.toDataURL("image/jpeg", 0.6);
+      const dataURL = canvas?.toDataURL("image/jpeg", 0.6);
 
       // Function to convert data URL to Blob
       const dataURLtoBlob = (dataURL: string) => {
