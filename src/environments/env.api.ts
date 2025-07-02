@@ -8,4 +8,6 @@ export const environment = {
     DEV_ETMS:'https://etms.instavans.com/',
     PROD_SMART:'https://smartshipper.instavans.com/',
     TRACKER_URL: 'https://tracker.instavans.com/track/',
+    TRIP_TRACKER: 'https://tracker.instavans.com/track/',
+    TRACKER_URL_PREFIX: "https://tracker.instavans.com/track/"
 }

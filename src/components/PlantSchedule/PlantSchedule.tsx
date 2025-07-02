@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   DatePicker,
   Card,
@@ -1438,6 +1438,7 @@ const PlantSchedule: React.FC = () => {
   const [shiftData, setShiftData] = useState<ScheduleData[]>([]);
   const [resultData, setResultData] = useState<ScheduleData[]>([]);
   const [totalStatsVisible, setTotalStatsVisible] = useState(false);
+  const componentPlantRef = useRef<HTMLDivElement>(null); 
 
   useEffect(() => {
     const savedTheme = Cookies.get('plantScheduleTheme') as ThemeKey;
@@ -1838,6 +1839,7 @@ const PlantSchedule: React.FC = () => {
 
   return (
     <Container
+      ref={componentPlantRef}
       theme={themes[currentTheme]}
       style={mobile ? {
         padding: '10px 10px 74px 10px',
@@ -1865,6 +1867,7 @@ const PlantSchedule: React.FC = () => {
           mobile={mobile}
           alwaysShowDatePicker={true}
           hideDatePickerDuringRefresh={false}
+          componentRef={componentPlantRef}
         />
 
         {!loading && (
