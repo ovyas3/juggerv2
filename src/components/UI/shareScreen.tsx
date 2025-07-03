@@ -175,8 +175,8 @@ export const ScreenShareModal: React.FC<ScreenShareModalProps> = ({
         ),
         width: 400,
         icon: null,
-        okText: "Close",
-        cancelText: null,
+        okText: "Close", // This will be the only visible button
+        cancelButtonProps: { style: { display: 'none' } }, // Hides
         maskClosable: true,
         centered: true,
       });
