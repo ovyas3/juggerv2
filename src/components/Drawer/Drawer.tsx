@@ -159,6 +159,14 @@ const navigationItems: NavItem[] = [
         ]
     },
     {
+        id: 'ptpkDashboard',
+        label: 'PTPK Dashboard',
+        icon: '',
+        activeIcon: RouteActiveIcon,
+        inactiveIcon: RouteInactiveIcon,
+        isImageIcon: true
+    },
+    {
         id: 'topDestination',
         label: 'Top Destination',
         icon: '',
