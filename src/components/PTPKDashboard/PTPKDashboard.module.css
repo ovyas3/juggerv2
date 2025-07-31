@@ -83,10 +83,17 @@
   }
   
 .stickyTabs {
-  width: 100%;
+  width: 92.5%;
   display: flex;
   justify-content: center;
-  margin-top: 10px;
+  margin-top: 6px;
+  position: fixed;
+  border-radius: 10px;
+  top: 50; 
+  z-index: 20;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  transition: box-shadow 0.2s;
 }
 
 .tabsHeader {

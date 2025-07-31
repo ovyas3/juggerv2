@@ -9,6 +9,7 @@ import DataOverviewTab from "./tabs/DataOverviewTab"
 import { httpsPost } from "@/utils/Communication";
 import { toTitleCase } from "@/utils/stringUtils";
 import AdvancedFiltersPanel from "./AdvancedFiltersPanel/AdvancedFiltersPanel";
+import dayjs from "dayjs"
 
 
 interface FilterOption {
@@ -54,6 +55,10 @@ export default function PTPKDashboard() {
   const [filters, setFilters] = useState<any>({});
   const [activeTab, setActiveTab] = useState("data");
 
+  const [distanceFrom, setDistanceFrom] = useState<string>("");
+  const [distanceTo, setDistanceTo] = useState<string>("");
+
+
   useEffect(() => {
     if (activeTab === "data") {
       fetchMetricsData();
@@ -64,44 +69,37 @@ export default function PTPKDashboard() {
   const fetchDropdownData = async (zoneFilter?: string | string[]) => {
     try {
       setIsLoading(true);
-
-      let zonesArray: string[] | undefined;
+  
+      let zonesArray: string[] = [];
       if (Array.isArray(zoneFilter)) {
-        zonesArray = zoneFilter.map(z => z.toUpperCase());
+        zonesArray = zoneFilter.map(zone => (typeof zone === 'string' ? zone.toUpperCase() : String(zone).toUpperCase()));
       } else if (zoneFilter) {
-        zonesArray = [zoneFilter.toUpperCase()];
+        zonesArray = [String(zoneFilter).toUpperCase()];
       }
-
-      const payload = zonesArray ? { zones: zonesArray } : {};
-
+  
+      const payload = { zones: zonesArray };
       const response = await httpsPost('ptpk/dropdowns', payload, {}, 1);
-
-      if (response && response.data) {
+  
+      if (response?.data) {
         const { zones = [], states = [], materials = [] } = response.data;
-
-        if (!zoneFilter) {
-          setZoneOptions(
-            zones.map((zone: string) => ({
-              id: zone,
-              label: toTitleCase(zone),
-              selected: false
-            }))
-          );
-
-          setMaterialOptions(
-            materials.map((material: string) => ({
-              id: material,
-              label: material,
-              selected: false
-            }))
-          );
+  
+        if (!zoneFilter || (Array.isArray(zoneFilter) && zoneFilter.length === 0)) {
+          setZoneOptions(zones.map((zone: any) => ({ id: zone, label: toTitleCase(zone), selected: false })));
         }
-
+        
+        setMaterialOptions(
+          materials.map((material: any) => ({
+            id: material,
+            label: material,
+            selected: materialOptions.some(opt => opt.label === material && opt.selected),
+          }))
+        );
+  
         setStateOptions(
-          states.map((state: string) => ({
+          states.map((state: any) => ({
             id: state,
             label: toTitleCase(state),
-            selected: false
+            selected: stateOptions.some(opt => opt.label === toTitleCase(state) && opt.selected),
           }))
         );
       }
@@ -116,24 +114,21 @@ export default function PTPKDashboard() {
       setIsLoading(false);
     }
   };
-
+  
   useEffect(() => {
     fetchDropdownData();
   }, []);
 
   const handleZoneChange = (newZoneOptions: FilterOption[]) => {
     setZoneOptions(newZoneOptions);
-    
-    const selectedZone = newZoneOptions.find(opt => opt.selected);
-    if (selectedZone) {
-      setStateOptions(prev => 
-        prev.map(opt => ({ ...opt, selected: false }))
-      );
-      fetchDropdownData(selectedZone.label);
-    } else {
-      fetchDropdownData();
-    }
+  
+    const selectedZonesArray = newZoneOptions
+    .filter(opt => opt.selected)
+    .map(opt => opt.label.toUpperCase());
+    setStateOptions(prev => prev.map(opt => ({ ...opt, selected: false })));
+    fetchDropdownData(selectedZonesArray.length > 0 ? selectedZonesArray : undefined);
   };
+  
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -146,22 +141,29 @@ export default function PTPKDashboard() {
     const selectedZones = zoneOptions.filter(opt => opt.selected).map(opt => opt.label);
     const selectedStates = stateOptions.filter(opt => opt.selected).map(opt => opt.label);
     const selectedMaterials = materialOptions.filter(opt => opt.selected).map(opt => opt.label);
-
-    const dateFrom = new Date().toISOString();
-    const dateTo = new Date().toISOString();
-
-    const payload = {
-      dateFrom,
-      dateTo,
-      zones: selectedZones,
-      states: selectedStates,
-      materials: selectedMaterials,
+  
+    const startDate = new Date().toISOString();
+    const endDate = new Date().toISOString();
+  
+    const payload: any = {
+      period: selectedDateFilter, 
+      startDate,
+      endDate,
     };
+  
+    if (selectedZones.length > 0) payload.zones = selectedZones;
+    if (selectedStates.length > 0) payload.states = selectedStates;
+    if (selectedMaterials.length > 0) payload.materials = selectedMaterials;
+    
+  
+    if (distanceFrom.trim() !== "") payload.gt_dist = Number(distanceFrom);
+    if (distanceTo.trim() !== "") payload.lt_dist = Number(distanceTo);
 
+  
     setFilters(payload);
     setIsFilterOpen(false);
   };
-
+  
   const fetchMetricsData = useCallback(async () => {
     setIsLoadingMetrics(true);
     try {
@@ -213,6 +215,25 @@ export default function PTPKDashboard() {
     fetchTableData();
   }, []);
 
+  const resetFilterSelections = () => {
+    setZoneOptions(prev => prev.map(opt => ({ ...opt, selected: false })));
+    setStateOptions(prev => prev.map(opt => ({ ...opt, selected: false })));
+    setMaterialOptions(prev => prev.map(opt => ({ ...opt, selected: false })));
+  
+    setDistanceFrom("");
+    setDistanceTo("");
+  
+    setFilters({
+      period: selectedDateFilter || "MTD",                
+      startDate: dayjs().startOf("month").toISOString(),  
+      endDate: dayjs().toISOString(),                      
+    });
+  
+    setIsFilterOpen(false);
+  };
+  
+
+  
   return (
     <div className={styles.dashboardContainer}>
         
@@ -253,6 +274,11 @@ export default function PTPKDashboard() {
               setStateOptions={setStateOptions}
               setMaterialOptions={setMaterialOptions}
               applyFilters={applyFilters}
+              distanceFrom={distanceFrom}
+              distanceTo={distanceTo}
+              setDistanceFrom={setDistanceFrom}
+              setDistanceTo={setDistanceTo}
+              resetFilters={resetFilterSelections}
             />
             )}
             

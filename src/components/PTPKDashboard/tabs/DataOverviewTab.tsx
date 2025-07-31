@@ -9,6 +9,7 @@ import {
   Database,
   Download,
   Filter,
+  Loader2,
 } from "lucide-react"
 import styles from "./DataOverviewTab.module.css"
 import { TabsContent } from "@/components/UI/tabs"
@@ -87,7 +88,7 @@ const formatNumber = (val: any, decimals = 2) => {
 };
   
   return (
-    <>
+    <div className={styles.mainContent}>
       <div className={styles.metricsGrid}>
         {isLoadingMetrics ? (
           <SummaryCardSkeleton count={4} />
@@ -359,7 +360,10 @@ const formatNumber = (val: any, decimals = 2) => {
                   {isLoadingTable ? (
                     <tr>
                       <td colSpan={regions.length * 4 + 8} style={{ textAlign: "center", padding: "2rem" }}>
-                        Loading...
+                        <Loader2 
+                        className="animate-spin"
+                        style={{ color: "#1e293b", fontSize: "2rem" }}
+                         />
                       </td>
                     </tr>
                   ) : !tableData || tableData.length === 0 ? (
@@ -484,7 +488,7 @@ const formatNumber = (val: any, decimals = 2) => {
           ))}
         </div> */}
       </TabsContent>
-    </>
+    </div>
   )
 }
 

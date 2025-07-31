@@ -104,129 +104,126 @@ const FilterBar = ({ onFilterClick, onApplyFilters }: FilterBarProps) => {
 
         {localPeriod === "Custom" && (
         <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <Box sx={{ display: "flex", gap: 4 }}>
-            <DatePicker 
-              slotProps={{
-                  textField: {
-                      size: "small",
-                      sx: {
-                          width: "140px",
-                          "& .MuiInputBase-root": {
-                              borderRadius: "10px",
-                              bgcolor: "rgba(249, 250, 251, 0.8)",
-                              backdropFilter: "blur(4px)",
-                              border: "1px solid rgba(209, 213, 219, 0.5)",
-                              boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
-                              transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-                              "&:hover": {
-                                  borderColor: "rgba(59, 130, 246, 0.7)",
-                                  boxShadow: "0 0 0 3px rgba(59, 130, 246, 0.1)",
-                              },
-                              "&.Mui-focused": {
-                                  borderColor: "#2563eb",
-                                  boxShadow: "0 0 0 4px rgba(37, 99, 235, 0.15)",
-                              },
-                          },
-                          "& .MuiInputBase-input": {
-                              py: 1.5,
-                              fontSize: "0.9rem",
-                              color: "#111827",
-                          },
-                          "& .MuiInputLabel-root": {
-                              transform: "translate(14px, 12px) scale(1)",
-                              fontSize: "0.9rem",
-                              fontWeight: 500,
-                              color: "#6b7280",
-                              "&.Mui-focused, &.MuiFormLabel-filled": {
-                                  transform: "translate(14px, -9px) scale(0.85)",
-                                  bgcolor: "rgba(255, 255, 255, 0.8)",
-                                  px: 0.5,
-                                  color: "#2563eb",
-                              },
-                          },
-                          "& .MuiOutlinedInput-notchedOutline": {
-                              border: "none",
-                          },
-                      },
-                  },
-              }}
-              label="From" 
-              value={customStartDate} 
-              format="DD/MM/YYYY" 
-              onChange={(date) => {
-                const safeDate = date ?? dayjs();
-                setCustomStartDate(safeDate);
-                onApplyFilters({
-                  period: localPeriod,
-                  // mode: localMode,
-                  // region: localRegion,
-                  startDate: date,
-                  endDate: customEndDate,
-                });
-              }}
-            />
-            <DatePicker 
-                label="To" 
-                value={customEndDate} 
-                format="DD/MM/YYYY" 
-                slotProps={{
-                    textField: {
-                        size: "small",
-                        sx: {
-                            width: "140px",
-                            "& .MuiInputBase-root": {
-                                borderRadius: "10px",
-                                bgcolor: "rgba(249, 250, 251, 0.8)",
-                                backdropFilter: "blur(4px)",
-                                border: "1px solid rgba(209, 213, 219, 0.5)",
-                                boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
-                                transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-                                "&:hover": {
-                                    borderColor: "rgba(59, 130, 246, 0.7)",
-                                    boxShadow: "0 0 0 3px rgba(59, 130, 246, 0.1)",
-                                },
-                                "&.Mui-focused": {
-                                    borderColor: "#2563eb",
-                                    boxShadow: "0 0 0 4px rgba(37, 99, 235, 0.15)",
-                                },
-                            },
-                            "& .MuiInputBase-input": {
-                                py: 1.5,
-                                fontSize: "0.9rem",
-                                color: "#111827",
-                            },
-                            "& .MuiInputLabel-root": {
-                                transform: "translate(14px, 12px) scale(1)",
-                                fontSize: "0.9rem",
-                                fontWeight: 500,
-                                color: "#6b7280",
-                                "&.Mui-focused, &.MuiFormLabel-filled": {
-                                    transform: "translate(14px, -9px) scale(0.85)",
-                                    bgcolor: "rgba(255, 255, 255, 0.8)",
-                                    px: 0.5,
-                                    color: "#2563eb",
-                                },
-                            },
-                            "& .MuiOutlinedInput-notchedOutline": {
-                                border: "none",
-                            },
-                        },
+        <Box sx={{ display: "flex", gap: 4 }}>
+          <DatePicker 
+            label="From" 
+            value={customStartDate} 
+            format="DD/MM/YYYY" 
+            slotProps={{
+              textField: {
+                size: "small",
+                sx: {
+                  width: "140px",
+                  "& .MuiInputBase-root": {
+                    borderRadius: "10px",
+                    bgcolor: "rgba(249, 250, 251, 0.8)",
+                    backdropFilter: "blur(4px)",
+                    border: "1px solid rgba(209, 213, 219, 0.5)",
+                    boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
+                    transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                    "&:hover": {
+                      borderColor: "rgba(59, 130, 246, 0.7)",
+                      boxShadow: "0 0 0 3px rgba(59, 130, 246, 0.1)",
                     },
-                }}
-                onChange={(date) => {
-                  const safeDate = date ?? dayjs(); // fallback to today if null
-                  setCustomStartDate(safeDate);
-                  onApplyFilters({
-                    period: localPeriod,
-                    // mode: localMode,
-                    // region: localRegion,
-                    startDate: date,
-                    endDate: customEndDate,
-                  });
-                }}
-            />
-            </Box>
-        </LocalizationProvider>
+                    "&.Mui-focused": {
+                      borderColor: "#2563eb",
+                      boxShadow: "0 0 0 4px rgba(37, 99, 235, 0.15)",
+                    },
+                  },
+                  "& .MuiInputBase-input": {
+                    py: 1.5,
+                    fontSize: "0.9rem",
+                    color: "#111827",
+                  },
+                  "& .MuiInputLabel-root": {
+                    transform: "translate(14px, 12px) scale(1)",
+                    fontSize: "0.9rem",
+                    fontWeight: 500,
+                    color: "#6b7280",
+                    "&.Mui-focused, &.MuiFormLabel-filled": {
+                      transform: "translate(14px, -9px) scale(0.85)",
+                      bgcolor: "rgba(255, 255, 255, 0.8)",
+                      px: 0.5,
+                      color: "#2563eb",
+                    },
+                  },
+                  "& .MuiOutlinedInput-notchedOutline": {
+                    border: "none",
+                  },
+                },
+              },
+            }}
+            onChange={(date) => {
+              const safeDate = date ?? dayjs();
+              setCustomStartDate(safeDate);
+              onApplyFilters({
+                period: localPeriod,
+                startDate: safeDate,
+                endDate: customEndDate,
+              });
+            }}
+          />
+          <DatePicker 
+            label="To" 
+            value={customEndDate} 
+            format="DD/MM/YYYY" 
+            slotProps={{
+              textField: {
+                size: "small",
+                sx: {
+                  width: "140px",
+                  "& .MuiInputBase-root": {
+                    borderRadius: "10px",
+                    bgcolor: "rgba(249, 250, 251, 0.8)",
+                    backdropFilter: "blur(4px)",
+                    border: "1px solid rgba(209, 213, 219, 0.5)",
+                    boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
+                    transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                    "&:hover": {
+                      borderColor: "rgba(59, 130, 246, 0.7)",
+                      boxShadow: "0 0 0 3px rgba(59, 130, 246, 0.1)",
+                    },
+                    "&.Mui-focused": {
+                      borderColor: "#2563eb",
+                      boxShadow: "0 0 0 4px rgba(37, 99, 235, 0.15)",
+                    },
+                  },
+                  "& .MuiInputBase-input": {
+                    py: 1.5,
+                    fontSize: "0.9rem",
+                    color: "#111827",
+                  },
+                  "& .MuiInputLabel-root": {
+                    transform: "translate(14px, 12px) scale(1)",
+                    fontSize: "0.9rem",
+                    fontWeight: 500,
+                    color: "#6b7280",
+                    "&.Mui-focused, &.MuiFormLabel-filled": {
+                      transform: "translate(14px, -9px) scale(0.85)",
+                      bgcolor: "rgba(255, 255, 255, 0.8)",
+                      px: 0.5,
+                      color: "#2563eb",
+                    },
+                  },
+                  "& .MuiOutlinedInput-notchedOutline": {
+                    border: "none",
+                  },
+                },
+              },
+            }}
+            onChange={(date) => {
+              const safeDate = date ?? dayjs(); 
+              setCustomEndDate(safeDate);
+              onApplyFilters({
+                period: localPeriod,
+                startDate: customStartDate,
+                endDate: safeDate,
+              });
+            }}
+          />
+        </Box>
+      </LocalizationProvider>
+      
         )}
     </div>
 
