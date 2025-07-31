@@ -96,15 +96,7 @@ const formatNumber = (val: any, decimals = 2) => {
           <div className={styles.noDataAvailable}>No data available for the selected period.</div>
         ) : (
           metricsData.map((metric: any) => {
-            const formatIconName = (name: string) => {
-              if (!name) return 'default';
-              return name
-                .split(/[-_]/)
-                .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-                .join('');
-            };
-
-            const iconName = formatIconName(metric.icon as string);
+            const iconName = metric.icon || 'default';
             const IconComponent = iconMap[iconName] || iconMap.default;
 
             return (
@@ -361,8 +353,7 @@ const formatNumber = (val: any, decimals = 2) => {
                     <tr>
                       <td colSpan={regions.length * 4 + 8} style={{ textAlign: "center", padding: "2rem" }}>
                         <Loader2 
-                        className="animate-spin"
-                        style={{ color: "#1e293b", fontSize: "2rem" }}
+                        style={{ color: "#2563EB", fontSize: "2rem" }}
                          />
                       </td>
                     </tr>
@@ -379,7 +370,55 @@ const formatNumber = (val: any, decimals = 2) => {
                       {idx === 0 && (
                         <td className={`${styles.stickyMode} ${styles.modeCell}`} rowSpan={mode.data.length}>
                           <div className={styles.modeContent}>
-                            <span className={styles.modeLabel}>{mode.name}</span>
+                            <div style={{
+                              display: 'flex',
+                              flexDirection: 'column',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              gap: 8,
+                              padding: '12px',
+                              height: '100%'
+                            }}>
+                              <div style={{
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                background: `${mode.color}20`, 
+                                borderRadius: "50%",
+                                width: 40,
+                                height: 40,
+                                boxShadow: "0 2px 8px 0 rgba(0,0,0,0.08)"
+                              }}>
+                                {(() => {
+                                  const Icon = iconMap[mode.icon] || iconMap.default;
+                                  return <Icon style={{ color: mode.color, width: 18, height: 18 }} />;
+                                })()}
+                              </div>
+                              
+                              <span style={{
+                                fontWeight: 600,
+                                fontSize: 16,
+                                color: mode.color,
+                                textAlign: 'center'
+                              }}>
+                                {mode.name}
+                              </span>
+                              
+                              <div style={{
+                                width: 60,
+                                height: 4,
+                                background: '#f0f0f0',
+                                borderRadius: 2,
+                                overflow: 'hidden'
+                              }}>
+                                <div style={{
+                                  width: '70%', 
+                                  height: '100%',
+                                  background: mode.color,
+                                  borderRadius: 2,
+                                }} />
+                              </div>
+                            </div>
                           </div>
                         </td>
                       )}

@@ -54,10 +54,10 @@ export default function PTPKDashboard() {
   const [isLoadingTable, setIsLoadingTable] = useState(false);
   const [filters, setFilters] = useState<any>({});
   const [activeTab, setActiveTab] = useState("data");
+  const [hasActiveFilters, setHasActiveFilters] = useState(false);
 
   const [distanceFrom, setDistanceFrom] = useState<string>("");
   const [distanceTo, setDistanceTo] = useState<string>("");
-
 
   useEffect(() => {
     if (activeTab === "data") {
@@ -65,6 +65,17 @@ export default function PTPKDashboard() {
       fetchTableData();
     }
   }, [filters, activeTab]);
+
+  useEffect(() => {
+    const isAnyFilterActive = 
+      (filters.zones && filters.zones.length > 0) ||
+      (filters.states && filters.states.length > 0) ||
+      (filters.materials && filters.materials.length > 0) ||
+      (filters.gt_dist !== undefined) ||
+      (filters.lt_dist !== undefined);
+    
+    setHasActiveFilters(isAnyFilterActive);
+  }, [filters]);
 
   const fetchDropdownData = async (zoneFilter?: string | string[]) => {
     try {
@@ -259,6 +270,7 @@ export default function PTPKDashboard() {
                 <FilterBar
                   onFilterClick={() => setIsFilterOpen(true)} 
                   onApplyFilters={(appliedFilters) => setFilters(appliedFilters)}
+                  hasActiveFilters={hasActiveFilters}
                 />
               </div>
             </div>

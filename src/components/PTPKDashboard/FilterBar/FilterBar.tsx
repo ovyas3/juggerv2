@@ -8,10 +8,11 @@ import styles from "./FilterBar.module.css";
 
 interface FilterBarProps {
   onFilterClick: () => void;
-  onApplyFilters: (appliedFilters: any) => void; 
+  onApplyFilters: (appliedFilters: any) => void;
+  hasActiveFilters: boolean;
 }
 
-const FilterBar = ({ onFilterClick, onApplyFilters }: FilterBarProps) => {
+const FilterBar = ({ onFilterClick, onApplyFilters, hasActiveFilters }: FilterBarProps) => {
   const [localPeriod, setLocalPeriod] = useState("MTD");
   // const [localMode, setLocalMode] = useState("All Modes");
   // const [localRegion, setLocalRegion] = useState("All Regions");
@@ -331,12 +332,17 @@ const FilterBar = ({ onFilterClick, onApplyFilters }: FilterBarProps) => {
           <RotateCcwIcon size={16} />
         </button>
 
-        <button
-          className={`${styles.filterButton} ${showAdvancedFilters ? styles.filterButtonActive : ""}`}
-          onClick={onFilterClick}
-        >
-          <FilterIcon size={16} />
-        </button>
+        <div className={styles.filterActions}>
+
+          <button 
+            className={`${styles.filterButton} ${hasActiveFilters ? styles.activeFilter : ''}`}
+            onClick={onFilterClick}
+            title="Advanced Filters"
+          >
+            <FilterIcon size={16} />
+            {hasActiveFilters && <span className={styles.filterBadge}></span>}
+          </button>
+        </div>
       </div>
     </div>
   );
