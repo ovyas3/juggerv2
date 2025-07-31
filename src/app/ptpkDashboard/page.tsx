@@ -22,9 +22,7 @@ export default function PTPKDashboardPage() {
                     !mobile ? <Header title={'eWayBill Dashboard'} isMapHelper={false} /> : <></>
                 }
             </div>
-            <div>
-                <PTPKDashboard />
-            </div>
+            <PTPKDashboard />
         </div>
         {!mobile ? <SideDrawer /> : <div >
             <MobileDrawer />

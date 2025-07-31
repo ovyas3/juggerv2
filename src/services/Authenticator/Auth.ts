@@ -5,7 +5,7 @@ import { setCookies, getCookie, hasCookie } from "@/utils/storageService";
 const authenticate = async (data: any) => {
   const {
     access_token_web,
-    access_token,
+    accessToken: access_token,
     default_unit,
     shippers,
     name,
@@ -89,8 +89,8 @@ const checkAuth = async (from: string, auth: string) => {
 
 export const getAuth = () => {
   const token = getCookie("access_token");
-  const shipper = getCookie("shipper_id");
-
+  const shipper = getCookie("selected_shipper");
+  console.log('getAuth', token, shipper);
   return `bearer ${token} shipper ${shipper}`;
 };
 
