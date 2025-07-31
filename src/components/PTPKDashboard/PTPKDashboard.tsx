@@ -186,6 +186,12 @@ export default function PTPKDashboard() {
   }, [filters]);
 
   useEffect(() => {
+    const payload = {
+      period: "MTD",
+      startDate: dayjs().startOf("month"),
+      endDate: dayjs(),
+    }
+    setFilters(payload);
     fetchMetricsData();
   }, []);
   
