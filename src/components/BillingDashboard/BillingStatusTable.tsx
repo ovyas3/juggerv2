@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from "react"
+import { useRouter } from 'next/navigation';
 import { format } from "date-fns"
 import { Calendar, Clock } from "lucide-react"
 import { Spin } from 'antd';
@@ -13,11 +14,13 @@ import {
   TableRow,
 } from "@/components/UI/table"
 import { Card, CardContent } from "@/components/UI/card"
-import { httpsGet } from "@/utils/Communication"
+import { httpsGet, httpsPost } from "@/utils/Communication"
 import { styled } from "@mui/material/styles";
 import Dialog from '@mui/material/Dialog';
 import CloseButtonIcon from "@/assets/close_icon.svg";
 import Image from "next/image"
+import { environment } from "@/environments/env.api";
+import { Truck } from "lucide-react";
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialogContent-root": {
@@ -38,7 +41,7 @@ const themes = {
     textSecondary: '#8bb4f7',
     accent: '#1890ff',
     background: 'linear-gradient(135deg, #001529 0%, #003a75 100%)',
-    cardBg: 'rgba(13, 25, 45, 0.8)',
+    cardBg: '#007BFF',
     hover: 'rgba(255, 99, 71, 0.1)',
   },
   purple: {
@@ -160,6 +163,8 @@ interface LocationData {
   totalCount: number
   locationName: string
   reference: string
+  shipmentIds?: string[] // To store shipment IDs from billing/dashboard
+  // gi?: string[] // Assuming gi is replaced by shipmentIds for this dialog's purpose
 }
 
 interface BilledData {
@@ -167,6 +172,7 @@ interface BilledData {
   totalWeight: number
   totalCount: number
   material: string
+  shipmentIds?: string[] // To store shipment IDs from billing/dashboard
 }
 
 interface DashboardData {
@@ -181,13 +187,28 @@ interface BillingStatusTableProps {
 }
 
 export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatusTableProps) {
+  const router = useRouter();
   const [data, setData] = useState<DashboardData | null>(null)
   const [loading, setLoading] = useState(true)
   const [isMobile, setIsMobile] = useState(false)
   const [currentTime, setCurrentTime] = useState(new Date())
   const [openGateInfoDialog, setOpenGateInfoDialog] = useState(false)
   const [selectedGateInfoData, setSelectedGateInfoData] = useState<any>(null)
+  const [shipmentDetails, setShipmentDetails] = useState<any[]>([]);
+  const [loadingShipmentDetails, setLoadingShipmentDetails] = useState(false);
 
+  interface ShipmentDetailItem {
+    _id: string;
+    driver?: { gate_entry_no?: string }; // Optional chaining for safety
+    vehicle_no?: string;
+    unique_code: string;
+  }
+
+  const getTrackerUrlPrefix = () => {
+    return process.env.NODE_ENV === 'production'
+      ? environment.TRACKER_URL
+      : environment.TRACKER_URL_PREFIX;
+  };
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth <= 768)
@@ -202,7 +223,10 @@ export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatus
       try {
         const response = await httpsGet("billing/dashboard", 1)
         if (response.statusCode === 200) {
-          setData(response.data)
+          // Assuming response.data contains underLoadingresult, underBillingresult etc.
+          // and each item in these arrays now includes a 'shipmentIds' field.
+          setData(response.data);
+          console.log("Dashboard data fetched:", response.data);
         }
       } catch (error) {
         console.error("Error fetching dashboard data:", error)
@@ -212,7 +236,7 @@ export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatus
     }
 
     fetchData()
-  }, [])
+  }, []) // router dependency removed as fetchData doesn't directly use it. httpsGet handles router internally if needed.
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -230,7 +254,7 @@ export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatus
         ...(data?.underBillingresult || []),
         ...(data?.doIssuedresult || []),
         ...(data?.billedResult || [])
-      ].map((item:any) => item.locationName ? item.locationName : item.material)
+      ].map((item: any) => item.locationName ? item.locationName : item.material)
     )
   )
 
@@ -366,13 +390,42 @@ export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatus
   const handleCloseGateInfoDialog = () => {
     setOpenGateInfoDialog(false)
     setSelectedGateInfoData(null)
+    setShipmentDetails([]); // Clear details when dialog closes
+    setLoadingShipmentDetails(false);
   };
 
-  const handleViewGateInfo = (data: any) => {
-    console.log(data, "data");
-    setSelectedGateInfoData(data)
-    setOpenGateInfoDialog(true)
+  const handleViewGateInfo = async (gateInfo: any) => {
+    setSelectedGateInfoData(gateInfo);
+    setOpenGateInfoDialog(true);
+    setShipmentDetails([]); // Reset previous details
+
+    // Check if shipmentIds are present in the gateInfo object
+    if (!gateInfo || !gateInfo.shipmentIds || gateInfo.shipmentIds.length === 0) {
+      console.log("No shipment IDs found for this entry:", gateInfo);
+      // Optionally, you can display a message in the dialog if no IDs are found
+      return;
+    }
+
+    setLoadingShipmentDetails(true);
+    try {
+      const payload = { shipmentIds: gateInfo.shipmentIds }; // API expects "shipment_ids"
+      // Pass router to httpsPost as it's a required parameter in Communication.ts
+      const response = await httpsPost("billing/shipments_details", payload, router, 1);
+
+      if (response && response.data && response.statusCode === 200) {
+        setShipmentDetails(response.data);
+      } else {
+        console.error("Failed to fetch shipment details:", response?.msg || "Unknown error");
+        setShipmentDetails([]); // Clear or set error state
+      }
+    } catch (error) {
+      console.error("Error calling billing/shipments_details:", error);
+      setShipmentDetails([]); // Clear or set error state
+    } finally {
+      setLoadingShipmentDetails(false);
+    }
   };
+
 
   return (
     <>
@@ -383,11 +436,11 @@ export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatus
               {!isMobile && (
                 <div className="table-header">
                   <div className="datetime-container">
-                    <div className="date-display">
+                    <div className="date-display" style={{ color: currentTheme.textSecondary }}>
                       <Calendar className="datetime-icon" size={16} />
                       <span>Date: {format(currentTime, "dd-MMM-yy")}</span>
                     </div>
-                    <div className="time-display">
+                    <div className="time-display" style={{ color: currentTheme.textSecondary }}>
                       <Clock className="datetime-icon" size={16} />
                       <span>Time: {format(currentTime, "hh:mm a")}</span>
                     </div>
@@ -402,27 +455,76 @@ export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatus
                     <TableHeader>
                       <TableRow>
                         <TableHead rowSpan={2} style={{
-                          textAlign: "left"
+                          textAlign: "center",
+                          minWidth: "140px", 
+                          maxWidth: "200px"
                         }}>Shop</TableHead>
                         <TableHead colSpan={2}>Under Loading</TableHead>
                         <TableHead colSpan={2}>Under Invoicing</TableHead>
                         <TableHead colSpan={2}>Billed</TableHead>
                         <TableHead colSpan={2}>DO Issued</TableHead>
-                        <TableHead rowSpan={2}>Total Potential (MT)</TableHead>
+                        <TableHead rowSpan={2} style={{ textAlign: "center" }}>
+                          Total 
+                          <br />
+                          Potential
+                          <br />
+                          (MT)
+                        </TableHead>
                         <TableHead colSpan={2}>Mode</TableHead>
-                        <TableHead rowSpan={2}>G. Total Qty (MT)</TableHead>
+                        <TableHead rowSpan={2} style={{ textAlign: "center" }}>
+                          G. Total
+                          <br />
+                          Qty
+                          <br />
+                          (MT)
+                        </TableHead>
                       </TableRow>
                       <TableRow>
-                        <TableHead>No. of Veh.</TableHead>
-                        <TableHead>Qty (MT)</TableHead>
-                        <TableHead>No. of Veh.</TableHead>
-                        <TableHead>Qty (MT)</TableHead>
-                        <TableHead>No. of Veh.</TableHead>
-                        <TableHead>Qty (MT)</TableHead>
-                        <TableHead>No. of Veh.</TableHead>
-                        <TableHead>Qty (MT)</TableHead>
-                        <TableHead>By Road (MT)</TableHead>
-                        <TableHead>By Rake</TableHead>
+                        {/* Under Loading */}
+                        <TableHead style={{ textAlign: "center", width: "50px", minWidth: "50px" }}><Truck size={16} color={currentTheme.text} /></TableHead>
+                        <TableHead style={{ width: "80px", minWidth: "80px" }}>
+                          Qty
+                          <br />
+                          (MT)
+                        </TableHead>
+                        {/* Under Invoicing */}
+                        <TableHead style={{ textAlign: "center", width: "50px", minWidth: "50px" }}><Truck size={16} color={currentTheme.text} /></TableHead>
+                        <TableHead style={{ width: "80px", minWidth: "80px" }}>
+                          Qty
+                          <br />
+                          (MT)
+                        </TableHead>
+                        {/* Billed */}
+                        <TableHead style={{ textAlign: "center", width: "50px", minWidth: "50px" }}><Truck size={16} color={currentTheme.text} /></TableHead>
+                        <TableHead style={{ width: "80px", minWidth: "80px" }}>
+                          Qty
+                          <br />
+                          (MT)
+                        </TableHead>
+                        {/* DO Issued */}
+                        <TableHead style={{ textAlign: "center", width: "50px", minWidth: "50px" }}><Truck size={16} color={currentTheme.text} /></TableHead>
+                        <TableHead style={{ width: "80px", minWidth: "80px" }}>
+                          Qty
+                          <br />
+                          (MT)
+                        </TableHead>
+                        {/* Total Potential (MT) - This column is rowSpan=2, so no header here in second row */}
+                        {/* Mode */}
+                        <TableHead style={{ minWidth: "80px" }}>
+                          By
+                          <br />
+                          Road
+                          <br />
+                          (MT)
+                        </TableHead>
+                        <TableHead style={{ minWidth: "80px" }}>
+                          By
+                          <br />
+                          Rake
+                          <br />
+                          (MT)
+                        </TableHead>
+                        {/* G. Total Qty (MT) - This column is rowSpan=2, so no header here in second row */}
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -449,40 +551,40 @@ export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatus
                         return (
                           <TableRow key={locationName}>
                             <TableCell style={{
-                              textAlign: "left"
+                              textAlign: "center"
                             }}>{locationName}</TableCell>
                             <TableCell
                               onClick={() => {
                                 handleViewGateInfo(underLoading);
                               }}
-                              style={{ cursor: "pointer" }}
+                              style={{ cursor: "pointer", width: "50px", minWidth: "50px" }}
                             >{underLoading?.totalCount || 0}
                             </TableCell>
-                            <TableCell>{Math.round(underLoading?.totalWeight || 0)}</TableCell>
+                            <TableCell style={{ width: "80px", minWidth: "80px" }}>{Math.round(underLoading?.totalWeight || 0)}</TableCell>
                             <TableCell
                               onClick={() => {
                                 handleViewGateInfo(underBilling);
                               }}
-                              style={{ cursor: "pointer" }}
+                              style={{ cursor: "pointer", width: "50px", minWidth: "50px" }}
                             >{underBilling?.totalCount || 0}</TableCell>
-                            <TableCell>{Math.round(underBilling?.totalWeight || 0)}</TableCell>
+                            <TableCell style={{ width: "80px", minWidth: "80px" }}>{Math.round(underBilling?.totalWeight || 0)}</TableCell>
                             <TableCell onClick={() => {
-                                handleViewGateInfo(billed);
-                              }}
-                              style={{ cursor: "pointer" }}
+                              handleViewGateInfo(billed);
+                            }}
+                              style={{ cursor: "pointer", width: "50px", minWidth: "50px" }}
                             >{billed?.totalCount || 0}</TableCell>
-                            <TableCell>{Math.round(billed?.totalWeight || 0)}</TableCell>
+                            <TableCell style={{ width: "80px", minWidth: "80px" }}>{Math.round(billed?.totalWeight || 0)}</TableCell>
                             <TableCell
                               onClick={() => {
                                 handleViewGateInfo(doIssued);
                               }}
-                              style={{ cursor: "pointer" }}
+                              style={{ cursor: "pointer", width: "50px", minWidth: "50px" }}
                             >{doIssued?.totalCount || 0}</TableCell>
-                            <TableCell>{Math.round(doIssued?.totalWeight || 0)}</TableCell>
-                            <TableCell>{Math.round(rowTotal)}</TableCell>
-                            <TableCell>{Math.round(billed?.totalWeight || 0)}</TableCell>
-                            <TableCell>0</TableCell>
-                            <TableCell>{Math.round((billed?.totalWeight || 0) + 0)}</TableCell>
+                            <TableCell style={{ width: "80px", minWidth: "80px" }}>{Math.round(doIssued?.totalWeight || 0)}</TableCell>
+                            <TableCell style={{ minWidth: "100px" }}>{Math.round(rowTotal)}</TableCell>
+                            <TableCell style={{ minWidth: "80px" }}>{Math.round(billed?.totalWeight || 0)}</TableCell>
+                            <TableCell style={{ minWidth: "80px" }}>0</TableCell>
+                            <TableCell style={{ minWidth: "100px" }}>{Math.round((billed?.totalWeight || 0) + 0)}</TableCell>
                           </TableRow>
                         )
                       })}
@@ -512,12 +614,12 @@ export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatus
                         <TableCell>
                           {Math.round(data?.doIssuedresult.reduce((sum, item) => sum + item.totalWeight, 0) || 0)}
                         </TableCell>
-                        <TableCell>{Math.round(calculateTotalWeight())}</TableCell>
-                        <TableCell>
+                        <TableCell style={{ minWidth: "100px" }}>{Math.round(calculateTotalWeight())}</TableCell>
+                        <TableCell style={{ minWidth: "80px" }}>
                           {Math.round(data?.billedResult.reduce((sum, item) => sum + item.totalWeight, 0) || 0)}
                         </TableCell>
-                        <TableCell>0</TableCell>
-                        <TableCell>
+                        <TableCell style={{ minWidth: "80px" }}>0</TableCell>
+                        <TableCell style={{ minWidth: "100px" }}>
                           {Math.round((data?.billedResult.reduce((sum, item) => sum + item.totalWeight, 0) || 0) + 0)}
                         </TableCell>
                       </TableRow>
@@ -555,27 +657,61 @@ export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatus
             </div>
             <div className="billing-status-gate-info-detail-item">
               <span className="billing-status-gate-info-detail-label">Total Weight:</span>
-              <span className="billing-status-gate-info-detail-value">{selectedGateInfoData?.totalWeight || 0} kg</span>
+              <span className="billing-status-gate-info-detail-value">{selectedGateInfoData?.totalWeight || 0} MT</span>
             </div>
           </div>
-          <div className="billing-status-gate-info-gate-in-list">
-            <h3>Gate In Numbers</h3>
-            <ul>
-              {selectedGateInfoData &&
-                selectedGateInfoData.gi &&
-                selectedGateInfoData.gi.length > 0 &&
-                selectedGateInfoData?.gi?.map((number: string, index: number) => (
-                  <li key={index}>{number}</li>
-                ))}
-            </ul>
-          </div>
+          {loadingShipmentDetails ? (
+            <div style={{ textAlign: 'center', padding: '20px' }}>
+              <Spin size="large" />
+              <p>Loading shipment details...</p>
+            </div>
+          ) : shipmentDetails && shipmentDetails.length > 0 ? (
+            <>
+              <div className="billing-status-gate-info-legend">
+                <div className="legend-item">
+                  <span className="legend-color-box gate-entry-legend-color"></span> Gate Entry Number
+                </div>
+                <div className="legend-item">
+                  <span className="legend-color-box vehicle-number-legend-color"></span> Vehicle Number
+                </div>
+              </div>
+              <div className="billing-status-gate-info-shipment-details-list"> {/* Changed class name for clarity */}
+                <h3>Shipment Details</h3>
+                <ul>
+                  {shipmentDetails.map((shipment: ShipmentDetailItem, index: number) => (
+                    <li key={shipment._id || index}> {/* Use a unique key */}
+                      <a
+                        href={`${getTrackerUrlPrefix()}${shipment.unique_code}`}
+                        target="_blank" // Opens in a new tab
+                        rel="noopener noreferrer" // Security best practice for target="_blank"
+                        title={`View details for ${shipment.vehicle_no}`}
+                      >
+                        <span className="gate-entry-number-style">{shipment.driver?.gate_entry_no || 'N/A'}</span>
+
+                        &nbsp;-&nbsp;
+
+                        <span className="vehicle-number-style">{shipment.vehicle_no || 'N/A'}</span>
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </>
+          ) : (
+
+            <div className="billing-status-gate-info-shipment-details-list">
+              <h3>Shipment Details</h3>
+              <p>{selectedGateInfoData?.shipmentIds && selectedGateInfoData.shipmentIds.length > 0 ? 'Could not load shipment details.' : 'No shipment IDs available for this entry.'}</p>
+            </div>
+          )}
         </div>
       </BootstrapDialog>
+
 
       <style jsx global>{`
         .billing-table-container {
           min-height: calc(100vh - 64px);
-          background-color: ${currentTheme.cardBg};
+          background-color: ${currentTheme.cardBg}; /* Keep background color */
           background-image: ${currentTheme.background};
           color: ${currentTheme.text};
           margin-top: 64px;
@@ -683,7 +819,7 @@ export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatus
       
                
         .billing-status-gate-info-dialog-styles {
-            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-family: 'Inter', sans-serif;
         }
 
         .billing-status-gate-info-dialog-styles .billing-status-gate-info-dialog-container {
@@ -754,36 +890,87 @@ export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatus
           color: #333;
         }
 
-        .billing-status-gate-info-gate-in-list {
+        .billing-status-gate-info-shipment-details-list { /* Updated class name */
           background-color: #f8f9fa;
           border-radius: 6px;
           padding: 1rem;
+          width: 100%; /* Ensure it takes full width of its container */
+          margin-top: 1rem; /* Add some space from the details above */
         }
 
-        .billing-status-gate-info-gate-in-list h3 {
+        .billing-status-gate-info-shipment-details-list h3 {
           font-size: 1.1rem;
           color: #333;
           margin-bottom: 0.5rem;
         }
 
-        .billing-status-gate-info-gate-in-list ul {
+        .billing-status-gate-info-shipment-details-list ul {
           list-style-type: none;
           padding: 0;
           margin: 0;
           display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+          grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Adjusted minmax for better readability */
           gap: 0.5rem;
         }
 
-        .billing-status-gate-info-gate-in-list li {
+        .billing-status-gate-info-shipment-details-list li {
           background-color: #e9ecef;
           border-radius: 4px;
           padding: 0.5rem;
           font-size: 0.9rem;
           text-align: center;
+        }
+
+        .billing-status-gate-info-shipment-details-list li a {
+          color: #007bff; /* Standard link color */
+          text-decoration: none;
+        }
+
+        .billing-status-gate-info-shipment-details-list li a:hover {
+          text-decoration: underline;
+          color: #0056b3;
+        }
+
+        .billing-status-gate-info-shipment-details-list p {
           color: #495057;
         }
 
+        .gate-entry-number-style {
+          color: #20114d;
+          // font-weight: bold;
+        }
+
+        .vehicle-number-style {
+          color: #green;
+          // font-weight: bold;
+        }
+
+        .billing-status-gate-info-legend {
+          display: flex;
+          gap: 1rem;
+          margin-bottom: 0.5rem; /* Space before the list */
+          padding-left: 1rem; /* Align with list padding */
+        }
+
+        .legend-item {
+          display: flex;
+          align-items: center;
+          font-size: 0.8rem;
+          color: #333;
+        }
+
+        .legend-color-box {
+          width: 12px;
+          height: 12px;
+          margin-right: 0.3rem;
+          border: 1px solid #ccc;
+        }
+        .gate-entry-legend-color {
+          background-color: #20114d;
+        }
+        .vehicle-number-legend-color {
+          background-color: #007BFF;
+        }
         @media (max-width: 768px) {
           .billing-table-container {
             // padding: 0.5rem;

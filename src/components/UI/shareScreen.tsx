@@ -51,7 +51,7 @@ export const ScreenShareModal: React.FC<ScreenShareModalProps> = ({
         scale: 0.7,
       });
 
-      const dataURL = canvas.toDataURL("image/jpeg", 0.6);
+      const dataURL = canvas?.toDataURL("image/jpeg", 0.6);
 
       // Function to convert data URL to Blob
       const dataURLtoBlob = (dataURL: string) => {
@@ -175,8 +175,8 @@ export const ScreenShareModal: React.FC<ScreenShareModalProps> = ({
         ),
         width: 400,
         icon: null,
-        okText: "Close",
-        cancelText: null,
+        okText: "Close", // This will be the only visible button
+        cancelButtonProps: { style: { display: 'none' } }, // Hides
         maskClosable: true,
         centered: true,
       });
