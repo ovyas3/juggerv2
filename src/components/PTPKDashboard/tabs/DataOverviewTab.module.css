@@ -1556,3 +1556,119 @@
   color: #64748b;
   margin-top: -0.25rem;
 }
+
+.metricsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.noDataAvailable {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 180px;   
+  min-width: 300px;    
+  width: 100%;
+  height: 100%;
+  font-size: 1rem;
+  font-weight: 500;
+  background-color: #fff;
+  color: #6b7280;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  text-align: center;
+}
+
+.metricCard {
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.metricCardBlue {
+  composes: metricCard;
+  background: linear-gradient(to bottom right, #e0f2ff, #dbeafe);
+  border: 1px solid #bfdbfe;
+}
+
+.metricCardRed {
+  composes: metricCard;
+  background: linear-gradient(to bottom right, #fef2f2, #fee2e2);
+  border: 1px solid #fecaca;
+}
+
+.metricCardEmerald {
+  composes: metricCard;
+  background: linear-gradient(to bottom right, #ecfdf5, #d1fae5);
+  border: 1px solid #a7f3d0;
+}
+
+.metricHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 0.75rem;
+}
+
+.metricTitleBlue {
+  display: contents;
+  color: #1d4ed8;
+}
+
+.metricTitleRed {
+  display: contents;
+  color: #dc2626;
+}
+
+.metricTitleEmerald {
+  display: contents;
+  color: #059669;
+}
+
+.metricValueBlue,
+.metricValueRed,
+.metricValueEmerald {
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 0.25rem;
+}
+
+.metricValueBlue {
+  color: #1e3a8a;
+}
+
+.metricValueRed {
+  color: #991b1b;
+}
+
+.metricValueEmerald {
+  color: #065f46;
+}
+
+.metricSubtitleBlue,
+.metricSubtitleRed,
+.metricSubtitleEmerald {
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.metricSubtitleBlue {
+  color: #2563eb;
+}
+
+.metricSubtitleRed {
+  color: #b91c1c;
+}
+
+.metricSubtitleEmerald {
+  color: #047857;
+}

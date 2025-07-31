@@ -1,19 +1,14 @@
 "use client"
 
-import { useState, useEffect, useRef, useCallback } from "react"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/UI/tabs"
+import { useState, useEffect, useCallback } from "react"
+import { Tabs, TabsList, TabsTrigger } from "@/components/UI/tabs"
 import styles from "./PTPKDashboard.module.css"
 import React from "react"
-import dayjs from "dayjs"
-import MetricCard from "../UI/MetricCard"
 import FilterBar from "./FilterBar/FilterBar";
 import DataOverviewTab from "./tabs/DataOverviewTab"
-import {MultiSelectDropdown} from "./MultiSelectDropdown/MultiSelectDropdown";
 import { httpsPost } from "@/utils/Communication";
 import { toTitleCase } from "@/utils/stringUtils";
 import AdvancedFiltersPanel from "./AdvancedFiltersPanel/AdvancedFiltersPanel";
-import { iconMap } from "../UI/iconMap";
-import SummaryCardSkeleton from "../UI/MetricCardSkeleton";
 
 
 interface FilterOption {
@@ -254,41 +249,14 @@ export default function PTPKDashboard() {
               applyFilters={applyFilters}
             />
             )}
-
-            <div className={styles.metricsGrid}>
-              {isLoadingMetrics ? (
-                <SummaryCardSkeleton count={4} />
-              ) : metricsData.length === 0 ? (
-                <div className={styles.noDataAvailable}>No data available for the selected period.</div>
-              ) : (
-                metricsData.map((metric) => {
-                  const formatIconName = (name: string) => {
-                    if (!name) return 'default';
-                    return name
-                      .split(/[-_]/)
-                      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-                      .join('');
-                  };
-                
-                  const iconName = formatIconName(metric.icon as string);
-                  const IconComponent = iconMap[iconName] || iconMap.default;
-
-                  return (
-                    <MetricCard
-                      key={metric.id}
-                      title={metric.title}
-                      value={metric.value}
-                      icon={<IconComponent className="h-4 w-4" style={{ color: metric.iconColor }} />}
-                      bgColor={metric.bgColor}
-                      borderColor={metric.borderColor}
-                      iconColor={metric.iconColor}
-                    />
-                  );
-                })
-              )}
-            </div>
             
-            <DataOverviewTab  tableData={tableData} isLoadingTable={isLoadingTable} filters={filters}/>
+            <DataOverviewTab  
+              tableData={tableData} 
+              isLoadingTable={isLoadingTable} 
+              filters={filters}
+              metricsData={metricsData}
+              isLoadingMetrics={isLoadingMetrics}
+            />
            
           </Tabs>
         </div>
