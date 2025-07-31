@@ -527,6 +527,16 @@
     font-weight: 600;
     color: #334155;
   }
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
 
   .subHeader.stickyMode,
   .subHeader.stickyMonth {

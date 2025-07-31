@@ -353,7 +353,8 @@ const formatNumber = (val: any, decimals = 2) => {
                     <tr>
                       <td colSpan={regions.length * 4 + 8} style={{ textAlign: "center", padding: "2rem" }}>
                         <Loader2 
-                        style={{ color: "#2563EB", fontSize: "2rem" }}
+                        className={styles.spinner}
+                        style={{ color: "#2563EB", fontSize: "2rem", width: "30px", height: "30px" }}
                          />
                       </td>
                     </tr>
