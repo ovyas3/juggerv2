@@ -1,19 +1,15 @@
 "use client"
 
-import { useState, useEffect, useRef, useCallback } from "react"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/UI/tabs"
+import { useState, useEffect, useCallback } from "react"
+import { Tabs, TabsList, TabsTrigger } from "@/components/UI/tabs"
 import styles from "./PTPKDashboard.module.css"
 import React from "react"
-import dayjs from "dayjs"
-import MetricCard from "../UI/MetricCard"
 import FilterBar from "./FilterBar/FilterBar";
 import DataOverviewTab from "./tabs/DataOverviewTab"
-import {MultiSelectDropdown} from "./MultiSelectDropdown/MultiSelectDropdown";
 import { httpsPost } from "@/utils/Communication";
 import { toTitleCase } from "@/utils/stringUtils";
 import AdvancedFiltersPanel from "./AdvancedFiltersPanel/AdvancedFiltersPanel";
-import { iconMap } from "../UI/iconMap";
-import SummaryCardSkeleton from "../UI/MetricCardSkeleton";
+import dayjs from "dayjs"
 
 
 interface FilterOption {
@@ -58,6 +54,10 @@ export default function PTPKDashboard() {
   const [isLoadingTable, setIsLoadingTable] = useState(false);
   const [filters, setFilters] = useState<any>({});
   const [activeTab, setActiveTab] = useState("data");
+  const [hasActiveFilters, setHasActiveFilters] = useState(false);
+
+  const [distanceFrom, setDistanceFrom] = useState<string>("");
+  const [distanceTo, setDistanceTo] = useState<string>("");
 
   useEffect(() => {
     if (activeTab === "data") {
@@ -66,47 +66,51 @@ export default function PTPKDashboard() {
     }
   }, [filters, activeTab]);
 
+  useEffect(() => {
+    const isAnyFilterActive = 
+      (filters.zones && filters.zones.length > 0) ||
+      (filters.states && filters.states.length > 0) ||
+      (filters.materials && filters.materials.length > 0) ||
+      (filters.gt_dist !== undefined) ||
+      (filters.lt_dist !== undefined);
+    
+    setHasActiveFilters(isAnyFilterActive);
+  }, [filters]);
+
   const fetchDropdownData = async (zoneFilter?: string | string[]) => {
     try {
       setIsLoading(true);
-
-      let zonesArray: string[] | undefined;
+  
+      let zonesArray: string[] = [];
       if (Array.isArray(zoneFilter)) {
-        zonesArray = zoneFilter.map(z => z.toUpperCase());
+        zonesArray = zoneFilter.map(zone => (typeof zone === 'string' ? zone.toUpperCase() : String(zone).toUpperCase()));
       } else if (zoneFilter) {
-        zonesArray = [zoneFilter.toUpperCase()];
+        zonesArray = [String(zoneFilter).toUpperCase()];
       }
-
-      const payload = zonesArray ? { zones: zonesArray } : {};
-
+  
+      const payload = { zones: zonesArray };
       const response = await httpsPost('ptpk/dropdowns', payload, {}, 1);
-
-      if (response && response.data) {
+  
+      if (response?.data) {
         const { zones = [], states = [], materials = [] } = response.data;
-
-        if (!zoneFilter) {
-          setZoneOptions(
-            zones.map((zone: string) => ({
-              id: zone,
-              label: toTitleCase(zone),
-              selected: false
-            }))
-          );
-
-          setMaterialOptions(
-            materials.map((material: string) => ({
-              id: material,
-              label: material,
-              selected: false
-            }))
-          );
+  
+        if (!zoneFilter || (Array.isArray(zoneFilter) && zoneFilter.length === 0)) {
+          setZoneOptions(zones.map((zone: any) => ({ id: zone, label: toTitleCase(zone), selected: false })));
         }
-
+        
+        setMaterialOptions(
+          materials.map((material: any) => ({
+            id: material,
+            label: material,
+            selected: materialOptions.some(opt => opt.label === material && opt.selected),
+          }))
+        );
+  
         setStateOptions(
-          states.map((state: string) => ({
+          states.map((state: any) => ({
             id: state,
             label: toTitleCase(state),
-            selected: false
+            selected: stateOptions.some(opt => opt.label === toTitleCase(state) && opt.selected),
           }))
         );
       }
@@ -121,24 +125,21 @@ export default function PTPKDashboard() {
       setIsLoading(false);
     }
   };
-
+  
   useEffect(() => {
     fetchDropdownData();
   }, []);
 
   const handleZoneChange = (newZoneOptions: FilterOption[]) => {
     setZoneOptions(newZoneOptions);
-    
-    const selectedZone = newZoneOptions.find(opt => opt.selected);
-    if (selectedZone) {
-      setStateOptions(prev => 
-        prev.map(opt => ({ ...opt, selected: false }))
-      );
-      fetchDropdownData(selectedZone.label);
-    } else {
-      fetchDropdownData();
-    }
+  
+    const selectedZonesArray = newZoneOptions
+    .filter(opt => opt.selected)
+    .map(opt => opt.label.toUpperCase());
+    setStateOptions(prev => prev.map(opt => ({ ...opt, selected: false })));
+    fetchDropdownData(selectedZonesArray.length > 0 ? selectedZonesArray : undefined);
   };
+  
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -151,22 +152,29 @@ export default function PTPKDashboard() {
     const selectedZones = zoneOptions.filter(opt => opt.selected).map(opt => opt.label);
     const selectedStates = stateOptions.filter(opt => opt.selected).map(opt => opt.label);
     const selectedMaterials = materialOptions.filter(opt => opt.selected).map(opt => opt.label);
-
-    const dateFrom = new Date().toISOString();
-    const dateTo = new Date().toISOString();
-
-    const payload = {
-      dateFrom,
-      dateTo,
-      zones: selectedZones,
-      states: selectedStates,
-      materials: selectedMaterials,
+  
+    const startDate = new Date().toISOString();
+    const endDate = new Date().toISOString();
+  
+    const payload: any = {
+      period: selectedDateFilter, 
+      startDate,
+      endDate,
     };
+  
+    if (selectedZones.length > 0) payload.zones = selectedZones;
+    if (selectedStates.length > 0) payload.states = selectedStates;
+    if (selectedMaterials.length > 0) payload.materials = selectedMaterials;
+    
+  
+    if (distanceFrom.trim() !== "") payload.gt_dist = Number(distanceFrom);
+    if (distanceTo.trim() !== "") payload.lt_dist = Number(distanceTo);
 
+  
     setFilters(payload);
     setIsFilterOpen(false);
   };
-
+  
   const fetchMetricsData = useCallback(async () => {
     setIsLoadingMetrics(true);
     try {
@@ -218,6 +226,25 @@ export default function PTPKDashboard() {
     fetchTableData();
   }, []);
 
+  const resetFilterSelections = () => {
+    setZoneOptions(prev => prev.map(opt => ({ ...opt, selected: false })));
+    setStateOptions(prev => prev.map(opt => ({ ...opt, selected: false })));
+    setMaterialOptions(prev => prev.map(opt => ({ ...opt, selected: false })));
+  
+    setDistanceFrom("");
+    setDistanceTo("");
+  
+    setFilters({
+      period: selectedDateFilter || "MTD",                
+      startDate: dayjs().startOf("month").toISOString(),  
+      endDate: dayjs().toISOString(),                      
+    });
+  
+    setIsFilterOpen(false);
+  };
+  
+
+  
   return (
     <div className={styles.dashboardContainer}>
         
@@ -243,6 +270,7 @@ export default function PTPKDashboard() {
                 <FilterBar
                   onFilterClick={() => setIsFilterOpen(true)} 
                   onApplyFilters={(appliedFilters) => setFilters(appliedFilters)}
+                  hasActiveFilters={hasActiveFilters}
                 />
               </div>
             </div>
@@ -258,43 +286,21 @@ export default function PTPKDashboard() {
               setStateOptions={setStateOptions}
               setMaterialOptions={setMaterialOptions}
               applyFilters={applyFilters}
+              distanceFrom={distanceFrom}
+              distanceTo={distanceTo}
+              setDistanceFrom={setDistanceFrom}
+              setDistanceTo={setDistanceTo}
+              resetFilters={resetFilterSelections}
             />
             )}
-
-            <div className={styles.metricsGrid}>
-              {isLoadingMetrics ? (
-                <SummaryCardSkeleton count={4} />
-              ) : metricsData.length === 0 ? (
-                <div className={styles.noDataAvailable}>No data available for the selected period.</div>
-              ) : (
-                metricsData.map((metric) => {
-                  const formatIconName = (name: string) => {
-                    if (!name) return 'default';
-                    return name
-                      .split(/[-_]/)
-                      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-                      .join('');
-                  };
-                
-                  const iconName = formatIconName(metric.icon as string);
-                  const IconComponent = iconMap[iconName] || iconMap.default;
-
-                  return (
-                    <MetricCard
-                      key={metric.id}
-                      title={metric.title}
-                      value={metric.value}
-                      icon={<IconComponent className="h-4 w-4" style={{ color: metric.iconColor }} />}
-                      bgColor={metric.bgColor}
-                      borderColor={metric.borderColor}
-                      iconColor={metric.iconColor}
-                    />
-                  );
-                })
-              )}
-            </div>
             
-            <DataOverviewTab  tableData={tableData} isLoadingTable={isLoadingTable} filters={filters}/>
+            <DataOverviewTab  
+              tableData={tableData} 
+              isLoadingTable={isLoadingTable} 
+              filters={filters}
+              metricsData={metricsData}
+              isLoadingMetrics={isLoadingMetrics}
+            />
            
           </Tabs>
         </div>

@@ -1,5 +1,4 @@
-
-  .advancedFilterButton {
+.advancedFilterButton {
     background: white !important;
     border: 1px solid #e2e8f0 !important;
     color: #334155 !important;
@@ -37,16 +36,16 @@
   }
 
   .distanceInput {
-  width: 80px;
-  padding: 4px 8px;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  font-size: 0.95rem;
-  background: #fff;
-  color: #22223b;
-  outline: none;
-  transition: border-color 0.2s;
-}
+    width: 100px;
+    padding: 8px 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    background: #fff;
+    color: #22223b;
+    outline: none;
+    transition: border-color 0.2s;
+  }
 
 .istanceInput:focus {
   border-color: #2563eb;
@@ -96,6 +95,7 @@
   background: white;
   z-index: 10;
 }
+
 .advancedFiltersContent{
   padding: 2px 14px;
   display: flex;
@@ -150,10 +150,10 @@
   color: #475569 !important;
 }
 .filterContent1 {
-  padding: 1.5rem;
+  /* padding: 1.5rem; */
   display: flex;
   flex-direction: column;
-  padding-top: 19% !important;
+  gap: 240px
 }
 .filterSection1 {
   width: 100%;
@@ -208,7 +208,7 @@
   display: flex;
   justify-content: space-between;
   gap: 12px;
-  margin-top: 270px;
+  /* margin-top: 250px; */
 }
 
 .applyButton {
@@ -220,11 +220,18 @@
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: background-color 0.2s, opacity 0.2s;
 }
 
-.applyButton:hover {
+.applyButton:hover:not(:disabled) {
   background-color: #3b82f6;
+}
+
+.applyButton:disabled {
+  background-color: #e5e7eb;
+  color: #9ca3af;
+  cursor: not-allowed;
+  opacity: 0.8;
 }
 
 .clearButton {

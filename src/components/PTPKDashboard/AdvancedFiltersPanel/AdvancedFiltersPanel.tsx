@@ -20,6 +20,11 @@ interface AdvancedFiltersPanelProps {
   setStateOptions: (opts: FilterOption[]) => void;
   setMaterialOptions: (opts: FilterOption[]) => void;
   applyFilters: () => void;
+  distanceFrom: string;
+  distanceTo: string;
+  setDistanceFrom: (val: string) => void;
+  setDistanceTo: (val: string) => void;
+  resetFilters: () => void;
 }
 
 const AdvancedFiltersPanel: React.FC<AdvancedFiltersPanelProps> = ({
@@ -32,16 +37,29 @@ const AdvancedFiltersPanel: React.FC<AdvancedFiltersPanelProps> = ({
   setStateOptions,
   setMaterialOptions,
   applyFilters,
+  distanceFrom,
+  distanceTo,
+  setDistanceFrom,
+  setDistanceTo,
+  resetFilters,
 }) => {
 
-  const [distanceFrom, setDistanceFrom] = React.useState("");
-  const [distanceTo, setDistanceTo] = React.useState("");
+  const isDistanceInvalid =
+    distanceFrom !== "" &&
+    distanceTo !== "" &&
+    Number(distanceFrom) > Number(distanceTo);
+
+  console.log("isDistanceInvalid", isDistanceInvalid);
+  
 
   if (!isOpen) return null;
 
   return (
     <>
-      <div className={styles.filterOverlay1} onClick={() => setIsFilterOpen(false)} />
+      <div
+        className={styles.filterOverlay1}
+        onClick={() => setIsFilterOpen(false)}
+      />
       <div className={styles.filterSidePanel1}>
         <div className={styles.filterHeader1}>
           <h3 className={styles.filterTitle1}>Advanced Filters</h3>
@@ -55,6 +73,7 @@ const AdvancedFiltersPanel: React.FC<AdvancedFiltersPanelProps> = ({
           </Button>
         </div>
 
+        <div className={styles.filterContent1}>
         <div className={styles.advancedFiltersContent}>
           <div className={styles.filterGroup}>
             <h4 className={styles.filterGroupTitle}>Zone</h4>
@@ -88,37 +107,71 @@ const AdvancedFiltersPanel: React.FC<AdvancedFiltersPanelProps> = ({
           </div>
           <div className={styles.filterGroup}>
             <h4 className={styles.filterGroupTitle}>Distance (KM)</h4>
-            <div className={styles.filterOptions} style={{ display: "flex", gap: "0.5rem" }}>
+            <div
+              className={styles.filterOptions}
+              style={{ display: "flex", gap: "0.5rem" }}
+            >
               <input
-                type="number"
-                min={0}
+                type="text"
                 placeholder="From"
                 value={distanceFrom}
-                onChange={e => setDistanceFrom(e.target.value)}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (/^\d*$/.test(val)) setDistanceFrom(val);
+                }}
                 className={styles.distanceInput}
-                style={{ width: 80, padding: "4px 8px", borderRadius: 6, border: "1px solid #d1d5db" }}
+                style={{
+                  borderColor: isDistanceInvalid ? "red" : undefined,
+                  borderWidth: isDistanceInvalid ? "2px" : undefined,
+                }}
+                inputMode="numeric"
+                autoComplete="off"
               />
               <span style={{ alignSelf: "center" }}>to</span>
               <input
-                type="number"
-                min={0}
+                type="text"
                 placeholder="To"
                 value={distanceTo}
-                onChange={e => setDistanceTo(e.target.value)}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (/^\d*$/.test(val)) setDistanceTo(val);
+                }}
                 className={styles.distanceInput}
-                style={{ width: 80, padding: "4px 8px", borderRadius: 6, border: "1px solid #d1d5db" }}
+                style={{
+                  borderColor: isDistanceInvalid ? "red" : undefined,
+                  borderWidth: isDistanceInvalid ? "2px" : undefined,
+                }}
+                inputMode="numeric"
+                autoComplete="off"
               />
             </div>
+
+            {isDistanceInvalid && (
+              <div style={{ color: "red", fontSize: "12px" }}>
+                "From" distance should not be more than "To" distance
+              </div>
+            )}
           </div>
         </div>
 
         <div className={styles.advancedFiltersFooter}>
-          <button className={styles.clearButton} onClick={() => setIsFilterOpen(false)}>
+          <button
+            className={styles.clearButton}
+            onClick={() => {
+              resetFilters();
+              setIsFilterOpen(false);
+            }}
+          >
             Cancel
           </button>
-          <button className={styles.applyButton} onClick={applyFilters}>
+          <button
+            className={styles.applyButton}
+            onClick={applyFilters}
+            disabled={isDistanceInvalid}
+          >
             Apply Filters
           </button>
+        </div>
         </div>
       </div>
     </>
