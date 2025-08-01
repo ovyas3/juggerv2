@@ -76,7 +76,7 @@ const DataOverviewTab = ({ tableData, isLoadingTable, filters, metricsData, isLo
     }
   };
 
-  const regions = ["North", "East", "West", "South", "Centre"];
+  const regions = ["North", "East", "West", "South", "Center"];
 
 const getZoneValue = (zones: Record<string, any>, region: string) => {
   // API zones keys are capitalized, so match accordingly
@@ -274,7 +274,7 @@ const formatNumber = (val: any, decimals = 2) => {
                   <tr className={styles.tableSubheaderRow}>
                     <th className={`${styles.subHeader} ${styles.stickyMode}`}></th>
                     <th className={`${styles.subHeader} ${styles.stickyMonth}`}></th>
-                    {["North", "East", "West", "South", "Centre"].map((region) => (
+                    {["North", "East", "West", "South", "Center"].map((region) => (
                       <th key={region} className={styles.subHeader}>
                         <div className={styles.subHeaderContent}>
                           <div className={styles.regionBar}></div>
@@ -291,7 +291,7 @@ const formatNumber = (val: any, decimals = 2) => {
                         <span>W.Avg</span>
                       </div>
                     </th>
-                    {["North", "East", "West", "South", "Centre"].map((region) => (
+                    {["North", "East", "West", "South", "Center"].map((region) => (
                       <th key={region} className={styles.subHeader}>
                         <div className={styles.subHeaderContent}>
                           <div className={styles.regionBarBlue}></div>
@@ -308,7 +308,7 @@ const formatNumber = (val: any, decimals = 2) => {
                         <span>W.Avg</span>
                       </div>
                     </th>
-                    {["North", "East", "West", "South", "Centre"].map((region) => (
+                    {["North", "East", "West", "South", "Center"].map((region) => (
                       <th key={region} className={styles.subHeader}>
                         <div className={styles.subHeaderContent}>
                           <div className={styles.regionBarGreen}></div>
@@ -325,7 +325,7 @@ const formatNumber = (val: any, decimals = 2) => {
                         <span>W.Avg</span>
                       </div>
                     </th>
-                    {["North", "East", "West", "South", "Centre"].map((region) => (
+                    {["North", "East", "West", "South", "Center"].map((region) => (
                       <th key={region} className={styles.subHeader}>
                         <div className={styles.subHeaderContent}>
                           <div className={styles.regionBarPurple}></div>
