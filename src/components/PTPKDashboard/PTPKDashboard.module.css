@@ -1,5 +1,6 @@
 
 .dashboardContainer {
+  margin-left: 80px;
   margin-top: 2rem;
     min-height: 100vh;
     background: linear-gradient(135deg, #f8fafc 0%, #e0f2fe 50%, #e0e7ff 100%);

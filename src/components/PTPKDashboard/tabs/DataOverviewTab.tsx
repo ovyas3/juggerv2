@@ -22,7 +22,7 @@ const DataOverviewTab = ({tableData, isLoadingTable, filters}: any) => {
   const handleExportData = async () => {
     setIsDownloading(true);
     try {
-      const response = await httpsPost("ptpk/download/full", {
+      const response = await httpsPost("ptpk/download/table", {
         ...filters, 
         report: true,
       }, {}, 1);
