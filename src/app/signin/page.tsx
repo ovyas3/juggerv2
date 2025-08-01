@@ -13,7 +13,6 @@ import hidePassword from "@/assets/hide_password.svg";
 import { useSnackbar } from "@/hooks/snackBar";
 
 const Signin = () => {
-  console.log("Signin");
   const { showMessage } = useSnackbar();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -39,7 +38,7 @@ const Signin = () => {
           );
           if (signedIn) {
             // getPreferences()
-            router.push("/");
+            router.push("/externalParking");
           }
         } else {
           showMessage(response.message, "error");

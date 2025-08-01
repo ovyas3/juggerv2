@@ -426,7 +426,7 @@ const formatNumber = (val: any, decimals = 2) => {
                       )}
                       <td className={`${styles.stickyMonth} ${styles.monthCell}`}>
                         <div className={styles.monthContent}>
-                          <span className={styles.monthName}>{row.month}</span>
+                          <span className={styles.monthName}>{row.month}{row.year ? `- ${row.year}` : ""}</span>
                         </div>
                       </td>
                       {regions.map(region => (

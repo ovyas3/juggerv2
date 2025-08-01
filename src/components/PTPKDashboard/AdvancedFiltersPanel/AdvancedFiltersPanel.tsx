@@ -148,7 +148,7 @@ const AdvancedFiltersPanel: React.FC<AdvancedFiltersPanelProps> = ({
 
             {isDistanceInvalid && (
               <div style={{ color: "red", fontSize: "12px" }}>
-                "From" distance should not be more than "To" distance
+                {`"From" distance should not be more than "To" distance`}
               </div>
             )}
           </div>
