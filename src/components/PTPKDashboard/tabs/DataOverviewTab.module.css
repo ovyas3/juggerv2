@@ -7,6 +7,7 @@
   flex-direction: column;
   gap: 1.5rem;
   width: 91.5vw;
+  margin-left: 1rem;
 }
 
 .tabsHeader {
@@ -1569,10 +1570,12 @@
 
 .metricsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 1rem;
   margin-top: 0.4rem;
   margin-bottom: 1rem;
+  margin-left: 1rem;
+  width: 95.9rem;
 }
 
 .noDataAvailable {

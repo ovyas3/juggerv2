@@ -53,6 +53,7 @@ export default function PTPKDashboard() {
   const [tableData, setTableData] = useState<any[]>([]);
   const [isLoadingTable, setIsLoadingTable] = useState(false);
   const [filters, setFilters] = useState<any>({});
+  const [filtersDate, setDateFilters] = useState<any>({});
   const [activeTab, setActiveTab] = useState("data");
   const [hasActiveFilters, setHasActiveFilters] = useState(false);
 
@@ -135,7 +136,7 @@ export default function PTPKDashboard() {
   
     const selectedZonesArray = newZoneOptions
     .filter(opt => opt.selected)
-    .map(opt => opt.label.toUpperCase());
+    .map(opt => opt.id);
     setStateOptions(prev => prev.map(opt => ({ ...opt, selected: false })));
     fetchDropdownData(selectedZonesArray.length > 0 ? selectedZonesArray : undefined);
   };
@@ -149,12 +150,12 @@ export default function PTPKDashboard() {
   }, [])
 
   const applyFilters = () => {
-    const selectedZones = zoneOptions.filter(opt => opt.selected).map(opt => opt.label);
+    const selectedZones = zoneOptions.filter(opt => opt.selected).map(opt => opt.id);
     const selectedStates = stateOptions.filter(opt => opt.selected).map(opt => opt.label);
     const selectedMaterials = materialOptions.filter(opt => opt.selected).map(opt => opt.label);
   
-    const startDate = new Date().toISOString();
-    const endDate = new Date().toISOString();
+    const startDate = fromDate ? fromDate : new Date().toISOString();
+    const endDate = toDate ? toDate : new Date().toISOString();
   
     const payload: any = {
       period: selectedDateFilter, 
@@ -171,6 +172,24 @@ export default function PTPKDashboard() {
     if (distanceTo.trim() !== "") payload.lt_dist = Number(distanceTo);
 
   
+    setFilters(payload);
+    setIsFilterOpen(false);
+  };
+
+  const applyFiltersFromBar = (payload: any) => {
+    const selectedZones = zoneOptions.filter(opt => opt.selected).map(opt => opt.id);
+    const selectedStates = stateOptions.filter(opt => opt.selected).map(opt => opt.label);
+    const selectedMaterials = materialOptions.filter(opt => opt.selected).map(opt => opt.label);
+  
+    if (selectedZones.length > 0) payload.zones = selectedZones;
+    if (selectedStates.length > 0) payload.states = selectedStates;
+    if (selectedMaterials.length > 0) payload.materials = selectedMaterials;
+  
+    if (distanceFrom.trim() !== "") payload.gt_dist = Number(distanceFrom);
+    if (distanceTo.trim() !== "") payload.lt_dist = Number(distanceTo);
+    setFromDate(payload.startDate);
+    setToDate(payload.endDate);
+    setSelectedDateFilter(payload.period);
     setFilters(payload);
     setIsFilterOpen(false);
   };
@@ -237,7 +256,7 @@ export default function PTPKDashboard() {
     setFilters({
       period: selectedDateFilter || "MTD",                
       startDate: dayjs().startOf("month").toISOString(),  
-      endDate: dayjs().toISOString(),                      
+      endDate: dayjs().toISOString(),                   
     });
   
     setIsFilterOpen(false);
@@ -269,7 +288,7 @@ export default function PTPKDashboard() {
                 </TabsList>
                 <FilterBar
                   onFilterClick={() => setIsFilterOpen(true)} 
-                  onApplyFilters={(appliedFilters) => setFilters(appliedFilters)}
+                  onApplyFilters={(appliedFilters) => applyFiltersFromBar(appliedFilters)}
                   hasActiveFilters={hasActiveFilters}
                 />
               </div>

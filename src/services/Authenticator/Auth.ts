@@ -90,7 +90,7 @@ const checkAuth = async (from: string, auth: string) => {
 export const getAuth = () => {
   const token = getCookie("access_token");
   const shipper = getCookie("selected_shipper");
-  console.log('getAuth', token, shipper);
+  // console.log('getAuth', token, shipper);
   return `bearer ${token} shipper ${shipper}`;
 };
 

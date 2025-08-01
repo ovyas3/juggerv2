@@ -14,7 +14,7 @@
   }
   
   .headerContent {
-    max-width: 80rem;
+    /* max-width: 80rem; */
     margin: 0 auto;
     padding: 1rem 1.5rem;
   }
@@ -71,7 +71,7 @@
   
 
   .mainContent {
-    max-width: 80rem;
+    /* max-width: 80rem; */
     margin: 0 auto;
     padding-top: 1.5rem;
   }

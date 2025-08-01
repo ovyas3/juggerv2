@@ -55,6 +55,7 @@ const DataOverviewTab = ({ tableData, isLoadingTable, filters, metricsData, isLo
           ...filters,
           month: row.month,
           report: true,
+          year: row.year,
         },
         {},
         1
