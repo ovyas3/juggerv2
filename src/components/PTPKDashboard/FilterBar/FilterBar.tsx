@@ -12,9 +12,10 @@ interface FilterBarProps {
   onFilterClick: () => void
   onApplyFilters: (appliedFilters: any) => void
   hasActiveFilters: boolean
+  resetAllFilters: () => void
 }
 
-const FilterBar = ({ onFilterClick, onApplyFilters, hasActiveFilters }: FilterBarProps) => {
+const FilterBar = ({ onFilterClick, onApplyFilters, hasActiveFilters, resetAllFilters }: FilterBarProps) => {
   const [localPeriod, setLocalPeriod] = useState("MTD")
   // const [localMode, setLocalMode] = useState("All Modes");
   // const [localRegion, setLocalRegion] = useState("All Regions");
@@ -42,18 +43,13 @@ const FilterBar = ({ onFilterClick, onApplyFilters, hasActiveFilters }: FilterBa
   }
 
   const handleResetAllFilters = () => {
-    setLocalPeriod("Custom")
+    setLocalPeriod("MTD")
     const initialStart = dayjs().startOf("month")
     const initialEnd = dayjs()
     setCustomStartDate(initialStart)
     setCustomEndDate(initialEnd)
     setShowPeriodDropdown(false)
-
-    onApplyFilters({
-      period: "Custom",
-      startDate: initialStart.toISOString(),
-      endDate: initialEnd.toISOString(),
-    })
+    resetAllFilters()
   }
 
   const handlePeriodChange = (newPeriod: string) => {
