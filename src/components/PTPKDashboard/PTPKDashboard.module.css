@@ -1,0 +1,282 @@
+.dashboardContainer {
+  margin-left: 70px;
+  margin-top: 2rem;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f8fafc 0%, #e0f2fe 50%, #e0e7ff 100%);
+}
+
+.dashboardHeader {
+  background: white;
+  border-bottom: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+.headerContent {
+  /* max-width: 80rem; */
+  margin: 0 auto;
+  padding: 1rem 1.5rem;
+}
+
+.headerFlex {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.headerBrand {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.brandIcon {
+  width: 3rem;
+  height: 3rem;
+  background: linear-gradient(135deg, #2563eb, #4f46e5);
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.brandIcon svg {
+  height: 1.5rem;
+  width: 1.5rem;
+  color: white;
+}
+
+.brandText h1 {
+  font-size: 1.875rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #111827, #374151);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin: 0;
+}
+
+.brandText p {
+  color: #6b7280;
+  margin: 0.25rem 0 0 0;
+}
+
+.headerControls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.mainContent {
+  /* max-width: 80rem; */
+  margin: 0 auto;
+  padding-top: 1.5rem;
+}
+
+.contentSpacing {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 91.5vw;
+}
+
+.stickyTabs {
+  width: 92.5%;
+  display: flex;
+  justify-content: center;
+  margin-top: 6px;
+  position: fixed;
+  border-radius: 10px;
+  top: 50;
+  z-index: 20;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: box-shadow 0.2s;
+}
+
+.tabsHeader {
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  padding: 12px;
+  gap: 8px;
+  width: 100%;
+}
+
+.tabFilters {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+
+.dropdown {
+  padding: 8px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 14px;
+  color: #111827;
+  min-width: 140px;
+}
+
+.dateInput {
+  padding: 8px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #111827;
+  background: #fff;
+}
+
+.rangeBox {
+  padding: 8px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #f8fafc;
+  font-size: 14px;
+  color: #111827;
+}
+
+.iconBtn {
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  padding: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.exportBtn {
+  display: flex;
+  align-items: center;
+  background: #2563eb;
+  color: #fff;
+  font-weight: 500;
+  font-size: 14px;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 14px;
+  cursor: pointer;
+}
+
+.tabsList {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  background-color: #f9fafb;
+  padding: 6px;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+  gap: 4px;
+  width: 100%;
+  margin-right: 30px;
+}
+
+.tabsTrigger {
+  background: transparent;
+  padding: 10px 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #6b7280;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  border: none;
+}
+
+.tabsTrigger:hover {
+  color: #111827;
+}
+
+.tabsTrigger[data-state="active"] {
+  background-color: #2563eb;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  color: #fff;
+}
+
+@media (max-width: 1400px) {
+  .contentSpacing {
+    width: 95vw;
+  }
+
+  .stickyTabs {
+    width: 94%;
+  }
+}
+
+@media (max-width: 1200px) {
+  .dashboardContainer {
+    margin-left: 60px;
+  }
+
+  .contentSpacing {
+    width: 92vw;
+  }
+
+  .stickyTabs {
+    width: 91%;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboardContainer {
+    margin-left: 20px;
+    margin-top: 1rem;
+  }
+
+  .contentSpacing {
+    width: 95vw;
+    margin-left: 0;
+  }
+
+  .stickyTabs {
+    width: 94%;
+    margin-left: 2%;
+  }
+
+  .tabsHeader {
+    padding: 8px;
+  }
+
+  .tabsList {
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
+
+  .tabsTrigger {
+    padding: 8px 10px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboardContainer {
+    margin-left: 10px;
+  }
+
+  .contentSpacing {
+    width: 98vw;
+  }
+
+  .stickyTabs {
+    width: 96%;
+    margin-left: 1%;
+  }
+
+  .headerBrand {
+    gap: 0.5rem;
+  }
+
+  .brandIcon {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  .brandText h1 {
+    font-size: 1.5rem;
+  }
+}

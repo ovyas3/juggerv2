@@ -1,0 +1,253 @@
+.advancedFilterButton {
+    background: white !important;
+    border: 1px solid #e2e8f0 !important;
+    color: #334155 !important;
+    font-weight: 500 !important;
+    transition: all 0.2s ease-in-out !important;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    padding: 0.5rem 1rem !important;
+    border-radius: 0.5rem !important;
+  }
+
+  .advancedFilterButton:hover {
+    background: #f8fafc !important;
+    border-color: #cbd5e1 !important;
+    transform: translateY(-1px) !important;
+  }
+
+  .advancedFilterButton:active {
+    transform: translateY(0) !important;
+  }
+
+  .filterOverlay1 {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 40;
+    backdrop-filter: blur(4px);
+    animation: fadeIn 0.2s ease-out;
+    
+  }
+
+  .distanceInput {
+    width: 100px;
+    padding: 8px 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    background: #fff;
+    color: #22223b;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+.istanceInput:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+}
+
+.bodyNoScroll {
+  overflow: hidden;
+  position: fixed;
+  left: 80px;
+}
+.filterSidePanel1 {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 357px;
+  height: 100vh;
+  max-width: 28rem;
+  background: white;
+  z-index: 50;
+  box-shadow: -4px 0 15px rgba(0, 0, 0, 0.1);
+  transform: translateX(100%);
+  animation: slideIn 0.3s ease-out forwards;
+  display: flex;
+  flex-direction: column;
+  /* overflow-y: auto; */
+  -webkit-overflow-scrolling: touch;
+}
+@keyframes slideIn {
+  to {
+    transform: translateX(0);
+  }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.filterHeader1 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.0rem;
+  border-bottom: 1px solid #e2e8f0;
+  position: sticky;
+  top: 52px;
+  background: white;
+  z-index: 10;
+}
+
+.advancedFiltersContent{
+  padding: 2px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 20%;
+}
+.filterGroup{
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+.filterGroupTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  margin: 0 0 10px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+}
+.filterGroupTitle::before {
+  content: '';
+  width: 3px;
+  height: 16px;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  border-radius: 2px;
+  margin-right: 8px;
+}
+.filterTitle1 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0;
+}
+.filterCloseButton1 {
+  color: #64748b !important;
+  padding: 0.5rem !important;
+  border-radius: 50% !important;
+  width: 35px !important;
+  height: 35px !important;
+  cursor: pointer !important;
+  border: 0.3px solid #64748b !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.filterCloseButton1:hover {
+  background: #f1f5f9 !important;
+  color: #475569 !important;
+}
+.filterContent1 {
+  /* padding: 1.5rem; */
+  display: flex;
+  flex-direction: column;
+  gap: 240px
+}
+.filterSection1 {
+  width: 100%;
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+}
+.filterLabel1 {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #475569;
+  margin-bottom: 0.5rem;
+}
+.filterSelect1 {
+  width: 100%;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.filterSelect1:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+.filterButtonSection1 {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.filterButtonSection1 button {
+  min-width: 100px;
+}
+@media (max-width: 640px) {
+  .filterSidePanel1 {
+    max-width: 100%;
+    border-radius: 0;
+  }
+
+  .filterContent1 {
+    padding: 1.25rem;
+  }
+}
+.advancedFiltersFooter {
+  padding: 16px;
+  border-top: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  /* margin-top: 250px; */
+}
+
+.applyButton {
+  padding: 10px 20px;
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s, opacity 0.2s;
+}
+
+.applyButton:hover:not(:disabled) {
+  background-color: #3b82f6;
+}
+
+.applyButton:disabled {
+  background-color: #e5e7eb;
+  color: #9ca3af;
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+
+.clearButton {
+  padding: 10px 20px;
+  background-color: #f3f4f6;
+  color: #374151; 
+  border: 1px solid #e0e0e0; 
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.clearButton:hover {
+  background-color: #e5e7eb;
+  border-color: #d1d5db;
+}
+  

@@ -19,15 +19,6 @@ const Signin = () => {
   const router = useRouter();
   const [hidePasswordFlag, setHidePasswordFlag] = useState(true);
 
-
-  // async function getPreferences() {
-  //   const response = await httpsGet('/get_preferences', 0, router)
-  //   if(response.statusCode === 200) {
-  //     const preferences = response.data?.constant
-  //     localStorage.setItem('preferences',JSON.stringify(preferences))
-  //   } 
-  // }
-
   const handleLogin = () => {
     const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     if (!email.length || !password.length) {
@@ -65,12 +56,6 @@ const Signin = () => {
 
         <div className="header">
           <div className="heading">Sign in</div>
-          {/* <div className="new-user">
-            New user?
-            <span style={{ color: "#3351FF", cursor: "pointer" }}>
-              &nbsp;Create an account
-            </span>
-          </div> */}
         </div>
         <div className="main-content">
           <div className="input-content">
@@ -108,7 +93,6 @@ const Signin = () => {
             )}
           </div>
         </div>
-        {/* <div className="forgot-password">Forgot Password?</div> */}
 
         <div className="footer">
           <div>

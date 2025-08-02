@@ -1,0 +1,234 @@
+
+.multiSelectContainer {
+  position: relative;
+  width: 100%;
+}
+
+.multiSelectButton {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%; 
+  padding: 8px 12px;
+  background-color: white;
+  border: 1px solid #e0e0e0; 
+  border-radius: 6px; 
+  font-size: 14px;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.multiSelectButton .buttonLabelText {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-right: 8px; 
+}
+
+.multiSelectButton:hover {
+  border-color: #b0b0b0; 
+  background-color: #f9f9f9; 
+}
+
+.selectedCount {
+  font-size: 12px;
+  color: #6b7280;
+  margin-left: 4px;
+}
+
+.dropdownMenu,
+.multiSelectDropdown { 
+    position: absolute;
+    top: calc(100% + 6px); 
+    right: 0; 
+    background-color: white;
+    border: 1px solid #e0e0e0; 
+    border-radius: 6px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08); 
+    z-index: 99; 
+    min-width: 200px; 
+    animation: fadeIn 0.15s ease-out; 
+}
+
+.multiSelectDropdown { 
+    left: 0; 
+    right: auto;
+    width: 100%; 
+}
+
+@keyframes fadeIn {
+  from {
+      opacity: 0;
+      transform: translateY(-5px);
+  }
+  to {
+      opacity: 1;
+      transform: translateY(0);
+  }
+}
+
+.dropdownItem,
+.multiSelectOption { 
+    padding: 10px 14px; 
+    font-size: 14px;
+    color: #333333;
+    cursor: pointer;
+    transition: background-color 0.15s ease-in-out;
+    display: flex; 
+    align-items: center; 
+    gap: 8px; 
+}
+
+.dropdownItem:hover,
+.multiSelectOption:hover {
+    background-color: #f0f0f0; 
+}
+
+.dropdownItemActive {
+    background-color: #e0e7ff; 
+    color: #3730a3; 
+    font-weight: 500; 
+}
+
+.filterButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px; 
+    height: 38px;
+    background-color: white;
+    border: 1px solid #e0e0e0; 
+    border-radius: 6px; 
+    color: #555555; 
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+.filterButton:hover {
+    border-color: #b0b0b0;
+    background-color: #f9f9f9;
+    color: #333333;
+}
+
+.filterButtonActive {
+    background-color: #3b82f6; 
+    border-color: #3b82f6;
+    color: white;
+}
+.filterButtonActive:hover {
+    background-color: #2563eb; 
+    border-color: #2563eb;
+}
+
+.dropdownArrow {
+    transition: transform 0.2s ease-in-out;
+    color: #6b7280; 
+}
+
+.dropdownArrowOpen {
+    transform: rotate(180deg);
+}
+
+
+.multiSelectDropdown .multiSelectHeader { 
+  padding: 10px 14px;
+}
+.multiSelectDropdown .searchContainer { 
+  padding: 10px 14px;
+}
+
+.multiSelectHeader {
+  padding: 8px 12px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.selectAllButton {
+  background: none;
+  border: none;
+  font-size: 13px; 
+  color: #1e40af;
+  cursor: pointer;
+  padding: 0;
+}
+
+.selectAllButton:hover {
+  text-decoration: underline;
+}
+
+.selectAllButton:disabled {
+  color: #9ca3af;
+  cursor: not-allowed;
+  text-decoration: none;
+}
+
+.multiSelectOptions {
+  overflow-y: auto;
+  max-height: 250px;
+  padding: 4px 0;
+}
+
+.checkbox {
+  width: 16px;
+  height: 16px;
+  border: 1px solid #cccccc; 
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: white;
+  flex-shrink: 0;
+}
+
+.checked {
+  background-color: #3b82f6; 
+  border-color: #3b82f6;
+  color: white;
+}
+.searchContainer {
+  position: relative;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af;
+}
+
+.multiSelectSearchIcon {
+  position: absolute;
+  left: 22px; 
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af;
+  z-index: 1;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 8px 12px 8px 42px; 
+  border: 1px solid #e0e0e0; 
+  border-radius: 6px; 
+  font-size: 14px;
+  color: #333333;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.searchInput:focus {
+  border-color: #1e40af;
+  box-shadow: 0 0 0 2px rgba(30, 64, 175, 0.1);
+}
+
+.searchInput::placeholder {
+  color: #9ca3af;
+}
+
+.noResults {
+  padding: 12px;
+  text-align: center;
+  color: #6b7280;
+  font-size: 14px;
+  font-style: italic;
+}

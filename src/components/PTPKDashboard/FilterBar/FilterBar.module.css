@@ -1,0 +1,287 @@
+.filtersContainer {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 19px;
+  box-sizing: border-box;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  gap: 16px;
+}
+
+.leftFilters {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+.dateRangeDisplayPill {
+  display: flex;
+  align-items: center;
+  background: #f1f5f9;
+  color: #111827;
+  padding: 8px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  gap: 6px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.datePillIcon {
+  color: #3b82f6;
+}
+
+.dropdownsContainer {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+}
+
+.dropdownWrapper {
+  position: relative;
+}
+
+.dropdownMenu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.06);
+  z-index: 10;
+  min-width: 120px;
+  padding: 4px 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.dropdownMenuItem {
+  padding: 10px 16px;
+  font-size: 14px;
+  color: #111827;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.2s;
+}
+
+.dropdownMenuItem:hover {
+  background-color: #f1f5f9;
+}
+
+.dropdownButton {
+  padding: 10px 15px;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  border-radius: 8px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  color: #111827;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  white-space: nowrap;
+}
+
+.dropdownButton:hover {
+  border-color: #cbd5e1;
+  background-color: #f9fafb;
+}
+
+.dropdownButtonActive {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+}
+
+.resetAllButton {
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  padding: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.resetAllButton:hover {
+  background-color: #f9fafb;
+  border-color: #cbd5e1;
+}
+
+.filterButton {
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  padding: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.filterButton:hover {
+  background-color: #f9fafb;
+  border-color: #cbd5e1;
+}
+
+.filterButtonActive {
+  border-color: #2563eb;
+  background-color: #e0f2fe;
+}
+
+.exportButton {
+  background: #2563eb;
+  color: #fff;
+  border: 1px solid #2563eb;
+  padding: 10px 40px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.exportButton:hover {
+  background-color: #3b82f6;
+  border-color: #3b82f6;
+  box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+}
+
+.filtersContainer,
+.leftFilters,
+.dropdownsContainer {
+  flex-wrap: nowrap;
+  min-width: 0;
+}
+
+.filterActions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.filterButton,
+.resetAllButton {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  background-color: #f9fafb;
+  color: #4b5563;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filterButton:hover,
+.resetAllButton:hover {
+  background-color: #f3f4f6;
+  border-color: #d1d5db;
+}
+
+.filterButton.activeFilter,
+.resetAllButton.activeFilter {
+  border-color: #3b82f6;
+  background-color: #eff6ff;
+  color: #1d4ed8;
+}
+
+.filterBadge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 8px;
+  height: 8px;
+  background-color: #ef4444;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .filtersContainer {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    padding: 12px 16px;
+  }
+
+  .leftFilters {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .dropdownsContainer {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .dateRangeDisplayPill {
+    font-size: 12px;
+    padding: 6px 16px;
+  }
+
+  .dropdownButton {
+    padding: 8px 12px;
+    font-size: 12px;
+    min-width: 100px;
+  }
+}
+
+@media (max-width: 480px) {
+  .filtersContainer {
+    padding: 8px 12px;
+  }
+
+  .dropdownsContainer {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .dropdownButton {
+    flex: 1;
+    min-width: 80px;
+  }
+
+  .dateRangeDisplayPill {
+    width: 100%;
+    justify-content: center;
+  }
+}

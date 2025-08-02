@@ -1,0 +1,94 @@
+.metricCard {
+  background-color: #f9fafb;
+  border-left: 4px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  padding: 23px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.cardContent {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  gap: 7px;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.icon {
+  height: 20px;
+  width: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.title {
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+}
+
+.value {
+  font-size: 24px;
+  font-weight: 700;
+  color: #111827;
+  margin: 4px 0;
+}
+
+.trendRow {
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+  gap: 4px;
+  color: #6b7280;
+}
+
+.trendIconUp {
+  color: #16a34a;
+  height: 14px;
+  width: 14px;
+}
+
+.trendIconDown {
+  color: #dc2626;
+  height: 14px;
+  width: 14px;
+}
+
+.trendIconNeutral {
+  color: #9ca3af;
+  height: 14px;
+  width: 14px;
+}
+
+.trendValue {
+  font-weight: 600;
+}
+
+.trendUp {
+  color: #16a34a;
+}
+
+.trendDown {
+  color: #dc2626;
+}
+
+.trendNeutral {
+  color: #6b7280;
+}
+
+.subText {
+  color: #9ca3af;
+  margin-left: 6px;
+}

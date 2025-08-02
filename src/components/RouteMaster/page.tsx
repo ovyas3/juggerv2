@@ -224,6 +224,7 @@ export default function InventoryDataTable() {
     fetchData();
   }, [page, rowsPerPage]);
 
+
   const handleCityChange = (event: SelectChangeEvent) => {
     setSelectedCity(event.target.value as string)
     setPage(0)

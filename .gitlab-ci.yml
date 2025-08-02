@@ -3,6 +3,33 @@ image: tk120404/node:22.2.0
 variables:
   GIT_STRATEGY: fetch
 
+uat_build:
+  tags:
+    - lucy-master
+  stage: build
+  environment:
+    name: uat
+  script:
+    - npm install
+    - npm run build
+    - echo $uatEnvKey | base64 -d > uatEnvKey.pem
+    - chmod 400 uatEnvKey.pem
+    - zip -qq -r $CI_JOB_ID.zip ./ -x uatEnvKey.pem
+    - scp -i uatEnvKey.pem -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $CI_JOB_ID.zip ubuntu@tms-api.instavans.in:/home/ubuntu/milkyway/packages/juggernaut-$CI_JOB_ID.zip
+    - ssh -t -t -i uatEnvKey.pem -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubuntu@tms-api.instavans.in << EOF
+    - rm -rf /home/ubuntu/milkyway/juggernaut/*
+    - cd /home/ubuntu/milkyway/juggernaut
+    - cp /home/ubuntu/milkyway/packages/juggernaut-$CI_JOB_ID.zip .
+    - unzip -qq -o juggernaut-$CI_JOB_ID.zip
+    - rm -rf juggernaut-$CI_JOB_ID.zip
+    - ls
+    - rm /home/ubuntu/milkyway/packages/juggernaut-$CI_JOB_ID.zip
+    - nvm use v22
+    - npm ci
+    - nvm use default
+    - pm2 reload juggernaut
+    - exit
+
 prod_build:
   tags:
     - lucy-master

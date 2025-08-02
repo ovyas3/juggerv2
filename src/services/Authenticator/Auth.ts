@@ -5,7 +5,7 @@ import { setCookies, getCookie, hasCookie } from "@/utils/storageService";
 const authenticate = async (data: any) => {
   const {
     access_token_web,
-    access_token,
+    accessToken: access_token,
     default_unit,
     shippers,
     name,
@@ -31,8 +31,8 @@ const authenticate = async (data: any) => {
       "corporate_shipper",
       JSON.stringify(corporate_shipper)
     );
-    localStorage.setItem("selected_shipper", corporate_shipper[0]?._id);
-    setCookies("selected_shipper", corporate_shipper[0]?._id);
+    localStorage.setItem("shipper_id", corporate_shipper[0]?._id);
+    setCookies("shipper_id", corporate_shipper[0]?._id);
   } else {
     setCookies("is_corporate_user", "false");
     localStorage.setItem("shippers", JSON.stringify(shippers));
@@ -40,9 +40,9 @@ const authenticate = async (data: any) => {
       (shipper: any) => shipper._id === default_unit
     );
     if (!selectedShipper) selectedShipper = shippers[0] as any;
-    setCookies("selected_shipper", selectedShipper._id);
+    setCookies("shipper_id", selectedShipper._id);
     setCookies("parent_name", selectedShipper.parent_name);
-    localStorage.setItem("selected_shipper", selectedShipper._id);
+    localStorage.setItem("shipper_id", selectedShipper._id);
   }
 };
 
