@@ -9,7 +9,7 @@ import MetricCard from "../../UI/MetricCard"
 import SummaryCardSkeleton from "../../UI/MetricCardSkeleton"
 import { iconMap } from "../../UI/iconMap"
 
-const DataOverviewTab = ({ tableData, isLoadingTable, filters, metricsData, isLoadingMetrics }: any) => {
+const DataOverviewTab = ({ tableData, isLoadingTable, filters, metricsData, isLoadingMetrics, dateType, onDateTypeChange }: any) => {
   const [isDownloading, setIsDownloading] = useState(false)
   const [rowDownloading, setRowDownloading] = useState<string | null>(null)
 
@@ -132,6 +132,20 @@ const DataOverviewTab = ({ tableData, isLoadingTable, filters, metricsData, isLo
                   </div>
                 </div>
                 <div className={styles.tableHeaderRight}>
+                  <div className={styles.dateToggleContainer}>
+                    <span className={styles.toggleLabel}>
+                      {dateType === 'approve' ? 'Approval Date' : 'Gate Out Date'}
+                    </span>
+                    <label className={styles.toggleSwitch}>
+                      <input 
+                        type="checkbox" 
+                        checked={dateType === 'gateout'}
+                        onChange={e => onDateTypeChange(e.target.checked ? 'gateout' : 'approve')}
+                        aria-label="Toggle Approval/Gate Out Date"
+                      />
+                      <span className={styles.slider}></span>
+                    </label>
+                  </div>
                   <button className={styles.exportButton} onClick={handleExportData} disabled={isDownloading}>
                     <Download className="h-4 w-4" />
                     {isDownloading ? "Exporting..." : "Export Data"}

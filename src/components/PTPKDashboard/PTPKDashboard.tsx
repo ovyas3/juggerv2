@@ -58,11 +58,11 @@ export default function PTPKDashboard() {
 
   const [distanceFrom, setDistanceFrom] = useState<string>("")
   const [distanceTo, setDistanceTo] = useState<string>("")
+  const [dateType, setDateType] = useState<'approve' | 'gateout'>('approve');
 
   useEffect(() => {
     if (activeTab === "data") {
       fetchMetricsData()
-      fetchTableData()
     }
   }, [filters, activeTab])
 
@@ -193,7 +193,8 @@ export default function PTPKDashboard() {
   const fetchMetricsData = useCallback(async () => {
     setIsLoadingMetrics(true)
     try {
-      const response = await httpsPost("ptpk/kpis", filters, {}, 1)
+      const { dateType, ...filtersForKpis } = filters;
+      const response = await httpsPost("ptpk/kpis", filtersForKpis, {}, 1);
       if (response.statusCode === 200 && response.data) {
         setMetricsData(response.data)
       } else {
@@ -222,7 +223,10 @@ export default function PTPKDashboard() {
   const fetchTableData = useCallback(async () => {
     setIsLoadingTable(true)
     try {
-      const response = await httpsPost("ptpk/table", filters, {}, 1)
+      const response = await httpsPost("ptpk/table", {
+        ...filters,
+        dateType,
+      }, {}, 1)
       if (response.statusCode === 200 && response.data) {
         setTableData(response.data.modes)
       } else {
@@ -235,11 +239,13 @@ export default function PTPKDashboard() {
     } finally {
       setIsLoadingTable(false)
     }
-  }, [filters])
+  }, [filters, dateType])
 
   useEffect(() => {
-    fetchTableData()
-  }, [])
+    if (activeTab === "data") {
+      fetchTableData();
+    }
+  }, [dateType, activeTab, fetchTableData]);
 
   const resetFilterSelections = () => {
     setZoneOptions((prev) => prev.map((opt) => ({ ...opt, selected: false })))
@@ -260,11 +266,16 @@ export default function PTPKDashboard() {
     setSelectedDateFilter("Custom")
     setFilters(resetPayload)
     setIsFilterOpen(false)
+    setDateType('approve')
 
     // Recall APIs
     fetchMetricsData()
     fetchTableData()
   }
+
+  const handleDateTypeChange = (newDateType: 'approve' | 'gateout') => {
+    setDateType(newDateType);
+  };
 
   return (
     <div className={styles.dashboardContainer}>
@@ -320,6 +331,8 @@ export default function PTPKDashboard() {
               filters={filters}
               metricsData={metricsData}
               isLoadingMetrics={isLoadingMetrics}
+              dateType={dateType}
+              onDateTypeChange={handleDateTypeChange}
             />
           </Tabs>
         </div>
