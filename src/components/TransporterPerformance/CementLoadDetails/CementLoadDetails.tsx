@@ -86,7 +86,7 @@ export default function CementLoadDetails() {
     const getZonesData = async () => {
         try {
             const response = await httpsGet('zones/get/', 0, router);
-            if (response?.statusCode === 200) {
+            if (response?.statusCode === 200 && response?.data?.zones) {
                 const { zones } = response.data;
                 setZonesWithStates(zones);
                 const zonesOpts = zones.map((zone: any) => ({
@@ -104,16 +104,22 @@ export default function CementLoadDetails() {
         try {
             const response = await httpsPost('stats/cr/getCarriers', {}, router, 1, false);
             if (response?.statusCode === 200) {
-                const carriers = response.data;
-                setCarrierOptions(carriers);
+                // Assign carriers data, using an empty array as a fallback if the data is undefined/null
+                const carriers = response.data || [];
+    
                 const carriersOpts = carriers.map((carrier: any) => ({
                     value: carrier._id,
                     label: carrier.parent_name,
                 }));
+    
                 setCarrierOptions(carriersOpts);
+            } else {
+                setCarrierOptions([]);
+                console.error('Error: Invalid status code for carriers data.');
             }
         } catch (error) {
             console.error('Error fetching carriers data:', error);
+            setCarrierOptions([]);
         }
     };
 
@@ -198,10 +204,17 @@ export default function CementLoadDetails() {
     const handleSelectZone = (e: any) => {
         const zone = e;
         setSelectedZone(e);
-        const statesOpts = zonesWithStates.find((item: any) => item.zone === zone)?.lanes.map((lane: any) => ({
-            value: lane._id,
-            label: lane.name,
-        }));
+        
+        const selectedZoneData = zonesWithStates.find((item: any) => item.zone === zone);
+        
+        let statesOpts = [];
+        if (selectedZoneData && selectedZoneData.lanes) {
+            statesOpts = selectedZoneData.lanes.map((lane: any) => ({
+                value: lane._id,
+                label: lane.name,
+            }));
+        }
+
         setStateOptions(statesOpts);
     };
 
