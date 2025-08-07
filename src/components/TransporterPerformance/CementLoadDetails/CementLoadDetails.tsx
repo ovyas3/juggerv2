@@ -144,22 +144,22 @@ export default function CementLoadDetails() {
                     const data = res[0];
                     //Allocated Data
                     const allocatedData = data?.dashboard1 && data?.dashboard1.length > 0 && data?.dashboard1[0]?.allocated || 0;
-                    const allocatedPercentage = Math.round((allocatedData / allocatedData) * 100);
+                    const allocatedPercentage = allocatedData === 0 ? 0 : Math.round((allocatedData / allocatedData) * 100); // Always 100
                     const allocatedValue = parseFloat(allocatedData.toFixed(2));
 
                     // Acceptance Data
                     const acceptedData = data?.dashboard1 && data?.dashboard1.length > 0 && data?.dashboard1[0]?.accepted || 0;
-                    const acceptancePercentage = Math.round((acceptedData / allocatedData) * 100);
+                    const acceptancePercentage = acceptedData === 0 ? 0 :Math.round((acceptedData / allocatedData) * 100);
                     const acceptanceValue = parseFloat(acceptedData.toFixed(2));
 
                     // Registered Data
                     const registeredData = data?.dashboard1 && data?.dashboard1.length > 0 && data?.dashboard1[0]?.registered || 0;
-                    const registeredPercentage = Math.round((registeredData / allocatedData) * 100);
+                    const registeredPercentage = registeredData === 0 ? 0 : Math.round((registeredData / allocatedData) * 100);
                     const registeredValue = parseFloat(registeredData.toFixed(2));
 
                     // Fulfilled Data
                     const fulfilledData = data?.dashboard2 && data?.dashboard2.length > 0 && data?.dashboard2[0]?.load || 0;
-                    const fulfilledPercentage = Math.round((fulfilledData / allocatedData) * 100);
+                    const fulfilledPercentage = fulfilledData === 0 ? 0 :Math.round((fulfilledData / allocatedData) * 100);
                     const fulfilledValue = parseFloat(fulfilledData.toFixed(2));
 
                     const finalDataObj = {
@@ -192,8 +192,6 @@ export default function CementLoadDetails() {
         } catch (error) {
             setLoading(false);
             console.error('Error fetching material data:', error);
-        } finally {
-            setLoading(false);
         }
     };
 
