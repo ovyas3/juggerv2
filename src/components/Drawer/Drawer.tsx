@@ -176,14 +176,6 @@ const navigationItems: NavItem[] = [
         inactiveIcon: RouteInactiveIcon,
         isImageIcon: true
     },
-    // {
-    //     id: 'freightEstimator',
-    //     label: 'Freight Estimator',
-    //     icon: '',
-    //     activeIcon: FreightEstimatorIconActive,
-    //     inactiveIcon: FreightEstimatorIcon,
-    //     isImageIcon: true
-    // },  
     {
         id: 'freightAccounting',
         label: 'Freight Accounting',
@@ -202,8 +194,16 @@ const navigationItems: NavItem[] = [
         isImageIcon: true,
         children: [
             {
+                id: 'CementCarrierScorecard',
+                label: 'Cement Carrier Scorecard',
+                icon: '',
+                activeIcon: LoadDetailsActive,
+                inactiveIcon: LoadDetailsInactive,
+                isImageIcon: true
+            },
+            {
                 id: 'TransporterLoadDetails',
-                label: 'Load Details',
+                label: 'Steel Carrier Scorecard',
                 icon: '',
                 activeIcon: LoadDetailsActive,
                 inactiveIcon: LoadDetailsInactive,
@@ -272,30 +272,6 @@ const navigationItems: NavItem[] = [
             }
         ]
     }
-    // {
-    //     id: 'ewaybillDashboard',
-    //     label: 'eWaybill Dashboard',
-    //     icon: '',
-    //     activeIcon: EWayBillActive,
-    //     inactiveIcon: EWayBillInactive,
-    //     isImageIcon: true
-    // },
-    // {
-    //     id: 'leadDistanceAnalysis',
-    //     label: 'Lead (Distance) Analysis',
-    //     icon: '',
-    //     activeIcon: LeadDistanceActive,
-    //     inactiveIcon: LeadDistanceInactive,
-    //     isImageIcon: true
-    // },
-    // {
-    //     id: 'freightTrends',
-    //     label: 'Freight Trends Dashboard',
-    //     icon: '',
-    //     activeIcon: FreightTrendsActive,
-    //     inactiveIcon: FreightTrendsInactive,
-    //     isImageIcon: true
-    // }
 ];
 
 const myklNavigationItems: NavItem[] = [
@@ -317,33 +293,6 @@ const myklNavigationItems: NavItem[] = [
         route: 'controlRoom',
         isImageIcon: true
     }
-//     {
-//         id: 'trackAndTrace',
-//         label: 'Track & Trace',
-//         icon: '',
-//         activeIcon: LoadActive,
-//         inactiveIcon: LoadInactive,
-//         route: 'controlRoom',
-//         isImageIcon: true
-//     },
-//     {
-//         id: 'freightBill',
-//         label: 'Freight Bill',
-//         icon: '',
-//         activeIcon: LoadActive,
-//         inactiveIcon: LoadInactive,
-//         route: 'controlRoom',
-//         isImageIcon: true
-//     },
-//     {
-//         id: 'gateTransaction',
-//         label: 'Gate Transaction',
-//         icon: '',
-//         activeIcon: LoadActive,
-//         inactiveIcon: LoadInactive,
-//         route: 'controlRoom',
-//         isImageIcon: true
-//     },
  ]
 
 const NavItem = ({

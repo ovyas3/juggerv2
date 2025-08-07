@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useRef, useEffect } from "react"
-import styles from "./LoadDetails.module.css"
+import styles from "@/components/TransporterPerformance/LoadDetails/LoadDetails.module.css"
 import { DateTime } from 'luxon'
 import CustomDatePicker from '@/components/UI/CustomDatePicker/CustomDatePicker';
 import { Box, Typography, IconButton } from '@mui/material';
@@ -15,7 +15,7 @@ import Image from "next/image";
 import { Select } from "antd";
 import { Weight, Truck, Download, InfoIcon } from "lucide-react"
 import { jsontocsv } from "@/utils/jsonToCsv";
-import LoadDetailsGaugeChart from "./LoadDetailsGauge";
+import LoadDetailsGaugeChart from "@/components/TransporterPerformance/LoadDetails/LoadDetailsGauge"
 
 const finalDataObj = {
     allocated: {
@@ -40,7 +40,7 @@ const finalDataObj = {
     },
 }
 
-export default function OwnVehicleUsage() {
+export default function CementLoadDetails() {
     // Date States
     const today: any = new Date();
     const oneWeekAgo: any = new Date();
@@ -117,10 +117,10 @@ export default function OwnVehicleUsage() {
         }
     };
 
-    const getOwnVehicleUsage = async (from: number, to: number) => {
+    const getCementVehicleUsage = async (from: number, to: number) => {
         let payload: any = {
             from: from,
-            to: to
+            to: to,
         };
 
         if (selectedCarriers.length > 0) {
@@ -137,7 +137,7 @@ export default function OwnVehicleUsage() {
 
         try {
             setLoading(true);
-            const response = await httpsPost('load/dashboard/performance', payload, router, 1, false);
+            const response = await httpsPost('load/dashboard/performance-cement', payload, router, 1, false);
             if (response?.statusCode === 200) {
                 const res = response.data;
                 if (res && res.length > 0) {
@@ -151,10 +151,6 @@ export default function OwnVehicleUsage() {
                     const acceptedData = data?.dashboard1 && data?.dashboard1.length > 0 && data?.dashboard1[0]?.accepted || 0;
                     const acceptancePercentage = Math.round((acceptedData / allocatedData) * 100);
                     const acceptanceValue = parseFloat(acceptedData.toFixed(2));
-
-                    // Rejected Data
-                    const rejectedPercentage = parseFloat(data.rejectedPercentage?.toString() || '0');
-                    const rejectedValue = parseFloat(data.rejectedActualValue?.toString() || '0');
 
                     // Registered Data
                     const registeredData = data?.dashboard1 && data?.dashboard1.length > 0 && data?.dashboard1[0]?.registered || 0;
@@ -223,7 +219,7 @@ export default function OwnVehicleUsage() {
         if (startDate && endDate) {
             const newStartDate: any = service.millies(startDate);
             const newEndDate: any = service.millies(endDate);
-            getOwnVehicleUsage(newStartDate, newEndDate);
+            getCementVehicleUsage(newStartDate, newEndDate);
         }
     };
 
@@ -256,7 +252,7 @@ export default function OwnVehicleUsage() {
                 style={{ margin: !mobile ? '56px 0 0 70px' : '0px' }}
             >
                 {mobile && (
-                    <h1 className={styles.containeTitle}>Steel Carrier Scorecard</h1>
+                    <h1 className={styles.containeTitle}>Cement Carrier Scorecard </h1>
                 )}
                 <div className={styles.header}>
                     <div className={styles.filterGroup}>
@@ -372,7 +368,7 @@ export default function OwnVehicleUsage() {
                             value={finalData.registered.needleValue}
                             total={finalData.registered.bottomLabel}
                             percentage={finalData.registered.needleValue}
-                            title="Registered"
+                            title="Assigned"
                             threshold={finalData.registered.threshold}
                         />
                         <LoadDetailsGaugeChart
@@ -387,5 +383,4 @@ export default function OwnVehicleUsage() {
             </div>
         </>
     );
-
 };
