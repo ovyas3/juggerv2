@@ -6,7 +6,6 @@ import {
   Container,
   Tabs,
   Tab,
-  Button,
   Paper,
   ThemeProvider,
   createTheme,
@@ -329,7 +328,6 @@ export default function JPCSettingsPage() {
   const [tabValue, setTabValue] = useState(0);
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
-    console.log("Tab changing from", tabValue, "to", newValue);
     setTabValue(newValue);
   };
 
