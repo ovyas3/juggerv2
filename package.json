@@ -26,6 +26,7 @@
     "@mui/x-data-grid-generator": "^7.7.1",
     "@mui/x-date-pickers": "^7.6.2",
     "@mui/x-date-pickers-pro": "^7.6.2",
+    "@next/swc-darwin-arm64": "^15.4.5",
     "@nextui-org/date-picker": "^2.1.1",
     "@nextui-org/react": "^2.4.1",
     "@radix-ui/react-dialog": "^1.1.4",

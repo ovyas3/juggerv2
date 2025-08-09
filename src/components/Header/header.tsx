@@ -68,6 +68,8 @@ const Header = ({ setReloadOnHeaderChange, isMapHelper, getAllShipment, isShipme
         return "Top Destination"
       case "/indentManagement/plant":
         return "Indent Management - Plant"
+      case "/settings":
+        return "Settings"
       // case "/ewaybillDashboard":
       //   return "eWayBill Dashboard"
       // case "/leadDistanceAnalysis":
