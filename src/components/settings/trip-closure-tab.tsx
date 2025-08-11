@@ -13,10 +13,14 @@ import {
   Divider,
   Container,
   Button,
+  IconButton,
+  Modal,
+  Tooltip,
 } from "@mui/material";
 import {
   LocationOn as LocationOnIcon,
   PhoneAndroid as PhoneAndroidIcon,
+  Visibility as VisibilityIcon,
 } from "@mui/icons-material";
 import { useRouter } from "next/navigation";
 import { httpsGet, httpsPost } from "@/utils/Communication";
@@ -45,6 +49,9 @@ export default function TripClosureTab({
   const [trackingConfigData, setTrackingConfigData] = useState([]);
   const router = useRouter();
   const { showMessage } = useSnackbar();
+  const [popupOpen, setPopupOpen] = useState(false);
+  const [popupContent, setPopupContent] = useState<any>(null);
+  const [popupAnchorEl, setPopupAnchorEl] = useState<any>(null);
 
   const geofenceOptions = [
     { value: "proximity", label: "Proximity" },
@@ -56,6 +63,18 @@ export default function TripClosureTab({
     { value: "time", label: "Time Threshold Only" },
     { value: "either", label: "Either (ePOD or Time)" },
   ];
+
+  const handleOpenPopup = (event: any, content: any) => {
+    setPopupContent(content);
+    setPopupAnchorEl(event.currentTarget);
+    setPopupOpen(true);
+  };
+
+  const handleClosePopup = () => {
+    setPopupOpen(false);
+    setPopupContent(null);
+    setPopupAnchorEl(null);
+  };
 
   const getTrackingSettings = async () => {
     const response = await httpsGet("trip_closure_settings/get", 0, router);
@@ -129,7 +148,7 @@ export default function TripClosureTab({
         sub_type: withoutGeofenceOption === "proximity" ? "PRX" : "PNC",
         value:
           withoutGeofenceOption === "proximity" ? Number(proximityDistance) : 0,
-        autoCloser: {
+        auto_closer: {
           enabled: autoClose,
           triggers: triggers,
           threshold_time:
@@ -166,7 +185,7 @@ export default function TripClosureTab({
       0
     );
     if (response.statusCode === 200) {
-      getTrackingSettings()
+      getTrackingSettings();
       showMessage("Trip Closure Settings Configuration Success", "success");
     } else {
       showMessage("Failed to configure Trip Closure Settings", "error");
@@ -227,6 +246,117 @@ export default function TripClosureTab({
     }
   }, [trackingConfigData]);
 
+  const gpsDetectionLogic = [
+    {
+      label: "1st",
+      color: "primary.main",
+      title: "Preference: Geofence (Polygonal)",
+      desc: "If a polygonal geofence is present at the delivery location, the system will use it for arrival detection",
+      show: true,
+    },
+    {
+      label: "2nd",
+      color: "grey.400",
+      title: "Preference: Without Geofence Options",
+      desc: "If no geofence is present, system uses one of the configured fallback options below",
+      show: true,
+    },
+  ];
+
+  const simDetectionLogic = [
+    {
+      label: "1",
+      color: "primary.main",
+      title: "Proximity",
+      desc: "Distance calculated from delivery location coordinates",
+      show: true,
+    },
+    {
+      label: "2",
+      color: "grey.400",
+      title: "Pincode",
+      desc: "Uses delivery location pincode boundary",
+      show: true,
+    },
+  ];
+
+  const renderPopupContent = (content: any) => (
+    <Box
+      sx={{
+        p: 3,
+        bgcolor: "background.paper",
+        border: "1px solid #e0e0e0",
+        borderRadius: "8px",
+        width: 400,
+        position: 'absolute',
+        top: popupAnchorEl ? popupAnchorEl.getBoundingClientRect().top + window.scrollY : 0,
+        left: popupAnchorEl ? popupAnchorEl.getBoundingClientRect().left + window.scrollX - 410 : 0,
+        zIndex: 1300,
+      }}
+    >
+      <Typography
+        variant="subtitle1"
+        sx={{ fontWeight: 600, mb: 2, fontSize: "14px" }}
+      >
+        {content.tracking === "GPS"
+          ? "Detection Logic Priority"
+          : "Detection Logic (Without Geofence)"}
+      </Typography>
+      {content.tracking === "SIM" && (
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          sx={{ mb: 2, fontSize: "14px" }}
+        >
+          SIM tracking operates without geofence dependency and uses the
+          following options:
+        </Typography>
+      )}
+      <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+        {content.detectionLogic.map(
+          (logic: any, i: any) =>
+            logic.show && (
+              <Box
+                key={i}
+                sx={{
+                  display: "flex",
+                  alignItems: "flex-start",
+                  gap: 2,
+                }}
+              >
+                <Chip
+                  label={logic.label}
+                  size="small"
+                  sx={{
+                    bgcolor: logic.color,
+                    color: "white",
+                    fontWeight: 600,
+                    minWidth: content.tracking === "GPS" ? 40 : 32,
+                    fontSize: "12px",
+                  }}
+                />
+                <Box>
+                  <Typography
+                    variant="body1"
+                    sx={{ fontWeight: 500, fontSize: "14px" }}
+                  >
+                    {logic.title}
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ fontSize: "14px" }}
+                  >
+                    {logic.desc}
+                  </Typography>
+                </Box>
+              </Box>
+            )
+        )}
+      </Box>
+    </Box>
+  );
+
   return (
     <>
       <Box sx={{ mx: "auto", p: 2 }}>
@@ -238,22 +368,7 @@ export default function TripClosureTab({
                 <LocationOnIcon sx={{ color: "primary.main", fontSize: 20 }} />
               ),
               title: "GPS Tracking Configuration",
-              detectionLogic: [
-                {
-                  label: "1st",
-                  color: "primary.main",
-                  title: "Preference: Geofence (Polygonal)",
-                  desc: "If a polygonal geofence is present at the delivery location, the system will use it for arrival detection",
-                  show: true,
-                },
-                {
-                  label: "2nd",
-                  color: "grey.400",
-                  title: "Preference: Without Geofence Options",
-                  desc: "If no geofence is present, system uses one of the configured fallback options below",
-                  show: true,
-                },
-              ],
+              detectionLogic: gpsDetectionLogic,
               withoutGeofenceLabel: "Without Geofence Configuration",
               dropdownLabel: "Fallback Option",
               dropdownValue: gpsWithoutGeofenceOption,
@@ -279,22 +394,7 @@ export default function TripClosureTab({
                 />
               ),
               title: "SIM Tracking Configuration",
-              detectionLogic: [
-                {
-                  label: "1",
-                  color: "primary.main",
-                  title: "Proximity",
-                  desc: "Distance calculated from delivery location coordinates",
-                  show: true,
-                },
-                {
-                  label: "2",
-                  color: "grey.400",
-                  title: "Pincode",
-                  desc: "Uses delivery location pincode boundary",
-                  show: true,
-                },
-              ],
+              detectionLogic: simDetectionLogic,
               withoutGeofenceLabel: "Configuration Settings",
               dropdownLabel: "Detection Option",
               dropdownValue: simWithoutGeofenceOption,
@@ -345,72 +445,25 @@ export default function TripClosureTab({
                   <Paper
                     sx={{
                       p: 3,
-                      bgcolor:
-                        config.tracking === "GPS" ? "#f8f9fa" : "#f8f9fa",
+                      bgcolor: "#f8f9fa",
                       border: "1px solid #e9ecef",
+                      position: 'relative'
                     }}
                   >
-                    <Typography
-                      variant="subtitle1"
-                      sx={{ fontWeight: 600, mb: 2, fontSize: "14px" }}
-                    >
-                      {config.tracking === "GPS"
-                        ? "Detection Logic Priority"
-                        : "Detection Logic (Without Geofence)"}
-                    </Typography>
-                    {config.tracking === "SIM" && (
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <Typography
-                        variant="body2"
-                        color="text.secondary"
-                        sx={{ mb: 2, fontSize: "14px" }}
+                        variant="subtitle1"
+                        sx={{ fontWeight: 600, fontSize: "14px" }}
                       >
-                        SIM tracking operates without geofence dependency and
-                        uses the following options:
+                        {config.tracking === "GPS"
+                          ? "Detection Logic Priority"
+                          : "Detection Logic (Without Geofence)"}
                       </Typography>
-                    )}
-                    <Box
-                      sx={{ display: "flex", flexDirection: "column", gap: 2 }}
-                    >
-                      {config.detectionLogic.map(
-                        (logic, i) =>
-                          logic.show && (
-                            <Box
-                              key={i}
-                              sx={{
-                                display: "flex",
-                                alignItems: "flex-start",
-                                gap: 2,
-                              }}
-                            >
-                              <Chip
-                                label={logic.label}
-                                size="small"
-                                sx={{
-                                  bgcolor: logic.color,
-                                  color: "white",
-                                  fontWeight: 600,
-                                  minWidth: config.tracking === "GPS" ? 40 : 32,
-                                  fontSize: "12px",
-                                }}
-                              />
-                              <Box>
-                                <Typography
-                                  variant="body1"
-                                  sx={{ fontWeight: 500, fontSize: "14px" }}
-                                >
-                                  {logic.title}
-                                </Typography>
-                                <Typography
-                                  variant="body2"
-                                  color="text.secondary"
-                                  sx={{ fontSize: "14px" }}
-                                >
-                                  {logic.desc}
-                                </Typography>
-                              </Box>
-                            </Box>
-                          )
-                      )}
+                      <Tooltip title="View Detection Logic Details">
+                        <IconButton onClick={(e) => handleOpenPopup(e, config)}>
+                          <VisibilityIcon />
+                        </IconButton>
+                      </Tooltip>
                     </Box>
                   </Paper>
 
@@ -660,6 +713,23 @@ export default function TripClosureTab({
           </Box>
         </Container>
       </Paper>
+      {popupOpen && (
+        <Modal
+          open={popupOpen}
+          onClose={handleClosePopup}
+          aria-labelledby="detection-logic-popup"
+          aria-describedby="detection-logic-details"
+          closeAfterTransition
+          slotProps={{
+            backdrop: {
+              onClick: handleClosePopup,
+              style: { backgroundColor: 'transparent' },
+            },
+          }}
+        >
+          {renderPopupContent(popupContent)}
+        </Modal>
+      )}
     </>
   );
 }

@@ -23,6 +23,7 @@ import {
   Select,
   MenuItem,
   FormControl,
+  TablePagination, // Import TablePagination
 } from "@mui/material";
 import { Add as AddIcon, Delete as DeleteIcon } from "@mui/icons-material";
 import { httpsGet, httpsPost } from "@/utils/Communication";
@@ -57,6 +58,10 @@ export default function InPlantDashboardTab() {
     metricName: "",
   });
 
+  const [page, setPage] = useState(0); // For current page
+  const [rowsPerPage, setRowsPerPage] = useState(5); // For rows per page
+  const [metricTotal, setMetricTotal] = useState(0); // For total number of metrics
+
   const EventOptions = [
     { value: "", label: "Select from event" },
     { value: "PO", label: "Parking Out" },
@@ -73,7 +78,7 @@ export default function InPlantDashboardTab() {
 
   const addKpiMetric = () => {
     const newMetric: KpiMetric = {
-      _id: Date.now().toString(),
+      _id: `new-${Date.now()}`, // Unique ID for new metrics
       from: "",
       to: "",
       value: {
@@ -98,11 +103,20 @@ export default function InPlantDashboardTab() {
     }
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
+    console.log(deleteDialog);
     if (deleteDialog.metricId) {
-      setKpiMetrics(
-        kpiMetrics.filter((metric) => metric._id !== deleteDialog.metricId)
+      const response = await httpsPost(
+        "inplant_dashboard_settings/delete",
+        { inplant_setting_id: deleteDialog.metricId },
+        router
       );
+      if (response.statusCode === 200) {
+        getInPlantMetrics(page, rowsPerPage); // Re-fetch data after deletion
+        showMessage("Metric deleted successfully", "success");
+      } else {
+        showMessage("Failed to delete metric", "error");
+      }
     }
     setDeleteDialog({ open: false, metricId: null, metricName: "" });
   };
@@ -192,14 +206,18 @@ export default function InPlantDashboardTab() {
       !metric.to
   );
 
-  const getInPlantMetrics = async () => {
+  const getInPlantMetrics = async (currentPage: number, currentRowsPerPage: number) => {
+    const skip = currentPage * currentRowsPerPage;
+    const limit = currentRowsPerPage;
     const response = await httpsGet(
-      "inplant_dashboard_settings/get",
+      `inplant_dashboard_settings/get?limit=${limit}&skip=${skip}`, // Add limit and skip
       0,
       router
     );
     if (response.statusCode === 200) {
-      const inPlantMetricsData = response?.data;
+      const inPlantMetricsData = response?.data?.data;
+      const count = response?.data?.count; // Get total count
+      setMetricTotal(count || 0); // Set total count
       if (inPlantMetricsData?.length) {
         const transformedData = inPlantMetricsData.map((item: any) => ({
           ...item,
@@ -211,6 +229,8 @@ export default function InPlantDashboardTab() {
           isNew: false,
         }));
         setKpiMetrics(transformedData);
+      } else {
+        setKpiMetrics([]); // Clear metrics if no data
       }
     }
   };
@@ -224,7 +244,6 @@ export default function InPlantDashboardTab() {
         target: value.target,
         good: value.good,
         average: value.average,
-        poor: 0,
         active: rest.active,
       };
 
@@ -239,15 +258,26 @@ export default function InPlantDashboardTab() {
     );
     if (response.statusCode === 200) {
       showMessage("In-Plant Metrics Configuration Success", "success");
-      getInPlantMetrics();
+      getInPlantMetrics(page, rowsPerPage); // Re-fetch data after save
     } else {
       showMessage("In-Plant Metrics Configuration Failed", "error");
     }
   };
 
+  // Handle page change
+  const handleChangePage = (event: unknown, newPage: number) => {
+    setPage(newPage);
+  };
+
+  // Handle rows per page change
+  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0); // Reset to first page when rows per page changes
+  };
+
   useEffect(() => {
-    getInPlantMetrics();
-  }, []);
+    getInPlantMetrics(page, rowsPerPage);
+  }, [page, rowsPerPage]); // Re-fetch when page or rowsPerPage changes
 
   return (
     <>
@@ -481,7 +511,7 @@ export default function InPlantDashboardTab() {
                         align="center"
                         sx={{ fontWeight: 500, fontSize: "14px" }}
                       >
-                        {idx + 1}
+                        {page * rowsPerPage + idx + 1}
                       </TableCell>
                       <TableCell align="center">
                         <FormControl sx={{ minWidth: 180 }} size="small">
@@ -635,7 +665,7 @@ export default function InPlantDashboardTab() {
                       <TableCell align="center">
                         {metric.value.average >= metric.value.good &&
                           metric.value.good >= metric.value.target &&
-                          !isNaN(metric.value.average) && (
+                          !isNaN(metric.value.average) ? (
                             <Box
                               sx={{
                                 display: "flex",
@@ -654,12 +684,9 @@ export default function InPlantDashboardTab() {
                               />
                               <span>&gt; Significant Delay</span>
                             </Box>
+                          ) : (
+                            "-"
                           )}
-                        {!(
-                          metric.value.average >= metric.value.good &&
-                          metric.value.good >= metric.value.target &&
-                          !isNaN(metric.value.average)
-                        ) && "-"}
                       </TableCell>
                       <TableCell align="center">
                         <Switch
@@ -704,6 +731,15 @@ export default function InPlantDashboardTab() {
                   </TableRow>
                 </TableBody>
               </Table>
+              <TablePagination
+                rowsPerPageOptions={[5, 10, 25]}
+                component="div"
+                count={metricTotal} // Total count of metrics
+                rowsPerPage={rowsPerPage}
+                page={page}
+                onPageChange={handleChangePage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+              />
             </TableContainer>
           </Box>
 
