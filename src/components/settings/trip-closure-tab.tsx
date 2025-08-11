@@ -36,14 +36,14 @@ export default function TripClosureTab({
   const [gpsAutoClose, setGpsAutoClose] = useState(false);
   const [gpsWithoutGeofenceOption, setGpsWithoutGeofenceOption] =
     useState("proximity");
-  const [gpsProximityDistance, setGpsProximityDistance] = useState("");
+  const [gpsProximityDistance, setGpsProximityDistance] = useState("300");
   const [gpsClosureMethod, setGpsClosureMethod] = useState("");
   const [gpsTimeThreshold, setGpsTimeThreshold] = useState("");
 
   const [simAutoClose, setSimAutoClose] = useState(false);
   const [simWithoutGeofenceOption, setSimWithoutGeofenceOption] =
     useState("proximity");
-  const [simProximityDistance, setSimProximityDistance] = useState("");
+  const [simProximityDistance, setSimProximityDistance] = useState("300");
   const [simClosureMethod, setSimClosureMethod] = useState("");
   const [simTimeThreshold, setSimTimeThreshold] = useState("");
   const [trackingConfigData, setTrackingConfigData] = useState([]);
@@ -199,10 +199,10 @@ export default function TripClosureTab({
           setGpsAutoClose(config.auto_closer.enabled);
           if (config.sub_type === "PRX") {
             setGpsWithoutGeofenceOption("proximity");
-            setGpsProximityDistance(config.value.toString());
+            setGpsProximityDistance(config.value.toString() || "300");
           } else if (config.sub_type === "PNC") {
             setGpsWithoutGeofenceOption("pincode");
-            setGpsProximityDistance("");
+            setGpsProximityDistance("300");
           }
 
           if (
@@ -222,10 +222,10 @@ export default function TripClosureTab({
           setSimAutoClose(config.auto_closer.enabled);
           if (config.sub_type === "PRX") {
             setSimWithoutGeofenceOption("proximity");
-            setSimProximityDistance(config.value.toString());
+            setSimProximityDistance(config.value.toString() || "300");
           } else if (config.sub_type === "PNC") {
             setSimWithoutGeofenceOption("pincode");
-            setSimProximityDistance("");
+            setSimProximityDistance("300");
           }
 
           if (
@@ -288,9 +288,13 @@ export default function TripClosureTab({
         border: "1px solid #e0e0e0",
         borderRadius: "8px",
         width: 400,
-        position: 'absolute',
-        top: popupAnchorEl ? popupAnchorEl.getBoundingClientRect().top + window.scrollY : 0,
-        left: popupAnchorEl ? popupAnchorEl.getBoundingClientRect().left + window.scrollX - 410 : 0,
+        position: "absolute",
+        top: popupAnchorEl
+          ? popupAnchorEl.getBoundingClientRect().top + window.scrollY
+          : 0,
+        left: popupAnchorEl
+          ? popupAnchorEl.getBoundingClientRect().left + window.scrollX - 410
+          : 0,
         zIndex: 1300,
       }}
     >
@@ -447,10 +451,16 @@ export default function TripClosureTab({
                       p: 3,
                       bgcolor: "#f8f9fa",
                       border: "1px solid #e9ecef",
-                      position: 'relative'
+                      position: "relative",
                     }}
                   >
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                      }}
+                    >
                       <Typography
                         variant="subtitle1"
                         sx={{ fontWeight: 600, fontSize: "14px" }}
@@ -723,7 +733,7 @@ export default function TripClosureTab({
           slotProps={{
             backdrop: {
               onClick: handleClosePopup,
-              style: { backgroundColor: 'transparent' },
+              style: { backgroundColor: "transparent" },
             },
           }}
         >
