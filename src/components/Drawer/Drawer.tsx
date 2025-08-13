@@ -31,6 +31,8 @@ import OwnVehicleUsageInactive from "@/assets/own_vehicle_gauge_bg_icon.svg";
 import OwnVehicleUsageActive from "@/assets/own_vehicle_gauge_wg_icon.svg";
 import LoadDetailsInactive from "@/assets/load_details_bg_icon.svg";
 import LoadDetailsActive from "@/assets/load_details_wg_icon.svg";
+import SettingsInactive from '@/assets/settings_bg_icon.svg';
+import SettingsActive from '@/assets/settings_wg_icon.svg';
 
 import EWayBillInactive from "@/assets/eway_bill_bg_icon.svg";
 import EWayBillActive from "@/assets/eway_bill_wg_icon.svg";
@@ -242,6 +244,14 @@ const navigationItems: NavItem[] = [
         route: 'reports',
         isImageIcon: true
     },
+    {
+        id: 'settings',
+        label: 'Settings',
+        icon: '',
+        activeIcon: SettingsActive,
+        inactiveIcon: SettingsInactive,
+        isImageIcon: true,
+      },
     {
         id: 'support',
         label: 'Support',
