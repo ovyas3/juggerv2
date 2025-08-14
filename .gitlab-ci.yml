@@ -3,12 +3,12 @@ image: tk120404/node:22.2.0
 variables:
   GIT_STRATEGY: fetch
 
-prod_build:
+dev_build:
   tags:
     - sarovar-dev
   stage: build
   environment:
-    name: prod
+    name: dev
   script:
     - npm install
     - npm run build
@@ -30,4 +30,3 @@ prod_build:
     - nvm use default
     - pm2 reload juggernaut
     - exit
-  when: manual
