@@ -3,29 +3,31 @@ image: tk120404/node:22.2.0
 variables:
   GIT_STRATEGY: fetch
 
-dev_build:
+prod_build:
   tags:
-    - juggernaut-dev
+    - sarovar-dev
   stage: build
   environment:
-    name: dev
+    name: prod
   script:
     - npm install
-    - npm run dev_build
+    - npm run build
     - echo $devEnvKey | base64 -d > devEnvKey.pem
-    - echo $devFingerPrint > ~/.ssh/known_hosts
     - chmod 400 devEnvKey.pem
     - zip -qq -r $CI_JOB_ID.zip ./ -x devEnvKey.pem
-    - scp -i devEnvKey.pem $CI_JOB_ID.zip ubuntu@dev-rms-api.instavans.com:/home/ubuntu/milkyway/packages/lucy-$CI_JOB_ID.zip
-    - ssh -t -t -i devEnvKey.pem  ubuntu@dev-rms-api.instavans.com << EOF
-    - rm -rf /home/ubuntu/milkyway/lucy/*
-    - cd /home/ubuntu/milkyway/lucy
-    - cp /home/ubuntu/milkyway/packages/lucy-$CI_JOB_ID.zip .
-    - unzip -qq -o lucy-$CI_JOB_ID.zip
-    - rm -rf lucy-$CI_JOB_ID.zip
+    - scp -i devEnvKey.pem -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $CI_JOB_ID.zip ubuntu@dev-api.instavans.com:/home/ubuntu/milkyway/packages/juggernaut-$CI_JOB_ID.zip
+    - ssh -t -t -i devEnvKey.pem -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubuntu@dev-api.instavans.com << EOF
+    - rm -rf /home/ubuntu/milkyway/juggernaut/*
+    - cd /home/ubuntu/milkyway/juggernaut
+    - cp /home/ubuntu/milkyway/packages/juggernaut-$CI_JOB_ID.zip .
+    - unzip -qq -o juggernaut-$CI_JOB_ID.zip
+    - rm -rf juggernaut-$CI_JOB_ID.zip
     - ls
-    - rm /home/ubuntu/milkyway/packages/lucy-$CI_JOB_ID.zip
+    - rm /home/ubuntu/milkyway/packages/juggernaut-$CI_JOB_ID.zip
     # - rm -rf node_modules
+    - nvm use v22
     - npm ci
-    - pm2 reload lucy
+    - nvm use default
+    - pm2 reload juggernaut
     - exit
+  when: manual
