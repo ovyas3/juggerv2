@@ -57,7 +57,9 @@ const Header = ({ setReloadOnHeaderChange, isMapHelper, getAllShipment, isShipme
       case "/TATTrends":
         return "TAT Trends"
       case "/TransporterLoadDetails":
-        return "Load Details"
+        return "Steel Carrier Scorecard"
+      case "/CementCarrierScorecard":
+        return "Cement Carrier Scorecard"
       case "/OwnVehicleUsage":
         return "Own Vehicle Usage"
       case "/indentManagement":
@@ -80,13 +82,13 @@ const Header = ({ setReloadOnHeaderChange, isMapHelper, getAllShipment, isShipme
         return ""
     }
   }
-  
+
   if (pathname === "/invoicingDashboard") {
-    const BillingDashboard = dynamic(() => 
-      import('../BillingDashboard/BillingDashboard'), 
+    const BillingDashboard = dynamic(() =>
+      import('../BillingDashboard/BillingDashboard'),
       { ssr: false }
     );
-    
+
     return <BillingDashboard hideHeader={true} hideTable={true} />;
   }
 
