@@ -1,0 +1,514 @@
+* AnomalyDashboard.css */
+
+/* General Layout */
+.dashboard-container {
+    min-height: 100vh;
+    background: linear-gradient(to bottom right, #f8fafc, #f1f5f9);
+    font-family: Arial, sans-serif;
+}
+
+.dashboard-main-content {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding-top: 5rem;
+    padding-left: 2rem;
+    padding-right: 2rem;
+    padding-bottom: 3rem;
+}
+
+.loading-state, .error-state {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 16rem;
+}
+
+.spinner {
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #1a202c;
+    border-radius: 50%;
+    width: 3rem;
+    height: 3rem;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.error-state {
+    color: #dc2626;
+    font-weight: 600;
+}
+
+.error-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+    margin-right: 0.5rem;
+}
+
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+}
+
+.card-group {
+    cursor: pointer;
+}
+
+.card {
+    background-color: white;
+    border-radius: 1rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    border: 1px solid #e2e8f0;
+    overflow: hidden;
+}
+
+.card-group:hover .card {
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+    transform: translateY(-0.5rem);
+}
+
+.card-content {
+    padding: 2rem;
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+}
+
+.card-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #1a202c;
+    margin-bottom: 0.25rem;
+}
+
+.card-subtitle {
+    color: #64748b;
+    font-size: 0.875rem;
+}
+
+.card-icon-container {
+    width: 4rem;
+    height: 4rem;
+    border-radius: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+}
+
+.card-group:hover .card-icon-container {
+    transform: scale(1.1);
+}
+
+.card-icon {
+    width: 2rem;
+    height: 2rem;
+}
+
+.card-body {
+    margin-bottom: 1.5rem;
+}
+
+.card-count {
+    font-size: 3rem;
+    font-weight: bold;
+    color: #1a202c;
+    margin-bottom: 0.75rem;
+}
+
+.card-status-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.alert-icon {
+    width: 1rem;
+    height: 1rem;
+    color: #ef4444;
+}
+
+/* Modals */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+    padding: 1rem;
+    transition: opacity 0.3s ease-in-out;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.modal-open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.modal-content {
+    background-color: white;
+    border-radius: 1rem;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    max-width: 80rem;
+    width: 100%;
+    max-height: 90vh;
+    overflow: hidden;
+}
+
+.modal-header {
+    background-color: #20104d;
+    padding: 1rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.modal-title-group {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.modal-icon-wrapper {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid white;
+}
+
+.modal-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    color: white;
+}
+
+.modal-title {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: white;
+}
+
+.modal-close-btn {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s;
+    border: 2px solid white;
+    background: transparent;
+    cursor: pointer;
+}
+
+.modal-close-icon {
+    width: 1rem;
+    height: 1rem;
+    color: white;
+}
+
+.modal-table-container {
+    overflow: auto;
+    max-height: calc(90vh - 88px);
+    position: relative;
+}
+
+.modal-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    flex-direction: column;
+}
+
+.modal-loading p {
+    margin-top: 1rem;
+    color: #64748b;
+}
+
+.modal-error, .modal-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    flex-direction: column;
+    color: #b91c1c;
+    font-weight: 600;
+    text-align: center;
+}
+
+.modal-empty {
+    color: #4a5568;
+}
+
+/* Table */
+.anomaly-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    max-height: 500px; /* Add this */
+    overflow-y: auto; /* Add this */
+}
+
+.anomaly-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    min-width: 1500px;
+}
+
+.anomaly-table thead {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+}
+
+/* --- Uniform Font Size and Cell Padding --- */
+.anomaly-table th, 
+.anomaly-table td {
+    padding: 0; /* Remove padding from parent cell */
+    text-align: center;
+    vertical-align: middle;
+    white-space: nowrap;
+    font-size: 0.875rem; /* Set a common font size for all cells */
+}
+
+/* Override specific font sizes to inherit from the parent cell */
+.bold-text,
+.faded-text,
+.link-sin,
+.link-mobile,
+.pill,
+.remarks-textarea,
+.sort-button {
+    font-size: inherit;
+}
+
+/* Sticky column block styling */
+.sticky-block {
+    position: sticky;
+    left: 0;
+    z-index: 10;
+    background-color: white; /* Default background for body cells */
+}
+
+/* Sticky header block styling */
+.anomaly-table thead th.sticky-block {
+    background-color: #20104d; /* Header background color */
+}
+
+/* Inner div styling to act as columns */
+.sticky-block > div {
+    display: flex;
+    height: 100%;
+    width: 100%;
+    background: inherit;
+}
+
+.sticky-block .inner-cell-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1rem; /* Apply padding to inner div */
+    text-align: center;
+    font-weight: 600;
+    color: white;
+    background-color: #20104d;
+}
+
+.sticky-block .inner-cell-body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1rem; /* Apply padding to inner div */
+}
+
+/* Standard (non-sticky) columns */
+.anomaly-table th {
+    font-weight: 600;
+    color: white;
+    background-color: #20104d;
+    padding: 0.75rem 1rem; /* Apply padding to standard header cells */
+}
+
+.anomaly-table td {
+    padding: 0.75rem 1rem; /* Apply padding to standard data cells */
+}
+
+.anomaly-table tbody tr:hover {
+    background-color: #f8fafc;
+}
+
+.sort-button {
+    background: none;
+    border: none;
+    color: inherit;
+    font-weight: inherit;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    gap: 0.25rem;
+}
+
+.icon-up, .icon-down {
+    width: 1rem;
+    height: 1rem;
+    display: inline-block;
+}
+
+/* Table specific styling */
+.truncate-text {
+    max-width: 17.5rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin: 0 auto;
+}
+
+.bold-text {
+    color: #1a202c;
+    font-weight: 500;
+}
+
+.faded-text {
+    font-size: 0.75rem; /* Keep this smaller for a subtle effect */
+    color: #4a5568;
+}
+
+.link-sin {
+    background-color: #dbeafe;
+    color: #1e40af;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.5rem;
+    font-family: monospace;
+    text-decoration: none;
+    transition: underline 0.2s;
+}
+
+.link-sin:hover {
+    text-decoration: underline;
+}
+
+/* --- Remarks Textarea Style --- */
+.remarks-textarea {
+  width: 200px;
+  height: 28px; /* Set a fixed height */
+  line-height: 20px; /* Set a line-height equal to the height of a single line of text */
+  padding: 4px; /* Use symmetrical padding */
+  font-family: inherit;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  box-sizing: border-box;
+  resize: vertical;
+}
+
+.remarks-textarea:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+    outline: none;
+}
+
+.error-border {
+    border: 1px solid #dc2626 !important;
+}
+
+.remark-error-text {
+    font-size: 0.75rem;
+    color: #dc2626;
+    margin-top: 0.25rem;
+    align-self: flex-start; /* Aligns the text to the left */
+    white-space: normal;
+    padding-left: 10px;
+}
+
+.pill {
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.pill-green {
+    background-color: #d1fae5;
+    color: #047857;
+}
+
+.pill-red {
+    background-color: #fee2e2;
+    color: #b91c1c;
+}
+
+.pill-blue {
+    background-color: #dbeafe;
+    color: #1e40af;
+}
+
+.pill-gray {
+    background-color: #e5e7eb;
+    color: #4b5563;
+}
+
+.pill-gray-light {
+    background-color: #f1f5f9;
+    color: #475569;
+}
+
+.link-mobile {
+    color: #2563eb;
+    font-family: monospace;
+    transition: color 0.2s;
+}
+
+.link-mobile:hover {
+    color: #1d4ed8;
+}
+
+.btn {
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    transition: all 0.2s;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    font-size: 0.875rem;
+}
+
+.btn-primary {
+    background-color: #20104d;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #2d1a5f;
+    transform: scale(1.05);
+}
+
+.anomaly-table tbody tr:hover .sticky-block {
+    background-color: #f8fafc; /* Match the hover color of the rest of the row */
+}
+
+/* Ensure the inner divs also inherit the background */
+.anomaly-table tbody tr:hover .sticky-block > div {
+    background-color: inherit;
+}
+

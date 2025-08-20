@@ -44,6 +44,8 @@ import FreightEstimatorIcon from "@/assets/freight_estimator_icon.svg";
 import FreightEstimatorIconActive from "@/assets/freight_estimator_icon_active.svg";
 import RouteActiveIcon from "@/assets/route_active.svg";
 import RouteInactiveIcon from "@/assets/route_inactive.svg";
+import AnomalyDashboardActiveIcon from "@/assets/anomaly_dashboard_wg.svg";
+import AnomalyDashboardInactiveIcon from "@/assets/anomaly_dashboard_bg.svg";
 
 import LoadActive from "@/assets/load_active_icon.svg";
 import LoadInactive from "@/assets/load_deactive_icon.svg";
@@ -166,6 +168,14 @@ const navigationItems: NavItem[] = [
         icon: '',
         activeIcon: RouteActiveIcon,
         inactiveIcon: RouteInactiveIcon,
+        isImageIcon: true
+    },
+    {
+        id: 'anomalydashboard',
+        label: 'Anomaly Dashboard',
+        icon: '',
+        activeIcon: AnomalyDashboardActiveIcon,
+        inactiveIcon: AnomalyDashboardInactiveIcon,
         isImageIcon: true
     },
     {
