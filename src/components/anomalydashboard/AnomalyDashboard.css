@@ -1,9 +1,36 @@
-* AnomalyDashboard.css */
+/* AnomalyDashboard.css */
+
+/* --- CSS Variables for Consistency --- */
+:root {
+  --primary-color: #20104d;
+  --secondary-color: #f8fafc;
+  --border-color: #e2e8f0;
+  --text-color: #1a202c;
+  --text-faded: #64748b;
+
+  /* Card Colors */
+  --high-speed-bg: #EFF6FF;
+  --high-speed-color: #3B82F6;
+  --distance-bg: #FEF2F2;
+  --distance-color: #EF4444;
+  --toll-plaza-bg: #ECFDF5;
+  --toll-plaza-color: #10B981;
+  --no-zone-bg: #FFFBEB;
+  --no-zone-color: #F59E0B;
+
+  /* Table Column Widths */
+  --col-sno-width: 50px;
+  --col-sin-width: 150px;
+  --col-remarks-width: 250px;
+  --col-delivery-width: 250px;
+  --col-location-width: 250px;
+  --col-material-width: 150px;
+}
 
 /* General Layout */
 .dashboard-container {
     min-height: 100vh;
-    background: linear-gradient(to bottom right, #f8fafc, #f1f5f9);
+    background: linear-gradient(to bottom right, var(--secondary-color), #f1f5f9);
     font-family: Arial, sans-serif;
 }
 
@@ -25,7 +52,7 @@
 
 .spinner {
     border: 2px solid #f3f3f3;
-    border-top: 2px solid #1a202c;
+    border-top: 2px solid var(--text-color);
     border-radius: 50%;
     width: 3rem;
     height: 3rem;
@@ -63,7 +90,7 @@
     border-radius: 1rem;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--border-color);
     overflow: hidden;
 }
 
@@ -86,12 +113,12 @@
 .card-title {
     font-size: 1.125rem;
     font-weight: 600;
-    color: #1a202c;
+    color: var(--text-color);
     margin-bottom: 0.25rem;
 }
 
 .card-subtitle {
-    color: #64748b;
+    color: var(--text-faded);
     font-size: 0.875rem;
 }
 
@@ -121,7 +148,7 @@
 .card-count {
     font-size: 3rem;
     font-weight: bold;
-    color: #1a202c;
+    color: var(--text-color);
     margin-bottom: 0.75rem;
 }
 
@@ -134,7 +161,7 @@
 .alert-icon {
     width: 1rem;
     height: 1rem;
-    color: #ef4444;
+    color: var(--distance-color);
 }
 
 /* Modals */
@@ -171,7 +198,7 @@
 }
 
 .modal-header {
-    background-color: #20104d;
+    background-color: var(--primary-color);
     padding: 1rem 2rem;
     display: flex;
     align-items: center;
@@ -241,7 +268,7 @@
 
 .modal-loading p {
     margin-top: 1rem;
-    color: #64748b;
+    color: var(--text-faded);
 }
 
 .modal-error, .modal-empty {
@@ -250,7 +277,7 @@
     justify-content: center;
     padding: 2rem;
     flex-direction: column;
-    color: #b91c1c;
+    color: var(--distance-color);
     font-weight: 600;
     text-align: center;
 }
@@ -280,42 +307,27 @@
     z-index: 20;
 }
 
-/* --- Uniform Font Size and Cell Padding --- */
 .anomaly-table th, 
 .anomaly-table td {
-    padding: 0; /* Remove padding from parent cell */
+    padding: 0;
     text-align: center;
     vertical-align: middle;
     white-space: nowrap;
-    font-size: 0.875rem; /* Set a common font size for all cells */
+    font-size: 0.875rem;
 }
 
-/* Override specific font sizes to inherit from the parent cell */
-.bold-text,
-.faded-text,
-.link-sin,
-.link-mobile,
-.pill,
-.remarks-textarea,
-.sort-button {
-    font-size: inherit;
-}
-
-/* Sticky column block styling */
 .sticky-block {
     position: sticky;
     left: 0;
     z-index: 10;
-    background-color: white; /* Default background for body cells */
+    background-color: white;
 }
 
-/* Sticky header block styling */
 .anomaly-table thead th.sticky-block {
-    background-color: #20104d; /* Header background color */
+    background-color: var(--primary-color);
 }
 
-/* Inner div styling to act as columns */
-.sticky-block > div {
+.sticky-block > .sticky-flex {
     display: flex;
     height: 100%;
     width: 100%;
@@ -326,34 +338,41 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 0.75rem 1rem; /* Apply padding to inner div */
+    padding: 0.75rem 1rem;
     text-align: center;
     font-weight: 600;
     color: white;
-    background-color: #20104d;
+    background-color: var(--primary-color);
 }
 
 .sticky-block .inner-cell-body {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 0.75rem 1rem; /* Apply padding to inner div */
+    padding: 0.75rem 1rem;
 }
 
-/* Standard (non-sticky) columns */
 .anomaly-table th {
     font-weight: 600;
     color: white;
-    background-color: #20104d;
-    padding: 0.75rem 1rem; /* Apply padding to standard header cells */
+    background-color: var(--primary-color);
+    padding: 0.75rem 1rem;
 }
 
 .anomaly-table td {
-    padding: 0.75rem 1rem; /* Apply padding to standard data cells */
+    padding: 0.75rem 1rem;
 }
 
 .anomaly-table tbody tr:hover {
-    background-color: #f8fafc;
+    background-color: var(--secondary-color);
+}
+
+.anomaly-table tbody tr:hover .sticky-block {
+    background-color: var(--secondary-color);
+}
+
+.anomaly-table tbody tr:hover .sticky-block > .sticky-flex {
+    background-color: inherit;
 }
 
 .sort-button {
@@ -375,7 +394,6 @@
     display: inline-block;
 }
 
-/* Table specific styling */
 .truncate-text {
     max-width: 17.5rem;
     overflow: hidden;
@@ -385,12 +403,12 @@
 }
 
 .bold-text {
-    color: #1a202c;
+    color: var(--text-color);
     font-weight: 500;
 }
 
 .faded-text {
-    font-size: 0.75rem; /* Keep this smaller for a subtle effect */
+    font-size: 0.75rem;
     color: #4a5568;
 }
 
@@ -408,14 +426,13 @@
     text-decoration: underline;
 }
 
-/* --- Remarks Textarea Style --- */
 .remarks-textarea {
   width: 200px;
-  height: 28px; /* Set a fixed height */
-  line-height: 20px; /* Set a line-height equal to the height of a single line of text */
-  padding: 4px; /* Use symmetrical padding */
+  height: 28px;
+  line-height: 20px;
+  padding: 4px;
   font-family: inherit;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border-color);
   border-radius: 6px;
   box-sizing: border-box;
   resize: vertical;
@@ -428,14 +445,14 @@
 }
 
 .error-border {
-    border: 1px solid #dc2626 !important;
+    border: 1px solid var(--distance-color) !important;
 }
 
 .remark-error-text {
     font-size: 0.75rem;
-    color: #dc2626;
+    color: var(--distance-color);
     margin-top: 0.25rem;
-    align-self: flex-start; /* Aligns the text to the left */
+    align-self: flex-start;
     white-space: normal;
     padding-left: 10px;
 }
@@ -494,21 +511,17 @@
 }
 
 .btn-primary {
-    background-color: #20104d;
+    background-color: var(--primary-color);
     color: white;
 }
 
-.btn-primary:hover {
+.btn-primary:hover:not(:disabled) {
     background-color: #2d1a5f;
     transform: scale(1.05);
 }
 
-.anomaly-table tbody tr:hover .sticky-block {
-    background-color: #f8fafc; /* Match the hover color of the rest of the row */
+.btn-primary:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
 }
-
-/* Ensure the inner divs also inherit the background */
-.anomaly-table tbody tr:hover .sticky-block > div {
-    background-color: inherit;
-}
-
