@@ -66,6 +66,8 @@ const Header = ({ setReloadOnHeaderChange, isMapHelper, getAllShipment, isShipme
         return "Indent Management"
       case "/ptpkDashboard":
         return "PTPK Dashboard"
+      case "/anomalydashboard":
+        return "Anomaly Dashboard"
       case "/topDestination":
         return "Top Destination"
       case "/indentManagement/plant":
@@ -107,7 +109,7 @@ const Header = ({ setReloadOnHeaderChange, isMapHelper, getAllShipment, isShipme
             alignItems: "center",
           }}
         >
-          {isCorporateUser ?
+          {isCorporateUser ? 
             <div className="drop_down">
               {shippers.length && <Dropdown reload={setReloadOnHeaderChange} shippers={shippers} getAllShipment={getAllShipment} />}
             </div> :
