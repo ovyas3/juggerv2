@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useRef, useEffect } from "react"
-import styles from "./LoadDetails.module.css"
+import styles from "@/components/TransporterPerformance/LoadDetails/LoadDetails.module.css"
 import { DateTime } from 'luxon'
 import CustomDatePicker from '@/components/UI/CustomDatePicker/CustomDatePicker';
 import { Box, Typography, IconButton } from '@mui/material';
@@ -15,7 +15,7 @@ import Image from "next/image";
 import { Select } from "antd";
 import { Weight, Truck, Download, InfoIcon } from "lucide-react"
 import { jsontocsv } from "@/utils/jsonToCsv";
-import LoadDetailsGaugeChart from "./LoadDetailsGauge";
+import LoadDetailsGaugeChart from "@/components/TransporterPerformance/LoadDetails/LoadDetailsGauge"
 
 const finalDataObj = {
     allocated: {
@@ -40,7 +40,7 @@ const finalDataObj = {
     },
 }
 
-export default function OwnVehicleUsage() {
+export default function CementLoadDetails() {
     // Date States
     const today: any = new Date();
     const oneWeekAgo: any = new Date();
@@ -86,7 +86,7 @@ export default function OwnVehicleUsage() {
     const getZonesData = async () => {
         try {
             const response = await httpsGet('zones/get/', 0, router);
-            if (response?.statusCode === 200) {
+            if (response?.statusCode === 200 && response?.data?.zones) {
                 const { zones } = response.data;
                 setZonesWithStates(zones);
                 const zonesOpts = zones.map((zone: any) => ({
@@ -104,23 +104,29 @@ export default function OwnVehicleUsage() {
         try {
             const response = await httpsPost('stats/cr/getCarriers', {}, router, 1, false);
             if (response?.statusCode === 200) {
-                const carriers = response.data;
-                setCarrierOptions(carriers);
+                // Assign carriers data, using an empty array as a fallback if the data is undefined/null
+                const carriers = response.data || [];
+    
                 const carriersOpts = carriers.map((carrier: any) => ({
                     value: carrier._id,
                     label: carrier.parent_name,
                 }));
+    
                 setCarrierOptions(carriersOpts);
+            } else {
+                setCarrierOptions([]);
+                console.error('Error: Invalid status code for carriers data.');
             }
         } catch (error) {
             console.error('Error fetching carriers data:', error);
+            setCarrierOptions([]);
         }
     };
 
-    const getOwnVehicleUsage = async (from: number, to: number) => {
+    const getCementVehicleUsage = async (from: number, to: number) => {
         let payload: any = {
             from: from,
-            to: to
+            to: to,
         };
 
         if (selectedCarriers.length > 0) {
@@ -137,33 +143,29 @@ export default function OwnVehicleUsage() {
 
         try {
             setLoading(true);
-            const response = await httpsPost('load/dashboard/performance', payload, router, 1, false);
+            const response = await httpsPost('load/dashboard/performance-cement', payload, router, 1, false);
             if (response?.statusCode === 200) {
                 const res = response.data;
                 if (res && res.length > 0) {
                     const data = res[0];
                     //Allocated Data
                     const allocatedData = data?.dashboard1 && data?.dashboard1.length > 0 && data?.dashboard1[0]?.allocated || 0;
-                    const allocatedPercentage = Math.round((allocatedData / allocatedData) * 100);
+                    const allocatedPercentage = allocatedData === 0 ? 0 : Math.round((allocatedData / allocatedData) * 100); // Always 100
                     const allocatedValue = parseFloat(allocatedData.toFixed(2));
 
                     // Acceptance Data
                     const acceptedData = data?.dashboard1 && data?.dashboard1.length > 0 && data?.dashboard1[0]?.accepted || 0;
-                    const acceptancePercentage = Math.round((acceptedData / allocatedData) * 100);
+                    const acceptancePercentage = acceptedData === 0 ? 0 :Math.round((acceptedData / allocatedData) * 100);
                     const acceptanceValue = parseFloat(acceptedData.toFixed(2));
-
-                    // Rejected Data
-                    const rejectedPercentage = parseFloat(data.rejectedPercentage?.toString() || '0');
-                    const rejectedValue = parseFloat(data.rejectedActualValue?.toString() || '0');
 
                     // Registered Data
                     const registeredData = data?.dashboard1 && data?.dashboard1.length > 0 && data?.dashboard1[0]?.registered || 0;
-                    const registeredPercentage = Math.round((registeredData / allocatedData) * 100);
+                    const registeredPercentage = registeredData === 0 ? 0 : Math.round((registeredData / allocatedData) * 100);
                     const registeredValue = parseFloat(registeredData.toFixed(2));
 
                     // Fulfilled Data
                     const fulfilledData = data?.dashboard2 && data?.dashboard2.length > 0 && data?.dashboard2[0]?.load || 0;
-                    const fulfilledPercentage = Math.round((fulfilledData / allocatedData) * 100);
+                    const fulfilledPercentage = fulfilledData === 0 ? 0 :Math.round((fulfilledData / allocatedData) * 100);
                     const fulfilledValue = parseFloat(fulfilledData.toFixed(2));
 
                     const finalDataObj = {
@@ -196,18 +198,23 @@ export default function OwnVehicleUsage() {
         } catch (error) {
             setLoading(false);
             console.error('Error fetching material data:', error);
-        } finally {
-            setLoading(false);
         }
     };
 
     const handleSelectZone = (e: any) => {
         const zone = e;
         setSelectedZone(e);
-        const statesOpts = zonesWithStates.find((item: any) => item.zone === zone)?.lanes.map((lane: any) => ({
-            value: lane._id,
-            label: lane.name,
-        }));
+        
+        const selectedZoneData = zonesWithStates.find((item: any) => item.zone === zone);
+        
+        let statesOpts = [];
+        if (selectedZoneData && selectedZoneData.lanes) {
+            statesOpts = selectedZoneData.lanes.map((lane: any) => ({
+                value: lane._id,
+                label: lane.name,
+            }));
+        }
+
         setStateOptions(statesOpts);
     };
 
@@ -223,7 +230,7 @@ export default function OwnVehicleUsage() {
         if (startDate && endDate) {
             const newStartDate: any = service.millies(startDate);
             const newEndDate: any = service.millies(endDate);
-            getOwnVehicleUsage(newStartDate, newEndDate);
+            getCementVehicleUsage(newStartDate, newEndDate);
         }
     };
 
@@ -256,7 +263,7 @@ export default function OwnVehicleUsage() {
                 style={{ margin: !mobile ? '56px 0 0 70px' : '0px' }}
             >
                 {mobile && (
-                    <h1 className={styles.containeTitle}>Steel Carrier Scorecard</h1>
+                    <h1 className={styles.containeTitle}>Cement Carrier Scorecard </h1>
                 )}
                 <div className={styles.header}>
                     <div className={styles.filterGroup}>
@@ -372,7 +379,7 @@ export default function OwnVehicleUsage() {
                             value={finalData.registered.needleValue}
                             total={finalData.registered.bottomLabel}
                             percentage={finalData.registered.needleValue}
-                            title="Registered"
+                            title="Assigned"
                             threshold={finalData.registered.threshold}
                         />
                         <LoadDetailsGaugeChart
@@ -387,5 +394,4 @@ export default function OwnVehicleUsage() {
             </div>
         </>
     );
-
 };
