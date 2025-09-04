@@ -1,0 +1,207 @@
+/* Overlay background */
+.modalOverlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* Modal dialog box */
+  .locationsPopupDialog {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 28px rgba(0,0,0,0.18);
+    width: 480px;
+    max-width: 96vw;
+    padding: 0;
+    overflow: hidden;
+    font-family: 'Muli', sans-serif;
+  }
+  
+  .locationsPopupContainer {
+    width: 100%;
+    padding: 0;
+  }
+  
+  /* Modal Header */
+  .locationsPopupHeader {
+    height: 44px;
+    display: flex;
+    align-items: center;
+    background: #1648A1;
+    color: #fff;
+    font-size: 16px;
+    padding: 0 15px 0 6px;
+    font-weight: 500;
+    justify-content: space-between;
+  }
+  
+  .dialogCloseButton {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 22px;
+    cursor: pointer;
+    margin-left: 8px;
+  }
+  
+  /* Modal body */
+  .body {
+    width: 100%;
+    padding: 10px 0 0 0;
+    border-bottom: 1px solid #e2e2e2;
+  }
+  
+  .content {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding: 0 18px 8px 18px;
+  }
+  
+  .firstRow,
+  .secondRow,
+  .row,
+  .confirmation {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    min-height: 35px;
+  }
+  
+  /* Columns inside rows */
+  .statusLabel,
+  .label, .consent {
+    width: 35%;
+    font-weight: 500;
+    font-size: 13px;
+  }
+  
+  .colon {
+    width: 5%;
+    text-align: center;
+  }
+  
+  .yesNo,
+  .value {
+    flex: 0.2;
+    font-weight: 600;
+    font-size: 13px;
+  }
+  
+  .submitButton {
+    padding-left: 12px;
+  }
+  
+  .button {
+    background: #0b64c9;
+    color: #fff;
+    font-size: 12px;
+    padding: 5px 12px;
+    border-radius: 3px;
+    cursor: pointer;
+    min-width: 72px;
+    border: none;
+    text-align: center;
+  }
+  
+  .button:hover {
+    filter: brightness(0.95);
+  }
+  
+  .submitButtonYes .button {
+    background-color: #0cc319;
+    width: 60px !important;
+  }
+  
+  .submitButtonNo .button {
+    background-color: #E54131;
+    width: 60px !important;
+    margin-left: 12px;
+  }
+  
+  .confirmation {
+    margin: 14px 0 6px 0;
+    background: #e2e2e2;
+    border-radius: 4px;
+    padding: 10px 0;
+    justify-content: flex-start;
+  }
+  .confirmation .text {
+    padding: 0 36px 0 12px;
+    font-size: 15px;
+    color: #333;
+    font-weight: 400;
+  }
+  
+  
+  .unsubscribedNow {
+    width: 95%;
+    min-height: 22px;
+    margin: 0 auto;
+    text-align: center;
+    color: #1648A1;
+    font-size: 13.5px;
+    font-weight: 500;
+    margin-top: 12px;
+  }
+  
+  .unsubscribeText {
+    color: #1648A1;
+    font-weight: 600;
+  }
+  
+  .message {
+    display: flex;
+    height: 32px;
+    align-items: center;
+    margin: 4px 0 2px 0;
+  }
+  
+  .mes {
+    font-size: 13px;
+    line-height: 1.2;
+    color: #3d3d3d;
+  }
+  
+  .note {
+    margin: 12px 18px 10px 18px;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    background: #f7f8fa;
+    border-radius: 3px;
+    padding: 8px 7px 8px 9px;
+    font-size: 12px;
+    color: #6f6f6f;
+  }
+  
+  .note-text {
+    font-weight: 700;
+    color: #4388bc;
+    margin-right: 6px;
+    min-width: 45px;
+  }
+  
+  /* Flags for subscribe status */
+  .flagImgG {
+    background: #068b00;
+    color: #fff;
+    border-radius: 3px;
+    padding: 2px 10px;
+    font-weight: 500;
+    display: inline-block;
+  }
+  
+  .flagImgR {
+    background: #db1e2d;
+    color: #fff;
+    border-radius: 3px;
+    padding: 2px 10px;
+    font-weight: 500;
+    display: inline-block;
+  }
+  

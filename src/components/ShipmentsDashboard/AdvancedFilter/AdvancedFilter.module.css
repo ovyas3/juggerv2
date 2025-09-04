@@ -1,0 +1,161 @@
+/* AdvancedFilter.module.css */
+.advancedSearchSection {
+    position: fixed;
+    right: 0;
+    top: 56px;
+    width: 380px;
+    height: calc(100% - 60px);
+    background: #fff;
+    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.15);
+    display: flex;
+    flex-direction: column;
+    z-index: 1000;
+    border-left: 1px solid #e5e5e5;
+  }
+  
+  .searchHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 30px;
+    font-size: 20px;
+    font-weight: 600;
+    border-bottom: 1px solid #4F46E5;
+    background-color: #4F46E5;
+    color: #FFFFFF;
+  }
+  
+  .closeBtn {
+    background: none;
+    border: none;
+    color: #FFFFFF;
+    cursor: pointer;
+    font-size: 24px;
+    padding: 0;
+    line-height: 1;
+  }
+  
+  .searchBody {
+    flex: 1;
+    overflow-y: auto;
+    padding: 18px 20px;
+    background: #fafafa;
+  }
+  
+  .filterSection {
+    margin-bottom: 15px;
+  }
+  
+  .label {
+    display: block;
+    font-size: 12px;
+    color: #000;
+    margin-bottom: 4px;
+    padding-left: 10px;
+  }
+  
+  .input,
+  .inputField {
+    height: 28px;
+    width: 98%;
+    border: solid 1px #e3e3e3;
+    border-radius: 4px;
+    outline: none;
+    padding: 0 8px;
+    box-sizing: border-box;
+    background-color: #fff;
+  }
+  
+  .inputSelect {
+    width: 100%;
+    height: 28px !important;
+    background-color: #fff;
+    border: solid 1px #e3e3e3;
+    border-radius: 4px;
+    color: #000;
+    box-sizing: border-box;
+  }
+  
+  /* Override MUI default styles */
+  .inputSelect:global(.MuiInputBase-root) {
+    height: 28px;
+    min-height: 28px;
+    font-size: 14px;
+  }
+  
+  .inputSelect :global(.MuiSelect-select) {
+    padding: 4px 8px !important;
+    font-size: 14px !important;
+    height: 20px !important;
+    line-height: 20px !important;
+    min-height: unset !important;
+  }
+  
+  .inputSelect :global(.MuiOutlinedInput-notchedOutline) {
+    border: none !important;
+  }
+  
+  .carrierSelected {
+    height: 27px !important;
+    border-radius: 5px !important;
+    padding-left: 10px !important;
+    width: 97% !important;
+  }
+  
+  .carrierSelected :global(.MuiSelect-select) {
+    color: #000 !important;
+  }
+  
+  .searchInputWrapper {
+    padding: 8px;
+    border-bottom: 1px solid #e3e3e3;
+  }
+  
+  .searchInput {
+    width: 100%;
+    height: 28px;
+    border: solid 1px #e3e3e3;
+    border-radius: 4px;
+    padding: 4px 8px;
+    box-sizing: border-box;
+  }
+  
+  .menuItem {
+    padding: 0;
+  }
+  
+  .dateIcon {
+    font-size: 20px;
+    color: #767676;
+    cursor: pointer;
+  }
+  
+  .searchFooter {
+    border-top: 1px solid #e5e5e5;
+    display: flex;
+    justify-content: space-around;
+    padding: 16px;
+    background-color: #fff;
+  }
+  
+  .submitButton .button,
+  .submitButtonClear .button {
+    text-align: center;
+    border-radius: 4px;
+    width: 80px;
+    padding: 10px 12px;
+    color: #fff;
+    font-size: 14px;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .submitButton .button {
+    background-color: #ec2055;
+  }
+  
+  .submitButtonClear .button {
+    background-color: #7c7c7c;
+  }
+  

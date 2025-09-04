@@ -1,0 +1,349 @@
+/* Modal Overlay */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Muli', sans-serif;
+}
+
+/* Main Dialog */
+.epodPreviewDialog {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 28px rgba(0, 0, 0, 0.18);
+  width: 1200px;
+  max-width: 96vw;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.epodPreviewContainer {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header */
+.epodPreviewHeader {
+  height: 44px;
+  display: flex;
+  align-items: center;
+  background: #1648A1;
+  color: #fff;
+  font-size: 16px;
+  padding: 0 15px 0 20px;
+  font-weight: 500;
+  justify-content: space-between;
+}
+
+.dialogCloseButton {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 4px;
+}
+
+.dialogCloseButton:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Body */
+.epodPreviewBody {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  padding: 20px;
+  gap: 24px;
+  max-height: calc(90vh - 84px);
+}
+
+/* Preview Container */
+.previewContainer {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow: hidden;
+}
+
+.mainPreview {
+  flex: 1;
+  border: 1px solid #e2e2e2;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  background-color: #f8f9fa;
+  min-height: 400px;
+}
+
+.previewImage {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.previewPdf {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+.previewActions {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 4px;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.actionButton {
+  background: none;
+  border: none;
+  color: #1648A1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+}
+
+.actionButton:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Thumbnails */
+.thumbnailContainer {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 4px 0;
+  min-height: 80px;
+}
+
+.thumbnail {
+  width: 64px;
+  height: 64px;
+  border: 1px solid #e2e2e2;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  overflow: hidden;
+  background-color: #f8f9fa;
+}
+
+.thumbnail:hover {
+  border-color: #1648A1;
+}
+
+.thumbnailImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.pdfIcon {
+  color: #E53935;
+  font-size: 32px !important;
+}
+
+/* Details Panel */
+.detailsPanel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.deliverySelector {
+  margin-bottom: 8px;
+}
+
+.selectInput {
+  width: 100%;
+}
+
+.detailsSection {
+  border: 1px solid #e2e2e2;
+  border-radius: 8px;
+  padding: 12px;
+  background-color: #f8f9fa;
+}
+
+.detailRow {
+  display: flex;
+  margin-bottom: 8px;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.detailLabel {
+  flex: 1;
+  color: #555;
+  font-weight: 500;
+  min-width: 140px;
+}
+
+.detailValue {
+  flex: 1.5;
+  color: #333;
+  font-weight: 400;
+  word-break: break-word;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Action Buttons */
+.actionButtons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid #e2e2e2;
+}
+
+.approveButton {
+  background-color: #0b64c9 !important;
+  color: white !important;
+  text-transform: none !important;
+  font-weight: 500 !important;
+  padding: 6px 20px !important;
+  border-radius: 4px !important;
+}
+
+.rejectButton {
+  background-color: #E54131 !important;
+  color: white !important;
+  text-transform: none !important;
+  font-weight: 500 !important;
+  padding: 6px 20px !important;
+  border-radius: 4px !important;
+}
+
+/* Rejection Dialog */
+.rejectionDialog {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  border-radius: 8px;
+}
+
+.rejectionContent {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 500px;
+}
+
+.rejectionContent h3 {
+  margin-top: 0;
+  margin-bottom: 16px;
+  color: #333;
+  font-size: 16px;
+}
+
+.reasonInput {
+  width: 100%;
+  min-height: 100px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-bottom: 16px;
+  font-family: inherit;
+  resize: vertical;
+}
+
+.rejectionActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.cancelButton {
+  text-transform: none !important;
+  border-color: #999 !important;
+  color: #333 !important;
+  font-weight: 500 !important;
+}
+
+.submitButton {
+  background-color: #0b64c9 !important;
+  color: white !important;
+  text-transform: none !important;
+  font-weight: 500 !important;
+}
+
+/* Scrollbar Styling */
+.detailsPanel::-webkit-scrollbar {
+  width: 6px;
+}
+
+.detailsPanel::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.detailsPanel::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.detailsPanel::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+.thumbnailContainer::-webkit-scrollbar {
+  height: 6px;
+}
+
+.thumbnailContainer::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.thumbnailContainer::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.thumbnailContainer::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}

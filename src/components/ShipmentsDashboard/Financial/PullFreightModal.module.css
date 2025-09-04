@@ -1,0 +1,35 @@
+/* PullFreightModal.module.css */
+.dialogPullFreight {
+    flex-direction: column;
+    align-items: center;
+    width: 696px;
+    padding: 20px;
+    position: relative;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .closeButton {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+  }
+  
+  .dialog_header {
+    margin-bottom: 20px;
+  }
+  
+  .dialog_title {
+    color: #42454E;
+    font-size: 20px;
+    font-weight: 500;
+  }
+  
+  /* Add all other styles from your Angular SCSS */
+  /* Make sure to convert SCSS nesting to flat CSS */
+  /* Add all the floating label styles, input styles, etc. */

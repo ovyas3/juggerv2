@@ -1,0 +1,121 @@
+.dialogPaper {
+  width: 500px;
+  max-width: 100%;
+  font-family: 'Muli', sans-serif;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 50px;
+  padding: 0 16px;
+  font-size: 16px;
+  font-weight: 400;
+  color: #fff;
+  background-color: #2962FF;
+  margin: 0;
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+}
+
+.closeButton:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.closeButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.section {
+  padding: 16px;
+}
+
+.reasonsMenu {
+  margin-bottom: 16px;
+}
+
+.select {
+  width: 100%;
+}
+
+.reasonBox {
+  margin-top: 16px;
+}
+
+.actions {
+  padding: 8px 16px 16px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.cancelButton {
+  background-color: #a4a4a4;
+  color: white;
+  text-transform: none;
+  padding: 6px 16px;
+  border-radius: 4px;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.cancelButton:hover {
+  background-color: #8a8a8a;
+}
+
+.submitButton {
+  background-color: #ee1f53;
+  color: white;
+  text-transform: none;
+  padding: 6px 16px;
+  border-radius: 4px;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.submitButton:hover {
+  background-color: #d41a49;
+}
+
+.submitButton:disabled {
+  background-color: #ffb3c5;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* Loading state */
+.loading {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  .dialogPaper {
+    margin: 16px;
+    width: calc(100% - 32px);
+  }
+  
+  .actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .cancelButton,
+  .submitButton {
+    width: 100%;
+  }
+}

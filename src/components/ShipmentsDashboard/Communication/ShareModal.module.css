@@ -1,0 +1,97 @@
+.dialogPaper {
+  width: 900px;
+  max-width: 100%;
+  height: 135px;
+  overflow: hidden;
+}
+
+.head {
+  height: 40px;
+  width: 100%;
+  background-color: #1648A1;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.label {
+  color: #fff;
+  font-size: 16px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.closeButton {
+  color: #fff;
+  padding: 4px;
+  margin-left: 8px;
+}
+
+.body {
+  padding: 16px;
+}
+
+.inputContainer {
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+.inputWrapper {
+  display: flex;
+  align-items: center;
+  margin-top: 8px;
+  position: relative;
+}
+
+.input {
+  flex: 1;
+  height: 36px;
+  padding: 8px 12px;
+  border: 1px solid #d3d3d3;
+  border-radius: 4px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.input:focus {
+  border-color: #1648A1;
+}
+
+.copyButton {
+  position: absolute;
+  right: 40px;
+  color: #666;
+  padding: 6px;
+  margin-left: 4px;
+}
+
+.whatsappButton {
+  position: absolute;
+  right: 8px;
+  color: #25D366;
+  padding: 6px;
+}
+
+.copiedText {
+  position: absolute;
+  right: 40px;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s;
+  right: 80px;
+}
+
+.copiedText.visible {
+  opacity: 1;
+}

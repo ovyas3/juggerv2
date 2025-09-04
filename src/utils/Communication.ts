@@ -9,6 +9,8 @@ const prefix = [
   environment.API_URL_DASHBOARD,
   environment.API_URL_DASHBOARD2,
   environment.API_URL_DASHBOARD3,
+  environment.API_URL_NEW_1,
+  environment.API_URL_NEW_2,
 ]
 
 const parent = [

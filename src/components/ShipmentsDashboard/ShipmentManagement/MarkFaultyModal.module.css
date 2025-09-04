@@ -1,0 +1,125 @@
+/* src/components/ShipmentsDashboard/Modals/MarkFaultyModal.module.css */
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .modal {
+    background: white;
+    border-radius: 8px;
+    width: 400px;
+    max-width: 90%;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+  
+  .header {
+    padding: 16px;
+    display: flex;
+    justify-content: center;
+    position: relative;
+  }
+  
+  .iconContainer {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .icon {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  
+  .closeButton {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #6b7280;
+    padding: 4px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .closeButton:hover {
+    background-color: #f3f4f6;
+  }
+  
+  .body {
+    padding: 0 24px 24px;
+    text-align: center;
+  }
+  
+  .message {
+    font-size: 16px;
+    color: #374151;
+    line-height: 1.5;
+  }
+  
+  .gpsProvider {
+    font-weight: 500;
+    margin-bottom: 12px;
+    color: #1f2937;
+  }
+  
+  .footer {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    padding: 16px 24px;
+    border-top: 1px solid #e5e7eb;
+  }
+  
+  .cancelButton,
+  .confirmButton {
+    padding: 8px 24px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .cancelButton {
+    background-color: #f3f4f6;
+    color: #374151;
+    border: 1px solid #d1d5db;
+  }
+  
+  .cancelButton:hover:not(:disabled) {
+    background-color: #e5e7eb;
+  }
+  
+  .confirmButton {
+    background-color: #ef4444;
+    color: white;
+    border: none;
+  }
+  
+  .confirmButton:hover:not(:disabled) {
+    background-color: #dc2626;
+  }
+  
+  .cancelButton:disabled,
+  .confirmButton:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
