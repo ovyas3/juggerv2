@@ -79,8 +79,8 @@ const JdeBookShipment: React.FC<JdeBookShipmentProps> = ({
     setLoading(true);
 
     const url = isUnplanned 
-      ? '/v1/jde/unplannedShipment/fetch' 
-      : '/v1/jde/secondaryShipment/fetch';
+      ? 'jde/unplannedShipment/fetch' 
+      : 'jde/secondaryShipment/fetch';
 
     try {
       const payload = {
@@ -124,8 +124,8 @@ const JdeBookShipment: React.FC<JdeBookShipmentProps> = ({
 
     setLoading(true);
     const url = isUnplanned 
-      ? '/v1/jde/unplannedShipment/fetch' 
-      : '/v1/jde/secondaryShipment/fetch';
+      ? 'jde/unplannedShipment/fetch' 
+      : 'jde/secondaryShipment/fetch';
 
     try {
       const payload = {
