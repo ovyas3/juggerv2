@@ -1,0 +1,226 @@
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(2px);
+  }
+  
+  .uploadDialog {
+    background: white;
+    border-radius: 8px;
+    width: 100%;
+    max-width: 500px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+  }
+  
+  .dialogHeader {
+    padding: 16px 20px;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f9fafb;
+  }
+  
+  .dialogTitle {
+    font-size: 18px;
+    font-weight: 600;
+    color: #111827;
+  }
+  
+  .dialogClose {
+    font-size: 20px;
+    cursor: pointer;
+    color: #6b7280;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: all 0.2s;
+  }
+  
+  .dialogClose:hover {
+    background-color: #f3f4f6;
+    color: #111827;
+  }
+  
+  .uploadArea {
+    padding: 32px 20px;
+    border: 2px dashed #d1d5db;
+    border-radius: 8px;
+    text-align: center;
+    margin: 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background-color: #f9fafb;
+  }
+  
+  .uploadArea:hover, .dragOver {
+    border-color: #4f46e5;
+    background-color: #f5f3ff;
+  }
+  
+  .uploadIcon {
+    font-size: 36px;
+    margin-bottom: 12px;
+    color: #4f46e5;
+  }
+  
+  .uploadText {
+    font-size: 16px;
+    font-weight: 500;
+    color: #111827;
+    margin-bottom: 8px;
+  }
+  
+  .uploadHint {
+    font-size: 14px;
+    color: #6b7280;
+    line-height: 1.4;
+  }
+  
+  .fileList {
+    margin: 0 20px 20px;
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+  }
+  
+  .fileItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    border-bottom: 1px solid #f3f4f6;
+    background-color: white;
+  }
+  
+  .fileItem:last-child {
+    border-bottom: none;
+  }
+  
+  .fileInfo {
+    flex: 1;
+    min-width: 0;
+  }
+  
+  .fileName {
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 14px;
+    color: #111827;
+  }
+  
+  .fileSize {
+    font-size: 12px;
+    color: #6b7280;
+    margin-top: 2px;
+    display: block;
+  }
+  
+  .removeFile {
+    background: none;
+    border: none;
+    color: #9ca3af;
+    cursor: pointer;
+    font-size: 16px;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: all 0.2s;
+  }
+  
+  .removeFile:hover {
+    background-color: #fee2e2;
+    color: #dc2626;
+  }
+  
+  .errorText {
+    color: #dc2626;
+    font-size: 14px;
+    padding: 0 20px;
+    margin-bottom: 16px;
+    white-space: pre-line;
+  }
+  
+  .dialogFooter {
+    padding: 16px 20px;
+    border-top: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    background-color: #f9fafb;
+  }
+  
+  .cancelButton, .submitButton {
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .cancelButton {
+    background-color: #f3f4f6;
+    color: #4b5563;
+    border: 1px solid #d1d5db;
+  }
+  
+  .cancelButton:hover {
+    background-color: #e5e7eb;
+  }
+  
+  .submitButton {
+    background-color: #4f46e5;
+    color: white;
+    border: 1px solid #4f46e5;
+  }
+  
+  .submitButton:hover {
+    background-color: #4338ca;
+  }
+  
+  .submitButton:disabled {
+    background-color: #a5b4fc;
+    border-color: #a5b4fc;
+    cursor: not-allowed;
+  }
+  
+  /* Custom scrollbar */
+  .fileList::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .fileList::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 0 0 6px 6px;
+  }
+  
+  .fileList::-webkit-scrollbar-thumb {
+    background: #c7d2fe;
+    border-radius: 3px;
+  }
+  
+  .fileList::-webkit-scrollbar-thumb:hover {
+    background: #a5b4fc;
+  }

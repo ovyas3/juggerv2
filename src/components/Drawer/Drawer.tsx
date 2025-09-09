@@ -171,6 +171,14 @@ const navigationItems: NavItem[] = [
         isImageIcon: true
     },
     {
+        id: 'shipmentsDashboard',
+        label: 'Shipments Dashboard',
+        icon: '',
+        activeIcon: RouteActiveIcon,
+        inactiveIcon: RouteInactiveIcon,
+        isImageIcon: true
+    },
+    {
         id: 'anomalydashboard',
         label: 'Anomaly Dashboard',
         icon: '',

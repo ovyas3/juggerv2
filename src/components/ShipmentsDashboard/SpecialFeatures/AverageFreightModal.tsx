@@ -1,0 +1,59 @@
+import React from 'react';
+import styles from '../ShipmentsDashboard.module.css';
+
+interface FreightItem {
+  id: string;
+  carrier: string;
+  amount: number;
+}
+
+interface AverageFreightModalProps {
+  show: boolean;
+  onClose: () => void;
+  averageFreightData: FreightItem[];
+}
+
+const AverageFreightModal: React.FC<AverageFreightModalProps> = ({
+  show,
+  onClose,
+  averageFreightData
+}) => {
+  if (!show) return null;
+
+  return (
+    <div className={styles.modalOverlay} onClick={onClose}>
+      <div className={styles.detailsPopupDialog} onClick={(e) => e.stopPropagation()}>
+        <div className={styles.detailsPopupContainer}>
+          <div className={styles.popupHeader}>
+            <h2>Average Freight Details</h2>
+            <button onClick={onClose}>
+              ✕
+            </button>
+          </div>
+          <div className={styles.detailsTableContainer}>
+            <table className={styles.detailsTable}>
+              <thead>
+                <tr>
+                  <th>Shipment ID</th>
+                  <th>Carrier</th>
+                  <th>Freight Amount (₹)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {averageFreightData.map((item, index) => (
+                  <tr key={index}>
+                    <td>{item.id}</td>
+                    <td>{item.carrier}</td>
+                    <td>{item.amount.toLocaleString()}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default AverageFreightModal;

@@ -1,0 +1,92 @@
+.main {
+  width: 100%;
+  height: auto;
+  overflow: hidden;
+  font-family: 'Muli', sans-serif;
+}
+
+.header {
+  text-align: left;
+  font-size: 16px;
+  font-weight: 400;
+  padding-top: 10px;
+  padding-left: 10px;
+  color: #fff;
+  border-bottom: solid 1px #b7b8b6;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  width: 100%;
+  border: 2px solid #4F46E5;
+  padding: 0 10px;
+  background-color: #4F46E5;
+  margin: 0 auto;
+  border-radius: 1px;
+  color: #fff;
+  height: 48px;
+}
+
+.closeIcon {
+  cursor: pointer;
+  font-size: 22px;
+  margin-right: 6px;
+}
+
+.section {
+  padding: 10px;
+  font-size: 14px;
+}
+
+.required {
+  color: red;
+}
+
+.inputContainer {
+  width: 95%;
+  padding: 10px;
+}
+
+.inputSelect {
+  width: 100%;
+  outline: none;
+  border: solid 1px #e7e8e9;
+  border-radius: 3px;
+  background: #ffffff;
+  text-align: left;
+  font-size: 14px;
+  font-family: 'Muli', sans-serif;
+  padding: 5px 0px 2px 2px;
+}
+
+.title {
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.submitButton {
+  font-family: 'Muli', sans-serif;
+  float: right;
+  margin-right: 10px;
+  margin-bottom: 10px;
+  margin-top: 10px;
+}
+
+.button {
+  text-align: center;
+  border-radius: 4px;
+  width: 80px;
+  padding: 8px 4px;
+  color: #fff;
+  background-color: #4F46E5;
+  font-size: 13px;
+  cursor: pointer;
+  margin-top: 1px;
+  margin-bottom: 1px;
+  border: none;
+}
+
+.selectAll {
+  margin: 5px 17px;
+}

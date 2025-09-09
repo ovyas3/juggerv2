@@ -1,0 +1,125 @@
+.container {
+  min-width: 600px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.datePickerContainer {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.radioGroup {
+  margin-bottom: 16px;
+}
+
+.contentBox {
+  margin-bottom: 16px;
+}
+
+.serialList {
+  maxHeight: 300px;
+  overflowY: 'auto';
+  padding: 8px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+}
+
+.serialItem {
+  display: flex;
+  align-items: center;
+  padding: 4px 0;
+}
+
+.serialItem:hover {
+  background-color: #f5f5f5;
+}
+
+.serialCheckbox {
+  marginRight: 8px;
+}
+
+.serialNumber {
+  flexGrow: 1;
+}
+
+.submitButton {
+  display: flex;
+  justify-content: flex-end;
+  marginTop: 16px;
+}
+
+.serialInvoicesContainer {
+  display: flex;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  overflow: hidden;
+  marginBottom: 16px;
+}
+
+.serialColumn, .invoiceColumn {
+  width: 50%;
+  maxHeight: 300px;
+  overflowY: auto;
+  padding: 8px;
+}
+
+.serialColumn {
+  borderRight: 1px solid #e0e0e0;
+}
+
+.serialItemSelectable {
+  padding: 8px;
+  cursor: pointer;
+}
+
+.serialItemSelectable:hover {
+  background-color: #f5f5f5;
+}
+
+.serialItemSelected {
+  background-color: #e3f2fd;
+}
+
+.serialItemSelected:hover {
+  background-color: #bbdefb;
+}
+
+.invoiceItem {
+  padding: 4px 0;
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  marginTop: 16px;
+}
+
+.loadingContainer {
+  display: flex;
+  justifyContent: center;
+  alignItems: center;
+  minHeight: 200px;
+}
+
+.searchButton {
+  width: 80px;
+  display: grid;
+  place-items: center;
+  height: 30px;
+  border-radius: 4px;
+  color: white;
+  float: right;
+  margin: 15px;
+  cursor: pointer;
+  border: none;
+  background-color: #4F46E5;
+  color: white;
+}

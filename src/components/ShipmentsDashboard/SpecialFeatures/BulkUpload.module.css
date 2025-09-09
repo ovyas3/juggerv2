@@ -1,0 +1,220 @@
+/* Main dialog container */
+.dialog {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.dialogContent {
+  padding: 20px 24px;
+  min-height: 200px;
+}
+
+/* Section styling */
+.section {
+  padding: 16px 0;
+}
+
+.unit {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Input container */
+.inputContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+}
+
+.required {
+  color: #EF4444;
+  margin-left: 2px;
+}
+
+/* Select input */
+.select {
+  margin-top: 4px;
+}
+
+.selectInput {
+  background-color: #F9FAFB;
+  border-radius: 6px;
+}
+
+/* File upload section */
+.uploadContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.uploadLabel {
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+}
+
+.fileInputContainer {
+  position: relative;
+  width: 100%;
+}
+
+.fileInput {
+  position: absolute;
+  width: 0.1px;
+  height: 0.1px;
+  opacity: 0;
+  overflow: hidden;
+  z-index: -1;
+}
+
+.fileInputLabel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  background-color: #F9FAFB;
+  border: 1px dashed #D1D5DB;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 14px;
+  color: #6B7280;
+}
+
+.fileInputLabel:hover {
+  background-color: #F3F4F6;
+  border-color: #9CA3AF;
+}
+
+.uploadIcon {
+  color: #4F46E5;
+}
+
+.fileTypeInfo {
+  font-size: 12px;
+  color: #6B7280;
+  margin-top: 4px;
+}
+
+/* Download section */
+.downloadContainer {
+  margin-top: 8px;
+}
+
+.downloadLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #4F46E5;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.downloadLink:hover {
+  color: #4338CA;
+  text-decoration: underline;
+}
+
+/* Dialog actions */
+.dialogActions {
+  padding: 16px 24px;
+  border-top: 1px solid #E5E7EB;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+/* Buttons */
+.cancelButton {
+  padding: 8px 16px;
+  border: 1px solid #D1D5DB;
+  border-radius: 4px;
+  background: white;
+  color: #4B5563;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cancelButton:hover {
+  background-color: #F3F4F6;
+  border-color: #9CA3AF;
+}
+
+.cancelButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.submitButton {
+  padding: 8px 24px;
+  border: none;
+  border-radius: 4px;
+  background-color: #4F46E5;
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 100px;
+}
+
+.submitButton:hover {
+  background-color: #4338CA;
+}
+
+.submitButton:disabled {
+  background-color: #A5B4FC;
+  cursor: not-allowed;
+}
+
+.fileInputLabel {
+  cursor: pointer;
+  color: #4F46E5;
+}
+
+/* Loading state */
+.loadingOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  border-radius: 8px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .dialogContent {
+    padding: 16px;
+  }
+  
+  .dialogActions {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .cancelButton,
+  .submitButton {
+    width: 100%;
+  }
+}

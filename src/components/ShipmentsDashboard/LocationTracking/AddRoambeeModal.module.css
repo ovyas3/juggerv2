@@ -1,0 +1,126 @@
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.dialogMain {
+  background: #fff;
+  border-radius: 8px;
+  width: 460px !important;
+  max-width: 90%;
+  box-shadow: 0 11px 15px -7px rgba(0,0,0,.2), 
+              0 24px 38px 3px rgba(0,0,0,.14), 
+              0 9px 46px 8px rgba(0,0,0,.12);
+}
+
+.section {
+  padding: 24px;
+}
+
+.commentSection {
+  /* Removed width: 50% to allow flexible sizing */
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+/* Use Flexbox to align label and input */
+.uploadFile {
+  display: flex;
+  align-items: center;
+  gap: 16px; /* Creates space between the label and the input field */
+}
+
+.inputLabel {
+  font-size: 14px;
+  color: #333;
+  font-weight: 500;
+  flex-shrink: 0; /* Prevents the label from shrinking */
+}
+
+.inputContainer {
+  position: relative;
+  flex-grow: 1; /* Allows the input container to fill remaining space */
+  float: none !important;
+  width: 97% !important;
+}
+
+.inputField {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  transition: border-color 0.2s;
+}
+
+.inputField:focus {
+  outline: none;
+  border-color: #3f51b5;
+}
+
+/* New container to manage button alignment */
+.actionsContainer {
+  display: flex;
+  justify-content: flex-end; /* Aligns button to the right */
+  padding-top: 16px;
+  margin-top: 16px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.submitButton {
+  background-color: #e54131; /* Your requested button color */
+  color: white;
+  padding: 10px 24px;
+  border-radius: 4px;
+  font-weight: 500;
+  font-size: 14px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s, opacity 0.2s;
+}
+
+.submitButton:hover:not(.disabled) {
+  background-color: #c43528; /* A darker shade for the hover effect */
+}
+
+.submitButton.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Loader styles are unchanged */
+.loader {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+  border-radius: 8px;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #2962ff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
