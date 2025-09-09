@@ -1,5 +1,6 @@
 import React, { useState, useRef, ChangeEvent, DragEvent } from 'react';
-import styles from '../ShipmentsDashboard.module.css';
+import styles from './UploadModal.module.css';
+import ModalHeader from '@/components/UI/ModalHeader/ModalHeader';
 
 interface UploadModalProps {
   show: boolean;
@@ -108,10 +109,10 @@ const UploadModal: React.FC<UploadModalProps> = ({
   return (
     <div className={styles.modalOverlay} onClick={onClose}>
       <div className={styles.uploadDialog} onClick={e => e.stopPropagation()}>
-        <div className={styles.dialogHeader}>
-          <div className={styles.dialogTitle}>{title}</div>
-          <div className={styles.dialogClose} onClick={onClose}>✕</div>
-        </div>
+        <ModalHeader 
+           title={title}
+           onClose={onClose}
+        />
         
         <div 
           className={`${styles.uploadArea} ${isDragging ? styles.dragOver : ''}`}

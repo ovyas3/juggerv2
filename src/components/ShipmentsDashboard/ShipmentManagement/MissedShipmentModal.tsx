@@ -1,112 +1,134 @@
+// MissedShipmentModal.tsx
 import React, { useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { useSnackbar } from "@/hooks/snackBar";
+import { httpsPost } from '@/utils/Communication';
 import styles from './MissedShipmentModal.module.css';
+import ModalHeader from '@/components/UI/ModalHeader/ModalHeader';
 
 interface MissedShipmentModalProps {
+  show: boolean;
   onClose: () => void;
-  onSubmit: (data: { doNumber: string; vehicleNumber: string; regNumber: string }) => void;
-  loading?: boolean;
+  onSuccess?: () => void;
 }
 
 const MissedShipmentModal: React.FC<MissedShipmentModalProps> = ({
+  show,
   onClose,
-  onSubmit,
-  loading = false,
+  onSuccess
 }) => {
-  const { t } = useTranslation();
+  const { showMessage } = useSnackbar();
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     doNumber: '',
     vehicleNumber: '',
-    regNumber: '',
+    registrationNumber: ''
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: value,
+      [name]: value
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSubmit(formData);
+  const handleSubmit = async () => {
+    const { doNumber, vehicleNumber, registrationNumber } = formData;
+    
+    if (!doNumber || !vehicleNumber || !registrationNumber) {
+      showMessage('Please fill all fields', 'error');
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      const response = await httpsPost(
+        'v1/utility/pullMissedShipmentJSPL',
+        {
+          do_numbers: doNumber,
+          vehicle_no: vehicleNumber,
+          registration_number: registrationNumber
+        },
+        {},
+        4
+      );
+
+      if (response.statusCode === 200) {
+        showMessage('Missed Shipment Added', 'success');
+        onSuccess?.();
+        onClose();
+      }
+    } catch (error: any) {
+      showMessage(
+        error.response?.data?.message || 'Failed to add missed shipment',
+        'error'
+      );
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  return (
-    <div className={styles.modalOverlay} onClick={onClose}>
-      <div className={styles.modal} onClick={e => e.stopPropagation()}>
-        <div className={styles.header}>
-          <div className={styles.dialogTitle}>
-            {t('MYSHIPMENTS.missedShipment')}
-          </div>
-          <button className={styles.closeButton} onClick={onClose}>
-            <span className="material-icons">close</span>
-          </button>
-        </div>
+  if (!show) return null;
 
-        <form onSubmit={handleSubmit} className={styles.form}>
+  return (
+    <div className={styles.overlay} onClick={onClose}>
+      <div className={styles.modal} onClick={e => e.stopPropagation()}>
+
+         <ModalHeader title="Missed Shipment" onClose={onClose} />
+
+        <div className={styles.body}>
           <div className={styles.formGroup}>
-            <div className={styles.inputGroup}>
+            <div className={styles.inputContainer}>
               <input
                 type="text"
                 name="doNumber"
-                className={styles.inputField}
                 value={formData.doNumber}
                 onChange={handleInputChange}
+                className={styles.inputField}
                 required
-                disabled={loading}
               />
-              <label className={styles.floatingLabel}>
-                {t('DO number')}
-              </label>
+              <label className={styles.floatingLabel}>DO number</label>
             </div>
           </div>
 
           <div className={styles.formGroup}>
-            <div className={styles.inputGroup}>
+            <div className={styles.inputContainer}>
               <input
                 type="text"
                 name="vehicleNumber"
-                className={styles.inputField}
                 value={formData.vehicleNumber}
                 onChange={handleInputChange}
+                className={styles.inputField}
                 required
-                disabled={loading}
               />
-              <label className={styles.floatingLabel}>
-                {t('Vehicle Number')}
-              </label>
+              <label className={styles.floatingLabel}>Vehicle Number</label>
             </div>
           </div>
 
           <div className={styles.formGroup}>
-            <div className={styles.inputGroup}>
+            <div className={styles.inputContainer}>
               <input
                 type="text"
-                name="regNumber"
-                className={styles.inputField}
-                value={formData.regNumber}
+                name="registrationNumber"
+                value={formData.registrationNumber}
                 onChange={handleInputChange}
+                className={styles.inputField}
                 required
-                disabled={loading}
               />
-              <label className={styles.floatingLabel}>
-                {t('Registration Number')}
-              </label>
+              <label className={styles.floatingLabel}>Registration Number</label>
             </div>
           </div>
+        </div>
 
-          <div className={styles.footer}>
-            <button 
-              type="submit" 
-              className={styles.submitButton}
-              disabled={loading}
-            >
-              {loading ? t('common.submitting') : t('Submit')}
-            </button>
-          </div>
-        </form>
+        <div className={styles.footer}>
+          <button
+            className={styles.submitButton}
+            onClick={handleSubmit}
+            disabled={isLoading}
+          >
+            {isLoading ? 'Submitting...' : 'Submit'}
+          </button>
+        </div>
       </div>
     </div>
   );

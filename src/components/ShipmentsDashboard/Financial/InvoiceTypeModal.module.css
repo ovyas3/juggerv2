@@ -61,58 +61,69 @@
     overflow-y: auto;
     flex: 1;
   }
+
+  .tableHeader{
+    font-size: 14px;
+    font-weight: 600;
+  }
   
   .tableContainer {
-    border: 1px solid #e5e7eb;
-    border-radius: 4px;
+    margin: 15px 17px;
+    max-height: 60vh;
     overflow: hidden;
-  }
-  
-  .tableHeader {
-    background-color: #f9fafb;
-    padding: 12px 16px;
-    border-bottom: 1px solid #e5e7eb;
-  }
-  
-  .label {
-    font-weight: 500;
-    color: #374151;
+    position: relative;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    background: white;
   }
   
   .tableWrapper {
-    overflow-x: auto;
+    overflow: auto;
+    max-height: calc(60vh - 60px); /* Adjust based on your header height */
   }
   
   .table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 14px;
-  }
-  
-  .tableHeaderCell {
-    padding: 12px 16px;
     text-align: left;
-    background-color: #f9fafb;
+    table-layout: fixed;
+  }
+  
+  .table thead {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  
+  .table th {
+    background-color: #f5f5f5;
+    padding: 12px 8px;
     font-weight: 500;
-    color: #374151;
-    white-space: nowrap;
+    border-bottom: 2px solid #e0e0e0;
+    position: sticky;
+    top: 0;
+    background-color: #f5f5f5;
+    z-index: 10;
   }
   
-  .tableRow {
-    border-bottom: 1px solid #e5e7eb;
-    transition: background-color 0.2s;
-  }
-  
-  .tableRow:hover {
-    background-color: #f9fafb;
-  }
-  
-  .tableCell {
-    padding: 16px;
+  .table td {
+    padding: 12px 8px;
     vertical-align: middle;
-    color: #4b5563;
-    white-space: nowrap;
+    border-bottom: 1px solid #f0f0f0;
   }
+  
+  .table tbody tr:hover {
+    background-color: #f9f9f9;
+  }
+  
+  /* Ensure proper alignment */
+  .table thead,
+  .table tbody tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+  }
+  
   
   .typeButton {
     background-color: #3b82f6;
@@ -145,7 +156,7 @@
   }
   
   .submitButton {
-    background-color: #3b82f6;
+    background-color: #4F46E5;
     color: white;
     border: none;
     border-radius: 4px;
@@ -162,7 +173,7 @@
   }
   
   .submitButton:hover:not(:disabled) {
-    background-color: #2563eb;
+    background-color: #433DE8;
   }
   
   .submitButton:disabled {

@@ -1,219 +1,159 @@
-/* src/components/ShipmentsDashboard/Modals/MissedEventModal.module.css */
-.modalOverlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-  }
-  
-  .modal {
-    background: white;
-    border-radius: 8px;
-    width: 500px;
-    max-width: 90%;
-    max-height: 90vh;
-    display: flex;
-    flex-direction: column;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  }
-  
-  .header {
-    padding: 16px 24px;
-    border-bottom: 1px solid #e5e7eb;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  
-  .dialog_title {
-    font-size: 18px;
-    font-weight: 600;
-    color: #1f2937;
-  }
-  
-  .closeButton {
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: #6b7280;
-    padding: 4px;
-    border-radius: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .closeButton:hover {
-    background-color: #f3f4f6;
-  }
-  
-  .body {
-    padding: 20px 24px;
-    flex: 1;
-    overflow-y: auto;
-  }
-  
-  .driverDetailsSec {
-    margin-bottom: 20px;
-  }
-  
-  .inputContainer {
-    position: relative;
-    margin-bottom: 16px;
-  }
-  
-  .inputGroup {
-    position: relative;
-  }
-  
-  .inputField {
-    width: 100%;
-    padding: 10px 12px;
-    font-size: 14px;
-    border: 1px solid #d1d5db;
-    border-radius: 4px;
-    background-color: white;
-    transition: border-color 0.2s;
-  }
-  
-  .inputField:focus {
-    outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.5);
-  }
-  
-  .floatingLabel {
-    position: absolute;
-    top: 10px;
-    left: 12px;
-    color: #6b7280;
-    font-size: 14px;
-    pointer-events: none;
-    transition: all 0.2s;
-    background: white;
-    padding: 0 4px;
-    transform-origin: left center;
-  }
-  
-  .inputField:focus + .floatingLabel,
-  .inputField:not(:placeholder-shown) + .floatingLabel {
-    top: -8px;
-    left: 8px;
-    font-size: 12px;
-    color: #3b82f6;
-  }
-  
-  .dropdown {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    max-height: 200px;
-    overflow-y: auto;
-    background: white;
-    border: 1px solid #e5e7eb;
-    border-radius: 4px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    z-index: 10;
-    margin-top: 4px;
-  }
-  
-  .dropdownItem {
-    padding: 8px 12px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-  }
-  
-  .dropdownItem:hover {
-    background-color: #f3f4f6;
-  }
-  
-  .note {
-    margin-top: 16px;
-  }
-  
-  .warningText {
-    font-family: 'Inter';
-    font-size: 10px;
-    color: #ef4444;
-    margin-bottom: 12px;
-    padding-left: 8px;
-  }
-  
-  .fetchButton {
-    background-color: #3b82f6;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    padding: 8px 16px;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    margin-bottom: 16px;
-    transition: background-color 0.2s;
-  }
-  
-  .fetchButton:hover:not(:disabled) {
-    background-color: #2563eb;
-  }
-  
-  .fetchButton:disabled {
-    background-color: #9ca3af;
-    cursor: not-allowed;
-  }
-  
-  .textareaContainer {
-    margin-top: 20px;
-  }
-  
-  .textarea {
-    width: 100%;
-    min-height: 100px;
-    padding: 12px;
-    border: 1px solid #d1d5db;
-    border-radius: 4px;
-    font-family: inherit;
-    font-size: 14px;
-    resize: vertical;
-  }
-  
-  .textarea:focus {
-    outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.5);
-  }
-  
-  .footer {
-    padding: 12px 24px;
-    border-top: 1px solid #e5e7eb;
-    display: flex;
-    justify-content: flex-end;
-  }
-  
-  .submitButton {
-    background-color: #3b82f6;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    padding: 8px 20px;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background-color 0.2s;
-  }
-  
-  .submitButton:hover:not(:disabled) {
-    background-color: #2563eb;
-  }
-  
-  .submitButton:disabled {
-    background-color: #9ca3af;
-    cursor: not-allowed;
-    opacity: 0.7;
-  }
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: white;
+  border-radius: 8px;
+  width: 500px;
+  max-width: 90%;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.header {
+  padding: 16px 24px;
+  border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 500;
+  color: #333;
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #666;
+  padding: 4px;
+}
+
+.body {
+  padding: 20px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.formGroup {
+  margin-bottom: 20px;
+}
+
+.inputContainer {
+  position: relative;
+  margin-bottom: 16px;
+}
+
+.selectField {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+  background-color: white;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23007CB2%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.7rem top 50%;
+  background-size: 0.65rem auto;
+}
+
+.inputField {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+.floatingLabel {
+  position: absolute;
+  left: 12px;
+  top: -8px;
+  font-size: 12px;
+  background: white;
+  padding: 0 4px;
+  color: #666;
+}
+
+.warningText {
+  color: #d32f2f;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.fetchButton {
+  background: #f5f5f5;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s;
+}
+
+.fetchButton:hover:not(:disabled) {
+  background: #e0e0e0;
+}
+
+.fetchButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.dataContainer {
+  margin-top: 20px;
+}
+
+.dataTextarea {
+  width: 100%;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 12px;
+  font-family: monospace;
+  resize: vertical;
+  min-height: 120px;
+}
+
+.footer {
+  padding: 16px 24px;
+  border-top: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.submitButton {
+  background: #4F46E5;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 24px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.submitButton:hover:not(:disabled) {
+  background: #433DE8;
+}
+
+.submitButton:disabled {
+  background: #9fa8da;
+  cursor: not-allowed;
+}

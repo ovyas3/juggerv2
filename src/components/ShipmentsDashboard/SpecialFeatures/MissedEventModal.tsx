@@ -1,7 +1,9 @@
-// src/components/ShipmentsDashboard/Modals/MissedEventModal.tsx
-import React, { useState } from 'react';
-import { useTranslation } from 'react-i18next';
+// MissedEventModal.tsx
+import React, { useState, useEffect } from 'react';
+import { useSnackbar } from "@/hooks/snackBar";
+import { httpsPost } from '@/utils/Communication';
 import styles from './MissedEventModal.module.css';
+import ModalHeader from '@/components/UI/ModalHeader/ModalHeader';
 
 interface MissedEvent {
   name: string;
@@ -10,135 +12,169 @@ interface MissedEvent {
 
 interface MissedEventModalProps {
   show: boolean;
+  shipmentId: string;
   onClose: () => void;
-  onFetch: () => void;
-  onSubmit: () => void;
-  missedEvents: string;
-  setMissedEvents: (value: string) => void;
-  missedEventDoNumber: string;
-  setMissedEventDoNumber: (value: string) => void;
-  dataMissedEvents: string;
-  setDataMissedEvents: (value: string) => void;
-  selectedMissedEvent: string;
-  setSelectedMissedEvent: (value: string) => void;
-  missed: MissedEvent[];
-  isLoading?: boolean;
+  onSuccess?: () => void;
 }
 
 const MissedEventModal: React.FC<MissedEventModalProps> = ({
   show,
+  shipmentId,
   onClose,
-  onFetch,
-  onSubmit,
-  missedEvents,
-  setMissedEvents,
-  missedEventDoNumber,
-  setMissedEventDoNumber,
-  dataMissedEvents,
-  setDataMissedEvents,
-  selectedMissedEvent,
-  setSelectedMissedEvent,
-  missed,
-  isLoading = false
+  onSuccess
 }) => {
-  const { t } = useTranslation();
+  const { showMessage } = useSnackbar();
+  const [isLoading, setIsLoading] = useState(false);
+  const [isFetching, setIsFetching] = useState(false);
+  const [missedEvents, setMissedEvents] = useState<MissedEvent[]>([]);
+  const [selectedEvent, setSelectedEvent] = useState<string>('');
+  const [doNumber, setDoNumber] = useState<string>('');
+  const [eventData, setEventData] = useState<string>('');
+
+  // Mock data - replace with actual API call if needed
+  const mockMissedEvents = [
+    { name: 'Event 1', value: 'event_1' },
+    { name: 'Event 2', value: 'event_2' },
+    { name: 'Event 3', value: 'event_3' }
+  ];
+
+  useEffect(() => {
+    // Fetch missed events if needed
+    setMissedEvents(mockMissedEvents);
+  }, []);
+
+  const handleFetch = async () => {
+    if (!selectedEvent) {
+      showMessage('Please select an event', 'error');
+      return;
+    }
+
+    try {
+      setIsFetching(true);
+      const response = await httpsPost(
+        'v1/utility/pullMissedEventsJSPL',
+        {
+          event: selectedEvent,
+          shipment: shipmentId,
+          OD_number: doNumber || undefined,
+          display: true
+        },
+        {},
+        4
+      );
+
+      setEventData(JSON.stringify(response.data || {}, null, 2));
+    } catch (error: any) {
+      showMessage(error.response?.data?.message || 'Failed to fetch event data', 'error');
+    } finally {
+      setIsFetching(false);
+    }
+  };
+
+  const handleSubmit = async () => {
+    if (!selectedEvent) {
+      showMessage('Please select an event', 'error');
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      const response = await httpsPost(
+        'v1/utility/pullMissedEventsJSPL',
+        {
+          event: selectedEvent,
+          shipment: shipmentId,
+          OD_number: doNumber || undefined,
+          display: false
+        },
+        {},
+        4
+      );
+
+      if (response.statusCode === 200) {
+        showMessage('Missed Event Added', 'success');
+        onSuccess?.();
+        onClose();
+      }
+    } catch (error: any) {
+      showMessage(error.response?.data?.message || 'Failed to add missed event', 'error');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   if (!show) return null;
 
   return (
-    <div className={styles.modalOverlay} onClick={onClose}>
+    <div className={styles.overlay} onClick={onClose}>
       <div className={styles.modal} onClick={e => e.stopPropagation()}>
-        <div className={styles.header}>
-          <div className={styles.dialog_title}>Missed Events</div>
-          <button className={styles.closeButton} onClick={onClose}>
-            <span className="material-icons">close</span>
-          </button>
-        </div>
-        
+        <ModalHeader title="Missed Events" onClose={onClose} />
+
         <div className={styles.body}>
-          <div className={styles.driverDetailsSec}>
+          <div className={styles.formGroup}>
             <div className={styles.inputContainer}>
-              <div className={styles.inputGroup}>
-                <input
-                  type="text"
-                  className={styles.inputField}
-                  value={missedEvents}
-                  onChange={(e) => setMissedEvents(e.target.value)}
-                  placeholder=" "
-                />
-                <label className={styles.floatingLabel}>
-                  {t('Missed Event')}
-                </label>
-                <div className={styles.dropdown}>
-                  {missed
-                    .filter(option => 
-                      option.name.toLowerCase().includes(missedEvents.toLowerCase())
-                    )
-                    .map(option => (
-                      <div 
-                        key={option.value}
-                        className={styles.dropdownItem}
-                        onClick={() => {
-                          setMissedEvents(option.name);
-                          setSelectedMissedEvent(option.value);
-                        }}
-                      >
-                        {option.name}
-                      </div>
-                    ))}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className={styles.driverDetailsSec}>
-            <div className={styles.inputContainer}>
-              <div className={styles.inputGroup}>
-                <input
-                  type="text"
-                  className={styles.inputField}
-                  value={missedEventDoNumber}
-                  onChange={(e) => setMissedEventDoNumber(e.target.value)}
-                  placeholder=" "
-                />
-                <label className={styles.floatingLabel}>
-                  {t('DO number')}
-                </label>
-              </div>
-            </div>
-          </div>
-
-          <div className={styles.driverDetailsSec}>
-            <div className={styles.note}>
-              <div className={styles.warningText}>
-                Do Number is Mandatory for IV
-              </div>
-              <button 
-                className={styles.fetchButton}
-                onClick={onFetch}
-                disabled={isLoading}
+              <select
+                className={styles.selectField}
+                value={selectedEvent}
+                onChange={(e) => setSelectedEvent(e.target.value)}
+                disabled={isLoading || isFetching}
               >
-                {isLoading ? 'Fetching...' : t('Fetch')}
-              </button>
-              <div className={styles.textareaContainer}>
-                <textarea
-                  className={styles.textarea}
-                  value={dataMissedEvents}
-                  onChange={(e) => setDataMissedEvents(e.target.value)}
-                  placeholder="Enter details here..."
-                />
-              </div>
+                <option value="">Select Missed Event</option>
+                {missedEvents.map((event) => (
+                  <option key={event.value} value={event.value}>
+                    {event.name}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
+
+          <div className={styles.formGroup}>
+            <div className={styles.inputContainer}>
+              <input
+                type="text"
+                className={styles.inputField}
+                value={doNumber}
+                onChange={(e) => setDoNumber(e.target.value)}
+                placeholder=" "
+                disabled={isLoading || isFetching}
+              />
+              <label className={styles.floatingLabel}>DO number</label>
+              {selectedEvent === 'IV' && !doNumber && (
+                <div className={styles.warningText}>Do Number is Mandatory for IV</div>
+              )}
+            </div>
+          </div>
+
+          <div className={styles.formGroup}>
+            <button
+              className={styles.fetchButton}
+              onClick={handleFetch}
+              disabled={!selectedEvent || isFetching || isLoading}
+            >
+              {isFetching ? 'Fetching...' : 'Fetch'}
+            </button>
+          </div>
+
+          {eventData && (
+            <div className={styles.dataContainer}>
+              <textarea
+                className={styles.dataTextarea}
+                value={eventData}
+                readOnly
+                rows={8}
+              />
+            </div>
+          )}
         </div>
 
         <div className={styles.footer}>
-          <button 
+          <button
             className={styles.submitButton}
-            onClick={onSubmit}
-            disabled={isLoading}
+            onClick={handleSubmit}
+            disabled={!selectedEvent || isLoading || isFetching}
           >
-            {isLoading ? 'Submitting...' : t('Submit')}
+            {isLoading ? 'Submitting...' : 'Submit'}
           </button>
         </div>
       </div>

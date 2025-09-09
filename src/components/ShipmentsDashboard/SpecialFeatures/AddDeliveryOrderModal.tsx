@@ -1,9 +1,13 @@
 import React, { useState } from 'react';
 import styles from './AddDeliveryOrderModal.module.css';
+import ModalHeader from '@/components/UI/ModalHeader/ModalHeader';
+import { httpsPost } from '@/utils/Communication';
+import { useSnackbar } from "@/hooks/snackBar";
 
 interface AddDeliveryOrderModalProps {
   show: boolean;
   shipmentNo: string;
+  shipmentId: string;
   onSave: (doNumber: string) => void;
   onClose: () => void;
   isLoading?: boolean;
@@ -12,16 +16,36 @@ interface AddDeliveryOrderModalProps {
 const AddDeliveryOrderModal: React.FC<AddDeliveryOrderModalProps> = ({
   show,
   shipmentNo,
+  shipmentId,
   onSave,
   onClose,
   isLoading = false
 }) => {
+  const { showMessage } = useSnackbar();
   const [doNumber, setDoNumber] = useState<string>('');
 
-  const handleSubmit = () => {
-    if (!doNumber.trim()) return;
-    onSave(doNumber);
+  // const handleSubmit = () => {
+  //   if (!doNumber.trim()) return;
+  //   onSave(doNumber);
+  // };
+
+
+  const handleSubmit = async () => {
+    try {
+      const response = await httpsPost("/v1/shipment/add_do_number", {
+        shipment: shipmentId,
+        doNumber,
+      }, {}, 4);
+
+      if (response.statusCode === 200) {
+        showMessage("DO Number added successfully", "success");
+        onClose();
+      }
+    } catch (error) {
+      showMessage("Error adding DO number:", "error");
+    }
   };
+
 
   if (!show) return null;
 
@@ -37,18 +61,7 @@ const AddDeliveryOrderModal: React.FC<AddDeliveryOrderModalProps> = ({
         )}
         
         <div className={styles.section}>
-          <div className={styles.header}>
-            <div className={styles.label}>
-              DO Details - {shipmentNo}
-            </div>
-            <i 
-              className={`${styles.materialIcons} ${styles.closeIcon}`} 
-              onClick={onClose}
-              title="Close"
-            >
-              clear
-            </i>
-          </div>
+          <ModalHeader title={`Delivery Order Details - #${shipmentNo}`} onClose={onClose} />
           
           <div className={styles.commentSection}>
             <div className={styles.uploadFile}>

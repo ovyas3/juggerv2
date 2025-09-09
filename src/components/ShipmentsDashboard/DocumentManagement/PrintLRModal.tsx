@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
 import { Dialog, DialogContent, Select, MenuItem, FormControl, InputLabel, Checkbox, ListItemText, SelectChangeEvent } from '@mui/material';
 import styles from './PrintLRModal.module.css';
-import CloseIcon from '@mui/icons-material/Close';
+import ModalHeader from '../../UI/ModalHeader/ModalHeader';
+import { useSnackbar } from "@/hooks/snackBar"; 
+import { httpsPost } from '@/utils/Communication';
 
 type CopyType = {
   name: string;
@@ -29,7 +30,7 @@ const PrintLRModal: React.FC<PrintLRModalProps> = ({
   onPrint,
   loading = false,
 }) => {
-  const { t } = useTranslation();
+  const { showMessage } = useSnackbar();
   const [selectedCopy, setSelectedCopy] = useState<string[]>([]);
   const [selectedProvider, setSelectedProvider] = useState<ProviderType | null>(null);
   const [allSelected, setAllSelected] = useState(false);
@@ -82,31 +83,57 @@ const PrintLRModal: React.FC<PrintLRModalProps> = ({
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    const shipmentIdsArray = Array.isArray(shipmentIds) ? shipmentIds : [shipmentIds];
+
+
     if (selectedCopy.length === 0) {
-      // Show error: Type of copy is required
+      showMessage('Please select at least one copy type', 'error');
       return;
     }
     
     if (!selectedProvider) {
-      // Show error: Provider is required
+      showMessage('Please select a provider', 'error');
       return;
     }
-
-    if (shipmentIds.length === 0) {
-      // Show error: No shipments selected
+  
+    if (shipmentIdsArray.length === 0) {
+      showMessage('No shipments selected', 'error');
       return;
     }
-
-    if (shipmentIds.length > 10) {
-      // Show error: Too many shipments selected
+  
+    if (shipmentIdsArray.length > 10) {
+      showMessage('Cannot process more than 10 shipments at once', 'error');
       return;
     }
-
-    onPrint({
-      type: selectedProvider.value,
-      copyTypes: selectedCopy,
-    });
+  
+    try {
+      const payload = {
+        shipmentIds: shipmentIdsArray,
+        type: selectedProvider.value,
+        copy_types: selectedCopy
+      };
+  
+      const response = await httpsPost('shipment/waybills', payload, {}, 4);
+      
+      if (response.statusCode === 200) {
+        // Create a temporary anchor element to trigger download
+        const a = document.createElement('a');
+        a.href = response.data.link;
+        a.setAttribute('download', 'waybills.pdf'); // You can customize the filename
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        
+        showMessage('Waybills downloaded successfully', 'success');
+        onClose();
+      } else {
+        showMessage(response.message || 'Failed to download waybills', 'error');
+      }
+    } catch (error: any) {
+      console.error('Error downloading waybills:', error);
+      showMessage(error?.message || 'Failed to download waybills', 'error');
+    }
   };
 
   return (
@@ -121,15 +148,15 @@ const PrintLRModal: React.FC<PrintLRModalProps> = ({
           </div>
         )}
         
-        <div className={styles.header}>
-          {t('PRINT_LR.title')}
-          <CloseIcon className={styles.closeIcon} onClick={onClose} />
-        </div>
+        <ModalHeader 
+          title="Download LRs" 
+          onClose={onClose} 
+        />
         
         <DialogContent className={styles.section}>
           <div className={styles.inputContainer}>
             <div className={styles.title}>
-              {t('PRINT_LR.type_of_copy')}<span className={styles.required}>*</span>
+              Type of Copy<span className={styles.required}>*</span>
             </div>
             <FormControl fullWidth>
               <Select
@@ -145,7 +172,7 @@ const PrintLRModal: React.FC<PrintLRModalProps> = ({
                     onChange={handleSelectAll}
                     inputProps={{ 'aria-label': 'select all copies' }}
                   />
-                  <span>{t('PRINT_LR.select_all')}</span>
+                  <span>Select All</span>
                 </div>
                 {copyTypes.map((copy) => (
                   <MenuItem key={copy.value} value={copy.value}>
@@ -159,7 +186,7 @@ const PrintLRModal: React.FC<PrintLRModalProps> = ({
           
           <div className={styles.inputContainer}>
             <div className={styles.title}>
-              {t('PRINT_LR.provided_by')}<span className={styles.required}>*</span>
+              Provided By<span className={styles.required}>*</span>
             </div>
             <FormControl fullWidth>
               <Select
@@ -185,7 +212,7 @@ const PrintLRModal: React.FC<PrintLRModalProps> = ({
               onClick={handleSubmit}
               disabled={loading || !selectedProvider || selectedCopy.length === 0}
             >
-              {t('PRINT_LR.submit')}
+              Submit
             </button>
           </div>
         </DialogContent>

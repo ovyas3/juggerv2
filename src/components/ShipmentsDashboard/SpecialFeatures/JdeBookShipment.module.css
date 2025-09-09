@@ -108,3 +108,18 @@
   alignItems: center;
   minHeight: 200px;
 }
+
+.searchButton {
+  width: 80px;
+  display: grid;
+  place-items: center;
+  height: 30px;
+  border-radius: 4px;
+  color: white;
+  float: right;
+  margin: 15px;
+  cursor: pointer;
+  border: none;
+  background-color: #4F46E5;
+  color: white;
+}

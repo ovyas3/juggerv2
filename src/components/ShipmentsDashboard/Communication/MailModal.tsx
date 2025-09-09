@@ -12,6 +12,7 @@ import EmailIcon from "@mui/icons-material/Email";
 import { useSnackbar } from "@/hooks/snackBar";
 import { httpsPost } from "@/utils/Communication";
 import styles from "./MailModal.module.css";
+import ModalHeader from '../../UI/ModalHeader/ModalHeader';
 
 interface MailModalProps {
   open: boolean;
@@ -53,9 +54,12 @@ const MailModal: React.FC<MailModalProps> = ({ open, onClose, shipment }) => {
         email_Ids: emailArray,
       });
 
-      if (response.data.statusCode === 200) {
+      if (response.statusCode === 200) {
         showMessage("Email sent successfully", "success");
         handleClose();
+      }
+      else {
+        showMessage(response.message, "error");
       }
     } catch (error: any) {
       showMessage(
@@ -80,19 +84,10 @@ const MailModal: React.FC<MailModalProps> = ({ open, onClose, shipment }) => {
       fullWidth
       classes={{ paper: styles.dialogPaper }}
     >
-      <DialogTitle className={styles.header}>
-        <div className={styles.label}>
-          Send Tracking Link
-          <IconButton
-            aria-label="close"
-            onClick={handleClose}
-            disabled={loading}
-            className={styles.closeButton}
-          >
-            <CloseIcon />
-          </IconButton>
-        </div>
-      </DialogTitle>
+      <ModalHeader 
+        title="Share Tracking URL Via Email" 
+        onClose={onClose} 
+      />
 
       <DialogContent className={styles.body}>
         <div className={styles.inputContainer}>

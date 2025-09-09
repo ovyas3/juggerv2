@@ -1,8 +1,27 @@
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1300; /* Same as MUI's modal z-index */
+}
+
 .dialogPaper {
-  width: 900px;
-  max-width: 100%;
+  width: 590px;
+  max-width: calc(100% - 48px);
   height: 135px;
   overflow: hidden;
+  background-color: #fff;
+  border-radius: 4px;
+  box-shadow: 0px 11px 15px -7px rgba(0,0,0,0.2), 
+              0px 24px 38px 3px rgba(0,0,0,0.14), 
+              0px 9px 46px 8px rgba(0,0,0,0.12);
+  margin: 32px;
 }
 
 .head {
@@ -32,7 +51,8 @@
 }
 
 .body {
-  padding: 16px;
+  /* padding: 16px; */
+  padding-left: 10px;
 }
 
 .inputContainer {

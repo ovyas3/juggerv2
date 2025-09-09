@@ -121,7 +121,7 @@
 .actionButton {
   background: none;
   border: none;
-  color: #1648A1;
+  color: #4F46E5;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -132,7 +132,7 @@
 }
 
 .actionButton:hover {
-  background-color: rgba(0, 0, 0, 0.05);
+  background-color: #433DE8;
 }
 
 /* Thumbnails */
@@ -233,12 +233,16 @@
 }
 
 .approveButton {
-  background-color: #0b64c9 !important;
+  background-color: #4F46E5 !important;
   color: white !important;
   text-transform: none !important;
   font-weight: 500 !important;
   padding: 6px 20px !important;
   border-radius: 4px !important;
+}
+
+.approveButton:hover:not(:disabled) {
+  background-color: #433DE8 !important;
 }
 
 .rejectButton {

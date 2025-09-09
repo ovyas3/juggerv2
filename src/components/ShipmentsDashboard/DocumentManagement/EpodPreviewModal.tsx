@@ -6,6 +6,9 @@ import PreviewIcon from '@mui/icons-material/Preview';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import styles from "./EpodPreviewModal.module.css";
 import service from "@/utils/timeService";
+import { useSnackbar } from "@/hooks/snackBar";
+import { httpsPost } from "@/utils/Communication";
+import ModalHeader from "../../UI/ModalHeader/ModalHeader";
 
 interface EpodPreviewModalProps {
   open: boolean;
@@ -27,6 +30,9 @@ const EpodPreviewModal = ({ open, onClose, data }: EpodPreviewModalProps) => {
   const [isPdf, setIsPdf] = useState(false);
   const [isRejecting, setIsRejecting] = useState(false);
   const [rejectReason, setRejectReason] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  const { showMessage } = useSnackbar();
 
   useEffect(() => {
     if (data?.deliveries?.length) {
@@ -58,19 +64,61 @@ const EpodPreviewModal = ({ open, onClose, data }: EpodPreviewModalProps) => {
     }
   };
 
-  const handleApprove = () => {
-    // TODO: Implement approve functionality
-    console.log('Approve', selectedDelivery._id);
+  const handleApprove = async () => {
+    try {
+      setIsLoading(true);
+      const response = await httpsPost(
+        'v1/shipment/approveEpod',
+        { 
+          delivery: selectedDelivery._id, 
+          approved: true 
+        },
+        {},
+        4 // version
+      );
+  
+      if (response.statusCode === 200) {
+        showMessage('EPOD approved successfully', 'success');
+        onClose(); // Close the modal on success
+      }
+    } catch (error: any) {
+      console.error('Error approving EPOD:', error);
+      showMessage(error.message || 'Failed to approve EPOD', 'error');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleReject = () => {
+  const handleReject = async () => {
     if (!rejectReason) {
-      // Show error
+      showMessage('Please provide a reason for rejection', 'error');
       return;
     }
-    // TODO: Implement reject functionality
-    console.log('Reject', selectedDelivery._id, rejectReason);
-    setIsRejecting(false);
+  
+    try {
+      setIsLoading(true);
+      const response = await httpsPost(
+        'v1/shipment/approveEpod',
+        { 
+          delivery: selectedDelivery._id, 
+          approved: false, 
+          reason: rejectReason 
+        },
+        {},
+        4 // version
+      );
+  
+      if (response.statusCode === 200) {
+        showMessage('EPOD has been rejected', 'success');
+        onClose(); // Close the modal on success
+      }
+    } catch (error) {
+      console.error('Error rejecting EPOD:', error);
+      showMessage('Something went wrong', 'error');
+    } finally {
+      setIsLoading(false);
+      setIsRejecting(false);
+    }
   };
 
   if (!selectedDelivery) return null;
@@ -115,12 +163,7 @@ const EpodPreviewModal = ({ open, onClose, data }: EpodPreviewModalProps) => {
     <div className={styles.modalOverlay} onClick={onClose}>
       <div className={styles.epodPreviewDialog} onClick={(e) => e.stopPropagation()}>
         <div className={styles.epodPreviewContainer}>
-          <div className={styles.epodPreviewHeader}>
-            <span>Epods Preview</span>
-            <button className={styles.dialogCloseButton} onClick={onClose}>
-              <CloseIcon />
-            </button>
-          </div>
+          <ModalHeader title="Epods Preview" onClose={onClose} />
           <div className={styles.epodPreviewBody}>
             <div className={styles.previewContainer}>
               {/* Main Preview Area */}

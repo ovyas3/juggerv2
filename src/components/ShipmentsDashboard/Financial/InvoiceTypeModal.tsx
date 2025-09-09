@@ -1,6 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styles from './InvoiceTypeModal.module.css';
+import ModalHeader from '@/components/UI/ModalHeader/ModalHeader';
 
 interface InvoiceItem {
   invoiceType: 'CT' | 'PT';
@@ -11,6 +12,8 @@ interface InvoiceItem {
 }
 
 interface InvoiceTypeModalProps {
+  show: boolean; 
+  shipmentId: string;
   onClose: () => void;
   onSubmit: () => void;
   onTypeChange: (item: InvoiceItem, newType: 'CT' | 'PT') => void;
@@ -19,16 +22,20 @@ interface InvoiceTypeModalProps {
 }
 
 const InvoiceTypeModal: React.FC<InvoiceTypeModalProps> = ({
+  show,
+  shipmentId,
   onClose,
   onSubmit,
   onTypeChange,
   invoiceData,
   loading = false,
 }) => {
+  if (!show) return null;
+
   const { t } = useTranslation();
 
   const columns = [
-    { key: 'sno', label: 'Slno' },
+    { key: 'sno', label: 'S.No.' },
     { key: 'invoice_type', label: 'Invoice Type' },
     { key: 'invoice', label: 'Invoice' },
     { key: 'shippedQuantity', label: 'Shipped Quantity (MT)' },
@@ -39,18 +46,16 @@ const InvoiceTypeModal: React.FC<InvoiceTypeModalProps> = ({
   return (
     <div className={styles.modalOverlay} onClick={onClose}>
       <div className={styles.modal} onClick={e => e.stopPropagation()}>
-        <div className={styles.header}>
-          <div className={styles.title}>{t('Update Invoice Type')}</div>
-          <button className={styles.closeButton} onClick={onClose}>
-            <span className="material-icons">close</span>
-          </button>
-        </div>
+        <ModalHeader
+          title='Update Invoice Type'
+          onClose={onClose}
+        />
 
         <div className={styles.content}>
-          <div className={styles.tableContainer}>
             <div className={styles.tableHeader}>
               <div className={styles.label}>Invoices</div>
             </div>
+          <div className={styles.tableContainer}>
             
             <div className={styles.tableWrapper}>
               <table className={styles.table}>

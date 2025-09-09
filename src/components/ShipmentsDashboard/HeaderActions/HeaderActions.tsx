@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { RefreshCw, RotateCw, Send, FileText, Upload } from 'lucide-react';
 import styles from './HeaderActions.module.css';
+import BulkUpload from '../SpecialFeatures/BulkUpload';
 
 interface HeaderActionsProps {
   onFetchShipments: () => void;
@@ -23,6 +24,13 @@ const HeaderActions: React.FC<HeaderActionsProps> = ({
   isLoading = false,
   hasSelectedShipments = false
 }) => {
+  const [showBulkUpload, setShowBulkUpload] = useState(false);
+  const [bulkUploadType, setBulkUploadType] = useState('shipment');
+
+  const handleBulkUpload = () => {
+    setBulkUploadType('shipment');
+    setShowBulkUpload(true);
+  };
 
   return (
     <div className={styles.headerActions}>
@@ -64,12 +72,20 @@ const HeaderActions: React.FC<HeaderActionsProps> = ({
       {/* )} */}
       <button
         className={styles.matStrokedButton}
-        onClick={onBulkUpload}
+        onClick={handleBulkUpload}
         disabled={isLoading}
       >
         <Upload className={styles.lucideIcon} />
         Bulk Upload
       </button>
+
+      {showBulkUpload && (
+  <BulkUpload
+    open={showBulkUpload}
+    onClose={() => setShowBulkUpload(false)}
+    type="shipment"
+  />
+)}
     </div>
   );
 };

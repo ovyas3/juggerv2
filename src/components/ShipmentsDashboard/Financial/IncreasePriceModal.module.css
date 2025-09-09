@@ -29,10 +29,14 @@
     display: flex;
     justify-content: space-between;
     padding: 10px;
-    background-color: #2962FF;
-    height: 40px;
     color: #fff;
+    width: 100%;
+    border: 2px solid #4F46E5;
     align-items: center;
+    background-color: #4F46E5;
+    margin: 0 auto;
+    border-radius: 1px;
+    height: 48px;
   }
   
   .header .label {
@@ -41,14 +45,17 @@
   }
   
   .close {
-    cursor: pointer;
+    background-color: #908be6;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    width: 32px;
+    height: 32px;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    transition: background-color 0.2s;
+    cursor: pointer;
+    padding: 0;
   }
   
   .close:hover {
@@ -61,7 +68,7 @@
     display: flex;
     flex-direction: column;
     flex: 1;
-    overflow-y: auto;
+    /* overflow-y: auto; */
   }
   
   /* Input Container */
@@ -96,8 +103,8 @@
   
   .selectInput:focus {
     outline: none;
-    border-color: #2962FF;
-    box-shadow: 0 0 0 2px rgba(41, 98, 255, 0.2);
+    border-color: #4F46E5;
+    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
   }
   
   .selectInput:disabled {
@@ -122,7 +129,7 @@
     width: 120px;
     padding: 8px 16px;
     color: #fff;
-    background-color: #2962FF;
+    background-color: #4F46E5;
     font-size: 14px;
     font-weight: 500;
     cursor: pointer;
@@ -132,7 +139,7 @@
   }
   
   .button:hover:not(:disabled) {
-    background-color: #204fd5;
+    background-color: #3B32B3;
   }
   
   .button:active:not(:disabled) {

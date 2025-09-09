@@ -1,10 +1,10 @@
-.modalOverlay {
+.overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -14,88 +14,70 @@
 .modal {
   background: white;
   border-radius: 8px;
-  width: 500px;
+  width: 450px;
   max-width: 90%;
   max-height: 90vh;
-  display: flex;
-  flex-direction: column;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
+  overflow-y: auto;
+  position: relative;
 }
 
 .header {
   padding: 16px 24px;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid #e0e0e0;
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.dialogTitle {
+.title {
   font-size: 18px;
-  font-weight: 600;
-  color: #1f2937;
+  font-weight: 500;
+  color: #333;
 }
 
 .closeButton {
   background: none;
   border: none;
   cursor: pointer;
-  color: #6b7280;
+  color: #666;
   padding: 4px;
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
-.closeButton:hover {
-  background-color: #f3f4f6;
-}
-
-.form {
-  padding: 20px 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  overflow-y: auto;
-  flex: 1;
+.body {
+  padding: 24px;
 }
 
 .formGroup {
-  margin-bottom: 16px;
+  margin-bottom: 20px;
 }
 
-.inputGroup {
+.inputContainer {
   position: relative;
-  width: 100%;
+  margin-bottom: 16px;
 }
 
 .inputField {
   width: 100%;
-  padding: 10px 12px;
-  font-size: 16px;
-  color: #42454E;
-  border: 1px solid #d1d5db;
+  padding: 12px;
+  border: 1px solid #ddd;
   border-radius: 4px;
-  background-color: white;
+  font-size: 16px;
   transition: border-color 0.2s;
 }
 
 .inputField:focus {
   outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.5);
+  border-color: #4F46E5;
 }
 
 .floatingLabel {
   position: absolute;
-  top: 10px;
   left: 12px;
-  color: #6b7280;
-  font-size: 14px;
-  pointer-events: none;
+  top: 12px;
+  color: #999;
+  font-size: 16px;
   transition: all 0.2s;
+  pointer-events: none;
   background: white;
   padding: 0 4px;
   transform-origin: left center;
@@ -103,58 +85,34 @@
 
 .inputField:focus + .floatingLabel,
 .inputField:not(:placeholder-shown) + .floatingLabel {
-  top: -8px;
-  left: 8px;
-  font-size: 12px;
-  color: #3b82f6;
-}
-
-.inputField:disabled {
-  background-color: #f9fafb;
-  cursor: not-allowed;
+  transform: translateY(-24px) scale(0.85);
+  color: #4F46E5;
 }
 
 .footer {
-  padding: 16px 0 0;
+  padding: 16px 24px;
+  border-top: 1px solid #e0e0e0;
   display: flex;
   justify-content: flex-end;
 }
 
 .submitButton {
-  background-color: #3b82f6;
+  background-color: #4F46E5;
   color: white;
   border: none;
-  border-radius: 4px;
   padding: 8px 24px;
+  border-radius: 4px;
+  cursor: pointer;
   font-size: 14px;
   font-weight: 500;
-  cursor: pointer;
   transition: background-color 0.2s;
-  min-width: 100px;
-  text-align: center;
 }
 
 .submitButton:hover:not(:disabled) {
-  background-color: #2563eb;
+  background-color: #433DE8;
 }
 
 .submitButton:disabled {
-  background-color: #9ca3af;
+  background-color: #9fa8da;
   cursor: not-allowed;
-  opacity: 0.7;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-.loading {
-  display: inline-block;
-  width: 16px;
-  height: 16px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-radius: 50%;
-  border-top-color: white;
-  animation: spin 1s ease-in-out infinite;
-  margin-right: 8px;
 }

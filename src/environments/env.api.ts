@@ -12,4 +12,6 @@ export const environment = {
     TRACKER_URL_PREFIX: "https://etms-tracker.instavans.com/track/",
     API_URL_NEW_1: 'https://dev-api.instavans.com/api/thor/',
     API_URL_NEW_2: 'https://dev-api.instavans.com/api/thor/v2/',
+    API_URL_NEW_3: 'https://dev-api.instavans.com/api/panther/',
+    API_URL_NEW_4: 'https://dev-api.instavans.com/api/flash/',
 }

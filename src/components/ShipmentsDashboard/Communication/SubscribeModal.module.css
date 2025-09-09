@@ -97,7 +97,7 @@
   }
   
   .button {
-    background: #0b64c9;
+    background: #4f46e5;
     color: #fff;
     font-size: 12px;
     padding: 5px 12px;
@@ -106,14 +106,34 @@
     min-width: 72px;
     border: none;
     text-align: center;
+    border-color: #4f46e5;
+    font-weight: 600;
   }
   
+  .loader {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .loaderIcon {
+    animation: spin 1s linear infinite;
+    height: 30px;
+    width: 30px;
+    color: #1648A1;
+  }
+
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
   .button:hover {
     filter: brightness(0.95);
   }
   
   .submitButtonYes .button {
-    background-color: #0cc319;
+    background-color: #178c04;
     width: 60px !important;
   }
   

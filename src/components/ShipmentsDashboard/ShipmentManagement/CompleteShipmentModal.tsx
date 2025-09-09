@@ -3,6 +3,8 @@ import { CheckCircle } from 'lucide-react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import styles from './CompleteShipmentModal.module.css';
+import ModalHeader from '../../UI/ModalHeader/ModalHeader';
+import { httpsGet } from '@/utils/Communication';
 
 interface CompleteShipmentModalProps {
   show: boolean;
@@ -42,7 +44,8 @@ export const CompleteShipmentModal: React.FC<CompleteShipmentModalProps> = ({
   const [showReasonInput, setShowReasonInput] = useState(false);
   const [isProceeding, setIsProceeding] = useState(false);
   const [reasons, setReasons] = useState<string[]>(['Other']);
-  
+  const [isJSPL, setIsJSPL] = useState(false);
+
   // Initialize date states
   const now = new Date();
   const [arrival, setArrival] = useState<DateTimeState>({
@@ -50,19 +53,19 @@ export const CompleteShipmentModal: React.FC<CompleteShipmentModalProps> = ({
     time: now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }).slice(0, 5),
     date_time: now.toISOString(),
   });
-  
+
   const [completion, setCompletion] = useState<DateTimeState>({
     date: now,
     time: now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }).slice(0, 5),
     date_time: now.toISOString(),
   });
-  
+
   const [unloadingStart, setUnloadingStart] = useState<DateTimeState>({
     date: null,
     time: '',
     date_time: '',
   });
-  
+
   const [unloadingEnd, setUnloadingEnd] = useState<DateTimeState>({
     date: null,
     time: '',
@@ -73,9 +76,34 @@ export const CompleteShipmentModal: React.FC<CompleteShipmentModalProps> = ({
   const showUnloadingFields = isTechnova && shipment.shipmentType !== 'arrived';
 
   useEffect(() => {
-    // Fetch reasons from your API if needed
-    // fetchReasons();
-  }, []);
+    const fetchReasons = async () => {
+      try {
+        // Get shipper data from localStorage
+        const shipperData = JSON.parse(localStorage.getItem("shippers") || "[]");
+        const isJSPLFlag = shipperData[0]?.parent_name?.includes('JSP') || 
+                          shipperData[0]?.parent_name?.includes('JSPL Angul') || 
+                          shipperData[0]?.parent_name?.includes('JSPL');
+        setIsJSPL(isJSPLFlag);
+        
+        // Fetch reasons based on JSPL flag
+        const url = isJSPLFlag 
+          ? 'constants/get_reasons?name=jspl_shipment_complete_reasons' 
+          : 'constants/get_reasons?name=shipment';
+        
+        const response = await httpsGet(url);
+        if (response.statusCode === 200 && response.data?.[0]?.reason) {
+          setReasons([...response.data[0].reason, 'Other']);
+        }
+      } catch (error) {
+        console.error('Error fetching reasons:', error);
+        // Keep the default 'Other' option if API call fails
+      }
+    };
+
+    if (show) {
+      fetchReasons();
+    }
+  }, [show]);
 
   const handleDateChange = (date: Date | null, type: 'arrival' | 'completion' | 'unloadingStart' | 'unloadingEnd') => {
     const timeString = type === 'arrival' ? arrival.time : 
@@ -184,18 +212,7 @@ export const CompleteShipmentModal: React.FC<CompleteShipmentModalProps> = ({
   return (
     <div className={styles.modalOverlay}>
       <div className={styles.dialogMain}>
-        <div className={styles.header}>
-          <h3 className={styles.title}>
-            Complete Shipment #{shipment.sin}
-          </h3>
-          <button 
-            onClick={onClose}
-            className={styles.closeButton}
-            aria-label="Close"
-          >
-            &times;
-          </button>
-        </div>
+        <ModalHeader title={`Complete Shipment #${shipment.sin}`} onClose={onClose} />
 
         <div className={styles.section}>
           {/* Rate Data */}
@@ -236,7 +253,7 @@ export const CompleteShipmentModal: React.FC<CompleteShipmentModalProps> = ({
           {shipment.shipmentType !== 'arrived' && (
             <div className={styles.formGroup}>
               <label className={styles.label}>
-                Finished At:
+                Completed At:
               </label>
               <div className={styles.inputGroup}>
                 <DatePicker
@@ -265,7 +282,7 @@ export const CompleteShipmentModal: React.FC<CompleteShipmentModalProps> = ({
               {/* Unloading Start */}
               <div className={styles.formGroup}>
                 <label className={styles.label}>
-                  Unloading Start:
+                  Start:
                 </label>
                 <div className={styles.inputGroup}>
                   <DatePicker
@@ -287,7 +304,7 @@ export const CompleteShipmentModal: React.FC<CompleteShipmentModalProps> = ({
               {/* Unloading End */}
               <div className={styles.formGroup}>
                 <label className={styles.label}>
-                  Unloading End:
+                  End:
                 </label>
                 <div className={styles.inputGroup}>
                   <DatePicker

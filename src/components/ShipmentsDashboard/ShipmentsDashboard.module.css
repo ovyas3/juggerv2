@@ -213,7 +213,8 @@
   gap: 8px;
   padding: 6px 14px;
   border-radius: 16px;
-  border: 1px solid #d8dbdf;
+  /* Set border to the maximum width (1.8px) in the default state */
+  border: 1.8px solid #d8dbdf;
   background-color: #f1f5f9;
   font-size: 13px;
   font-weight: 500;
@@ -224,11 +225,12 @@
 
 .filterButton:hover {
   background-color: #f1f3f4;
-  border-color: #c6cace;
+  border-color: #c6cace; /* Only change color on hover */
 }
 
 .filterButton.selected {
-  border: 1.8px solid #673ab7;
+  /* On selection, only change the border-color, not its width */
+  border-color: #673ab7;
   background-color: #ede7f6;
   color: #5e35b1;
 }
@@ -241,13 +243,17 @@
   font-size: 12px;
   min-width: 18px;
   text-align: center;
+  /* Add a transparent border to reserve space */
+  border: 1px solid transparent;
 }
 
 .filterButton.selected .filterCount {
-  border: 1px solid #7c3aed;
+  /* On selection, give the border a color */
+  border-color: #7c3aed;
   color: white;
   background-color: #7c3aed;
 }
+
 
 .section {
   width: 98%;
@@ -256,11 +262,11 @@
 }
 
 .header {
-  padding: 0px 10px;
+  padding: 10px;
   display: flex;
-  flex-direction: row;
   align-items: center;
-  justify-content: space-around;
+  justify-content: space-between; /* Pushes input and buttons to opposite ends */
+  width: 99%;
 }
 
 .title {
@@ -273,26 +279,98 @@
 }
 
 .inputContainer {
-  width: 32%;
-  float: right;
-  padding: 10px 0px;
+  display: flex;
+  width: 400px;
+}
+
+/* New container to position the custom arrow */
+.selectContainer {
+  position: relative;
   display: flex;
 }
 
-.filter {
-  padding: 0px 10px;
+.inputSelect {
+  /* Reset native appearance to allow custom styling */
+  -webkit-appearance: none;
+  appearance: none;
+
+  /* Basic styling */
+  outline: none;
+  border: solid 1px #d2d2d2;
+  background-color: #ffffff;
+  height: 38px;
+  font-size: 14px;
+  font-family: "Muli", sans-serif;
+  padding: 0 30px 0 8px; /* Add padding-right to make space for the arrow */
+  border-radius: 4px;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  cursor: pointer;
 }
 
-.inputSelect {
+/* Custom dropdown arrow */
+.selectContainer::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 6px solid #555; /* Arrow color */
+  pointer-events: none; /* Prevents the arrow from blocking clicks on the select */
+}
+
+/* Ensure options have a white background, though this may not work everywhere */
+.inputSelect option {
+  background: white;
+  color: black;
+}
+
+.inputSearch {
   outline: none;
   border: solid 1px #d2d2d2;
   background: #ffffff;
-  text-align: left;
-  width: 50%;
-  height: 30px;
+  height: 38px;
   font-size: 14px;
   font-family: "Muli", sans-serif;
-  padding-left: 5px;
+  padding: 0 8px;
+  border-radius: 4px;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  border-left: none; /* Connects it smoothly to the select box */
+  width: 100%;
+}
+
+
+
+.buttonContainer {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Adds consistent spacing between all buttons */
+}
+
+.button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  border-radius: 4px;
+  padding: 8px 12px;
+  font-size: 14px;
+  cursor: pointer;
+  font-weight: bold;
+  background-color: #4f46e5;
+  color: #ffffff;
+  border: none;
+  white-space: nowrap; /* Prevents text from wrapping */
+  height: 38px; /* Match input height */
+}
+
+.button:hover {
+  background-color: #4338ca;
 }
 
 .matSelect {
@@ -321,31 +399,25 @@
   flex-direction: row;
 }
 
-/* Add this to your CSS module or stylesheet */
 .customSelectButton {
-  text-align: center;
-  border-radius: 4px;
-  width: 114px;
-  padding: 5px 8px 5px 8px;
-  font-size: 14px;
-  cursor: pointer;
-  margin-top: 8px;
-  margin-bottom: 1px;
-  margin-right: 10px;
-  font-weight: bold;
-  background-color: #4f46e5;
-  color: #ffffff;
-  border-color: #4f46e5;
-  border: none;
-  /* Remove default arrow for easier styling */
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
+  text-align: center;
+  border-radius: 4px;
+  padding: 8px 12px;
+  font-size: 14px;
+  cursor: pointer;
+  font-weight: bold;
+  background-color: #4f46e5;
+  color: #ffffff;
+  border: none;
+  height: 38px; /* Match input height */
+  white-space: nowrap;
 }
 
-.submitButton {
-  cursor: pointer;
-  margin: 3px 10px 10px 0px;
+.customSelectButton:hover {
+  background-color: #4338ca;
 }
 
 .submitButton .button {
@@ -1779,7 +1851,7 @@ table.matTable {
 }
 
 .inputContainer input {
-  height: 30px;
+  /* height: 30px; */
   width: 100%;
   outline: none;
   border: 1px solid #1a1a1a1f;
@@ -4087,4 +4159,68 @@ select.didFloatingSelect::-ms-expand {
 .matColumnDelivery {
   min-width: 250px;
   max-width: 255px;
+}
+
+
+.distributionGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+  margin-top: 24px;
+}
+
+.distributionCard {
+  background-color: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+
+.statusList, .performanceList {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.statusItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+}
+
+.statusInfo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #333;
+}
+
+.statusDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.statusValues {
+  display: flex;
+  gap: 16px;
+  color: #555;
+  min-width: 80px;
+  justify-content: space-between;
+}
+
+.statusCount {
+  font-weight: 500;
+  color: #333;
+}
+
+.statusPercentage {
+  color: #757575;
+  width: 35px;
+  text-align: right;
 }

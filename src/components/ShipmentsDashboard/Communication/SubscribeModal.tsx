@@ -4,6 +4,8 @@ import { useSnackbar } from "@/hooks/snackBar";
 import service from "@/utils/timeService"; // adjust path as needed
 import styles from "./SubscribeModal.module.css"; // Use the CSS provided previously
 import router from "next/router";
+import ModalHeader from "@/components/UI/ModalHeader/ModalHeader";
+import { Loader2 } from "lucide-react";
 
 const carrierMessages = {
   airtel: "Please provide your consent to track your location by your service provider, Please reply with Y to 5114040",
@@ -29,8 +31,8 @@ const SubscribeModal = ({ open, onClose, shipment }: { open: boolean, onClose: (
     setLoading(true);
     httpsGet("shipment/simTrack/status?id=" + shipment._id, 4)
       .then((resp) => {
-        if (resp.data.statusCode === 200) {
-          const d = resp.data.data;
+        if (resp.statusCode === 200) {
+          const d = resp.data;
           setSubStatus(d.isSubscribed ? "Yes" : "No");
           setConsent(d.isConsent ? "Yes" : "No");
           setCarrier(d.carrier || "");
@@ -49,18 +51,17 @@ const SubscribeModal = ({ open, onClose, shipment }: { open: boolean, onClose: (
   // Subscribe/Unsubscribe actions
   const performAction = (action: string) => {
     setLoading(true);
-    const url =
-      action === "subscribe"
-        ? "shipment/simTrack/subscribe"
-        : "shipment/simTrack/unsubscribe";
+    const url = action === "subscribe" 
+      ? "shipment/simTrack/subscribe" 
+      : "shipment/simTrack/unsubscribe";
     const payload = { id: shipment._id };
     // if (shipment.carrier?._id) payload.carrier = shipment.carrier._id;
-
-    httpsGet(url + "?id=" + shipment._id, 4, router)
+  
+    httpsPost(url, payload, {}, 4)
       .then((resp) => {
-        if (resp.data.statusCode === 200) {
-          setSubStatus(resp.data.data.isSubscribed ? "Yes" : "No");
-          setConsent(resp.data.data.isConsent ? "Yes" : "No");
+        if (resp.statusCode === 200) {
+          setSubStatus(resp.data.isSubscribed ? "Yes" : "No");
+          setConsent(resp.data.isConsent ? "Yes" : "No");
           setUnsubscribeNow(false);
           snackbar.showMessage(
             action === "subscribe"
@@ -69,9 +70,11 @@ const SubscribeModal = ({ open, onClose, shipment }: { open: boolean, onClose: (
             "success"
           );
           onClose(true); // pass true if data was changed
+        } else {
+          throw new Error(resp.message || "Failed to perform action");
         }
       })
-      .catch((e) => snackbar.showMessage(e.message, "error"))
+      .catch((e) => snackbar.showMessage(e.message || "An error occurred", "error"))
       .finally(() => {
         setLoading(false);
         setConfirm(false);
@@ -87,15 +90,15 @@ const SubscribeModal = ({ open, onClose, shipment }: { open: boolean, onClose: (
         onClick={(e) => e.stopPropagation()}
       >
         <div className={styles.locationsPopupContainer}>
-          <div className={styles.locationsPopupHeader}>
-            <span>
-              Shipment #{shipment.sin} | {shipment.status}
-            </span>
-            <button className={styles.dialogCloseButton} onClick={() => onClose(false)}>✕</button>
-          </div>
+          <ModalHeader 
+            title={`Shipment #${shipment.sin} | ${shipment.status}`} 
+            onClose={() => onClose(false)} 
+          />
           <div className={styles.body}>
             {loading ? (
-              <div>Loading...</div>
+              <div className={styles.loader}>
+                <Loader2 className={styles.loaderIcon} />
+              </div>
             ) : (
               <div className={styles.content}>
                 <div
@@ -107,7 +110,7 @@ const SubscribeModal = ({ open, onClose, shipment }: { open: boolean, onClose: (
                   <div
                     className={styles.yesNo}
                     style={{
-                      color: subStatus === "Yes" ? "#02f500" : "#ff0000"
+                      color: subStatus === "Yes" ? "#178c04" : "#ff0000"
                     }}
                   >
                     {subStatus}
@@ -115,7 +118,7 @@ const SubscribeModal = ({ open, onClose, shipment }: { open: boolean, onClose: (
                   <div
                     className={styles.submitButton}
                     style={{
-                      backgroundColor: subStatus === "Yes" ? "#E54131" : "#0b64c9"
+                      backgroundColor: subStatus === "Yes" ? "#fff" : "#4f46e5"
                     }}
                   >
                     <div
@@ -140,7 +143,7 @@ const SubscribeModal = ({ open, onClose, shipment }: { open: boolean, onClose: (
                   <div
                     className={styles.yesNo}
                     style={{
-                      color: consent === "Yes" ? "#02f500" : "#ff0000"
+                      color: consent === "Yes" ? "#178c04" : "#ff0000"
                     }}
                   >
                     {consent}
@@ -207,8 +210,8 @@ const SubscribeModal = ({ open, onClose, shipment }: { open: boolean, onClose: (
             <div className={styles["note-text"]}>Note</div>
             <div className={styles.text}>
               {/* Customize disclaimer as needed */}
-              Tracking consent is needed for SIM-based tracking.<br />
-              Contact customer support for details.
+              Unsubscribe and Subscribe to send SMS<br />
+              SIM tracking request status takes at least 1 hour to update.
             </div>
           </div>
         </div>

@@ -3,6 +3,10 @@ import { X, Calendar as CalendarIcon } from 'lucide-react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import styles from './MarkAsArrivedModal.module.css';
+import { environment } from '../../../environments/env.api';
+import { httpsGet } from '@/utils/Communication';
+import { useSnackbar } from '@/hooks/snackBar';
+import ModalHeader from '@/components/UI/ModalHeader/ModalHeader';
 
 interface MarkAsArrivedModalProps {
   show: boolean;
@@ -33,11 +37,13 @@ const MarkAsArrivedModal: React.FC<MarkAsArrivedModalProps> = ({
   shipment,
   isLoading = false,
 }) => {
+  const { showMessage } = useSnackbar();
   const [reason, setReason] = useState('');
   const [selectedReason, setSelectedReason] = useState('');
   const [showReasonInput, setShowReasonInput] = useState(false);
   const [reasons, setReasons] = useState<string[]>(['Other']);
-  
+  const [isLoadingReasons, setIsLoadingReasons] = useState(false);
+
   const now = new Date();
   const [arrival, setArrival] = useState<DateTimeState>({
     date: now,
@@ -47,9 +53,39 @@ const MarkAsArrivedModal: React.FC<MarkAsArrivedModalProps> = ({
 
   // Fetch reasons from API
   useEffect(() => {
-    // TODO: Replace with actual API call
-    // fetchReasons();
-  }, []);
+    const fetchReasons = async () => {
+      try {
+        setIsLoadingReasons(true);
+        // Get auth token from cookies
+        // const userCookie = document.cookie.split('; ').find(row => row.startsWith('user='));
+        // const authToken = userCookie ? JSON.parse(decodeURIComponent(userCookie.split('=')[1])).accessToken : null;
+        
+        // if (!authToken) {
+        //   console.error('No auth token found');
+        //   return;
+        // }
+
+        const response = await httpsGet('constants/get_reasons?name=shipment', 4);
+
+        if (response.statusCode == 200) {
+          if (response.data[0]?.reason) {
+            setReasons([...response.data[0].reason, 'Other']);
+          }
+        } else {
+          showMessage('Failed to load reasons.', 'error');
+        }
+      } catch (error) {
+        console.error('Error fetching reasons:', error);
+        // Keep the default 'Other' option if API call fails
+      } finally {
+        setIsLoadingReasons(false);
+      }
+    };
+
+    if (show) {
+      fetchReasons();
+    }
+  }, [show]);
 
   const handleDateTimeChange = (date: Date | null, field: 'date' | 'time') => {
     if (!date) return;
@@ -108,12 +144,11 @@ const MarkAsArrivedModal: React.FC<MarkAsArrivedModalProps> = ({
   return (
     <div className={styles.overlay}>
       <div className={styles.modal}>
-        <div className={styles.header}>
-          {shipment.orderNo ? `#${shipment.orderNo}` : 'Mark as Arrived'}
-          <button onClick={onClose} className={styles.closeButton}>
-            <X size={20} />
-          </button>
-        </div>
+
+        <ModalHeader 
+          title={`Mark as Arrived ${shipment.orderNo ? `#${shipment.orderNo}` : ''}`} 
+          onClose={onClose} 
+        />
         
         <div className={styles.content}>
           <div className={styles.rateData}>

@@ -71,6 +71,7 @@
   border-radius: 4px;
   font-weight: 500;
   transition: background-color 0.2s;
+  border: none;
 }
 
 .cancelButton:hover {
@@ -85,6 +86,7 @@
   border-radius: 4px;
   font-weight: 500;
   transition: background-color 0.2s;
+  border: none;
 }
 
 .submitButton:hover {

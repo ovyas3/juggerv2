@@ -35,8 +35,14 @@ import {
   Download,
   WifiOff,
   PlusCircle,
+  UserPlus,
+  Plus,
 } from "lucide-react";
-import { Button } from "../UI/button";
+import MarkAsArrivedModal from "../ShipmentsDashboard/Others/MarkAsArrivedModal";
+import CompleteShipmentModal from "../ShipmentsDashboard/ShipmentManagement/CompleteShipmentModal";
+import {
+  Button
+} from "../UI/button";
 import {
   Select,
   SelectContent,
@@ -75,7 +81,7 @@ import AddRoambeeModal from "../ShipmentsDashboard/LocationTracking/AddRoambeeMo
 import OpenVideosModal from "../ShipmentsDashboard/SpecialFeatures/OpenVideosModal";
 import AddDeliveryOrderModal from "../ShipmentsDashboard/SpecialFeatures/AddDeliveryOrderModal";
 import AddManagedByModal from "../ShipmentsDashboard/SpecialFeatures/AddManagedByModal";
-import IncreasePriceModal from "../ShipmentsDashboard/Financial/CreatePaymentAdvanceModal";
+import IncreasePriceModal from "../ShipmentsDashboard/Financial/IncreasePriceModal";
 import UpdateStatusModal from "../ShipmentsDashboard/ShipmentManagement/UpdateStatusModal";
 import WarningModal from "../ShipmentsDashboard/SpecialFeatures/WarningModal";
 import HeaderActions from "../ShipmentsDashboard/HeaderActions/HeaderActions";
@@ -86,11 +92,25 @@ import ShareModal from "../ShipmentsDashboard/Communication/ShareModal";
 import CancelShipmentModal from "../ShipmentsDashboard/ShipmentManagement/CancelShipmentModal";
 import MailModal from "../ShipmentsDashboard/Communication/MailModal";
 import CreatePaymentAdvanceModal from "../ShipmentsDashboard/Financial/CreatePaymentAdvanceModal";
-import EditLocationsModal from "../ShipmentsDashboard/DocumentManagement/PrintLRModal";
+import EditLocationsModal from "../ShipmentsDashboard/LocationTracking/EditLocationsModal";
 import PrintLRModal from "../ShipmentsDashboard/DocumentManagement/PrintLRModal";
+import AddGpsConnectionModal from "../ShipmentsDashboard/LocationTracking/AddGpsConnectionModal";
+import AddRemarkDialog from '../ShipmentsDashboard/LocationTracking/AddRemarkDialog';
+import ConfirmationDialog from '../UI/ConfirmationDialog/ConfirmationDialog';
+import RecalculateDistanceModal from '../ShipmentsDashboard/Financial/RecalculateDistanceModal';
+import InvoiceTypeModal from '../ShipmentsDashboard/Financial/InvoiceTypeModal';
+import ReasonDialog from '@/components/ShipmentsDashboard/Others/ReasonDialog';
+import UpdateCarrierFreight from '../ShipmentsDashboard/Others/UpdateCarrierFreight';
+import MarkFaultyModal from '../ShipmentsDashboard/ShipmentManagement/MarkFaultyModal';
+import MissedShipmentModal from "./ShipmentManagement/MissedShipmentModal";
+import MissedEventModal from "./SpecialFeatures/MissedEventModal";
+import RetriggerEventModal from "./SpecialFeatures/RetriggerEventModal";
+import DriverExpenses from "./SpecialFeatures/DriverExpenses";
+import GeofenceEditor from "./SpecialFeatures/GeofenceEditor";
 
 // Types
 interface Shipment {
+  unique_code: any;
   epods: any;
   _id: string;
   sin: string;
@@ -135,6 +155,9 @@ interface Shipment {
     remark: string;
     date: string;
   }>;
+  gpsProvider?: string;
+  gps_disconnection_reason?: any[];
+  delay_reason?: any[];
 }
 
 interface Insight {
@@ -154,6 +177,23 @@ interface AnalyticsData {
   totalFreightValue: number;
   averageFreight: number;
   activeCarriers: number;
+}
+
+// 1. First, define the Location interface
+interface Location {
+  _id: string;
+  name: string;
+  area: string;
+  city: string;
+  shipper?: string;
+  geo_fence?: {
+    coordinates: number[][][];
+  };
+}
+
+interface ShipperPrefs {
+  locations: Location[];
+  deliveryLocations: Location[];
 }
 
 const ShipmentsDashboard: React.FC = () => {
@@ -222,8 +262,7 @@ const ShipmentsDashboard: React.FC = () => {
   const [showActiveCarriersPopup, setShowActiveCarriersPopup] = useState(false);
   const [showTotalFreightPopup, setShowTotalFreightPopup] = useState(false);
   const [showAverageFreightPopup, setShowAverageFreightPopup] = useState(false);
-  const [showDelayedShipmentDialog, setShowDelayedShipmentDialog] =
-    useState(false);
+  const [showDelayedShipmentDialog, setShowDelayedShipmentDialog] = useState(false);
   const [showRerunDialog, setShowRerunDialog] = useState(false);
   const [showPullFreightDialog, setShowPullFreightDialog] = useState(false);
   const [showAttachDialog, setShowAttachDialog] = useState(false);
@@ -244,11 +283,23 @@ const ShipmentsDashboard: React.FC = () => {
   const [shipmentDelayData, setShipmentDelayData] = useState<any>({});
   const [selectedRerunOption, setSelectedRerunOption] = useState("");
   const [selectedShipmentSIN, setSelectedShipmentSIN] = useState("");
-  const [pullFreightData, setPullFreightData] = useState({
-    SIN: "",
+  const [pullFreightData, setPullFreightData] = useState<{
+    _id: string;
+    vehicleNo: string;
+    pickup: string;
+    sin: string;
+    destinations: Array<{
+      name: string;
+      area?: string;
+      city: string;
+      _id: string;
+    }>;
+  }>({
+    _id: "",
     vehicleNo: "",
     pickup: "",
-    shipmentId: "", // Make sure this is included
+    sin: "",
+    destinations: []
   });
   const [freightPayload, setFreightPayload] = useState<any>({});
   const [selectedShipmentStatus, setSelectedShipmentStatus] = useState("");
@@ -356,6 +407,22 @@ const ShipmentsDashboard: React.FC = () => {
   const [showAddDO, setShowAddDO] = useState(false);
   const [currentShipmentNo, setCurrentShipmentNo] = useState("");
 
+  const [showGpsModal, setShowGpsModal] = useState(false);
+  const [selectedGps, setSelectedGps] = useState<string[]>([]);
+
+  const [showDelayReasonDialog, setShowDelayReasonDialog] = useState(false);
+  const [selectedShipmentForDelay, setSelectedShipmentForDelay] = useState<Shipment | null>(null);
+
+  const [selectedShipmentForPriceIncrease, setSelectedShipmentForPriceIncrease] = useState<string>("");
+
+  const [showMarkAsArrivedModal, setShowMarkAsArrivedModal] = useState(false);
+  const [selectedShipmentForArrival, setSelectedShipmentForArrival] = useState<Shipment | null>(null);
+  const [showCompleteShipmentModal, setShowCompleteShipmentModal] = useState(false);
+  const [selectedShipmentForCompletion, setSelectedShipmentForCompletion] = useState<Shipment | null>(null);
+
+  const [showMissedShipmentModal, setShowMissedShipmentModal] = useState(false);
+  const [selectedShipmentForMissed, setSelectedShipmentForMissed] = useState<Shipment | null>(null)
+
   const handleSaveDO = async (doNumber: string) => {
     try {
       // Call your API to save the DO number
@@ -414,6 +481,32 @@ const ShipmentsDashboard: React.FC = () => {
       setIsTechnova(false);
     }
   }, []);
+
+  const handleDelayReasonSubmit = async (shipmentId: string, remark: string) => {
+    try {
+      const response = await httpsPost('shipment/delay', {
+        shipment_id: shipmentId,
+        reason: remark,
+        type: 'delay_reason'
+      });
+
+      if (response.statusCode === 200) {
+        // Refresh the shipment data or update the UI as needed
+        showMessage('Delay reason updated successfully', 'success');
+        // You might want to refresh the shipments list here
+        // fetchShipments(); 
+      } else {
+        throw new Error(response.message || 'Failed to update delay reason');
+      }
+    } catch (error: any) {
+      console.error('Error updating delay reason:', error);
+      showMessage(
+        error.message || 'Failed to update delay reason. Please try again.',
+        'error'
+      );
+    }
+  };
+
   // Modal and dialog states
   const [delayHistory, setDelayHistory] = useState<any[]>([]);
   const [delaygpsRemoveHistory, setDelaygpsRemoveHistory] = useState<any[]>([]);
@@ -421,7 +514,7 @@ const ShipmentsDashboard: React.FC = () => {
   const [selectedShipmentNo, setSelectedShipmentNo] = useState("");
   const [fromDateTsReRun, setFromDateTsReRun] = useState("");
   const [toDateTsReRun, setToDateTsReRun] = useState("");
-  const [freightType, setFreightType] = useState("");
+  const [freightType, setFreightType] = useState<'rate' | 'client_rate'>("rate");
   const [selectedDestination, setSelectedDestination] = useState("");
   const [shipmentsFilter, setShipmentsFilter] = useState<any>({
     type_filter: "outbound",
@@ -449,6 +542,112 @@ const ShipmentsDashboard: React.FC = () => {
   const [showIncreasePrice, setShowIncreasePrice] = useState(false);
 
   const [actionSearch, setActionSearch] = useState("");
+
+  const [showFlushFreightConfirm, setShowFlushFreightConfirm] = useState(false);
+  const [shipmentToFlush, setShipmentToFlush] = useState<Shipment | null>(null);
+  const [isFlushingFreight, setIsFlushingFreight] = useState(false);
+  const [reasonDialog, setReasonDialog] = useState<{
+    open: boolean;
+    type: 'delay' | 'gps';
+    shipmentId: string | null;
+  }>({
+    open: false,
+    type: 'delay',
+    shipmentId: null
+  });
+const [selectedShipmentForGps, setSelectedShipmentForGps] = useState<any>(null);
+const [showStatusModal, setShowStatusModal] = useState(false);
+const [selectedShipmentForStatus, setSelectedShipmentForStatus] = useState<Shipment | null>(null);
+const [showFaultyModal, setShowFaultyModal] = useState(false);
+const [selectedShipmentForFaulty, setSelectedShipmentForFaulty] = useState<Shipment | null>(null);
+const [showMissedEventModal, setShowMissedEventModal] = useState(false);
+const [selectedShipmentForMissedEvent, setSelectedShipmentForMissedEvent] = useState<Shipment | null>(null);
+const [showAddManagedByModal, setShowAddManagedByModal] = useState(false);
+const [selectedShipmentForManagedBy, setSelectedShipmentForManagedBy] = useState<Shipment | null>(null);
+// Add these state variables at the top with other state declarations
+const [showRetriggerEventModal, setShowRetriggerEventModal] = useState(false);
+const [selectedShipmentForRetrigger, setSelectedShipmentForRetrigger] = useState<Shipment | null>(null);
+const [showDriverExpenses, setShowDriverExpenses] = useState(false);
+
+// Add this near other state declarations
+const [isGeofenceEditorOpen, setIsGeofenceEditorOpen] = useState(false);
+const [selectedShipmentForGeofence, setSelectedShipmentForGeofence] = useState<Shipment | null>(null);
+
+// Add this with other handler functions
+const handleOpenGeofenceEditor = (shipment: Shipment) => {
+  setSelectedShipmentForGeofence(shipment);
+  setIsGeofenceEditorOpen(true);
+  closeAllDialogs();
+};
+
+  const handleOpenReasonDialog = (type: 'delay' | 'gps', shipmentId: string) => {
+    setReasonDialog({
+      open: true,
+      type,
+      shipmentId
+    });
+  };
+
+  const handleOpenGpsModal = (shipment: any) => {
+    closeAllDialogs();
+    setSelectedShipmentForGps(shipment);
+    setSelectedGps([]); // Reset selected GPS
+    setShowGpsModal(true);
+  };
+  
+  const handleCloseReasonDialog = () => {
+    setReasonDialog(prev => ({ ...prev, open: false }));
+  };
+
+  const handleDriverExpenseClick = (shipment: Shipment) => {
+    setSelectedShipment(shipment);
+    setShowDriverExpenses(true);
+  };
+  
+
+  const handleFlushFreight = async (shipment: Shipment) => {
+    closeAllDialogs();
+    if (!shipment._id) {
+      showMessage('Invalid shipment selected', 'error');
+      return;
+    }
+    setShipmentToFlush(shipment);
+    setShowFlushFreightConfirm(true);
+  };
+
+  const confirmFlushFreight = async () => {
+    if (!shipmentToFlush?._id) {
+      showMessage('No shipment selected', 'error');
+      return;
+    }
+
+    setShowFlushFreightConfirm(false);
+    setIsFlushingFreight(true);
+  
+    try {
+      const response = await httpsPost('carrier_invoice/flushFreight', {
+        _id: shipmentToFlush._id
+      }, {}, 6);
+
+      if (response.statusCode === 200) {
+        showMessage('Freight flushed successfully', 'success');
+        // Refresh the shipments list or update the UI as needed
+        // fetchShipments();
+      } else {
+        showMessage(response.message || 'Failed to flush freight', 'error');
+      }
+    } catch (error: any) {
+      console.error('Error flushing freight:', error);
+      showMessage(
+        error.message || 'Failed to flush freight. Please try again.',
+        'error'
+      );
+    } finally {
+      setIsFlushingFreight(false);
+    }
+  };
+
+  
   const actionMenuCategories = {
     "Quick Actions": [
       { icon: Eye, label: "View", color: "text-blue-600" },
@@ -458,7 +657,8 @@ const ShipmentsDashboard: React.FC = () => {
         color: "text-blue-500",
         onClick: (shipment: Shipment) => {
           // Generate the tracking URL based on your application's routing
-          const trackingUrl = `${window.location.origin}/tracking/${shipment._id}`;
+          closeAllDialogs();
+          const trackingUrl = `${window.location.origin}/track/${shipment.unique_code}`;
           setShareUrl(trackingUrl);
           setShareModalOpen(true);
         },
@@ -468,6 +668,7 @@ const ShipmentsDashboard: React.FC = () => {
         label: "Mail",
         color: "text-orange-600",
         onClick: (shipment: Shipment) => {
+          closeAllDialogs();
           setShipmentToMail(shipment);
           setMailModalOpen(true);
         },
@@ -477,66 +678,85 @@ const ShipmentsDashboard: React.FC = () => {
         label: "Cancel",
         color: "text-red-600",
         onClick: (shipment: Shipment) => {
+          closeAllDialogs();
           setShipmentToCancel(shipment);
           setCancelModalOpen(true);
         },
       },
     ],
     "Tracking & GPS": [
-      { icon: Download, label: "SIM Tracking", color: "text-amber-600" },
+      { 
+        icon: Download, 
+        label: "SIM Tracking", 
+        color: "text-amber-600",
+        onClick: (shipment: Shipment) => {
+          closeAllDialogs();
+          setSelectedShipment(shipment);
+          setModalOpen(true);
+        }
+      },
       {
         icon: WifiOff,
         label: "GPS Disconnection Reason",
         color: "text-teal-600",
+        onClick: (shipment: Shipment) => handleOpenReasonDialog('gps', shipment._id)
       },
-      { icon: Wifi, label: "Add GPS Connection", color: "text-amber-600" },
-      { icon: Clock, label: "Update Delay Reason", color: "text-teal-600" },
+      { 
+        icon: Wifi, 
+        label: "Add GPS Connection", 
+        color: "text-amber-600",
+        onClick: (shipment: Shipment) => handleOpenGpsModal(shipment)
+      },
+      { icon: Clock, label: "Update Delay Reason", color: "text-teal-600", onClick: (shipment: Shipment) => {
+        closeAllDialogs();
+        handleOpenReasonDialog('delay', shipment._id)
+      } },
     ],
     "Location & Routes": [
       {
         icon: Edit,
         label: "Edit Pickup Location",
         color: "text-pink-600",
-        onClick: (shipment: any) => {
-          console.log("Edit Pickup Location clicked", { shipment });
-          setSelectedShipment(shipment);
-          setSelectedLocationType("pickup");
-          console.log("Before setting showEditLocationModal to true");
-          setShowEditLocationModal(true);
-          console.log("After setting showEditLocationModal to true");
-        },
+        onClick: (shipment: Shipment) => handleOpenEditLocation(shipment, 'pickup'),
+        disabled: (shipment: Shipment) => 
+          ['Completed', 'Cancelled'].includes(shipment.status)
       },
       {
         icon: Edit,
         label: "Edit Delivery Location",
         color: "text-pink-600",
-        onClick: (shipment: any) => {
-          console.log("Edit Delivery Location clicked", { shipment });
-          setSelectedShipment(shipment);
-          setSelectedLocationType("delivery");
-          console.log("Before setting showEditLocationModal to true");
-          setShowEditLocationModal(true);
-          console.log("After setting showEditLocationModal to true");
-        },
+        onClick: (shipment: Shipment) => handleOpenEditLocation(shipment, 'delivery'),
+        disabled: (shipment: Shipment) => 
+          ['Completed', 'Cancelled'].includes(shipment.status)
       },
       {
         icon: Route,
         label: "Pull Freight with Routes",
         color: "text-brown-600",
         onClick: (shipment: Shipment) => {
+          closeAllDialogs();
           setPullFreightData({
-            SIN: shipment._id,
-            vehicleNo: shipment.vehicleNumber,
-            pickup: shipment.driverMobile,
-            shipmentId: shipment._id, // Make sure to set this if needed by getPullFreight
+            _id: shipment._id,
+            sin: shipment.sin,
+            vehicleNo: shipment.vehicleNumber || "",
+            pickup: shipment.from?.[0]?.location?.name || "",
+            destinations: shipment.to?.map(dest => ({
+              _id: dest.location?._id || "",
+              name: dest.location?.name || "",
+              city: dest.location?.city || ""
+            })) || []
           });
           setShowPullFreightDialog(true);
-        },
+        }
       },
       {
         icon: Calculator,
         label: "Recalculate Distance",
         color: "text-pink-600",
+        onClick: (shipment: any) => {
+          closeAllDialogs();
+          handleRecalculateDistance(shipment)
+        }
       },
     ],
     "Freight & Payment": [
@@ -544,17 +764,36 @@ const ShipmentsDashboard: React.FC = () => {
         icon: Truck,
         label: "Update Carrier Freight",
         color: "text-gray-600",
+        onClick: (shipment: Shipment) => {
+          closeAllDialogs();
+          handleOpenFreightModal(shipment._id, 'rate');
+        }
       },
-      { icon: Truck, label: "Flush Freight", color: "text-gray-600" },
+      { 
+        icon: Truck, 
+        label: "Flush Freight", 
+        color: "text-gray-600",
+        onClick: handleFlushFreight
+      },
       {
         icon: CreditCard,
         label: "Create Advance Payment",
         color: "text-indigo-600",
+        onClick: (shipment: Shipment) => {
+          setSelectedShipmentForPayment(shipment);
+          setShowPaymentAdvanceModal(true);
+          closeAllDialogs();
+        },
       },
       {
         icon: FileText,
         label: "Change Invoice Type",
         color: "text-brown-600",
+        onClick: (shipment: Shipment) => {
+          setSelectedShipmentForInvoiceType(shipment);
+          setIsInvoiceTypeModalOpen(true);
+          closeAllDialogs();
+        },
       },
     ],
     "Documents & Status": [
@@ -562,20 +801,36 @@ const ShipmentsDashboard: React.FC = () => {
         icon: FileText,
         label: "Upload Approval Documents",
         color: "text-purple-600",
+        onClick: (shipment: Shipment) => {
+          console.log('Upload Approval Documents clicked');
+          closeAllDialogs();
+          console.log('Setting selected shipment and showing dialog');
+          setSelectedShipment(shipment);
+          setShowAttachDialog(true);
+        },
       },
       {
         icon: Package,
         label: "View Epods",
         color: "text-brown-600",
         onClick: (shipment: Shipment) => {
+          closeAllDialogs();
+          console.log('View Epods clicked, shipment:', shipment);
           setSelectedShipmentForEpod(shipment);
+          console.log('After setSelectedShipmentForEpod, selectedShipmentForEpod:', shipment);
           setIsEpodModalOpen(true);
+          console.log('After setIsEpodModalOpen, isEpodModalOpen:', true);
         },
       },
       {
         icon: CheckCircle,
-        label: "Submit Mark As Arrived",
+        label: "Complete Shipment",
         color: "text-green-600",
+        onClick: (shipment: Shipment) => {
+          setSelectedShipmentForCompletion(shipment);
+          setShowCompleteShipmentModal(true);
+          closeAllDialogs();
+        },
       },
       {
         icon: DoorOpen,
@@ -591,6 +846,7 @@ const ShipmentsDashboard: React.FC = () => {
         onClick: (shipment: Shipment) => {
           setSelectedShipmentForRoambee(shipment);
           setShowRoambeeModal(true);
+          closeAllDialogs();
         },
       },
       // {
@@ -606,6 +862,11 @@ const ShipmentsDashboard: React.FC = () => {
         icon: CheckCircle,
         label: "Submit Mark As Arrived",
         color: "text-green-600",
+        onClick: (shipment: Shipment) => {
+          setSelectedShipmentForArrival(shipment);
+          setShowMarkAsArrivedModal(true);
+          closeAllDialogs();
+        },
       },
       //Create Payment Advice
       {
@@ -619,7 +880,7 @@ const ShipmentsDashboard: React.FC = () => {
         icon: Upload,
         label: "Bulk Upload - Commercial Invoices",
         color: "text-green-600",
-        onClick: () => setShowUploadModal(true),
+        onClick: (shipment: Shipment) => handleBulkUploadClick(shipment)
       },
     ],
     Others: [
@@ -629,31 +890,122 @@ const ShipmentsDashboard: React.FC = () => {
         label: "Add DO Details",
         color: "text-blue-600",
         onClick: (shipment: any) => {
+          closeAllDialogs();
           setSelectedShipment(shipment);
           setSelectedShipmentSIN(shipment.sin || shipment._id);
           setShowAddDODialog(true);
         },
       },
-      // Edit Pickup Location
+      // update shipment status
       {
         icon: Edit,
-        label: "Edit Pickup Location",
-        color: "text-pink-600",
+        label: "Update Shipment Status",
+        color: "text-yellow-600",
+        onClick: (shipment: Shipment) => {
+          closeAllDialogs();
+          setSelectedShipmentForStatus(shipment);
+          setShowStatusModal(true);
+        }
       },
-      // Edit Delivery Location
+      // Mark as faulty
       {
-        icon: Edit,
-        label: "Edit Delivery Location",
-        color: "text-pink-600",
+        icon: AlertCircle,
+        label: "Mark Fault Device",
+        color: "text-red-600",
+        onClick: (shipment: Shipment) => {
+          closeAllDialogs();
+          setSelectedShipmentForFaulty(shipment);
+          setShowFaultyModal(true);
+        }
       },
-      //view ePODS
+       // Missed Shipment
       {
-        icon: Eye,
-        label: "View ePODS",
-        color: "text-green-600",
+        icon: AlertCircle,
+        label: "Missed Shipment",
+        color: "text-red-600",
+        onClick: (shipment: Shipment) => {
+          closeAllDialogs();
+          setSelectedShipmentForMissed(shipment);
+          setShowMissedShipmentModal(true);
+        }
+      },
+      {
+        icon: AlertCircle,
+        label: "Missed Event",
+        color: "text-red-600",
+        onClick: (shipment: Shipment) => {
+          closeAllDialogs();
+          setSelectedShipmentForMissedEvent(shipment);
+          setShowMissedEventModal(true);
+        }
       },
     ],
+    Others1: [
+      // Add Managed By 
+      {
+        icon: UserPlus,
+        label: "Add Managed By",
+        color: "text-blue-600",
+        onClick: (shipment: Shipment) => {
+          closeAllDialogs();
+          setSelectedShipmentForManagedBy(shipment);
+          setShowAddManagedByModal(true);
+        }
+      },
+      // Retriggered missed shipment
+      {
+        icon: RefreshCw,
+        label: "ReTrigger Missed Events",
+        color: "text-blue-600",
+        onClick: (shipment: Shipment) => {
+          closeAllDialogs();
+          setSelectedShipmentForRetrigger(shipment);
+          setShowRetriggerEventModal(true);
+        }
+      },
+      //Reassign
+      {
+        icon: RefreshCw,
+        label: "Reassign",
+        color: "text-blue-600",
+      },
+      //Update Client Freight
+      {
+        icon: Edit,
+        label: "Update Client Freight",
+        color: "text-yellow-600",
+        onClick: (shipment: Shipment) => {
+          closeAllDialogs();
+          handleOpenFreightModal(shipment._id, 'client_rate');
+        }
+      },
+      //Add Driver Expenses
+      {
+        icon: Plus,
+        label: "Add Driver Expenses",
+        color: "text-green-600",
+        onClick: (shipment: Shipment) => {
+          closeAllDialogs();
+          handleDriverExpenseClick(shipment);
+        }
+      },
+    ],
+    Others2: [
+      //Add/Edit Geofence
+      {
+        icon: Plus,
+        label: "Add/Edit Geofence",
+        color: "text-green-600",
+        onClick: handleOpenGeofenceEditor,
+        disabled: (shipment: Shipment) => 
+          ['Completed', 'Cancelled'].includes(shipment.status)
+      },
+    ]
   };
+
+  useEffect(() => {
+    console.log('showAttachDialog state changed:', showAttachDialog);
+  }, [showAttachDialog]);
 
   // Sub filters data
   const subFilters = [
@@ -1129,35 +1481,28 @@ const ShipmentsDashboard: React.FC = () => {
     setShowActiveCarriersPopup(true);
   };
 
-  const openTotalFreightPopup = () => {
-    setShowTotalFreightPopup(true);
-  };
 
-  const openAverageFreightPopup = () => {
-    setShowAverageFreightPopup(true);
-  };
+  // const getPullFreight = async (data: {
+  //   destination: string;
+  //   freightRate: string;
+  // }) => {
+  //   console.log(" getPullFreight ----");
+  //   try {
+  //     const response = await httpsGet(
+  //       `/api/freight_rate_route_code/get?destination=${encodeURIComponent(
+  //         data.destination
+  //       )}&shipment=${encodeURIComponent(pullFreightData.shipmentId)}`
+  //     );
 
-  const getPullFreight = async (data: {
-    destination: string;
-    freightRate: string;
-  }) => {
-    console.log(" getPullFreight ----");
-    try {
-      const response = await httpsGet(
-        `/api/freight_rate_route_code/get?destination=${encodeURIComponent(
-          data.destination
-        )}&shipment=${encodeURIComponent(pullFreightData.shipmentId)}`
-      );
-
-      if (response.statusCode === 200) {
-        alert(`New Freight Rate is ${response.data}`);
-        setShowPullFreightDialog(false);
-      }
-    } catch (error) {
-      console.error("Error getting freight rate:", error);
-      alert("Failed to get freight rate");
-    }
-  };
+  //     if (response.statusCode === 200) {
+  //       alert(`New Freight Rate is ${response.data}`);
+  //       setShowPullFreightDialog(false);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error getting freight rate:", error);
+  //     alert("Failed to get freight rate");
+  //   }
+  // };
 
   const updateFreight = async () => {
     try {
@@ -1205,28 +1550,6 @@ const ShipmentsDashboard: React.FC = () => {
     }
   };
 
-  const submitDONumber = async () => {
-    try {
-      const response = await fetch("/api/shipment/add_do_number", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          shipment: selectedShipmentSIN,
-          doNumber,
-        }),
-      });
-      const data = await response.json();
-
-      if (data.statusCode === 200) {
-        alert("DO Number added successfully");
-        setShowAddDODialog(false);
-        fetchShipments();
-      }
-    } catch (error) {
-      console.error("Error adding DO number:", error);
-    }
-  };
-
   const submitManagedBy = async () => {
     try {
       const response = await fetch("/api/shipment/add_managed_by", {
@@ -1251,23 +1574,18 @@ const ShipmentsDashboard: React.FC = () => {
 
   const submitIncreasePrice = async () => {
     try {
-      const response = await fetch("/api/rates/refresh-freight", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          shipments: selectedShipmentsArray,
-          dealer_type: selectedDealerType,
-        }),
-      });
-      const data = await response.json();
-
-      if (data.statusCode === 200) {
-        alert("Freight recalculated successfully");
+      const response = await httpsPost("rates/refresh-freight", {
+        shipments: selectedShipmentsArray,
+        dealer_type: selectedDealerType,
+      }, {},4);
+      if (response.statusCode === 200) {
+        showMessage("Freight recalculated successfully", "success");
         setShowIncreasePriceDialog(false);
         fetchShipments();
       }
     } catch (error) {
       console.error("Error recalculating freight:", error);
+      showMessage("Error recalculating freight", "error");
     }
   };
 
@@ -2012,7 +2330,7 @@ const ShipmentsDashboard: React.FC = () => {
         title={statusLabels[status] || status} // Show status text on hover
       />
     );
-  }
+  };
 
   const renderSINCell = (shipment: any) => (
     <div>
@@ -2242,42 +2560,7 @@ const ShipmentsDashboard: React.FC = () => {
     </div>
   );
 
-  const handleSubmitRoambee = async (roambeeId: string) => {
-    if (!selectedShipmentForRoambee) return;
-
-    try {
-      setIsSubmittingRoambee(true);
-      // Replace with your actual API endpoint
-      const response = await httpsPost("shipment/add_roambee_id", {
-        shipmentId: selectedShipmentForRoambee._id,
-        roambeeId,
-      });
-
-      if (response.data.statusCode === 200) {
-        showMessage("Roambee ID added successfully", "success");
-        setShowRoambeeModal(false);
-        // Refresh the shipments list or update the specific shipment
-        fetchShipments();
-      }
-    } catch (error: any) {
-      showMessage(
-        error.response?.data?.message || "Failed to add Roambee ID",
-        "error"
-      );
-    } finally {
-      setIsSubmittingRoambee(false);
-    }
-  };
-
   const renderSubscriptionCell = (shipment: any) => {
-    // This logic enables the cell if "showSubscriptionStatus" is true
-    // AND shipment.simTracking is present AND shipment is not GPS vehicle
-    console.log(
-      "shipment.showSubscriptionStatus",
-      shipment.showSubscriptionStatus
-    );
-    console.log("shipment.gpsVehicle", shipment.gpsVehicle);
-    // akila - simconsent
     return shipment.showSubscriptionStatus && !shipment.gpsVehicle ? (
       <div
         className={styles.subscription}
@@ -2377,10 +2660,14 @@ const ShipmentsDashboard: React.FC = () => {
 
   //   if (onClear) onClear();
   // };
-  console.log(
-    "Rendering PullFreightModal with showPullFreightDialog:",
-    showPullFreightDialog
-  );
+
+  const [showBulkUploadModal, setShowBulkUploadModal] = useState(false);
+  const [selectedShipmentForBulkUpload, setSelectedShipmentForBulkUpload] = useState<any>(null);
+
+  const handleBulkUploadClick = (shipment: any) => {
+    setSelectedShipmentForBulkUpload(shipment);
+    setShowBulkUploadModal(true);
+  };
 
   const [shareModalOpen, setShareModalOpen] = useState(false);
   const [shareUrl, setShareUrl] = useState("");
@@ -2402,7 +2689,7 @@ const ShipmentsDashboard: React.FC = () => {
     try {
       setIsLoading(true);
       const response = await httpsPost(
-        "/v1/jde/vehicleArrival",
+        "jde/vehicleArrival",
         selectedShipmentsArray
       );
 
@@ -2430,7 +2717,7 @@ const ShipmentsDashboard: React.FC = () => {
     try {
       setIsLoading(true);
       const response = await httpsPost(
-        "/v1/jde/uploadEPODtoJDE",
+        "jde/uploadEPODtoJDE",
         selectedShipmentsArray
       );
 
@@ -2458,7 +2745,7 @@ const ShipmentsDashboard: React.FC = () => {
     try {
       setIsLoading(true);
       const response = await httpsPost(
-        "/v1/jde/fetchInvoicesFromJde",
+        "jde/fetchInvoicesFromJde",
         selectedShipmentsArray
       );
 
@@ -2497,10 +2784,10 @@ const ShipmentsDashboard: React.FC = () => {
   const [shipmentToMail, setShipmentToMail] = useState<Shipment | null>(null);
 
   const [showPaymentAdviceModal, setShowPaymentAdviceModal] = useState(false);
-  const [selectedShipmentForPayment, setSelectedShipmentForPayment] =
-    useState<Shipment | null>(null);
+
 
   const handleCreatePaymentAdvice = (shipment: Shipment) => {
+    closeAllDialogs();
     setSelectedShipmentForPayment(shipment);
     setShowPaymentAdviceModal(true);
   };
@@ -2523,25 +2810,95 @@ const ShipmentsDashboard: React.FC = () => {
   };
 
   const [showEditLocationModal, setShowEditLocationModal] = useState(false);
-  const [selectedLocationType, setSelectedLocationType] = useState<
-    "pickup" | "delivery"
-  >("pickup");
-
-  const [shipperPrefs, setShipperPrefs] = useState({
+  const [selectedLocationType, setSelectedLocationType] = useState<'pickup' | 'delivery'>('pickup');
+  const [shipperPrefs, setShipperPrefs] = useState<ShipperPrefs>({
     locations: [],
-    deliveryLocations: [],
+    deliveryLocations: []
   });
 
-  const handleEditSubmit = async (location: any, date: Date | null) => {
+  const handleOpenEditLocation = (shipment: any, type: 'pickup' | 'delivery') => {
+    setSelectedShipment(shipment);
+    setSelectedLocationType(type);
+    
+    // Fetch shipper preferences if not already loaded
+    if (shipment.organization?._id) {
+      fetchShipperPrefs(shipment.organization._id);
+    }
+    
+    setShowEditLocationModal(true);
+  };
+
+  const fetchShipperPrefs = async (orgId: string) => {
     try {
-      // TODO: Implement the API call to update the location
-      console.log(`Updating ${selectedLocationType} location:`, {
-        location,
-        date,
-      });
-      setShowEditLocationModal(false);
+      const response = await httpsGet(`org_pref?organization=${orgId}`, 4);
+      if (response.statusCode === 200) {
+        // For supplier type, filter locations
+        const typeData = JSON.parse(localStorage.getItem('shippers') || '[]');
+        if (typeData[0]?.type === 'supplier') {
+          const supplier = typeData[0];
+          const locationData: ShipperPrefs['locations'] = [...(response.data.locations || [])];
+          setShipperPrefs({
+            locations: locationData.filter(x => x.shipper === supplier._id),
+            deliveryLocations: locationData.filter(x => x.shipper !== supplier._id)
+          });
+        } else {
+          setShipperPrefs({
+            locations: [...(response.data.locations || [])],
+            deliveryLocations: [...(response.data.locations || [])]
+          });
+        }
+      }
     } catch (error) {
-      console.error("Error updating location:", error);
+      console.error('Error fetching shipper prefs:', error);
+      showMessage('Failed to load location preferences', 'error');
+    }
+  };
+
+  const handleFetchLocations = async (date: Date | null) => {
+    if (!selectedShipment) return [];
+    
+    try {
+      // Implement your location fetching logic here
+      // This is a placeholder - replace with your actual API call
+      const response = await httpsGet('location/search', 
+      //   {
+      //   date: date?.toISOString(),
+      //   type: selectedLocationType,
+      //   shipmentId: selectedShipment._id
+      // }, 
+      4);
+      
+      return response.data || [];
+    } catch (error) {
+      console.error('Error fetching locations:', error);
+      showMessage('Failed to fetch locations', 'error');
+      return [];
+    }
+  };
+
+  const handleEditSubmit = async (location: any, date: Date | null) => {
+    if (!selectedShipment) return;
+    
+    try {
+      const payload = {
+        shipmentId: selectedShipment._id,
+        locationId: location._id,
+        type: selectedLocationType,
+        date: date?.toISOString()
+      };
+      
+      const response = await httpsPost('shipment/update-location', payload, {}, 4);
+      
+      if (response.statusCode === 200) {
+        showMessage('Location updated successfully', 'success');
+        fetchShipments(); // Refresh the shipments list
+        setShowEditLocationModal(false);
+      } else {
+        throw new Error(response.message || 'Failed to update location');
+      }
+    } catch (error: any) {
+      console.error('Error updating location:', error);
+      showMessage(error.message || 'Failed to update location', 'error');
     }
   };
 
@@ -2555,11 +2912,6 @@ const ShipmentsDashboard: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    console.log("showEditLocationModal state changed:", showEditLocationModal);
-    console.log("selectedShipment:", selectedShipment);
-    console.log("selectedLocationType:", selectedLocationType);
-  }, [showEditLocationModal, selectedShipment, selectedLocationType]);
 
   const [isPrintLRModalOpen, setIsPrintLRModalOpen] = useState(false);
   const [selectedShipmentIds, setSelectedShipmentIds] = useState<string[]>([]);
@@ -2576,57 +2928,30 @@ const ShipmentsDashboard: React.FC = () => {
   };
 
   const handleDownloadLRsClick = () => {
-    // Get selected shipment IDs
-    const selectedIds = shipments
-      .filter((shipment) => shipment.selected)
-      .map((shipment) => shipment._id);
-
-    if (selectedIds.length === 0) {
-      // Optionally show a message to select shipments first
+    const selectedId = selectedShipmentsArray[0];
+    if (!selectedId) {
+      showMessage("Please select a shipment first", "error");
       return;
     }
 
     closeAllDialogs();
-    setSelectedShipmentIds(selectedIds);
+    setSelectedShipmentIds(selectedId);
     setIsPrintLRModalOpen(true);
   };
 
   const [isIncreasePriceModalOpen, setIsIncreasePriceModalOpen] =
     useState(false);
-  const [
-    selectedShipmentForRecalculation,
-    setSelectedShipmentForRecalculation,
-  ] = useState<string>("");
 
-  const handleRecalculateFreight = async (dealerType: string) => {
-    try {
-      // Handle the recalculate freight action here
-      console.log(
-        "Recalculating freight for shipment ID:",
-        selectedShipmentForRecalculation,
-        "with dealer type:",
-        dealerType
-      );
-      // Add your API call or recalculation logic here
-
-      // Close the modal after successful submission
-      setIsIncreasePriceModalOpen(false);
-    } catch (error) {
-      console.error("Error recalculating freight:", error);
-    }
-  };
 
   const handleRecalculateFreightClick = () => {
-    // Get the first selected shipment ID (or handle multiple selections as needed)
-    const selectedId = shipments.find((shipment) => shipment.selected)?._id;
-
+    const selectedId = selectedShipmentsArray[0];
     if (!selectedId) {
-      // Optionally show a message to select a shipment first
+      showMessage("Please select a shipment first", "error");
       return;
     }
 
     closeAllDialogs();
-    setSelectedShipmentForRecalculation(selectedId);
+    setSelectedShipmentForPriceIncrease(selectedId);
     setIsIncreasePriceModalOpen(true);
   };
 
@@ -2662,6 +2987,130 @@ const ShipmentsDashboard: React.FC = () => {
     setShowEditLocationModal(false);
     setIsPrintLRModalOpen(false);
     setIsIncreasePriceModalOpen(false);
+  };
+
+  const [showPaymentAdvanceModal, setShowPaymentAdvanceModal] = useState(false);
+  const [selectedShipmentForPayment, setSelectedShipmentForPayment] = useState<Shipment | null>(null);
+
+  const handlePaymentAdvanceSubmit = async (paymentData: any) => {
+    try {
+      // Add your payment submission logic here
+      console.log('Submitting payment advance:', paymentData);
+      // Example API call (uncomment and modify as needed):
+      // const response = await httpsPost('payments/advance', {
+      //   shipment_id: selectedShipmentForPayment?._id,
+      //   ...paymentData
+      // });
+      // 
+      // if (response.statusCode === 200) {
+      //   showMessage('Payment advance created successfully', 'success');
+      //   setShowPaymentAdvanceModal(false);
+      // }
+    } catch (error: any) {
+      console.error('Error creating payment advance:', error);
+      showMessage(
+        error.message || 'Failed to create payment advance. Please try again.',
+        'error'
+      );
+    }
+  };
+
+  const [showRecalculateDistanceModal, setShowRecalculateDistanceModal] = useState(false);
+  const [selectedShipmentForRecalculation, setSelectedShipmentForRecalculation] = useState<{
+    _id: string;
+    sin: string;
+    from: Array<{ location: { name: string; city: string; _id: string } }>;
+    to: Array<{ location: { name: string; city: string; _id: string } }>;
+  } | null>(null);
+
+  const handleRecalculateDistance = (shipment: any) => {
+    setSelectedShipmentForRecalculation({
+      _id: shipment._id,
+      sin: shipment.sin,
+      from: shipment.from,
+      to: shipment.to
+    });
+    setShowRecalculateDistanceModal(true);
+  };
+
+  const [isInvoiceTypeModalOpen, setIsInvoiceTypeModalOpen] = useState(false);
+  const [selectedShipmentForInvoiceType, setSelectedShipmentForInvoiceType] = useState<Shipment | null>(null);
+
+  const [invoiceData, setInvoiceData] = useState<Array<{
+    invoiceType: 'CT' | 'PT';
+    invoice: string;
+    shippedQty: number | string;
+    shippedNop: number | string;
+    [key: string]: any;
+  }>>([]);
+  const [isLoadingInvoices, setIsLoadingInvoices] = useState(false);
+
+  const fetchInvoiceData = async (shipmentId: string) => {
+    try {
+      setIsLoadingInvoices(true);
+      const response = await httpsGet(`/api/shipment/one/${shipmentId}`);
+      // Transform the response data to match the expected format
+      const invoiceItems = response.data.invoices?.map((inv: any) => ({
+        invoiceType: inv.invoiceType || 'CT',
+        invoice: inv.invoiceNumber || '',
+        shippedQty: inv.shippedQuantity || 0,
+        shippedNop: inv.shippedPieces || 0,
+        ...inv // Include all other invoice properties
+      })) || [];
+      setInvoiceData(invoiceItems);
+    } catch (error) {
+      console.error('Error fetching invoice data:', error);
+      // Show error toast or notification
+    } finally {
+      setIsLoadingInvoices(false);
+    }
+  };
+
+  const handleInvoiceTypeChange = (item: any, newType: 'CT' | 'PT') => {
+    setInvoiceData(prevData =>
+      prevData.map(inv =>
+        inv.invoice === item.invoice ? { ...inv, invoiceType: newType } : inv
+      )
+    );
+  };
+
+  const handleInvoiceTypeSubmit = async () => {
+    try {
+      setIsLoadingInvoices(true);
+      // Call your API to update invoice types
+      await httpsPost('/api/update-invoice-types', {
+        shipmentId: selectedShipmentForInvoiceType?._id,
+        invoices: invoiceData.map(inv => ({
+          invoice: inv.invoice,
+          invoiceType: inv.invoiceType
+        }))
+      });
+      // Show success message
+      // Close the modal
+      setIsInvoiceTypeModalOpen(false);
+      // Refresh the shipment data
+      fetchShipments();
+    } catch (error) {
+      console.error('Error updating invoice types:', error);
+      // Show error toast or notification
+    } finally {
+      setIsLoadingInvoices(false);
+    }
+  };
+
+  const [showUpdateFreightModal, setShowUpdateFreightModal] = useState(false);
+  const [selectedShipmentForFreight, setSelectedShipmentForFreight] = useState<string | null>(null);
+
+  const handleOpenFreightModal = (shipmentId: string, freightType: 'rate' | 'client_rate') => {
+    setSelectedShipmentForFreight(shipmentId);
+    setFreightType(freightType);
+    setShowUpdateFreightModal(true);
+  };
+
+  const handleFreightUpdateSuccess = () => {
+    setShowUpdateFreightModal(false);
+    fetchShipments(); // Refresh the shipments list
+    showMessage('Freight updated successfully', 'success');
   };
 
   return (
@@ -2739,7 +3188,9 @@ const ShipmentsDashboard: React.FC = () => {
         </div>
       </div>
       <div className={styles.header}>
-        <div className={styles.inputContainer}>
+      <div className={styles.inputContainer}>
+        {/* Wrap the select in a container for custom arrow positioning */}
+        <div className={styles.selectContainer}>
           <select
             value={searchType}
             onChange={(e) => setSearchType(e.target.value)}
@@ -2753,104 +3204,60 @@ const ShipmentsDashboard: React.FC = () => {
             <option value="ppd_no">PPD Number</option>
             <option value="do_number">DO Number</option>
           </select>
-
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder={`Enter ${searchType}`}
-            className={styles.inputSelect}
-            // onKeyPress={(e) => e.key === 'Enter' && c()}
-          />
         </div>
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder={`Enter ${searchType}`}
+          className={styles.inputSearch}
+        />
+      </div>
 
-        <div
-          className={`${styles.submitButton} ${styles.advancedSearchSubmitButton}`}
-          role="button"
-          tabIndex={0}
-          onClick={() => setShowAdvancedSearch((prev) => !prev)}
-          onKeyPress={(e) =>
-            e.key === "Enter" && setShowAdvancedSearch((prev) => !prev)
-          }
-          style={{ cursor: "pointer" }}
-        >
-          <div className={styles.button}>Advanced Search</div>
-        </div>
 
-        <div className={styles.submitButton}>
+        {/* All buttons are now wrapped in a single container */}
+        <div className={styles.buttonContainer}>
           <div
-            className={styles.button}
-            // onClick={openMapView}
-            style={{ marginLeft: 10 }}
+            className={`${styles.button} ${styles.advancedSearchSubmitButton}`}
+            role="button"
+            tabIndex={0}
+            onClick={() => setShowAdvancedSearch((prev) => !prev)}
+            onKeyPress={(e) =>
+              e.key === "Enter" && setShowAdvancedSearch((prev) => !prev)
+            }
           >
-            Map View
+            Advanced Search
           </div>
-        </div>
 
-        <div className={styles.commercial_invoice_btn}>
-          <div className={styles.submitButton}>
-            <div className={styles.commercial_invoice_submit}>
-              <select
-                className={styles.customSelectButton}
-                // onChange={(e) => openBulkUpload(e.target.value)}
-                defaultValue=""
-                aria-label="Upload commercial invoices"
-              >
-                <option value="" disabled>
-                  Upload Commercial Invoice
-                </option>
-                <option value="commercial_invoice">
-                  Upload Commercial Invoice
-                </option>
-                <option value="commercial_invoice_Tcode">
-                  Upload with TCode
-                </option>
-              </select>
-            </div>
+          <div className={styles.button}>Map View</div>
+
+          <div className={styles.commercial_invoice_btn}>
+            <select
+              className={styles.customSelectButton}
+              defaultValue=""
+              aria-label="Upload commercial invoices"
+            >
+              <option value="" disabled>
+                Upload Commercial Invoice
+              </option>
+              <option value="commercial_invoice">Upload Commercial Invoice</option>
+              <option value="commercial_invoice_Tcode">Upload with TCode</option>
+            </select>
           </div>
-        </div>
 
-        <div className={styles.submitButton}>
-          <div
-            className={styles.button}
-            onClick={toggleAnalyticsView}
-            style={{ marginLeft: 10 }}
-          >
+          <div className={styles.button} onClick={toggleAnalyticsView}>
             {isAnalyticsView ? "Table View" : "Analytics View"}
           </div>
-        </div>
 
-        <div className={styles.submitButton}>
-          <div
-            className={styles.button}
-            onClick={toggleCompactView}
-            style={{ marginLeft: 10 }}
-          >
+          <div className={styles.button} onClick={toggleCompactView}>
             {isCompactView ? "Comfortable" : "Compact"}
           </div>
-        </div>
 
-        {/* {advanceSearch && ( */}
-        {/* <div className={styles.submitButton}>
-          <div
-            className={styles.button}
-            // onClick={clear}
-            style={{ width: 46 }}
-          >
-            Clear
-          </div>
-        </div> */}
-        {/* // )} */}
-
-        {showButtons && (
-          <>
-            <div
-              className={styles.submitButton}
-              onClick={handleDownloadLRsClick}
-            >
-              <div className={styles.button}>Download LRs</div>
-            </div>
-            <div className={styles.submitButton}>
+          {showButtons && (
+            <>
+              <div className={styles.button} onClick={handleDownloadLRsClick}>
+                Download LRs
+              </div>
               <div
                 className={styles.button}
                 onClick={handleRecalculateFreightClick}
@@ -2858,21 +3265,11 @@ const ShipmentsDashboard: React.FC = () => {
               >
                 Recalculate Freight
               </div>
-            </div>
-          </>
-        )}
-
-        {/* {urlParams?.type && ( */}
-        {/* <div className={styles.submitButton}>
-          <div
-            className={styles.button}
-            // onClick={resetFilters}
-          >
-            Reset Filters
-          </div>
-        </div> */}
-        {/* )} */}
+            </>
+          )}
+        </div>
       </div>
+
       {showAdvancedSearch && (
         <AdvancedFilter
           userType={userType}
@@ -2922,8 +3319,6 @@ const ShipmentsDashboard: React.FC = () => {
           selectedAnalyticsRange={selectedAnalyticsRange}
           setSelectedAnalyticsRange={setSelectedAnalyticsRange}
           formatCurrency={formatCurrency}
-          openTotalFreightPopup={openTotalFreightPopup}
-          openAverageFreightPopup={openAverageFreightPopup}
           openActiveCarriersPopup={openActiveCarriersPopup}
         />
       ) : (
@@ -3096,7 +3491,7 @@ const ShipmentsDashboard: React.FC = () => {
         />
       )} */}
       {/* {showAverageFreightPopup && (
-        <FreightModal
+        <TotalFreightModal
           show={showAverageFreightPopup}
           title="Average Freight Details"
           data={averageFreightData}
@@ -3135,42 +3530,78 @@ const ShipmentsDashboard: React.FC = () => {
 
       {/* Pull Freight Dialog */}
       {showPullFreightDialog && (
-        <PullFreightModal
-          show={showPullFreightDialog}
-          sin={pullFreightData.SIN}
-          vehicleNo={pullFreightData.vehicleNo}
-          pickup={pullFreightData.pickup}
-          destinations={destinations}
-          onClose={() => {
-            console.log("Modal close button clicked");
-            setShowPullFreightDialog(false);
-          }}
-          onGetFreight={getPullFreight}
-        />
-      )}
+  <PullFreightModal
+    _id={pullFreightData._id}  // Changed from shipmentId to _id
+    show={showPullFreightDialog}
+    sin={pullFreightData.sin}  // Changed from pullFreightData.SIN to pullFreightData.sin
+    vehicleNo={pullFreightData.vehicleNo}
+    pickup={pullFreightData.pickup}
+    destinations={pullFreightData.destinations}
+    onClose={() => {
+      setShowPullFreightDialog(false);
+    }}
+    onGetFreight={async (data) => {
+      try {
+        // Handle the freight data here
+        console.log('Freight data:', data);
+        // Add your freight handling logic here
+      } catch (error) {
+        console.error('Error handling freight:', error);
+      }
+    }}
+  />
+)}
 
       {showRoambeeModal && selectedShipmentForRoambee && (
         <AddRoambeeModal
           show={showRoambeeModal}
           shipmentNo={selectedShipmentForRoambee?.sin || ""}
+          shipmentId={selectedShipmentForRoambee?._id || ""}
           onClose={() => {
             setShowRoambeeModal(false);
             setSelectedShipmentForRoambee(null);
           }}
-          onSubmit={handleSubmitRoambee}
+          onSuccess={() => {
+            fetchShipments();
+          }}
           isLoading={isSubmittingRoambee}
         />
       )}
 
-      {/*      
-      {showAttachDialog && (
+      {showAttachDialog && selectedShipment && (
         <AttachFilesModal
           show={showAttachDialog}
           onClose={() => setShowAttachDialog(false)}
-          onFileChange={handleFileChange}
-          onAttach={attachFiles}
+          onAttach={() => {
+            // This will be called after successful upload
+            // You can refresh the shipments list or update the UI as needed
+            fetchShipments(); // Assuming you have a function to refresh the shipments
+          }}
+          shipmentId={selectedShipment._id || ""} // Make sure to use the correct property name
         />
       )}
+
+{showStatusModal && selectedShipmentForStatus && (
+  <UpdateStatusModal
+    show={showStatusModal}
+    shipmentNo={selectedShipmentForStatus.sin}
+    shipmentId={selectedShipmentForStatus._id}
+    shipmentDetails={{
+      from: selectedShipmentForStatus.from[0],
+      to: selectedShipmentForStatus.to[0]
+    }}
+    onClose={() => {
+      setShowStatusModal(false);
+      setSelectedShipmentForStatus(null);
+    }}
+    onSuccess={() => {
+      fetchShipments(); // Refresh the shipments list
+    }}
+  />
+)}
+
+      {/*      
+     
       
       {showUpdateFreightDialog && (
         <IncreasePriceModal
@@ -3322,6 +3753,25 @@ const ShipmentsDashboard: React.FC = () => {
           }}
         />
       )}
+
+{reasonDialog.open && reasonDialog.shipmentId && (
+  <ReasonDialog
+    open={reasonDialog.open}
+    onClose={handleCloseReasonDialog}
+    type={reasonDialog.type}
+    shipmentId={reasonDialog.shipmentId}
+    history={
+      reasonDialog.type === 'delay' 
+        ? shipments.find(s => s._id === reasonDialog.shipmentId)?.delay_reason || []
+        : shipments.find(s => s._id === reasonDialog.shipmentId)?.gps_disconnection_reason || []
+    }
+    onSuccess={() => {
+      fetchShipments(); // Refresh the shipments list
+      showMessage('Reason updated successfully', 'success');
+    }}
+  />
+)}
+
       {showBulkUpload && (
         <BulkUploadShipments
           open={showBulkUpload}
@@ -3401,24 +3851,65 @@ const ShipmentsDashboard: React.FC = () => {
           onClose={() => setShowAddDODialog(false)}
           onSave={handleSaveDO}
           shipmentNo={selectedShipmentSIN}
+          shipmentId={selectedShipment?._id || ""}
           isLoading={false}
         />
       )}
-      {/* {showEditLocationModal && selectedShipment && (
+{showEditLocationModal && selectedShipment && (
   <EditLocationsModal
-    show={showEditLocationModal}
-    onClose={() => setShowEditLocationModal(false)}
-    addLocationsType={selectedLocationType}
-    orderNumber={selectedShipment?.sin || selectedShipment?._id || ""}
-    shipperPrefs={shipperPrefs}
-    onEditSubmit={handleEditSubmit}
-    onFetchLocation={fetchLocations}
-   nearestPickup={selectedShipment?.from?.[0]?.location ? {
-  ...selectedShipment.from[0].location,
-  area: '' 
-} : null}
+  show={showEditLocationModal}
+  onClose={() => setShowEditLocationModal(false)}
+  addLocationsType={selectedLocationType}
+  shipmentId={selectedShipment._id}
+  shipperPrefs={shipperPrefs}
+  orderNumber={selectedShipment.sin}
+  // pickupId={selectedShipment.from?.[0]?._id || ""}
+  // deliveryId={selectedShipment.to?.[0]?._id || ""}
+  elementOrderId={selectedShipment._id}
+  // currentLocation={selectedShipment.trip_tracker?.last_location || []}
+  onEditSuccess={() => {
+    setShowEditLocationModal(false);
+    fetchShipments();
+  }}
   />
-)} */}
+)}
+
+      {showGpsModal && selectedShipmentForGps && (
+        <AddGpsConnectionModal
+        show={showGpsModal}
+        onClose={() => {
+          setShowGpsModal(false);
+          setSelectedGps([]);
+        }}
+        selectedGps={selectedGps}
+        onGpsChange={setSelectedGps}
+        driverType={selectedShipmentForGps.driver_type === 'attached' ? 'temporary' : 'own'}
+        attachedDriverId={selectedShipmentForGps.assigned_driver?._id}
+        vehicleId={selectedShipmentForGps.assigned_driver?.vehicle_type?._id || ""}
+        onSuccess={() => {
+          fetchShipments(); // Refresh the shipments list
+          showMessage('GPS connection added successfully', 'success');
+        }}
+        isLoading={false} // Set to true when making API call
+        />
+      )}
+
+{showFaultyModal && selectedShipmentForFaulty && (
+  <MarkFaultyModal
+    show={showFaultyModal}
+    vehicleNumber={selectedShipmentForFaulty.vehicleNumber || ''}
+    gpsProvider={selectedShipmentForFaulty.gpsProvider || 'GPS Device'}
+    onClose={() => {
+      setShowFaultyModal(false);
+      setSelectedShipmentForFaulty(null);
+    }}
+    onSuccess={() => {
+      fetchShipments(); // Refresh the shipments list
+    }}
+  />
+)}
+
+     
 
       {isEpodModalOpen && selectedShipmentForEpod && (
         <EpodPreviewModal
@@ -3464,16 +3955,222 @@ const ShipmentsDashboard: React.FC = () => {
         />
       )}
 
-      {/* {isIncreasePriceModalOpen && (
+      {isIncreasePriceModalOpen && (
         <IncreasePriceModal
           show={isIncreasePriceModalOpen}
-          shipmentId={selectedShipmentForRecalculation}
+          shipmentId={selectedShipmentForPriceIncrease}
           onClose={() => setIsIncreasePriceModalOpen(false)}
-          onSubmit={handleRecalculateFreight}
+          onSubmit={submitIncreasePrice}
         />
-      )} */}
+      )}
+      {showPaymentAdvanceModal && selectedShipmentForPayment && (
+        <CreatePaymentAdvanceModal
+          show={showPaymentAdvanceModal}
+          onClose={() => setShowPaymentAdvanceModal(false)}
+          onSubmit={handlePaymentAdvanceSubmit}
+          shipmentId={selectedShipmentForPayment._id}
+          data={{
+            shipment: selectedShipmentForPayment,
+            // Add any additional required data here
+          }}
+        />
+      )}
+      {showFlushFreightConfirm && (
+        <ConfirmationDialog
+          isOpen={showFlushFreightConfirm}
+          title="Confirm Flush Freight"
+          message="Are you sure you want to flush freight for this shipment? This action cannot be undone."
+          confirmText={isFlushingFreight ? 'Processing...' : 'Yes, Flush Freight'}
+          onConfirm={confirmFlushFreight}
+          onCancel={() => setShowFlushFreightConfirm(false)}
+          isProcessing={isFlushingFreight}
+        />
+      )}
+      {showRecalculateDistanceModal && selectedShipmentForRecalculation && (
+        <RecalculateDistanceModal
+          show={showRecalculateDistanceModal}
+          onClose={() => setShowRecalculateDistanceModal(false)}
+          shipmentId={selectedShipmentForRecalculation._id}
+          orderSIN={selectedShipmentForRecalculation.sin}
+          pickupAddresses={selectedShipmentForRecalculation.from.map(f => 
+            `${f.location.name}${f.location.city ? `, ${f.location.city}` : ''}`
+          )}
+          deliveryAddresses={selectedShipmentForRecalculation.to.map(t => 
+            `${t.location.name}${t.location.city ? `, ${t.location.city}` : ''}`
+          )}
+        />
+      )}
+      {isInvoiceTypeModalOpen && selectedShipmentForInvoiceType && (
+        <InvoiceTypeModal
+          show={isInvoiceTypeModalOpen}
+          onClose={() => {
+            setIsInvoiceTypeModalOpen(false);
+            setSelectedShipmentForInvoiceType(null);
+          }}
+          shipmentId={selectedShipmentForInvoiceType._id}
+          invoiceData={invoiceData}
+          onTypeChange={handleInvoiceTypeChange}
+          onSubmit={handleInvoiceTypeSubmit}
+          loading={isLoadingInvoices}
+        />
+      )}
+      {selectedShipmentForFreight && (
+        <UpdateCarrierFreight
+        open={showUpdateFreightModal}
+        onClose={() => setShowUpdateFreightModal(false)}
+        shipmentId={selectedShipmentForFreight}
+        onSuccess={handleFreightUpdateSuccess}
+        freightType={freightType}
+      />
+      )}
+      {selectedShipmentForArrival && (
+        <MarkAsArrivedModal
+          show={showMarkAsArrivedModal}
+          onClose={() => setShowMarkAsArrivedModal(false)}
+          onSubmit={(data) => {
+            // Handle the arrival submission
+            console.log('Mark as arrived:', data);
+            // You might want to make an API call here
+            setShowMarkAsArrivedModal(false);
+          }}
+          shipment={{
+            _id: selectedShipmentForArrival._id,
+            orderNo: selectedShipmentForArrival.sin,
+            from: selectedShipmentForArrival.from?.[0]?.location?.name,
+            to: selectedShipmentForArrival.to?.[0]?.location?.name,
+          }}
+        />
+      )}
+      {selectedShipmentForCompletion && (
+        <CompleteShipmentModal
+          show={showCompleteShipmentModal}
+          onClose={() => setShowCompleteShipmentModal(false)}
+          onSubmit={(data) => {
+            // Handle the completion submission
+            console.log('Complete shipment:', data);
+            // You might want to make an API call here
+            setShowCompleteShipmentModal(false);
+          }}
+          shipment={{
+            _id: selectedShipmentForCompletion._id,
+            sin: selectedShipmentForCompletion.sin || '',
+            from: selectedShipmentForCompletion.from?.[0]?.location?.name,
+            to: selectedShipmentForCompletion.to?.[0]?.location?.name,
+            // shipmentType: selectedShipmentForCompletion.shipmentType || ''
+          }}
+        />
+      )}
+      {showBulkUploadModal && (
+        <BulkUploadShipments
+          open={showBulkUploadModal}
+          onClose={() => setShowBulkUploadModal(false)}
+          type="commercial_invoice"
+          shipmentId={selectedShipmentForBulkUpload?._id}
+          onSuccess={() => {
+            // Refresh the shipments list or perform any other success action
+            fetchShipments();
+          }}
+        />
+      )}
+
+{showMissedShipmentModal && (
+  <MissedShipmentModal
+    show={showMissedShipmentModal}
+    onClose={() => {
+      setShowMissedShipmentModal(false);
+      setSelectedShipmentForMissed(null);
+    }}
+    onSuccess={() => {
+      fetchShipments(); // Refresh the shipments list
+    }}
+  />
+)}
+
+{showMissedEventModal && selectedShipmentForMissedEvent && (
+  <MissedEventModal
+    show={showMissedEventModal}
+    shipmentId={selectedShipmentForMissedEvent._id}
+    onClose={() => {
+      setShowMissedEventModal(false);
+      setSelectedShipmentForMissedEvent(null);
+    }}
+    onSuccess={() => {
+      fetchShipments(); // Refresh the shipments list
+    }}
+  />
+)}
+
+{showAddManagedByModal && selectedShipmentForManagedBy && (
+  <AddManagedByModal
+    show={showAddManagedByModal}
+    shipmentId={selectedShipmentForManagedBy._id}
+    shipmentNo={selectedShipmentForManagedBy.sin}
+    onClose={() => {
+      setShowAddManagedByModal(false);
+      setSelectedShipmentForManagedBy(null);
+    }}
+    onSuccess={() => {
+      fetchShipments(); // Refresh the shipments list
+    }}
+  />
+)}
+
+{showRetriggerEventModal && selectedShipmentForRetrigger && (
+  <RetriggerEventModal
+    show={showRetriggerEventModal}
+    shipment={selectedShipmentForRetrigger}
+    onClose={() => {
+      setShowRetriggerEventModal(false);
+      setSelectedShipmentForRetrigger(null);
+    }}
+    onSuccess={() => {
+      fetchShipments(); // Refresh the shipments list
+    }}
+  />
+)}
+
+{selectedShipment && (
+      <DriverExpenses
+        open={showDriverExpenses}
+        onClose={() => setShowDriverExpenses(false)}
+        shipment={selectedShipment}
+        onSuccess={() => {
+          // Refresh the shipments data or show success message
+          // You might want to add a refresh function here
+          setShowDriverExpenses(false);
+        }}
+      />
+    )}
+
+{isGeofenceEditorOpen && selectedShipmentForGeofence && (
+  <GeofenceEditor
+    open={isGeofenceEditorOpen}
+    onClose={() => setIsGeofenceEditorOpen(false)}
+    shipment={{
+      ...selectedShipmentForGeofence,
+      pickDate: selectedShipmentForGeofence.scheduledDate || new Date().toISOString(),
+      deliverDate: selectedShipmentForGeofence.scheduledDeliveryDate || new Date().toISOString(),
+      to: (selectedShipmentForGeofence.to || []).map((dest: any, index: number) => ({
+        _id: dest._id || `temp-${index}`, // Ensure _id is provided
+        location: {
+          _id: dest.location?._id || `loc-${index}`,
+          name: dest.location?.name || '',
+          area: dest.location?.area || '',
+          geo_point: { 
+            coordinates: dest.location?.geo_point?.coordinates || [0, 0] 
+          },
+          polylines: [],
+          reference: dest.location?.reference || ''
+        }
+      }))
+    }}
+  />
+)}
+
     </div>
   );
 };
+
+
 
 export default ShipmentsDashboard;

@@ -25,7 +25,8 @@
   }
   
   .section {
-    padding: 24px;
+    /* padding: 24px; */
+    padding-bottom: 24px;
   }
   
   .header {
@@ -70,6 +71,7 @@
   
   .commentSection {
     margin-bottom: 24px;
+    padding: 16px;
   }
   
   .uploadFile {
@@ -154,7 +156,7 @@
   .submitButton {
     display: flex;
     justify-content: center;
-    margin-top: 24px;
+    margin-top: -31px;
     cursor: pointer;
   }
   
@@ -164,7 +166,7 @@
   }
   
   .button {
-    background-color: #2962ff;
+    background-color: #4F46E5;
     color: white;
     padding: 8px 24px;
     border-radius: 4px;
@@ -183,7 +185,7 @@
   }
   
   .button:not(:disabled):hover {
-    background-color: #0039cb;
+    background-color: #433DE8;
   }
   
   /* Loader styles */

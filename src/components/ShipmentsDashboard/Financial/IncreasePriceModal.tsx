@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styles from './IncreasePriceModal.module.css';
-import { useTranslation } from 'react-i18next';
+import CloseIcon from '@mui/icons-material/Close';
+import ModalHeader from '../../UI/ModalHeader/ModalHeader';
 
 interface DealerType {
   value: string;
@@ -22,15 +23,32 @@ const IncreasePriceModal: React.FC<IncreasePriceModalProps> = ({
   onSubmit,
   isLoading = false,
 }) => {
-  const { t } = useTranslation();
   const [selectedDealerType, setSelectedDealerType] = useState<string>('');
-  
-  // These would typically come from props or API
-  const dealerTypes: DealerType[] = [
-    { value: 'dealer1', name: t('DEALER_TYPES.dealer1') },
-    { value: 'dealer2', name: t('DEALER_TYPES.dealer2') },
-    // Add more dealer types as needed
-  ];
+  const [dealerTypes, setDealerTypes] = useState<DealerType[]>([{ name: 'Carrier', value: 'carrier' }]);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const shipperData = JSON.parse(localStorage.getItem('shippers') || '[]');
+        if (shipperData.length > 0) {
+          const userType = shipperData[0].type || 'normal';
+          setDealerTypes(
+            userType === '4pl' 
+              ? [
+                  { name: 'Carrier', value: 'carrier' },
+                  { name: 'Client', value: 'client' }
+                ]
+              : [
+                  { name: 'Carrier', value: 'carrier' }
+                ]
+          );
+        }
+      } catch (error) {
+        console.error('Error parsing shipper data:', error);
+      }
+    }
+  }, []);
+
 
   const handleSubmit = async () => {
     if (!selectedDealerType) return;
@@ -42,20 +60,14 @@ const IncreasePriceModal: React.FC<IncreasePriceModalProps> = ({
   return (
     <div className={styles.modalOverlay}>
       <div className={styles.modal}>
-        <div className={styles.header}>
-          <div className={styles.label}>
-            {t('MYSHIPMENTS.recalculate_freight')}
-          </div>
-          <div className={styles.close} onClick={onClose}>
-            <span className="material-icons" style={{ cursor: 'pointer' }}>
-              close
-            </span>
-          </div>
-        </div>
+      <ModalHeader 
+        title="Recalculate Freight" 
+        onClose={onClose} 
+      />
         <div className={styles.body}>
           <div className={styles.inputContainer}>
             <div className={styles.title}>
-              {t('MYSHIPMENTS.select_dealer_type')}
+              Select Dealer Type
             </div>
             <select 
               className={styles.selectInput}
@@ -81,7 +93,7 @@ const IncreasePriceModal: React.FC<IncreasePriceModalProps> = ({
               {isLoading ? (
                 <div className={styles.spinner}></div>
               ) : (
-                t('PRINT_LR.submit')
+                'Submit'
               )}
             </button>
           </div>

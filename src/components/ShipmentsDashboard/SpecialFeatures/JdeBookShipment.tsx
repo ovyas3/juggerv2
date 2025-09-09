@@ -22,6 +22,7 @@ import { DateTime } from 'luxon';
 import { useSnackbar } from "@/hooks/snackBar";
 import styles from './JdeBookShipment.module.css';
 import { X } from 'lucide-react';
+import ModalHeader from '@/components/UI/ModalHeader/ModalHeader';
 
 interface JdeBookShipmentProps {
   open: boolean;
@@ -255,24 +256,8 @@ const JdeBookShipment: React.FC<JdeBookShipmentProps> = ({
       fullWidth
       className={styles.container}
     >
-      <DialogTitle style={{
-            width: '100%',
-            border: '2px solid #4F46E5',
-            padding: '0 10px',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            backgroundColor: '#4F46E5',
-            margin: '0 auto',
-            borderRadius: '4px',
-            color: '#fff',
-            height: '48px',
-      }}>
-        Book {ltl ? 'LTL' : 'FTL'} Shipment
-        <IconButton onClick={onClose}>
-          <X className="h-5 w-5" />
-        </IconButton>
-      </DialogTitle>
+
+      <ModalHeader title="Fetch & Book Shipment`s" onClose={onClose} />
 
       <DialogContent>
         <Box className={styles.header}>
@@ -312,20 +297,20 @@ const JdeBookShipment: React.FC<JdeBookShipmentProps> = ({
             //   />}
             />
           </LocalizationProvider>
-          <Button 
-            variant="contained" 
+          <button 
             onClick={handleSearch}
             disabled={loading || searchLoader}
+            className={styles.searchButton}
           >
             {searchLoader ? <CircularProgress size={24} /> : 'Search'}
-          </Button>
+          </button>
         </Box>
-
+{/* 
         {loading && (
           <Box className={styles.loadingContainer}>
             <CircularProgress />
           </Box>
-        )}
+        )} */}
 
         {searchFlag && !submitFlag && (
           <>

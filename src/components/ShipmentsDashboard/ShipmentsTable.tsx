@@ -155,237 +155,6 @@ export const ShipmentsTable: React.FC<ShipmentsTableProps> = ({
   //     }
   //   };
 
-  //   // Action menu categories with all actions
-  //   const actionCategories = [
-  //     {
-  //       name: 'QUICK ACTIONS',
-  //       actions: [
-  //         {
-  //           label: 'View',
-  //           icon: <Eye className="w-4 h-4 mr-2 text-blue-600" />,
-  //           onClick: handleViewDetails,
-  //           disabled: false,
-  //           show: true
-  //         },
-  //         {
-  //           label: 'Share',
-  //           icon: <Share2 className="w-4 h-4 mr-2 text-blue-500" />,
-  //           onClick: handleShare,
-  //           disabled: shipment.disableShare,
-  //           show: true
-  //         },
-  //         {
-  //           label: 'Mail',
-  //           icon: <Mail className="w-4 h-4 mr-2 text-orange-600" />,
-  //           onClick: handleSendEmail,
-  //           disabled: shipment.disableShare,
-  //           show: true
-  //         },
-  //         {
-  //           label: 'Cancel',
-  //           icon: <XCircle className="w-4 h-4 mr-2 text-red-600" />,
-  //           onClick: handleCancel,
-  //           disabled: shipment.status === 'Completed' || shipment.status === 'Cancelled',
-  //           show: true
-  //         }
-  //       ]
-  //     },
-  //     {
-  //       name: 'TRACKING & GPS',
-  //       actions: [
-  //         {
-  //           label: 'SIM Tracking',
-  //           icon: <Download className="w-4 h-4 mr-2 text-amber-600" />,
-  //           onClick: () => {},
-  //           disabled: shipment.status === 'Completed' || shipment.status === 'Assigned' || shipment.status === 'Cancelled',
-  //           show: true // Add condition based on user permissions
-  //         },
-  //         {
-  //           label: 'GPS Disconnection Reason',
-  //           icon: <WifiOff className="w-4 h-4 mr-2 text-orange-600" />,
-  //           onClick: () => { /* openUpdateRemarks(shipment, 'gpsRemoveReason') */ },
-  //           disabled: false,
-  //           show: true // Add condition based on user permissions
-  //         },
-  //         {
-  //           label: 'Add GPS Connection',
-  //           icon: <Wifi className="w-4 h-4 mr-2 text-amber-600" />,
-  //           onClick: () => { /* openAddGpsConnection(shipment) */ },
-  //           disabled: !shipment.carrier,
-  //           show: true // Add condition based on user permissions
-  //         },
-  //         {
-  //           label: 'Update Delay Reason',
-  //           icon: <Clock className="w-4 h-4 mr-2 text-teal-600" />,
-  //           onClick: () => { /* openUpdateRemarks(shipment, 'delayReason') */ },
-  //           disabled: false,
-  //           show: true // Add condition based on user permissions
-  //         }
-  //       ]
-  //     },
-  //     {
-  //       name: 'LOCATION & ROUTES',
-  //       actions: [
-  //         {
-  //           label: 'Edit Pickup',
-  //           icon: <MapPin className="w-4 h-4 mr-2 text-pink-600" />,
-  //           onClick: () => { onEditPickup?.(shipment); },
-  //           disabled: shipment.status === 'Completed' || shipment.status === 'Cancelled',
-  //           show: true // Add condition based on user permissions
-  //         },
-  //         {
-  //           label: 'Edit Delivery',
-  //           icon: <MapPin className="w-4 h-4 mr-2 text-pink-600" />,
-  //           onClick: () => { onEditDelivery?.(shipment); },
-  //           disabled: shipment.status === 'Completed' || shipment.status === 'Cancelled',
-  //           show: true // Add condition based on user permissions
-  //         },
-  //         {
-  //           label: 'Pull Freight with Routes',
-  //           icon: <DollarSign className="w-4 h-4 mr-2 text-amber-800" />,
-  //           onClick: () => { /* openPullFreightDialog(shipment) */ },
-  //           disabled: false,
-  //           show: true // Add condition based on user permissions
-  //         },
-  //         {
-  //           label: 'Recalculate Distance',
-  //           icon: <MapPin className="w-4 h-4 mr-2 text-pink-600" />,
-  //           onClick: () => { /* openDistanceCalculation(shipment) */ },
-  //           disabled: false,
-  //           show: true // Add condition based on user permissions
-  //         }
-  //       ]
-  //     },
-  //     {
-  //       name: 'FREIGHT & PAYMENT',
-  //       actions: [
-  //         {
-  //           label: 'Update Carrier Freight',
-  //           icon: <DollarSign className="w-4 h-4 mr-2 text-gray-600" />,
-  //           onClick: () => { onUpdateFreight?.(shipment); },
-  //           disabled: false,
-  //           show: true // Add condition: shipment.rate?.type === 'manual' && showFreight
-  //         },
-  //         {
-  //           label: 'Flush Freight',
-  //           icon: <DollarSign className="w-4 h-4 mr-2 text-gray-600" />,
-  //           onClick: () => { /* updateFreightNew(shipment) */ },
-  //           disabled: false,
-  //           show: true // Add condition based on user permissions
-  //         },
-  //         {
-  //           label: 'Create Advance Payment',
-  //           icon: <DollarSign className="w-4 h-4 mr-2 text-indigo-600" />,
-  //           onClick: () => { /* createPaymentAdvice(shipment) */ },
-  //           disabled: shipment.status === 'Cancelled',
-  //           show: true // Add condition: !shipment.isOwnFleet_shipment
-  //         },
-  //         {
-  //           label: 'Change Invoice Type',
-  //           icon: <FileText className="w-4 h-4 mr-2 text-amber-800" />,
-  //           onClick: () => { /* openChangeInvoiceType(shipment) */ },
-  //           disabled: false,
-  //           show: true // Add condition based on user permissions
-  //         }
-  //       ]
-  //     },
-  //     {
-  //       name: 'DOCUMENTS & STATUS',
-  //       actions: [
-  //         {
-  //           label: 'Upload Approval Documents',
-  //           icon: <FileText className="w-4 h-4 mr-2 text-purple-600" />,
-  //           onClick: () => { /* openAttachDialog(shipment) */ },
-  //           disabled: false,
-  //           show: true // Add condition: shipment.rate?.type === 'manual'
-  //         },
-  //         {
-  //           label: 'View ePODs',
-  //           icon: <FileText className="w-4 h-4 mr-2 text-amber-800" />,
-  //           onClick: () => { onViewEpods?.(shipment); },
-  //           disabled: !shipment.carrier,
-  //           show: true // Add condition based on user permissions
-  //         },
-  //         {
-  //           label: 'Submit Mark As Arrived',
-  //           icon: <CheckCircle className="w-4 h-4 mr-2 text-green-600" />,
-  //           onClick: () => { /* completeShipment(shipment, 'arrived') */ },
-  //           disabled: shipment.status === 'Completed' || shipment.status === 'Cancelled',
-  //           show: true // Add condition: functions.shipment_management || (roles.owner || roles.fleet)
-  //         },
-  //         {
-  //           label: 'Recalculate Customer Gate In/Out',
-  //           icon: <MapPin className="w-4 h-4 mr-2 text-pink-600" />,
-  //           onClick: () => { /* openUploadDialog(shipment) */ },
-  //           disabled: shipment.disableInvoiceEdit && (shipmentType === 'outbound' || shipmentType === 'all'),
-  //           show: true // Add condition based on user permissions
-  //         }
-  //       ]
-  //     }
-  //   ];
-
-  //   // Filter actions based on search
-  //   const filteredCategories = actionCategories.map(category => ({
-  //     ...category,
-  //     actions: category.actions.filter(action =>
-  //       action.show &&
-  //       (action.label.toLowerCase().includes(actionSearchState.toLowerCase()) ||
-  //        actionSearchState === '')
-  //     )
-  //   })).filter(category => category.actions.length > 0);
-
-  //   return (
-  //     <div className={styles.actionCell}>
-  //       <DropdownMenu>
-  //         <DropdownMenuTrigger asChild>
-  //           <Button variant="ghost" className="h-8 w-8 p-0">
-  //             <span className="sr-only">Open menu</span>
-  //             <MoreHorizontal className="h-4 w-4" />
-  //           </Button>
-  //         </DropdownMenuTrigger>
-  //         <DropdownMenuContent align="end" className={styles.actionMenu}>
-  //           <div className={styles.searchContainer}>
-  //             <Search className={styles.searchIcon} />
-  //             <input
-  //               type="text"
-  //               placeholder="Search actions..."
-  //               value={actionSearchState}
-  //               onChange={(e) => setActionSearchState(e.target.value)}
-  //               className={styles.searchInput}
-  //               onClick={(e) => e.stopPropagation()}
-  //             />
-  //           </div>
-
-  //           <div className={styles.actionsGrid}>
-  //             {filteredCategories.map((category, catIndex) => (
-  //               <div key={catIndex} className={styles.actionSection}>
-  //                 <div className={styles.sectionHeader}>{category.name}</div>
-  //                 {category.actions.map((action, actionIndex) => (
-  //                   <DropdownMenuItem
-  //                     key={`${catIndex}-${actionIndex}`}
-  //                     onSelect={(e) => {
-  //                       e.preventDefault();
-  //                       if (!action.disabled) {
-  //                         action.onClick();
-  //                       }
-  //                     }}
-  //                     className={`${styles.actionItem} ${action.disabled ? styles.disabled : ''}`}
-  //                     disabled={action.disabled}
-  //                   >
-  //                     <span className="flex items-center">
-  //                       {action.icon}
-  //                       <span>{action.label}</span>
-  //                     </span>
-  //                   </DropdownMenuItem>
-  //                 ))}
-  //               </div>
-  //             ))}
-  //           </div>
-  //         </DropdownMenuContent>
-  //       </DropdownMenu>
-  //     </div>
-  //   );
-  // };
 
   if (isAnalyticsView) return null;
 
@@ -471,7 +240,11 @@ export const ShipmentsTable: React.FC<ShipmentsTableProps> = ({
               Last Known Location
             </th>
             <th className={styles.matHeaderCell}>Freight (₹)</th>
-            <th className={styles.matHeaderCell}>Actions</th>
+            <th
+              className={`${styles.matHeaderCell} ${styles.matColumnActions}`}
+            >
+              Actions
+            </th>
           </tr>
         </thead>
 
@@ -650,7 +423,9 @@ export const ShipmentsTable: React.FC<ShipmentsTableProps> = ({
                     : "N/A"}
                 </td>
 
-                <td className={styles.cellActions}>
+                <td
+                  className={`${styles.cellActions} ${styles.matColumnActions}`}
+                >
                   <div className={styles.quickActions}>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -664,7 +439,9 @@ export const ShipmentsTable: React.FC<ShipmentsTableProps> = ({
                       <DropdownMenuContent
                         align="end"
                         className={styles.actionMenuDropdown}
-                        onInteractOutside={() => setActionSearchState("")}
+                        onInteractOutside={() => {
+                          setActionSearchState("");
+                        }}
                       >
                         <div className={styles.actionMenuSearch}>
                           <Search className={styles.searchIcon} />
@@ -714,10 +491,10 @@ export const ShipmentsTable: React.FC<ShipmentsTableProps> = ({
                                         <DropdownMenuItem
                                           key={index}
                                           className={styles.actionMenuItem}
-                                          onClick={(e) => {
+                                          onSelect={(e) => {
                                             e.preventDefault();
                                             if (item.onClick) {
-                                              item.onClick(shipment); // This will call the onClick handler with the shipment
+                                              item.onClick(shipment);
                                             }
                                           }}
                                         >

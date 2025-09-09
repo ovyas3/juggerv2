@@ -1,117 +1,218 @@
-import React, { useState } from 'react';
-import styles from '../ShipmentsDashboard.module.css';
+import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
+import styles from './PullFreightModal.module.css';
+import ModalHeader from '@/components/UI/ModalHeader/ModalHeader';
+import { useSnackbar } from "@/hooks/snackBar";
+// ... existing imports ...
+import { httpsGet, httpsPost } from '@/utils/Communication';
 
 interface PullFreightModalProps {
-    show: boolean;
-    sin: string;
-    vehicleNo: string;
-    pickup: string;
-    destinations: Array<{_id: string, name: string}>;
-    onClose: () => void;
-    onGetFreight: (data: {destination: string, freightRate: string}) => void;
-  }
-  
-  const PullFreightModal: React.FC<PullFreightModalProps> = ({
-    show,
-    sin,
-    vehicleNo,
-    pickup,
-    destinations,
-    onClose,
-    onGetFreight
-  }) => {
-    console.log('PullFreightModal rendered with:', { 
-      show, 
-      sin, 
-      vehicleNo, 
-      pickup,
-      destinations: destinations?.length 
-    });
-  
-    if (!show) {
-      console.log('Modal not shown because show is false');
-      return null;
+  _id: string;
+  show: boolean;
+  sin: string;
+  vehicleNo: string;
+  pickup: string;
+  destinations: any;
+  onClose: () => void;
+  onGetFreight: (data: { destination: string, freightRate: string }) => Promise<void>;
+}
+
+const PullFreightModal: React.FC<PullFreightModalProps> = ({
+  _id,
+  show,
+  sin,
+  vehicleNo,
+  pickup,
+  destinations = [],
+  onClose,
+  onGetFreight
+}) => {
+  const { showMessage } = useSnackbar();
+  const [selectedDestination, setSelectedDestination] = useState('');
+  const [freightRate, setFreightRate] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [cities, setCities] = useState<string[]>([]);
+  const [showDropdown, setShowDropdown] = useState(false);
+
+  // Fetch cities when component mounts
+  useEffect(() => {
+    if (show) {
+      fetchCities();
     }
-  
-    const [selectedDestination, setSelectedDestination] = useState('');
-    const [freightRate, setFreightRate] = useState('');
-  
-    return (
-      <div style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundColor: 'rgba(0,0,0,0.5)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        zIndex: 1000
-      }} onClick={onClose}>
-        <div style={{
-          backgroundColor: 'white',
-          padding: '20px',
-          borderRadius: '8px',
-          width: '500px',
-          maxWidth: '90%',
-          maxHeight: '90vh',
-          overflow: 'auto'
-        }} onClick={e => e.stopPropagation()}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-            <h2>Pull Freight</h2>
-            <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer' }}>
-              ×
-            </button>
-          </div>
-          
-          {/* Rest of your modal content */}
-          <div>
-            <p>SIN: {sin}</p>
-            <p>Vehicle: {vehicleNo}</p>
-            <p>Pickup: {pickup}</p>
-            
-            <div style={{ margin: '20px 0' }}>
-              <select 
-                value={selectedDestination}
-                onChange={(e) => setSelectedDestination(e.target.value)}
-                style={{ width: '100%', padding: '8px', marginBottom: '10px' }}
-              >
-                <option value="">Select Destination</option>
-                {destinations?.map(dest => (
-                  <option key={dest._id} value={dest._id}>
-                    {dest.name}
-                  </option>
-                ))}
-              </select>
-              
-              <input
-                type="text"
-                value={freightRate}
-                onChange={(e) => setFreightRate(e.target.value)}
-                placeholder="Freight Rate"
-                style={{ width: '100%', padding: '8px', marginBottom: '10px' }}
-              />
-              
-              <button 
-                onClick={() => onGetFreight({ destination: selectedDestination, freightRate })}
-                style={{ 
-                  padding: '8px 16px', 
-                  backgroundColor: '#0070f3', 
-                  color: 'white', 
-                  border: 'none', 
-                  borderRadius: '4px',
-                  cursor: 'pointer'
-                }}
-              >
-                Get Freight
-              </button>
+  }, [show]);
+
+  const fetchCities = async () => {
+    try {
+      const response = await httpsGet('v1/shipment/getCities', 7);
+      if (response.statusCode === 200) {
+        setCities(response.data || []);
+      }
+    } catch (error: any) {
+      console.error('Error fetching cities:', error);
+      showMessage(error.error?.message || 'Failed to load cities', 'error');
+    }
+  };
+
+  const handleDestinationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSelectedDestination(value);
+    setShowDropdown(true);
+  };
+
+  const selectDestination = (city: string) => {
+    setSelectedDestination(city);
+    setShowDropdown(false);
+  };
+
+  const handleSubmit = async () => {
+    if (!selectedDestination) {
+      showMessage('Please select a delivery location', 'error');
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      const queryParams = new URLSearchParams({
+        destination: selectedDestination.toLowerCase(),
+        shipment: _id
+      }).toString();
+
+      const response = await httpsGet(`/freight_rate_route_code/get?${queryParams}`, 6);
+
+      if (response.statusCode !== 200) {
+        throw new Error(response.message || 'Failed to fetch freight rate');
+      }
+
+      onGetFreight({
+        destination: selectedDestination,
+        freightRate: response.data?.toString() || ''
+      });
+      
+      onClose();
+    } catch (error: any) {
+      console.error('Error pulling freight:', error);
+      showMessage(error.message || 'Failed to fetch freight rate', 'error');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (!show) return null;
+
+  return (
+    <div className={styles.overlay} onClick={onClose}>
+      <div className={styles.dialogPullFreight} onClick={e => e.stopPropagation()}>
+        <ModalHeader 
+          title="Pull Freight with Routes" 
+          onClose={onClose} 
+        />
+        
+        <div className={styles.dialog_body}>
+          <div className={styles.driverDetailsSec}>
+            <div className={styles.mwgContainer}>
+              <div className={styles.SearchDetailsSec}>
+                <div className={styles.item}>
+                  <div className={styles.input}>
+                    <input
+                      type="text"
+                      className={styles.inputField}
+                      value={sin}
+                      disabled
+                      placeholder=" "
+                    />
+                    <label className={styles.floatingLabel}>SIN</label>
+                  </div>
+                </div>
+                <div className={styles.item}>
+                  <div className={styles.input}>
+                    <input
+                      type="text"
+                      className={styles.inputField}
+                      value={vehicleNo}
+                      disabled
+                      placeholder=" "
+                    />
+                    <label className={styles.floatingLabel}>Vehicle No</label>
+                  </div>
+                </div>
+                <div className={styles.item}>
+                  <div className={styles.input}>
+                    <input
+                      type="text"
+                      className={styles.inputField}
+                      value={pickup}
+                      disabled
+                      placeholder=" "
+                    />
+                    <label className={styles.floatingLabel}>Pickup Location</label>
+                  </div>
+                </div>
+                <div className={styles.item}>
+                  <div className={styles.input} style={{ position: 'relative' }}>
+                    <input
+                      type="text"
+                      className={styles.inputField}
+                      value={selectedDestination}
+                      onChange={handleDestinationChange}
+                      onFocus={() => setShowDropdown(true)}
+                      placeholder=" "
+                    />
+                    <label className={styles.floatingLabel}>Delivery Location</label>
+                    {showDropdown && cities.length > 0 && (
+                      <div className={styles.dropdown}>
+                        {cities
+                          .filter(city => 
+                            city.toLowerCase().includes(selectedDestination.toLowerCase())
+                          )
+                          .map((city, index) => (
+                            <div
+                              key={index}
+                              className={styles.dropdownItem}
+                              onClick={() => selectDestination(city)}
+                            >
+                              {city}
+                            </div>
+                          ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <div className={styles.item}>
+                  <div className={styles.input}>
+                    <input
+                      type="text"
+                      className={styles.inputField}
+                      value={freightRate}
+                      onChange={(e) => setFreightRate(e.target.value)}
+                      placeholder=" "
+                    />
+                    <label className={styles.floatingLabel}>Freight Rate (₹)</label>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    );
-  };
 
-  export default PullFreightModal;
+        <div className={styles.dialog_footer}>
+          <button 
+            className={styles.submitButton} 
+            onClick={handleSubmit}
+            disabled={isLoading}
+          >
+            {isLoading ? 'Loading...' : 'Pull Freight'}
+          </button>
+          <button 
+            className={styles.cancelButton}
+            onClick={onClose}
+            disabled={isLoading}
+          >
+            Clear
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default PullFreightModal;

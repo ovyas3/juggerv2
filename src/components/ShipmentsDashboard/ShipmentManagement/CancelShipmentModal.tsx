@@ -4,6 +4,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import { useSnackbar } from '@/hooks/snackBar';
 import { httpsGet, httpsPost } from '@/utils/Communication';
 import styles from './CancelShipmentModal.module.css';
+import ModalHeader from '../../UI/ModalHeader/ModalHeader';
 
 interface CancelShipmentModalProps {
   open: boolean;
@@ -31,13 +32,26 @@ const CancelShipmentModal: React.FC<CancelShipmentModalProps> = ({
   useEffect(() => {
     const fetchReasons = async () => {
       try {
+        setLoading(true);
         const response = await httpsGet('constants/get_reasons?name=shipment');
-        if (response.data.statusCode === 200) {
-          const reasonsList = [...response.data.data[0].reason, 'Other'];
+        console.log(response);
+        if (response.statusCode === 200) {
+          console.log("response.data", response.data)
+          // Extract reasons from the first item in the data array
+          const reasonsList = [...(response.data[0].reason || []), 'Other'];
           setReasons(reasonsList);
+        } else {
+          setLoading(false);
+          showMessage('No cancellation reasons found', 'error');
         }
       } catch (error: any) {
-        showMessage(error.response?.data?.message || 'Failed to load cancellation reasons', 'error');
+        setLoading(false);
+        console.error('Error fetching cancellation reasons:', error);
+        // Fallback to default reasons on error
+        setReasons([]);
+        showMessage('Failed to load cancellation reasons.', 'error');
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -70,13 +84,14 @@ const CancelShipmentModal: React.FC<CancelShipmentModalProps> = ({
         reason,
       });
 
-      if (response.data.statusCode === 200) {
+      if (response.statusCode === 200) {
         showMessage('Shipment cancelled successfully', 'success');
         onCancelSuccess();
         handleClose();
+        onClose();
       }
     } catch (error: any) {
-      showMessage(error.response?.data?.message || 'Failed to cancel shipment', 'error');
+      showMessage(error.message || 'Failed to cancel shipment', 'error');
     } finally {
       setLoading(false);
     }
@@ -97,12 +112,10 @@ const CancelShipmentModal: React.FC<CancelShipmentModalProps> = ({
       fullWidth
       classes={{ paper: styles.dialogPaper }}
     >
-      <DialogTitle className={styles.header}>
-        Cancel Shipment #{shipment?.sin}
-        <button className={styles.closeButton} onClick={handleClose} disabled={loading}>
-          <CloseIcon />
-        </button>
-      </DialogTitle>
+      <ModalHeader 
+        title={`Cancel Shipment - #${shipment?.sin}`}
+        onClose={handleClose}
+      />
       
       <DialogContent className={styles.section}>
         <div className={styles.reasonsMenu}>
@@ -141,23 +154,22 @@ const CancelShipmentModal: React.FC<CancelShipmentModalProps> = ({
         )}
       </DialogContent>
 
-      <DialogActions className={styles.actions}>
-        <Button 
+      <div className={styles.actions}>
+        <button 
           onClick={handleClose} 
           className={styles.cancelButton}
           disabled={loading}
         >
           Close
-        </Button>
-        <Button 
+        </button>
+        <button 
           onClick={handleSubmit} 
           className={styles.submitButton}
           disabled={loading}
-          startIcon={loading ? <CircularProgress size={20} color="inherit" /> : null}
         >
-          {loading ? 'Cancelling...' : 'Confirm Cancellation'}
-        </Button>
-      </DialogActions>
+          {loading ? 'Cancelling...' : 'Submit'}
+        </button>
+      </div>
     </Dialog>
   );
 };

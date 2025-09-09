@@ -1,12 +1,11 @@
 .main {
-  width: 560px;
+  width: 100%;
   height: auto;
   overflow: hidden;
   font-family: 'Muli', sans-serif;
 }
 
 .header {
-  height: 30px;
   text-align: left;
   font-size: 16px;
   font-weight: 400;
@@ -14,10 +13,18 @@
   padding-left: 10px;
   color: #fff;
   border-bottom: solid 1px #b7b8b6;
-  background-color: #2962Ff;
   display: flex;
   justify-content: space-between;
   align-items: center;
+
+  width: 100%;
+  border: 2px solid #4F46E5;
+  padding: 0 10px;
+  background-color: #4F46E5;
+  margin: 0 auto;
+  border-radius: 1px;
+  color: #fff;
+  height: 48px;
 }
 
 .closeIcon {
@@ -72,7 +79,7 @@
   width: 80px;
   padding: 8px 4px;
   color: #fff;
-  background-color: #2962Ff;
+  background-color: #4F46E5;
   font-size: 13px;
   cursor: pointer;
   margin-top: 1px;

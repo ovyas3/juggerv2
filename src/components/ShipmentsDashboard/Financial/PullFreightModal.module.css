@@ -1,35 +1,165 @@
 /* PullFreightModal.module.css */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  overflow: auto;
+}
+
 .dialogPullFreight {
-    flex-direction: column;
-    align-items: center;
-    width: 696px;
-    padding: 20px;
-    position: relative;
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  width: 500px;
+  max-width: 90%;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.dialog_body {
+  padding: 24px;
+}
+
+.mwgContainer {
+  width: 100%;
+}
+
+.SearchDetailsSec {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.item {
+  width: 100%;
+  position: relative;
+}
+
+.input {
+  position: relative;
+  margin-bottom: 16px;
+}
+
+.inputField {
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 14px;
+  border: 1px solid #DFE3EB;
+  border-radius: 6px;
+  background: #fff;
+  transition: border-color 0.2s;
+}
+
+.inputField:focus {
+  outline: none;
+  border-color: #2962FF;
+  box-shadow: 0 0 0 2px rgba(41, 98, 255, 0.2);
+}
+
+.inputField:disabled {
+  background-color: #f5f7fa;
+  cursor: not-allowed;
+}
+
+.floatingLabel {
+  position: absolute;
+  top: -8px;
+  left: 12px;
+  font-size: 10px;
+  font-weight: 500;
+  color: #7e7e7e;
+  background: white;
+  padding: 0 4px;
+  transition: all 0.2s;
+}
+
+.dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  max-height: 200px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #DFE3EB;
+  border-radius: 6px;
+  margin-top: 4px;
+  z-index: 10;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.dropdownItem {
+  padding: 10px 16px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.dropdownItem:hover {
+  background-color: #f5f7fa;
+}
+
+.dialog_footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 16px 24px;
+  background: #f9fafb;
+  border-top: 1px solid #e5e7eb;
+  border-radius: 0 0 8px 8px;
+}
+
+.submitButton {
+  padding: 8px 16px;
+  background: #4F46E5;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.submitButton:hover:not(:disabled) {
+  background: #433DE8;
+}
+
+.submitButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.cancelButton {
+  padding: 8px 16px;
+  background: #f3f4f6;
+  color: #4b5563;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.cancelButton:hover {
+  background: #e5e7eb;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  .dialogPullFreight {
+    width: 95%;
+    max-width: 95%;
   }
   
-  .closeButton {
-    position: absolute;
-    right: 20px;
-    top: 20px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 0;
+  .dialog_body {
+    padding: 16px;
   }
-  
-  .dialog_header {
-    margin-bottom: 20px;
-  }
-  
-  .dialog_title {
-    color: #42454E;
-    font-size: 20px;
-    font-weight: 500;
-  }
-  
-  /* Add all other styles from your Angular SCSS */
-  /* Make sure to convert SCSS nesting to flat CSS */
-  /* Add all the floating label styles, input styles, etc. */
+}

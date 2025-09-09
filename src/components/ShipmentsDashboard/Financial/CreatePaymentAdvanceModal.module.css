@@ -1,4 +1,4 @@
-.overlay {
+.modalOverlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -14,235 +14,193 @@
 .modal {
   background: white;
   border-radius: 8px;
-  width: 100%;
+  width: 90%;
   max-width: 1000px;
   max-height: 90vh;
-  overflow-y: auto;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  font-family: 'Muli', sans-serif;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .header {
-  height: 50px;
+  padding: 16px;
+  border-bottom: 1px solid #e0e0e0;
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  padding: 0 20px;
-  font-size: 16px;
-  font-weight: 600;
-  color: white;
-  background-color: #2962FF;
-  border-top-left-radius: 8px;
-  border-top-right-radius: 8px;
-}
-
-.closeButton {
-  background: none;
-  border: none;
-  color: white;
-  cursor: pointer;
-  display: flex;
   align-items: center;
-  justify-content: center;
-  padding: 4px;
-  border-radius: 4px;
-  transition: background-color 0.2s;
-}
-
-.closeButton:hover {
-  background-color: rgba(255, 255, 255, 0.2);
-}
-
-.content {
-  padding: 20px;
 }
 
 .paymentMode {
+  padding: 16px;
+  border-bottom: 1px solid #e0e0e0;
   display: flex;
   justify-content: space-between;
-  margin-bottom: 20px;
-  align-items: center;
 }
 
 .paymentModeSelect {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 16px;
 }
 
 .selectInput {
-  padding: 8px 12px;
-  border: 1px solid #ddd;
+  padding: 8px;
   border-radius: 4px;
+  border: 1px solid #ccc;
   min-width: 200px;
-  font-size: 14px;
-}
-
-.tdsInput {
-  font-weight: 500;
 }
 
 .paymentDetails {
+  padding: 16px;
   display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-  margin-bottom: 20px;
+  gap: 12px;
+  justify-content: space-between;
+  flex-direction: row;
 }
 
 .transactionId {
   display: flex;
-  flex-direction: column;
-  min-width: 250px;
-  gap: 5px;
+  align-items: center;
+  gap: 8px;
 }
 
-.transactionId input {
-  padding: 8px 12px;
-  border: 1px solid #ddd;
+.transactionId input[type="text"],
+.transactionId input[type="date"] {
+  padding: 8px;
+  border: 1px solid #ccc;
   border-radius: 4px;
-  font-size: 14px;
-}
-
-.datePickerContainer {
-  position: relative;
-}
-
-.dateInput {
-  padding: 8px 12px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  width: 100%;
-  font-size: 14px;
+  min-width: 200px;
 }
 
 .bankDetails {
-  background-color: #f8f9fa;
-  border-radius: 6px;
-  padding: 15px;
-  margin-bottom: 20px;
+  padding: 16px;
+  background-color: #f5f5f5;
+  margin: 0 16px;
+  border-radius: 4px;
 }
 
-.heading {
-  font-size: 16px;
-  margin-bottom: 10px;
-  color: #333;
+.bankDetails .heading {
+  margin-bottom: 8px;
 }
 
 .accountDetails {
   display: flex;
   flex-wrap: wrap;
-  gap: 15px;
+  gap: 16px;
 }
 
 .item {
-  background-color: white;
-  padding: 8px 12px;
-  border-radius: 4px;
-  border: 1px solid #eee;
-  font-size: 14px;
   min-width: 200px;
 }
 
+/* Add these styles to CreatePaymentAdvanceModal.module.css */
+
 .tableContainer {
-  overflow-x: auto;
-  margin-bottom: 20px;
-  border: 1px solid #eee;
-  border-radius: 6px;
+  margin: 15px 17px;
+  max-height: 400px; /* Adjust this value as needed */
+  overflow-y: auto;
+  position: relative;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
 }
 
-.tableContainer table {
+.table {
   width: 100%;
   border-collapse: collapse;
-}
-
-.tableContainer th, 
-.tableContainer td {
-  padding: 12px 15px;
   text-align: left;
-  border-bottom: 1px solid #eee;
 }
 
-.tableContainer th {
-  background-color: #f8f9fa;
-  font-weight: 600;
-  color: #555;
-  font-size: 14px;
+.table thead {
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
-.tableContainer tr:hover {
+.table th {
+  background-color: #f5f5f5;
+  padding: 12px 8px;
+  font-weight: 500;
+  border-bottom: 2px solid #e0e0e0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: #f5f5f5;
+}
+
+.table tbody {
+  display: block;
+  overflow-y: auto;
+  max-height: calc(400px - 45px); /* Adjust based on your header height */
+}
+
+.table tbody tr {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.table tbody tr:hover {
   background-color: #f9f9f9;
+}
+
+.table td {
+  padding: 12px 8px;
+  vertical-align: middle;
+}
+
+/* Ensure the table cells align with the header */
+.table thead, .table tbody tr {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
 }
 
 .amountInput {
   width: 100px;
-  padding: 6px 8px;
-  border: 1px solid #ddd;
+  padding: 6px;
+  border: 1px solid #ccc;
   border-radius: 4px;
-  text-align: right;
 }
 
 .footer {
+  padding: 16px;
   display: flex;
   justify-content: flex-end;
-  margin-top: 20px;
+  gap: 12px;
+  border-top: 1px solid #e0e0e0;
 }
 
-.submitButton {
-  background-color: #2962FF;
-  color: white;
-  border: none;
-  padding: 10px 20px;
+.submitButton,
+.cancelButton {
+  padding: 8px 16px;
   border-radius: 4px;
   cursor: pointer;
   font-weight: 500;
-  transition: background-color 0.2s;
+}
+
+.submitButton {
+  background-color: #4F46E5;
+  color: white;
+  border: none;
 }
 
 .submitButton:hover {
-  background-color: #1e4bcf;
+  background-color: #433DE8;
 }
 
 .submitButton:disabled {
-  background-color: #9e9e9e;
+  background-color: #9fa8da;
   cursor: not-allowed;
 }
 
-.loader {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(255, 255, 255, 0.8);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 10;
-  border-radius: 8px;
+.cancelButton {
+  background-color: #f5f5f5;
+  border: 1px solid #ccc;
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .modal {
-    width: 95%;
-    margin: 0 10px;
-  }
-  
-  .paymentDetails {
-    flex-direction: column;
-    gap: 15px;
-  }
-  
-  .transactionId {
-    width: 100%;
-  }
-  
-  .accountDetails {
-    flex-direction: column;
-    gap: 10px;
-  }
-  
-  .item {
-    width: 100%;
-  }
+.loading {
+  display: flex;
+  justify-content: center;
+  padding: 16px;
 }
