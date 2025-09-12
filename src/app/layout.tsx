@@ -6,7 +6,7 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages } from 'next-intl/server';
 import "./globals.css";
 import { SnackbarProvider } from '../hooks/snackBar';
-import MapsProvider from "./providers/MapsProvider"; 
+import MapsProvider from "../../src/app/providers/MapProvider"; 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
