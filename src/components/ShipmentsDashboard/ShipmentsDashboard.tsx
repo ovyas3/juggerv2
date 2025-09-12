@@ -1144,6 +1144,7 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
   ];
 
   // Effect
+ 
 
   useEffect(() => {
     setShowButtons(selectedShipmentsArray.length > 0);
@@ -1160,7 +1161,18 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
   };
 
   const handleSubFilterSelect = (filterKey: string) => {
-    setSelectedSubFilter(selectedSubFilter === filterKey ? null : filterKey);
+    const newSelectedFilter = selectedSubFilter === filterKey ? null : filterKey;
+
+    // 2. Set the state with the new value
+    setSelectedSubFilter(newSelectedFilter);
+  
+    // Reset page to 0 and fetch data with the new filter
+    setCurrentPage(0);
+    fetchShipments({
+      dashboard_filter: newSelectedFilter,
+      skip: 0,
+      limit: pageSize,
+    });
   };
 
   const handleClearFilters = () => {
@@ -1880,6 +1892,7 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
           temp.delay_reason = element.delay_reason;
           temp.sale_order = element.sale_order || "";
           temp.gps_disconnection_reason = element.gps_disconnection_reason;
+          temp.isSpotDriver = element.driver.driver_type === "temporary";
 
           // Driver and vehicle information
           temp.driver_type =
@@ -2535,7 +2548,7 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
   const renderVehicleCell = (shipment: any) => (
     <div>
       <div>{shipment.vehicleNumber}</div>
-      {/* {shipment.trans_vehicle_no?.length > 0 && (
+      {shipment.trans_vehicle_no?.length > 0 && (
         <div className={styles.sub}>
           {shipment.trans_vehicle_no.map((vehicle: any, idx: number) => (
             <div key={idx}>
@@ -2548,7 +2561,7 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
           ))}
         </div>
       )}
-      <div className={styles.sub}>(Requested / Assigned)</div>
+      {/* <div className={styles.sub}>(Requested / Assigned)</div>
       <div className={styles.sub}>{shipment.reqVehicleType} / {shipment.vehicleType}</div> */}
     </div>
   );
@@ -3189,22 +3202,44 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
       </div>
       <div className={styles.header}>
       <div className={styles.inputContainer}>
+     
+              
         {/* Wrap the select in a container for custom arrow positioning */}
-        <div className={styles.selectContainer}>
+        {/* <div className={styles.selectContainer}>
           <select
             value={searchType}
             onChange={(e) => setSearchType(e.target.value)}
-            className={styles.inputSelect}
+            className={styles.perPageSelect}
           >
-            <option value="SIN">SIN</option>
-            <option value="project_code">Project Code</option>
-            <option value="vehicle_no">Vehicle No</option>
-            <option value="purchase_order">PO Number</option>
-            <option value="sale_order">SO Number</option>
-            <option value="ppd_no">PPD Number</option>
-            <option value="do_number">DO Number</option>
+            <option value="SIN" className={styles.perPageItem}>SIN</option>
+            <option value="project_code" className={styles.perPageItem}>Project Code</option>
+            <option value="vehicle_no" className={styles.perPageItem}>Vehicle No</option>
+            <option value="purchase_order" className={styles.perPageItem}>PO Number</option>
+            <option value="sale_order" className={styles.perPageItem}>SO Number</option>
+            <option value="ppd_no" className={styles.perPageItem}>PPD Number</option>
+            <option value="do_number" className={styles.perPageItem}>DO Number</option>
           </select>
-        </div>
+        </div> */}
+       <div className={styles.tableControls}>
+  <Select
+    value={searchType}
+    onValueChange={(value) => setSearchType(value)}
+  >
+    <SelectTrigger className={styles.perSinSelect}>
+      <SelectValue />
+    </SelectTrigger>
+    <SelectContent className={styles.perPageContent}>
+      <SelectItem value="SIN" className={styles.perPageItem}>SIN</SelectItem>
+      <SelectItem value="project_code" className={styles.perPageItem}>Project Code</SelectItem>
+      <SelectItem value="vehicle_no" className={styles.perPageItem}>Vehicle No</SelectItem>
+      <SelectItem value="purchase_order" className={styles.perPageItem}>PO Number</SelectItem>
+      <SelectItem value="sale_order" className={styles.perPageItem}>SO Number</SelectItem>
+      <SelectItem value="ppd_no" className={styles.perPageItem}>PPD Number</SelectItem>
+      <SelectItem value="do_number" className={styles.perPageItem}>DO Number</SelectItem>
+    </SelectContent>
+  </Select>
+
+</div>
         <input
           type="text"
           value={searchQuery}
@@ -3213,7 +3248,7 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
           className={styles.inputSearch}
         />
       </div>
-
+{/* </div> */}
 
         {/* All buttons are now wrapped in a single container */}
         <div className={styles.buttonContainer}>
@@ -3231,19 +3266,22 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
 
           <div className={styles.button}>Map View</div>
 
-          <div className={styles.commercial_invoice_btn}>
-            <select
-              className={styles.customSelectButton}
-              defaultValue=""
-              aria-label="Upload commercial invoices"
-            >
-              <option value="" disabled>
-                Upload Commercial Invoice
-              </option>
-              <option value="commercial_invoice">Upload Commercial Invoice</option>
-              <option value="commercial_invoice_Tcode">Upload with TCode</option>
-            </select>
-          </div>
+          <div className={styles.tableControls}>
+  <Select onValueChange={(value) => openBulkUpload(value)}>
+    <SelectTrigger className={styles.perPageSelect}>
+      <SelectValue placeholder="Upload Commercial Invoice" />
+    </SelectTrigger>
+    <SelectContent className={styles.perPageContent}>
+      <SelectItem value="commercial_invoice" className={styles.perPageItem}>
+        Upload Commercial Invoice
+      </SelectItem>
+      <SelectItem value="commercial_invoice_Tcode" className={styles.perPageItem}>
+        Upload with TCode
+      </SelectItem>
+    </SelectContent>
+  </Select>
+</div>
+   {/* </div> */}
 
           <div className={styles.button} onClick={toggleAnalyticsView}>
             {isAnalyticsView ? "Table View" : "Analytics View"}
@@ -3268,7 +3306,7 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
             </>
           )}
         </div>
-      </div>
+       </div> 
 
       {showAdvancedSearch && (
         <AdvancedFilter
@@ -3354,12 +3392,12 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
                   <SelectTrigger className={styles.perPageSelect}>
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="100">100 per page</SelectItem>
-                    <SelectItem value="200">200 per page</SelectItem>
-                    <SelectItem value="300">300 per page</SelectItem>
-                    <SelectItem value="400">400 per page</SelectItem>
-                    <SelectItem value="500">500 per page</SelectItem>
+                  <SelectContent className={styles.perPageContent}>
+                    <SelectItem value="100" className={styles.perPageItem}>100 per page</SelectItem>
+                    <SelectItem value="200" className={styles.perPageItem}>200 per page</SelectItem>
+                    <SelectItem value="300" className={styles.perPageItem}>300 per page</SelectItem>
+                    <SelectItem value="400" className={styles.perPageItem}>400 per page</SelectItem>
+                    <SelectItem value="500" className={styles.perPageItem}>500 per page</SelectItem>
                   </SelectContent>
                 </Select>
 
@@ -3411,7 +3449,8 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
                   </button>
                 </div>
               </div>
-            </div>
+             
+                  </div>
 
             <div className={styles.statusLegend}>
               {Object.entries(statusLabels).map(([status, label]) => (
@@ -4167,7 +4206,7 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
   />
 )}
 
-    </div>
+    // </div>
   );
 };
 

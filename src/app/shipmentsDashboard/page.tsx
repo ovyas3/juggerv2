@@ -22,7 +22,9 @@ export default function shipmentsDashboard() {
                     !mobile ? <Header title={'eWayBill Dashboard'} isMapHelper={false} /> : <></>
                 }
             </div>
+           
             <ShipmentsDashboard />
+            
         </div>
         {!mobile ? <SideDrawer /> : <div >
             <MobileDrawer />

@@ -12,6 +12,31 @@
     z-index: 1000;
     border-left: 1px solid #e5e5e5;
   }
+  /* Add this to AdvancedFilter.module.css */
+.carrierDropdownPaper {
+  width: 380px !important; /* Adjust this value to your desired width */
+}
+/* Update these styles in AdvancedFilter.module.css */
+
+.carrierMenuItem {
+  /* This is a good fallback, but the nested rule is more reliable */
+  font-size: 12px !important;
+  /* You may also want to adjust padding to make the items more compact */
+  padding-top: 4px !important;
+  padding-bottom: 4px !important;
+}
+.smallCheckbox {
+  padding: 4px !important; /* Reduce padding to make the clickable area smaller */
+}
+
+.smallCheckbox svg {
+  transform: scale(0.8); /* Scale down the SVG icon */
+}
+
+/* This is the most crucial rule for the text inside */
+.carrierMenuItem :global(.MuiListItemText-primary) {
+  font-size: 12px !important; /* Set your desired font size here */
+}
   
   .searchHeader {
     display: flex;
