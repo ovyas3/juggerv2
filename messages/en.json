@@ -553,5 +553,9 @@
   },
   "UpdateCarrierFreight": {
     "updateFreight": "Update Freight"
+  },
+  "MAILMODAL":{
+    "emailAddress": "Email Address",
+    "shareTrackingUrl": "Share Tracking URL Via Email"
   }
 }

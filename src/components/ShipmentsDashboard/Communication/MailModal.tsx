@@ -13,6 +13,7 @@ import { useSnackbar } from "@/hooks/snackBar";
 import { httpsPost } from "@/utils/Communication";
 import styles from "./MailModal.module.css";
 import ModalHeader from '../../UI/ModalHeader/ModalHeader';
+import {useTranslations} from 'next-intl';
 
 interface MailModalProps {
   open: boolean;
@@ -27,6 +28,7 @@ const MailModal: React.FC<MailModalProps> = ({ open, onClose, shipment }) => {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const { showMessage } = useSnackbar();
+  const t = useTranslations('MAILMODAL');
 
   const validateEmail = (email: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -85,13 +87,15 @@ const MailModal: React.FC<MailModalProps> = ({ open, onClose, shipment }) => {
       classes={{ paper: styles.dialogPaper }}
     >
       <ModalHeader 
-        title="Share Tracking URL Via Email" 
+        title={t("shareTrackingUrl")} 
         onClose={onClose} 
       />
 
       <DialogContent className={styles.body}>
         <div className={styles.inputContainer}>
-          <div className={styles.label}>Email Address</div>
+          <div className={styles.label}>
+            {t("emailAddress")}
+          </div>
           <div className={styles.inputWrapper}>
             <TextField
               fullWidth
