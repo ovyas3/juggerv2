@@ -11,7 +11,7 @@ export default function TriptrackerPage() {
   // const uniqueCode ="TbaTlSmC50";
   // const uniqueCode ="xl4hU5SGXz";
   // const uniqueCode ="xl4hU5SGXz";
-  const uniqueCode ="6BQiTLRQ1N";
+  const uniqueCode ="2mV4U5t8xQ";
   
   // const uniqueCode ="nE3ZXGJQKZ";
     // sp.get("unique_code") ?? sp.get("code") ?? "";

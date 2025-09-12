@@ -314,9 +314,10 @@ export const AdvancedFilter: React.FC<AdvancedFilterProps> = ({
               displayEmpty
             >
               {shipStatus.map((status) => (
-                <MenuItem key={status.value} value={status.name}>
+                <MenuItem key={status.value} value={status.name} className={styles.carrierMenuItem}>
                   <Checkbox
                     checked={shipmentStatusValue.indexOf(status.name) > -1}
+                    className={styles.smallCheckbox}
                   />
                   <ListItemText primary={status.name} />
                 </MenuItem>
@@ -445,6 +446,11 @@ export const AdvancedFilter: React.FC<AdvancedFilterProps> = ({
               className={`${styles.inputSelect} ${styles.carrierSelected}`}
               renderValue={(selected) => `${selected.length} selected`}
               displayEmpty
+              MenuProps={{
+                classes: {
+                  paper: styles.carrierDropdownPaper,
+                },
+              }}
             >
               <div className={styles.searchInputWrapper}>
                 <input
@@ -457,9 +463,10 @@ export const AdvancedFilter: React.FC<AdvancedFilterProps> = ({
                 />
               </div>
               {filteredCarriers.map((carrier) => (
-                <MenuItem key={carrier._id} value={carrier._id}>
+                <MenuItem key={carrier._id} value={carrier._id} className={styles.carrierMenuItem}>
                   <Checkbox
                     checked={selectedCarriers.indexOf(carrier._id) > -1}
+                    className={styles.smallCheckbox}
                   />
                   <ListItemText
                     primary={`${carrier.parent_name} - ${carrier.name}`}
@@ -473,6 +480,7 @@ export const AdvancedFilter: React.FC<AdvancedFilterProps> = ({
             <label className={styles.label}>From</label>
             <DatePicker
               value={fromDate}
+                format="dd/MM/yyyy"
               onChange={setFromDate}
               slots={{
                 textField: (params) => (
@@ -488,6 +496,19 @@ export const AdvancedFilter: React.FC<AdvancedFilterProps> = ({
                         </InputAdornment>
                       ),
                     }}
+                    slotProps={{
+                      textField: {
+                          className: styles.input,
+                          size: 'small',
+                          InputProps: {
+                              endAdornment: (
+                                  <InputAdornment position="end">
+                                      <CalendarTodayIcon className={styles.dateIcon} />
+                                  </InputAdornment>
+                              ),
+                          },
+                      },
+                  }}
                   />
                 ),
               }}
@@ -497,6 +518,7 @@ export const AdvancedFilter: React.FC<AdvancedFilterProps> = ({
           <div className={styles.filterSection}>
             <label className={styles.label}>To</label>
             <DatePicker
+              format="dd/MM/yyyy"
               value={toDate}
               onChange={setToDate}
               minDate={fromDate || undefined}
@@ -517,6 +539,19 @@ export const AdvancedFilter: React.FC<AdvancedFilterProps> = ({
                   />
                 ),
               }}
+              slotProps={{
+                textField: {
+                    className: styles.input,
+                    size: 'small',
+                    InputProps: {
+                        endAdornment: (
+                            <InputAdornment position="end">
+                                <CalendarTodayIcon className={styles.dateIcon} />
+                            </InputAdornment>
+                        ),
+                    },
+                },
+            }}
             />
           </div>
 

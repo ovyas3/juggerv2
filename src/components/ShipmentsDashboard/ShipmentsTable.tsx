@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import styles from "./shipmentsDashboard.module.css";
+import styles from "./ShipmentsDashboard.module.css";
 import { Button } from "../UI/button";
 import {
   DropdownMenu,
@@ -26,6 +26,7 @@ import {
 import { LocationDialog } from "../../components/ShipmentsDashboard/LocationTracking/LocationDialog";
 import greenSIM from "../../assets/green-SIM.svg";
 import redSIM from "../../assets/red-SIM.svg";
+import spotdrivericon from "../../assets/spotdriver-blue.svg";
 import Image from "next/image";
 import { environment } from "@/environments/env.api";
 
@@ -165,11 +166,16 @@ export const ShipmentsTable: React.FC<ShipmentsTableProps> = ({
       }`}
       ref={tableRef}
     >
-      <table className={`${styles.matTable} ${styles.table}`}>
+     <table
+  className={`${styles.matTable} ${styles.table} ${
+    ["all", "others"].includes(shipmentType) ? "" : styles.noDelivery
+  }`}
+>
         <thead className={styles.matHeaderRow}>
-          <tr>
-            <th className={`${styles.matHeaderCell} ${styles.matColumnSelect}`}>
-              <input
+          <tr className={styles.headerRow}>
+            <th className={`${styles.matHeaderCell} ${styles.matColumnSelect} ${styles.stickyTop} ${styles.stickyColumn}`}>
+            Select
+              {/* <input
                 type="checkbox"
                 onChange={(e) => handleSelectAllShipments(e.target.checked)}
                 checked={
@@ -177,33 +183,40 @@ export const ShipmentsTable: React.FC<ShipmentsTableProps> = ({
                     Math.min(shipmentsArray.length, 10) &&
                   shipmentsArray.length > 0
                 }
-              />
+              /> */}
             </th>
-            <th className={`${styles.matHeaderCell} ${styles.matColumnSno}`}>
+            <th className={`${styles.matHeaderCell} ${styles.matColumnSno} ${styles.stickyTop} ${styles.stickyColumn}`}>
               S.No
             </th>
-            <th className={`${styles.matHeaderCell} ${styles.matColumnStatus}`}>
+            <th className={`${styles.matHeaderCell} ${styles.matColumnStatus} ${styles.stickyTop}${styles.stickyColumn}`}>
               Status
             </th>
-            <th className={`${styles.matHeaderCell} ${styles.matColumnSIN}`}>
+            <th className={`${styles.matHeaderCell} ${styles.matColumnSIN} ${styles.stickyTop} ${styles.stickyColumn}`}>
               SIN
             </th>
             <th
-              className={`${styles.matHeaderCell} ${styles.matColumnPickup} ${styles.stickyColumn}`}
+              className={`${styles.matHeaderCell} ${styles.matColumnPickup} ${styles.stickyTop} ${styles.stickyColumn}`}
             >
               {shipmentType === "outbound" ? "Delivery" : "Pickup"}
             </th>
             {["all", "others"].includes(shipmentType) && (
               <th
-                className={`${styles.matHeaderCell} ${styles.matColumnDelivery} ${styles.stickyColumn}`}
+                className={`${styles.matHeaderCell} ${styles.matColumnDelivery} ${styles.stickyTop} ${styles.stickyColumn}`}
               >
                 Delivery
               </th>
             )}
             {/* <th className={`${styles.matHeaderCell} ${styles.matColumnDateTime}`}>Date & Time</th> */}
-            <th
+            {/* <th
               className={`${styles.matHeaderCell} ${styles.matColumnCarrier}`}
-            >
+            > */}
+        <th
+  className={`${styles.matHeaderCell} ${styles.matColumnCarrier} ${
+    ["all", "others"].includes(shipmentType)
+      ? styles.leftAfterDelivery   // Pickup(200) + Delivery(200) = 400
+      : styles.leftAfterPickup     // Pickup only = 200
+  }`}
+>
               Carrier
             </th>
 
@@ -241,7 +254,7 @@ export const ShipmentsTable: React.FC<ShipmentsTableProps> = ({
             </th>
             <th className={styles.matHeaderCell}>Freight (₹)</th>
             <th
-              className={`${styles.matHeaderCell} ${styles.matColumnActions}`}
+              className={`${styles.matHeaderCell} ${styles.matColumnActions} ${styles.stickyRight}`}
             >
               Actions
             </th>
@@ -288,6 +301,7 @@ export const ShipmentsTable: React.FC<ShipmentsTableProps> = ({
                 <td className={`${styles.matCell} ${styles.matColumnSIN}`}>
                   {renderSINCell(shipment)}
                 </td>
+               
                 <td
                   className={`${styles.matCell} ${styles.matColumnPickup} ${styles.stickyColumn}`}
                 >
@@ -310,6 +324,7 @@ export const ShipmentsTable: React.FC<ShipmentsTableProps> = ({
                       (type: string, locs: any[]) =>
                         openLocationsPopup(type, locs, shipment),
                       shipmentType,
+             
                       "delivery"
                     )}
                   </td>
@@ -317,7 +332,14 @@ export const ShipmentsTable: React.FC<ShipmentsTableProps> = ({
                 {/* <td className={`${styles.matCell} ${styles.matColumnDateTime}`}>
                   {renderDateTimeCell(shipment, shipmentType)}
                 </td> */}
-                <td className={`${styles.matCell} ${styles.matColumnCarrier}`}>
+                {/* <td className={`${styles.matCell} ${styles.matColumnCarrier}`}> */}
+                <td
+  className={`${styles.matCell} ${styles.matColumnCarrier} ${styles.stickyColumn} ${
+    ["all", "others"].includes(shipmentType)
+      ? styles.leftAfterDelivery
+      : styles.leftAfterPickup
+  }`}
+>
                   {shipment.carrier_parent_name}
                 </td>
 
@@ -365,7 +387,19 @@ export const ShipmentsTable: React.FC<ShipmentsTableProps> = ({
                 </td>
 
                 <td className={styles.matCell}>
-                  <div>{shipment.driverName}</div>
+                  <div>{shipment.driverName}
+                  {shipment.isSpotDriver  && (
+        <span 
+         
+        > <img 
+        src={spotdrivericon.src} 
+        alt="Spot Driver" 
+        title="Spot Driver"
+        style={{ height: '12px', width: '12px' }}
+      /></span>
+      )}
+                  </div>
+
                 </td>
 
                 <td
@@ -424,7 +458,7 @@ export const ShipmentsTable: React.FC<ShipmentsTableProps> = ({
                 </td>
 
                 <td
-                  className={`${styles.cellActions} ${styles.matColumnActions}`}
+                  className={`${styles.cellActions} ${styles.matColumnActions} ${styles.stickyRight}`}
                 >
                   <div className={styles.quickActions}>
                     <DropdownMenu>
@@ -442,6 +476,7 @@ export const ShipmentsTable: React.FC<ShipmentsTableProps> = ({
                         onInteractOutside={() => {
                           setActionSearchState("");
                         }}
+                        sideOffset={15}
                       >
                         <div className={styles.actionMenuSearch}>
                           <Search className={styles.searchIcon} />

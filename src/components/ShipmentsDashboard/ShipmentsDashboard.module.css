@@ -7,7 +7,80 @@
   text-align: center;
   font-size: 10px;
 }
+.stickyTop {
+  position: sticky;
+  top: 0;             /* pin at the top */
+  z-index: 5;         /* above body cells */
+  background: #ebeef7;    /* avoid text blending while scrolling */
+}
+.matHeaderRow {
+  position: relative;   /* no sticky here */
+  z-index: 10;
+  background-color: #ebeef7;
+}
 
+/* When Delivery column is NOT present (inbound), remove any offset/ghost gap */
+.noDelivery .matColumnCarrier,
+.noDelivery th.matColumnCarrier,
+.noDelivery td.matColumnCarrier {
+  position: sticky !important;  
+  left: auto !important;
+  margin-left: 0 !important;
+  top: 0;    
+}
+
+/* If you use a visual divider on the sticky block, keep it on Pickup */
+.noDelivery .matColumnPickup {
+  /* keep the divider here so the edge still looks intentional */
+  border-right: 1px solid #d1d5db; /* adjust color as you like */
+}
+
+/* And make sure Carrier doesn't add an extra divider that looks like a gap */
+.noDelivery .matColumnCarrier {
+  border-left: none !important;
+}
+/* Generic sticky behavior for left-freeze columns */
+.stickyColumn {
+  position: sticky;
+  z-index: 4;
+  left: 0;   
+  background: #fff;     /* so it doesn't show content underneath */
+}
+/* --- Sticky column fixes for Pickup, Delivery, Carrier --- */
+
+/* Replace border-right with inset shadow to avoid white gap while scrolling */
+
+
+/* Known widths for offsets */
+/* .leftAfterPickup { left: 200px; }      
+.leftAfterDelivery { left: 400px; }     */
+
+/* Give Carrier a stable width so it doesn't jitter */
+.matColumnCarrier {
+  width: 220px;
+  min-width: 220px;
+}
+
+/* Optional: divider after Carrier */
+.matColumnCarrier {
+  border-right: 1px solid #e5e7eb;
+}
+
+ 
+ .noDelivery .matColumnCarrier::before,
+.noDelivery .matColumnCarrier::after {
+  content: none !important;
+} 
+
+.matColumnCarrier {
+  background-color: #f2f2f2;  /* pick a shade darker than white */
+  border-right: 2px solid #000 !important; /* solid divider */
+  z-index: 4; /* keep it above scrollable cells */
+}
+.matColumnCarrier {
+  min-width: 230px !important;
+  max-width: 230px !important;
+}
 .divider div:before,
 .divider div:after {
   background-color: #e7e7e7;
@@ -48,14 +121,20 @@
   left: 0px;
   width: calc(100% - 15px);
   height: 100%;
-  overflow: auto;
-  padding: 10px;
+  overflow: hidden;
+  padding: 10px 30px 0px 8px;
   font-family: "Muli", sans-serif;
   font-size: 14px;
   top: 42px;
   left: 57px;
 }
 
+/* Table container does the scrolling */
+.tableContainer {
+  position: relative;
+  overflow-y: auto;
+  max-height: calc(100vh - 250px);
+}
 .main .matSelectTrigger {
   padding: 2px 8px;
 }
@@ -287,6 +366,72 @@
 .selectContainer {
   position: relative;
   display: flex;
+}
+/* Styling for the container holding the select element */
+.selectContainer {
+  position: relative;
+  display: inline-block;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* Styles for the <select> element itself */
+.nativeSelect {
+  width: 140px;
+  height: 32px;
+  background: #fff;
+  border: 2px solid #c3c9e8;
+  border-radius: 8px;
+  color: #22223b;
+  box-shadow: none;
+  transition: border 0.2s;
+  padding: 4px 12px;
+  cursor: pointer;
+
+  /* Hides the default arrow in different browsers */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+/* On hover, slightly change the border color */
+.nativeSelect:hover {
+  border-color: #9ba0c4;
+}
+
+/* On focus, add a highlight border */
+.nativeSelect:focus {
+  outline: none;
+  border-color: #5a74ff; /* A vibrant blue for focus */
+  box-shadow: 0 0 0 2px rgba(90, 116, 255, 0.2);
+}
+
+/* Create a custom arrow using a pseudo-element on the container */
+.selectContainer::after {
+  content: "▾"; /* Unicode for a down arrow */
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  font-size: 16px;
+  color: #5e6488;
+  pointer-events: none; /* Allows clicks to pass through to the select element */
+}
+
+/* Styling for the <option> elements (support is limited) */
+.nativeOption {
+  background-color: #fff;
+  color: #22223b;
+  font-weight: 500;
+  padding: 8px 12px;
+}
+
+/* Hover/selected state for options (limited browser support) */
+.nativeOption:hover,
+.nativeOption:checked {
+  background-color: #f0f4ff;
+  color: #5a74ff;
 }
 
 .inputSelect {
@@ -644,18 +789,52 @@
 .tableContainer {
   width: 100%;
   overflow-x: auto;
+  overflow-y: auto; 
   max-height: calc(100vh - 250px);
-  /* margin-left: 16px; */
+
+}
+.tableContainer .matTable {
+  /* frozen block layout */
+  --select-w: 86px;      /* update to your real width */
+  --sno-w: 50px;
+  --status-w: 110px;     /* examples */
+  --sin-w: 115px;
+
+  --pickup-left: calc(var(--select-w) + var(--sno-w) + var(--status-w) + var(--sin-w));
+  --pickup-w: 200px;     /* actual pickup col width incl borders */
+  --delivery-w: 200px;   /* actual delivery col width incl borders */
+
+  /* Carrier sits immediately after pickup+delivery */
+  --carrier-left: calc(var(--pickup-left) + var(--pickup-w) + var(--delivery-w));
+}
+.tableContainer .matTable[data-shipment-type="inbound"] {
+  /* Delivery absent */
+  --delivery-w: 0px;
+}
+
+.tableContainer .matTable[data-shipment-type="outbound"] {
+  /* Pickup absent */
+  --pickup-w: 0px;
+}
+
+.stickyRight {
+  position: sticky;
+  right: 0;
+  z-index: 1; /* A z-index is crucial to keep the column on top of others when scrolling */
+  background-color: #fff; /* Match your table background to avoid seeing content underneath */
 }
 
 .matHeaderRow {
-  position: sticky;
+  /* position: sticky; */
+  position: relative;
   top: 0;
   z-index: 999;
 }
 
 .table {
   width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
 }
 
 .highlightRow {
@@ -1018,10 +1197,8 @@ table.matTable {
   max-width: 280px !important;
 }
 
-.matColumnCarrier {
-  min-width: 230px !important;
-  max-width: 230px !important;
-}
+
+
 
 .matColumnSno {
   min-width: 50px !important;
@@ -3503,24 +3680,26 @@ select.didFloatingSelect::-ms-expand {
   left: 0;
   min-width: 40px;
   width: 40px;
+  top: 0;
   z-index: 30;
   background: #ebeef7;
 }
-
-.matColumnSno {
+ .matColumnSno {
   position: sticky;
   left: 40px;
   min-width: 50px;
   width: 50px;
+  top: 0;
   z-index: 29;
   background: #ebeef7;
-}
+} 
 
 .matColumnStatus {
   position: sticky;
   left: 90px;
-  /* min-width: 86px; */
+
   width: 86px;
+  top: 0;
   z-index: 28;
   background: #ebeef7;
   max-width: 50px;
@@ -3529,31 +3708,36 @@ select.didFloatingSelect::-ms-expand {
 .matColumnSIN {
   position: sticky;
   left: 139px;
+  top: 0;
   min-width: 115px;
   width: 100px;
   z-index: 27;
   background: #ebeef7;
-}
+} 
 
+
+
+ 
 .matColumnPickup {
   position: sticky;
   left: 254px;
   min-width: 250px;
   max-width: 250px;
+  top: 0;
   width: 200px;
   z-index: 26;
   background: #ebeef7;
-}
+} 
 
 .matColumnDelivery {
   position: sticky;
-  left: 509px;
+  left: 500px;
   min-width: 250px;
   max-width: 250px;
   width: 200px;
   z-index: 25;
   background: #ebeef7;
-}
+} 
 
 .matColumnDateTime {
   position: sticky;
@@ -3566,7 +3750,7 @@ select.didFloatingSelect::-ms-expand {
 
 .matColumnCarrier {
   position: sticky;
-  left: 764px;
+  left: 750px;
   min-width: 200px;
   width: 200px;
   z-index: 23;
@@ -3614,7 +3798,7 @@ select.didFloatingSelect::-ms-expand {
 
 /* Sticky header row */
 .matHeaderRow {
-  position: sticky;
+  position: relative;
   top: 0;
   z-index: 20;
   background: #ebeef7;
@@ -3646,7 +3830,8 @@ select.didFloatingSelect::-ms-expand {
 .matCell.matColumnDateTime,
 .matCell.matColumnCarrier {
   background: #ebeef7;
-  border-right: 1px solid #d2d2d2;
+  
+ 
 }
 
 .matCell.matColumnSelect {
@@ -3813,9 +3998,13 @@ select.didFloatingSelect::-ms-expand {
   border: 1px solid rgba(139, 92, 246, 0.1);
   box-shadow: 0 20px 40px rgba(139, 92, 246, 0.15);
   animation: scaleIn 0.3s ease-out;
-  min-width: 500px;
+
+  max-width: 500px !important;
+  max-height: 400px !important;
   padding: 0;
   overflow: hidden;
+  overflow-y: auto;
+  z-index: 100;
 }
 
 .actionCategoriesGrid {
@@ -3823,7 +4012,7 @@ select.didFloatingSelect::-ms-expand {
   grid-template-columns: repeat(2, 1fr);
   gap: 16px;
   padding: 16px;
-  max-height: 400px;
+
   overflow-y: auto;
 }
 
@@ -3855,7 +4044,7 @@ select.didFloatingSelect::-ms-expand {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 6px 8px;
+  padding: 6px 6px;
   border-radius: 4px;
   font-size: 12px;
   transition: all 0.2s ease;
@@ -4055,10 +4244,51 @@ select.didFloatingSelect::-ms-expand {
   align-items: center;
   justify-content: space-between;
 }
+.perSinSelect {
+  width: 140px;
+  height: 38px;
+  background: #fff;
+  border: 2px solid #c3c9e8; /* subtle blue-gray */
+  border-radius: 0px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #22223b;
+  box-shadow: none;
+  transition: border 0.2s;
+  appearance: none;
+  padding: 4px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.perPageItem:global([data-state='checked']) svg {
+  display: none;
+}
 .perPageSelect:focus {
   border-color: #2563eb; /* blue on focus */
 }
+.perPageContent {
+  background: #fff;
+  border: 1px solid #c3c9e8;
+  border-radius: 8px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 8px 0;
+}
 
+/* Styles for each individual option in the dropdown list */
+.perPageItem {
+  font-size: 14px;
+  font-weight: 500;
+  color: #22223b;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+/* Styles for the hovered option */
+.perPageItem:hover {
+  background-color: #f0f4ff;
+}
 .paginationControls {
   display: flex;
   align-items: center;
@@ -4087,12 +4317,19 @@ select.didFloatingSelect::-ms-expand {
   cursor: default;
   box-shadow: none;
 }
-
-.paginationIcon {
-  width: 20px !important;
-  height: 20px !important;
-  display: block;
+/* Hides the tick icon from the dropdown items */
+.perPageItem:global(.radix-select-item-indicator) {
+  display: none;
 }
+/* .paginationIcon {
+  width: 10px !important;
+  height: 10px !important;
+  display: block;
+} */
+.headerRow th {
+  border-bottom: 2px solid #919191 !important; /* black line */
+}
+
 
 .pageInfo {
   font-size: 18px;
@@ -4101,7 +4338,12 @@ select.didFloatingSelect::-ms-expand {
   margin: 0 12px;
   white-space: nowrap;
 }
-
+.spotDriverIcon {
+  width: 1px;
+  height: 1px;
+  vertical-align: middle;
+  margin-left: 4px;
+}
 /* Add these to your existing ShipmentsDashboard.module.css */
 .matColumnLastLocation {
   width: 60px;
