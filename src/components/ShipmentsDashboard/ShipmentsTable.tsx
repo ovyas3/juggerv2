@@ -453,7 +453,7 @@ export const ShipmentsTable: React.FC<ShipmentsTableProps> = ({
                 >
                   {renderLastLocationCell(shipment)}
                 </td>
-                <td className={styles.matCell}>
+                <td className={`${styles.matCell} ${styles.matColumnFreightPrice}`}>
                   {shipment.frieght_price
                     ? formatCurrency(shipment.frieght_price)
                     : "N/A"}

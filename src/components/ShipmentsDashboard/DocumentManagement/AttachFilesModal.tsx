@@ -1,15 +1,16 @@
-import React, { useState, useRef, ChangeEvent } from 'react';
-import styles from './AttachFilesModal.module.css';
-import { useSnackbar } from '@/hooks/snackBar';
-import ModalHeader from '@/components/UI/ModalHeader/ModalHeader';
-import { httpsPost } from '@/utils/Communication';
+import React, { useState, useRef, ChangeEvent } from "react";
+import styles from "./AttachFilesModal.module.css";
+import { useSnackbar } from "@/hooks/snackBar";
+import ModalHeader from "@/components/UI/ModalHeader/ModalHeader";
+import { httpsPost } from "@/utils/Communication";
 
 interface AttachFilesModalProps {
   show: boolean;
   onClose: () => void;
-  onAttach: () => void;  
-  shipmentId: string;     
+  onAttach: () => void;
+  shipmentId: string;
   isLoading?: boolean;
+  sin?: string;
 }
 
 const AttachFilesModal: React.FC<AttachFilesModalProps> = ({
@@ -17,7 +18,8 @@ const AttachFilesModal: React.FC<AttachFilesModalProps> = ({
   onClose,
   onAttach,
   shipmentId,
-  isLoading = false
+  isLoading = false,
+  sin,
 }) => {
   const [files, setFiles] = useState<FileList | null>(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -32,58 +34,54 @@ const AttachFilesModal: React.FC<AttachFilesModalProps> = ({
 
   const handleAttach = async () => {
     if (!files || files.length === 0) {
-      showMessage('Please select at least one file', 'error');
+      showMessage("Please select at least one file", "error");
       return;
     }
-  
-    // Validate file types
-    const validTypes = ['image/jpeg', 'image/png'];
+
+    const validTypes = ["image/jpeg", "image/png"];
     const invalidFiles = Array.from(files).filter(
-      file => !validTypes.includes(file.type)
+      (file) => !validTypes.includes(file.type)
     );
-  
+
     if (invalidFiles.length > 0) {
-      showMessage('Only JPG and PNG files are allowed', 'error');
+      showMessage("Only JPG and PNG files are allowed", "error");
       return;
     }
-  
+
     const formData = new FormData();
-    
-    // Append each file with the correct content type
+
     Array.from(files).forEach((file) => {
-      // Create a new blob with the correct content type
       const blob = new Blob([file], { type: file.type });
-      formData.append('doc', blob, file.name);
+      formData.append("doc", blob, file.name);
     });
-  
+
     try {
       setIsUploading(true);
       const response = await httpsPost(
-        `shipment/approval_doc/${shipmentId}`, 
+        `shipment/approval_doc/${shipmentId}`,
         formData,
         {
-          // Remove any default Content-Type header to let the browser set it with the boundary
           headers: {
-            'Content-Type': undefined,
+            "Content-Type": undefined,
           },
         },
         5
       );
-  
+
       if (response.statusCode === 200) {
-        showMessage('Files uploaded successfully', 'success');
-        onAttach(); 
-        onClose();  
+        showMessage("Files uploaded successfully", "success");
+        onAttach();
+        onClose();
         if (fileInputRef.current) {
-          fileInputRef.current.value = '';
+          fileInputRef.current.value = "";
         }
         setFiles(null);
       } else {
-        showMessage(response.message || 'Failed to upload files', 'error');
+        showMessage(response.message || "Failed to upload files", "error");
       }
     } catch (error: any) {
-      console.error('Error uploading files:', error);
-      showMessage(error.message || 'Failed to upload files', 'error');
+      console.error("Error uploading files:", error);
+      showMessage(error.message || "Failed to upload files", "error");
     } finally {
       setIsUploading(false);
     }
@@ -112,8 +110,8 @@ const AttachFilesModal: React.FC<AttachFilesModalProps> = ({
           </div>
         )}
         <div className={styles.section}>
-          <ModalHeader 
-            title="Upload Approval Documents" 
+          <ModalHeader
+            title={`Upload Approval Documents - #${sin}`}
             onClose={onClose}
           />
           <div className={styles.commentSection}>
@@ -122,11 +120,11 @@ const AttachFilesModal: React.FC<AttachFilesModalProps> = ({
                 type="file"
                 ref={fileInputRef}
                 className={styles.inputField}
-                style={{ display: 'none' }}
+                style={{ display: "none" }}
                 onChange={handleFileChange}
                 multiple
               />
-              <button 
+              <button
                 className={styles.browseButton}
                 onClick={handleClickUpload}
                 type="button"
@@ -146,12 +144,14 @@ const AttachFilesModal: React.FC<AttachFilesModalProps> = ({
               )}
             </div>
           </div>
-          <div 
-            className={`${styles.submitButton} ${!files ? styles.disabled : ''}`}
+          <div
+            className={`${styles.submitButton} ${
+              !files ? styles.disabled : ""
+            }`}
             onClick={!isUploading ? handleAttach : undefined}
           >
             <div className={styles.button}>
-              {isUploading ? 'Uploading...' : 'Upload Files'}
+              {isUploading ? "Uploading..." : "Upload Files"}
             </div>
           </div>
         </div>

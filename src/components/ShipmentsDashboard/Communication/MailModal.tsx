@@ -1,19 +1,17 @@
 import React, { useState } from "react";
 import {
   Dialog,
-  DialogTitle,
   DialogContent,
   TextField,
   IconButton,
   CircularProgress,
 } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
 import EmailIcon from "@mui/icons-material/Email";
 import { useSnackbar } from "@/hooks/snackBar";
 import { httpsPost } from "@/utils/Communication";
 import styles from "./MailModal.module.css";
-import ModalHeader from '../../UI/ModalHeader/ModalHeader';
-import {useTranslations} from 'next-intl';
+import ModalHeader from "../../UI/ModalHeader/ModalHeader";
+import { useTranslations } from "next-intl";
 
 interface MailModalProps {
   open: boolean;
@@ -28,7 +26,7 @@ const MailModal: React.FC<MailModalProps> = ({ open, onClose, shipment }) => {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const { showMessage } = useSnackbar();
-  const t = useTranslations('MAILMODAL');
+  const t = useTranslations("MAILMODAL");
 
   const validateEmail = (email: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -59,8 +57,7 @@ const MailModal: React.FC<MailModalProps> = ({ open, onClose, shipment }) => {
       if (response.statusCode === 200) {
         showMessage("Email sent successfully", "success");
         handleClose();
-      }
-      else {
+      } else {
         showMessage(response.message, "error");
       }
     } catch (error: any) {
@@ -86,16 +83,14 @@ const MailModal: React.FC<MailModalProps> = ({ open, onClose, shipment }) => {
       fullWidth
       classes={{ paper: styles.dialogPaper }}
     >
-      <ModalHeader 
-        title={t("shareTrackingUrl")} 
-        onClose={onClose} 
+      <ModalHeader
+        title={`Share Tracking URL Via Email - #${shipment.sin}`}
+        onClose={onClose}
       />
 
       <DialogContent className={styles.body}>
         <div className={styles.inputContainer}>
-          <div className={styles.label}>
-            {t("emailAddress")}
-          </div>
+          <div className={styles.label}>{t("emailAddress")}</div>
           <div className={styles.inputWrapper}>
             <TextField
               fullWidth

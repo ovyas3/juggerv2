@@ -909,6 +909,7 @@ table.matTable {
   font-weight: bold !important;
   border-right: solid 1px #d2d2d2;
   border-bottom: none;
+  box-sizing: border-box;
 }
 
 .matRow {
@@ -918,10 +919,11 @@ table.matTable {
 .matCell {
   border-right: solid 1px #d2d2d2;
   border-bottom: solid 1px #d2d2d2;
-  padding: 0px 2px;
+  padding: 0px 0px; 
   font-weight: 600;
   font-size: 12px;
   height: 70px;
+  box-sizing: border-box;
 }
 
 .matCell i {
@@ -1232,12 +1234,31 @@ table.matTable {
 .matColumnLastLocation {
   min-width: 180px !important;
   max-width: 180px !important;
+  width: 180px !important;
+  border-right: solid 1px #d2d2d2 !important;
 }
 
+.matColumnFreightPrice {
+  min-width: 120px !important;
+  max-width: 120px !important;
+  width: 120px !important;
+  border-left: none !important; 
+}
+
+
+.matHeaderCell.matColumnLastLocation {
+  border-right: solid 1px #d2d2d2 !important;
+}
+
+.matHeaderCell.matColumnFreightPrice {
+  border-left: none !important;
+}
 .matHeaderCell.matColumnPickupDrop,
 .matHeaderCell.matColumnCarrier {
   white-space: nowrap;
 }
+
+
 
 .matPaginator {
   position: relative;
@@ -1291,6 +1312,12 @@ table.matTable {
 .tableContainer.compactView .matHeaderCell,
 .tableContainer.compactView .matCell {
   padding: 0 8px !important;
+  font-size: 12px !important;
+}
+
+.tableContainer.compactView .matHeaderCell .matColumnLastLocation,
+.tableContainer.compactView .matCell .matColumnLastLocation {
+  padding: 0 1px !important;
   font-size: 12px !important;
 }
 
@@ -3285,6 +3312,13 @@ select.didFloatingSelect::-ms-expand {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
 }
+
+.tableDivContainer {
+  position: relative;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+}
 /* For header and row cells sticky bg */
 .matHeaderCell.matColumnSelect,
 .matHeaderCell.matColumnSno,
@@ -3653,16 +3687,18 @@ select.didFloatingSelect::-ms-expand {
 
 /* Status Legend Styles */
 .statusLegend {
-  display: flex;
-  gap: 19px;
   margin-left: auto;
-  margin-right: 25px;
+  margin-right: 15px;
   align-items: center;
   flex-wrap: wrap;
-  width: 97%;
   justify-content: center;
   /* font-size: 17px; */
   height: 23px;
+
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
+  width: 700px;
 }
 
 .legendItem {

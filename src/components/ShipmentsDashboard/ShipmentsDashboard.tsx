@@ -249,6 +249,8 @@ const ShipmentsDashboard: React.FC = () => {
   const [isEpodModalOpen, setIsEpodModalOpen] = useState(false);
   const [selectedShipmentForEpod, setSelectedShipmentForEpod] =
     useState<Shipment | null>(null);
+  const [selectedShipmentForAttach, setSelectedShipmentForAttach] =
+    useState<Shipment | null>(null);
 
   // Analytics data
   const [analyticsData, setAnalyticsData] = useState<AnalyticsData>({
@@ -578,10 +580,12 @@ const [locationDialogState, setLocationDialogState] = useState<{
     open: boolean;
     type: 'delay' | 'gps';
     shipmentId: string | null;
+    sin: string;
   }>({
     open: false,
     type: 'delay',
-    shipmentId: null
+    shipmentId: null,
+    sin: ""
   });
 const [selectedShipmentForGps, setSelectedShipmentForGps] = useState<any>(null);
 const [showStatusModal, setShowStatusModal] = useState(false);
@@ -608,11 +612,12 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
   closeAllDialogs();
 };
 
-  const handleOpenReasonDialog = (type: 'delay' | 'gps', shipmentId: string) => {
+  const handleOpenReasonDialog = (type: 'delay' | 'gps', shipmentId: string, sin: string) => {
     setReasonDialog({
       open: true,
       type,
-      shipmentId
+      shipmentId,
+      sin
     });
   };
 
@@ -688,6 +693,7 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
           closeAllDialogs();
           const trackingUrl = `${window.location.origin}/track/${shipment.unique_code}`;
           setShareUrl(trackingUrl);
+          setSharedShipment(shipment);
           setShareModalOpen(true);
         },
       },
@@ -727,7 +733,7 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
         icon: WifiOff,
         label: "GPS Disconnection Reason",
         color: "text-teal-600",
-        onClick: (shipment: Shipment) => handleOpenReasonDialog('gps', shipment._id)
+        onClick: (shipment: Shipment) => handleOpenReasonDialog('gps', shipment._id, shipment.sin)
       },
       { 
         icon: Wifi, 
@@ -737,7 +743,7 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
       },
       { icon: Clock, label: "Update Delay Reason", color: "text-teal-600", onClick: (shipment: Shipment) => {
         closeAllDialogs();
-        handleOpenReasonDialog('delay', shipment._id)
+        handleOpenReasonDialog('delay', shipment._id, shipment.sin)
       } },
     ],
     "Location & Routes": [
@@ -794,7 +800,7 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
         color: "text-gray-600",
         onClick: (shipment: Shipment) => {
           closeAllDialogs();
-          handleOpenFreightModal(shipment._id, 'rate');
+          handleOpenFreightModal(shipment._id, shipment.sin, 'rate');
         }
       },
       { 
@@ -833,7 +839,7 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
           console.log('Upload Approval Documents clicked');
           closeAllDialogs();
           console.log('Setting selected shipment and showing dialog');
-          setSelectedShipment(shipment);
+          setSelectedShipmentForAttach(shipment);
           setShowAttachDialog(true);
         },
       },
@@ -1004,7 +1010,7 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
         color: "text-yellow-600",
         onClick: (shipment: Shipment) => {
           closeAllDialogs();
-          handleOpenFreightModal(shipment._id, 'client_rate');
+          handleOpenFreightModal(shipment._id, shipment.sin, 'client_rate');
         }
       },
       //Add Driver Expenses
@@ -2517,7 +2523,7 @@ const renderLastLocationCell = (shipment: any) => {
   };
 
   return (
-    <td className={`${styles.matCell} ${styles.matColumnLastLocation}`}>
+    <div>
       {shipment.trip_tracker?.last_location_address ? (
         <LocationDialog
           address={shipment.trip_tracker.last_location_address}
@@ -2539,7 +2545,7 @@ const renderLastLocationCell = (shipment: any) => {
       ) : (
         "-"
       )}
-    </td>
+    </div>
   );
 };
 
@@ -2761,6 +2767,7 @@ const renderLastLocationCell = (shipment: any) => {
 
   const [shareModalOpen, setShareModalOpen] = useState(false);
   const [shareUrl, setShareUrl] = useState("");
+  const [sharedShipment, setSharedShipment] = useState<Shipment | null>(null);
 
   const [showJdeBookShipment, setShowJdeBookShipment] = useState(false);
   const [showBulkUpload, setShowBulkUpload] = useState(false);
@@ -3219,9 +3226,11 @@ const applyFilter = () => {
 
   const [showUpdateFreightModal, setShowUpdateFreightModal] = useState(false);
   const [selectedShipmentForFreight, setSelectedShipmentForFreight] = useState<string | null>(null);
+  const [freightSIN, setFreightSIN] = useState<string>('');
 
-  const handleOpenFreightModal = (shipmentId: string, freightType: 'rate' | 'client_rate') => {
+  const handleOpenFreightModal = (shipmentId: string, sin: string, freightType: 'rate' | 'client_rate') => {
     setSelectedShipmentForFreight(shipmentId);
+    setFreightSIN(sin);
     setFreightType(freightType);
     setShowUpdateFreightModal(true);
   };
@@ -3481,7 +3490,7 @@ const applyFilter = () => {
 
           {/* Table */}
           <div
-            className={`${styles.tableContainer} ${
+            className={`${styles.tableDivContainer} ${
               isCompactView ? styles.compactView : ""
             }`}
             data-shipment-type={shipmentType}
@@ -3495,6 +3504,18 @@ const applyFilter = () => {
                   {totalShipments.toLocaleString()} shipments
                 </span>
               </div>
+
+              <div className={styles.statusLegend}>
+              {Object.entries(statusLabels).map(([status, label]) => (
+                <div key={status} className={styles.legendItem}>
+                  <div
+                    className={styles.legendColor}
+                    style={{ backgroundColor: statusColors[status] || "#666" }}
+                  />
+                  <span className={styles.legendText}>{label}</span>
+                </div>
+              ))}
+            </div>
 
               <div className={styles.tableControls}>
                 <Select
@@ -3567,17 +3588,7 @@ const applyFilter = () => {
              
                   </div>
 
-            <div className={styles.statusLegend}>
-              {Object.entries(statusLabels).map(([status, label]) => (
-                <div key={status} className={styles.legendItem}>
-                  <div
-                    className={styles.legendColor}
-                    style={{ backgroundColor: statusColors[status] || "#666" }}
-                  />
-                  <span className={styles.legendText}>{label}</span>
-                </div>
-              ))}
-            </div>
+
 
             {!isAnalyticsView && (
               <ShipmentsTable
@@ -3723,7 +3734,7 @@ const applyFilter = () => {
         />
       )}
 
-      {showAttachDialog && selectedShipment && (
+      {showAttachDialog && selectedShipmentForAttach && (
         <AttachFilesModal
           show={showAttachDialog}
           onClose={() => setShowAttachDialog(false)}
@@ -3732,7 +3743,8 @@ const applyFilter = () => {
             // You can refresh the shipments list or update the UI as needed
             fetchShipments(); // Assuming you have a function to refresh the shipments
           }}
-          shipmentId={selectedShipment._id || ""} // Make sure to use the correct property name
+          shipmentId={selectedShipmentForAttach._id || ""} // Make sure to use the correct property name
+          sin={selectedShipmentForAttach.sin || ""}
         />
       )}
 
@@ -3915,6 +3927,7 @@ const applyFilter = () => {
     onClose={handleCloseReasonDialog}
     type={reasonDialog.type}
     shipmentId={reasonDialog.shipmentId}
+    sin={reasonDialog.sin}
     history={
       reasonDialog.type === 'delay' 
         ? shipments.find(s => s._id === reasonDialog.shipmentId)?.delay_reason || []
@@ -3944,11 +3957,15 @@ const applyFilter = () => {
           }}
         />
       )}
-      {shareModalOpen && (
+      {shareModalOpen && sharedShipment && (
         <ShareModal
           open={shareModalOpen}
-          onClose={() => setShareModalOpen(false)}
+          onClose={() => {
+            setShareModalOpen(false);
+            setSharedShipment(null);
+          }}
           trackingUrl={shareUrl}
+          sin={sharedShipment.sin}
         />
       )}
       {cancelModalOpen && shipmentToCancel && (
@@ -4045,7 +4062,8 @@ const applyFilter = () => {
           fetchShipments(); // Refresh the shipments list
           showMessage('GPS connection added successfully', 'success');
         }}
-        isLoading={false} // Set to true when making API call
+        isLoading={false} 
+        sin={selectedShipmentForGps.sin}
         />
       )}
 
@@ -4054,6 +4072,7 @@ const applyFilter = () => {
     show={showFaultyModal}
     vehicleNumber={selectedShipmentForFaulty.vehicleNumber || ''}
     gpsProvider={selectedShipmentForFaulty.gpsProvider || 'GPS Device'}
+    sin={selectedShipmentForFaulty.sin}
     onClose={() => {
       setShowFaultyModal(false);
       setSelectedShipmentForFaulty(null);
@@ -4097,6 +4116,7 @@ const applyFilter = () => {
               : [],
             invoices: [], // Add invoice data if available
             carrier_waybills: [], // Add waybill data if available
+            sin: selectedShipmentForEpod.sin,
           }}
         />
       )}
@@ -4139,6 +4159,7 @@ const applyFilter = () => {
           onConfirm={confirmFlushFreight}
           onCancel={() => setShowFlushFreightConfirm(false)}
           isProcessing={isFlushingFreight}
+          sin={shipmentToFlush?.sin}
         />
       )}
       {showRecalculateDistanceModal && selectedShipmentForRecalculation && (
@@ -4146,7 +4167,7 @@ const applyFilter = () => {
           show={showRecalculateDistanceModal}
           onClose={() => setShowRecalculateDistanceModal(false)}
           shipmentId={selectedShipmentForRecalculation._id}
-          orderSIN={selectedShipmentForRecalculation.sin}
+          sin={selectedShipmentForRecalculation.sin}
           pickupAddresses={selectedShipmentForRecalculation.from.map(f => 
             `${f.location.name}${f.location.city ? `, ${f.location.city}` : ''}`
           )}
@@ -4167,6 +4188,7 @@ const applyFilter = () => {
           onTypeChange={handleInvoiceTypeChange}
           onSubmit={handleInvoiceTypeSubmit}
           loading={isLoadingInvoices}
+          sin={selectedShipmentForInvoiceType.sin}
         />
       )}
       {selectedShipmentForFreight && (
@@ -4176,6 +4198,7 @@ const applyFilter = () => {
         shipmentId={selectedShipmentForFreight}
         onSuccess={handleFreightUpdateSuccess}
         freightType={freightType}
+        sin={freightSIN}
       />
       )}
       {selectedShipmentForArrival && (
@@ -4225,6 +4248,7 @@ const applyFilter = () => {
             // Refresh the shipments list or perform any other success action
             fetchShipments();
           }}
+          sin={selectedShipmentForBulkUpload?.sin}
         />
       )}
 
@@ -4238,6 +4262,7 @@ const applyFilter = () => {
     onSuccess={() => {
       fetchShipments(); // Refresh the shipments list
     }}
+    sin={selectedShipmentForMissed?.sin || ""}
   />
 )}
 
@@ -4252,6 +4277,7 @@ const applyFilter = () => {
     onSuccess={() => {
       fetchShipments(); // Refresh the shipments list
     }}
+    sin={selectedShipmentForMissedEvent.sin || ""}
   />
 )}
 

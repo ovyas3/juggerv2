@@ -81,7 +81,6 @@ const DriverExpenses: React.FC<DriverExpensesProps> = ({
 
   useEffect(() => {
     if (open) {
-      // Initialize with one empty expense
       addExpense();
       try {
         const shippers = JSON.parse(localStorage.getItem("shippers") || "[]");
@@ -235,7 +234,10 @@ const DriverExpenses: React.FC<DriverExpensesProps> = ({
         className: styles.modal,
       }}
     >
-      <ModalHeader title="Add Driver Expenses" onClose={onClose} />
+      <ModalHeader
+        title={`Add Driver Expenses - #${shipment.sin}`}
+        onClose={onClose}
+      />
 
       <DialogContent className={styles.dialogContent}>
         <div className={styles.infoGrid}>

@@ -1,10 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { X } from 'lucide-react';
-import styles from './PullFreightModal.module.css';
-import ModalHeader from '@/components/UI/ModalHeader/ModalHeader';
+import React, { useState, useEffect } from "react";
+import styles from "./PullFreightModal.module.css";
+import ModalHeader from "@/components/UI/ModalHeader/ModalHeader";
 import { useSnackbar } from "@/hooks/snackBar";
-// ... existing imports ...
-import { httpsGet, httpsPost } from '@/utils/Communication';
+import { httpsGet } from "@/utils/Communication";
 
 interface PullFreightModalProps {
   _id: string;
@@ -14,7 +12,10 @@ interface PullFreightModalProps {
   pickup: string;
   destinations: any;
   onClose: () => void;
-  onGetFreight: (data: { destination: string, freightRate: string }) => Promise<void>;
+  onGetFreight: (data: {
+    destination: string;
+    freightRate: string;
+  }) => Promise<void>;
 }
 
 const PullFreightModal: React.FC<PullFreightModalProps> = ({
@@ -25,16 +26,15 @@ const PullFreightModal: React.FC<PullFreightModalProps> = ({
   pickup,
   destinations = [],
   onClose,
-  onGetFreight
+  onGetFreight,
 }) => {
   const { showMessage } = useSnackbar();
-  const [selectedDestination, setSelectedDestination] = useState('');
-  const [freightRate, setFreightRate] = useState('');
+  const [selectedDestination, setSelectedDestination] = useState("");
+  const [freightRate, setFreightRate] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [cities, setCities] = useState<string[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
 
-  // Fetch cities when component mounts
   useEffect(() => {
     if (show) {
       fetchCities();
@@ -43,13 +43,13 @@ const PullFreightModal: React.FC<PullFreightModalProps> = ({
 
   const fetchCities = async () => {
     try {
-      const response = await httpsGet('v1/shipment/getCities', 7);
+      const response = await httpsGet("v1/shipment/getCities", 7);
       if (response.statusCode === 200) {
         setCities(response.data || []);
       }
     } catch (error: any) {
-      console.error('Error fetching cities:', error);
-      showMessage(error.error?.message || 'Failed to load cities', 'error');
+      console.error("Error fetching cities:", error);
+      showMessage(error.error?.message || "Failed to load cities", "error");
     }
   };
 
@@ -66,7 +66,7 @@ const PullFreightModal: React.FC<PullFreightModalProps> = ({
 
   const handleSubmit = async () => {
     if (!selectedDestination) {
-      showMessage('Please select a delivery location', 'error');
+      showMessage("Please select a delivery location", "error");
       return;
     }
 
@@ -74,24 +74,27 @@ const PullFreightModal: React.FC<PullFreightModalProps> = ({
       setIsLoading(true);
       const queryParams = new URLSearchParams({
         destination: selectedDestination.toLowerCase(),
-        shipment: _id
+        shipment: _id,
       }).toString();
 
-      const response = await httpsGet(`/freight_rate_route_code/get?${queryParams}`, 6);
+      const response = await httpsGet(
+        `/freight_rate_route_code/get?${queryParams}`,
+        6
+      );
 
       if (response.statusCode !== 200) {
-        throw new Error(response.message || 'Failed to fetch freight rate');
+        throw new Error(response.message || "Failed to fetch freight rate");
       }
 
       onGetFreight({
         destination: selectedDestination,
-        freightRate: response.data?.toString() || ''
+        freightRate: response.data?.toString() || "",
       });
-      
+
       onClose();
     } catch (error: any) {
-      console.error('Error pulling freight:', error);
-      showMessage(error.message || 'Failed to fetch freight rate', 'error');
+      console.error("Error pulling freight:", error);
+      showMessage(error.message || "Failed to fetch freight rate", "error");
     } finally {
       setIsLoading(false);
     }
@@ -101,12 +104,15 @@ const PullFreightModal: React.FC<PullFreightModalProps> = ({
 
   return (
     <div className={styles.overlay} onClick={onClose}>
-      <div className={styles.dialogPullFreight} onClick={e => e.stopPropagation()}>
-        <ModalHeader 
-          title="Pull Freight with Routes" 
-          onClose={onClose} 
+      <div
+        className={styles.dialogPullFreight}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <ModalHeader
+          title={`Pull Freight with Routes - #${sin}`}
+          onClose={onClose}
         />
-        
+
         <div className={styles.dialog_body}>
           <div className={styles.driverDetailsSec}>
             <div className={styles.mwgContainer}>
@@ -144,11 +150,16 @@ const PullFreightModal: React.FC<PullFreightModalProps> = ({
                       disabled
                       placeholder=" "
                     />
-                    <label className={styles.floatingLabel}>Pickup Location</label>
+                    <label className={styles.floatingLabel}>
+                      Pickup Location
+                    </label>
                   </div>
                 </div>
                 <div className={styles.item}>
-                  <div className={styles.input} style={{ position: 'relative' }}>
+                  <div
+                    className={styles.input}
+                    style={{ position: "relative" }}
+                  >
                     <input
                       type="text"
                       className={styles.inputField}
@@ -157,12 +168,16 @@ const PullFreightModal: React.FC<PullFreightModalProps> = ({
                       onFocus={() => setShowDropdown(true)}
                       placeholder=" "
                     />
-                    <label className={styles.floatingLabel}>Delivery Location</label>
+                    <label className={styles.floatingLabel}>
+                      Delivery Location
+                    </label>
                     {showDropdown && cities.length > 0 && (
                       <div className={styles.dropdown}>
                         {cities
-                          .filter(city => 
-                            city.toLowerCase().includes(selectedDestination.toLowerCase())
+                          .filter((city) =>
+                            city
+                              .toLowerCase()
+                              .includes(selectedDestination.toLowerCase())
                           )
                           .map((city, index) => (
                             <div
@@ -186,7 +201,9 @@ const PullFreightModal: React.FC<PullFreightModalProps> = ({
                       onChange={(e) => setFreightRate(e.target.value)}
                       placeholder=" "
                     />
-                    <label className={styles.floatingLabel}>Freight Rate (₹)</label>
+                    <label className={styles.floatingLabel}>
+                      Freight Rate (₹)
+                    </label>
                   </div>
                 </div>
               </div>
@@ -195,14 +212,14 @@ const PullFreightModal: React.FC<PullFreightModalProps> = ({
         </div>
 
         <div className={styles.dialog_footer}>
-          <button 
-            className={styles.submitButton} 
+          <button
+            className={styles.submitButton}
             onClick={handleSubmit}
             disabled={isLoading}
           >
-            {isLoading ? 'Loading...' : 'Pull Freight'}
+            {isLoading ? "Loading..." : "Pull Freight"}
           </button>
-          <button 
+          <button
             className={styles.cancelButton}
             onClick={onClose}
             disabled={isLoading}

@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import styles from './AddGpsConnectionModal.module.css';
+import React, { useState, useEffect } from "react";
+import styles from "./AddGpsConnectionModal.module.css";
 import { httpsGet, httpsPost } from "@/utils/Communication";
-import ModalHeader from '@/components/UI/ModalHeader/ModalHeader';
-import Loader from '@/components/UI/Loader/Loader';
-import { MultiSelect } from '@/components/UI/MultiSelect/MultiSelect';
+import ModalHeader from "@/components/UI/ModalHeader/ModalHeader";
+import Loader from "@/components/UI/Loader/Loader";
+import { MultiSelect } from "@/components/UI/MultiSelect/MultiSelect";
 import { useSnackbar } from "@/hooks/snackBar";
 
 interface GpsOption {
@@ -16,11 +16,12 @@ interface AddGpsConnectionModalProps {
   onClose: () => void;
   selectedGps: string[];
   onGpsChange: (selected: string[]) => void;
-  driverType: 'temporary' | 'own'; // Add driver type
-  attachedDriverId?: string; // For temporary drivers
-  vehicleId?: string; // For own drivers
+  driverType: "temporary" | "own";
+  attachedDriverId?: string;
+  vehicleId?: string;
   onSuccess?: () => void;
   isLoading?: boolean;
+  sin?: string;
 }
 
 const AddGpsConnectionModal: React.FC<AddGpsConnectionModalProps> = ({
@@ -33,6 +34,7 @@ const AddGpsConnectionModal: React.FC<AddGpsConnectionModalProps> = ({
   vehicleId,
   onSuccess,
   isLoading = false,
+  sin,
 }) => {
   const { showMessage } = useSnackbar();
   const [gpsOptions, setGpsOptions] = useState<GpsOption[]>([]);
@@ -43,17 +45,19 @@ const AddGpsConnectionModal: React.FC<AddGpsConnectionModalProps> = ({
   useEffect(() => {
     const fetchGpsOptions = async () => {
       if (!show) return;
-      
+
       setIsLoadingGps(true);
       setError(null);
-      
+
       try {
         const response = await httpsGet("settings/constants", 4);
         if (response.statusCode === 200 && response?.data?.gps) {
-          const options = response.data.gps.map((gps: { name: string; value: string }) => ({
-            label: gps.name,
-            value: gps.value
-          }));
+          const options = response.data.gps.map(
+            (gps: { name: string; value: string }) => ({
+              label: gps.name,
+              value: gps.value,
+            })
+          );
           setGpsOptions(options);
         } else {
           setError("Failed to load GPS options.");
@@ -71,48 +75,56 @@ const AddGpsConnectionModal: React.FC<AddGpsConnectionModalProps> = ({
 
   const handleSubmit = async () => {
     if (!selectedGps.length) {
-      showMessage('Please select at least one GPS provider', 'error');
+      showMessage("Please select at least one GPS provider", "error");
       return;
     }
 
     setIsSubmitting(true);
-    const provider = selectedGps.join(', ');
+    const provider = selectedGps.join(", ");
 
     try {
       let payload;
-      if (driverType === 'temporary') {
+      if (driverType === "temporary") {
         if (!attachedDriverId) {
-          throw new Error('Driver ID is required for temporary drivers');
+          throw new Error("Driver ID is required for temporary drivers");
         }
         payload = {
           attachedDriverId,
           gps: provider.toLowerCase(),
         };
-      } else if (driverType === 'own') {
+      } else if (driverType === "own") {
         if (!vehicleId) {
-          throw new Error('Vehicle ID is required');
+          throw new Error("Vehicle ID is required");
         }
         payload = {
           vehicleId,
           gps: provider.toLowerCase(),
         };
       } else {
-        throw new Error('Invalid driver type');
+        throw new Error("Invalid driver type");
       }
 
-      const response = await httpsPost("vehicle/addGpsConnection", payload, {}, 4);
-      
+      const response = await httpsPost(
+        "vehicle/addGpsConnection",
+        payload,
+        {},
+        4
+      );
+
       if (response.statusCode === 200) {
-        showMessage('GPS added successfully', 'success');
-        onGpsChange([]); // Clear selected GPS
+        showMessage("GPS added successfully", "success");
+        onGpsChange([]);
         onClose();
-        onSuccess?.(); // Call the success callback if provided
+        onSuccess?.();
       } else {
-        throw new Error(response.message || 'Failed to add GPS connection');
+        throw new Error(response.message || "Failed to add GPS connection");
       }
     } catch (error: any) {
-      console.error('Error adding GPS connection:', error);
-      showMessage(error.message || 'An error occurred while adding GPS connection', 'error');
+      console.error("Error adding GPS connection:", error);
+      showMessage(
+        error.message || "An error occurred while adding GPS connection",
+        "error"
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -122,9 +134,9 @@ const AddGpsConnectionModal: React.FC<AddGpsConnectionModalProps> = ({
 
   return (
     <div className={styles.modalOverlay} onClick={onClose}>
-      <div className={styles.modal} onClick={e => e.stopPropagation()}>
-        <ModalHeader title="Add GPS Connection" onClose={onClose} />
-        
+      <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+        <ModalHeader title={`Add GPS Connection - #${sin}`} onClose={onClose} />
+
         <div className={styles.body}>
           {isLoadingGps ? (
             <Loader />
@@ -134,32 +146,38 @@ const AddGpsConnectionModal: React.FC<AddGpsConnectionModalProps> = ({
             <>
               <div className={styles.inputContainer}>
                 <MultiSelect
-                  options={gpsOptions.map(opt => ({
+                  options={gpsOptions.map((opt) => ({
                     id: opt.value,
                     label: opt.label,
                     selected: selectedGps.includes(opt.value),
                   }))}
-                  onChange={updatedOptions => {
-                    onGpsChange(updatedOptions.filter(opt => opt.selected).map(opt => opt.id));
+                  onChange={(updatedOptions) => {
+                    onGpsChange(
+                      updatedOptions
+                        .filter((opt) => opt.selected)
+                        .map((opt) => opt.id)
+                    );
                   }}
                   label="Select Provider"
                 />
               </div>
 
               <div className={styles.buttonContainer}>
-                <button 
+                <button
                   className={`${styles.button} ${styles.cancelButton}`}
                   onClick={onClose}
                   disabled={isLoading}
                 >
                   Cancel
                 </button>
-                <button 
+                <button
                   className={`${styles.button} ${styles.submitButton}`}
                   onClick={handleSubmit}
-                  disabled={isLoading || selectedGps.length === 0 || isSubmitting}
+                  disabled={
+                    isLoading || selectedGps.length === 0 || isSubmitting
+                  }
                 >
-                  {isSubmitting ? 'Submitting...' : 'Submit'}
+                  {isSubmitting ? "Submitting..." : "Submit"}
                 </button>
               </div>
             </>
