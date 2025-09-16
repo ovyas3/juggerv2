@@ -81,6 +81,7 @@ interface ShipmentsTableProps {
   copyDestinationCode: any;
   openLocationsPopup: any;
   formatCurrency: (amount: number) => string;
+  renderLastLocationCell: (shipment: Shipment) => React.ReactNode;
   // onViewDetails: (shipment: Shipment) => void;
   // onShare: (shipment: Shipment) => void;
   // onSendEmail: (shipment: Shipment) => void;
@@ -110,6 +111,7 @@ export const ShipmentsTable: React.FC<ShipmentsTableProps> = ({
   renderLocationCell,
   renderDateTimeCell,
   renderVehicleCell,
+  renderLastLocationCell,
   renderConsentCell,
   renderSubscriptionCell,
   handleSelectShipment,
@@ -156,7 +158,6 @@ export const ShipmentsTable: React.FC<ShipmentsTableProps> = ({
   //     }
   //   };
 
-
   if (isAnalyticsView) return null;
 
   return (
@@ -166,15 +167,16 @@ export const ShipmentsTable: React.FC<ShipmentsTableProps> = ({
       }`}
       ref={tableRef}
     >
-     <table
-  className={`${styles.matTable} ${styles.table} ${
-    ["all", "others"].includes(shipmentType) ? "" : styles.noDelivery
-  }`}
->
+      <table
+        className={`${styles.matTable} ${styles.table}`}
+        data-shipment-type={shipmentType}
+      >
         <thead className={styles.matHeaderRow}>
           <tr className={styles.headerRow}>
-            <th className={`${styles.matHeaderCell} ${styles.matColumnSelect} ${styles.stickyTop} ${styles.stickyColumn}`}>
-            Select
+            <th
+              className={`${styles.matHeaderCell} ${styles.matColumnSelect} ${styles.stickyTop} ${styles.stickyColumn}`}
+            >
+              Select
               {/* <input
                 type="checkbox"
                 onChange={(e) => handleSelectAllShipments(e.target.checked)}
@@ -185,38 +187,50 @@ export const ShipmentsTable: React.FC<ShipmentsTableProps> = ({
                 }
               /> */}
             </th>
-            <th className={`${styles.matHeaderCell} ${styles.matColumnSno} ${styles.stickyTop} ${styles.stickyColumn}`}>
+            <th
+              className={`${styles.matHeaderCell} ${styles.matColumnSno} ${styles.stickyTop} ${styles.stickyColumn}`}
+            >
               S.No
             </th>
-            <th className={`${styles.matHeaderCell} ${styles.matColumnStatus} ${styles.stickyTop}${styles.stickyColumn}`}>
+            <th
+              className={`${styles.matHeaderCell} ${styles.matColumnStatus} ${styles.stickyTop}${styles.stickyColumn}`}
+            >
               Status
             </th>
-            <th className={`${styles.matHeaderCell} ${styles.matColumnSIN} ${styles.stickyTop} ${styles.stickyColumn}`}>
+            <th
+              className={`${styles.matHeaderCell} ${styles.matColumnSIN} ${styles.stickyTop} ${styles.stickyColumn}`}
+            >
               SIN
             </th>
-            <th
-              className={`${styles.matHeaderCell} ${styles.matColumnPickup} ${styles.stickyTop} ${styles.stickyColumn}`}
-            >
-              {shipmentType === "outbound" ? "Delivery" : "Pickup"}
-            </th>
-            {["all", "others"].includes(shipmentType) && (
+            {/* Pickup Column - Hide for outbound */}
+            {shipmentType !== "outbound" && (
+              <th
+                className={`${styles.matHeaderCell} ${styles.matColumnPickup} ${styles.stickyTop} ${styles.stickyColumn}`}
+              >
+                Pickup
+              </th>
+            )}
+
+            {/* Delivery Column - Hide for inbound */}
+            {shipmentType !== "inbound" && (
               <th
                 className={`${styles.matHeaderCell} ${styles.matColumnDelivery} ${styles.stickyTop} ${styles.stickyColumn}`}
               >
                 Delivery
               </th>
             )}
+
             {/* <th className={`${styles.matHeaderCell} ${styles.matColumnDateTime}`}>Date & Time</th> */}
             {/* <th
               className={`${styles.matHeaderCell} ${styles.matColumnCarrier}`}
             > */}
-        <th
-  className={`${styles.matHeaderCell} ${styles.matColumnCarrier} ${
-    ["all", "others"].includes(shipmentType)
-      ? styles.leftAfterDelivery   // Pickup(200) + Delivery(200) = 400
-      : styles.leftAfterPickup     // Pickup only = 200
-  }`}
->
+            <th
+              className={`${styles.matHeaderCell} ${styles.matColumnCarrier} ${
+                ["all", "others"].includes(shipmentType)
+                  ? styles.leftAfterDelivery // Pickup(200) + Delivery(200) = 400
+                  : styles.leftAfterPickup // Pickup only = 200
+              }`}
+            >
               Carrier
             </th>
 
@@ -301,45 +315,52 @@ export const ShipmentsTable: React.FC<ShipmentsTableProps> = ({
                 <td className={`${styles.matCell} ${styles.matColumnSIN}`}>
                   {renderSINCell(shipment)}
                 </td>
-               
-                <td
-                  className={`${styles.matCell} ${styles.matColumnPickup} ${styles.stickyColumn}`}
-                >
-                  {renderLocationCell(
-                    shipment,
-                    copyDestinationCode,
-                    (type: string, locs: any[]) =>
-                      openLocationsPopup(type, locs, shipment),
-                    shipmentType,
-                    "pickup"
-                  )}
-                </td>
-                {["all", "others"].includes(shipmentType) && (
+
+                {/* Pickup Cell - Hide for outbound */}
+                {shipmentType !== "outbound" && (
+                  <td
+                    className={`${styles.matCell} ${styles.matColumnPickup} ${styles.stickyColumn}`}
+                  >
+                    {renderLocationCell(
+                      shipment,
+                      copyDestinationCode,
+                      (type: string, locs: any) =>
+                        openLocationsPopup(type, locs, shipment),
+                      shipmentType,
+                      "pickup"
+                    )}
+                  </td>
+                )}
+
+                {/* Delivery Cell - Hide for inbound */}
+                {shipmentType !== "inbound" && (
                   <td
                     className={`${styles.matCell} ${styles.matColumnDelivery} ${styles.stickyColumn}`}
                   >
                     {renderLocationCell(
                       shipment,
                       copyDestinationCode,
-                      (type: string, locs: any[]) =>
+                      (type: string, locs: any) =>
                         openLocationsPopup(type, locs, shipment),
                       shipmentType,
-             
                       "delivery"
                     )}
                   </td>
                 )}
+
                 {/* <td className={`${styles.matCell} ${styles.matColumnDateTime}`}>
                   {renderDateTimeCell(shipment, shipmentType)}
                 </td> */}
                 {/* <td className={`${styles.matCell} ${styles.matColumnCarrier}`}> */}
                 <td
-  className={`${styles.matCell} ${styles.matColumnCarrier} ${styles.stickyColumn} ${
-    ["all", "others"].includes(shipmentType)
-      ? styles.leftAfterDelivery
-      : styles.leftAfterPickup
-  }`}
->
+                  className={`${styles.matCell} ${styles.matColumnCarrier} ${
+                    styles.stickyColumn
+                  } ${
+                    ["all", "others"].includes(shipmentType)
+                      ? styles.leftAfterDelivery
+                      : styles.leftAfterPickup
+                  }`}
+                >
                   {shipment.carrier_parent_name}
                 </td>
 
@@ -387,19 +408,20 @@ export const ShipmentsTable: React.FC<ShipmentsTableProps> = ({
                 </td>
 
                 <td className={styles.matCell}>
-                  <div>{shipment.driverName}
-                  {shipment.isSpotDriver  && (
-        <span 
-         
-        > <img 
-        src={spotdrivericon.src} 
-        alt="Spot Driver" 
-        title="Spot Driver"
-        style={{ height: '12px', width: '12px' }}
-      /></span>
-      )}
+                  <div>
+                    {shipment.driverName}
+                    {shipment.isSpotDriver && (
+                      <span>
+                        {" "}
+                        <img
+                          src={spotdrivericon.src}
+                          alt="Spot Driver"
+                          title="Spot Driver"
+                          style={{ height: "12px", width: "12px" }}
+                        />
+                      </span>
+                    )}
                   </div>
-
                 </td>
 
                 <td
@@ -429,27 +451,7 @@ export const ShipmentsTable: React.FC<ShipmentsTableProps> = ({
                 <td
                   className={`${styles.matCell} ${styles.matColumnLastLocation}`}
                 >
-                  {shipment.trip_tracker?.last_location_address ? (
-                    <LocationDialog
-                      address={shipment.trip_tracker.last_location_address}
-                      lastUpdated={shipment.trip_tracker?.last_location_at}
-                    >
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className={styles.locationButton}
-                        title="View location"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          console.log("Location button clicked");
-                        }}
-                      >
-                        <MapPin className={styles.locationIcon} />
-                      </Button>
-                    </LocationDialog>
-                  ) : (
-                    "-"
-                  )}
+                  {renderLastLocationCell(shipment)}
                 </td>
                 <td className={styles.matCell}>
                   {shipment.frieght_price

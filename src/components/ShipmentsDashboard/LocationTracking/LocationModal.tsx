@@ -1,6 +1,7 @@
-import React from 'react';
-import styles from './LocationModal.module.css';
-import CloseIcon from '@mui/icons-material/Close';
+import React from "react";
+import styles from "./LocationModal.module.css";
+import CloseIcon from "@mui/icons-material/Close";
+import ModalHeader from "@/components/UI/ModalHeader/ModalHeader";
 
 interface Location {
   location: {
@@ -16,9 +17,10 @@ interface Location {
 
 interface LocationModalProps {
   show: boolean;
-  type: 'Pickup' | 'Delivery';
+  type: "Pickup" | "Delivery";
   locations: Location[];
   onClose: () => void;
+  shipmentSin: string;
 }
 
 const LocationModal: React.FC<LocationModalProps> = ({
@@ -26,7 +28,9 @@ const LocationModal: React.FC<LocationModalProps> = ({
   type,
   locations,
   onClose,
+  shipmentSin,
 }) => {
+  console.log("shipmentSin:", shipmentSin);
   if (!show) return null;
 
   const getDateText = (location: Location) => {
@@ -35,7 +39,9 @@ const LocationModal: React.FC<LocationModalProps> = ({
         <div className={styles.dateText}>
           <span>Actual: {location.actualDate}</span>
           {location.scheduledDate && (
-            <span className={styles.scheduledDate}>({location.scheduledDate})</span>
+            <span className={styles.scheduledDate}>
+              ({location.scheduledDate})
+            </span>
           )}
         </div>
       );
@@ -48,26 +54,24 @@ const LocationModal: React.FC<LocationModalProps> = ({
   return (
     <div className={styles.modalOverlay} onClick={onClose}>
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-        <div className={styles.header}>
-          <h4 className={styles.title}>{type} Locations</h4>
-          <button className={styles.closeButton} onClick={onClose}>
-            <CloseIcon style={{ fontSize: 18 }} />
-          </button>
-        </div>
+        <ModalHeader
+          title={`${type} Locations - #${shipmentSin}`}
+          onClose={onClose}
+        />
 
         <div className={styles.body}>
           {locations.map((loc, index) => (
             <div key={loc.location._id} className={styles.locationItem}>
-              <div 
+              <div
                 className={`${styles.locationIcon} ${
-                  type === 'Pickup' ? styles.pickupIcon : styles.deliveryIcon
+                  type === "Pickup" ? styles.pickupIcon : styles.deliveryIcon
                 }`}
               >
-                {type === 'Pickup' ? `P${index + 2}` : `D${index + 2}`}
+                {type === "Pickup" ? `P${index + 2}` : `D${index + 2}`}
               </div>
               <div className={styles.locationDetails}>
                 <div className={styles.locationName}>
-                  {loc.location.reference ? `${loc.location.reference} - ` : ''}
+                  {loc.location.reference ? `${loc.location.reference} - ` : ""}
                   {loc.location.name} - {loc.location.city}
                 </div>
                 {getDateText(loc)}

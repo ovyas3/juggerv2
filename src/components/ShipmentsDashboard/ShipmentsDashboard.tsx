@@ -37,6 +37,7 @@ import {
   PlusCircle,
   UserPlus,
   Plus,
+  MapPin,
 } from "lucide-react";
 import MarkAsArrivedModal from "../ShipmentsDashboard/Others/MarkAsArrivedModal";
 import CompleteShipmentModal from "../ShipmentsDashboard/ShipmentManagement/CompleteShipmentModal";
@@ -107,6 +108,8 @@ import MissedEventModal from "./SpecialFeatures/MissedEventModal";
 import RetriggerEventModal from "./SpecialFeatures/RetriggerEventModal";
 import DriverExpenses from "./SpecialFeatures/DriverExpenses";
 import GeofenceEditor from "./SpecialFeatures/GeofenceEditor";
+import { LocationDialog } from "./LocationTracking/LocationDialog";
+import TotalFreightModal from "./SpecialFeatures/TotalFreightModal";
 
 // Types
 interface Shipment {
@@ -177,6 +180,8 @@ interface AnalyticsData {
   totalFreightValue: number;
   averageFreight: number;
   activeCarriers: number;
+  delayedShipments: number;
+  highPriority: number;
 }
 
 // 1. First, define the Location interface
@@ -213,7 +218,7 @@ const ShipmentsDashboard: React.FC = () => {
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(0);
-  const [pageSize, setPageSize] = useState(100);
+  const [pageSize, setPageSize] = useState(10);
 
   // Search and filters
   const [searchQuery, setSearchQuery] = useState("");
@@ -251,6 +256,8 @@ const ShipmentsDashboard: React.FC = () => {
     totalFreightValue: 117750,
     averageFreight: 14719,
     activeCarriers: 7,
+    delayedShipments: 2,
+    highPriority: 1,
   });
 
   // Modal states
@@ -258,7 +265,11 @@ const ShipmentsDashboard: React.FC = () => {
   const [selectedShipmentDetails, setSelectedShipmentDetails] =
     useState<Shipment | null>(null);
   const [showLocationPopup, setShowLocationPopup] = useState(false);
-  const [locationPopupData, setLocationPopupData] = useState<any>(null);
+  const [locationPopupData, setLocationPopupData] = useState<{
+    type: string;
+    locations: any[];
+    shipmentSin: string;
+  } | null>(null);  
   const [showActiveCarriersPopup, setShowActiveCarriersPopup] = useState(false);
   const [showTotalFreightPopup, setShowTotalFreightPopup] = useState(false);
   const [showAverageFreightPopup, setShowAverageFreightPopup] = useState(false);
@@ -422,6 +433,12 @@ const ShipmentsDashboard: React.FC = () => {
 
   const [showMissedShipmentModal, setShowMissedShipmentModal] = useState(false);
   const [selectedShipmentForMissed, setSelectedShipmentForMissed] = useState<Shipment | null>(null)
+  const [odcFilter, setOdcFilter] = useState<boolean>(false);
+
+const [locationDialogState, setLocationDialogState] = useState<{
+  isOpen: boolean;
+  shipmentId?: string;
+}>({ isOpen: false });
 
   const handleSaveDO = async (doNumber: string) => {
     try {
@@ -439,8 +456,15 @@ const ShipmentsDashboard: React.FC = () => {
     locations: any[],
     shipment: any
   ) => {
+    if (!shipment) {
+      console.error('No shipment data provided');
+      return;
+    }
+    
+    const locationsArray = Array.isArray(locations) ? locations : [];
+    
     // Add date information to each location
-    const locationsWithDates = locations.map((loc) => ({
+    const locationsWithDates = locationsArray.map((loc) => ({
       ...loc,
       scheduledDate:
         type === "pickup"
@@ -455,9 +479,13 @@ const ShipmentsDashboard: React.FC = () => {
     setLocationPopupData({
       type: type.charAt(0).toUpperCase() + type.slice(1), // Capitalize first letter
       locations: locationsWithDates,
+      shipmentSin: shipment.sin, // Changed from shipmentId to sin to match the LocationModal props
     });
     setShowLocationPopup(true);
   };
+  useEffect(() => {
+    console.log('locationPopupData:', locationPopupData);
+  }, []);
 
   const openVideo = (url: string) => {
     setVideoUrl(url);
@@ -1202,7 +1230,8 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
     event: React.MouseEvent
   ) => {
     event.stopPropagation();
-    setLocationPopupData({ locations, type });
+    const locationsArray = Array.isArray(locations) ? locations : [];
+    setLocationPopupData({ locations: locationsArray, type, shipmentSin: "" });
     setShowLocationPopup(true);
   };
 
@@ -1392,6 +1421,7 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
     setPpdNo("");
     setSelectedOrganisation({ name: "", id: "" });
     setSelectedSegmentation([]);
+    setOdcFilter(false);
 
     fetchShipments();
   };
@@ -1827,9 +1857,14 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
       // (converted from Angular advance search logic)
     }
 
+    
     setShowLoader(true);
-
+    
     const filters: any = {};
+
+    if (odcFilter !== null) {
+      filters.odc = odcFilter;
+    }
 
     // Use the provided type or fall back to the current shipmentType
     const filterType = type || shipmentType;
@@ -1841,7 +1876,7 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
     filters.limit = pageSize;
     filters.skip = currentPage * pageSize;
 
-    if (inputQuery !== "" && inputQuery.length && searchValue) {
+    if (inputQuery !== "" && inputQuery.length > 0 && searchValue) {
       if (searchValue === "vehicle_no") {
         filters[searchValue] = inputQuery.toUpperCase();
       } else {
@@ -2253,7 +2288,7 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
 
   useEffect(() => {
     fetchShipments();
-  }, [currentPage, pageSize]);
+  }, [currentPage, pageSize, odcFilter]);
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -2382,7 +2417,7 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
   const renderLocationCell = (
     shipment: any,
     copyDestinationCode: (code: string) => void,
-    openLocationsPopup: (type: string, locations: any[]) => void,
+    openLocationsPopup: (type: string, locations: any[], shipment: any) => void,
     shipmentType: string,
     displayType: "pickup" | "delivery" = "pickup"
   ) => {
@@ -2441,7 +2476,7 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
               }`}
               onClick={(e) => {
                 e.stopPropagation();
-                openLocationsPopup(displayType, locations.slice(1));
+                openLocationsPopup(displayType, locations.slice(1), shipment);
               }}
               title={`Show ${additionalCount} additional ${
                 isPickup ? "pickup" : "delivery"
@@ -2466,6 +2501,48 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
       </div>
     );
   };
+const renderLastLocationCell = (shipment: any) => {
+  const isDialogOpen = locationDialogState.isOpen && locationDialogState.shipmentId === shipment._id;
+  
+  const handleLocationClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setLocationDialogState({
+      isOpen: true,
+      shipmentId: shipment._id
+    });
+  };
+
+  const handleLocationDialogClose = () => {
+    setLocationDialogState({ isOpen: false });
+  };
+
+  return (
+    <td className={`${styles.matCell} ${styles.matColumnLastLocation}`}>
+      {shipment.trip_tracker?.last_location_address ? (
+        <LocationDialog
+          address={shipment.trip_tracker.last_location_address}
+          lastUpdated={shipment.trip_tracker?.last_location_at}
+          isOpen={isDialogOpen}
+          onClose={handleLocationDialogClose}
+          shipmentId={shipment.sin}
+        >
+          <Button
+            variant="ghost"
+            size="icon"
+            className={styles.locationButton}
+            title="View location"
+            onClick={handleLocationClick}
+          >
+            <MapPin className={styles.locationIcon} />
+          </Button>
+        </LocationDialog>
+      ) : (
+        "-"
+      )}
+    </td>
+  );
+};
+
   const renderDateTimeCell = (shipment: any, shipmentType: string) => {
     // When shipmentType is 'others' show Pickup and Delivery times with badges
     if (shipmentType === "others") {
@@ -2765,7 +2842,7 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
       if (response.statusCode === 200) {
         showMessage("Invoice details fetched successfully", "success");
       } else {
-        showMessage("Failed to fetch invoice details", "error");
+        showMessage(response.message || "Failed to fetch invoice details", "error");
       }
       // Refresh the shipments data
       fetchShipments();
@@ -2888,6 +2965,35 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
       return [];
     }
   };
+
+  const SearchTypes = [
+  { name: 'SIN', value: 'SIN' },
+  { name: 'Project Code', value: 'project_code' },
+  { name: 'Vehicle No', value: 'vehicle_no' },
+  { name: 'PO Number', value: 'purchase_order' },
+  { name: 'SO Number', value: 'sale_order' },
+  { name: 'PPD Number', value: 'ppd_no' },
+  { name: 'DO Number', value: 'do_number' },
+];
+
+const changeSearchType = (typeName: string, typeValue: string) => {
+  // Delete the previous search filter
+  delete shipmentsFilter[searchValue];
+  setSearchType(typeName);
+  setSearchValue(typeValue);
+  setInputQuery("");
+};
+
+const applyFilter = () => {
+  if (inputQuery.length <= 3) {
+    showMessage('Enter at least 4 characters to Search', 'error');
+    return;
+  }
+  
+  // Clear the input flag and fetch shipments
+  fetchShipments(shipmentsFilter);
+};
+
 
   const handleEditSubmit = async (location: any, date: Date | null) => {
     if (!selectedShipment) return;
@@ -3199,56 +3305,65 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
             </button>
           ))}
         </div>
+        <div className={styles.filterGroup}>
+  <label className={styles.checkboxLabel}>
+    <input
+      type="checkbox"
+      checked={odcFilter === true}
+      onChange={(e) => setOdcFilter(e.target.checked)}
+    />
+    <span>ODC Shipment(s)</span>
+  </label>
+</div>
+
+
       </div>
       <div className={styles.header}>
-      <div className={styles.inputContainer}>
-     
-              
-        {/* Wrap the select in a container for custom arrow positioning */}
-        {/* <div className={styles.selectContainer}>
-          <select
-            value={searchType}
-            onChange={(e) => setSearchType(e.target.value)}
-            className={styles.perPageSelect}
-          >
-            <option value="SIN" className={styles.perPageItem}>SIN</option>
-            <option value="project_code" className={styles.perPageItem}>Project Code</option>
-            <option value="vehicle_no" className={styles.perPageItem}>Vehicle No</option>
-            <option value="purchase_order" className={styles.perPageItem}>PO Number</option>
-            <option value="sale_order" className={styles.perPageItem}>SO Number</option>
-            <option value="ppd_no" className={styles.perPageItem}>PPD Number</option>
-            <option value="do_number" className={styles.perPageItem}>DO Number</option>
-          </select>
-        </div> */}
-       <div className={styles.tableControls}>
-  <Select
-    value={searchType}
-    onValueChange={(value) => setSearchType(value)}
-  >
-    <SelectTrigger className={styles.perSinSelect}>
-      <SelectValue />
-    </SelectTrigger>
-    <SelectContent className={styles.perPageContent}>
-      <SelectItem value="SIN" className={styles.perPageItem}>SIN</SelectItem>
-      <SelectItem value="project_code" className={styles.perPageItem}>Project Code</SelectItem>
-      <SelectItem value="vehicle_no" className={styles.perPageItem}>Vehicle No</SelectItem>
-      <SelectItem value="purchase_order" className={styles.perPageItem}>PO Number</SelectItem>
-      <SelectItem value="sale_order" className={styles.perPageItem}>SO Number</SelectItem>
-      <SelectItem value="ppd_no" className={styles.perPageItem}>PPD Number</SelectItem>
-      <SelectItem value="do_number" className={styles.perPageItem}>DO Number</SelectItem>
-    </SelectContent>
-  </Select>
-
+      <div className={styles.tableControls}>
+  <div className={styles.inputSearchContainer}>
+    <Select
+      value={searchType}
+      onValueChange={(value) => {
+        const selectedType = SearchTypes.find(type => type.name === value);
+        if (selectedType) {
+          changeSearchType(selectedType.name, selectedType.value);
+        }
+      }}
+    >
+      <SelectTrigger className={styles.perSinSelect}>
+        <SelectValue placeholder={searchType} />
+      </SelectTrigger>
+      <SelectContent className={styles.perPageContent}>
+        {SearchTypes.map((type) => (
+          <SelectItem key={type.value} value={type.name} className={styles.perPageItem}>
+            {type.name}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+    
+    <div className={styles.searchInputContainer}>
+      <input
+        type="text"
+        placeholder="Search ..."
+        name="filter"
+        value={inputQuery}
+        onChange={(e) => setInputQuery(e.target.value)}
+        className={styles.inputSearch}
+        onKeyPress={(e) => {
+          if (e.key === 'Enter') {
+            applyFilter();
+          }
+        }}
+      />
+      <Search
+        className={styles.searchIcon}
+        onClick={applyFilter}
+      />
+    </div>
+  </div>
+  
 </div>
-        <input
-          type="text"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder={`Enter ${searchType}`}
-          className={styles.inputSearch}
-        />
-      </div>
-{/* </div> */}
 
         {/* All buttons are now wrapped in a single container */}
         <div className={styles.buttonContainer}>
@@ -3490,6 +3605,7 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
                 copyDestinationCode={copyDestinationCode}
                 openLocationsPopup={openLocationsPopup}
                 formatCurrency={formatCurrency}
+                renderLastLocationCell={renderLastLocationCell}
               />
             )}
           </div>
@@ -3498,8 +3614,9 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
       {/* Modals */}
       {showLocationPopup && locationPopupData && (
         <LocationModal
+          shipmentSin={locationPopupData?.shipmentSin || ""}
           show={showLocationPopup}
-          type={locationPopupData?.type || ""}
+          type={locationPopupData?.type as "Delivery" | "Pickup"}
           locations={locationPopupData?.locations || []}
           onClose={() => setShowLocationPopup(false)}
         />
@@ -3520,23 +3637,22 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
         />
       )}
       {/* Total Freight Popup */}
-      {/* {showTotalFreightPopup && (
-        <FreightModal
+      {showTotalFreightPopup && (
+        <TotalFreightModal
           show={showTotalFreightPopup}
           title="Total Freight Breakdown"
-          data={totalFreightData}
-          showPercentage={true}
+          totalFreightData={totalFreightData}
           onClose={() => setShowTotalFreightPopup(false)}
         />
-      )} */}
-      {/* {showAverageFreightPopup && (
+      )}
+      {showAverageFreightPopup && (
         <TotalFreightModal
           show={showAverageFreightPopup}
           title="Average Freight Details"
-          data={averageFreightData}
+          totalFreightData={averageFreightData}
           onClose={() => setShowAverageFreightPopup(false)}
         />
-      )} */}
+      )}
       {/* Delayed Shipment Dialog */}
       {/* {showDelayedShipmentDialog && (
         <DelayPenaltyModal
