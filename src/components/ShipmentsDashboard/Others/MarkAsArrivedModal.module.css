@@ -86,23 +86,31 @@
 
 .dateTimePicker {
   position: relative;
-  display: flex;
-  align-items: center;
+  width: 100%;
 }
 
 .dateInput {
   width: 100%;
   padding: 10px 15px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
   font-size: 14px;
+  transition: all 0.3s;
+}
+
+.dateInput:hover {
+  border-color: #4F46E5;
+}
+
+.dateInput:focus,
+.dateInput:focus-visible {
+  border-color: #4F46E5;
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+  outline: none;
 }
 
 .calendarIcon {
-  position: absolute;
-  right: 10px;
-  color: #666;
-  pointer-events: none;
+  display: none;
 }
 
 .reasonSection {
@@ -116,14 +124,67 @@
   font-size: 14px;
 }
 
-.reasonSelect {
+.select {
   width: 100%;
-  padding: 10px 15px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+  min-height: 36px;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
   font-size: 14px;
-  margin-bottom: 15px;
   background-color: white;
+  transition: all 0.3s;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+}
+
+.select:hover {
+  border-color: #4F46E5;
+}
+
+.select:focus-within {
+  border-color: #4F46E5;
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+  outline: none;
+}
+
+.select[data-state="open"] {
+  border-color: #4F46E5;
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+}
+
+.selectContent {
+  background: white;
+  border-radius: 6px;
+  box-shadow: 0 3px 6px -4px rgba(0, 0, 0, 0.12), 
+              0 6px 16px 0 rgba(0, 0, 0, 0.08), 
+              0 9px 28px 8px rgba(0, 0, 0, 0.05);
+  padding: 4px;
+  z-index: 1000;
+  max-height: 250px;
+  overflow-y: auto;
+  width: 520px !important;
+  margin-top: 5px;
+}
+
+.selectItem {
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #333;
+  transition: all 0.2s;
+}
+
+.selectItem:hover {
+  background-color: #f5f5f5;
+}
+
+.selectItem[data-highlighted] {
+  background-color: #4F46E5;
+  color: white;
+  outline: none;
 }
 
 .reasonTextarea {
@@ -180,4 +241,16 @@
 
 .submitButton:hover:not(:disabled) {
   background-color: #433DE8;
+}
+
+.selectItem[data-state="checked"]::before,
+.selectItem[aria-selected="true"]::before,
+.selectItem[data-selected]::before {
+  display: none !important;
+}
+
+.selectItem[data-state="checked"] svg,
+.selectItem[aria-selected="true"] svg,
+.selectItem[data-selected] svg {
+  display: none !important;
 }

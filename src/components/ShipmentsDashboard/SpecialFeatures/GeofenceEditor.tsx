@@ -49,6 +49,7 @@ interface Delivery {
 }
 
 interface Shipment {
+  sin: string;
   _id: string;
   to: Delivery[];
   from: any[];
@@ -760,7 +761,7 @@ const GeofenceEditor: React.FC<GeofenceEditorProps> = ({
       </DialogTitle> */}
 
       <ModalHeader 
-        title="Update Delivery Location"
+        title={`Update Delivery Location - #${shipment.sin}`}
         onClose={onClose}
       />
       

@@ -1,9 +1,17 @@
 import React, { useState, useEffect } from "react";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
+import { DatePicker } from "antd";
+import dayjs from "dayjs";
 import styles from "./CompleteShipmentModal.module.css";
 import ModalHeader from "../../UI/ModalHeader/ModalHeader";
 import { httpsGet } from "@/utils/Communication";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../UI/select";
+import { useSnackbar } from "@/hooks/snackBar";
 
 interface CompleteShipmentModalProps {
   show: boolean;
@@ -38,6 +46,7 @@ export const CompleteShipmentModal: React.FC<CompleteShipmentModalProps> = ({
   shipment,
   isLoading = false,
 }) => {
+  const { showMessage } = useSnackbar();
   const [reason, setReason] = useState("");
   const [selectedReason, setSelectedReason] = useState("");
   const [showReasonInput, setShowReasonInput] = useState(false);
@@ -205,10 +214,12 @@ export const CompleteShipmentModal: React.FC<CompleteShipmentModalProps> = ({
 
   const handleSubmit = () => {
     if (shipment.shipmentType !== "arrived" && !completion.date_time) {
+      showMessage("Please select a completion date", "error");
       return;
     }
 
     if (!arrival.date_time) {
+      showMessage("Please select an arrival date", "error");
       return;
     }
 
@@ -217,10 +228,12 @@ export const CompleteShipmentModal: React.FC<CompleteShipmentModalProps> = ({
       !isProceeding &&
       (!unloadingStart.date_time || !unloadingEnd.date_time)
     ) {
+      showMessage("Please select unloading start and end dates", "error");
       return;
     }
 
     if (!selectedReason && !reason) {
+      showMessage("Please select a reason", "error");
       return;
     }
 
@@ -262,17 +275,13 @@ export const CompleteShipmentModal: React.FC<CompleteShipmentModalProps> = ({
             <label className={styles.label}>Arrived At:</label>
             <div className={styles.inputGroup}>
               <DatePicker
-                selected={arrival.date}
-                onChange={(date) => handleDateChange(date, "arrival")}
+                value={arrival.date ? dayjs(arrival.date) : null}
+                onChange={(date) =>
+                  handleDateChange(date?.toDate() || null, "arrival")
+                }
+                showTime
+                format="DD/MM/YYYY HH:mm"
                 className={styles.dateInput}
-                maxDate={new Date()}
-              />
-              <input
-                type="time"
-                value={arrival.time}
-                onChange={(e) => handleTimeChange(e, "arrival")}
-                className={styles.timeInput}
-                step="300"
               />
             </div>
           </div>
@@ -282,18 +291,13 @@ export const CompleteShipmentModal: React.FC<CompleteShipmentModalProps> = ({
               <label className={styles.label}>Completed At:</label>
               <div className={styles.inputGroup}>
                 <DatePicker
-                  selected={completion.date}
-                  onChange={(date) => handleDateChange(date, "completion")}
+                  value={completion.date ? dayjs(completion.date) : null}
+                  onChange={(date) =>
+                    handleDateChange(date?.toDate() || null, "completion")
+                  }
+                  showTime
+                  format="DD/MM/YYYY HH:mm"
                   className={styles.dateInput}
-                  minDate={arrival.date ? arrival.date : undefined}
-                  maxDate={new Date()}
-                />
-                <input
-                  type="time"
-                  value={completion.time}
-                  onChange={(e) => handleTimeChange(e, "completion")}
-                  className={styles.timeInput}
-                  step="300"
                 />
               </div>
             </div>
@@ -302,25 +306,19 @@ export const CompleteShipmentModal: React.FC<CompleteShipmentModalProps> = ({
           {showUnloadingFields && (
             <div className={styles.unloadingSection}>
               <div className={styles.unloadingTitle}>Unloading</div>
-
-              {/* Unloading Start */}
               <div className={styles.formGroup}>
                 <label className={styles.label}>Start:</label>
                 <div className={styles.inputGroup}>
                   <DatePicker
-                    selected={unloadingStart.date}
-                    onChange={(date) =>
-                      handleDateChange(date, "unloadingStart")
+                    value={
+                      unloadingStart.date ? dayjs(unloadingStart.date) : null
                     }
+                    onChange={(date) =>
+                      handleDateChange(date?.toDate() || null, "unloadingStart")
+                    }
+                    showTime
+                    format="DD/MM/YYYY HH:mm"
                     className={styles.dateInput}
-                    maxDate={new Date()}
-                  />
-                  <input
-                    type="time"
-                    value={unloadingStart.time}
-                    onChange={(e) => handleTimeChange(e, "unloadingStart")}
-                    className={styles.timeInput}
-                    step="300"
                   />
                 </div>
               </div>
@@ -329,18 +327,13 @@ export const CompleteShipmentModal: React.FC<CompleteShipmentModalProps> = ({
                 <label className={styles.label}>End:</label>
                 <div className={styles.inputGroup}>
                   <DatePicker
-                    selected={unloadingEnd.date}
-                    onChange={(date) => handleDateChange(date, "unloadingEnd")}
+                    value={unloadingEnd.date ? dayjs(unloadingEnd.date) : null}
+                    onChange={(date) =>
+                      handleDateChange(date?.toDate() || null, "unloadingEnd")
+                    }
+                    showTime
+                    format="DD/MM/YYYY HH:mm"
                     className={styles.dateInput}
-                    // minDate={unloadingStart.date}
-                    maxDate={new Date()}
-                  />
-                  <input
-                    type="time"
-                    value={unloadingEnd.time}
-                    onChange={(e) => handleTimeChange(e, "unloadingEnd")}
-                    className={styles.timeInput}
-                    step="300"
                   />
                 </div>
               </div>
@@ -366,21 +359,31 @@ export const CompleteShipmentModal: React.FC<CompleteShipmentModalProps> = ({
 
           <div className={styles.formGroup}>
             <label className={styles.label}>Reason:</label>
-            <select
+            <Select
               value={selectedReason}
-              onChange={(e) => {
-                setSelectedReason(e.target.value);
-                setShowReasonInput(e.target.value === "Other");
+              onValueChange={(value) => {
+                setSelectedReason(value);
+                setShowReasonInput(value === "Other");
               }}
-              className={styles.select}
             >
-              <option value="">Select a reason</option>
-              {reasons.map((reason) => (
-                <option key={reason} value={reason}>
-                  {reason}
-                </option>
-              ))}
-            </select>
+              <SelectTrigger className={styles.select}>
+                <SelectValue
+                  placeholder="Select a reason"
+                  className={styles.selectValue}
+                />
+              </SelectTrigger>
+              <SelectContent className={styles.selectContent}>
+                {reasons.map((reason) => (
+                  <SelectItem
+                    key={reason}
+                    value={reason}
+                    className={styles.selectItem}
+                  >
+                    {reason}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           {showReasonInput && (

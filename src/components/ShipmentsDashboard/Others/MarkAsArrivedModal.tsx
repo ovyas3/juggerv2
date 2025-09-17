@@ -1,11 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { Calendar as CalendarIcon } from "lucide-react";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
+import { DatePicker } from "antd";
+import dayjs from "dayjs";
 import styles from "./MarkAsArrivedModal.module.css";
 import { httpsGet } from "@/utils/Communication";
 import { useSnackbar } from "@/hooks/snackBar";
 import ModalHeader from "@/components/UI/ModalHeader/ModalHeader";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/UI/select";
 
 interface MarkAsArrivedModalProps {
   show: boolean;
@@ -21,8 +27,7 @@ interface MarkAsArrivedModalProps {
 }
 
 interface DateTimeState {
-  date: Date | null;
-  time: string;
+  date: dayjs.Dayjs | null;
   date_time: string;
 }
 
@@ -40,14 +45,9 @@ const MarkAsArrivedModal: React.FC<MarkAsArrivedModalProps> = ({
   const [reasons, setReasons] = useState<string[]>(["Other"]);
   const [isLoadingReasons, setIsLoadingReasons] = useState(false);
 
-  const now = new Date();
+  const now = dayjs();
   const [arrival, setArrival] = useState<DateTimeState>({
     date: now,
-    time: now.toLocaleTimeString("en-US", {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: false,
-    }),
     date_time: now.toISOString(),
   });
 
@@ -80,37 +80,16 @@ const MarkAsArrivedModal: React.FC<MarkAsArrivedModalProps> = ({
     }
   }, [show]);
 
-  const handleDateTimeChange = (date: Date | null, field: "date" | "time") => {
+  const handleDateTimeChange = (date: dayjs.Dayjs | null) => {
     if (!date) return;
 
     const newArrival = { ...arrival };
-
-    if (field === "date") {
-      newArrival.date = date;
-      const [hours, minutes] = newArrival.time.split(":");
-      date.setHours(parseInt(hours, 10), parseInt(minutes, 10), 0, 0);
-    } else {
-      const timeString = date.toLocaleTimeString("en-US", {
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: false,
-      });
-      newArrival.time = timeString;
-
-      if (newArrival.date) {
-        const [hours, minutes] = timeString.split(":");
-        const newDate = new Date(newArrival.date);
-        newDate.setHours(parseInt(hours, 10), parseInt(minutes, 10), 0, 0);
-        newArrival.date = newDate;
-      }
-    }
-
-    newArrival.date_time = newArrival.date?.toISOString() || "";
+    newArrival.date = date;
+    newArrival.date_time = date.toISOString();
     setArrival(newArrival);
   };
 
-  const handleReasonChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const value = e.target.value;
+  const handleReasonChange = (value: string) => {
     setSelectedReason(value);
     setShowReasonInput(value === "Other");
   };
@@ -159,41 +138,46 @@ const MarkAsArrivedModal: React.FC<MarkAsArrivedModalProps> = ({
               <label>Arrived At:</label>
               <div className={styles.dateTimePicker}>
                 <DatePicker
-                  selected={arrival.date}
-                  onChange={(date) => handleDateTimeChange(date, "date")}
-                  showTimeSelect
-                  timeFormat="HH:mm"
-                  timeIntervals={15}
-                  dateFormat="MMMM d, yyyy h:mm aa"
+                  value={arrival.date}
+                  onChange={handleDateTimeChange}
+                  showTime
+                  format="DD/MM/YYYY HH:mm"
                   className={styles.dateInput}
                 />
-                <CalendarIcon className={styles.calendarIcon} />
               </div>
             </div>
           </div>
 
           {reasons.length > 0 && (
             <div className={styles.reasonSection}>
-              <label>Reason:</label>
-              <select
+              <label htmlFor="reason">Reason:</label>
+              <Select
                 value={selectedReason}
-                onChange={handleReasonChange}
-                className={styles.reasonSelect}
+                onValueChange={handleReasonChange}
+                disabled={isLoadingReasons}
               >
-                <option value="">Select a reason</option>
-                {reasons.map((r) => (
-                  <option key={r} value={r}>
-                    {r}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger className={styles.select}>
+                  <SelectValue placeholder="Select a reason" />
+                </SelectTrigger>
+                <SelectContent className={styles.selectContent}>
+                  {reasons.map((reason) => (
+                    <SelectItem
+                      key={reason}
+                      value={reason}
+                      className={styles.selectItem}
+                    >
+                      {reason}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
 
               {showReasonInput && (
                 <textarea
+                  className={styles.reasonTextarea}
                   value={reason}
                   onChange={(e) => setReason(e.target.value)}
                   placeholder="Please specify the reason"
-                  className={styles.reasonTextarea}
                 />
               )}
             </div>
