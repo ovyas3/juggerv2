@@ -1,0 +1,92 @@
+/* MarkFaultyModal.module.css */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.dialogMain {
+  background: white;
+  border-radius: 8px;
+  /* padding: 24px; */
+  position: relative;
+  /* width: 400px; */
+  max-width: 90%;
+}
+
+.closeButton {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.dialogHeader {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.dialogHeader img {
+  width: 60px;
+  height: 60px;
+}
+
+.dialogBody {
+  /* margin-bottom: 24px; */
+  text-align: center;
+  padding: 20px;
+}
+
+.note {
+  font-size: 16px;
+  color: #333;
+}
+
+.gpsProvider {
+  font-weight: 500;
+  margin-bottom: 12px;
+}
+
+.dialogFooter {
+  display: flex;
+  justify-content: space-evenly;
+  gap: 12px;
+  margin-bottom: 25px;
+}
+
+.confirmButton,
+.cancelButton {
+  padding: 8px 24px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.confirmButton {
+  background: #e53935;
+  color: white;
+  border: none;
+}
+
+.cancelButton {
+  background: #f5f5f5;
+  color: #333;
+  border: 1px solid #ddd;
+}
+
+.confirmButton:disabled,
+.cancelButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

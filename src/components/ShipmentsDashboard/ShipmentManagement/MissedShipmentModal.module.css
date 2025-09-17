@@ -1,0 +1,118 @@
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: white;
+  border-radius: 8px;
+  width: 450px;
+  max-width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+.header {
+  padding: 16px 24px;
+  border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 500;
+  color: #333;
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #666;
+  padding: 4px;
+}
+
+.body {
+  padding: 24px;
+}
+
+.formGroup {
+  margin-bottom: 20px;
+}
+
+.inputContainer {
+  position: relative;
+  margin-bottom: 16px;
+}
+
+.inputField {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+  transition: border-color 0.2s;
+}
+
+.inputField:focus {
+  outline: none;
+  border-color: #4F46E5;
+}
+
+.floatingLabel {
+  position: absolute;
+  left: 12px;
+  top: 12px;
+  color: #999;
+  font-size: 16px;
+  transition: all 0.2s;
+  pointer-events: none;
+  background: white;
+  padding: 0 4px;
+  transform-origin: left center;
+}
+
+.inputField:focus + .floatingLabel,
+.inputField:not(:placeholder-shown) + .floatingLabel {
+  transform: translateY(-24px) scale(0.85);
+  color: #4F46E5;
+}
+
+.footer {
+  padding: 16px 24px;
+  border-top: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.submitButton {
+  background-color: #4F46E5;
+  color: white;
+  border: none;
+  padding: 8px 24px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.submitButton:hover:not(:disabled) {
+  background-color: #433DE8;
+}
+
+.submitButton:disabled {
+  background-color: #9fa8da;
+  cursor: not-allowed;
+}

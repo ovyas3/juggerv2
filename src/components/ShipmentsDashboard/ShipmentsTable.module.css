@@ -1,0 +1,119 @@
+.flagImg {
+  width: 20px;
+  height: 20px;
+  vertical-align: middle;
+  cursor: pointer;
+}
+
+.trackLink {
+  display: inline-block;
+  padding: 4px;
+  text-decoration: none;
+}
+
+.matColumnTrack {
+  width: 70px;
+  text-align: center;
+}
+
+/* Location columns */
+.matColumnPickup {
+  width: 200px;
+  min-width: 200px;
+}
+
+.matColumnDelivery {
+  width: 200px;
+  min-width: 200px;
+}
+
+.locationCell {
+  padding: 4px 0;
+}
+
+.locationInfo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.pickIcon,
+.dropIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: white;
+  flex-shrink: 0;
+}
+
+.pickIcon {
+  background-color: #3b82f6; /* Blue */
+}
+
+.dropIcon {
+  background-color: #10b981; /* Green */
+}
+
+.locationTextWrapper {
+  flex: 1;
+  min-width: 0;
+}
+
+.locationText {
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+}
+
+.dateText {
+  font-size: 12px;
+  color: #6b7280; /* gray-500 */
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.badgeCircle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: none;
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.badgePickup {
+  background-color: #3b82f6; /* Blue */
+}
+
+.badgeDelivery {
+  background-color: #10b981; /* Green */
+}
+
+.copyButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 0 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}

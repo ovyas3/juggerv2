@@ -31,6 +31,8 @@ import OwnVehicleUsageInactive from "@/assets/own_vehicle_gauge_bg_icon.svg";
 import OwnVehicleUsageActive from "@/assets/own_vehicle_gauge_wg_icon.svg";
 import LoadDetailsInactive from "@/assets/load_details_bg_icon.svg";
 import LoadDetailsActive from "@/assets/load_details_wg_icon.svg";
+import SettingsInactive from '@/assets/settings_bg_icon.svg';
+import SettingsActive from '@/assets/settings_wg_icon.svg';
 
 import EWayBillInactive from "@/assets/eway_bill_bg_icon.svg";
 import EWayBillActive from "@/assets/eway_bill_wg_icon.svg";
@@ -42,6 +44,8 @@ import FreightEstimatorIcon from "@/assets/freight_estimator_icon.svg";
 import FreightEstimatorIconActive from "@/assets/freight_estimator_icon_active.svg";
 import RouteActiveIcon from "@/assets/route_active.svg";
 import RouteInactiveIcon from "@/assets/route_inactive.svg";
+import AnomalyDashboardActiveIcon from "@/assets/anomaly_dashboard_wg.svg";
+import AnomalyDashboardInactiveIcon from "@/assets/anomaly_dashboard_bg.svg";
 
 import LoadActive from "@/assets/load_active_icon.svg";
 import LoadInactive from "@/assets/load_deactive_icon.svg";
@@ -167,6 +171,22 @@ const navigationItems: NavItem[] = [
         isImageIcon: true
     },
     {
+        id: 'shipmentsDashboard',
+        label: 'Shipments Dashboard',
+        icon: '',
+        activeIcon: RouteActiveIcon,
+        inactiveIcon: RouteInactiveIcon,
+        isImageIcon: true
+    },
+    {
+        id: 'anomalydashboard',
+        label: 'Anomaly Dashboard',
+        icon: '',
+        activeIcon: AnomalyDashboardActiveIcon,
+        inactiveIcon: AnomalyDashboardInactiveIcon,
+        isImageIcon: true
+    },
+    {
         id: 'topDestination',
         label: 'Top Destination',
         icon: '',
@@ -174,14 +194,6 @@ const navigationItems: NavItem[] = [
         inactiveIcon: RouteInactiveIcon,
         isImageIcon: true
     },
-    // {
-    //     id: 'freightEstimator',
-    //     label: 'Freight Estimator',
-    //     icon: '',
-    //     activeIcon: FreightEstimatorIconActive,
-    //     inactiveIcon: FreightEstimatorIcon,
-    //     isImageIcon: true
-    // },  
     {
         id: 'freightAccounting',
         label: 'Freight Accounting',
@@ -200,8 +212,16 @@ const navigationItems: NavItem[] = [
         isImageIcon: true,
         children: [
             {
+                id: 'CementCarrierScorecard',
+                label: 'Cement Carrier Scorecard',
+                icon: '',
+                activeIcon: LoadDetailsActive,
+                inactiveIcon: LoadDetailsInactive,
+                isImageIcon: true
+            },
+            {
                 id: 'TransporterLoadDetails',
-                label: 'Load Details',
+                label: 'Steel Carrier Scorecard',
                 icon: '',
                 activeIcon: LoadDetailsActive,
                 inactiveIcon: LoadDetailsInactive,
@@ -243,6 +263,14 @@ const navigationItems: NavItem[] = [
         isImageIcon: true
     },
     {
+        id: 'settings',
+        label: 'Settings',
+        icon: '',
+        activeIcon: SettingsActive,
+        inactiveIcon: SettingsInactive,
+        isImageIcon: true,
+      },
+    {
         id: 'support',
         label: 'Support',
         icon: '',
@@ -262,30 +290,6 @@ const navigationItems: NavItem[] = [
             }
         ]
     }
-    // {
-    //     id: 'ewaybillDashboard',
-    //     label: 'eWaybill Dashboard',
-    //     icon: '',
-    //     activeIcon: EWayBillActive,
-    //     inactiveIcon: EWayBillInactive,
-    //     isImageIcon: true
-    // },
-    // {
-    //     id: 'leadDistanceAnalysis',
-    //     label: 'Lead (Distance) Analysis',
-    //     icon: '',
-    //     activeIcon: LeadDistanceActive,
-    //     inactiveIcon: LeadDistanceInactive,
-    //     isImageIcon: true
-    // },
-    // {
-    //     id: 'freightTrends',
-    //     label: 'Freight Trends Dashboard',
-    //     icon: '',
-    //     activeIcon: FreightTrendsActive,
-    //     inactiveIcon: FreightTrendsInactive,
-    //     isImageIcon: true
-    // }
 ];
 
 const myklNavigationItems: NavItem[] = [
@@ -307,33 +311,6 @@ const myklNavigationItems: NavItem[] = [
         route: 'controlRoom',
         isImageIcon: true
     }
-//     {
-//         id: 'trackAndTrace',
-//         label: 'Track & Trace',
-//         icon: '',
-//         activeIcon: LoadActive,
-//         inactiveIcon: LoadInactive,
-//         route: 'controlRoom',
-//         isImageIcon: true
-//     },
-//     {
-//         id: 'freightBill',
-//         label: 'Freight Bill',
-//         icon: '',
-//         activeIcon: LoadActive,
-//         inactiveIcon: LoadInactive,
-//         route: 'controlRoom',
-//         isImageIcon: true
-//     },
-//     {
-//         id: 'gateTransaction',
-//         label: 'Gate Transaction',
-//         icon: '',
-//         activeIcon: LoadActive,
-//         inactiveIcon: LoadInactive,
-//         route: 'controlRoom',
-//         isImageIcon: true
-//     },
  ]
 
 const NavItem = ({

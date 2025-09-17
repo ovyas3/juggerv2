@@ -5,21 +5,18 @@ variables:
 
 dev_build:
   tags:
-    - juggernaut-dev
+    - lucy-master
   stage: build
   environment:
     name: dev
   script:
     - npm install
-    - npm run dev_build
+    - npm run build
     - echo $devEnvKey | base64 -d > devEnvKey.pem
-    - echo $devFingerPrint > ~/.ssh/known_hosts
     - chmod 400 devEnvKey.pem
     - zip -qq -r $CI_JOB_ID.zip ./ -x devEnvKey.pem
-    - scp -i devEnvKey.pem -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $CI_JOB_ID.zip ubuntu@dev-api.instavans.com:/home/ubuntu/milkyway/packages/juggernaut-$CI_JOB_ID.zip
-    - ssh -t -t -i devEnvKey.pem  ubuntu@dev-api.instavans.com << EOF
-    // /Users/instavans/Documents/projects/juggernaut
-    - ssh -t -t -i devEnvKey.pem  ubuntu@dev-api.instavans.com << EOF
+    - scp -i devEnvKey.pem -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $CI_JOB_ID.zip ubuntu@dev-api.instavans.in:/home/ubuntu/milkyway/packages/juggernaut-$CI_JOB_ID.zip
+    - ssh -t -t -i devEnvKey.pem -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubuntu@dev-api.instavans.in << EOF
     - rm -rf /home/ubuntu/milkyway/juggernaut/*
     - cd /home/ubuntu/milkyway/juggernaut
     - cp /home/ubuntu/milkyway/packages/juggernaut-$CI_JOB_ID.zip .
@@ -27,7 +24,8 @@ dev_build:
     - rm -rf juggernaut-$CI_JOB_ID.zip
     - ls
     - rm /home/ubuntu/milkyway/packages/juggernaut-$CI_JOB_ID.zip
-    # - rm -rf node_modules
+    - nvm use v22
     - npm ci
+    - nvm use default
     - pm2 reload juggernaut
     - exit

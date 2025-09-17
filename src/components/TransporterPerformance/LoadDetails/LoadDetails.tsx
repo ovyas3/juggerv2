@@ -256,7 +256,7 @@ export default function OwnVehicleUsage() {
                 style={{ margin: !mobile ? '56px 0 0 70px' : '0px' }}
             >
                 {mobile && (
-                    <h1 className={styles.containeTitle}>Load Details</h1>
+                    <h1 className={styles.containeTitle}>Steel Carrier Scorecard</h1>
                 )}
                 <div className={styles.header}>
                     <div className={styles.filterGroup}>

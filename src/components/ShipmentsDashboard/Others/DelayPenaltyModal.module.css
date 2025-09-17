@@ -1,0 +1,150 @@
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: white;
+  border-radius: 8px;
+  width: 500px;
+  max-width: 90%;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.loader {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+}
+
+.header {
+  padding: 16px 24px;
+  background-color: #4F46E5;
+  color: white;
+  font-size: 16px;
+  font-weight: 500;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.section {
+  padding: 20px 24px;
+}
+
+.text {
+  margin-bottom: 20px;
+  color: #4B5563;
+  line-height: 1.5;
+}
+
+.penaltyDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.detailRow {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.title {
+  width: 160px;
+  color: #4B5563;
+  font-size: 14px;
+}
+
+.colon {
+  margin: 0 8px;
+  color: #6B7280;
+}
+
+.box {
+  flex: 1;
+  padding: 8px 12px;
+  background-color: #F9FAFB;
+  border: 1px solid #E5E7EB;
+  border-radius: 4px;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+}
+
+.checkbox {
+  flex: 1;
+  padding: 8px 0;
+}
+
+.input input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #D1D5DB;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.button {
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  text-align: center;
+}
+
+.approveButton {
+  background-color: #10B981;
+  color: white;
+}
+
+.approveButton:hover {
+  background-color: #059669;
+}
+
+.disapproveButton {
+  background-color: #EF4444;
+  color: white;
+}
+
+.disapproveButton:hover {
+  background-color: #DC2626;
+}

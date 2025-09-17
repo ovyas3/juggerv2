@@ -57,17 +57,25 @@ const Header = ({ setReloadOnHeaderChange, isMapHelper, getAllShipment, isShipme
       case "/TATTrends":
         return "TAT Trends"
       case "/TransporterLoadDetails":
-        return "Load Details"
+        return "Steel Carrier Scorecard"
+      case "/CementCarrierScorecard":
+        return "Cement Carrier Scorecard"
       case "/OwnVehicleUsage":
         return "Own Vehicle Usage"
       case "/indentManagement":
         return "Indent Management"
       case "/ptpkDashboard":
         return "PTPK Dashboard"
+      case "/shipmentsDashboard":
+        return "Shipments Dashboard"
+      case "/anomalydashboard":
+        return "Anomaly Dashboard"
       case "/topDestination":
         return "Top Destination"
       case "/indentManagement/plant":
         return "Indent Management - Plant"
+      case "/settings":
+        return "Settings"
       // case "/ewaybillDashboard":
       //   return "eWayBill Dashboard"
       // case "/leadDistanceAnalysis":
@@ -78,13 +86,13 @@ const Header = ({ setReloadOnHeaderChange, isMapHelper, getAllShipment, isShipme
         return ""
     }
   }
-  
+
   if (pathname === "/invoicingDashboard") {
-    const BillingDashboard = dynamic(() => 
-      import('../BillingDashboard/BillingDashboard'), 
+    const BillingDashboard = dynamic(() =>
+      import('../BillingDashboard/BillingDashboard'),
       { ssr: false }
     );
-    
+
     return <BillingDashboard hideHeader={true} hideTable={true} />;
   }
 
@@ -103,7 +111,7 @@ const Header = ({ setReloadOnHeaderChange, isMapHelper, getAllShipment, isShipme
             alignItems: "center",
           }}
         >
-          {isCorporateUser ?
+          {isCorporateUser ? 
             <div className="drop_down">
               {shippers.length && <Dropdown reload={setReloadOnHeaderChange} shippers={shippers} getAllShipment={getAllShipment} />}
             </div> :
