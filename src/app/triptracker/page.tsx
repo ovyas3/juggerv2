@@ -1,13 +1,13 @@
 "use client"
 
 import Triptracker from "@/components/triptracker/triptracker"
-import { useMediaQuery, useTheme } from "@mui/material"
+// import { useMediaQuery, useTheme } from "@mui/material"
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 
-export default function TriptrackerPage() {
-  const theme = useTheme()
-  const mobile = useMediaQuery(theme.breakpoints.down("sm"))
+function TriptrackerContent() {
+  // const theme = useTheme()
+  // const mobile = useMediaQuery(theme.breakpoints.down("sm"))
   const sp = useSearchParams();
 
   const [uniqueCode, setUniqCode] = useState<string>(sp.get("unique_code") as string);
@@ -18,10 +18,18 @@ export default function TriptrackerPage() {
       setUniqCode(unCode);
     }
   }, [sp]);
-  
+
   return (
     <div>
       <Triptracker uniqueCode={uniqueCode}></Triptracker>
     </div>
+  )
+}
+
+export default function TriptrackerPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <TriptrackerContent />
+    </Suspense>
   )
 }
