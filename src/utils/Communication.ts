@@ -9,6 +9,10 @@ const prefix = [
   environment.API_URL_DASHBOARD,
   environment.API_URL_DASHBOARD2,
   environment.API_URL_DASHBOARD3,
+  environment.API_URL_NEW_1,
+  environment.API_URL_NEW_2,
+  environment.API_URL_NEW_3,
+  environment.API_URL_NEW_4,
 ]
 
 const parent = [
@@ -105,6 +109,61 @@ const httpsPost = async (path: string, data: any, router: any = null, type = 0, 
     return response?.data || response;
 };
 
+const httpsPut = async (
+  path: string,
+  data: any,
+  router: any = null,
+  type = 0,
+  isFile = false
+) => {
+  const auth = getAuth();
+  const authorization = {
+    Authorization: auth,
+  };
+  const headers = {
+    Authorization: auth,
+    'Content-Type': 'multipart/form-data',
+  };
+  const url = prefix[type] + path;
+  let config;
+  if (isFile) {
+    config = {
+      method: 'PUT',
+      url,
+      headers: headers,
+      data,
+    };
+  } else {
+    config = {
+      method: 'PUT',
+      url,
+      headers: authorization,
+      data,
+    };
+  }
+  const response = await axios(config)
+    .then(res => res)
+    .catch(err => {
+      if (
+        axios.isAxiosError(err) &&
+        err.response?.status === 401 &&
+        !redirectInProgress
+      ) {
+        redirectInProgress = true;
+        const fromRms = Boolean(localStorage.getItem('isRmsLogin'));
+        if (fromRms) {
+          router.push('/signin');
+        } else {
+          router.push(process.env.NEXT_PUBLIC_SMARTSHIPPER);
+        }
+        deleteAllCache();
+      } else {
+        redirectInProgress = false;
+      }
+      return err.response?.data;
+    });
+  return response?.data;
+};
 const apiCall = async (config: any) => {
   const finalConf = {
     ...config,
@@ -122,4 +181,4 @@ const apiCall = async (config: any) => {
   await axios(finalConf);
 };
 
-export { httpsGet, httpsPost, apiCall };
+export { httpsGet, httpsPost, httpsPut, apiCall };

@@ -8,7 +8,7 @@ const nextConfig = {
     images: {
         domains: ['wagon-tally-sheet.s3.ap-south-1.amazonaws.com', 's3.ap-south-1.amazonaws.com'],
     },
-    basePath: process.env.NODE_ENV === 'local' ? '' : '/dashV2',
+    // basePath: process.env.NODE_ENV === 'local' ? '' : '/dashV2',
 };
 
 export default withNextIntl(nextConfig);

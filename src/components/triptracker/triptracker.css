@@ -1,0 +1,3078 @@
+/* triptracker.css - Clean Professional Design with #20104D Theme */
+:root {
+    --primary-color: #20104d;
+    --primary-light: #3d2066;
+    --primary-lighter: #f3f0ff;
+    --brand-blue: #3b82f6;
+    --brand-green: #10b981;
+    --brand-red: #ef4444;
+    --brand-orange: #f97316;
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    --border-color: #e2e8f0;
+    --bg-white: rgba(255, 255, 255, 0.95);
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  }
+  
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(to bottom right, #f8fafc, #f1f5f9);
+  }
+  /* --- Mobile-First Adjustments (for screens up to 768px) --- */
+  
+  /* --- Mobile Layout Adjustments (for screens up to 768px) --- */
+  
+  
+  
+  
+  .tooltip {
+    position: relative;
+    display: inline-block;
+  }
+  .tooltip .tooltip-content {
+    visibility: hidden;
+    opacity: 0;
+    position: absolute;
+    z-index: 1000;
+    top: 125%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--text-primary);
+    color: white;
+    text-align: center;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    z-index: 9999 !important; /* HIGHLIGHT: Increased z-index for all tooltips */
+    white-space: nowrap;
+    box-shadow: var(--shadow-lg);
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+  }
+  
+    /* HIGHLIGHT: Use an active state for the tooltip on mobile touch */
+   
+  
+  .tooltip .tooltip-content::after {
+    content: "";
+    position: absolute;
+    top: -5px;
+    /* top: 100%; */
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: var(--text-primary) transparent transparent transparent;
+  }
+  
+  .tooltip:hover .tooltip-content {
+    visibility: visible;
+    opacity: 1;
+  }
+  
+  .dashboard-container {
+    min-height: 100vh;
+    background: linear-gradient(to bottom right, #f8fafc, #f1f5f9);
+    padding: 0 0rem 0rem;
+  
+  }
+  
+  .header {
+    border-bottom: 1px solid var(--border-color);
+    background: var(--bg-white);
+    backdrop-filter: blur(12px);
+    box-shadow: var(--shadow-md);
+    padding: 0.75rem 1rem;
+  
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+  }
+  
+  .header:hover {
+    box-shadow: var(--shadow-lg);
+  }
+  
+  .header-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .header-logo-section {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .logo-icon-wrapper {
+    display: flex;
+    height: 2.5rem;
+    width: 2.5rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.75rem;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+    box-shadow: var(--shadow-md);
+    transition: transform 0.2s ease;
+  }
+  /* ADDED: Media query for mobile-specific styles */
+  
+  
+  .logo-icon-wrapper:hover {
+    transform: scale(1.05);
+  }
+  
+  .logo-icon {
+    height: 1.0rem;
+    width: 1.0rem;
+    color: white;
+  }
+  @media (max-width: 640px) {
+    .tracking-icons {
+      display: none !important;
+    }
+  }
+  .logo-icon-wrapper {
+    display: flex;
+    height: 2.0rem;
+    width: 2.0rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.75rem;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+    box-shadow: var(--shadow-md);
+    transition: transform 0.2s ease;
+  }
+  .logo-title {
+    font-size: 0.975rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin: 0;
+  }
+  .refresh-button {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    color: var(--text-secondary);
+    transition: all 0.2s ease;
+  }
+  
+  
+  
+  
+  .logo-subtitle {
+    font-size: 0.55rem;
+    color: var(--text-secondary);
+    margin: 0;
+    margin-top: 2px;
+  }
+  
+  .header-customer-info {
+    display: none;
+    align-items: center;
+    gap: 0.75rem;
+    margin-left: 2rem;
+    padding-left: 2rem;
+    border-left: 1px solid var(--border-color);
+  }
+  
+  @media (min-width: 768px) {
+    .header-customer-info {
+      display: flex;
+    }
+  }
+  
+  .customer-icon-wrapper {
+    width: 2rem;
+    height: 2rem;
+    background: linear-gradient(135deg, var(--brand-blue), #1d4ed8);
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-sm);
+  }
+  .icon-wrapper.bg-orange {
+    background-color:  #ede9fe; /* This sets the light orange background circle */
+  }
+  
+  /* .icon-wrapper.bg-purple .icon {
+    color: #6b21a8; 
+  }
+  .icon-wrapper.bg-purple  {
+    color: #6b21a8; 
+  } */
+  .icon-wrapper.bg-purple {
+    background-color: #dad0ff; /* Light purple background */
+  }
+  
+  .icon-wrapper.bg-purple .icon {
+    color: #392153; /* Your specific purple color */
+  }
+  .icon-wrapper.bg-orange {
+    background-color: #ffedd5; /* Light orange background */
+  }
+  .icon-wrapper.bg-orange .icon {
+    color: #ea580c; /* Orange icon color */
+  }
+  
+  .loading-overlay {
+    position: fixed; /* Ensures it covers the entire viewport */
+    top: 0;
+    left: 0;
+    width: 100vw; /* Viewport width */
+    height: 100vh; /* Viewport height */
+    background-color: rgba(255, 255, 255, 0.9); /* A semi-transparent white background */
+    z-index: 1000; /* Ensures it's on top of all other content */
+  
+    /* HIGHLIGHT: These properties center the content horizontally and vertically */
+    display: flex;
+    justify-content: center; /* Centers horizontally */
+    align-items: center; /* Centers vertically */
+    flex-direction: column; /* Stacks the spinner and text vertically */
+  
+    font-size: 1.25rem;
+    color: #333;
+  }
+  .customer-icon {
+    height: 1rem;
+    width: 1rem;
+    color: white;
+  }
+  
+  .customer-name {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+  }
+  
+  .customer-role {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin: 0;
+  }
+  
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .refresh-button {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    color: var(--text-secondary);
+    transition: all 0.2s ease;
+  }
+  
+  .refresh-button:hover {
+    background-color: var(--primary-lighter);
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+   
+  }
+  
+  .refresh-icon {
+    height: 1rem;
+    width: 1rem;
+  }
+  
+  .header-eta {
+    display: none;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    background: var(--bg-white);
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.5rem;
+    border: 1px solid var(--border-color);
+  }
+  
+  @media (min-width: 640px) {
+    .header-eta {
+      display: flex;
+    }
+  }
+  
+  .eta-dot {
+    height: 0.5rem;
+    width: 0.5rem;
+    border-radius: 50%;
+    background-color: var(--brand-green);
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+  
+  .shipment-id {
+    border-radius: 0.5rem;
+    border: 1px solid var(--border-color);
+    background: var(--bg-white);
+    padding: 0.5rem 0.75rem;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.2s ease;
+    font-weight: 600;
+    color: var(--primary-color);
+  }
+  @media (max-width: 640px) {
+    .shipment-id {
+      /* Option 1: Adjust size for better fit on small screens */
+      padding: 0.3rem 0.5rem;
+      font-size: 0.8rem;
+      /* Optional: Hide the element completely on mobile */
+      /* display: none; */
+    }
+  }
+  
+  .shipment-id:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
+  }
+  
+  .tracking-icons {
+    display: flex;
+    gap: 0.5rem;
+   
+  }
+  
+  .icon-wrapper {
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    transition: transform 0.2s ease;
+  }
+  
+  .icon-wrapper:hover {
+    transform: scale(1.1);
+  }
+  
+  .icon-wrapper.bg-green {
+    background-color: #d1fae5;
+  }
+  
+  .icon-wrapper.bg-blue {
+    background-color: #dbeafe;
+  }
+  
+  .icon {
+    height: 1rem;
+    width: 1rem;
+  }
+  
+  .icon-wrapper.bg-green .icon {
+    color: var(--brand-green);
+  }
+  
+  .icon-wrapper.bg-blue .icon {
+    color: var(--brand-blue);
+  }
+  
+  .status-badge {
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: white;
+    transition: all 0.2s ease;
+    cursor: pointer;
+  }
+  
+  .status-badge.delivered {
+    background-color: var(--brand-green);
+  }
+  
+  .status-badge.delivered:hover {
+    background-color: #059669;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+  }
+  
+  .help-button {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.75rem;
+    border: none;                    
+    color: #ffffff;                 
+    background-color: #800080; 
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s ease;
+    cursor: pointer;
+  }
+  /* Mobile responsiveness for screens smaller than 768px */
+  @media (max-width: 640px) {
+    .status-badge {
+      padding: 0.2rem 0.2rem; /* Reduce padding for smaller screens */
+      font-size: 0.65rem; /* Decrease font size */
+      border-radius: 0.4rem; /* Slightly smaller border radius */
+    }
+  
+    .help-button {
+      padding: 0.2rem 0.2rem; /* Reduce padding */
+      font-size: 0.5rem; /* Decrease font size */
+      gap: 0.2rem; /* Reduce the gap between icon and text */
+    }
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding-left: 0.6rem;
+    }
+    .refresh-button {
+      background: transparent;
+      border: 1px solid var(--border-color);
+      cursor: pointer;
+      padding: 0.2rem;
+      border-radius: 0.5rem;
+   
+      color: var(--text-secondary);
+      transition: all 0.2s ease;
+    }
+  }
+  
+  /* .help-button:hover {
+    background-color: var(--primary-lighter);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+  } */
+  
+  .help-icon {
+    height: 1rem;
+    width: 1rem;
+  }
+  
+  .main-content {
+    /* padding: 0; */
+    padding: 0 1rem 1rem;
+  }
+  
+  .kpi-strip {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  /* @media (max-width: 640px) {
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      grid-template-areas: 
+        "center"
+        "left" 
+        "right";
+      gap: 1rem;
+      padding: 0 1rem;
+    }
+    
+  
+    .center-section {
+      grid-area: center;
+      order: 1; 
+    }
+    
+    .sidebar-left {
+      grid-area: left;
+      order: 2;
+    }
+    
+    .sidebar-right {
+      grid-area: right;
+      order: 3;
+    }
+    
+  
+    .card {
+      width: 100%;
+      margin-bottom: 1rem;
+    }
+    
+  
+    .map-card {
+      min-height: 300px;
+    }
+    
+    .map-host {
+      height: 250px; 
+    }
+    
+  
+    .center-section,
+    .sidebar-left,
+    .sidebar-right {
+      width: 100%;
+    }
+  } */
+  
+  /* CSS-only solution - works with existing TSX structure */
+  
+  @media (max-width: 640px) {
+  
+    .main-content {
+      display: flex;
+      flex-direction: column;
+    }
+    
+  
+    .main-grid {
+      order: 1; 
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      padding: 0 1rem;
+    }
+    
+    .kpi-strip {
+      order: 2;
+    }
+    
+   
+    .center-section {
+      order: -1; 
+    }
+    
+    .sidebar-left {
+      order: 0;}
+    
+    .sidebar-right {
+      order: 1; 
+    }
+    
+  
+    .card {
+      width: 100%;
+      margin-bottom: 1rem;
+    }
+    
+  
+    .map-card {
+      min-height: 300px;
+    }
+    
+    .map-host {
+      height: 250px;
+    }
+    
+  
+    .kpi-strip {
+      overflow-x: auto;
+      padding-bottom: 0.5rem;
+      margin: 1rem 0;
+    }
+    
+    .kpi-card {
+      min-width: 140px;
+      flex-shrink: 0;
+    }
+    
+    .kpi-card.distance {
+      min-width: 200px;
+    }
+  }
+  
+  /* .kpi-card { position: relative; z-index: 0; }
+  
+  
+  .kpi-card.tooltip-open {
+    z-index: 10000;              
+  }
+  
+  
+  .kpi-card.tooltip-open,
+  .kpi-card.tooltip-open * {
+    transform: none !important;
+    filter: none !important;
+    backdrop-filter: none !important;
+  } */
+  .kpi-card.tooltip-open {
+    z-index: 10000 !important; /* Forces the card to the top of the stacking order */
+    position: relative !important; /* Necessary to ensure z-index works on all browsers */
+  }
+  
+  /*
+   * This rule disables any CSS properties on the active card and its
+   * children that might create a new stacking context, which could
+   * trap the tooltip. The `!important` rule is used to override
+   * any existing hover or base styles.
+   */
+  .kpi-card.tooltip-open,
+  .kpi-card.tooltip-open * {
+    filter: none !important;
+    backdrop-filter: none !important;
+  }
+
+  /* Ensure tooltip content maintains proper centering when opened via click */
+  /* .kpi-card.tooltip-open .tooltip-content {
+    transform: translateX(-50%) !important;
+  } */
+
+  /* Ensure tooltip arrow remains centered when opened via click */
+  /* .kpi-card.tooltip-open .tooltip-content::after {
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+  } */
+  
+  /* * The tooltip-backdrop will create the full-screen semi-transparent
+   * overlay to draw the user's attention to the tooltip.
+   */
+  .tooltip-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35); /* A slight dimming effect */
+    z-index: 9999 !important; /* Just below the tooltip itself */
+  }
+  
+  
+  /* mobile tooltip stays centered */
+  @media (max-width: 640px) {
+    .tooltip-content {
+      display: none;
+      /* ... your existing styles for fixed positioning ... */
+      /* position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 10000 !important;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.2s ease-in-out; */
+       /* HIGHLIGHT: Ensure this is high */
+      /* ... other styles ... */
+    }
+    .tooltip-content::after {
+      display: none;
+    }
+    /* .tooltip-content {
+      position: fixed;           
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      max-width: 90vw; width: 320px;
+      background: rgba(255,255,255,.95);
+      backdrop-filter: blur(8px);
+      border: 1px solid #e5e7eb; border-radius: 12px;
+      box-shadow: var(--shadow-lg);
+      opacity: 0; visibility: hidden; transition: opacity .2s, visibility .2s;
+    }
+    /* 
+  
+    .tooltip-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.35); z-index: 9999; } */
+  }
+  .kpi-card.tooltip-open .tooltip-content { opacity: 1; visibility: visible; } 
+  
+  @media (max-width: 640px) {
+    .kpi-card {
+      position: static; 
+      backdrop-filter: none;
+      
+    }
+  
+    .kpi-card:hover {
+      transform: none;
+      box-shadow: none;
+    }
+    .kpi-strip {
+      display: grid;
+    
+      grid-template-columns:repeat(1, 1fr);
+      grid-auto-rows: 1fr;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .tooltip-content {
+    
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 9999 !important; 
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.2s ease-in-out;
+   
+      background: rgba(255, 255, 255, 0.95); 
+      backdrop-filter: blur(8px);
+      box-shadow: var(--shadow-lg);
+    }
+    .kpi-card.tooltip-open .tooltip-content {
+      opacity: 1;
+      visibility: visible;
+      z-index: 10000;
+    }
+  }
+  
+  .kpi-card {
+    text-align: center;
+    padding: 0.5rem;
+    border-radius: 0.75rem;
+    border: 1px solid var(--border-color);
+    cursor: pointer;
+    padding: 0.50rem 0.50rem 0.50rem 2rem;
+    transition: all 0.3s ease;
+    background: var(--bg-white);
+    backdrop-filter: blur(8px);
+    display: flex;
+    z-index: 2;  
+    flex-direction: column;
+    align-items: center;    
+    justify-content: center; 
+  }
+  
+  .kpi-card:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+    border-color: var(--primary-color);
+  } 
+  
+  
+  .kpi-card.early {
+    background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+    border-color: #bbf7d0;
+  }
+  
+  .kpi-card.distance {
+    background: linear-gradient(135deg, #eff6ff, #dbeafe);
+    border-color: #bfdbfe;
+  }
+  
+  .kpi-card.on-time {
+    background: linear-gradient(135deg, var(--primary-lighter), #ede9fe);
+    border-color:#c084fc;
+  }
+  
+  .kpi-card.stoppages {
+    background: linear-gradient(135deg, #fff7ed, #ffedd5);
+    border-color: #fed7aa;
+  }
+  
+  .kpi-card.deviations {
+    background: linear-gradient(135deg, #fff1f2, #ffe4e6);
+    border-color: #fecaca;
+  }
+  .kpi-card.halt-alert {
+    background: linear-gradient(135deg, #a3e8ec, #95effb);
+    border-color: #47d9fd;
+  }
+  
+  .kpi-value {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+    transition: color 0.2s ease;
+  }
+  
+  .kpi-card.early .kpi-value {
+    color: #047857;
+  }
+  
+  .kpi-card.on-time .kpi-value {
+    color: var(--primary-color);
+  }
+  
+  .kpi-card.stoppages .kpi-value {
+    color: #ea580c;
+  }
+  
+  .kpi-card.deviations .kpi-value {
+    color: #e11d48;
+  }
+  .kpi-card.halt-alert .kpi-value {
+    color: #1a6ae3;
+  }
+
+  
+  .kpi-label {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+  }
+  
+  .kpi-distance-metrics {
+    margin-bottom: 0.75rem;
+  }
+  
+  .distance-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .distance-item {
+    text-align: center;
+  }
+  
+  .distance-value {
+    font-weight: 700;
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+  }
+  
+  .kpi-card.distance .distance-value {
+    color: var(--brand-blue);
+  }
+  
+  .kpi-card.distance .distance-value.traveled {
+    color: var(--brand-green);
+  }
+  
+  .kpi-card.distance .distance-value.remaining {
+    color: var(--text-secondary);
+  }
+
+  .tooltip-content {
+    /* other styles */
+    position: absolute;
+    /* background-color: var(--bg-white); 
+    color: var(--text-primary);  */
+    z-index: 999;
+    /* other styles */
+  }
+  @media (max-width: 640px) {
+    .tooltip-content {
+      /* HIGHLIGHT: Override desktop positioning */
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      
+      /* HIGHLIGHT: Ensure visibility and proper stacking */
+      z-index: 1000;
+      
+      /* HIGHLIGHT: Add a backdrop to focus attention on the tooltip */
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(8px);
+      
+      /* HIGHLIGHT: Make it a pop-up instead of a hover element */
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 24px;
+      
+      /* HIGHLIGHT: Set a maximum width for readability on small screens */
+      max-width: 90%;
+      width: 300px;
+      
+      /* HIGHLIGHT: Initial state for the click/tap effect */
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.2s ease-in-out;
+    }
+    
+    /* HIGHLIGHT: Use an active state for the tooltip on mobile touch */
+    .tooltip:active .tooltip-content {
+      opacity: 1;
+      visibility: visible;
+    }
+  }
+  .distance-label {
+    font-size: 0.625rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+  }
+  
+  .progress-bar {
+    width: 100%;
+    background-color: #e5e7eb;
+    border-radius: 9999px;
+    height: 0.5rem;
+    overflow: hidden;
+  }
+  
+  .progress-bar-fill {
+    background: linear-gradient(90deg, var(--brand-green), #059669);
+    height: 100%;
+    width: 100%;
+    transition: width 0.5s ease;
+    border-radius: 9999px;
+  }
+  
+  .main-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+  
+  @media (min-width: 1024px) {
+    .main-grid {
+      grid-template-columns: repeat(12, 1fr);
+      gap: 1.5rem;
+    }
+  }
+  
+  .sidebar-left {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  @media (min-width: 1024px) {
+    .sidebar-left {
+      grid-column: span 3;
+    }
+  }
+  
+  .center-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  @media (min-width: 1024px) {
+    .center-section {
+      grid-column: span 6;
+    }
+  }
+  
+  .sidebar-right {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  @media (min-width: 1024px) {
+    .sidebar-right {
+      grid-column: span 3;
+    }
+  }
+  
+  .card {
+    background: var(--bg-white);
+    backdrop-filter: blur(12px);
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border-color);
+    border-radius: 0.75rem;
+    padding: 1rem;
+    transition: all 0.3s ease;
+  }
+  
+  .card:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-1px);
+  }
+  
+  .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border-color);
+  }
+  
+  .card-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1rem;
+    color: var(--primary-color);
+    font-weight: 600;
+  }
+  
+  .card-icon {
+    height: 1.25rem;
+    width: 1.25rem;
+  }
+  
+  .collapse-button {
+    background: none;
+    border: 1px solid var(--border-color);
+    padding: 0.25rem;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .collapse-button:hover {
+    background-color: var(--primary-lighter);
+    border-color: var(--primary-color);
+  }
+  
+  .collapse-icon {
+    height: 1rem;
+    width: 1rem;
+    color: var(--text-secondary);
+  }
+  
+  .collapse-button:hover .collapse-icon {
+    color: var(--primary-color);
+  }
+  
+  .card-content {
+    padding: 0;
+  }
+  
+  .location-item {
+    padding: 1rem;
+    border-radius: 0.75rem;
+    transition: all 0.2s ease;
+   
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .location-item:hover {
+    box-shadow: var(--shadow-md);
+    /* transform: translateX(4px); */
+  }
+  
+  .location-item.origin {
+    background: linear-gradient(135deg, #eff6ff, #dbeafe);
+    border: 1px solid #bfdbfe;
+  }
+  
+  .location-item.destination {
+    background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+    border: 1px solid #bbf7d0;
+  }
+  
+  .location-icon-wrapper {
+    position: relative; 
+    padding: 0.75rem;
+    border-radius: 0.75rem;
+    box-shadow: var(--shadow-sm);
+  }
+  
+  .location-item.origin .location-icon-wrapper {
+    background-color: #dbeafe;
+  }
+  
+  .location-item.destination .location-icon-wrapper {
+    background-color: #d1fae5;
+  }
+  
+  .location-icon {
+    height: 1.25rem;
+    width: 1.25rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .location-icon.origin-icon {
+    background-color: var(--brand-blue);
+  }
+  
+  .location-icon.destination-icon {
+    background-color: var(--brand-green);
+  }
+  
+  .location-dot {
+    height: 0.5rem;
+    width: 0.5rem;
+    border-radius: 50%;
+    background-color: white;
+  }
+  
+  .check-icon {
+    height: 0.75rem;
+    width: 0.75rem;
+    color: white;
+  }
+  
+  .location-details {
+    flex: 1;
+    min-width: 0;
+  }
+  
+  .location-type {
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+  
+  .location-item.origin .location-type {
+    color: #1e40af;
+  }
+  
+  .location-item.destination .location-type {
+    color: #065f46;
+  }
+  
+  .location-name {
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+  }
+  
+  .location-time {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+  }
+  
+  .time-icon {
+    height: 0.875rem;
+    width: 0.875rem;
+  }
+  
+  .vehicle-driver-details .detail-item {
+    /* display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    transition: all 0.2s ease;
+    margin-bottom: 0.5rem; */
+    display: grid;
+    grid-template-columns: auto 1fr; /* This is the key change */
+    gap: 1.5rem;                     /* This creates the uniform gap */
+    align-items: center;
+    padding: 0.8rem 0.5rem; 
+  
+    transition: background-color 0.2s ease;
+  }
+  
+  
+  
+  .detail-item:last-child {
+    border-bottom: none;
+  }
+  
+  /* The value still aligns to the right within its own column */
+  .detail-value {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #1e293b; 
+    text-align: right;
+  }
+  
+  .detail-label {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+  }
+  
+  /* .detail-value {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-primary);
+  } */
+  
+  .ad-card {
+    background: linear-gradient(135deg, #eff6ff, #e0e7ff);
+    border-color: #bfdbfe;
+    z-index: 1;
+  }
+  
+  .ad-content {
+    padding: 0.6rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .ad-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  .ad-icon-wrapper {
+    width: 2rem;
+    height: 2rem;
+    background: linear-gradient(135deg, var(--brand-blue), #1d4ed8);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .ad-icon {
+    height: 1rem;
+    width: 1rem;
+    color: white;
+  }
+  
+  .ad-header span {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #1e40af;
+  }
+  
+  .ad-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+  }
+  
+  .ad-text {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    margin-bottom: 1rem;
+  }
+  
+  .ad-button {
+    background: linear-gradient(135deg, var(--brand-blue), #1d4ed8);
+    color: white;
+    font-size: 0.875rem;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 0.5rem;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    font-weight: 600;
+  }
+  
+  .ad-button:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+  }
+  
+  .map-card {
+    min-height: 0px;
+  }
+  
+  .map-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+  
+  @media (min-width: 640px) {
+    .map-buttons {
+      flex-direction: row;
+    }
+  }
+  
+  .map-button {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--primary-color);
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-weight: 500;
+  }
+  
+  .map-button.active {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+    color: white;
+  }
+  
+  .map-button.outline {
+    background-color: transparent;
+    color: var(--primary-color);
+  }
+  
+  .map-button.outline:hover {
+    background-color: var(--primary-lighter);
+  }
+  
+  .button-icon {
+    height: 1rem;
+    width: 1rem;
+    margin-right: 0.5rem;
+  }
+  
+  .map-filter-buttons {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color);
+  }
+  
+  .filter-button {
+    font-size: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.5rem;
+    background-color: transparent;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+  
+  .filter-button.deviation {
+    border: 1px solid #fecaca;
+    color: #e11d48;
+  }
+  
+  .filter-button.deviation:hover {
+    background-color: #fff1f2;
+  }
+  
+  .filter-button.stoppage {
+    border: 1px solid #fed7aa;
+    color: #ea580c;
+  }
+  
+  .filter-button.stoppage:hover {
+    background-color: #fff7ed;
+  }
+  
+  .filter-icon {
+    height: 0.875rem;
+    width: 0.875rem;
+  }
+  
+  .current-location-box {
+    background: linear-gradient(135deg, #f9fafb, #f3f4f6);
+    border: 1px solid var(--border-color);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    transition: all 0.2s ease;
+  }
+  
+  .current-location-box:hover {
+    box-shadow: var(--shadow-md);
+  }
+  
+  .location-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+  }
+  
+  .location-status {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  
+  .location-dot-active {
+    height: 0.75rem;
+    width: 0.75rem;
+    border-radius: 50%;
+    background-color: var(--brand-green);
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+  
+  .location-status span {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+  
+  .location-info {
+    font-size: 0.875rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .location-address {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+  
+  .location-icon {
+    height: 1.25rem;
+    width: 1.25rem;
+    color: var(--primary-color);
+  }
+  
+  .location-sub-address,
+  .location-update,
+  .location-known {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin-left: 2rem;
+  }
+  
+  .location-signal {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin-left: 2rem;
+  }
+  
+  .signal-dot {
+    height: 0.5rem;
+    width: 0.5rem;
+    border-radius: 50%;
+    background-color: var(--brand-green);
+  }
+  
+  .card-content-collapsed {
+    padding: 0.75rem;
+  }
+  
+  .metadata-summary {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+  }
+  
+  .metadata-details .detail-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    transition: all 0.2s ease;
+    margin-bottom: 0.5rem;
+  }
+  
+  
+  
+  .metadata-details .detail-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+  }
+  
+  .metadata-details .detail-value {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+  
+  .detail-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+  
+  .metadata-badges {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1rem;
+  }
+  
+  .metadata-badge {
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.5rem;
+    font-size: 0.75rem;
+    border: 1px solid var(--primary-color);
+    background-color: var(--primary-lighter);
+    color: var(--primary-color);
+    transition: all 0.2s ease;
+    cursor: pointer;
+    font-weight: 500;
+  }
+  
+  /* .metadata-badge:hover {
+    background-color: var(--primary-color);
+    color: white;
+  } */
+  
+  .tracking-status-grid {
+    display: flex;              /* put items in a row */
+    gap: 1rem; 
+    overflow-x: auto; /* This is the key line to enable horizontal scrolling */
+    gap: 16px; /* Adjust the spacing between items as needed */
+    padding-bottom: 8px;
+    /* display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem; */
+  }
+  @media (max-width: 640px) { 
+    .card.device-tracking-card {
+      width: 100%;
+      max-width: 100% !important;    /* cap it */
+      overflow: hidden;   /* hide any child overflow */
+      min-width: 0;
+      flex: 1 1 auto;     
+    }
+    .tracking-status-grid {
+      display: flex;              /* put items in a row */
+      gap: 1rem; 
+     
+      flex-wrap: wrap;              
+      overflow-x: auto; /* This is the key line to enable horizontal scrolling */
+      gap: 16px; /* Adjust the spacing between items as needed */
+      padding-bottom: 8px;
+      width: 100%;          /* lock grid inside parent card */
+      max-width: 100%; 
+      min-width: 0; 
+  
+      /* display: grid;
+      grid-template-columns: 1fr;
+      gap: 1rem; */
+    }
+    
+  .tracking-status-item {
+   
+  
+    flex: 0 0 calc((100% - 16px) / 2);  /* 2 items per row */
+      max-width: calc((100% - 16px) / 2);
+      min-height: 200px;
+    /* min-width: 130px;
+    min-height: 200px;  */
+    border: 1px solid var(--border-color);
+    border-radius: 0.75rem;
+  
+  }
+  
+  
+  
+  
+  
+  }
+  
+  
+  
+  .tracking-status-item {
+    flex: 1; 
+    flex-shrink: 0;
+  
+    min-width: 140px;
+    min-height: 200px; 
+    border: 1px solid var(--border-color);
+    border-radius: 0.75rem;
+  
+  }
+  
+  .tracking-status-item:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
+  }
+  
+  .tracking-status-item.gps {
+    background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+    border-color: #bbf7d0;
+  }
+  
+  .tracking-status-item.sim {
+    background: linear-gradient(135deg, #DACFFE,#DACFFE);
+    border-color:#b293d5;
+  }
+  .tracking-status-item.app {
+    background: linear-gradient(135deg, #FFEDD5, #FFEDD5);
+    border-color:  #ede9fe ;
+  }
+  
+  .tracking-status-header {
+    display: flex;
+    align-items: center;
+    /* justify-content: space-between; */
+    margin-bottom: 1rem;
+    
+  }
+  
+  .tracking-status-header .icon-wrapper {
+    padding: 0.4rem;
+    border-radius: 0.4rem;
+  }
+  
+  .tracking-status-item.gps .icon-wrapper {
+    background-color: #d1fae5;
+  }
+  
+  .tracking-status-item.sim .icon-wrapper {
+    background-color:#DACFFE;
+  }
+  .tracking-status-item.app .icon-wrapper {
+    background-color: #dbeafe;
+  }
+  .tracking-status-item.app .icon-wrapper {
+    background-color:#FFEDD5  ;
+  }
+  
+  .tracking-icon {
+    height: 1.25rem;
+    width: 1.25rem;
+  }
+  
+  .tracking-status-item.gps .tracking-icon {
+    color: var(--brand-green);
+  }
+  
+  .tracking-status-item.sim .tracking-icon {
+    color: #b293d5;
+  }
+  .tracking-status-item.app .tracking-icon {
+    color:#EA580B ;
+  }
+  
+  
+  .tracking-status-header h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0;
+  }
+  
+  .tracking-status-item.gps h3 {
+    color: #065f46;
+  }
+  .tracking-status-item.sim h3 {
+    color: #392153;
+  }
+  
+  .tracking-status-item.app h3 {
+    color:#EA580B;
+  }
+  
+  .tracking-status-header p {
+    font-size: 0.75rem;
+    margin: 0;
+    color: var(--text-secondary);
+  }
+  
+  .tracking-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .tracking-detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.75rem;
+  }
+  
+  .tracking-detail-row span:first-child {
+    color: var(--text-secondary);
+    font-weight: 500;
+  }
+  
+  .tracking-detail-row span:last-child {
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+  
+  .timeline-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .tab-container {
+    display: flex;
+    background-color: #f1f5f9;
+    border-radius: 0.75rem;
+    padding: 0.10rem;
+  }
+  
+  .tab-button {
+    padding: 0.4rem 0.650rem;
+    font-size: 0.75rem;
+    border: none;
+    background: none;
+    border-radius: 0.5rem;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 500;
+  }
+  
+  .tab-button.active {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+    color: white;
+    
+  }
+  
+  .tab-button:not(.active) {
+    color: var(--text-secondary);
+  }
+  
+  .tab-button:not(.active):hover {
+    background-color: var(--primary-lighter);
+    color: var(--primary-color);
+   
+  }
+  
+  .tab-icon {
+    height: 1rem;
+    width: 1rem;
+  }
+  
+  .timeline-content {
+    padding-top: 1rem;
+  }
+  
+  .timeline-title-container {
+    margin-bottom: 1rem;
+  }
+  
+  .timeline-title-container h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin: 0;
+  }
+  
+  .timeline-title-container p {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin: 0;
+    margin-top: 0.25rem;
+  }
+  /* This makes the icon's container the reference for positioning the line */
+  .timeline-icon-container {
+    position: relative;
+    /* Add flex to center the icon perfectly, which also centers the line */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 32px; /* Give it a fixed width to align items consistently */
+  }
+  
+  /* This creates the vertical dashed line itself */
+  .timeline-icon-container::before {
+    content: '';
+    position: absolute;
+    top: 100%; /* Start the line at the bottom of the container */
+    left: 50%; /* Center the line horizontally */
+    transform: translateX(-50%);
+  
+    /* Make the line long enough to span the gap to the next item */
+    /* You may need to adjust '2rem' to match your spacing perfectly */
+    height: calc(100% + 2rem);
+    
+    /* Style the line */
+    border-left: 2px dashed #cbd5e1; /* A neutral gray color */
+  }
+  
+  /* This hides the line on the very last item in the timeline */
+  .timeline-item:last-child .timeline-icon-container::before {
+    display: none;
+  }
+  .timeline-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    /* margin-bottom: 1.5rem; */
+    padding: 0.7rem;
+    border-radius: 0.75rem;
+    transition: all 0.2s ease;
+  }
+  
+  /* .timeline-item:hover {
+    background-color: var(--primary-lighter);
+  } */
+  
+  .timeline-icon-wrapper {
+    display: flex;
+    height: 2rem;
+    width: 2rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background-color: var(--brand-green);
+    background-color:  #5B3782 ;
+    color: white;
+    flex-shrink: 0;
+    z-index: 2;
+    box-shadow: var(--shadow-sm);
+  }
+  /* Make the icon's container a positioning anchor for the line */
+  .timeline-icon-wrapper {
+    position: relative; /* This is crucial for positioning the line */
+    z-index: 1;         /* Ensures icon is above the line if they overlap */
+  }
+  
+  /* Create the vertical dashed line using a '::before' pseudo-element */
+  .timeline-icon-wrapper::before {
+    content: ''; /* Pseudo-elements must have a 'content' property */
+    position: absolute;
+    
+    /* Positioning the line */
+    top: 100%; /* Start the line at the bottom of the icon wrapper */
+    left: 50%; /* Center the line horizontally with the icon */
+    transform: translateX(-50%);
+    
+    /* Sizing the line to span the gap between items */
+    /* The '1.5rem' value should roughly match the margin-bottom of .timeline-item */
+    height: calc(100% + 1.5rem); 
+    
+    /* Styling the line */
+    border-left: 2px dashed #cbd5e1; /* A neutral gray color, e.g., slate-300 */
+  }
+  
+  /* Hide the connecting line on the very last item in the list */
+  .timeline-item:last-child .timeline-icon-wrapper::before {
+    display: none;
+  }
+  .timeline-icon {
+    height: 1.2rem;
+    width: 1.2rem;
+    
+  }
+  timeline-icon path {
+    fill: #5B3782;     /* Fills the main body with your color */
+    stroke: #5B3782;     /* Sets the outline to the same color */
+    stroke-width: 2.5;   /* Adjust outline thickness if needed */
+  }
+  
+  /* Style for the small inner circle */
+  .timeline-icon circle {
+    fill: white;       /* Makes the inner circle 'hollow' (assuming a white background) */
+    stroke: #5B3782;     /* Gives the hollow circle a matching outline */
+    stroke-width: 1.5;   /* Match the path's outline thickness for consistency */
+  }
+  
+  
+  .timeline-details {
+    flex: 1;
+    min-width: 0;
+  
+  }
+  
+  .timeline-time-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+  }
+  
+  .timeline-time {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+  
+  .timeline-dot {
+    height: 0.5rem;
+    width: 0.5rem;
+    border-radius: 50%;
+    background-color: var(--brand-green);
+  
+  }
+  
+  .timeline-date {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    font-weight: 400;
+  }
+  
+  .timeline-event {
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+    /* margin: 0rem 1; */
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+  
+  .timeline-planned {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin-bottom: 0rem;
+    
+  }
+  
+  .link-button {
+    background: none;
+    border: none;
+    padding: 0;
+    font-size: 0.75rem;
+    cursor: pointer;
+    color: var(--primary-color);
+    font-weight: 500;
+    transition: color 0.2s ease;
+  }
+  
+  .link-button:hover {
+    color: var(--primary-light);
+    text-decoration: underline;
+  }
+  
+  .toll-history-section .toll-history-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    /* max-height: 100px; 
+    overflow-y: auto; */
+    overflow: visible;  
+    /* padding: 0.75rem 0.75rem 0.75rem 0.25rem !important; */
+    /* padding: 0.75rem; */
+    border-radius: 0.75rem;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    margin-bottom: 0.5rem;
+  }
+  .toll-history-section .toll-history-item {
+    display: grid;
+    grid-template-columns: 5rem 20px 1fr;  /* date | icon | text */
+    column-gap: 8px;
+    align-items: center;
+    overflow: visible;
+    max-height: none;
+  }
+  .toll-date { justify-self: end; }
+  .toll-icon-container { justify-self: center; }
+  .toll-name { margin-left: 0; }
+  
+  /* .toll-history-item:hover {
+    background-color: var(--primary-lighter);
+  } */
+  
+  .toll-date {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    width: 6rem;
+    text-align: right;
+    line-height: 1.25;
+  }
+  
+  .toll-date div:first-child {
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+  
+  .toll-date div:nth-child(2) {
+    font-size: 0.625rem;
+    color: var(--text-secondary);
+  }
+  
+  .toll-time {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+  
+  .toll-icon-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .toll-icon-wrapper {
+    width: 1.5rem;
+    height: 1.5rem;
+    background: linear-gradient(135deg, var(--brand-red), #dc2626);
+    border-radius: 0.375rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-sm);
+  }
+  
+  .toll-icon {
+    width: 0.875rem;
+    height: 0.875rem;
+    color: white;
+  }
+  
+  .toll-line {
+    /* width: 2px;
+    height: 1.5rem;
+    background: linear-gradient(to bottom, var(--border-color), transparent); */
+    width: 0; /* no width, only border */
+    height: 1.5rem;
+    border-left: 2px dashed var(--border-color);
+  }
+  
+  .toll-name {
+    flex: 1;
+    min-width: 0;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin-left: -12px;
+    /* white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; */
+    white-space: normal;   /* allow wrapping */
+    overflow: visible;     /* don’t hide text */
+    text-overflow: unset;  /* disable ellipsis */
+    word-break: break-word; /* break long names if needed */
+  }
+  
+  /* Modal Styles */
+  .modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    /* background-color: rgba(32, 16, 77, 0.5); */
+    /* background: rgba(0, 0, 0, 0.4);  */
+    background: rgba(0, 0, 0, 0.4) !important;
+    z-index: 40;
+    backdrop-filter: blur(4px);
+  }
+  
+  .modal-content {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    max-width: 28rem;
+    background-color: white;
+    border-radius: 1rem;
+    padding: 2rem;
+    box-shadow: var(--shadow-lg);
+    z-index: 50;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--border-color);
+  }
+  
+  .modal-header {
+    display: absolute;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+  }
+  
+  .modal-close-button {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    padding: 0.5rem;
+    cursor: pointer;
+    border-radius: 50%;
+    color: var(--text-secondary);
+    transition: all 0.2s ease;
+  }
+  
+  .modal-close-button:hover {
+    background-color: var(--primary-lighter);
+    color: var(--primary-color);
+  }
+  
+  .modal-close-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+  
+  
+  .modal-title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+  
+  .modal-title-icon {
+    height: 1.5rem;
+    width: 1.5rem;
+    color: var(--primary-color);
+  }
+  
+  .modal-description {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    padding-top: 1rem;
+  }
+  
+  .modal-buttons-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center; 
+    gap: 1rem;
+    padding-top: 1.5rem;
+  }
+  @media (max-width: 640px) { /* You can adjust this breakpoint */
+    .modal-buttons-container {
+      flex-direction: column; /* Stacks the buttons vertically */
+      align-items: stretch; /* Makes buttons fill the full width */
+    }
+    .modal-buttons-container .modal-button {
+      min-width: unset; /* Remove the fixed minimum width for mobile */
+    }
+  }
+  .modal-button {
+    display: flex;
+    width:20%;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.6rem 1.0rem;
+    border: 1px solid var(--primary-color);
+    color: var(--primary-color);
+    background-color:transparent;
+    border-radius: 0.75rem;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+  } 
+  
+  
+  .modal-button:hover {
+    background-color: var(--primary-lighter);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+  }
+  
+  .modal-button-icon {
+    height: 1.25rem;
+    width: 1.25rem;
+  }
+  
+  /* Animations */
+  @keyframes pulse {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .card {
+    animation: fadeIn 0.3s ease-out;
+  }
+  
+  /* Responsive Design */
+  /* @media (max-width: 640px) {
+    .dashboard-container {
+      padding: 0.0rem;
+    }
+  
+    .header {
+      padding: 0.5rem;
+    }
+  
+  
+    .kpi-strip {
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
+    }
+  
+    .main-grid {
+      gap: 0.75rem;
+    }
+  } */
+  
+  
+  
+  
+  /* Documents grid */
+  .documents-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+  
+  @media (min-width: 640px) {
+    .documents-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  .no-data-message {
+           /* keeps it in a single line */
+   
+    text-align: center;
+                /* ensure it doesn’t overflow container */
+  }
+  .doc-tile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.85rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0.75rem;
+    background: var(--bg-white);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .doc-tile:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--primary-color);
+    border-top-width: 2px;
+  }
+  
+  .doc-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+    color: var(--primary-color);
+  }
+  
+  .doc-thumb {
+    width: 100%;
+    aspect-ratio: 4/3;
+    object-fit: cover;
+    border-radius: 0.5rem;
+    border: 1px solid var(--border-color);
+  }
+  
+  .doc-name {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    text-align: center;
+  }
+  
+  /* Modal tweaks for documents */
+  .doc-modal {
+    max-width: 42rem; /* wider modal for images */
+  }
+  
+  .doc-image-wrap {
+    margin-top: 1rem;
+  
+    border: 1px solid var(--border-color);
+    border-radius: 0.75rem;
+    overflow: hidden;
+    background: #fff;
+  }
+  
+  .doc-image-wrap img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .doc-flex {
+    display: flex;
+    align-items: center;
+   
+   gap: 6px; /* space between icon and text */
+  }
+  /* Larger, rounded tooltip like the screenshot */
+  .tooltip-lg {
+    min-width: 260px;
+    max-width: 340px;
+    padding: 12px 14px;
+    border-radius: 12px;     /* more round */
+    line-height: 1.25;
+  }
+  
+  /* Title at the top */
+  .tooltip-title {
+    font-size: 0.7rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #fff;
+    text-align: left; 
+  }
+  
+  /* Key/value rows */
+  .tooltip-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 6px 0;
+  }
+  
+  .tooltip-key {
+    color: #e5e7eb;          /* light gray */
+    font-weight: 600;
+    font-size: 0.85rem;
+  }
+  
+  .tooltip-val {
+    color: #ffffff;
+    font-weight: 500;
+    font-size: 0.85rem;
+    white-space: wrap;
+  }
+  
+  /* Subtle footer line */
+  .tooltip-muted {
+    margin-top: 8px;
+    font-size: 0.8rem;
+    color: #9ca3af;          /* muted gray */
+  }
+  
+  /* Make sure arrow matches dark tooltip and sits below the card */
+  .tooltip .tooltip-content::after {
+    top: -5px;
+    border-color: var(--text-primary) transparent transparent transparent;
+  }
+  
+  /* Keep tooltips on top of everything */
+  .tooltip .tooltip-content {
+    z-index: 10000 !important;
+  }
+  .status-pill {
+    padding: 2px 6px;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 12px;
+    color: #fff;
+    margin-left: auto;
+    margin-right: 6px;
+  }
+  
+  .gps-pill {
+    background-color: #16a34a; /* Tailwind green-600 */
+  }
+  
+  .sim-pill {
+    background-color: #392153; /* Tailwind blue-600 */
+  }
+  .app-pill{
+    background-color:#EA580B;
+  }
+  .pill-left {
+    margin-left: 12px; /* adjust as needed (-8px or -12px) */
+  }
+  /* add uniform padding around details */
+  .tracking-details.padded {
+    padding: 12px;       /* adjust as you like (12–16px looks good) */
+    border-radius: 10px; /* optional, keeps spacing consistent */
+  }
+  
+  /* --- modal header row + close chip --- */
+  .modal-top{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:0.75rem;
+  }
+  
+  .modal-close-chip{
+    /* border:1px solid var(--border-color); */
+    border: none;                /* remove browser default border */
+    outline: none; 
+    background:#fff;
+    color:var(--text-secondary);
+    font-size:.75rem;
+    line-height:1;
+    /* padding:.45rem .7rem; */
+    /* border-radius:9999px; */
+    cursor:pointer;
+    transition:all .15s ease;
+  }
+  /* .modal-close-chip:hover{
+    color:var(--primary-color);
+    border-color:var(--primary-color);
+    background:var(--primary-lighter);
+  } */
+  
+  /* thin line under the title */
+  .modal-separator{
+    border:0;
+    height:1px;
+    background:var(--border-color);
+    margin:.75rem 0 1rem;
+  }
+  
+  /* --- fixed-height image area --- */
+  .doc-image-frame{
+    height: 280px;                 /* fixed visual area */
+    border:1px solid var(--border-color);
+    border-radius:.75rem;
+    overflow:hidden;
+    background:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .doc-image-frame img{
+    width:100%;
+    height:100%;
+    object-fit:contain;            /* keep the whole image visible */
+  }
+  
+  /* center the Download button and keep it compact */
+  .modal-buttons-container{
+    display:flex;
+    justify-content:center;
+    padding-top:1rem;
+  }
+  
+  .modal-button{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:.5rem;
+    width:150px;                   /* ~1/3 feel without stretching */
+    padding:.6rem 1rem;
+    border:1px solid var(--primary-color);
+    color:var(--primary-color);
+    background:#fff;
+    border-radius:.75rem;
+    font-size:.95rem;
+    font-weight:600;
+    text-decoration:none;          /* remove underline */
+    cursor:pointer;
+    transition:all .15s ease;
+  }
+  .modal-button:hover{
+    background:var(--primary-lighter);
+    box-shadow:var(--shadow-md);
+    transform:translateY(-1px);
+  }
+  .modal-button:focus{ outline:none; }
+  .modal-button:visited{ color:var(--primary-color); text-decoration:none; }
+  
+  /* keep the icon a touch smaller for the compact button */
+  .modal-button-icon{
+    width:1rem;
+    height:1rem;
+  }
+  /* ADDED — container to anchor the popover */
+  .map-host {
+    position: relative; 
+    margin-top: 1rem;
+    height: clamp(320px, 45vh, 560px); 
+  }
+  
+  /* ADDED — confirmation popover UI */
+  .map-confirm-popover {
+    position: absolute;
+    z-index: 5;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+     border-radius: 10px; 
+    /* padding: 12px 14px 10px 14px;
+    max-width: 320px; */
+    border-radius: 12px;         
+    padding: 20px 24px 18px 24px; /* more breathing room */
+    min-width: 450px;             /* increase width */
+    max-width: 480px;             /* cap it reasonably */
+    font-size: 15px;              /* slightly larger text */
+    line-height: 1.4;
+  }
+  
+  /* ADDED — top-right placement */
+  /* .map-confirm-popover.top-right {
+    top: 12px;
+    right: 0px;
+  } */
+  .map-confirm-popover.top-right { /* legacy class */
+    top: 50% !important;
+    right: auto !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+  }
+  
+  .map-confirm-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #111827;
+    margin: 0 24px 10px 0;
+    line-height: 1.35;
+  }
+  
+  .map-confirm-actions {
+    display: flex;
+    gap: 8px;
+  }
+  
+  @media (max-width: 768px) {
+    .map-confirm-popover {
+      /* Use 90% of the screen width with a max limit */
+      width: 70vw;
+      /* max-width: 300px;  */
+  
+      /* Reduce padding on smaller screens */
+      padding: 24px 20px;
+    }
+  
+    .map-confirm-title {
+      /* Make the title text slightly smaller */
+      font-size: 16px; 
+    }
+  
+    .map-confirm-actions {
+      /* Stack the buttons vertically */
+      flex-direction: row; 
+      
+      /* Reduce the gap and top margin for a tighter look */
+      gap: 12px;
+      margin-top: 24px;
+    }
+    
+    .map-confirm-actions .btn {
+        /* Make buttons take up the full width of the container */
+        width: 100%;
+    }
+  }
+  
+  .map-confirm-close {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 1;
+    color: #6b7280;
+  }
+  
+  .btn {
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 13px;
+    cursor: pointer;
+    border: 1px solid transparent;
+  }
+  
+  .btn-primary {
+    background: #111827;
+    color: #fff;
+  }
+  
+  .btn-ghost {
+    background: #fff;
+    color: #111827;
+    border-color: #e5e7eb;
+  }
+  
+  
+  /* === Ellipsis utilities (single-line & 2-line) === */
+  .ellipsis-1 {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+  .ellipsis-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;     /* number of lines to show */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .toll-history-section {
+    max-height: 320px;         /* pick a height that fits your layout */
+    overflow-y: auto;
+  }
+  /* === Lightweight tooltip (uses data-title attr) === */
+  .tooltip-ellipsis {
+    position: relative;
+    display: inline-block;  /* or block if flex child */
+     width: 100%; 
+    cursor: default;
+  }  
+  .tooltip-ellipsis {
+   position: relative;
+    display: inline-block;
+    cursor: default;
+    max-width: 100%;
+    overflow: hidden;    
+    text-overflow: ellipsis;
+    white-space: nowrap; 
+    position: relative;
+  
+    display: block; 
+  
+    max-width: 100%; 
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    cursor: default;
+  } 
+   .tooltip-ellipsis:hover::after {
+    content: attr(data-title);
+   display:block;
+    max-width: 500px;
+    position: absolute;
+    left: 2%;
+    top: 100%;
+  
+    transform: translateY(-20px);
+  
+    min-width: auto;
+     min-height:auto;
+    white-space: normal;
+    word-wrap: break-word;
+  
+    word-break: break-all; 
+    z-index: 20;
+    overflow-wrap: anywhere; 
+  
+    background: #111827;
+    color: #fff;
+    padding: 6px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    line-height: 1.25;
+    box-shadow: 0 6px 18px rgba(0,0,0,.18);
+  } 
+  
+  
+  
+  
+  /* Full-screen dim background when confirm is open */
+  .map-confirm-backdrop {
+    position: fixed;
+    inset: 0;                     /* top:0; right:0; bottom:0; left:0 */
+    background: rgba(0,0,0,0.45); /* dim the page */
+    z-index: 9998;                /* just under the popover */
+    backdrop-filter: blur(2px);   /* optional blur */
+  }
+  
+  /* Centered, larger popup */
+  .map-confirm-popover {
+    position: fixed;              /* take it out of the map/card flow */
+    inset: 0;                     /* for easy centering with margin auto */
+    margin: auto;
+  
+    z-index: 9999;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.22);
+    border-radius: 14px;
+    padding: 24px 28px;
+    max-width: 525px;
+    /* width: clamp(480px, 70vw, 640px);   */
+    max-height: 40vh;
+    overflow: auto;               /* scroll if content grows */
+  }
+  
+  /* Title & buttons a bit bigger */
+  .map-confirm-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #111827;
+    margin: 0 0 16px 0;
+    line-height: 1.35;
+    text-align: center;
+    display: flex;
+    align-items: center;         /* vertical center */
+    justify-content: center;
+    margin-top: 30px; 
+  }
+  
+  .map-confirm-actions .btn {
+    padding: 10px 16px;
+    font-size: 14px;
+  }
+  
+  /* On small screens, use almost full width */
+  @media (max-width: 640px) {
+    .map-confirm-popover {
+      /* position: fixed; */
+          /* top: 50%;
+          left: 50%; */
+          /* transform: translate(-50%, -50%); */
+          
+          /* Set the desired width */
+          min-width: 90% !important;
+          min-height: 400px;
+          /* Remove the conflicting properties */
+          /* inset: unset !important;
+          margin: unset !important; */
+          
+          /* Maintain other styles */
+          /* padding: 20px; */
+           /* or a specific value *
+   
+      /* Use new centering method */
+     
+   /* Set a maximum width to prevent it from getting too large on some phones */
+     
+      /* Ensure it's centered if you're using `width` instead of `inset: 0; margin: auto;` */
+  
+    }
+  }
+  .btn-primary {
+    background-color: #2563eb; /* blue-600 */
+    color: #fff;
+    border: none;
+  }
+  /* ADDED — scrollable container for intermediate stops */
+  .stops-scroll {
+    max-height: 240px;            /* adjust as you like */
+    overflow-y: auto;
+    padding-right: 4px;
+    margin: 0.25rem 0 0.5rem 0;
+    border-left: 2px dashed var(--border-color);
+    margin-left: 14px;            /* aligns with icon stack */
+  }
+  
+  /* ADDED — toggle link spacing */
+  .stops-toggle {
+    margin: 0.25rem 0 0.5rem 2.75rem; /* indent under icons */
+  }
+  
+  /* ADDED — pickup / drop colorways */
+  .location-item.pickup {
+    background: linear-gradient(135deg, #fff7ed, #ffedd5); /* warm/amber */
+    border: 1px solid #fed7aa;
+  }
+  
+  .location-item.drop {
+    background: linear-gradient(135deg, #fff1f2, #ffe4e6); /* rose */
+    border: 1px solid #fecaca;
+  }
+  
+  /* ADDED — pickup/drop small icon chips */
+  .location-icon.pickup-icon {
+    background-color: var(--brand-orange); /* matches warm stop */
+  }
+  
+  .location-icon.drop-icon {
+    background-color: var(--brand-red);    /* matches drop stop */
+  }
+  /* NEW: scroll area for extra destinations */
+  .dests-scroll {
+    max-height: 240px;
+    overflow-y: auto;
+    padding-right: 4px;
+    margin: 0.25rem 0 0.5rem 0;
+    border-left: 2px dashed var(--border-color);
+    margin-left: 14px;
+  }
+  
+  /* NEW: visual for non-final destinations */
+  .location-item.dest-alt {
+    background: linear-gradient(135deg, #fff1f2, #ffe4e6); /* similar to drop */
+    border: 1px solid #fecaca;
+  }
+  
+  /* (already present for intermediates; reused here) */
+  .location-icon.drop-icon {
+    background-color: var(--brand-red);
+  }
+  /* --- KPI icon badge --- */
+  .kpi-card { position: relative; } /* you already have kpi-card; ensure it can position children */
+  
+  .kpi-icon-badge {
+    position: absolute;
+    top: 0.55rem;  /* Adjust to vertically center in the top area */
+    left: 0.55rem;
+    /* top: 8px;               
+    left: 10px; */
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    box-shadow: var(--shadow-sm);
+    opacity: .95;
+  }
+  
+  .kpi-icon { width: 16px; height: 16px; }
+  
+  /* tint + icon color per card type */
+  .kpi-card.early .kpi-icon-badge       { background: #d1fae5; color: #047857; }  /* green */
+  .kpi-card.distance .kpi-icon-badge    { background: #dbeafe; color: #1d4ed8; }  /* blue  */
+  .kpi-card.on-time .kpi-icon-badge     { background: #ede9fe; color: #6b21a8; }  /* purple */
+  .kpi-card.stoppages .kpi-icon-badge   { background: #ffedd5; color: #ea580c; }  /* orange */
+  .kpi-card.deviations .kpi-icon-badge  { background: #ffe4e6; color: #e11d48; }  /* rose   */
+  .kpi-card.halt-alert .kpi-icon-badge  { background: #a8e0f4; color:#1d96e1; }  /* rose   */
+  /* CHANGED: allow badges to position over the icon wrapper */
+  
+  
+  /* NEW: generic round badge used on origin/destination icons */
+  /* .more-badge {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    border: 2px solid #fff;           
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 800;
+    line-height: 1;
+    color: #fff;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,.15);
+  } */
+  .more-badge {
+    /* position, top, and right are removed */
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    border: none; /* Removed the white border, as it's no longer an overlay */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 800;
+    line-height: 1;
+    color: #fff;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Softened the shadow slightly */
+  }
+  /* NEW: color variants to match your themes */
+  .origin-badge {
+    background: var(--brand-blue);        /* same vibe as origin */
+  }
+  .dest-badge {
+    background: var(--brand-green);       /* same vibe as destination */
+  }
+  
+  /* optional: small hover pop */
+  .more-badge:hover { transform: scale(1.06); }
+  
+  /* Fullscreen Map overlay */
+  .mapfs-backdrop {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,.45);
+    z-index: 9998;
+    backdrop-filter: blur(2px);
+  }
+  .mapfs-shell {
+    position: fixed; inset: 0;
+    z-index: 9999;
+    display: grid; place-items: center;
+    padding: 0px;
+  }
+  .mapfs-card {
+    width:  100vw;
+    height: 100vh;
+    background: #fff;
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+  }
+  
+  /* ensures the Leaflet container has space */
+  .map-host {
+    position: relative;
+    margin-top: 1rem;
+    height: clamp(320px, 45vh, 560px); /* pick a size you like */
+    /* or: height: 420px; */
+  }
+  
+  /* (optional safety) make sure Leaflet fills the box */
+  .map-host .leaflet-container {
+    height: 100% !important;
+    width: 100% !important;
+  }
+  /* Base style for all status badges */
+  .status-badge {
+    display: inline-block; /* Ensures padding and height are applied correctly */
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px; /* Creates the pill shape */
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-align: center;
+    white-space: nowrap; /* Prevents text from wrapping */
+  }
+  
+  /* --- Dynamic Color Styles --- */
+  
+  /* Default/Loading state */
+  .status-badge.loading,
+  .status-badge.unknown {
+    background-color: #e5e7eb; /* gray-200 */
+    color: #374151; /* gray-700 */
+  }
+  
+  /* Pending state */
+  .status-badge.pending {
+    background-color: #f3f4f6; /* gray-100 */
+    color: #4b5563; /* gray-600 */
+  }
+  
+  /* Allocated state */
+  .status-badge.allocated {
+    background-color: #dbeafe; /* blue-100 */
+    color: #1e40af; /* blue-800 */
+  }
+  
+  /* Accepted state */
+  .status-badge.accepted {
+    background-color: #d1fae5; /* green-100 */
+    color: #065f46; /* green-800 */
+  }
+  
+  /* Assigned state */
+  .status-badge.assigned {
+    background-color: #e0e7ff; /* indigo-100 */
+    color: #3730a3; /* indigo-800 */
+  }
+  
+  /* In Transit / At Location states */
+  .status-badge.in-transit,
+  .status-badge.at-location {
+    background-color: #fef3c7; /* amber-100 */
+    color: #92400e; /* amber-800 */
+  }
+  
+  /* Completed state */
+  .status-badge.Delivered {
+    background-color: #dcfce7; /* green-200 */
+    color: #166534; /* green-800 */
+  }
+  
+  /* Cancelled / Error states */
+  .status-badge.cancelled,
+  .status-badge.error {
+    background-color: #fee2e2; /* red-100 */
+    color: #991b1b; /* red-800 */
+  }
+  .scrollable-container {
+    max-height: 450px; /* Set a fixed height for the container */
+    overflow-y: auto;  /* Enable vertical scrolling */
+    padding-right: 0.3rem; /* Add padding to prevent the scrollbar from touching content */
+  }
+  /* --- Fullscreen Map Exit Button --- */
+  /* .mapfs-exit-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 10000; 
+    
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    
+    background-color: var(--text-primary);
+    color: white;
+    
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    
+    transition: all 0.2s ease;
+    box-shadow: var(--shadow-lg);
+  } */
+  
+  /* .mapfs-exit-btn:hover {
+    transform: translateY(-2px);
+    background-color: #000; 
+  } */
+  /* In your triptracker.css file */
+  /* .mapfs-exit-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 10000;
+    
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    
+  
+    background-color: rgba(29, 41, 59, 0.8); 
+    backdrop-filter: blur(8px);
+    
+    color: white;
+    
+    padding: 0.5rem 1rem;
+  
+    border-radius: 9999px; 
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    
+    transition: all 0.2s ease;
+    box-shadow: var(--shadow-lg);
+  }
+  
+  .mapfs-exit-btn:hover {
+  
+    transform: scale(1.05);
+    background-color: rgba(0, 0, 0, 0.9);
+  } */
+  .mapfs-exit-btn {
+    position: absolute;
+    top: 20px;
+    right: 7px;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    
+    background-color: rgba(255, 255, 255, 0.9); /* HIGHLIGHT: A semi-transparent white */
+    backdrop-filter: blur(8px);
+    
+    color: #111827; /* HIGHLIGHT: Dark text for contrast */
+    
+    padding: 0.3rem 0.8rem;
+    border-radius: 9999px; 
+    border: 1px solid rgba(0, 0, 0, 0.1); /* HIGHLIGHT: A thin, subtle dark border */
+    
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* HIGHLIGHT: Softer shadow */
+  }
+  
+  .mapfs-exit-btn:hover {
+    transform: translateY(-2px); /* HIGHLIGHT: A subtle lift effect */
+    background-color: #fff; /* HIGHLIGHT: A solid white on hover */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* HIGHLIGHT: Slightly larger shadow on hover */
+  }
+  /* Make the frame a positioning container for the spinner */
+  .doc-image-frame {
+    position: relative;
+    /* ... your other styles ... */
+  }
+  
+  /* Styles for the loader overlay */
+  .pdf-loader {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: #f9fafb; /* A light background */
+    z-index: 10;
+    gap: 1rem;
+    color: var(--text-secondary);
+  }
+  
+  /* Spinner animation */
+  .spinner {
+    border: 4px solid rgba(0,0,0,.1);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border-left-color: var(--primary-color);
+    animation: spin 1s linear infinite;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  /* Progress bar pulse animation */
+  @keyframes progressPulse {
+    0% { 
+      opacity: 0.8;
+      box-shadow: 0 0 10px rgba(34, 197, 94, 0.3);
+    }
+    100% { 
+      opacity: 1;
+      box-shadow: 0 0 20px rgba(34, 197, 94, 0.6);
+    }
+  }

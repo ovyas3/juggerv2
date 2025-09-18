@@ -1,0 +1,542 @@
+/* Layout & container */
+.container { position: relative; width: 100%; height: 100%;}
+
+/* Generic center helpers */
+.centerCol { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+
+/* Initial loading */
+.loadingWrap { width: 100%; height: 100%; background: #f3f4f6; display: flex; align-items: center; justify-content: center; }
+.spinnerSm { width: 32px; height: 32px; border-radius: 9999px; border: 3px solid #e5e7eb; border-top-color: #2563eb; animation: spin 1s linear infinite; margin: 0 auto 8px; }
+.muted { color: #6b7280; font-size: 14px; }
+
+/* ThreeD loader overlay */
+.overlayFixedDark { position: fixed; inset: 0; background: #0f172a; display: flex; align-items: center; justify-content: center; z-index: 999; }
+.spinnerLg { width: 48px; height: 48px; border-radius: 9999px; border: 3px solid #4c1d95; border-bottom-color: transparent; animation: spin 0.8s linear infinite; margin: 0 auto 14px; }
+.overlayTextLg { color: #fff; font-size: 18px; }
+
+/* Animations */
+@keyframes spin { to { transform: rotate(360deg); } }
+.container > .leaflet-container {
+  pointer-events: auto;
+}
+/* Popup content */
+.popup { font-size: 13px; color: #111827; min-width: 160px; }
+.popupTitle { font-weight: 600; margin-bottom: 6px; }
+.popupTitleDivider { padding-bottom: 8px; border-bottom: 1px solid #e5e7eb; margin-bottom: 10px; }
+.titleGreen { color: #16a34a; }
+.titleRed { color:#ef4444; }
+.titleDes { color:#f97316; }
+.titleBlue { color: #1d4ed8; }
+.titleOrange { color: #f59e0b; }
+.popupBody { margin: 2px 0; }
+.popupMeta { font-size: 11px; color: #6b7280; margin-top: 4px; }
+.textGreen { color: #16a34a; }
+
+/* Metric rows in deviation popup */
+.metricRow { display: flex; justify-content: space-between; align-items: flex-start; margin: 4px 0; }
+.metricRowTop { padding-top: 6px; border-top: 1px solid #f3f4f6; }
+.metricKey { color: #6b7280; font-size: 11px; }
+.metricVal { color: #111827; font-weight: 700; font-size: 11px; margin-left: 8px; text-align: right; }
+
+/* Buttons (generic) */
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; font-size: 12px; border-radius: 6px; border: none; cursor: pointer; }
+.btnGreen { background: #16a34a; color: #fff; }
+.btnRed   { background: #ef4444; color: #fff; }
+.btnBlue  { background: #2563eb; color: #fff; }
+.btnGray  { background: #6b7280; color: #fff; }
+.btnSlate { background: #475569; color: #fff; width: 100%; padding: 8px 12px; }
+
+.btnGreenSm { background: #16a34a; color: #fff; padding: 4px 8px; font-size: 11px; border-radius: 6px; }
+.btnRedSm   { background: #ef4444; color: #fff; padding: 4px 8px; font-size: 11px; border-radius: 6px; }
+.btnBlueSm  { background: #2563eb; color: #fff; padding: 4px 8px; font-size: 11px; border-radius: 6px; }
+.btnGraySm  { background: #6b7280; color: #fff; padding: 4px 8px; font-size: 11px; border-radius: 6px; }
+
+.iconXs { width: 12px; height: 12px; }
+/* .iconSm { width: 16px; height: 16px; }
+.iconSm:hover { width: 16px; height: 16px; transition: opacity 0.2s ease-in-out;  }
+.iconBtnPlain:hover .iconSm {
+  opacity: 0.7 !important; 
+} */
+ /* kepler-map.module.css */
+
+.iconSm { 
+  width: 16px; 
+  height: 16px; 
+  /* Add the transition property here for a smooth effect */
+  transition: opacity 0.2s ease-in-out, color 0.2s ease-in-out; 
+  /* Ensure the default opacity is 1 */
+  opacity: 1;
+  /* Set the default color */
+  color: #000; /* Use a default color like black or a variable */
+}
+
+/* Explicitly target the icon when it's hovered */
+.iconSm:hover {
+  opacity: 0.7;
+  color:#000 ; /* Add a hover color, e.g., red */
+}
+
+/* Also target the icon when its parent button is hovered */
+.iconBtnPlain:hover .iconSm {
+  opacity: 0.7;
+  color:#000 ; /* Add a hover color, e.g., red */
+}
+/* Replay block inside popup */
+.replayBlock { border-top: 1px solid #e5e7eb; padding-top: 10px; }
+.replayTitle { font-size: 12px; font-weight: 600; color: #374151; margin-bottom: 8px; }
+.replayRow { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+.replayControls { display: flex; flex-direction: column; gap: 8px; }
+.replaySpeed { display: flex; align-items: center; gap: 8px; }
+.selectXs { font-size: 12px; padding: 2px 6px; border: 1px solid #d1d5db; border-radius: 6px; }
+@media (max-width: 640px) {
+  .replayPanel {
+    /* Position at the bottom of the screen */
+    /* top: auto; */
+    bottom: 100px;
+    left: 20px;
+    right: 20px;
+    width: 100px  !important;
+  
+ /* Take up the full width minus padding */
+   
+    padding: 6px !important;
+    flex-direction: row; /* Change to a horizontal layout */
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .replayHead {
+    /* Hide the header title to save space */
+    display: none;
+  }
+
+  .replayBody {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .replayRow {
+    flex-wrap: wrap; /* Allow buttons to wrap if needed */
+    justify-content: center;
+    margin-bottom: 0.5;
+  }
+  .replaySpeedControl {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: #f1f5f9; /* Light slate background */
+    border-radius: 10.575rem; /* Rounded corners */
+    padding: 0.15rem;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05); 
+  }
+  
+  .speedLabel {
+    font-size: 0.875rem;
+    color: #4a5568;
+    white-space: nowrap;
+  }
+  .speedSelect {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-color: transparent;
+    border: none;
+    font-size: 0.75rem; /* Smaller font size */
+    font-weight: 600; /* Semi-bold font */
+    color: #334155; /* Dark slate text color */
+    padding: 0.0rem 0.0rem;
+    cursor: pointer;
+    outline: none;
+    border-radius: 0.25rem;
+    transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  }
+  
+  /* .speedSelect {
+    flex-grow: 1;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    border: 1px solid #cbd5e0;
+    font-size: 0.875rem;
+    background-color: #f8fafc;
+    color: #4a5568;
+    cursor: pointer;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: url('data:image/svg+xml;utf8,<svg fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" fill-rule="evenodd"></path></svg>');
+    background-repeat: no-repeat;
+    background-position: right 0.5rem center;
+    background-size: 1.2rem;
+  } */
+  
+  .speedSelect:focus {
+    outline: none;
+    border-color: #4299e1;
+    box-shadow: 0 0 0 2px rgba(66, 153, 225, 0.5);
+  }
+  .replayRow .btn {
+    padding: 4px 6px; /* Smaller buttons */
+    font-size: 14px;
+    
+  }
+
+  .progressText {
+    display: none; /* Hide the text to save vertical space */
+  }
+
+  /* Adjust the stop button to be more compact on mobile */
+  .replayRow .btnGray {
+    order: 2; /* Move it to the end */
+  }
+}
+
+.progressTrack { width: 100%; height: 8px; border-radius: 9999px; background: #e5e7eb; overflow: hidden; }
+.progressBar { height: 8px; border-radius: 9999px; background: #2563eb; transition: width 100ms linear; }
+.progressText { font-size: 12px; color: #6b7280; text-align: center; }
+
+/* Magnifier */
+.magnifier {
+  position: absolute; z-index: 1001; border: solid #3b82f6;cursor: grab;   border-radius: 9999px;
+  overflow: hidden; background: #fff; box-shadow: 0 25px 50px rgba(0,0,0,.25);
+  /* pointer-events: none; */
+}
+.magnifierInner { position: relative; width: 100%; height: 100%; pointer-events: none; outline: 2px solid red; }
+.magnifierBorder { position: absolute; inset: 0; border: 2px solid #fff; border-radius: 9999px; pointer-events: none; }
+.magnifierBadge { position: absolute; top: 8px; right: 8px; background: #3b82f6; color: #fff; font-size: 11px; padding: 2px 6px; border-radius: 6px; font-weight: 700; box-shadow: 0 10px 15px rgba(0,0,0,.2); }
+.crosshair { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); pointer-events: none; }
+.crosshairH { width: 24px; height: 2px; background: #3b82f6; box-shadow: 0 2px 6px rgba(0,0,0,.3); }
+.crosshairV { position: absolute; left: 50%; top: 0; transform: translate(-50%, -50%); width: 2px; height: 24px; background: #3b82f6; box-shadow: 0 2px 6px rgba(0,0,0,.3); }
+.coordBadge { position: absolute; bottom: 8px; left: 8px; background: rgba(0,0,0,.7); color: #fff; font-size: 11px; padding: 2px 6px; border-radius: 4px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+
+/* Marker chips & deviation dot (used inside DivIcon HTML) */
+.markerChip {
+  color: #fff; width: 30px; height: 30px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 14px; border: 3px solid #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,.3);
+}
+.vehicleEmoji { font-size: 24px; filter: drop-shadow(2px 2px 4px rgba(0,0,0,.5)); }
+.devDot { width: 12px; height: 12px; background: #ef4444; border-radius: 9999px; border: 2px solid #fff; box-shadow: 0 2px 4px rgba(0,0,0,.3); }
+
+/* Magnifier settings panel */
+.magnifierPanel {
+  position: absolute; top: 16px; left: 16px; background: #0f172a; color: #fff;
+  padding: 12px; border-radius: 10px; box-shadow: 0 20px 25px rgba(0,0,0,.25); z-index: 1002; min-width: 240px;
+}
+.magnifierPanelHeader { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.iconBtnPlain { background: transparent; border: none; color: #94a3b8; cursor: pointer; }
+.iconBtnPlain:hover { color: #fff; }
+.panelBody { display: flex; flex-direction: column; gap: 10px; }
+.panelRowHead { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+.monoBadge { background: #1f2937; padding: 2px 6px; border-radius: 6px; font-size: 10px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+.slider { width: 100%; height: 8px; background: #475569; border-radius: 9999px; appearance: none; cursor: pointer; }
+.slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 14px; height: 14px; border-radius: 9999px; background: #60a5fa; border: 2px solid #fff; }
+.slider::-moz-range-thumb { width: 14px; height: 14px; border-radius: 9999px; background: #60a5fa; border: 2px solid #fff; }
+.magnifier:active {
+  cursor: grabbing;
+}
+/* HIGHLIGHT: New CSS class to hide the element */
+.hideOnSettings {
+  display: none !important;
+}
+.mapWrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+/* Live status */
+.statusOverlay {
+  width: 250px;
+  position: absolute; top: 16px; left: 16px; background: rgba(255,255,255,.95);
+  backdrop-filter: saturate(1.2) blur(2px);
+  border: 1px solid #e5e7eb; border-radius: 10px; padding: 12px;
+  box-shadow: 0 10px 15px rgba(0,0,0,.1); z-index: 1000; max-width: 200px;
+  transition: left .3s ease;
+}
+.statusOverlay.smallText .statusTitle {
+  font-size: 10px; /* Reduce the title size */
+}
+
+.statusOverlay.smallText .statusItem span {
+  font-size: 10px; /* Reduce the content size for smaller screens */
+}
+
+.statusShift { left: 320px; }
+/* .smallText { font-size: 12px; } */
+.smallText {
+  width: 150px; /* Adjust as needed */
+  height: auto; /* Or set a specific height */
+  padding: 8px; /* Reduce padding */
+  max-width: 150px;
+  font-size: 0.8em; /* Make text smaller */
+}
+.statusTitle { font-size: 14px; font-weight: 600; color: #1f2937; margin-bottom: 8px; }
+.statusList { display: flex; flex-direction: column; gap: 6px; }
+.statusItem { display: flex; align-items: center; gap: 8px; }
+.statusSplit { border-top: 1px solid #e5e7eb; padding-top: 4px; margin-top: 4px; }
+.dot { width: 8px; height: 8px; border-radius: 9999px; }
+.dotGreen { background: #22c55e; }
+.dotBlue { background: #3b82f6; }
+.dotOrange { background: #f59e0b; }
+.dotBluePulse { background: #3b82f6; animation: pulse 1.2s infinite; }
+.dotPurplePulse { background: #8b5cf6; animation: pulse 1.2s infinite; }
+@keyframes pulse { 0%, 100% { opacity: .5; } 50% { opacity: 1; } }
+.mutedXs { color: #6b7280; font-size: 12px; }
+
+/* Top-right controls */
+.topRightControls { position: absolute; top: 60px; right: 10px; display: flex; flex-direction: column;
+    gap: 8px; z-index: 1000; }
+.iconBtn {
+  width: 40px; height: 40px; background: #fff; border: 1px solid #e5e7eb; border-radius: 10px;
+  display: grid; place-items: center; box-shadow: 0 8px 20px rgba(0,0,0,.12); transition: background .15s;
+  cursor: pointer; color: #374151;
+}
+/* .iconBtn:hover { background: #f8fafc; } */
+.iconBtnActiveBlue   { background: #3b82f6; color: #fff; border-color: #3b82f6; }
+.iconBtnActivePurple { background: #8b5cf6; color: #fff; border-color: #8b5cf6; }
+.iconBtnActiveIndigo { background: #6366f1; color: #fff; border-color: #6366f1; }
+
+/* Map style selector */
+.mapStyleSelector { position: absolute; top: 64px; right: 16px; z-index: 1010; }
+.mapStyleHeader { background: #111827; color: #fff; border-radius: 10px 10px 0 0; padding: 10px 12px; display: flex; align-items: center; justify-content: space-between; }
+.styleList { background: #1f2937; padding: 10px; border-radius: 0 0 10px 10px; max-width: 280px; max-height: 260px; overflow-y: auto; }
+.styleItem { width: 100%; display: flex; align-items: center; gap: 12px; padding: 8px; border-radius: 8px; background: transparent; border: none; color: #d1d5db; text-align: left; cursor: pointer; }
+.styleItem:hover { background: #374151; }
+.styleItemActive { background: #4b5563; outline: 2px solid #fff; }
+.styleSwatch { width: 32px; height: 32px; border-radius: 6px; border: 2px solid #475569; flex-shrink: 0; }
+.styleName { font-size: 13px; }
+
+/* Bottom-left satellite button */
+.bottomLeft { position: absolute; left: 16px; bottom: 16px; z-index: 1000; }
+.satelliteBtn {
+  display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 10px;
+  background: #fff; border: 1px solid #e5e7eb; color: #374151; box-shadow: 0 8px 20px rgba(0,0,0,.12); cursor: pointer;
+}
+.satelliteBtn:hover { background: #f9fafb; }
+.satelliteActive { background: #eff6ff; border-color: #93c5fd; color: #1d4ed8; }
+
+/* Replay floating panel */
+.replayPanel {
+  position: absolute; left: 10px; bottom: 16px; z-index: 801;
+  background: rgba(255,255,255,.95); border: 1px solid #e5e7eb; border-radius: 10px; padding: 16px; min-width: 280px;
+  box-shadow: 0 12px 20px rgba(0,0,0,.12);
+}
+.replayHead { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.replayHeadTitle { font-size: 14px; font-weight: 600; color: #1f2937; }
+.replayBody { display: flex; flex-direction: column; gap: 10px; }
+
+/* Right-side vertical controls */
+.sideControls { position: absolute;
+     /* right: 80px; top: 18rem; */
+     top: 15px;         /* 16px (top padding) + ~40px (icon row) + 8px gap */
+  right: 15px;   display: flex; flex-direction: row; gap: 8px; z-index: 1000; }
+.sideBtn {
+  color: #fff; padding: 5px 7px; font-size: 11px; display: flex; align-items: center; gap: 6px; min-width: 50px;
+  justify-content: flex-start; border-radius: 8px; box-shadow: 0 10px 20px rgba(0,0,0,.2); cursor: pointer; border: none;
+}
+.sideBtnGreen { background: #16a34a; }
+.sideBtnBlue  { background: #2563eb; }
+.sideBtnRed   { background: #ef4444; }
+.sideBtnGray  { background: #5a5655; }
+.sideBtnPurple{ background: #392153;}
+.sideBtnFastag{background: #3351FE;}
+.sideBtnPink{background:#b066fa;}
+.sideBtnOrange{background:#EA580B;}
+
+.mapEmoji svg {
+  width: 35px;
+  height: 35px;
+}
+.mapEmoji {
+  /* Set the color of the icon */
+  color: #800080; /* A dark blue color, for example */
+}
+.sideDotBox { width: 12px; height: 12px; background: rgba(255,255,255,.3); border-radius: 4px; display: flex; align-items: center; justify-content: center; }
+.sideSquare { width: 8px; height: 8px; border: 1px solid #fff; border-radius: 2px; }
+
+/* Utility */
+.small { font-size: 12px; }
+/* kepler-map.module.css */
+
+/* ... add this new class at the end of the file ... */
+
+.sideControlsFullscreen {
+    /* Reposition to the top right */
+    top: 70px;
+    bottom: auto; /* Remove the bottom positioning */
+    right: 55px;
+    /* Stack the buttons vertically */
+    flex-direction: column;
+    
+    /* Remove the panel styling for a floating look */
+    background: none;
+    backdrop-filter: none;
+    box-shadow: none;
+    padding: 0;
+  }
+/* Style for the horizontal line */
+.divider {
+  border: none;
+  height: 1px;
+  background-color: #e2e8f0; /* A light gray color */
+  margin: 8px 0 12px 0; /* Adds space above and below the line */
+}
+
+/* Update popupBody to use flexbox for alignment */
+.popupBody {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px; /* Space between each row */
+  gap: 16px; /* Ensures a gap between label and value */
+}
+
+/* Style for the labels (e.g., "Duration:") */
+.popupLabel {
+  font-weight: 500; /* Makes it less bold than the value */
+  color: #64748b;   /* A secondary text color */
+  font-size: 0.9rem;
+}
+
+/* Style for the values (the actual data) */
+.popupValue {
+  font-weight: 600;
+  color: #1e293b; /* A primary text color */
+  text-align: right;
+}
+.sideControlsMobile {
+  top: auto;
+  bottom: 120px;
+  right: 85%;
+  transform: translateX(50%);
+  flex-direction: column;
+  padding: 10px;
+
+  border-radius: 12px;
+
+}
+
+.sideControlsMobile .sideBtn {
+  padding: 8px 10px;
+}
+
+@media (max-width: 640px) {
+  .sideControls {
+      /* This will be handled by sideControlsMobile */
+      /*
+      top: auto; 
+      right: auto;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      flex-direction: row;
+      */
+  }
+}
+
+/* Day Run Table */
+.dayRunTable {
+  position: absolute;
+  top: 290px;
+  left: 16px;
+  width: 250px;
+  background: rgba(255,255,255,.95);
+  backdrop-filter: saturate(1.2) blur(2px);
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  box-shadow: 0 10px 15px rgba(0,0,0,.1);
+  max-height: 300px;
+  overflow: hidden;
+  z-index: 1000;
+  transition: left .3s ease;
+}
+
+.tableHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  border-bottom: 1px solid #e5e7eb;
+  background: rgba(249,250,251,.8);
+}
+
+.tableHeader h3 {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.dayRunTable.smallText .tableHeader h3 {
+  font-size: 10px;
+}
+
+.dayRunTable.smallText .table {
+  font-size: 10px;
+}
+
+.dayRunTable.smallText .table th,
+.dayRunTable.smallText .table td {
+  padding: 6px 8px;
+}
+
+.tableContent {
+  overflow-y: auto;
+  max-height: 240px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.table th {
+  background: #f9fafb;
+  color: #6b7280;
+  font-weight: 600;
+  padding: 8px 12px;
+  text-align: left;
+  border-bottom: 1px solid #e5e7eb;
+  position: sticky;
+  top: 0;
+}
+
+.table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid #f3f4f6;
+  color: #111827;
+}
+
+.table tr:hover {
+  background: #f9fafb;
+}
+
+.table tr:last-child td {
+  border-bottom: none;
+}
+
+.iconBtnPlain {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #6b7280;
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.iconBtnPlain:hover {
+  background: #f3f4f6;
+  color: #111827;
+}
+
+.iconSm {
+  width: 16px;
+  height: 16px;
+}
