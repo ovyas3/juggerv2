@@ -249,6 +249,7 @@
 }
 /* Live status */
 .statusOverlay {
+  width: 250px;
   position: absolute; top: 16px; left: 16px; background: rgba(255,255,255,.95);
   backdrop-filter: saturate(1.2) blur(2px);
   border: 1px solid #e5e7eb; border-radius: 10px; padding: 12px;
@@ -434,4 +435,108 @@
       flex-direction: row;
       */
   }
+}
+
+/* Day Run Table */
+.dayRunTable {
+  position: absolute;
+  top: 290px;
+  left: 16px;
+  width: 250px;
+  background: rgba(255,255,255,.95);
+  backdrop-filter: saturate(1.2) blur(2px);
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  box-shadow: 0 10px 15px rgba(0,0,0,.1);
+  max-height: 300px;
+  overflow: hidden;
+  z-index: 1000;
+  transition: left .3s ease;
+}
+
+.tableHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  border-bottom: 1px solid #e5e7eb;
+  background: rgba(249,250,251,.8);
+}
+
+.tableHeader h3 {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.dayRunTable.smallText .tableHeader h3 {
+  font-size: 10px;
+}
+
+.dayRunTable.smallText .table {
+  font-size: 10px;
+}
+
+.dayRunTable.smallText .table th,
+.dayRunTable.smallText .table td {
+  padding: 6px 8px;
+}
+
+.tableContent {
+  overflow-y: auto;
+  max-height: 240px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.table th {
+  background: #f9fafb;
+  color: #6b7280;
+  font-weight: 600;
+  padding: 8px 12px;
+  text-align: left;
+  border-bottom: 1px solid #e5e7eb;
+  position: sticky;
+  top: 0;
+}
+
+.table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid #f3f4f6;
+  color: #111827;
+}
+
+.table tr:hover {
+  background: #f9fafb;
+}
+
+.table tr:last-child td {
+  border-bottom: none;
+}
+
+.iconBtnPlain {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #6b7280;
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.iconBtnPlain:hover {
+  background: #f3f4f6;
+  color: #111827;
+}
+
+.iconSm {
+  width: 16px;
+  height: 16px;
 }
