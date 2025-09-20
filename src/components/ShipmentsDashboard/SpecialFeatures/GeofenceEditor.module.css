@@ -1,0 +1,138 @@
+.dialogMain {
+  width: 928px;
+  height: 642px;
+  overflow: hidden;
+  font-family: 'Inter', sans-serif;
+  border-radius: 16px;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  height: 80px;
+  padding-left: 16px;
+  justify-content: space-between;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.label {
+  font-size: 20px;
+  color: #42454E;
+  font-weight: bold;
+}
+
+.section {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  border-radius: 16px;
+}
+
+.left {
+  flex: 0.56;
+  height: 642px;
+  position: relative;
+}
+
+.right {
+  flex: 0.44;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: #fff;
+  padding: 16px;
+  overflow-y: auto;
+}
+
+.formGroup {
+  margin-bottom: 20px;
+}
+
+.inputField {
+  width: 100%;
+  height: 36px;
+  border: solid 1px #dddddc;
+  border-radius: 4px;
+  padding: 0 12px;
+  font-size: 14px;
+  color: #131722;
+  outline: none;
+}
+
+.selectField {
+  width: 100%;
+  height: 36px;
+  border: solid 1px #DFE3EB;
+  border-radius: 4px;
+  font-size: 14px;
+  color: #71747A;
+  padding: 0 12px;
+}
+
+.divider {
+  color: #DFE3EB;
+  border-top: 1px solid #DFE3EB;
+  margin-bottom: 20px;
+  gap: 12px;
+}
+
+.horizontalRuler {
+  border: none;
+  border-top: 1px solid #DFE3EB;
+  margin: 20px 0;
+}
+
+.locationDetails {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 12px 16px;
+  background-color: #fff;
+  border-radius: 4px;
+  border: 1px solid #F0F3F9;
+  justify-content: space-between;
+}
+
+.locationName {
+  font-size: 16px;
+  color: #42454E;
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+
+.locationArea {
+  font-size: 12px;
+  color: #71747A;
+}
+
+.deleteIconBtn {
+  color: #E53935;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+.dialogFooterBtn {
+  width: 100%;
+  height: 44px;
+  background-color: #2962FF;
+  color: #FFFFFF;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  margin-top: 20px;
+  margin-bottom: 8px;
+  transition: background 0.2s;
+}
+
+.dialogFooterBtn:disabled {
+  background-color: #E0E0E0;
+  color: #9E9E9E;
+  cursor: not-allowed;
+}

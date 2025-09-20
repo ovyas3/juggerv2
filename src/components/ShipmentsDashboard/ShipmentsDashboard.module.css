@@ -289,47 +289,49 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 6px 14px;
-  border-radius: 16px;
-  /* Set border to the maximum width (1.8px) in the default state */
-  border: 1.8px solid #d8dbdf;
-  background-color: #f1f5f9;
+  padding: 0px 24px;
+  border-radius: 18px;
+  border: 2px solid;
+  background: transparent;
   font-size: 13px;
   font-weight: 500;
   color: #3c4043;
   cursor: pointer;
   transition: all 0.2s ease-in-out;
+  position: relative;
+  overflow: hidden;
 }
 
-.filterButton:hover {
-  background-color: #f1f3f4;
-  border-color: #c6cace; /* Only change color on hover */
+
+
+.filterButton:hover, .filterButton:focus {
+  background-color: var(--filter-color-10);
+  /* transform: translateY(-2px); */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .filterButton.selected {
-  /* On selection, only change the border-color, not its width */
-  border-color: #673ab7;
-  background-color: #ede7f6;
-  color: #5e35b1;
+  background-color: var(--filter-color-20);
+  /* font-weight: 600; */
+  /* transform: translateY(-1px); */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.filterCount {
-  font-weight: 600;
-  background-color: #e8eaed;
-  border-radius: 10px;
-  padding: 2px 8px;
-  font-size: 12px;
-  min-width: 18px;
-  text-align: center;
-  /* Add a transparent border to reserve space */
-  border: 1px solid transparent;
+.filterButton::after {
+  /* content: ''; */
+  display: block;
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 4px;
+  height: 2px;
+  border-radius: 2px;
+  background: transparent;
+  transition: background 0.25s cubic-bezier(.4,0,.2,1);
 }
 
-.filterButton.selected .filterCount {
-  /* On selection, give the border a color */
-  border-color: #7c3aed;
-  color: white;
-  background-color: #7c3aed;
+.filterButton:active {
+  transform: translateY(0);
 }
 
 

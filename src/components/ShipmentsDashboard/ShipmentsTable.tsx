@@ -82,6 +82,9 @@ interface ShipmentsTableProps {
   openLocationsPopup: any;
   formatCurrency: (amount: number) => string;
   renderLastLocationCell: (shipment: Shipment) => React.ReactNode;
+  actionMenuOpenId: string | null;
+  setActionMenuOpenId: (id: string | null) => void;
+  closeActionMenu: () => void;
   // onViewDetails: (shipment: Shipment) => void;
   // onShare: (shipment: Shipment) => void;
   // onSendEmail: (shipment: Shipment) => void;
@@ -118,6 +121,9 @@ export const ShipmentsTable: React.FC<ShipmentsTableProps> = ({
   copyDestinationCode,
   openLocationsPopup,
   formatCurrency,
+  actionMenuOpenId,
+  setActionMenuOpenId,
+  closeActionMenu,
   // onViewDetails,
   // onShare,
   // onSendEmail,
@@ -246,7 +252,7 @@ export const ShipmentsTable: React.FC<ShipmentsTableProps> = ({
             <th
               className={`${styles.matHeaderCell} ${styles.matColumnDriverPhone}`}
             >
-              Driver Phone
+              Phone
             </th>
             <th className={`${styles.matHeaderCell} ${styles.matColumnEpod}`}>
               EPOD
@@ -463,11 +469,17 @@ export const ShipmentsTable: React.FC<ShipmentsTableProps> = ({
                   className={`${styles.cellActions} ${styles.matColumnActions} ${styles.stickyRight}`}
                 >
                   <div className={styles.quickActions}>
-                    <DropdownMenu>
+                    <DropdownMenu
+                      open={actionMenuOpenId === shipment._id}
+  onOpenChange={(open) => {
+    setActionMenuOpenId(open ? shipment._id : null);
+  }}
+                    >
                       <DropdownMenuTrigger asChild>
                         <button
                           className={styles.actionsMenuButton}
                           title="More actions"
+                          onClick={() => setActionMenuOpenId(shipment._id)}
                         >
                           <MoreHorizontal className={styles.actionIcon} />
                         </button>
@@ -529,11 +541,14 @@ export const ShipmentsTable: React.FC<ShipmentsTableProps> = ({
                                           key={index}
                                           className={styles.actionMenuItem}
                                           onSelect={(e) => {
-                                            e.preventDefault();
-                                            if (item.onClick) {
-                                              item.onClick(shipment);
-                                            }
-                                          }}
+    e.preventDefault();
+    console.log("DropdownMenuItem onSelect triggered for:", item.label);
+    closeActionMenu();
+    console.log("closeActionMenu called from DropdownMenuItem");
+    if (item.onClick) {
+      item.onClick(shipment);
+    }
+  }}
                                         >
                                           <IconComponent
                                             className={`${

@@ -1,4 +1,5 @@
-.overlay {
+/* Modal Overlay */
+.modalOverlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -11,149 +12,382 @@
   z-index: 1000;
 }
 
-.modal {
+/* Main Dialog Container */
+.dialogMissedEvent {
   background: white;
   border-radius: 8px;
-  width: 500px;
+  width: 520px;
   max-width: 90%;
   max-height: 90vh;
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  animation: modalSlideIn 0.3s ease-out;
 }
 
-.header {
-  padding: 16px 24px;
-  border-bottom: 1px solid #e0e0e0;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.title {
-  font-size: 18px;
-  font-weight: 500;
-  color: #333;
-}
-
-.closeButton {
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: #666;
-  padding: 4px;
-}
-
-.body {
+/* Dialog Body */
+.dialogBody {
   padding: 20px;
   overflow-y: auto;
   flex: 1;
 }
 
-.formGroup {
+/* Driver Details Section */
+.driverDetailsSec {
   margin-bottom: 20px;
 }
 
-.inputContainer {
+/* Main Width Container */
+.mwgContainer {
+  width: 100%;
+}
+
+/* Search Details Section */
+.searchDetailsSec {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Form Item Container */
+.item {
+  width: 100%;
+}
+
+/* Input Container with Floating Label */
+.input {
   position: relative;
   margin-bottom: 16px;
 }
 
-.selectField {
+/* Input Field Styling */
+.inputField {
   width: 100%;
-  padding: 12px;
+  padding: 12px 16px;
   border: 1px solid #ddd;
   border-radius: 4px;
   font-size: 16px;
   background-color: white;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
+}
+
+.inputField:focus {
+  outline: none;
+  border-color: #4F46E5;
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+}
+
+.inputField:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* Select Field Specific Styling */
+.inputField[type="select-one"],
+.inputField select,
+select.inputField {
   appearance: none;
   background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23007CB2%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
   background-repeat: no-repeat;
   background-position: right 0.7rem top 50%;
   background-size: 0.65rem auto;
+  color: #666 !important;
+  cursor: pointer;
 }
 
-.inputField {
-  width: 100%;
-  padding: 12px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 16px;
-}
-
+/* Floating Label */
 .floatingLabel {
   position: absolute;
   left: 12px;
   top: -8px;
   font-size: 12px;
+  font-weight: 500;
   background: white;
   padding: 0 4px;
   color: #666;
+  pointer-events: none;
 }
 
-.warningText {
-  color: #d32f2f;
-  font-size: 12px;
-  margin-top: 4px;
+/* Fetch Section */
+.fetchSection {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
-.fetchButton {
-  background: #f5f5f5;
-  border: 1px solid #ddd;
+/* Fetch Button */
+.fetchBtn {
+  color: #fff;
+  background: #4F46E5;
+  border: 1px solid #4F46E5;
   border-radius: 4px;
-  padding: 8px 16px;
+  padding: 10px 20px;
   cursor: pointer;
   font-size: 14px;
-  transition: background-color 0.2s;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  align-self: flex-start;
 }
 
-.fetchButton:hover:not(:disabled) {
-  background: #e0e0e0;
+.fetchBtn:hover:not(:disabled) {
+  background: #433DE8;
+  border-color: #433DE8;
 }
 
-.fetchButton:disabled {
-  opacity: 0.6;
+.fetchBtn:disabled {
+  opacity: 0.9;
   cursor: not-allowed;
+  background: #9fa8da;
+  border-color: #9fa8da;
+  color: #fff;
 }
 
-.dataContainer {
-  margin-top: 20px;
-}
-
-.dataTextarea {
-  width: 100%;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  padding: 12px;
-  font-family: monospace;
-  resize: vertical;
-  min-height: 120px;
-}
-
-.footer {
+/* Dialog Footer */
+.dialogFooter {
   padding: 16px 24px;
   border-top: 1px solid #e0e0e0;
   display: flex;
   justify-content: flex-end;
+  background: #fafafa;
 }
 
-.submitButton {
+/* Footer Submit Button */
+.dialogFooterBtn {
   background: #4F46E5;
   color: white;
   border: none;
   border-radius: 4px;
-  padding: 8px 24px;
+  padding: 10px 24px;
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.2s ease;
+  min-width: 80px;
 }
 
-.submitButton:hover:not(:disabled) {
+.dialogFooterBtn:hover:not(:disabled) {
   background: #433DE8;
+  /* transform: translateY(-1px); */
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3);
 }
 
-.submitButton:disabled {
+.dialogFooterBtn:disabled {
   background: #9fa8da;
   cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Warning Text Styling */
+.warningText {
+  color: #d32f2f;
+  font-size: 10px;
+  font-family: 'Inter', sans-serif;
+  padding-left: 8px;
+  padding-bottom: 20px;
+  margin-top: -10px;
+}
+
+/* Data Container */
+.dataContainer {
+  margin-top: 20px;
+}
+
+/* Data Textarea Styling */
+.dataTextarea {
+  width: 100%;
+  height: 108px;
+  border: 1px solid black;
+  border-radius: 4px;
+  padding: 8px;
+  font-family: monospace;
+  font-size: 12px;
+  resize: vertical;
+  background: #ffffff;
+  opacity: 1;
+  box-sizing: border-box;
+}
+
+.dataTextarea:focus {
+  outline: none;
+  border-color: #4F46E5;
+}
+
+/* Select Component Styles */
+.select {
+  width: 100%;
+  min-height: 36px;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  font-size: 14px;
+  background-color: white;
+  transition: all 0.3s;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+}
+
+.select:hover {
+  border-color: #4F46E5;
+}
+
+.select:focus-within {
+  border-color: #4F46E5;
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+  outline: none;
+}
+
+.select[data-state="open"] {
+  border-color: #4F46E5;
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+}
+
+.selectContent {
+  background: white;
+  border-radius: 6px;
+  box-shadow: 0 3px 6px -4px rgba(0, 0, 0, 0.12), 
+              0 6px 16px 0 rgba(0, 0, 0, 0.08), 
+              0 9px 28px 8px rgba(0, 0, 0, 0.05);
+  padding: 4px;
+  z-index: 1000;
+  max-height: 250px;
+  overflow-y: auto;
+  width: 478px !important;
+}
+
+.selectItem {
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #333;
+  transition: all 0.2s;
+}
+
+.selectItem:hover {
+  background-color: #f5f5f5;
+}
+
+.selectItem[data-highlighted] {
+  background-color: #4F46E5;
+  color: white;
+  outline: none;
+}
+
+.selectValue {
+  color: #333;
+  width: 100%;
+  text-align: left;
+  flex: 1;
+}
+
+.selectItem[data-state="checked"]::before,
+.selectItem[aria-selected="true"]::before,
+.selectItem[data-selected]::before {
+  display: none !important;
+}
+
+.selectItem[data-state="checked"] svg,
+.selectItem[aria-selected="true"] svg,
+.selectItem[data-selected] svg {
+  display: none !important;
+}
+
+/* Additional Utility Classes */
+.disabled {
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.loading {
+  position: relative;
+}
+
+.loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 16px;
+  height: 16px;
+  margin: -8px 0 0 -8px;
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid #4F46E5;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+  .dialogMissedEvent {
+    width: 95%;
+    margin: 0 10px;
+  }
+  
+  .dialogBody {
+    padding: 16px;
+  }
+  
+  .dialogFooter {
+    padding: 12px 16px;
+  }
+  
+  .inputField {
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+}
+
+/* Focus Management */
+.dialogMissedEvent:focus {
+  outline: none;
+}
+
+/* High Contrast Support */
+@media (prefers-contrast: high) {
+  .inputField {
+    border-width: 2px;
+  }
+  
+  .dialogFooterBtn {
+    border: 2px solid transparent;
+  }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  .modalOverlay,
+  .dialogFooterBtn,
+  .fetchBtn,
+  .inputField {
+    transition: none;
+  }
+  
+  @keyframes modalSlideIn {
+    from, to {
+      opacity: 1;
+      transform: none;
+    }
+  }
 }

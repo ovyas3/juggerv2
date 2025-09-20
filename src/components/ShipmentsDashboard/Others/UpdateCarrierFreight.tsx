@@ -37,9 +37,7 @@ const UpdateCarrierFreight: React.FC<UpdateCarrierFreightProps> = ({
   const [loading, setLoading] = useState(false);
   const [showOtherReason, setShowOtherReason] = useState(false);
   const [selectedReason, setSelectedReason] = useState("");
-  const [weightUnits, setWeightUnits] = useState<
-    Array<{ value: string; label: string }>
-  >([{ value: "KG", label: "KG" }]);
+  const [weightUnits, setWeightUnits] = useState<string[]>(["KG"]);
   const [reasons, setReasons] = useState<string[]>(["Other"]);
   const [freightData, setFreightData] = useState<FreightData>({
     freight: "",
@@ -49,90 +47,82 @@ const UpdateCarrierFreight: React.FC<UpdateCarrierFreightProps> = ({
     price: "",
     reason: "",
   });
+  const [manualPrice, setManualPrice] = useState<string | number>("");
 
   useEffect(() => {
     if (open) {
+      setFreightData({
+        freight: "",
+        weight: "",
+        weight_price: "",
+        uom: "KG",
+        price: "",
+        reason: "",
+      });
+      setManualPrice("");
+      setSelectedReason("");
+      setShowOtherReason(false);
       fetchWeightUnits();
       fetchReasons();
     }
+    // eslint-disable-next-line
   }, [open]);
 
+  // Fetch UOM units
   const fetchWeightUnits = async () => {
     try {
-      const response = await httpsGet(
-        "constants/get_reasons?name=UOMConstants",
-        4
-      );
+      const response = await httpsGet("constants/get_reasons?name=UOMConstants", 4);
       if (
         response?.statusCode === 200 &&
         Array.isArray(response.data) &&
         response.data.length > 0
       ) {
         const items = response.data[0]?.value || [];
-        const units = items
-          .map((item: any) => {
-            if (item && typeof item === "object") {
-              return {
-                value: String(item.value || "").trim(),
-                label: String(item.name || item.value || "").trim(),
-              };
-            }
-            const str = String(item || "").trim();
-            return { value: str, label: str };
-          })
-          .filter((unit: { value: string }) => unit.value);
-
-        setWeightUnits(
-          units.length > 0 ? units : [{ value: "KG", label: "KG" }]
+        const units = items.map((item: any) =>
+          typeof item === "object" ? String(item.value || "").trim() : String(item || "").trim()
         );
+        setWeightUnits(units.length > 0 ? units : ["KG"]);
       }
-    } catch (error) {
-      console.error("Error fetching weight units:", error);
-      showMessage("Failed to load weight units", "error");
-      setWeightUnits([{ value: "KG", label: "KG" }]);
+    } catch {
+      setWeightUnits(["KG"]);
     }
   };
 
+  // Fetch reasons
   const fetchReasons = async () => {
     try {
       const response = await httpsGet(
-        "constants/get_reasons?name=updateFreight",
+        freightType === "client_rate"
+          ? "constants/get_reasons?name=client_price"
+          : "constants/get_reasons?name=updateFreight",
         4
       );
       if (response.statusCode === 200 && response.data?.length > 0) {
-        const reasonList = [...response.data[0].reason, "Other"];
-        setReasons(reasonList);
+        setReasons([...response.data[0].reason, "Other"]);
       }
-    } catch (error) {
-      console.error("Error fetching reasons:", error);
-      setReasons([
-        "Price Negotiation",
-        "Additional Charges",
-        "Discount",
-        "Other",
-      ]);
+    } catch {
+      setReasons(["Other"]);
     }
   };
 
+  // Input change handler
   const handleInputChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
 
     setFreightData((prev) => ({
       ...prev,
       [name]:
-        name.endsWith("price") ||
-        name.endsWith("freight") ||
-        name.endsWith("weight")
-          ? value === ""
-            ? ""
-            : parseFloat(value) || 0
+        name === "freight" ||
+        name === "weight" ||
+        name === "weight_price" ||
+        name === "price"
+          ? value === "" ? "" : parseFloat(value)
           : value,
     }));
 
+    // If entering freight, clear weight/price/uom
     if (name === "freight" && value) {
       setFreightData((prev) => ({
         ...prev,
@@ -154,11 +144,11 @@ const UpdateCarrierFreight: React.FC<UpdateCarrierFreightProps> = ({
     }
   };
 
+
   const calculateFreightValues = () => {
     if (freightData.weight && freightData.weight_price) {
       const totalPrice = (
-        parseFloat(freightData.weight as string) *
-        parseFloat(freightData.weight_price as string)
+        Number(freightData.weight) * Number(freightData.weight_price)
       ).toFixed(2);
       setFreightData((prev) => ({
         ...prev,
@@ -167,54 +157,9 @@ const UpdateCarrierFreight: React.FC<UpdateCarrierFreightProps> = ({
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    try {
-      setLoading(true);
-
-      const payload: any = {
-        reason: freightData.reason || "Carrier accepted this Freight rate",
-        shipment: shipmentId,
-        ...(freightData.freight && { price: freightData.freight }),
-        ...(freightData.weight && {
-          weight: freightData.weight,
-          price_per_weight: freightData.weight_price,
-          uom: freightData.uom,
-        }),
-      };
-
-      if (payload.price || (payload.weight && payload.price_per_weight)) {
-        const response = await httpsPost(
-          "shipment/update_manual_rate",
-          payload,
-          {},
-          4
-        );
-
-        if (response.status === 200) {
-          showMessage("Freight updated successfully", "success");
-          if (onSuccess) onSuccess();
-          onClose();
-        } else {
-          showMessage(response.message || "Failed to update freight", "error");
-        }
-      } else {
-        showMessage(
-          "Please fill either Freight Amount or both Weight and Price Per Weight",
-          "error"
-        );
-      }
-    } catch (error) {
-      console.error("Error updating freight:", error);
-      showMessage("An unexpected error occurred", "error");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleReasonChange = (e: React.ChangeEvent<{ value: unknown }>) => {
-    const reason = e.target.value as string;
+  // Reason dropdown change
+  const handleReasonChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const reason = e.target.value;
     setSelectedReason(reason);
     setShowOtherReason(reason === "Other");
     setFreightData((prev) => ({
@@ -223,17 +168,84 @@ const UpdateCarrierFreight: React.FC<UpdateCarrierFreightProps> = ({
     }));
   };
 
+  // Submit handler
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Validation: require reason and either freight or (weight & price per weight)
+    if (!selectedReason && !freightData.reason) {
+      showMessage("Please select a reason", "error");
+      return;
+    }
+    if (
+      !freightData.freight &&
+      (!freightData.weight || !freightData.weight_price)
+    ) {
+      showMessage(
+        "Please fill either Freight Amount or both Weight and Price Per Weight",
+        "error"
+      );
+      return;
+    }
+
+    setLoading(true);
+
+    // Prepare payload
+    let payload: any = {
+      reason: showOtherReason ? freightData.reason : selectedReason,
+      shipment: shipmentId,
+    };
+
+    if (freightType === "rate") {
+  if (manualPrice) payload.price = manualPrice;
+  if (freightData.freight) payload.price = freightData.freight;
+  if (freightData.weight && freightData.weight_price) {
+    payload.weight = freightData.weight;
+    payload.price_per_weight = freightData.weight_price;
+    payload.uom = freightData.uom;
+  }
+} else {
+  // client_rate
+  if (freightData.freight) payload.client_price = freightData.freight;
+  if (freightData.weight && freightData.weight_price) {
+    payload.weight = freightData.weight;
+    payload.price_per_weight = freightData.weight_price;
+    payload.uom = freightData.uom;
+  }
+}
+
+    try {
+      const url =
+        freightType === "rate"
+          ? "shipment/update_manual_rate"
+          : "shipment/add_client_price";
+      const response = await httpsPost(url, payload, {}, 4);
+
+      if (response.statusCode === 200) {
+        showMessage("Freight updated successfully", "success");
+        if (onSuccess) onSuccess();
+        onClose();
+      } else {
+        showMessage(response.message || "Failed to update freight", "error");
+      }
+    } catch (error: any) {
+      showMessage(error.message || "An unexpected error occurred", "error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (!open) return null;
 
   return (
     <div className={styles.modalOverlay} onClick={onClose}>
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
         <ModalHeader
-          title={t(
+          title={
             freightType === "rate"
-              ? `Update Carrier Freight - #${sin}`
-              : `Update Client Freight - #${sin}`
-          )}
+              ? `Update Carrier Freight${sin ? ` - #${sin}` : ""}`
+              : `Update Client Freight${sin ? ` - #${sin}` : ""}`
+          }
           onClose={onClose}
         />
         <div className={styles.content}>
@@ -280,8 +292,8 @@ const UpdateCarrierFreight: React.FC<UpdateCarrierFreightProps> = ({
                       className={styles.selectField}
                     >
                       {weightUnits.map((unit) => (
-                        <option key={unit.value} value={unit.value}>
-                          {unit.label}
+                        <option key={unit} value={unit}>
+                          {unit}
                         </option>
                       ))}
                     </select>
@@ -303,21 +315,24 @@ const UpdateCarrierFreight: React.FC<UpdateCarrierFreightProps> = ({
 
               <hr className={styles.horizontalRuler} />
 
-              <div className={styles.finalDetailsSection}>
-                <div className={styles.formGroup}>
-                  <input
-                    type="number"
-                    name="price"
-                    value={freightData.price}
-                    onChange={handleInputChange}
-                    className={styles.inputField}
-                    placeholder="Freight Amount"
-                    disabled={freightType !== "rate"}
-                    step="0.01"
-                    min="0"
-                  />
-                </div>
+             <div className={styles.formGroup}>
+  <input
+    type="number"
+    className={styles.inputField}
+    placeholder="Freight"
+    value={
+      freightData.freight !== ""
+        ? freightData.freight
+        : freightData.weight && freightData.weight_price
+        ? Number(freightData.weight) * Number(freightData.weight_price)
+        : ""
+    }
+    readOnly
+    disabled={freightType !== "rate"}
+  />
+</div>
 
+              <div className={styles.finalDetailsSection}>
                 <div className={styles.formGroup}>
                   <select
                     value={selectedReason}
@@ -358,7 +373,12 @@ const UpdateCarrierFreight: React.FC<UpdateCarrierFreightProps> = ({
                 <button
                   type="submit"
                   className={styles.submitButton}
-                  disabled={loading || !freightData.reason}
+                  disabled={
+                    loading ||
+                    (!selectedReason && !freightData.reason) ||
+                    (!freightData.freight &&
+                      (!freightData.weight || !freightData.weight_price))
+                  }
                 >
                   {loading ? "Saving..." : "Submit"}
                 </button>

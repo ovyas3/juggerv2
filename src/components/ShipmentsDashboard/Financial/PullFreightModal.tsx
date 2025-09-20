@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import styles from "./PullFreightModal.module.css";
 import ModalHeader from "@/components/UI/ModalHeader/ModalHeader";
 import { useSnackbar } from "@/hooks/snackBar";
@@ -34,6 +34,24 @@ const PullFreightModal: React.FC<PullFreightModalProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [cities, setCities] = useState<string[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Handle click outside to close dropdown
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowDropdown(false);
+      }
+    };
+
+    if (showDropdown) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showDropdown]);
 
   useEffect(() => {
     if (show) {
@@ -159,6 +177,7 @@ const PullFreightModal: React.FC<PullFreightModalProps> = ({
                   <div
                     className={styles.input}
                     style={{ position: "relative" }}
+                    ref={dropdownRef}
                   >
                     <input
                       type="text"
@@ -198,7 +217,12 @@ const PullFreightModal: React.FC<PullFreightModalProps> = ({
                       type="text"
                       className={styles.inputField}
                       value={freightRate}
-                      onChange={(e) => setFreightRate(e.target.value)}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (value === '' || /^\d+$/.test(value)) {
+                          setFreightRate(value);
+                        }
+                      }}
                       placeholder=" "
                     />
                     <label className={styles.floatingLabel}>

@@ -196,7 +196,7 @@ const ReasonDialog: React.FC<ReasonDialogProps> = ({
                 </div>
               )}
 
-              {isDelayReason && (
+              {/* {isDelayReason && ( */}
                 <div className={styles.checkboxContainer}>
                   <input
                     type="checkbox"
@@ -212,7 +212,7 @@ const ReasonDialog: React.FC<ReasonDialogProps> = ({
                     Notify Customer
                   </label>
                 </div>
-              )}
+              {/* )} */}
 
               <button
                 className={styles.submitButton}

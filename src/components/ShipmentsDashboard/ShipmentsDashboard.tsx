@@ -113,6 +113,8 @@ import TotalFreightModal from "./SpecialFeatures/TotalFreightModal";
 
 // Types
 interface Shipment {
+  drop: any;
+  organization: any;
   unique_code: any;
   epods: any;
   _id: string;
@@ -436,6 +438,8 @@ const ShipmentsDashboard: React.FC = () => {
   const [showMissedShipmentModal, setShowMissedShipmentModal] = useState(false);
   const [selectedShipmentForMissed, setSelectedShipmentForMissed] = useState<Shipment | null>(null)
   const [odcFilter, setOdcFilter] = useState<boolean>(false);
+  // ...existing code...
+const [actionMenuOpenId, setActionMenuOpenId] = useState<string | null>(null);
 
 const [locationDialogState, setLocationDialogState] = useState<{
   isOpen: boolean;
@@ -604,12 +608,27 @@ const [showDriverExpenses, setShowDriverExpenses] = useState(false);
 // Add this near other state declarations
 const [isGeofenceEditorOpen, setIsGeofenceEditorOpen] = useState(false);
 const [selectedShipmentForGeofence, setSelectedShipmentForGeofence] = useState<Shipment | null>(null);
+// Add this state to store the location data for the modal
+const [combinedLocationData, setCombinedLocationData] = useState<{
+  combinedLocation: string;
+  pickupCity: string;
+  pickupId: string;
+  deliveryId: string;
+  currentLocation: number[];
+}>({
+  combinedLocation: '',
+  pickupCity: '',
+  pickupId: '',
+  deliveryId: '',
+  currentLocation: []
+});
+
 
 // Add this with other handler functions
 const handleOpenGeofenceEditor = (shipment: Shipment) => {
+  closeAllDialogs();
   setSelectedShipmentForGeofence(shipment);
   setIsGeofenceEditorOpen(true);
-  closeAllDialogs();
 };
 
   const handleOpenReasonDialog = (type: 'delay' | 'gps', shipmentId: string, sin: string) => {
@@ -689,7 +708,6 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
         label: "Share",
         color: "text-blue-500",
         onClick: (shipment: Shipment) => {
-          // Generate the tracking URL based on your application's routing
           closeAllDialogs();
           const trackingUrl = `${window.location.origin}/track/${shipment.unique_code}`;
           setShareUrl(trackingUrl);
@@ -698,15 +716,17 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
         },
       },
       {
-        icon: Mail,
-        label: "Mail",
-        color: "text-orange-600",
-        onClick: (shipment: Shipment) => {
-          closeAllDialogs();
-          setShipmentToMail(shipment);
-          setMailModalOpen(true);
-        },
-      },
+  icon: Mail,
+  label: "Mail",
+  color: "text-orange-600",
+  onClick: (shipment: Shipment) => {
+    console.log("Mail action onClick called");
+    closeAllDialogs();
+    setShipmentToMail(shipment);
+    setMailModalOpen(true);
+    console.log("Mail modal should now be open");
+  },
+},
       {
         icon: XCircle,
         label: "Cancel",
@@ -814,9 +834,9 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
         label: "Create Advance Payment",
         color: "text-indigo-600",
         onClick: (shipment: Shipment) => {
+          closeAllDialogs();
           setSelectedShipmentForPayment(shipment);
           setShowPaymentAdvanceModal(true);
-          closeAllDialogs();
         },
       },
       {
@@ -824,9 +844,9 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
         label: "Change Invoice Type",
         color: "text-brown-600",
         onClick: (shipment: Shipment) => {
+          closeAllDialogs();
           setSelectedShipmentForInvoiceType(shipment);
           setIsInvoiceTypeModalOpen(true);
-          closeAllDialogs();
         },
       },
     ],
@@ -861,16 +881,20 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
         label: "Complete Shipment",
         color: "text-green-600",
         onClick: (shipment: Shipment) => {
+          closeAllDialogs();
           setSelectedShipmentForCompletion(shipment);
           setShowCompleteShipmentModal(true);
-          closeAllDialogs();
         },
       },
       {
         icon: DoorOpen,
         label: "Recalculate Customer Gate In/Out",
         color: "text-pink-600",
-      },
+        onClick: 
+          (shipment: Shipment) => handleRecalculateGateInOut(shipment),
+        disabled: (shipment: Shipment) =>
+          ["Completed", "Cancelled"].includes(shipment.status),
+          },
     ],
     Other: [
       {
@@ -878,9 +902,9 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
         label: "Add Roambee ID",
         color: "text-blue-600",
         onClick: (shipment: Shipment) => {
+          closeAllDialogs();
           setSelectedShipmentForRoambee(shipment);
           setShowRoambeeModal(true);
-          closeAllDialogs();
         },
       },
       // {
@@ -897,9 +921,9 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
         label: "Submit Mark As Arrived",
         color: "text-green-600",
         onClick: (shipment: Shipment) => {
+          closeAllDialogs();
           setSelectedShipmentForArrival(shipment);
           setShowMarkAsArrivedModal(true);
-          closeAllDialogs();
         },
       },
       //Create Payment Advice
@@ -1037,20 +1061,28 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
     ]
   };
 
+const closeActionMenu = () => {
+  console.log("closeActionMenu executed, closing dropdown");
+  setActionMenuOpenId(null);
+};
+
   useEffect(() => {
     console.log('showAttachDialog state changed:', showAttachDialog);
   }, [showAttachDialog]);
 
   // Sub filters data
   const subFilters = [
-    { key: "accepted", label: "Accepted", count: 156 },
-    { key: "at_pickup", label: "At Pickup", count: 23 },
-    { key: "in_transit", label: "In Transit", count: 53 },
-    { key: "completed", label: "Completed", count: 29 },
-    { key: "delayed", label: "Delayed", count: 12 },
-    { key: "today", label: "Today", count: 234 },
-    { key: "high_priority", label: "High Priority", count: 45 },
-    { key: "pending_epod", label: "Pending EPOD", count: 156 },
+    { key: "completed", label: "Completed", count: 0, color: "#2ecc40" },
+    { key: "approved", label: "Approved", count: 0, color: "#27ae60" },
+    { key: "pending", label: "Pending", count: 0, color: "#2980b9" },
+    { key: "in_transit", label: "In Transit", count: 0, color: "#f39c12" },
+    { key: "cancelled", label: "Cancelled", count: 0, color: "#e74c3c" },
+    { key: "assigned", label: "Assigned", count: 0, color: "#8e44ad" },
+    { key: "towards_pickup", label: "Towards Pickup", count: 0, color: "#16a085" },
+    { key: "at_pickup", label: "At Pickup", count: 0, color: "#3498db" },
+    { key: "at_delivery", label: "At Delivery", count: 0, color: "#f1948a" },
+    { key: "accepted", label: "Accepted", count: 0, color: "#1abc9c" },
+    { key: "about_to_reach", label: "About to Reach", count: 0, color: "#34495e" }
   ];
 
   // Analytics lifecycle data
@@ -2889,6 +2921,12 @@ const renderLastLocationCell = (shipment: any) => {
     setShowPaymentAdviceModal(true);
   };
 
+  const handleRecalculateGateInOut = async (shipment: Shipment) => {
+    closeAllDialogs();
+    setSelectedShipmentForRerun(shipment);
+    setShowRerunDialog(true);
+  }
+
   const handlePaymentAdviceSubmit = async (data: any) => {
     try {
       // TODO: Replace with your actual API call
@@ -2913,17 +2951,52 @@ const renderLastLocationCell = (shipment: any) => {
     deliveryLocations: []
   });
 
-  const handleOpenEditLocation = (shipment: any, type: 'pickup' | 'delivery') => {
-    setSelectedShipment(shipment);
-    setSelectedLocationType(type);
-    
-    // Fetch shipper preferences if not already loaded
-    if (shipment.organization?._id) {
-      fetchShipperPrefs(shipment.organization._id);
-    }
-    
-    setShowEditLocationModal(true);
-  };
+// Update the handleOpenEditLocation function
+const handleOpenEditLocation = (shipment: any, type: 'pickup' | 'delivery') => {
+  setSelectedShipment(shipment);
+  setSelectedLocationType(type);
+  
+  // Get existing location data similar to Angular version
+  let combinedLocation = '';
+  let pickupCity = '';
+  let pickupId = '';
+  let deliveryId = '';
+  let currentLocation: number[] = [];
+  
+  if (type === 'pickup' && shipment.from && shipment.from.length > 0) {
+    const location = shipment.from[0].location;
+    combinedLocation = `${location.name} - ${location.area}${location.city ? ` - ${location.city}` : ''}`;
+    pickupId = shipment.from[0].id;
+    pickupCity = location.city || '';
+  }
+  
+  if (type === 'delivery' && shipment.to && shipment.to.length > 0) {
+    const location = shipment.to[0].location;
+    combinedLocation = `${location.name} - ${location.area}${location.city ? ` - ${location.city}` : ''}`;
+    deliveryId = shipment.to[0].id;
+  }
+  
+  // Get current location coordinates if available
+  if (shipment.triptracker?.lastlocation) {
+    currentLocation = shipment.triptracker.lastlocation;
+  }
+  
+  // Fetch shipper preferences
+  if (shipment.organization?.id) {
+    fetchShipperPrefs(shipment.organization._id);
+  }
+  
+  // Set the combined location data for the modal
+  setCombinedLocationData({
+    combinedLocation,
+    pickupCity,
+    pickupId,
+    deliveryId,
+    currentLocation
+  });
+  
+  setShowEditLocationModal(true);
+};
 
   const fetchShipperPrefs = async (orgId: string) => {
     try {
@@ -3059,7 +3132,6 @@ const applyFilter = () => {
       showMessage("Please select a shipment first", "error");
       return;
     }
-
     closeAllDialogs();
     setSelectedShipmentIds(selectedId);
     setIsPrintLRModalOpen(true);
@@ -3075,7 +3147,6 @@ const applyFilter = () => {
       showMessage("Please select a shipment first", "error");
       return;
     }
-
     closeAllDialogs();
     setSelectedShipmentForPriceIncrease(selectedId);
     setIsIncreasePriceModalOpen(true);
@@ -3117,6 +3188,7 @@ const applyFilter = () => {
 
   const [showPaymentAdvanceModal, setShowPaymentAdvanceModal] = useState(false);
   const [selectedShipmentForPayment, setSelectedShipmentForPayment] = useState<Shipment | null>(null);
+  const [selectedShipmentForRerun, setSelectedShipmentForRerun] = useState<Shipment | null>(null);
 
   const handlePaymentAdvanceSubmit = async (paymentData: any) => {
     try {
@@ -3302,19 +3374,49 @@ const applyFilter = () => {
       <div className={styles.subFiltersContainer}>
         <div className={styles.filterButtonsGroup}>
           {subFilters.map((filter) => (
-            <button
-              key={filter.key}
-              className={`${styles.filterButton} ${
-                selectedSubFilter === filter.key ? styles.selected : ""
-              }`}
-              onClick={() => handleSubFilterSelect(filter.key)}
-            >
-              {filter.label}
-              <span className={styles.filterCount}>{filter.count}</span>
-            </button>
+    //         <button
+    //           key={filter.key}
+    //           className={`${styles.filterButton} ${
+    //             selectedSubFilter === filter.key ? styles.selected : ""
+    //           }`}
+    //           onClick={() => handleSubFilterSelect(filter.key)}
+    //            style={{
+    //   border: `2px solid ${filter.color}`,
+    //   backgroundColor:
+    //     selectedSubFilter === filter.key
+    //       ? `${filter.color}20` 
+    //       : "transparent",    
+    // }}
+    //         >
+    //           {filter.label}
+    //           <span className={styles.filterCount} style={{ 
+    //             backgroundColor: filter.color,
+    //             color: 'white'
+    //           }}>
+    //             {filter.count}
+    //           </span>
+    //         </button>
+
+    <button
+    key={filter.key}
+    className={`${styles.filterButton} ${
+      selectedSubFilter === filter.key ? styles.selected : ""
+    }`}
+    onClick={() => handleSubFilterSelect(filter.key)}
+    style={{
+      // @ts-ignore
+      '--filter-color': filter.color,
+      '--filter-color-10': `${filter.color}1a`,
+      '--filter-color-20': `${filter.color}33`,
+      borderColor: filter.color,
+      color: selectedSubFilter === filter.key ? filter.color : 'inherit',
+    } as React.CSSProperties}
+  >
+    {filter.label}
+  </button>
           ))}
         </div>
-        <div className={styles.filterGroup}>
+        {/* <div className={styles.filterGroup}>
   <label className={styles.checkboxLabel}>
     <input
       type="checkbox"
@@ -3323,7 +3425,7 @@ const applyFilter = () => {
     />
     <span>ODC Shipment(s)</span>
   </label>
-</div>
+</div> */}
 
 
       </div>
@@ -3505,18 +3607,6 @@ const applyFilter = () => {
                 </span>
               </div>
 
-              <div className={styles.statusLegend}>
-              {Object.entries(statusLabels).map(([status, label]) => (
-                <div key={status} className={styles.legendItem}>
-                  <div
-                    className={styles.legendColor}
-                    style={{ backgroundColor: statusColors[status] || "#666" }}
-                  />
-                  <span className={styles.legendText}>{label}</span>
-                </div>
-              ))}
-            </div>
-
               <div className={styles.tableControls}>
                 <Select
                   value={pageSize.toString()}
@@ -3617,6 +3707,9 @@ const applyFilter = () => {
                 openLocationsPopup={openLocationsPopup}
                 formatCurrency={formatCurrency}
                 renderLastLocationCell={renderLastLocationCell}
+                  actionMenuOpenId={actionMenuOpenId}
+  setActionMenuOpenId={setActionMenuOpenId}
+  closeActionMenu={closeActionMenu}
               />
             )}
           </div>
@@ -3680,7 +3773,7 @@ const applyFilter = () => {
         />
       )} */}
       {/* Rerun Dialog */}
-      {showRerunDialog && (
+      {/* {showRerunDialog && (
         <RerunShipmentModal
           show={showRerunDialog}
           shipmentSIN={selectedShipmentSIN}
@@ -3692,7 +3785,7 @@ const applyFilter = () => {
             onRerunSubmit();
           }}
         />
-      )}
+      )} */}
 
       {/* Pull Freight Dialog */}
       {showPullFreightDialog && (
@@ -4029,22 +4122,41 @@ const applyFilter = () => {
       )}
 {showEditLocationModal && selectedShipment && (
   <EditLocationsModal
-  show={showEditLocationModal}
-  onClose={() => setShowEditLocationModal(false)}
-  addLocationsType={selectedLocationType}
-  shipmentId={selectedShipment._id}
-  shipperPrefs={shipperPrefs}
-  orderNumber={selectedShipment.sin}
-  // pickupId={selectedShipment.from?.[0]?._id || ""}
-  // deliveryId={selectedShipment.to?.[0]?._id || ""}
-  elementOrderId={selectedShipment._id}
-  // currentLocation={selectedShipment.trip_tracker?.last_location || []}
-  onEditSuccess={() => {
-    setShowEditLocationModal(false);
-    fetchShipments();
-  }}
+    show={showEditLocationModal}
+    onClose={() => {
+      setShowEditLocationModal(false);
+      setCombinedLocationData({
+        combinedLocation: '',
+        pickupCity: '',
+        pickupId: '',
+        deliveryId: '',
+        currentLocation: []
+      });
+    }}
+    addLocationsType={selectedLocationType}
+    shipmentId={selectedShipment._id}
+    shipperPrefs={shipperPrefs}
+    orderNumber={selectedShipment.sin}
+    pickupId={combinedLocationData.pickupId}
+    deliveryId={combinedLocationData.deliveryId}
+    elementOrderId={selectedShipment.organization._id}
+    currentLocation={combinedLocationData.currentLocation}
+    combinedLocation={combinedLocationData.combinedLocation} // Add this prop
+    pickupCity={combinedLocationData.pickupCity} // Add this prop
+    onEditSuccess={() => {
+      setShowEditLocationModal(false);
+      fetchShipments();
+      setCombinedLocationData({
+        combinedLocation: '',
+        pickupCity: '',
+        pickupId: '',
+        deliveryId: '',
+        currentLocation: []
+      });
+    }}
   />
 )}
+
 
       {showGpsModal && selectedShipmentForGps && (
         <AddGpsConnectionModal
@@ -4201,43 +4313,37 @@ const applyFilter = () => {
         sin={freightSIN}
       />
       )}
-      {selectedShipmentForArrival && (
-        <MarkAsArrivedModal
-          show={showMarkAsArrivedModal}
-          onClose={() => setShowMarkAsArrivedModal(false)}
-          onSubmit={(data) => {
-            // Handle the arrival submission
-            console.log('Mark as arrived:', data);
-            // You might want to make an API call here
-            setShowMarkAsArrivedModal(false);
-          }}
-          shipment={{
-            _id: selectedShipmentForArrival._id,
-            orderNo: selectedShipmentForArrival.sin,
-            from: selectedShipmentForArrival.from?.[0]?.location?.name,
-            to: selectedShipmentForArrival.to?.[0]?.location?.name,
-          }}
-        />
-      )}
-      {selectedShipmentForCompletion && (
-        <CompleteShipmentModal
-          show={showCompleteShipmentModal}
-          onClose={() => setShowCompleteShipmentModal(false)}
-          onSubmit={(data) => {
-            // Handle the completion submission
-            console.log('Complete shipment:', data);
-            // You might want to make an API call here
-            setShowCompleteShipmentModal(false);
-          }}
-          shipment={{
-            _id: selectedShipmentForCompletion._id,
-            sin: selectedShipmentForCompletion.sin || '',
-            from: selectedShipmentForCompletion.from?.[0]?.location?.name,
-            to: selectedShipmentForCompletion.to?.[0]?.location?.name,
-            // shipmentType: selectedShipmentForCompletion.shipmentType || ''
-          }}
-        />
-      )}
+     {selectedShipmentForArrival && (
+  <CompleteShipmentModal
+    show={showMarkAsArrivedModal}
+    onClose={() => setShowMarkAsArrivedModal(false)}
+    shipment={{
+      _id: selectedShipmentForArrival._id,
+      sin: selectedShipmentForArrival.sin,
+      from: selectedShipmentForArrival.from?.[0]?.location?.name,
+      to: selectedShipmentForArrival.to?.[0]?.location?.name,
+      shipmentType: "arrived", // This is the key difference!
+      drop: selectedShipmentForArrival.drop,
+    }}
+    fetchShipments={fetchShipments}
+    setShowCompleteShipmentModal={setShowMarkAsArrivedModal}
+  />
+)}
+{selectedShipmentForCompletion && (
+  <CompleteShipmentModal
+    show={showCompleteShipmentModal}
+    onClose={() => setShowCompleteShipmentModal(false)}
+    shipment={{
+      _id: selectedShipmentForCompletion._id,
+      sin: selectedShipmentForCompletion.sin || '',
+      from: selectedShipmentForCompletion.from?.[0]?.location?.name,
+      to: selectedShipmentForCompletion.to?.[0]?.location?.name,
+      shipmentType: "complete",
+    }}
+    fetchShipments={fetchShipments}
+    setShowCompleteShipmentModal={setShowCompleteShipmentModal}
+  />
+)}
       {showBulkUploadModal && (
         <BulkUploadShipments
           open={showBulkUploadModal}
@@ -4322,6 +4428,14 @@ const applyFilter = () => {
         }}
       />
     )}
+
+{showRerunDialog && (
+  <RerunShipmentModal
+    show={showRerunDialog}
+    shipmentId={selectedShipmentForRerun?._id || ""}
+    onClose={() => setShowRerunDialog(false)}
+  />
+)}
 
 {isGeofenceEditorOpen && selectedShipmentForGeofence && (
   <GeofenceEditor

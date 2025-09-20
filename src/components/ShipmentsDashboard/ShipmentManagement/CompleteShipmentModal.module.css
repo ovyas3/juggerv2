@@ -81,6 +81,22 @@
   margin-bottom: 16px;
 }
 
+.location {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.from {
+  margin-right: 4px;
+}
+
+.to {
+  margin-right: 22px;
+}
+
+
 .label {
   display: block;
   margin-bottom: 8px;
@@ -137,6 +153,7 @@
   resize: vertical;
   font-family: inherit;
   font-size: 14px;
+  margin-top: 10px;
 }
 
 .select {
@@ -179,7 +196,8 @@
   z-index: 1000;
   max-height: 250px;
   overflow-y: auto;
-  width: 555px !important;
+  width: 551px !important;
+  margin-top: 5px;
 }
 
 .selectItem {
@@ -238,7 +256,7 @@
 }
 
 .secondaryButton:hover {
-  background-color: #BDBDBD;
+  background-color: #d6440e;
 }
 
 .errorText {

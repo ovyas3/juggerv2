@@ -25,6 +25,7 @@ import LocationOnIcon from '@mui/icons-material/LocationOn';
 import { useSnackbar } from '@/hooks/snackBar';
 import { httpsGet, httpsPut, httpsPost } from '@/utils/Communication';
 import ModalHeader from '@/components/UI/ModalHeader/ModalHeader';
+import styles from "./GeofenceEditor.module.css";
 
 declare global {
   interface Window {
@@ -721,69 +722,16 @@ const GeofenceEditor: React.FC<GeofenceEditorProps> = ({
   };
   
   return (
-    <Dialog 
-      open={open} 
-      onClose={onClose}
-      maxWidth="lg"
-      fullWidth
-      PaperProps={{
-        style: { 
-          width: '928px',
-          maxWidth: '95vw',
-          height: '642px',
-          maxHeight: '95vh',
-          margin: 0,
-          borderRadius: '16px',
-          overflow: 'hidden'
-        }
-      }}
-    >
-      {/* <DialogTitle 
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          height: '80px',
-          padding: '0 24px',
-          borderBottom: '1px solid #e0e0e0',
-          backgroundColor: '#fff',
-          '& .MuiTypography-root': {
-            fontSize: '20px',
-            fontWeight: 'bold',
-            color: '#42454E'
-          }
-        }}
-      >
-        Update Delivery Location
-        <IconButton onClick={onClose} size="small">
-          <CloseIcon />
-        </IconButton>
-      </DialogTitle> */}
-
-      <ModalHeader 
-        title={`Update Delivery Location - #${shipment.sin}`}
-        onClose={onClose}
-      />
-      
-      <DialogContent 
-        sx={{
-          display: 'flex',
-          padding: 0,
-          height: 'calc(100% - 80px)',
-          '&.MuiDialogContent-root': {
-            padding: 0
-          }
-        }}
-      >
+    <div className={styles.dialogMain}>
+      <div className={styles.header}>
+        <div className={styles.label}>Update Delivery Location</div>
+        <button className={styles.deleteIconBtn} onClick={onClose}>
+          ×
+        </button>
+      </div>
+      <div className={styles.section}>
         {/* Left side - Map */}
-        <div 
-          ref={mapRef}
-          style={{
-            flex: '0.56',
-            height: '100%',
-            position: 'relative'
-          }}
-        >
+        <div className={styles.left} ref={mapRef}>
           {loading && (
             <div style={{
               position: 'absolute',
@@ -801,20 +749,10 @@ const GeofenceEditor: React.FC<GeofenceEditorProps> = ({
             </div>
           )}
         </div>
-        
         {/* Right side - Controls */}
-        <div 
-          style={{
-            flex: '0.44',
-            display: 'flex',
-            flexDirection: 'column',
-            padding: '16px',
-            backgroundColor: '#fff',
-            overflowY: 'auto'
-          }}
-        >
+        <div className={styles.right}>
           {/* Delivery Location Dropdown */}
-          <div style={{ marginBottom: '20px' }}>
+          <div className={styles.formGroup}>
             <FormControl fullWidth size="small">
               <InputLabel id="delivery-location-label">Select Delivery Location</InputLabel>
               <Select
@@ -827,17 +765,6 @@ const GeofenceEditor: React.FC<GeofenceEditorProps> = ({
                   }
                 }}
                 label="Select Delivery Location"
-                sx={{
-                  '& .MuiOutlinedInput-notchedOutline': {
-                    borderColor: '#DFE3EB'
-                  },
-                  '&:hover .MuiOutlinedInput-notchedOutline': {
-                    borderColor: '#DFE3EB'
-                  },
-                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                    borderColor: '#2962FF'
-                  }
-                }}
               >
                 {shipment.to.map((delivery, index) => (
                   <MenuItem key={delivery._id} value={delivery._id}>
@@ -849,14 +776,8 @@ const GeofenceEditor: React.FC<GeofenceEditorProps> = ({
               </Select>
             </FormControl>
           </div>
-          
           {/* Date Selection and Get Path Button */}
-          <div style={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            marginBottom: '20px',
-            gap: '12px'
-          }}>
+          <div className={styles.formGroup} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <FormControl size="small" sx={{ minWidth: 150 }}>
               <InputLabel id="date-select-label">Select a Date</InputLabel>
               <Select
@@ -864,17 +785,6 @@ const GeofenceEditor: React.FC<GeofenceEditorProps> = ({
                 value={selectedDate}
                 onChange={(e) => setSelectedDate(e.target.value)}
                 label="Select a Date"
-                sx={{
-                  '& .MuiOutlinedInput-notchedOutline': {
-                    borderColor: '#DFE3EB'
-                  },
-                  '&:hover .MuiOutlinedInput-notchedOutline': {
-                    borderColor: '#DFE3EB'
-                  },
-                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                    borderColor: '#2962FF'
-                  }
-                }}
               >
                 {dateOptions.map((date) => (
                   <MenuItem key={date} value={date}>
@@ -883,7 +793,6 @@ const GeofenceEditor: React.FC<GeofenceEditorProps> = ({
                 ))}
               </Select>
             </FormControl>
-            
             <Button
               variant="outlined"
               onClick={handleGetPath}
@@ -910,7 +819,6 @@ const GeofenceEditor: React.FC<GeofenceEditorProps> = ({
               Get Path
             </Button>
           </div>
-          
           {/* Arrived and Finished Times */}
           <div style={{
             backgroundColor: '#F0F3F9',
@@ -933,40 +841,11 @@ const GeofenceEditor: React.FC<GeofenceEditorProps> = ({
               }}>
                 Arrived at
               </span>
-              
               <LocalizationProvider dateAdapter={AdapterDateFns}>
                 <DatePicker
                   value={arrivedAt}
                   onChange={(date) => setArrivedAt(date)}
-                //   renderInput={(params: any) => (
-                //     <TextField 
-                //       {...params} 
-                //       size="small" 
-                //       sx={{ 
-                //         width: '140px',
-                //         '& .MuiOutlinedInput-root': {
-                //           height: '36px',
-                //           '& input': {
-                //             padding: '8px 12px',
-                //             fontSize: '14px',
-                //             color: '#131722'
-                //           },
-                //           '& fieldset': {
-                //             borderColor: '#DFE3EB'
-                //           },
-                //           '&:hover fieldset': {
-                //             borderColor: '#DFE3EB'
-                //           },
-                //           '&.Mui-focused fieldset': {
-                //             borderColor: '#2962FF'
-                //           }
-                //         }
-                //       }}
-                //       placeholder="Date"
-                //     />
-                //   )}
                 />
-                
                 <TimePicker
                   value={arrivedTime ? new Date(`1970-01-01T${arrivedTime}`) : null}
                   onChange={(time) => {
@@ -980,38 +859,9 @@ const GeofenceEditor: React.FC<GeofenceEditorProps> = ({
                       setArrivedTime('');
                     }
                   }}
-                //   renderInput={(params: any) => (
-                //     <TextField 
-                //       {...params} 
-                //       size="small" 
-                //       sx={{ 
-                //         width: '100px',
-                //         marginLeft: '8px',
-                //         '& .MuiOutlinedInput-root': {
-                //           height: '36px',
-                //           '& input': {
-                //             padding: '8px 12px',
-                //             fontSize: '14px',
-                //             color: '#131722'
-                //           },
-                //           '& fieldset': {
-                //             borderColor: '#DFE3EB'
-                //           },
-                //           '&:hover fieldset': {
-                //             borderColor: '#DFE3EB'
-                //           },
-                //           '&.Mui-focused fieldset': {
-                //             borderColor: '#2962FF'
-                //           }
-                //         }
-                //       }}
-                //       placeholder="Time"
-                //     />
-                //   )}
                 />
               </LocalizationProvider>
             </div>
-            
             {/* Finished At */}
             <div style={{
               display: 'flex',
@@ -1024,40 +874,11 @@ const GeofenceEditor: React.FC<GeofenceEditorProps> = ({
               }}>
                 Finished at
               </span>
-              
               <LocalizationProvider dateAdapter={AdapterDateFns}>
                 <DatePicker
                   value={finishedAt}
                   onChange={(date) => setFinishedAt(date)}
-                //   renderInput={(params: any) => (
-                //     <TextField 
-                //       {...params} 
-                //       size="small" 
-                //       sx={{ 
-                //         width: '140px',
-                //         '& .MuiOutlinedInput-root': {
-                //           height: '36px',
-                //           '& input': {
-                //             padding: '8px 12px',
-                //             fontSize: '14px',
-                //             color: '#131722'
-                //           },
-                //           '& fieldset': {
-                //             borderColor: '#DFE3EB'
-                //           },
-                //           '&:hover fieldset': {
-                //             borderColor: '#DFE3EB'
-                //           },
-                //           '&.Mui-focused fieldset': {
-                //             borderColor: '#2962FF'
-                //           }
-                //         }
-                //       }}
-                //       placeholder="Date"
-                //     />
-                //   )}
                 />
-                
                 <TimePicker
                   value={finishedTime ? new Date(`1970-01-01T${finishedTime}`) : null}
                   onChange={(time) => {
@@ -1071,112 +892,43 @@ const GeofenceEditor: React.FC<GeofenceEditorProps> = ({
                       setFinishedTime('');
                     }
                   }}
-                //   renderInput={(params: any) => (
-                //     <TextField 
-                //       {...params} 
-                //       size="small" 
-                //       sx={{ 
-                //         width: '100px',
-                //         marginLeft: '8px',
-                //         '& .MuiOutlinedInput-root': {
-                //           height: '36px',
-                //           '& input': {
-                //             padding: '8px 12px',
-                //             fontSize: '14px',
-                //             color: '#131722'
-                //           },
-                //           '& fieldset': {
-                //             borderColor: '#DFE3EB'
-                //           },
-                //           '&:hover fieldset': {
-                //             borderColor: '#DFE3EB'
-                //           },
-                //           '&.Mui-focused fieldset': {
-                //             borderColor: '#2962FF'
-                //           }
-                //         }
-                //       }}
-                //       placeholder="Time"
-                //     />
-                //   )}
                 />
               </LocalizationProvider>
             </div>
           </div>
-          
           {/* Location Details */}
-          <div style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: '20px',
-            padding: '12px 16px',
-            backgroundColor: '#fff',
-            borderRadius: '4px',
-            border: '1px solid #F0F3F9'
-          }}>
+          <div className={styles.locationDetails}>
             <div style={{ display: 'flex', alignItems: 'center' }}>
               <LocationOnIcon sx={{ color: '#2962FF', marginRight: '12px' }} />
               <div>
-                <div style={{
-                  fontSize: '16px',
-                  color: '#42454E',
-                  fontWeight: 500,
-                  marginBottom: '6px'
-                }}>
+                <div className={styles.locationName}>
                   {locality || 'Location not specified'}
                 </div>
-                <div style={{
-                  fontSize: '12px',
-                  color: '#71747A'
-                }}>
+                <div className={styles.locationArea}>
                   {areaDetails.area || 'Area not specified'}
                 </div>
               </div>
             </div>
-            
-            <IconButton 
+            <button 
+              className={styles.deleteIconBtn}
               onClick={handleRemoveGeofence}
-              size="small"
-              sx={{
-                color: '#E53935',
-                '&:hover': {
-                  backgroundColor: 'rgba(229, 57, 53, 0.08)'
-                }
-              }}
+              type="button"
             >
               <DeleteIcon />
-            </IconButton>
+            </button>
           </div>
-          
           {/* Update Location Button */}
-          <Button
-            variant="contained"
+          <button
+            className={styles.dialogFooterBtn}
             onClick={handleUpdateLocation}
             disabled={loading}
-            sx={{
-              width: '100%',
-              height: '44px',
-              backgroundColor: '#2962FF',
-              color: '#FFFFFF',
-              borderRadius: '4px',
-              textTransform: 'none',
-              fontSize: '14px',
-              fontWeight: 500,
-              '&:hover': {
-                backgroundColor: '#1E4B9A'
-              },
-              '&.Mui-disabled': {
-                backgroundColor: '#E0E0E0',
-                color: '#9E9E9E'
-              }
-            }}
+            type="button"
           >
             {loading ? 'Updating...' : 'UPDATE LOCATION'}
-          </Button>
+          </button>
         </div>
-      </DialogContent>
-    </Dialog>
+      </div>
+    </div>
   );
 };
 
