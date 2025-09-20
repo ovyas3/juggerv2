@@ -220,7 +220,7 @@ const ShipmentsDashboard: React.FC = () => {
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(0);
-  const [pageSize, setPageSize] = useState(10);
+  const [pageSize, setPageSize] = useState(100);
 
   // Search and filters
   const [searchQuery, setSearchQuery] = useState("");
