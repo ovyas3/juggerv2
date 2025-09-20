@@ -516,31 +516,6 @@ const [locationDialogState, setLocationDialogState] = useState<{
     }
   }, []);
 
-  const handleDelayReasonSubmit = async (shipmentId: string, remark: string) => {
-    try {
-      const response = await httpsPost('shipment/delay', {
-        shipment_id: shipmentId,
-        reason: remark,
-        type: 'delay_reason'
-      });
-
-      if (response.statusCode === 200) {
-        // Refresh the shipment data or update the UI as needed
-        showMessage('Delay reason updated successfully', 'success');
-        // You might want to refresh the shipments list here
-        // fetchShipments(); 
-      } else {
-        throw new Error(response.message || 'Failed to update delay reason');
-      }
-    } catch (error: any) {
-      console.error('Error updating delay reason:', error);
-      showMessage(
-        error.message || 'Failed to update delay reason. Please try again.',
-        'error'
-      );
-    }
-  };
-
   // Modal and dialog states
   const [delayHistory, setDelayHistory] = useState<any[]>([]);
   const [delaygpsRemoveHistory, setDelaygpsRemoveHistory] = useState<any[]>([]);
@@ -608,6 +583,7 @@ const [showDriverExpenses, setShowDriverExpenses] = useState(false);
 // Add this near other state declarations
 const [isGeofenceEditorOpen, setIsGeofenceEditorOpen] = useState(false);
 const [selectedShipmentForGeofence, setSelectedShipmentForGeofence] = useState<Shipment | null>(null);
+const [selectedSubFilters, setSelectedSubFilters] = useState<string[]>([]);
 // Add this state to store the location data for the modal
 const [combinedLocationData, setCombinedLocationData] = useState<{
   combinedLocation: string;
@@ -1143,22 +1119,6 @@ const closeActionMenu = () => {
     },
   ];
 
-  const lucideIconMap = {
-    inventory_2: Package2, // closest to "inventory"
-    assignment_ind: UserCheck, // closest to "assignment/user"
-    local_shipping: Truck, // truck for shipping
-    transfer_within_a_station: RefreshCw, // movement/transfer
-    task_alt: ClipboardCheck, // completion/check
-    check_circle: CheckCircle2, // check mark
-  };
-
-  const lucideInsightIcons = {
-    check_circle: CheckCircle2,
-    warning: AlertTriangle,
-    trending_up: TrendingUp,
-    people: Users,
-  };
-
   const analyticsInsights = [
     {
       text: "Shipment volume increased by 12.5% compared to last week",
@@ -1227,98 +1187,27 @@ const closeActionMenu = () => {
   };
 
   const handleSubFilterSelect = (filterKey: string) => {
-    const newSelectedFilter = selectedSubFilter === filterKey ? null : filterKey;
-
-    // 2. Set the state with the new value
-    setSelectedSubFilter(newSelectedFilter);
+    const updatedFilters = selectedSubFilters.includes(filterKey)
+      ? selectedSubFilters.filter(key => key !== filterKey)
+      : [...selectedSubFilters, filterKey];
   
-    // Reset page to 0 and fetch data with the new filter
+    setSelectedSubFilters(updatedFilters);
     setCurrentPage(0);
-    fetchShipments({
-      dashboard_filter: newSelectedFilter,
+  
+    // Prepare filter object for fetchShipments
+    const filterObj: any = {
       skip: 0,
       limit: pageSize,
-    });
-  };
-
-  const handleClearFilters = () => {
-    setInvoiceNo("");
-    setLrNumber("");
-    setFromDate("");
-    setToDate("");
-    setVehicleNumber("");
-    setMobile("");
-    setSelectedCarriers([]);
-    setSelectedOrganizations([]);
-    setSelectedMaterials([]);
-    setSelectedPickups([]);
-    setSelectedDeliveries([]);
-    setSearchQuery("");
-    fetchShipments();
-  };
-
-  const handleOpenShipmentDetails = (shipment: Shipment) => {
-    setSelectedShipmentDetails(shipment);
-    setShowShipmentDetails(true);
-  };
-
-  const handleOpenLocationsPopup = (
-    locations: any[],
-    type: string,
-    event: React.MouseEvent
-  ) => {
-    event.stopPropagation();
-    const locationsArray = Array.isArray(locations) ? locations : [];
-    setLocationPopupData({ locations: locationsArray, type, shipmentSin: "" });
-    setShowLocationPopup(true);
-  };
-
-  const getStatusColor = (status: string) => {
-    const statusColors: { [key: string]: string } = {
-      Completed: "#28a745",
-      "In Transit": "#17a2b8",
-      "At Pickup": "#ffc107",
-      Pending: "#6c757d",
-      Cancelled: "#dc3545",
-      Assigned: "#007bff",
-      "Towards Pickup": "#fd7e14",
-      "At Delivery": "#20c997",
-      Accepted: "#6f42c1",
-      "About to Reach": "#e83e8c",
+      odc: odcFilter
     };
-    return statusColors[status] || "#6c757d";
+  
+    if (updatedFilters.length > 0) {
+      filterObj.status = updatedFilters;  
+    }
+    
+    // Call fetchShipments with the updated filters
+    fetchShipments(filterObj);
   };
-
-  const formatDateTime = (dateTime: string) => {
-    if (!dateTime) return "N/A";
-    return new Date(dateTime).toLocaleString("en-IN", {
-      day: "2-digit",
-      month: "short",
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: true,
-    });
-  };
-
-  const columnsToDisplay = [
-    "selected",
-    "sno",
-    "status",
-    "sin",
-    "pickup_drop",
-    "date_time",
-    "carrier",
-    "vehicle_number",
-    "track",
-    "driver",
-    "driver_phone",
-    "epod",
-    "consent",
-    "subscribed",
-    "last_location",
-    "freight",
-    "action",
-  ];
 
   const fetchDropdownData = async () => {
     try {
@@ -1357,76 +1246,6 @@ const closeActionMenu = () => {
     }
   };
 
-  const handleShipmentClick = (shipment: any) => {
-    setCurrentShipment(shipment);
-    setShowUpdateStatus(true);
-  };
-
-  const handleStatusUpdate = async (statusId: any) => {
-    try {
-      // Call your API to update the status
-      // await updateShipmentStatus(currentShipment.id, statusId);
-      // Handle success (maybe show a success message and refresh the data)
-      setShowUpdateStatus(false);
-    } catch (error) {
-      console.error("Failed to update status:", error);
-    }
-  };
-
-  const handleTrackShipment = (shipment: any, e: React.MouseEvent) => {
-    e.stopPropagation();
-    // Open tracking modal or navigate to tracking page
-    console.log("Tracking shipment:", shipment.sin);
-  };
-
-  const handleMapView = (shipment: any, e: React.MouseEvent) => {
-    e.stopPropagation();
-    // Open map modal
-    console.log("Opening map for shipment:", shipment.sin);
-  };
-
-  const handleShareShipment = (shipment: any, e: React.MouseEvent) => {
-    e.stopPropagation();
-    // Open share modal
-    console.log("Sharing shipment:", shipment.sin);
-  };
-
-  const formatDate = (dateString: string): string => {
-    if (!dateString) return "N/A";
-    return new Date(dateString).toLocaleString();
-  };
-
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
-    // Show success message
-    console.log("Copied to clipboard:", text);
-  };
-
-  const handleAdvancedSearch = () => {
-    // const filters = {
-    //   fromDate,
-    //   toDate,
-    //   invoiceNo,
-    //   lrNumber,
-    //   materials: selectedMaterials.map(m => m._id),
-    //   pickups: selectedPickups.map(p => p._id),
-    //   deliveries: selectedDeliveries.map(d => d._id),
-    //   carriers: selectedCarriers.map(c => c._id),
-    //   status: shipmentStatusName,
-    //   mobile,
-    //   vehicleNo,
-    //   sin: shipmentSIN,
-    //   projectCode,
-    //   saleOrder,
-    //   purchaseOrder,
-    //   ppdNo,
-    //   organization: selectedOrganisation.id,
-    //   segmentations: selectedSegmentation
-    // };
-    // fetchShipments(filters);
-    // setShowAdvanceSearch(false);
-  };
-
   const shipmentStatus = [
     { name: "PNDG", value: "Pending" },
     { name: "ASN", value: "Assigned" },
@@ -1460,85 +1279,9 @@ const closeActionMenu = () => {
     setSelectedOrganisation({ name: "", id: "" });
     setSelectedSegmentation([]);
     setOdcFilter(false);
+    setSelectedSubFilters([]);
 
     fetchShipments();
-  };
-
-  // Pagination Functions
-  const handlePageChange = (newPage: number) => {
-    setCurrentPage(newPage);
-    fetchShipments({
-      skip: newPage * pageSize,
-      limit: pageSize,
-    });
-  };
-
-  const handlePageSizeChange = (newPageSize: number) => {
-    setPageSize(newPageSize);
-    setCurrentPage(0);
-    fetchShipments({
-      skip: 0,
-      limit: newPageSize,
-    });
-  };
-
-  // Modal Functions for all the dialog handlers
-  const openShipmentDetails = (shipment: any, tabIndex: number = 0) => {
-    // Open shipment details modal
-    console.log("Opening shipment details:", shipment);
-  };
-
-  const openAssignModal = (shipment: any, label: string = "Assign Driver") => {
-    // Open assign driver modal
-    console.log("Opening assign modal:", shipment);
-  };
-
-  const openCancelModal = (shipment: any) => {
-    // Open cancel shipment modal
-    console.log("Opening cancel modal:", shipment);
-  };
-
-  const showLastLocation = (shipment: any) => {
-    setLastKnownLocationValue(
-      shipment.trip_tracker?.last_location_address || "N/A"
-    );
-    setLastKnownLocationTime(
-      formatDate(shipment.trip_tracker?.last_location_at)
-    );
-    setShowLastKnownLocationDialog(true);
-  };
-
-  // Bulk Actions
-  const printInvoices = async () => {
-    if (selectedShipmentsArray.length === 0) {
-      alert("Please select shipments");
-      return;
-    }
-
-    const payload = { ids: selectedShipmentsArray };
-    try {
-      const response = await fetch("/api/reports/download_invoice_report", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      const data = await response.json();
-
-      if (data.statusCode === 200) {
-        window.open(data.data.link, "_blank");
-      }
-    } catch (error) {
-      console.error("Error printing invoices:", error);
-    }
-  };
-
-  const printLRs = () => {
-    if (selectedShipmentsArray.length === 0) {
-      alert("Please select shipments");
-      return;
-    }
-    // Open print LR modal
-    console.log("Printing LRs for:", selectedShipmentsArray);
   };
 
   // Initialize data on component mount
@@ -1561,97 +1304,6 @@ const closeActionMenu = () => {
     setShowActiveCarriersPopup(true);
   };
 
-
-  // const getPullFreight = async (data: {
-  //   destination: string;
-  //   freightRate: string;
-  // }) => {
-  //   console.log(" getPullFreight ----");
-  //   try {
-  //     const response = await httpsGet(
-  //       `/api/freight_rate_route_code/get?destination=${encodeURIComponent(
-  //         data.destination
-  //       )}&shipment=${encodeURIComponent(pullFreightData.shipmentId)}`
-  //     );
-
-  //     if (response.statusCode === 200) {
-  //       alert(`New Freight Rate is ${response.data}`);
-  //       setShowPullFreightDialog(false);
-  //     }
-  //   } catch (error) {
-  //     console.error("Error getting freight rate:", error);
-  //     alert("Failed to get freight rate");
-  //   }
-  // };
-
-  const updateFreight = async () => {
-    try {
-      const response = await fetch("/api/shipment/update_freight", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(freightPayload),
-      });
-      const data = await response.json();
-
-      if (data.statusCode === 200) {
-        alert("Freight updated successfully");
-        setShowUpdateFreightDialog(false);
-        fetchShipments();
-      }
-    } catch (error) {
-      console.error("Error updating freight:", error);
-    }
-  };
-
-  const updateShipmentStatus = async () => {
-    if (!selectedShipmentStatus) {
-      alert("Please select a status");
-      return;
-    }
-
-    try {
-      const response = await fetch("/api/shipment/update_status", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          shipment: selectedShipmentSIN,
-          status: selectedShipmentStatus,
-        }),
-      });
-      const data = await response.json();
-
-      if (data.statusCode === 200) {
-        alert("Status updated successfully");
-        setShowUpdateStatusDialog(false);
-        fetchShipments();
-      }
-    } catch (error) {
-      console.error("Error updating status:", error);
-    }
-  };
-
-  const submitManagedBy = async () => {
-    try {
-      const response = await fetch("/api/shipment/add_managed_by", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          shipment: selectedShipmentSIN,
-          managedBy: selectedCarrierManagedBy.id,
-        }),
-      });
-      const data = await response.json();
-
-      if (data.statusCode === 200) {
-        alert("Carrier added successfully");
-        setShowAddManagedByDialog(false);
-        fetchShipments();
-      }
-    } catch (error) {
-      console.error("Error adding managed by:", error);
-    }
-  };
-
   const submitIncreasePrice = async () => {
     try {
       const response = await httpsPost("rates/refresh-freight", {
@@ -1666,115 +1318,6 @@ const closeActionMenu = () => {
     } catch (error) {
       console.error("Error recalculating freight:", error);
       showMessage("Error recalculating freight", "error");
-    }
-  };
-
-  const updateRemarks = async () => {
-    const url =
-      delayReasonType === "delayReason"
-        ? "/api/shipment/delay_reason"
-        : "/api/shipment/gps_disconnection_reason";
-
-    const payload =
-      delayReasonType === "delayReason"
-        ? {
-            _id: selectedShipmentSIN,
-            delay_reason:
-              selectedReason === "Others" ? otherReason : selectedReason,
-            ...(notify ? { notify } : {}),
-          }
-        : {
-            _id: selectedShipmentSIN,
-            reason: selectedReason === "Others" ? otherReason : selectedReason,
-          };
-
-    try {
-      const response = await fetch(url, {
-        method: delayReasonType === "delayReason" ? "PUT" : "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      const data = await response.json();
-
-      if (data.statusCode === 200) {
-        alert("Updated successfully");
-        setShowAddRemarkDialog(false);
-        fetchShipments();
-      }
-    } catch (error) {
-      console.error("Error updating remarks:", error);
-    }
-  };
-
-  const approveWaiveOff = async (status: string) => {
-    try {
-      const response = await fetch(
-        `/api/shipment/delay_penalty_waive_off/${selectedShipmentSIN}`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            status,
-            suggested_amount: shipmentDelayData.suggested_amount,
-          }),
-        }
-      );
-      const data = await response.json();
-
-      if (data.statusCode === 200) {
-        alert("Waive off processed successfully");
-        setShowDelayedShipmentDialog(false);
-        fetchShipments();
-      }
-    } catch (error) {
-      console.error("Error processing waive off:", error);
-    }
-  };
-
-  const handleSearch = (searchValue: string) => {
-    setSearchTerm(searchValue);
-    // Debounce the search
-    const timeoutId = setTimeout(() => {
-      fetchShipments({ search: searchValue });
-    }, 1000);
-
-    return () => clearTimeout(timeoutId);
-  };
-
-  const onRerunSubmit = async () => {
-    if (!selectedRerunOption) {
-      alert("Please select a status");
-      return;
-    }
-
-    try {
-      const response = await fetch("/api/re/run", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          shipment: selectedShipmentSIN,
-          status: selectedRerunOption,
-          startTime: fromDateTsReRun,
-          endTime: toDateTsReRun,
-        }),
-      });
-      const data = await response.json();
-
-      if (data.statusCode === 200) {
-        alert("Rerun successful");
-        setShowRerunDialog(false);
-      }
-    } catch (error) {
-      console.error("Error running rerun:", error);
-    }
-  };
-
-  // File handling functions
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (files) {
-      // Handle file upload logic
-      console.log("Files selected:", files);
     }
   };
 
@@ -1806,51 +1349,6 @@ const closeActionMenu = () => {
       }, 2000);
     } catch (error) {
       console.error("Error uploading files:", error);
-    }
-  };
-
-  const attachFiles = async () => {
-    // Handle file attachment logic
-    console.log("Attaching files");
-  };
-
-  const uploadBulkShipments = async () => {
-    // Handle bulk upload logic
-    console.log("Uploading bulk shipments");
-  };
-
-  const submitRoambee = async () => {
-    if (!selectedShipmentForRoambee) return;
-
-    try {
-      setIsSubmittingRoambee(true);
-      // Replace with your actual API endpoint
-      const response = await httpsPost("shipment/add_roambee_id", {
-        shipmentId: selectedShipmentForRoambee._id,
-        roambeeId,
-      });
-
-      if (response.data.statusCode === 200) {
-        showMessage("Roambee ID added successfully", "success");
-        setShowRoambeeModal(false);
-        // Refresh the shipments list or update the specific shipment
-        fetchShipments();
-      }
-    } catch (error: any) {
-      showMessage(
-        error.response?.data?.message || "Failed to add Roambee ID",
-        "error"
-      );
-    } finally {
-      setIsSubmittingRoambee(false);
-    }
-  };
-
-  const handleWarningConfirm = (confirmed: boolean) => {
-    setShowWarningDialog(false);
-    if (confirmed) {
-      // Proceed with the action
-      console.log("Warning confirmed, proceeding...");
     }
   };
 
@@ -1904,8 +1402,12 @@ const closeActionMenu = () => {
       filters.odc = odcFilter;
     }
 
+    if (typeof type === "object" && type !== null && !Array.isArray(type)) {
+    Object.assign(filters, type);
+  }
+
     // Use the provided type or fall back to the current shipmentType
-    const filterType = type || shipmentType;
+    const filterType = shipmentType;
 
     if (filterType !== "all") {
       filters.type_filter = filterType;
@@ -2418,40 +1920,6 @@ const closeActionMenu = () => {
     );
   };
 
-  const renderSINCell = (shipment: any) => (
-    <div>
-      {shipment.sin}
-      {shipment.ppd && <span>-{shipment.ppd}</span>}
-      {shipment.serial_number && (
-        <span>
-          {shipment.is_unplanned ? " - US" : " - SS"}- {shipment.serial_number}
-        </span>
-      )}
-      {shipment.delayed_shipment && (
-        <span
-          title="Delay"
-          style={{
-            cursor: "default",
-            display: "inline-flex",
-            verticalAlign: "middle",
-            marginLeft: 8,
-          }}
-        >
-          <AlertCircle size={18} color="#e03e3e" />
-        </span>
-      )}
-      {shipment.sale_order && (
-        <div>
-          {shipment.sale_order.split(",")[0]}
-          {shipment.sale_order.split(",").length > 1 && (
-            <span title={shipment.sale_order.split(",").slice(1).join(",")}>
-              +{shipment.sale_order.split(",").length - 1}
-            </span>
-          )}
-        </div>
-      )}
-    </div>
-  );
   const renderLocationCell = (
     shipment: any,
     copyDestinationCode: (code: string) => void,
@@ -2708,87 +2176,6 @@ const renderLastLocationCell = (shipment: any) => {
     ) : null;
   };
 
-  const handleAttachFiles = async (files: FileList) => {
-    setIsUploading(true);
-    try {
-      // Handle file upload here
-      console.log("Uploading files:", files);
-      // await uploadFiles(files);
-      setShowAttachModal(false);
-    } catch (error) {
-      console.error("Error uploading files:", error);
-    } finally {
-      setIsUploading(false);
-    }
-  };
-
-  const renderMaterialCell = (shipment: any) => (
-    <div>
-      {shipment.material?.map((item: any, i: number) => (
-        <span key={i}>
-          {item.name}
-          {i < shipment.material.length - 1 && ", "}
-        </span>
-      ))}
-    </div>
-  );
-
-  const filteredCarriers = allCarriers.filter((carrier) =>
-    carrier.name.toLowerCase().includes(carrierSearch.toLowerCase())
-  );
-
-  // const handleApply = () => {
-  //   const filters = {};
-  //   if (selectedOrganisation) filters.organizations = [selectedOrganisation.id || selectedOrganisation._id];
-  //   if (selectedMaterials.length) filters.materials = selectedMaterials.map((m) => m.id || m._id);
-  //   if (invoiceNo) filters.invoice_no = invoiceNo;
-  //   if (lrNumber) filters.lr_no = lrNumber;
-  //   if (shipmentSin) filters.SIN = shipmentSin;
-  //   if (shipmentStatus.length) filters.status = shipmentStatus;
-  //   if (projectCode) filters.project_code = projectCode;
-  //   if (ppdNo) filters.ppd_no = ppdNo;
-  //   if (selectedPickups.length) filters.pickups = selectedPickups.map((p) => p.id || p._id);
-  //   if (selectedCarriers.length) filters.carriers = selectedCarriers.map((c) => c.id || c._id);
-  //   if (commercialInvoice !== null) filters.commercial_invoice = commercialInvoice;
-  //   if (selectedDeliveries.length) filters.deliveries = selectedDeliveries.map((d) => d.id || d._id);
-  //   if (fromDateString) filters.from = fromDateString;
-  //   if (toDateString) filters.to = toDateString;
-  //   if (transVehicle) filters.trans_vehicle = transVehicle === "Trans";
-  //   if (saleOrder) filters.sale_order = saleOrder;
-  //   if (purchaseOrder) filters.purchase_order = purchaseOrder;
-  //   if (selectedSegmentations.length) filters.segmentations = selectedSegmentations;
-  //   if (nonTracking) filters.nonTracking = nonTracking === "Tracking" ? false : true;
-  //   if (mobile) filters.mobile = mobile;
-
-  //   if (onApply) onApply(filters);
-  // };
-
-  // const handleClear = () => {
-  //   setSelectedOrganisation(null);
-  //   setSelectedMaterials([]);
-  //   setInvoiceNo("");
-  //   setLrNumber("");
-  //   setShipmentSin("");
-  //   setShipmentStatus([]);
-  //   setProjectCode("");
-  //   setPpdNo("");
-  //   setSelectedPickups([]);
-  //   setSelectedCarriers([]);
-  //   setCarrierSearch("");
-  //   setCommercialInvoice(null);
-  //   setSelectedDeliveries([]);
-  //   setFromDateString("");
-  //   setToDateString("");
-  //   setTransVehicle("");
-  //   setSaleOrder("");
-  //   setPurchaseOrder("");
-  //   setSelectedSegmentations([]);
-  //   setNonTracking("");
-  //   setMobile("");
-
-  //   if (onClear) onClear();
-  // };
-
   const [showBulkUploadModal, setShowBulkUploadModal] = useState(false);
   const [selectedShipmentForBulkUpload, setSelectedShipmentForBulkUpload] = useState<any>(null);
 
@@ -2927,23 +2314,6 @@ const renderLastLocationCell = (shipment: any) => {
     setShowRerunDialog(true);
   }
 
-  const handlePaymentAdviceSubmit = async (data: any) => {
-    try {
-      // TODO: Replace with your actual API call
-      // const response = await httpsPost('carrier_bill_advice/create', data);
-      // if (response.success) {
-      //   // Handle success
-      //   setShowPaymentAdviceModal(false);
-      //   // Optionally refresh the data
-      //   fetchShipments();
-      // }
-      console.log("Payment advice data:", data);
-      setShowPaymentAdviceModal(false);
-    } catch (error) {
-      console.error("Error creating payment advice:", error);
-    }
-  };
-
   const [showEditLocationModal, setShowEditLocationModal] = useState(false);
   const [selectedLocationType, setSelectedLocationType] = useState<'pickup' | 'delivery'>('pickup');
   const [shipperPrefs, setShipperPrefs] = useState<ShipperPrefs>({
@@ -3024,28 +2394,6 @@ const handleOpenEditLocation = (shipment: any, type: 'pickup' | 'delivery') => {
     }
   };
 
-  const handleFetchLocations = async (date: Date | null) => {
-    if (!selectedShipment) return [];
-    
-    try {
-      // Implement your location fetching logic here
-      // This is a placeholder - replace with your actual API call
-      const response = await httpsGet('location/search', 
-      //   {
-      //   date: date?.toISOString(),
-      //   type: selectedLocationType,
-      //   shipmentId: selectedShipment._id
-      // }, 
-      4);
-      
-      return response.data || [];
-    } catch (error) {
-      console.error('Error fetching locations:', error);
-      showMessage('Failed to fetch locations', 'error');
-      return [];
-    }
-  };
-
   const SearchTypes = [
   { name: 'SIN', value: 'SIN' },
   { name: 'Project Code', value: 'project_code' },
@@ -3073,44 +2421,6 @@ const applyFilter = () => {
   // Clear the input flag and fetch shipments
   fetchShipments(shipmentsFilter);
 };
-
-
-  const handleEditSubmit = async (location: any, date: Date | null) => {
-    if (!selectedShipment) return;
-    
-    try {
-      const payload = {
-        shipmentId: selectedShipment._id,
-        locationId: location._id,
-        type: selectedLocationType,
-        date: date?.toISOString()
-      };
-      
-      const response = await httpsPost('shipment/update-location', payload, {}, 4);
-      
-      if (response.statusCode === 200) {
-        showMessage('Location updated successfully', 'success');
-        fetchShipments(); // Refresh the shipments list
-        setShowEditLocationModal(false);
-      } else {
-        throw new Error(response.message || 'Failed to update location');
-      }
-    } catch (error: any) {
-      console.error('Error updating location:', error);
-      showMessage(error.message || 'Failed to update location', 'error');
-    }
-  };
-
-  const fetchLocations = async (date: Date | null) => {
-    try {
-      // TODO: Implement the API call to fetch locations
-      return [];
-    } catch (error) {
-      console.error("Error fetching locations:", error);
-      return [];
-    }
-  };
-
 
   const [isPrintLRModalOpen, setIsPrintLRModalOpen] = useState(false);
   const [selectedShipmentIds, setSelectedShipmentIds] = useState<string[]>([]);
@@ -3243,27 +2553,6 @@ const applyFilter = () => {
   }>>([]);
   const [isLoadingInvoices, setIsLoadingInvoices] = useState(false);
 
-  const fetchInvoiceData = async (shipmentId: string) => {
-    try {
-      setIsLoadingInvoices(true);
-      const response = await httpsGet(`/api/shipment/one/${shipmentId}`);
-      // Transform the response data to match the expected format
-      const invoiceItems = response.data.invoices?.map((inv: any) => ({
-        invoiceType: inv.invoiceType || 'CT',
-        invoice: inv.invoiceNumber || '',
-        shippedQty: inv.shippedQuantity || 0,
-        shippedNop: inv.shippedPieces || 0,
-        ...inv // Include all other invoice properties
-      })) || [];
-      setInvoiceData(invoiceItems);
-    } catch (error) {
-      console.error('Error fetching invoice data:', error);
-      // Show error toast or notification
-    } finally {
-      setIsLoadingInvoices(false);
-    }
-  };
-
   const handleInvoiceTypeChange = (item: any, newType: 'CT' | 'PT') => {
     setInvoiceData(prevData =>
       prevData.map(inv =>
@@ -3317,7 +2606,16 @@ const applyFilter = () => {
     <div className={styles.main}>
       {/* Header */}
       <div className={styles.shipmentsMainHeader}>
-        <h1 className={styles.pageTitle}>Shipments Dashboard</h1>
+                <div className={styles.filterGroup}>
+  <label className={styles.checkboxLabel}>
+    <input
+      type="checkbox"
+      checked={odcFilter === true}
+      onChange={(e) => setOdcFilter(e.target.checked)}
+    />
+    <span>ODC Shipment(s)</span>
+  </label>
+</div>
         <HeaderActions
           onFetchShipments={openFetchJdeShipment}
           onUpdateVehicleArrival={uploadVehicleArrivalBackToJde}
@@ -3372,60 +2670,31 @@ const applyFilter = () => {
       </div>
       {/* Sub Filters */}
       <div className={styles.subFiltersContainer}>
-        <div className={styles.filterButtonsGroup}>
-          {subFilters.map((filter) => (
-    //         <button
-    //           key={filter.key}
-    //           className={`${styles.filterButton} ${
-    //             selectedSubFilter === filter.key ? styles.selected : ""
-    //           }`}
-    //           onClick={() => handleSubFilterSelect(filter.key)}
-    //            style={{
-    //   border: `2px solid ${filter.color}`,
-    //   backgroundColor:
-    //     selectedSubFilter === filter.key
-    //       ? `${filter.color}20` 
-    //       : "transparent",    
-    // }}
-    //         >
-    //           {filter.label}
-    //           <span className={styles.filterCount} style={{ 
-    //             backgroundColor: filter.color,
-    //             color: 'white'
-    //           }}>
-    //             {filter.count}
-    //           </span>
-    //         </button>
-
-    <button
-    key={filter.key}
-    className={`${styles.filterButton} ${
-      selectedSubFilter === filter.key ? styles.selected : ""
-    }`}
-    onClick={() => handleSubFilterSelect(filter.key)}
-    style={{
-      // @ts-ignore
-      '--filter-color': filter.color,
-      '--filter-color-10': `${filter.color}1a`,
-      '--filter-color-20': `${filter.color}33`,
-      borderColor: filter.color,
-      color: selectedSubFilter === filter.key ? filter.color : 'inherit',
-    } as React.CSSProperties}
-  >
-    {filter.label}
-  </button>
-          ))}
-        </div>
-        {/* <div className={styles.filterGroup}>
-  <label className={styles.checkboxLabel}>
-    <input
-      type="checkbox"
-      checked={odcFilter === true}
-      onChange={(e) => setOdcFilter(e.target.checked)}
-    />
-    <span>ODC Shipment(s)</span>
-  </label>
-</div> */}
+<div className={styles.filterButtonsGroup}>
+  {subFilters.map((filter) => {
+    const isSelected = selectedSubFilters.includes(filter.key);
+    return (
+      <button
+        key={filter.key}
+        className={`${styles.filterButton} ${
+          isSelected ? styles.selected : ""
+        }`}
+        onClick={() => handleSubFilterSelect(filter.key)}
+        style={{
+          '--filter-color': filter.color,
+          '--filter-color-10': `${filter.color}1a`,
+          '--filter-color-20': `${filter.color}33`,
+          borderColor: filter.color,
+          color: isSelected ? filter.color : 'inherit',
+          backgroundColor: isSelected ? `${filter.color}1a` : 'transparent',
+        } as React.CSSProperties}
+      >
+        {filter.label}
+        {isSelected && <span className={styles.checkmark}>✓</span>}
+      </button>
+    );
+  })}
+</div>
 
 
       </div>
@@ -3696,7 +2965,6 @@ const applyFilter = () => {
                 setActionSearch={setActionSearch}
                 actionMenuCategories={actionMenuCategories}
                 renderStatusCell={renderStatusCell}
-                renderSINCell={renderSINCell}
                 renderLocationCell={renderLocationCell}
                 renderDateTimeCell={renderDateTimeCell}
                 renderVehicleCell={renderVehicleCell}
@@ -4462,7 +3730,7 @@ const applyFilter = () => {
   />
 )}
 
-    // </div>
+    </div>
   );
 };
 

@@ -62,7 +62,6 @@ interface ShipmentsTableProps {
   setActionSearch: (value: string) => void;
   actionMenuCategories: any;
   renderStatusCell: (shipment: Shipment) => React.ReactNode;
-  renderSINCell: (shipment: Shipment) => React.ReactNode;
   renderLocationCell: (
     shipment: Shipment,
     copyDestinationCode: any,
@@ -110,7 +109,6 @@ export const ShipmentsTable: React.FC<ShipmentsTableProps> = ({
   setActionSearch,
   actionMenuCategories,
   renderStatusCell,
-  renderSINCell,
   renderLocationCell,
   renderDateTimeCell,
   renderVehicleCell,
@@ -196,7 +194,7 @@ export const ShipmentsTable: React.FC<ShipmentsTableProps> = ({
             <th
               className={`${styles.matHeaderCell} ${styles.matColumnSno} ${styles.stickyTop} ${styles.stickyColumn}`}
             >
-              S.No
+              S.No.
             </th>
             <th
               className={`${styles.matHeaderCell} ${styles.matColumnStatus} ${styles.stickyTop}${styles.stickyColumn}`}
@@ -267,6 +265,20 @@ export const ShipmentsTable: React.FC<ShipmentsTableProps> = ({
             >
               Subscribed
             </th>
+            <th className={styles.matHeaderCell}>Serial No.</th>
+            <th className={styles.matHeaderCell}>ePOD Received</th>
+            <th className={styles.matHeaderCell}>PPD Updated</th>
+            <th className={styles.matHeaderCell}>PPD</th>
+            <th className={styles.matHeaderCell}>Delayed</th>
+            <th className={styles.matHeaderCell}>Sale Order</th>
+            <th className={styles.matHeaderCell}>Driver Expense Paid</th>
+            <th className={styles.matHeaderCell}>Driver Expense Exists</th>
+            <th className={styles.matHeaderCell}>ePOD Requested</th>
+            <th className={styles.matHeaderCell}>Delay Penalty Waive Off</th>
+            <th className={styles.matHeaderCell}>Waybill Flag</th>
+            <th className={styles.matHeaderCell}>Advance Amount</th>
+            <th className={styles.matHeaderCell}>GPS Vehicle</th>
+            <th className={styles.matHeaderCell}>Commercial Invoice Exist</th>
             <th
               className={`${styles.matHeaderCell} ${styles.matColumnLastLocation}`}
             >
@@ -319,7 +331,7 @@ export const ShipmentsTable: React.FC<ShipmentsTableProps> = ({
                   {renderStatusCell(shipment)}
                 </td>
                 <td className={`${styles.matCell} ${styles.matColumnSIN}`}>
-                  {renderSINCell(shipment)}
+                  {shipment.sin}
                 </td>
 
                 {/* Pickup Cell - Hide for outbound */}
@@ -454,6 +466,91 @@ export const ShipmentsTable: React.FC<ShipmentsTableProps> = ({
                   {renderSubscriptionCell(shipment)}
                 </td>
 
+                <td className={styles.matCell}>
+                  {shipment.serial_number
+                    ? `${shipment.is_unplanned ? "US" : "SS"} - ${shipment.serial_number}`
+                    : "-"}
+                </td>
+                <td className={styles.matCell}>
+                  {shipment.whatsApp?.isEpodReceived ? "Yes" : "No"}
+                </td>
+                <td className={styles.matCell}>
+                  {shipment.ppd_updated ? (
+                    <span title="PPD Updated">
+                      <CheckCircle size={16} color="#22c55e" />
+                    </span>
+                  ) : (
+                    "-"
+                  )}
+                </td>
+                <td className={styles.matCell}>{shipment.ppd || "-"}</td>
+                <td className={styles.matCell}>
+                  {shipment.delayed_shipment ? (
+                    <span style={{ color: "#e03e3e" }}>Yes</span>
+                  ) : (
+                    "No"
+                  )}
+                </td>
+                <td className={styles.matCell}>
+                  {shipment.sale_order
+                    ? (() => {
+                        const orders = shipment.sale_order.split(",");
+                        return (
+                          <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                            <span>{orders[0]}</span>
+                            {orders.length > 1 && (
+                              <span
+                                className={styles.buble_round}
+                                title={orders.slice(1).join(",")}
+                                style={{
+                                  background: "#e5e7eb",
+                                  borderRadius: "50%",
+                                  padding: "0 6px",
+                                  fontSize: "12px",
+                                  marginLeft: "4px",
+                                }}
+                              >
+                                +{orders.length - 1}
+                              </span>
+                            )}
+                          </span>
+                        );
+                      })()
+                    : "-"}
+                </td>
+                <td className={styles.matCell}>
+                  {shipment.status === "Completed" && shipment.carrier_parent_name === "Own Fleet"
+                    ? shipment.driver_expense_paid
+                      ? "Yes"
+                      : "No"
+                    : "-"}
+                </td>
+                <td className={styles.matCell}>
+                  {shipment.status === "Completed" && shipment.carrier_parent_name === "Own Fleet"
+                    ? shipment.driver_expense_exists && !shipment.driver_expense_paid
+                      ? "Yes"
+                      : "No"
+                    : "-"}
+                </td>
+                <td className={styles.matCell}>
+                  {shipment.whatsApp?.isEpodRequested ? "Yes" : "No"}
+                </td>
+                <td className={styles.matCell}>
+                  {shipment.delay_penalty_waive_off?.status === "PENDING" ? "Pending" : "No"}
+                </td>
+                <td className={styles.matCell}>
+                  {shipment.waybillFlag ? "Yes" : "No"}
+                </td>
+                <td className={styles.matCell}>
+                  {shipment.advance_amount ? shipment.advance_amount : "-"}
+                </td>
+                <td className={styles.matCell}>
+                  {shipment.gpsVehicle ? "Yes" : "No"}
+                </td>
+                <td className={styles.matCell}>
+                  {shipment.commercial_invoice_exist ? "Yes" : "No"}
+                </td>
+
                 <td
                   className={`${styles.matCell} ${styles.matColumnLastLocation}`}
                 >
@@ -471,9 +568,9 @@ export const ShipmentsTable: React.FC<ShipmentsTableProps> = ({
                   <div className={styles.quickActions}>
                     <DropdownMenu
                       open={actionMenuOpenId === shipment._id}
-  onOpenChange={(open) => {
-    setActionMenuOpenId(open ? shipment._id : null);
-  }}
+                      onOpenChange={(open) => {
+                        setActionMenuOpenId(open ? shipment._id : null);
+                      }}
                     >
                       <DropdownMenuTrigger asChild>
                         <button
