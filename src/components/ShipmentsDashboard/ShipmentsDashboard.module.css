@@ -141,7 +141,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 24px;
+  /* padding: 16px 24px; */
   border-bottom: 1px solid #e0e0e0;
   background-color: #fff;
 }
@@ -4273,4 +4273,17 @@ select.didFloatingSelect::-ms-expand {
 .checkboxLabel input[type="checkbox"]:focus {
   outline: 2px solid #4f46e5;
   outline-offset: 2px;
+}
+
+.headerActions {
+    display: flex;
+}
+
+.helpIcon {
+  color: #4f46e5; /* or any color that matches your design */
+  cursor: pointer;
+}
+
+.helpIcon:hover {
+  color: #4338ca; /* slightly darker on hover */
 }
