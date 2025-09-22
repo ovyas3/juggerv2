@@ -1034,6 +1034,21 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
         disabled: (shipment: Shipment) => 
           ['Completed', 'Cancelled'].includes(shipment.status)
       },
+      {
+        icon: Upload,
+        label: "Upload EPOD",
+        color: "text-green-600",
+      },
+      {
+        icon: Upload,
+        label: "Request EPOD",
+        color: "text-green-600",
+      },
+      {
+        icon: Upload,
+        label: "Recalculate Customer Gate In/Out",
+        color: "text-green-600",
+      },
     ]
   };
 

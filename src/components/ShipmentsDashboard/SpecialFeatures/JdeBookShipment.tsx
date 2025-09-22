@@ -379,14 +379,14 @@ const JdeBookShipment: React.FC<JdeBookShipmentProps> = ({
               </Box>
             </Box>
 
-            <Box className={styles.submitButton}>
-              <Button
-                variant="contained"
+            <Box>
+              <button
                 onClick={handleSubmitSearch}
                 disabled={selectedSerials.size === 0}
+                className={styles.submitButton}
               >
                 Submit
-              </Button>
+              </button>
             </Box>
           </>
         )}
@@ -441,13 +441,13 @@ const JdeBookShipment: React.FC<JdeBookShipmentProps> = ({
                 label="Make First Pickup as Last Delivery"
               />
 
-              <Button
-                variant="contained"
+              <button
                 onClick={handleBookShipment}
                 disabled={loading}
+                className={styles.bookShipmentButton}
               >
                 {loading ? "Processing..." : "Book Shipment"}
-              </Button>
+              </button>
             </Box>
           </>
         )}

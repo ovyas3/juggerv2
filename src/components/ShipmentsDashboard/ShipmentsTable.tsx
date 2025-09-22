@@ -242,11 +242,11 @@ export const ShipmentsTable: React.FC<ShipmentsTableProps> = ({
               <th className={styles.matHeaderCell}>Booked By</th>
             )}
 
-            <th className={styles.matHeaderCell}>Vehicle Number</th>
+            <th className={`${styles.matHeaderCell} ${styles.matColumnVehicleNumber}`}>Vehicle Number</th>
             <th className={`${styles.matHeaderCell} ${styles.matColumnTrack}`}>
               Track
             </th>
-            <th className={styles.matHeaderCell}>Driver</th>
+            <th className={`${styles.matHeaderCell} ${styles.matColumnDriver}`}>Driver</th>
             <th
               className={`${styles.matHeaderCell} ${styles.matColumnDriverPhone}`}
             >
@@ -265,20 +265,20 @@ export const ShipmentsTable: React.FC<ShipmentsTableProps> = ({
             >
               Subscribed
             </th>
-            <th className={styles.matHeaderCell}>Serial No.</th>
-            <th className={styles.matHeaderCell}>ePOD Received</th>
-            <th className={styles.matHeaderCell}>PPD Updated</th>
-            <th className={styles.matHeaderCell}>PPD</th>
-            <th className={styles.matHeaderCell}>Delayed</th>
-            <th className={styles.matHeaderCell}>Sale Order</th>
-            <th className={styles.matHeaderCell}>Driver Expense Paid</th>
-            <th className={styles.matHeaderCell}>Driver Expense Exists</th>
-            <th className={styles.matHeaderCell}>ePOD Requested</th>
-            <th className={styles.matHeaderCell}>Delay Penalty Waive Off</th>
-            <th className={styles.matHeaderCell}>Waybill Flag</th>
-            <th className={styles.matHeaderCell}>Advance Amount</th>
-            <th className={styles.matHeaderCell}>GPS Vehicle</th>
-            <th className={styles.matHeaderCell}>Commercial Invoice Exist</th>
+            <th className={`${styles.matHeaderCell} ${styles.matColumnSerialNo}`}>Serial No.</th>
+            <th className={`${styles.matHeaderCell} ${styles.matColumnEpodReceived}`}>ePOD Received</th>
+            <th className={`${styles.matHeaderCell} ${styles.matColumnPpdUpdated}`}>PPD Updated</th>
+            <th className={`${styles.matHeaderCell} ${styles.matColumnPpd}`}>PPD</th>
+            <th className={`${styles.matHeaderCell} ${styles.matColumnDelayed}`}>Delayed</th>
+            <th className={`${styles.matHeaderCell} ${styles.matColumnSaleOrder}`}>Sale Order</th>
+            <th className={`${styles.matHeaderCell} ${styles.matColumnDriverExpensePaid}`}>Driver Expense Paid</th>
+            <th className={`${styles.matHeaderCell} ${styles.matColumnDriverExpenseExists}`}>Driver Expense Exists</th>
+            <th className={`${styles.matHeaderCell} ${styles.matColumnEpodRequested}`}>ePOD Requested</th>
+            <th className={`${styles.matHeaderCell} ${styles.matColumnDelayPenaltyWaiveOff}`}>Delay Penalty Waive Off</th>
+            <th className={`${styles.matHeaderCell} ${styles.matColumnWaybillFlag}`}>Waybill Flag</th>
+            <th className={`${styles.matHeaderCell} ${styles.matColumnAdvanceAmount}`}>Advance Amount</th>
+            <th className={`${styles.matHeaderCell} ${styles.matColumnGpsVehicle}`}>GPS Vehicle</th>
+            <th className={`${styles.matHeaderCell} ${styles.matColumnCommercialInvoiceExist}`}>Commercial Invoice Exist</th>
             <th
               className={`${styles.matHeaderCell} ${styles.matColumnLastLocation}`}
             >

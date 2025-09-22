@@ -204,7 +204,10 @@ const BulkUpload: React.FC<BulkUploadProps> = ({
           {type !== "commercial_invoice" &&
             type !== "commercial_invoice_Tcode" && (
               <FormControl fullWidth sx={{ mb: 3 }} error={!selectedOrg}>
-                <InputLabel id="organization-label">
+                <InputLabel 
+                 id="organization-label"
+                 sx={{ backgroundColor: 'background.paper', px: 0.5, zIndex: 1 }}
+                >
                   Select Client <span style={{ color: "red" }}>*</span>
                 </InputLabel>
                 <Select
@@ -218,6 +221,22 @@ const BulkUpload: React.FC<BulkUploadProps> = ({
                   }}
                   label="Organization"
                   disabled={loading}
+                  sx={{
+                    '&.Mui-focused': {
+                      boxShadow: '0 0 0 2px rgba(79,70,229,0.2)',
+                    },
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      borderColor: 'rgba(0,0,0,0.23)',
+                    },
+                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#4f46e5',
+                    },
+                    '& .MuiSelect-select': {
+                      minHeight: 0,
+                      paddingTop: 1.2,
+                      paddingBottom: 1.2,
+                    },
+                  }}
                 >
                   {organizations.map((org) => (
                     <MenuItem key={org._id} value={org._id}>

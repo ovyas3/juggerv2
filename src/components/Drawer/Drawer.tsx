@@ -172,7 +172,7 @@ const navigationItems: NavItem[] = [
     },
     {
         id: 'shipmentsDashboard',
-        label: 'Shipments Dashboard',
+        label: 'Shipments List',
         icon: '',
         activeIcon: RouteActiveIcon,
         inactiveIcon: RouteInactiveIcon,

@@ -53,6 +53,41 @@
   display: flex;
   justify-content: flex-end;
   margin-top: 16px;
+  width: 80px;
+  display: grid;
+  place-items: center;
+  height: 39px;
+  border-radius: 4px;
+  color: white;
+  float: right;
+  margin: 15px;
+  cursor: pointer;
+  border: none;
+  background-color: #4F46E5;
+  color: white;
+}
+
+.submitButton:hover {
+  background-color: #4338ca;
+}
+
+.bookShipmentButton {
+  width: 80px;
+  display: grid;
+  place-items: center;
+  height: 39px;
+  border-radius: 4px;
+  color: white;
+  float: right;
+  margin: 15px;
+  cursor: pointer;
+  border: none;
+  background-color: #4F46E5;
+  color: white;
+}
+
+.bookShipmentButton:hover {
+  background-color: #4338ca;
 }
 
 .serialInvoicesContainer {
@@ -122,6 +157,10 @@
   border: none;
   background-color: #4F46E5;
   color: white;
+}
+
+.searchButton:hover {
+  background-color: #4338ca;
 }
 
 .datePickerContainer :global(.ant-picker-dropdown) {

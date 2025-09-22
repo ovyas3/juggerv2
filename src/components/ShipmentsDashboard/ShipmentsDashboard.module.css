@@ -132,7 +132,6 @@
 .tableContainer {
   position: relative;
   overflow-y: auto;
-  max-height: calc(100vh - 250px);
 }
 .main .matSelectTrigger {
   padding: 2px 8px;
@@ -833,7 +832,7 @@
   width: 100%;
   overflow-x: auto;
   overflow-y: auto; 
-  max-height: calc(100vh - 250px);
+  max-height: calc(100vh - 343px);
 
 }
 .tableContainer .matTable {
@@ -896,6 +895,8 @@ table.matTable {
   border-spacing: 0;
   border-bottom: solid 1px #d2d2d2;
   text-align: center;
+  border-spacing: 0; /* Add this if not present */
+  border-collapse: separate;
 }
 
 .matSortHeaderContainer {
@@ -1255,9 +1256,19 @@ table.matTable {
   max-width: 70px !important;
 }
 
-.matColumnDriverPhone {
+.matColumnVehicleNumber {
   min-width: 120px !important;
   max-width: 120px !important;
+}
+
+.matColumnDriver {
+  min-width: 120px !important;
+  max-width: 120px !important;
+}
+
+.matColumnDriverPhone {
+  min-width: 110px !important;
+  max-width: 110px !important;
 }
 
 .matColumnEpod {
@@ -1266,8 +1277,8 @@ table.matTable {
 }
 
 .matColumnConsent {
-  min-width: 100px !important;
-  max-width: 100px !important;
+  min-width: 90px !important;
+  max-width: 90px !important;
 }
 
 .matColumnSubscribed {
@@ -1275,10 +1286,77 @@ table.matTable {
   max-width: 120px !important;
 }
 
+.matColumnSerialNo {
+  min-width: 100px !important;
+  max-width: 100px !important;
+}
+
+.matColumnEpodReceived {
+  min-width: 120px !important;
+  max-width: 120px !important;
+}
+
+.matColumnPpdUpdated {
+  min-width: 120px !important;
+  max-width: 120px !important;
+}
+
+.matColumnPpd {
+  min-width: 120px !important;
+  max-width: 120px !important;
+}
+
+.matColumnDelayed {
+  min-width: 120px !important;
+  max-width: 120px !important;
+}
+
+.matColumnSaleOrder {
+  min-width: 120px !important;
+  max-width: 120px !important;
+}
+
+.matColumnDriverExpensePaid {
+  min-width: 120px !important;
+  max-width: 120px !important;
+}
+
+.matColumnDriverExpenseExists {
+  min-width: 120px !important;
+  max-width: 120px !important;
+}
+
+.matColumnEpodRequested {
+  min-width: 120px !important;
+  max-width: 120px !important;
+}
+
+.matColumnDelayPenaltyWaiveOff {
+  min-width: 120px !important;
+  max-width: 120px !important;
+}
+
+.matColumnWaybillFlag {
+  min-width: 120px !important;
+  max-width: 120px !important;
+}
+.matColumnAdvanceAmount {
+  min-width: 120px !important;
+  max-width: 120px !important;
+}
+.matColumnGpsVehicle {
+  min-width: 120px !important;
+  max-width: 120px !important;
+}
+.matColumnCommercialInvoiceExist {
+  min-width: 120px !important;
+  max-width: 120px !important;
+}
+
 .matColumnLastLocation {
-  min-width: 180px !important;
-  max-width: 180px !important;
-  width: 180px !important;
+  min-width: 120px !important;
+  max-width: 120px !important;
+  width: 120px !important;
   border-right: solid 1px #d2d2d2 !important;
 }
 
@@ -3202,8 +3280,8 @@ select.didFloatingSelect::-ms-expand {
 .matColumnSelect {
   position: sticky;
   left: 0;
-  min-width: 40px;
-  width: 40px;
+  min-width: 48px;
+  width: 48px;
   top: 0;
   z-index: 30;
   background: #ebeef7;
@@ -3393,7 +3471,9 @@ select.didFloatingSelect::-ms-expand {
   position: sticky !important;
 }
 
-
+.matCell, .matRow {
+  box-sizing: border-box;
+}
 
 /* Action Column Styles */
 .actionCell {
@@ -4123,6 +4203,21 @@ select.didFloatingSelect::-ms-expand {
   color: #fff;
   border: 2px solid #4f46e5;
   padding: 0px 10px;
+}
+
+.perSinSelect:hover {
+  border-color: #4f46e5;
+  background-color: #4f46e5;
+}
+
+.perSinSelect:active {
+  border-color: #4f46e5 !important;
+  background-color: #4f46e5 !important;
+}
+
+.perSinSelect:focus {
+  border-color: #4f46e5 !important;
+  background-color: #4f46e5 !important;
 }
 
 .filterGroup {
