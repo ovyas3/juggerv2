@@ -29,6 +29,7 @@ import redSIM from "../../assets/red-SIM.svg";
 import spotdrivericon from "../../assets/spotdriver-blue.svg";
 import Image from "next/image";
 import { environment } from "@/environments/env.api";
+import { toTitleCase } from "@/utils/stringUtils"
 
 interface Shipment {
   _id: string;
@@ -253,7 +254,7 @@ export const ShipmentsTable: React.FC<ShipmentsTableProps> = ({
               Phone
             </th>
             <th className={`${styles.matHeaderCell} ${styles.matColumnEpod}`}>
-              EPOD
+              ePOD
             </th>
             <th
               className={`${styles.matHeaderCell} ${styles.matColumnConsent}`}
@@ -379,7 +380,7 @@ export const ShipmentsTable: React.FC<ShipmentsTableProps> = ({
                       : styles.leftAfterPickup
                   }`}
                 >
-                  {shipment.carrier_parent_name}
+                  {toTitleCase(shipment.carrier_parent_name)}
                 </td>
 
                 {shipmentType === "inbound" && (
@@ -427,7 +428,7 @@ export const ShipmentsTable: React.FC<ShipmentsTableProps> = ({
 
                 <td className={styles.matCell}>
                   <div>
-                    {shipment.driverName}
+                    {toTitleCase(shipment.driverName || "")}
                     {shipment.isSpotDriver && (
                       <span>
                         {" "}
