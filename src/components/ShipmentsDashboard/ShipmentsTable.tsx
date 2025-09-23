@@ -80,6 +80,7 @@ interface ShipmentsTableProps {
   handleSelectShipment: (id: string, checked: boolean) => void;
   copyDestinationCode: any;
   openLocationsPopup: any;
+  onViewDetails: (shipmentId: string) => void;
   formatCurrency: (amount: number) => string;
   // onViewDetails: (shipment: Shipment) => void;
   // onShare: (shipment: Shipment) => void;
@@ -116,6 +117,7 @@ export const ShipmentsTable: React.FC<ShipmentsTableProps> = ({
   copyDestinationCode,
   openLocationsPopup,
   formatCurrency,
+  onViewDetails,
   // onViewDetails,
   // onShare,
   // onSendEmail,
@@ -279,7 +281,7 @@ export const ShipmentsTable: React.FC<ShipmentsTableProps> = ({
             </tr>
           ) : (
             shipmentsArray.map((shipment, index) => (
-              <tr key={shipment._id} className={styles.matRow}>
+              <tr key={shipment._id} className={styles.matRow} onClick={() => onViewDetails(shipment._id)}>
                 <td className={`${styles.matCell} ${styles.matColumnSelect}`}>
                   <input
                     type="checkbox"

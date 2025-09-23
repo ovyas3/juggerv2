@@ -3,7 +3,7 @@ import { Box, Button, Typography, useTheme } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import BaseDialog, { BaseDialogProps } from './BaseDialog';
 
-interface NoDataDialogProps extends Omit<BaseDialogProps, 'title' | 'children' | 'actions'> {
+export interface NoDataDialogProps extends Omit<BaseDialogProps, 'title' | 'children' | 'actions'> {
   title?: string;
   message?: string | ReactNode;
   icon?: ReactNode;
@@ -39,7 +39,7 @@ const NoDataDialog: React.FC<NoDataDialogProps> = ({
   const { t } = useTranslation();
   const theme = useTheme();
 
-  const handleClose = (event: {}, reason: 'backdropClick' | 'escapeKeyDown' | 'closeButtonClick') => {
+  const handleClose = (event: {}, reason: string) => {
     if (onClose) onClose(event, reason);
   };
 

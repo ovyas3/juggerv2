@@ -10,12 +10,13 @@ import {
   MenuItem, 
   FormHelperText,
   useTheme,
-  SelectChangeEvent
+  SelectChangeEvent,
+  DialogProps
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
-import BaseDialog, { BaseDialogProps } from './BaseDialog';
+import BaseDialog from './BaseDialog';
 
-export interface CommentDialogProps extends Omit<BaseDialogProps, 'title' | 'children' | 'actions'> {
+export interface CommentDialogProps extends Omit<DialogProps, 'title' | 'children' | 'onClose'> {
   title?: string;
   initialComment?: string;
   initialReason?: string;
@@ -78,11 +79,6 @@ const CommentDialog: React.FC<CommentDialogProps> = ({
     if (error) setError('');
   };
 
-  const handleClose = () => {
-    if (onClose) onClose();
-    if (rest.onClose) rest.onClose({}, 'backdropClick');
-  };
-
   const handleSubmit = async () => {
     if (!isFormValid) {
       setError(t('commentDialog.pleaseFillAllFields'));
@@ -92,7 +88,7 @@ const CommentDialog: React.FC<CommentDialogProps> = ({
     try {
       setIsSubmitting(true);
       await onSave(comment, reason || undefined);
-      handleClose();
+      if (onClose) onClose();
     } catch (err) {
       setError(t('commentDialog.saveFailed', { error: err instanceof Error ? err.message : '' }));
     } finally {
@@ -104,11 +100,11 @@ const CommentDialog: React.FC<CommentDialogProps> = ({
     <BaseDialog
       title={title || t('commentDialog.addComment')}
       {...rest}
-      onClose={handleClose}
+      onClose={onClose || (() => {})}
       actions={
         <Box sx={{ display: 'flex', gap: 2, width: '100%', justifyContent: 'flex-end' }}>
           <Button 
-            onClick={handleClose} 
+            onClick={onClose} 
             disabled={isSubmitting}
             variant="outlined"
           >

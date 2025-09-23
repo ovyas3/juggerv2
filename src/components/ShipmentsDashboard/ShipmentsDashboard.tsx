@@ -68,6 +68,7 @@ import {
 import { ShipmentsTable } from "./ShipmentsTable";
 import { AnalyticsView } from "./AnalyticsView";
 import { AdvancedFilter } from "./AdvancedFilter/AdvancedFilter";
+import ShipmentDetails from "./ShipmentDetails/ShipmentDetails"; 
 import LocationModal from "../ShipmentsDashboard/LocationTracking/LocationModal";
 import ActiveCarriersModal from "../ShipmentsDashboard/SpecialFeatures/ActiveCarriersModal";
 // import FreightModal from "../ShipmentsDashboard/SpecialFeatures/FreightModal";
@@ -209,6 +210,8 @@ const ShipmentsDashboard: React.FC = () => {
   const [showButtons, setShowButtons] = useState(false);
   const [isAnalyticsView, setIsAnalyticsView] = useState(false);
   const [isCompactView, setIsCompactView] = useState(false);
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+  const [selectedShipmentId, setSelectedShipmentId] = useState<string | null>(null);
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
 
   // Pagination
@@ -603,7 +606,14 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
     setSelectedShipment(shipment);
     setShowDriverExpenses(true);
   };
-  
+  const handleViewDetails = (shipmentId: string) => {
+    setSelectedShipmentId(shipmentId);
+    setIsDetailsModalOpen(true);
+  };
+  const handleCloseDetails = () => {
+    setIsDetailsModalOpen(false);
+    setSelectedShipmentId(null);
+  };
 
   const handleFlushFreight = async (shipment: Shipment) => {
     closeAllDialogs();
@@ -650,7 +660,15 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
   
   const actionMenuCategories = {
     "Quick Actions": [
-      { icon: Eye, label: "View", color: "text-blue-600" },
+      {
+        icon: Eye,
+        label: "View",
+        color: "text-blue-600",
+        onClick: (shipment: Shipment) => {
+          closeAllDialogs();
+          handleViewDetails(shipment._id);
+        }
+      },
       {
         icon: Share2,
         label: "Share",
@@ -3480,6 +3498,7 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
                 setActionSearch={setActionSearch}
                 actionMenuCategories={actionMenuCategories}
                 renderStatusCell={renderStatusCell}
+                onViewDetails={handleViewDetails}
                 renderSINCell={renderSINCell}
                 renderLocationCell={renderLocationCell}
                 renderDateTimeCell={renderDateTimeCell}
@@ -3509,6 +3528,13 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
           open={modalOpen}
           onClose={closeSubscribeModal}
           shipment={selectedShipment}
+        />
+      )}
+      {isDetailsModalOpen && selectedShipmentId && (
+        <ShipmentDetails
+          isOpen={isDetailsModalOpen}
+          onClose={handleCloseDetails}
+          shipmentId={selectedShipmentId}
         />
       )}
       {/* Active Carriers Popup */}

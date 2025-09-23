@@ -1,15 +1,15 @@
 import React, { useState, useCallback, ChangeEvent } from 'react';
-import { Button, Typography, Box, List, ListItem, ListItemIcon, ListItemText, IconButton, Chip } from '@mui/material';
+import { Button, Typography, Box, List, ListItem, ListItemIcon, ListItemText, IconButton, Chip, CircularProgress, DialogProps } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { CloudUpload, InsertDriveFile, Close } from '@mui/icons-material';
-import BaseDialog, { BaseDialogProps } from './BaseDialog';
+import BaseDialog from './BaseDialog';
 
 export interface FileWithPreview extends File {
   preview?: string;
   id: string;
 }
 
-interface FileUploadDialogProps extends Omit<BaseDialogProps, 'title' | 'children' | 'actions'> {
+export interface FileUploadDialogProps extends Omit<DialogProps, 'title' | 'children' | 'onClose'> {
   title?: string;
   accept?: string;
   multiple?: boolean;
@@ -35,7 +35,7 @@ const FileUploadDialog: React.FC<FileUploadDialogProps> = ({
   cancelButtonText,
   allowedFileTypes,
   showPreview = true,
-  ...rest
+  ...rest 
 }) => {
   const { t } = useTranslation();
   const [files, setFiles] = useState<FileWithPreview[]>([]);
@@ -49,9 +49,8 @@ const FileUploadDialog: React.FC<FileUploadDialogProps> = ({
 
   const handleClose = useCallback(() => {
     reset();
-    if (onClose) onClose();
-    if (rest.onClose) rest.onClose({}, 'backdropClick');
-  }, [onClose, reset, rest]);
+    if (onClose) onClose(); 
+  }, [onClose, reset]);
 
   const handleFileChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
@@ -148,7 +147,7 @@ const FileUploadDialog: React.FC<FileUploadDialogProps> = ({
     <BaseDialog
       title={title || t('fileUpload.uploadFiles')}
       {...rest}
-      onClose={handleClose}
+      onClose={onClose || (() => {})}
       actions={
         <Box sx={{ display: 'flex', gap: 2, width: '100%', justifyContent: 'flex-end' }}>
           <Button 

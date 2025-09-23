@@ -14,9 +14,9 @@ import {
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 
-interface BaseDialogProps extends Omit<MuiDialogProps, 'title'> {
+export interface BaseDialogProps extends Omit<MuiDialogProps, 'title'> {
   open: boolean;
-  onClose: () => void;
+  onClose: (event: {}, reason: 'backdropClick' | 'escapeKeyDown' | string) => void;
   title?: ReactNode;
   children: ReactNode;
   actions?: ReactNode;
@@ -42,10 +42,14 @@ const BaseDialog: React.FC<BaseDialogProps> = ({
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const fullScreen = fullScreenProp !== undefined ? fullScreenProp : isMobile;
 
+  const handleCloseButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    onClose(event, 'closeButtonClick');
+  };
+
   return (
     <MuiDialog
       open={open}
-      onClose={onClose}
+      onClose={(event, reason) => onClose(event, reason)}
       fullScreen={fullScreen}
       maxWidth={maxWidth}
       fullWidth={!!maxWidth}
@@ -74,7 +78,7 @@ const BaseDialog: React.FC<BaseDialogProps> = ({
           {showCloseButton && (
             <IconButton
               aria-label="close"
-              onClick={onClose}
+              onClick={handleCloseButtonClick}
               sx={{
                 color: (theme) => theme.palette.grey[500],
               }}

@@ -1,9 +1,9 @@
 import React from 'react';
-import { Button, Typography, Box } from '@mui/material';
+import { Button, Typography, Box, DialogProps } from '@mui/material';
 import { useTranslation } from 'react-i18next';
-import BaseDialog, { BaseDialogProps } from './BaseDialog';
+import BaseDialog from './BaseDialog';
 
-interface ConfirmationDialogProps extends Omit<BaseDialogProps, 'title' | 'children' | 'actions'> {
+export interface ConfirmationDialogProps extends Omit<DialogProps, 'title' | 'children' | 'onClose'> {
   title?: string;
   message: string | React.ReactNode;
   confirmText?: string;
@@ -13,6 +13,7 @@ interface ConfirmationDialogProps extends Omit<BaseDialogProps, 'title' | 'child
   confirmButtonProps?: object;
   cancelButtonProps?: object;
   severity?: 'error' | 'warning' | 'info' | 'success';
+  onClose?: () => void;
 }
 
 const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
@@ -21,22 +22,23 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
   confirmText,
   cancelText,
   onConfirm,
-  onCancel,
+  onCancel: onCancelProp,
   confirmButtonProps = {},
   cancelButtonProps = {},
   severity = 'warning',
+  onClose,
   ...rest
 }) => {
   const { t } = useTranslation();
 
   const handleConfirm = () => {
     onConfirm();
-    if (rest.onClose) rest.onClose({}, 'backdropClick');
+    if (onClose) onClose();
   };
 
   const handleCancel = () => {
-    if (onCancel) onCancel();
-    if (rest.onClose) rest.onClose({}, 'backdropClick');
+    if (onCancelProp) onCancelProp();
+    if (onClose) onClose();
   };
 
   const getSeverityColor = () => {
@@ -57,6 +59,7 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
     <BaseDialog
       title={title || t('common.confirmAction')}
       {...rest}
+      onClose={onClose || (() => {})}
       actions={
         <Box sx={{ display: 'flex', gap: 2 }}>
           <Button

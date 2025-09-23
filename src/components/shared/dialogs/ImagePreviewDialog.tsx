@@ -1,10 +1,10 @@
 import React, { useCallback, useRef } from 'react';
-import { Box, Button, IconButton, Typography, useTheme } from '@mui/material';
+import { Box, Button, IconButton, Typography, useTheme, DialogProps } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { Download, Close, ZoomIn, ZoomOut, RotateLeft, RotateRight } from '@mui/icons-material';
-import BaseDialog, { BaseDialogProps } from './BaseDialog';
+import BaseDialog from './BaseDialog';
 
-interface ImagePreviewDialogProps extends Omit<BaseDialogProps, 'title' | 'children' | 'actions'> {
+export interface ImagePreviewDialogProps extends Omit<DialogProps, 'title' | 'children' | 'onClose'> {
   imageUrl: string;
   title?: string;
   fileName?: string;
@@ -40,8 +40,7 @@ const ImagePreviewDialog: React.FC<ImagePreviewDialogProps> = ({
 
   const handleClose = useCallback(() => {
     if (onClose) onClose();
-    if (rest.onClose) rest.onClose({}, 'backdropClick');
-  }, [onClose, rest]);
+  }, [onClose]);
 
   const handleDownload = useCallback(() => {
     if (onDownload) {
@@ -84,7 +83,7 @@ const ImagePreviewDialog: React.FC<ImagePreviewDialogProps> = ({
     <BaseDialog
       title={title}
       maxWidth={maxWidth}
-      onClose={handleClose}
+      onClose={onClose || (() => {})}
       {...rest}
       actions={
         <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
