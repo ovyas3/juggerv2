@@ -4231,8 +4231,7 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
     }}
   />
 )}
-
-    // </div>
+ </div>
   );
 };
 
