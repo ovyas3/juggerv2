@@ -190,7 +190,7 @@ const ShipmentsDashboard: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showButtons, setShowButtons] = useState(false);
   const [isAnalyticsView, setIsAnalyticsView] = useState(false);
-  const [isCompactView, setIsCompactView] = useState(false);
+  const [isCompactView, setIsCompactView] = useState(true);
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
 
   // Pagination
@@ -356,13 +356,12 @@ const ShipmentsDashboard: React.FC = () => {
   const [showMissedShipmentModal, setShowMissedShipmentModal] = useState(false);
   const [selectedShipmentForMissed, setSelectedShipmentForMissed] = useState<Shipment | null>(null)
   const [odcFilter, setOdcFilter] = useState<boolean>(false);
-  // ...existing code...
-const [actionMenuOpenId, setActionMenuOpenId] = useState<string | null>(null);
+  const [actionMenuOpenId, setActionMenuOpenId] = useState<string | null>(null);
 
-const [locationDialogState, setLocationDialogState] = useState<{
-  isOpen: boolean;
-  shipmentId?: string;
-}>({ isOpen: false });
+  const [locationDialogState, setLocationDialogState] = useState<{
+    isOpen: boolean;
+    shipmentId?: string;
+  }>({ isOpen: false });
 
   const [freightType, setFreightType] = useState<'rate' | 'client_rate'>("rate");
   const [shipmentsFilter, setShipmentsFilter] = useState<any>({
@@ -438,13 +437,13 @@ const handleSaveDO = async (doNumber: string) => {
 };
 
 const helpDataInbound = [
-  { head: 'Help', data: 'View all the inbound shipments.' },
+  { head: 'Help', data: 'View all the inbound shipments' },
 ];
 const helpDataOutbound = [
-  { head: 'Help', data: 'View all the outbound shipments.' },
+  { head: 'Help', data: 'View all the outbound shipments' },
 ];
 const helpDataOthers = [
-  { head: 'Help', data: 'View all other shipments.' },
+  { head: 'Help', data: 'View all other shipments' },
 ];
 
 const openInvoiceVideos = () => {
@@ -586,368 +585,214 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
     }
   };
 
-  
-  const actionMenuCategories = {
-    "Quick Actions": [
-      { icon: Eye, label: "View", color: "text-blue-600" },
-      {
-        icon: Share2,
-        label: "Share",
-        color: "text-blue-500",
-        onClick: (shipment: Shipment) => {
-          closeAllDialogs();
-          const trackingUrl = `${window.location.origin}/track/${shipment.unique_code}`;
-          setShareUrl(trackingUrl);
-          setSharedShipment(shipment);
-          setShareModalOpen(true);
-        },
-      },
-      {
-  icon: Mail,
-  label: "Mail",
-  color: "text-orange-600",
-  onClick: (shipment: Shipment) => {
-    console.log("Mail action onClick called");
+  const handleShareShipment = (shipment: Shipment) => {
+  closeAllDialogs();
+  const trackingUrl = `${window.location.origin}/track/${shipment.unique_code}`;
+  setShareUrl(trackingUrl);
+  setSharedShipment(shipment);
+  setShareModalOpen(true);
+};
+
+const handleMailShipment = (shipment: Shipment) => {
+  closeAllDialogs();
+  setShipmentToMail(shipment);
+  setMailModalOpen(true);
+};
+
+const handleCancelShipment = (shipment: Shipment) => {
+  closeAllDialogs();
+  setShipmentToCancel(shipment);
+  setCancelModalOpen(true);
+};
+
+const handleSimTracking = (shipment: Shipment) => {
+  closeAllDialogs();
+  setSelectedShipment(shipment);
+  setModalOpen(true);
+};
+
+const handlePullFreightWithRoutes = (shipment: Shipment) => {
+  closeAllDialogs();
+  setPullFreightData({
+    _id: shipment._id,
+    sin: shipment.sin,
+    vehicleNo: shipment.vehicleNumber || "",
+    pickup: shipment.from?.[0]?.location?.name || "",
+    destinations: shipment.to?.map(dest => ({
+      _id: dest.location?._id || "",
+      name: dest.location?.name || "",
+      city: dest.location?.city || ""
+    })) || []
+  });
+  setShowPullFreightDialog(true);
+};
+
+const handleRecalculateDistanceClick = (shipment: Shipment) => {
+  closeAllDialogs();
+  handleRecalculateDistance(shipment);
+};
+
+const handleCreateAdvancePayment = (shipment: Shipment) => {
+  closeAllDialogs();
+  setSelectedShipmentForPayment(shipment);
+  setShowPaymentAdvanceModal(true);
+};
+
+const handleChangeInvoiceType = (shipment: Shipment) => {
+  closeAllDialogs();
+  setSelectedShipmentForInvoiceType(shipment);
+  setIsInvoiceTypeModalOpen(true);
+};
+
+const handleUploadApprovalDocuments = (shipment: Shipment) => {
+  closeAllDialogs();
+  setSelectedShipmentForAttach(shipment);
+  setShowAttachDialog(true);
+};
+
+const handleViewEpods = (shipment: Shipment) => {
+  closeAllDialogs();
+  setSelectedShipmentForEpod(shipment);
+  setIsEpodModalOpen(true);
+};
+
+const handleCompleteShipment = (shipment: Shipment) => {
+  closeAllDialogs();
+  setSelectedShipmentForCompletion(shipment);
+  setShowCompleteShipmentModal(true);
+};
+
+const handleAddRoambeeId = (shipment: Shipment) => {
+  closeAllDialogs();
+  setSelectedShipmentForRoambee(shipment);
+  setShowRoambeeModal(true);
+};
+
+const handleMarkAsArrived = (shipment: Shipment) => {
+  closeAllDialogs();
+  setSelectedShipmentForArrival(shipment);
+  setShowMarkAsArrivedModal(true);
+};
+
+const handleBulkUploadCommercialInvoices = (shipment: Shipment) => {
+  handleBulkUploadClick(shipment);
+};
+
+const handleAddDODetails = (shipment: Shipment) => {
+  closeAllDialogs();
+  setSelectedShipment(shipment);
+  setSelectedShipmentSIN(shipment.sin || shipment._id);
+  setShowAddDODialog(true);
+};
+
+const handleUpdateShipmentStatus = (shipment: Shipment) => {
+  closeAllDialogs();
+  setSelectedShipmentForStatus(shipment);
+  setShowStatusModal(true);
+};
+
+const handleMarkFaultDevice = (shipment: Shipment) => {
+  closeAllDialogs();
+  setSelectedShipmentForFaulty(shipment);
+  setShowFaultyModal(true);
+};
+
+const handleMissedShipment = (shipment: Shipment) => {
+  closeAllDialogs();
+  setSelectedShipmentForMissed(shipment);
+  setShowMissedShipmentModal(true);
+};
+
+const handleMissedEvent = (shipment: Shipment) => {
+  closeAllDialogs();
+  setSelectedShipmentForMissedEvent(shipment);
+  setShowMissedEventModal(true);
+};
+
+const handleAddManagedBy = (shipment: Shipment) => {
+  closeAllDialogs();
+  setSelectedShipmentForManagedBy(shipment);
+  setShowAddManagedByModal(true);
+};
+
+const handleRetriggerMissedEvents = (shipment: Shipment) => {
+  closeAllDialogs();
+  setSelectedShipmentForRetrigger(shipment);
+  setShowRetriggerEventModal(true);
+};
+
+const handleAddDriverExpenses = (shipment: Shipment) => {
+  closeAllDialogs();
+  handleDriverExpenseClick(shipment);
+};
+
+  const handleCreatePaymentAdvice = (shipment: Shipment) => {
     closeAllDialogs();
-    setShipmentToMail(shipment);
-    setMailModalOpen(true);
-    console.log("Mail modal should now be open");
-  },
-},
-      {
-        icon: XCircle,
-        label: "Cancel",
-        color: "text-red-600",
-        onClick: (shipment: Shipment) => {
-          closeAllDialogs();
-          setShipmentToCancel(shipment);
-          setCancelModalOpen(true);
-        },
-      },
-    ],
-    "Tracking & GPS": [
-      { 
-        icon: Download, 
-        label: "SIM Tracking", 
-        color: "text-amber-600",
-        onClick: (shipment: Shipment) => {
-          closeAllDialogs();
-          setSelectedShipment(shipment);
-          setModalOpen(true);
-        }
-      },
-      {
-        icon: WifiOff,
-        label: "GPS Disconnection Reason",
-        color: "text-teal-600",
-        onClick: (shipment: Shipment) => handleOpenReasonDialog('gps', shipment._id, shipment.sin)
-      },
-      { 
-        icon: Wifi, 
-        label: "Add GPS Connection", 
-        color: "text-amber-600",
-        onClick: (shipment: Shipment) => handleOpenGpsModal(shipment)
-      },
-      { icon: Clock, label: "Update Delay Reason", color: "text-teal-600", onClick: (shipment: Shipment) => {
-        closeAllDialogs();
-        handleOpenReasonDialog('delay', shipment._id, shipment.sin)
-      } },
-    ],
-    "Location & Routes": [
-      {
-        icon: Edit,
-        label: "Edit Pickup Location",
-        color: "text-pink-600",
-        onClick: (shipment: Shipment) => handleOpenEditLocation(shipment, 'pickup'),
-        disabled: (shipment: Shipment) => 
-          ['Completed', 'Cancelled'].includes(shipment.status)
-      },
-      {
-        icon: Edit,
-        label: "Edit Delivery Location",
-        color: "text-pink-600",
-        onClick: (shipment: Shipment) => handleOpenEditLocation(shipment, 'delivery'),
-        disabled: (shipment: Shipment) => 
-          ['Completed', 'Cancelled'].includes(shipment.status)
-      },
-      {
-        icon: Route,
-        label: "Pull Freight with Routes",
-        color: "text-brown-600",
-        onClick: (shipment: Shipment) => {
-          closeAllDialogs();
-          setPullFreightData({
-            _id: shipment._id,
-            sin: shipment.sin,
-            vehicleNo: shipment.vehicleNumber || "",
-            pickup: shipment.from?.[0]?.location?.name || "",
-            destinations: shipment.to?.map(dest => ({
-              _id: dest.location?._id || "",
-              name: dest.location?.name || "",
-              city: dest.location?.city || ""
-            })) || []
-          });
-          setShowPullFreightDialog(true);
-        }
-      },
-      {
-        icon: Calculator,
-        label: "Recalculate Distance",
-        color: "text-pink-600",
-        onClick: (shipment: any) => {
-          closeAllDialogs();
-          handleRecalculateDistance(shipment)
-        }
-      },
-    ],
-    "Freight & Payment": [
-      {
-        icon: Truck,
-        label: "Update Carrier Freight",
-        color: "text-gray-600",
-        onClick: (shipment: Shipment) => {
-          closeAllDialogs();
-          handleOpenFreightModal(shipment._id, shipment.sin, 'rate');
-        }
-      },
-      { 
-        icon: Truck, 
-        label: "Flush Freight", 
-        color: "text-gray-600",
-        onClick: handleFlushFreight
-      },
-      {
-        icon: CreditCard,
-        label: "Create Advance Payment",
-        color: "text-indigo-600",
-        onClick: (shipment: Shipment) => {
-          closeAllDialogs();
-          setSelectedShipmentForPayment(shipment);
-          setShowPaymentAdvanceModal(true);
-        },
-      },
-      {
-        icon: FileText,
-        label: "Change Invoice Type",
-        color: "text-brown-600",
-        onClick: (shipment: Shipment) => {
-          closeAllDialogs();
-          setSelectedShipmentForInvoiceType(shipment);
-          setIsInvoiceTypeModalOpen(true);
-        },
-      },
-    ],
-    "Documents & Status": [
-      {
-        icon: FileText,
-        label: "Upload Approval Documents",
-        color: "text-purple-600",
-        onClick: (shipment: Shipment) => {
-          console.log('Upload Approval Documents clicked');
-          closeAllDialogs();
-          console.log('Setting selected shipment and showing dialog');
-          setSelectedShipmentForAttach(shipment);
-          setShowAttachDialog(true);
-        },
-      },
-      {
-        icon: Package,
-        label: "View Epods",
-        color: "text-brown-600",
-        onClick: (shipment: Shipment) => {
-          closeAllDialogs();
-          console.log('View Epods clicked, shipment:', shipment);
-          setSelectedShipmentForEpod(shipment);
-          console.log('After setSelectedShipmentForEpod, selectedShipmentForEpod:', shipment);
-          setIsEpodModalOpen(true);
-          console.log('After setIsEpodModalOpen, isEpodModalOpen:', true);
-        },
-      },
-      {
-        icon: CheckCircle,
-        label: "Complete Shipment",
-        color: "text-green-600",
-        onClick: (shipment: Shipment) => {
-          closeAllDialogs();
-          setSelectedShipmentForCompletion(shipment);
-          setShowCompleteShipmentModal(true);
-        },
-      },
-      {
-        icon: DoorOpen,
-        label: "Recalculate Customer Gate In/Out",
-        color: "text-pink-600",
-        onClick: 
-          (shipment: Shipment) => handleRecalculateGateInOut(shipment),
-        disabled: (shipment: Shipment) =>
-          ["Completed", "Cancelled"].includes(shipment.status),
-          },
-    ],
-    Other: [
-      {
-        icon: PlusCircle,
-        label: "Add Roambee ID",
-        color: "text-blue-600",
-        onClick: (shipment: Shipment) => {
-          closeAllDialogs();
-          setSelectedShipmentForRoambee(shipment);
-          setShowRoambeeModal(true);
-        },
-      },
-      {
-        icon: CheckCircle,
-        label: "Submit Mark As Arrived",
-        color: "text-green-600",
-        onClick: (shipment: Shipment) => {
-          closeAllDialogs();
-          setSelectedShipmentForArrival(shipment);
-          setShowMarkAsArrivedModal(true);
-        },
-      },
-      //Create Payment Advice
-      {
-        icon: CreditCard,
-        label: "Create Payment Advance",
-        color: "text-indigo-600",
-        onClick: (shipment: Shipment) => handleCreatePaymentAdvice(shipment),
-      },
-      //Bulk Upload - Commercial Invoices
-      {
-        icon: Upload,
-        label: "Bulk Upload - Commercial Invoices",
-        color: "text-green-600",
-        onClick: (shipment: Shipment) => handleBulkUploadClick(shipment)
-      },
-    ],
-    Others: [
-      // Add DO Details
-      {
-        icon: PlusCircle,
-        label: "Add DO Details",
-        color: "text-blue-600",
-        onClick: (shipment: any) => {
-          closeAllDialogs();
-          setSelectedShipment(shipment);
-          setSelectedShipmentSIN(shipment.sin || shipment._id);
-          setShowAddDODialog(true);
-        },
-      },
-      // update shipment status
-      {
-        icon: Edit,
-        label: "Update Shipment Status",
-        color: "text-yellow-600",
-        onClick: (shipment: Shipment) => {
-          closeAllDialogs();
-          setSelectedShipmentForStatus(shipment);
-          setShowStatusModal(true);
-        }
-      },
-      // Mark as faulty
-      {
-        icon: AlertCircle,
-        label: "Mark Fault Device",
-        color: "text-red-600",
-        onClick: (shipment: Shipment) => {
-          closeAllDialogs();
-          setSelectedShipmentForFaulty(shipment);
-          setShowFaultyModal(true);
-        }
-      },
-       // Missed Shipment
-      {
-        icon: AlertCircle,
-        label: "Missed Shipment",
-        color: "text-red-600",
-        onClick: (shipment: Shipment) => {
-          closeAllDialogs();
-          setSelectedShipmentForMissed(shipment);
-          setShowMissedShipmentModal(true);
-        }
-      },
-      {
-        icon: AlertCircle,
-        label: "Missed Event",
-        color: "text-red-600",
-        onClick: (shipment: Shipment) => {
-          closeAllDialogs();
-          setSelectedShipmentForMissedEvent(shipment);
-          setShowMissedEventModal(true);
-        }
-      },
-    ],
-    Others1: [
-      // Add Managed By 
-      {
-        icon: UserPlus,
-        label: "Add Managed By",
-        color: "text-blue-600",
-        onClick: (shipment: Shipment) => {
-          closeAllDialogs();
-          setSelectedShipmentForManagedBy(shipment);
-          setShowAddManagedByModal(true);
-        }
-      },
-      // Retriggered missed shipment
-      {
-        icon: RefreshCw,
-        label: "ReTrigger Missed Events",
-        color: "text-blue-600",
-        onClick: (shipment: Shipment) => {
-          closeAllDialogs();
-          setSelectedShipmentForRetrigger(shipment);
-          setShowRetriggerEventModal(true);
-        }
-      },
-      //Reassign
-      {
-        icon: RefreshCw,
-        label: "Reassign",
-        color: "text-blue-600",
-      },
-      //Update Client Freight
-      {
-        icon: Edit,
-        label: "Update Client Freight",
-        color: "text-yellow-600",
-        onClick: (shipment: Shipment) => {
-          closeAllDialogs();
-          handleOpenFreightModal(shipment._id, shipment.sin, 'client_rate');
-        }
-      },
-      //Add Driver Expenses
-      {
-        icon: Plus,
-        label: "Add Driver Expenses",
-        color: "text-green-600",
-        onClick: (shipment: Shipment) => {
-          closeAllDialogs();
-          handleDriverExpenseClick(shipment);
-        }
-      },
-    ],
-    Others2: [
-      //Add/Edit Geofence
-      {
-        icon: Plus,
-        label: "Add/Edit Geofence",
-        color: "text-green-600",
-        onClick: handleOpenGeofenceEditor,
-        disabled: (shipment: Shipment) => 
-          ['Completed', 'Cancelled'].includes(shipment.status)
-      },
-      {
-        icon: Upload,
-        label: "Upload EPOD",
-        color: "text-green-600",
-      },
-      {
-        icon: Upload,
-        label: "Request EPOD",
-        color: "text-green-600",
-      }
-    ]
+    setSelectedShipmentForPayment(shipment);
+    setShowPaymentAdviceModal(true);
   };
+
+
+  
+const actionMenuCategories = {
+  "Quick Actions": [
+    { icon: Eye, label: "View", color: "text-blue-600" },
+    { icon: Share2, label: "Share", color: "text-blue-500", onClick: handleShareShipment },
+    { icon: Mail, label: "Mail", color: "text-orange-600", onClick: handleMailShipment },
+    { icon: XCircle, label: "Cancel", color: "text-red-600", onClick: handleCancelShipment },
+  ],
+  "Tracking & GPS": [
+    { icon: Download, label: "SIM Tracking", color: "text-amber-600", onClick: handleSimTracking },
+    { icon: WifiOff, label: "GPS Disconnection Reason", color: "text-teal-600", onClick: (shipment: Shipment) => handleOpenReasonDialog('gps', shipment._id, shipment.sin) },
+    { icon: Wifi, label: "Add GPS Connection", color: "text-amber-600", onClick: (shipment: Shipment) => handleOpenGpsModal(shipment) },
+    { icon: Clock, label: "Update Delay Reason", color: "text-teal-600", onClick: (shipment: Shipment) => { closeAllDialogs(); handleOpenReasonDialog('delay', shipment._id, shipment.sin); } },
+  ],
+  "Location & Routes": [
+    { icon: Edit, label: "Edit Pickup Location", color: "text-pink-600", onClick: (shipment: Shipment) => handleOpenEditLocation(shipment, 'pickup'), disabled: (shipment: Shipment) => ['Completed', 'Cancelled'].includes(shipment.status) },
+    { icon: Edit, label: "Edit Delivery Location", color: "text-pink-600", onClick: (shipment: Shipment) => handleOpenEditLocation(shipment, 'delivery'), disabled: (shipment: Shipment) => ['Completed', 'Cancelled'].includes(shipment.status) },
+    { icon: Route, label: "Pull Freight with Routes", color: "text-brown-600", onClick: handlePullFreightWithRoutes },
+    { icon: Calculator, label: "Recalculate Distance", color: "text-pink-600", onClick: handleRecalculateDistanceClick },
+  ],
+  "Freight & Payment": [
+    { icon: Truck, label: "Update Carrier Freight", color: "text-gray-600", onClick: (shipment: Shipment) => { closeAllDialogs(); handleOpenFreightModal(shipment._id, shipment.sin, 'rate'); } },
+    { icon: Truck, label: "Flush Freight", color: "text-gray-600", onClick: handleFlushFreight },
+    { icon: CreditCard, label: "Create Advance Payment", color: "text-indigo-600", onClick: handleCreateAdvancePayment },
+    { icon: FileText, label: "Change Invoice Type", color: "text-brown-600", onClick: handleChangeInvoiceType },
+  ],
+  "Documents & Status": [
+    { icon: FileText, label: "Upload Approval Documents", color: "text-purple-600", onClick: handleUploadApprovalDocuments },
+    { icon: Package, label: "View Epods", color: "text-brown-600", onClick: handleViewEpods },
+    { icon: CheckCircle, label: "Complete Shipment", color: "text-green-600", onClick: handleCompleteShipment },
+    { icon: DoorOpen, label: "Recalculate Customer Gate In/Out", color: "text-pink-600", onClick: (shipment: Shipment) => handleRecalculateGateInOut(shipment), disabled: (shipment: Shipment) => ["Completed", "Cancelled"].includes(shipment.status) },
+  ],
+  "Shipment Operations": [
+    { icon: PlusCircle, label: "Add Roambee ID", color: "text-blue-600", onClick: handleAddRoambeeId },
+    { icon: CheckCircle, label: "Submit Mark As Arrived", color: "text-green-600", onClick: handleMarkAsArrived },
+    { icon: CreditCard, label: "Create Payment Advance", color: "text-indigo-600", onClick: handleCreatePaymentAdvice },
+    { icon: Upload, label: "Bulk Upload - Commercial Invoices", color: "text-green-600", onClick: handleBulkUploadCommercialInvoices },
+  ],
+  "Shipment Management": [
+    { icon: PlusCircle, label: "Add DO Details", color: "text-blue-600", onClick: handleAddDODetails },
+    { icon: Edit, label: "Update Shipment Status", color: "text-yellow-600", onClick: handleUpdateShipmentStatus },
+    { icon: AlertCircle, label: "Mark Fault Device", color: "text-red-600", onClick: handleMarkFaultDevice },
+    { icon: AlertCircle, label: "Missed Shipment", color: "text-red-600", onClick: handleMissedShipment },
+    { icon: AlertCircle, label: "Missed Event", color: "text-red-600", onClick: handleMissedEvent },
+  ],
+  "Advanced": [
+    { icon: UserPlus, label: "Add Managed By", color: "text-blue-600", onClick: handleAddManagedBy },
+    { icon: RefreshCw, label: "ReTrigger Missed Events", color: "text-blue-600", onClick: handleRetriggerMissedEvents },
+    { icon: RefreshCw, label: "Reassign", color: "text-blue-600" },
+    { icon: Edit, label: "Update Client Freight", color: "text-yellow-600", onClick: (shipment: Shipment) => { closeAllDialogs(); handleOpenFreightModal(shipment._id, shipment.sin, 'client_rate'); } },
+    { icon: Plus, label: "Add Driver Expenses", color: "text-green-600", onClick: handleAddDriverExpenses },
+  ],
+  "Geofence & EPOD": [
+    { icon: Plus, label: "Add/Edit Geofence", color: "text-green-600", onClick: handleOpenGeofenceEditor, disabled: (shipment: Shipment) => ['Completed', 'Cancelled'].includes(shipment.status) },
+    { icon: Upload, label: "Upload EPOD", color: "text-green-600" },
+    { icon: Upload, label: "Request EPOD", color: "text-green-600" }, 
+  ]
+};
+
+
 
 const closeActionMenu = () => {
   console.log("closeActionMenu executed, closing dropdown");
@@ -2158,12 +2003,6 @@ const renderLastLocationCell = (shipment: any) => {
   const [showPaymentAdviceModal, setShowPaymentAdviceModal] = useState(false);
 
 
-  const handleCreatePaymentAdvice = (shipment: Shipment) => {
-    closeAllDialogs();
-    setSelectedShipmentForPayment(shipment);
-    setShowPaymentAdviceModal(true);
-  };
-
   const handleRecalculateGateInOut = async (shipment: Shipment) => {
     closeAllDialogs();
     setSelectedShipmentForRerun(shipment);
@@ -2929,7 +2768,13 @@ const applyFilter = () => {
            show={showOpenVideosDialog}
   videoUrl={videoUrl}
   onClose={() => setShowOpenVideosDialog(false)}
-  title="Shipment Help Video"
+  title={
+    shipmentType === "inbound"
+      ? helpDataInbound[0]?.data
+      : shipmentType === "outbound"
+      ? helpDataOutbound[0]?.data
+      : helpDataOthers[0]?.data
+  }
         />
       )}
 

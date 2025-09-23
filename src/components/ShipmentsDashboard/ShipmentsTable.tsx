@@ -590,7 +590,7 @@ export const ShipmentsTable: React.FC<ShipmentsTableProps> = ({
                         sideOffset={15}
                       >
                         <div className={styles.actionMenuSearch}>
-                          <Search className={styles.searchIcon} />
+                          <Search className={styles.TableSearchIcon} />
                           <input
                             type="text"
                             placeholder="Search actions..."
@@ -600,6 +600,9 @@ export const ShipmentsTable: React.FC<ShipmentsTableProps> = ({
                             }
                             value={actionSearchState}
                           />
+                          <div className={styles.shipmentInfo}>
+                            <div className={styles.shipmentSin}>#{shipment.sin}</div>
+                          </div>
                         </div>
                         <div className={styles.actionCategoriesGrid}>
                           {Object.entries(actionMenuCategories)
@@ -638,14 +641,14 @@ export const ShipmentsTable: React.FC<ShipmentsTableProps> = ({
                                           key={index}
                                           className={styles.actionMenuItem}
                                           onSelect={(e) => {
-    e.preventDefault();
-    console.log("DropdownMenuItem onSelect triggered for:", item.label);
-    closeActionMenu();
-    console.log("closeActionMenu called from DropdownMenuItem");
-    if (item.onClick) {
-      item.onClick(shipment);
-    }
-  }}
+                                            e.preventDefault();
+                                            console.log("DropdownMenuItem onSelect triggered for:", item.label);
+                                            closeActionMenu();
+                                            console.log("closeActionMenu called from DropdownMenuItem");
+                                            if (item.onClick) {
+                                              item.onClick(shipment);
+                                            }
+                                          }}
                                         >
                                           <IconComponent
                                             className={`${
