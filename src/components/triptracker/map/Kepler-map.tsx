@@ -35,6 +35,7 @@ interface KeplerMapProps {
   showStoppages?: boolean;
   showHaltPoints?: boolean; 
   isFullscreen?: boolean;
+  setShowDeviations: (show: boolean) => void;
   onZoomIn?: () => void;
   onZoomOut?: () => void;
   onToggleSatellite?: () => void;
@@ -140,6 +141,7 @@ function MagnifierMapController({ setMap }: { setMap: (map: LeafletMap) => void 
 export default function KeplerMap({
   showGPSRoute = true,
   showDeviations = true,
+  setShowDeviations,
   showStoppages = false, 
   showGeofence = true,
   showHaltPoints,
@@ -185,6 +187,7 @@ const [progressPercentage, setProgressPercentage] = useState(0);
 const [dayRunPolylines, setDayRunPolylines] = useState<[number, number][][]>([]);
 const [showDayRun, setShowDayRun] = useState(false);
 const [dayRunDetails, setDayRunDetails] = useState<any[]>([]);
+const [deviationData, setDeviationData] = useState<any[]>([]);
  // 0 to 100
 const [currentReplayPositions, setCurrentReplayPositions] = useState<number>(0);
 
@@ -206,6 +209,10 @@ const replayIndexRef = useRef(0);
 const [isPausedAtHalt, setIsPausedAtHalt] = useState(false);
 const [replayTimeoutId, setReplayTimeoutId] = useState<NodeJS.Timeout | null>(null);
 const [currentReplayHaltIndex, setCurrentReplayHaltIndex] = useState(-1);
+const [isPausedAtDeviation, setIsPausedAtDeviation] = useState(false);
+const [currentReplayDeviationIndex, setCurrentReplayDeviationIndex] = useState(-1);
+const deviationPopupRef = useRef<L.Popup | null>(null);
+const deviationPopupTimerRef = useRef<NodeJS.Timeout | null>(null);
   const [showMagnifierSettings, setShowMagnifierSettings] = useState(false);
   const [isMagnifierEnabled, setIsMagnifierEnabled] = useState(false);
   const [magnifierPosition, setMagnifierPosition] = useState({ x: 0, y: 0 });
@@ -264,6 +271,12 @@ const [isMobile, setIsMobile] = useState(false);
       window.removeEventListener('resize', checkIsMobile);
     };
   }, []); // Empty dependency array ensures this runs only once on mount
+  // Close day run table when exiting fullscreen
+  useEffect(() => {
+    if (!isFullscreen && showDayRun) {
+      setShowDayRun(false);
+    }
+  }, [isFullscreen, showDayRun]);
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !activeMode) return;
@@ -413,6 +426,28 @@ useEffect(() => {
       // do not schedule the next timer here — the pause useEffect handles resume
       return;
     }
+    // Look for deviation start/end points that have not been handled yet and are within tolerance
+    const foundDeviationIndex = deviationData.findIndex((deviation, idx) => {
+      if (idx <= currentReplayDeviationIndex) return false; // only look for future deviations
+      // Check both start and end points of the deviation
+      const startCoords: [number, number] = deviation.path[0]; // First point of deviation path
+      const endCoords: [number, number] = deviation.path[deviation.path.length - 1]; // Last point of deviation path
+      const distanceToStart = L.latLng(nextPosition).distanceTo(L.latLng(startCoords));
+      const distanceToEnd = L.latLng(nextPosition).distanceTo(L.latLng(endCoords));
+      return distanceToStart <= toleranceMeters || distanceToEnd <= toleranceMeters;
+    });
+    if (foundDeviationIndex !== -1) {
+      // Stop at the deviation point
+      replayIndexRef.current = candidateIndex;
+      setCurrentReplayPosition(nextPosition);
+      setReplayProgress(
+        (candidateIndex / (activeRoute.length - 1)) * 100
+      );
+      setCurrentReplayDeviationIndex(foundDeviationIndex);
+      setIsPausedAtDeviation(true);
+      // do not schedule the next timer here — the pause useEffect handles resume
+      return;
+    }
   
     // Normal frame advance if no halt
     replayIndexRef.current = candidateIndex;
@@ -423,7 +458,7 @@ useEffect(() => {
     timerId = setTimeout(animateReplay, animationDelay);
   };
 // Start the animation loop if not paused
-if (!isPausedAtHalt) {
+if (!isPausedAtHalt && !isPausedAtDeviation) {
   timerId = setTimeout(animateReplay, animationDelay);
 }
 
@@ -434,7 +469,7 @@ return () => {
   
 
  
-}, [isReplaying, activeRoute, isPausedAtHalt, haltPoints, currentReplayHaltIndex, replaySpeed]);
+}, [isReplaying, activeRoute, isPausedAtHalt, isPausedAtDeviation, haltPoints, currentReplayHaltIndex, currentReplayDeviationIndex, deviationData, replaySpeed]);
 
 // This new useEffect handles the pause duration and resume. It's cleaner and separates concerns.
 useEffect(() => {
@@ -452,6 +487,22 @@ useEffect(() => {
         }
     };
 }, [isPausedAtHalt]);
+// useEffect to handle deviation pause duration and resume
+useEffect(() => {
+    let timerId: NodeJS.Timeout | null = null;
+    console.log("Deviation popup useEffect triggered. isPausedAtDeviation =", isPausedAtDeviation);
+    if (isPausedAtDeviation) {
+        // If we're paused at deviation, set a timer to un-pause after 5 seconds.
+        timerId = setTimeout(() => {
+            setIsPausedAtDeviation(false);
+        }, 5000);
+    }
+    return () => {
+        if (timerId) {
+            clearTimeout(timerId);
+        }
+    };
+}, [isPausedAtDeviation]);
 
 // Add this NEW useEffect hook to manage the pause duration and resume.
 // This is cleaner and separates concerns.
@@ -593,6 +644,80 @@ useEffect(() => {
   };
 }, [isPausedAtHalt, currentReplayHaltIndex, currentReplayPosition, haltPoints]);
 
+// Deviation popup useEffect - similar to halt popup but for deviations
+useEffect(() => {
+  if (!mapRef.current) return;
+  // Clear any previous deviation popup / timer
+  const closeExistingDeviation = () => {
+    if (deviationPopupTimerRef.current) {
+      clearTimeout(deviationPopupTimerRef.current);
+      deviationPopupTimerRef.current = null;
+    }
+    if (deviationPopupRef.current && mapRef.current) {
+      try {
+        mapRef.current.closePopup(deviationPopupRef.current);
+      } catch {}
+      deviationPopupRef.current = null;
+    }
+  };
+  if (isPausedAtDeviation && currentReplayDeviationIndex > -1 && currentReplayPosition && deviationData[currentReplayDeviationIndex]) {
+    // Build a simple HTML string for the deviation popup content
+    const deviation = deviationData[currentReplayDeviationIndex];
+    const content = `
+      <div class="${styles.popup}">
+        <div class="${styles.popupTitle} ${styles.titleRed}">Deviation Info</div>
+        <hr class="${styles.divider}" />
+        <div class="${styles.popupBody}">Reason: <strong>${deviation.reason}</strong></div>
+        <div class="${styles.popupBody}">Distance: <strong>${deviation.distance}</strong></div>
+        <div class="${styles.popupBody}">Duration: <strong>${deviation.duration}</strong></div>
+        <div class="${styles.popupBody}">Start: <strong>${deviation.startTime}</strong></div>
+        <div class="${styles.popupBody}">End: <strong>${deviation.endTime}</strong></div>
+      </div>
+    `;
+    // ensure previous popup closed
+    closeExistingDeviation();
+    // create/open popup at vehicle position
+    try {
+      const popup = L.popup({
+        closeOnClick: false,
+        autoClose: false,
+        className: '' // optional: add custom class
+      })
+        .setLatLng(currentReplayPosition)
+        .setContent(content)
+        .openOn(mapRef.current as any); // openOn attaches it to the map
+      deviationPopupRef.current = popup;
+      // Pan map slightly to show the popup
+      try {
+        mapRef.current.panTo(currentReplayPosition, { animate: true, duration: 0.4 });
+      } catch {}
+      // set timer to close popup and resume replay
+      deviationPopupTimerRef.current = setTimeout(() => {
+        if (deviationPopupRef.current && mapRef.current) {
+          try { mapRef.current.closePopup(deviationPopupRef.current); } catch {}
+          deviationPopupRef.current = null;
+        }
+        setIsPausedAtDeviation(false);
+      }, 5000); // Show popup for 5 seconds
+    } catch (err) {
+      console.error("Failed to show deviation popup", err);
+    }
+  } else {
+    // not paused or missing data -> close any existing popup
+    closeExistingDeviation();
+  }
+  // cleanup
+  return () => {
+    if (deviationPopupTimerRef.current) {
+      clearTimeout(deviationPopupTimerRef.current);
+      deviationPopupTimerRef.current = null;
+    }
+    if (deviationPopupRef.current && mapRef.current) {
+      try { mapRef.current.closePopup(deviationPopupRef.current); } catch {}
+      deviationPopupRef.current = null;
+    }
+  };
+}, [isPausedAtDeviation, currentReplayDeviationIndex, currentReplayPosition, deviationData]);
 
 type ShipPoint = {
   location: {
@@ -633,7 +758,15 @@ type ShipmentResponse = {
     dayrun?: {
       dayRuns?: dayRuns[];
     };
- 
+    deviation?: {
+      deviations?: {
+        start_time: string;
+        end_time?: string | null;
+        distance: number;
+        polyline: string;
+        duration: number;
+      }[];
+    };
   };
 };
 interface dayRuns {
@@ -705,12 +838,10 @@ function convertUtcToIst24hr(utcDateString: string | undefined): string {
   // Use Intl.DateTimeFormat to get date and time components in IST
   // This is the most reliable way to handle timezone conversions
   const options: Intl.DateTimeFormatOptions = {
-    year: 'numeric',
     month: '2-digit',
     day: '2-digit',
     hour: '2-digit',
     minute: '2-digit',
-    second: '2-digit',
     hour12: false, // Ensure 24-hour format
     timeZone: 'Asia/Kolkata' // Explicitly set the timezone to IST
   };
@@ -773,10 +904,26 @@ setProgressPercentage(newProgress);
         // Include any other details you want to display
       }));
       setDayRunDetails(extractedDetails);
+      // Process deviation data
+      const deviations = shipment?.deviation?.deviations || [];
+      const processedDeviations = deviations.map((deviation: any, index: number) => ({
+        id: index + 1,
+        path: decodePolyline(deviation.polyline),
+        reason: "Route deviation detected",
+        location: `Deviation ${index + 1}`,
+        startTime: convertUtcToIst24hr(deviation.start_time),
+        endTime: convertUtcToIst24hr(deviation.end_time),
+        distance: `${deviation.distance?.toFixed(2)} km`,
+        duration: `${Math.floor(deviation.duration / 60)} min`,
+        polyline: deviation.polyline
+      }));
+      setDeviationData(processedDeviations);
       // Assuming it's encoded
         console.log("Decoded Day Run Polylines:", decodedDayRuns);
         console.log("Day Run Details:", extractedDetails);
         console.log("Show Day Run State:", showDayRun);
+        console.log("Deviation Data:", processedDeviations);
+        console.log("Deviation Count:", processedDeviations.length);
       // Update the state with the day run polylines
       setDayRunPolylines(decodedDayRuns);
 
@@ -1307,38 +1454,8 @@ useEffect(() => {
   };
   const routeBuffer = createRouteBuffer(mainRoute);
 
-  const deviationRoutes = [
-    {
-      id: 1,
-      path: [
-        [28.6139, 77.209],
-        [28.62, 77.195],
-        [28.615, 77.18],
-        [28.6129, 77.2295],
-      ] as [number, number][],
-      reason: "Traffic congestion on main route",
-      location: "Karol Bagh Junction",
-      startTime: "10:25 AM",
-      endTime: "10:50 AM",
-      distance: "2.3 km",
-      duration: "25 min",
-    },
-    {
-      id: 2,
-      path: [
-        [28.5562, 77.241],
-        [28.54, 77.26],
-        [28.53, 77.255],
-        [28.5355, 77.25],
-      ] as [number, number][],
-      reason: "Road construction work",
-      location: "Kalkaji Extension",
-      startTime: "11:15 AM",
-      endTime: "11:25 AM",
-      distance: "1.8 km",
-      duration: "10 min",
-    },
-  ];
+  // Use dynamic deviation data from API, fallback to empty array if no data
+  const deviationRoutes = deviationData.length > 0 ? deviationData : [];
 
   const geofenceAreas = [
     { id: 1, center: [28.6139, 77.209] as [number, number], radius: 500, name: "Pickup Zone - Connaught Place", color: "#22c55e" },
@@ -1628,6 +1745,8 @@ const startReplay = () => {
       setCurrentReplayPosition(activeRoute[0]);
       setCurrentReplayHaltIndex(-1);  // reset halts
       setIsPausedAtHalt(false);
+      setCurrentReplayDeviationIndex(-1);  // reset deviations
+      setIsPausedAtDeviation(false);
       // Clean up any old timers
       // if (replayTimeoutId) {
       //     clearTimeout(replayTimeoutId);
@@ -1635,6 +1754,8 @@ const startReplay = () => {
       // }
       if (haltPopupTimerRef.current) { clearTimeout(haltPopupTimerRef.current); haltPopupTimerRef.current = null; }
     if (haltPopupRef.current && mapRef.current) { try { mapRef.current.closePopup(haltPopupRef.current); } catch {}; haltPopupRef.current = null; }
+    if (deviationPopupTimerRef.current) { clearTimeout(deviationPopupTimerRef.current); deviationPopupTimerRef.current = null; }
+    if (deviationPopupRef.current && mapRef.current) { try { mapRef.current.closePopup(deviationPopupRef.current); } catch {}; deviationPopupRef.current = null; }
   }
 };
 const pauseReplay = () => {
@@ -1656,8 +1777,12 @@ const stopReplay = () => {
   setReplayProgress(0);
   setIsPausedAtHalt(false);
 setCurrentReplayHaltIndex(-1);
+setIsPausedAtDeviation(false);
+setCurrentReplayDeviationIndex(-1);
 if (haltPopupTimerRef.current) { clearTimeout(haltPopupTimerRef.current); haltPopupTimerRef.current = null; }
+if (deviationPopupTimerRef.current) { clearTimeout(deviationPopupTimerRef.current); deviationPopupTimerRef.current = null; }
 if (haltPopupRef.current && mapRef.current) { try { mapRef.current.closePopup(haltPopupRef.current); } catch {}; haltPopupRef.current = null; }
+if (deviationPopupRef.current && mapRef.current) { try { mapRef.current.closePopup(deviationPopupRef.current); } catch {}; deviationPopupRef.current = null; }
 
 };
 const stopAndHideReplay = () => {
@@ -1977,6 +2102,37 @@ if (haltPopupRef.current && mapRef.current) { try { mapRef.current.closePopup(ha
   />
 ))}
 
+{/* === Deviation Polylines (in red) === */}
+{showDeviations && deviationRoutes.map((route) => (
+  <Polyline
+    key={`deviation-polyline-${route.id}`}
+    positions={route.path}
+    pathOptions={{
+      color: selectedDeviationForReplay === route.id ? "#f59e0b" : "#ef4444",
+      weight: 4,
+      opacity: 0.9,
+      dashArray: "10, 5"
+    }}
+  >
+    <Popup>
+      <div className={styles.popup}>
+        <div className={`${styles.popupTitle} ${styles.titleRed}`}>Route Deviation</div>
+        <div className={styles.metricRow}>
+          <span className={styles.metricKey}>Location:</span>
+          <span className={styles.metricVal}>{route.location}</span>
+        </div>
+        <div className={styles.metricRow}>
+          <span className={styles.metricKey}>Distance:</span>
+          <span className={styles.metricVal}>{route.distance}</span>
+        </div>
+        <div className={styles.metricRow}>
+          <span className={styles.metricKey}>Duration:</span>
+          <span className={styles.metricVal}>{route.duration}</span>
+        </div>
+      </div>
+    </Popup>
+  </Polyline>
+))}
        
 {currentLocation &&  !isReplaying &&(
   <Marker 
@@ -2086,9 +2242,11 @@ if (haltPopupRef.current && mapRef.current) { try { mapRef.current.closePopup(ha
                           <Play className={styles.iconXs} /> Resume
                         </button>
                       ) : (
-                        <button onClick={() => startReplay(
-                          // route.id
-                          )} className={`${styles.btn} ${styles.btnGreenSm}`}>
+                        <button onClick={() => {
+                          setSelectedDeviationForReplay(route.id);
+                          setIsReplaying(true);
+                          setReplayProgress(0);
+                          }} className={`${styles.btn} ${styles.btnGreenSm}`}>
                           <Play className={styles.iconXs} /> Play
                         </button>
 
@@ -2565,7 +2723,7 @@ if (haltPopupRef.current && mapRef.current) { try { mapRef.current.closePopup(ha
 
 
         <button
-          onClick={() => onToggleDeviations && onToggleDeviations()}
+          onClick={() => setShowDeviations(!showDeviations)}
           className={`${styles.sideBtn} ${showDeviations ? styles.sideBtnOrange : styles.sideBtnGray}`}
         >
           {/* <div className={styles.sideDotBox}></div> */}
@@ -2580,9 +2738,14 @@ if (haltPopupRef.current && mapRef.current) { try { mapRef.current.closePopup(ha
 
 
         <button
-         onClick={() => setShowDayRun((prev) => !prev)}
-         className={`${styles.sideBtn} ${showDayRun ? styles.sideBtnPink : styles.sideBtnGray}`}
-
+         onClick={() => {
+           if (isFullscreen) {
+             setShowDayRun((prev) => !prev);
+           }
+         }}
+         className={`${styles.sideBtn} ${showDayRun ? styles.sideBtnPink : styles.sideBtnGray} ${!isFullscreen ? styles.disabled : ''}`}
+         disabled={!isFullscreen}
+         title={!isFullscreen ? "Day Run details available only in fullscreen mode" : "Toggle Day Run details"}
         >
           {/* <div className={styles.sideDotBox}></div> */}
           <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

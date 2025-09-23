@@ -345,6 +345,11 @@
 .sideBtnFastag{background: #3351FE;}
 .sideBtnPink{background:#b066fa;}
 .sideBtnOrange{background:#EA580B;}
+.disabled {
+  opacity: 0.5;
+  cursor: not-allowed !important;
+  pointer-events: none;
+}
 
 .mapEmoji svg {
   width: 35px;
@@ -442,7 +447,7 @@
   position: absolute;
   top: 290px;
   left: 16px;
-  width: 250px;
+  width: 350px;
   background: rgba(255,255,255,.95);
   backdrop-filter: saturate(1.2) blur(2px);
   border: 1px solid #e5e7eb;

@@ -68,6 +68,8 @@ const Header = ({ setReloadOnHeaderChange, isMapHelper, getAllShipment, isShipme
         return "Anomaly Dashboard"
       case "/topDestination":
         return "Top Destination"
+      case "/dayRun":
+        return "Day Run"
       case "/indentManagement/plant":
         return "Indent Management - Plant"
       // case "/ewaybillDashboard":
