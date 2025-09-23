@@ -30,6 +30,12 @@ import spotdrivericon from "../../assets/spotdriver-blue.svg";
 import Image from "next/image";
 import { environment } from "@/environments/env.api";
 import { toTitleCase } from "@/utils/stringUtils"
+import simTrackingIcon from "../../assets/sim_tracking.svg";
+import gpsTrackingIcon from "../../assets/gps_tracking.svg";
+import mobileIcon from "../../assets/mobile.svg";
+import { httpsPost } from "@/utils/Communication";
+import { useSnackbar } from "@/hooks/snackBar";
+
 
 interface Shipment {
   _id: string;
@@ -42,6 +48,7 @@ interface Shipment {
   trip_tracker?: {
     last_location_address?: string;
     last_location_at?: string;
+    methods?: string[];
   };
   frieght_price?: number;
   [key: string]: any; // For additional properties
@@ -132,7 +139,9 @@ export const ShipmentsTable: React.FC<ShipmentsTableProps> = ({
   // onUpdateFreight,
   // onViewEpods,
 }) => {
+  const { showMessage } = useSnackbar();
   const [actionSearchState, setActionSearchState] = useState("");
+  const [showDownLoadLoader, setShowDownLoadLoader] = useState(false);
 
   const shouldShowAction = (actionName: string): boolean => {
     if (!actionSearchState) return true;
@@ -162,6 +171,26 @@ export const ShipmentsTable: React.FC<ShipmentsTableProps> = ({
   //       onCancel?.(shipment);
   //     }
   //   };
+
+
+const downloadLocHistory = async (type: "SIM" | "APP" | "GPS", shipmentId: string) => {
+  setShowDownLoadLoader(true);
+  try {
+    const payload = { shipment: shipmentId, method: type };
+    const response = await httpsPost("reports/path_report", payload, {}, 1);
+    if (response && response.data && response.data.link) {
+      window.open(response.data.link, "_blank");
+    }
+    if(response && response.error){
+     showMessage(response.message, "error");
+    }
+  } catch (err: any) {
+    console.error("Error downloading location history:", err);
+    setShowDownLoadLoader(false);
+    showMessage(err?.error?.message || "Failed to download location history", "error");
+  }
+  setShowDownLoadLoader(false);
+};
 
   if (isAnalyticsView) return null;
 
@@ -272,13 +301,7 @@ export const ShipmentsTable: React.FC<ShipmentsTableProps> = ({
             <th className={`${styles.matHeaderCell} ${styles.matColumnPpd}`}>PPD</th>
             <th className={`${styles.matHeaderCell} ${styles.matColumnDelayed}`}>Delayed</th>
             <th className={`${styles.matHeaderCell} ${styles.matColumnSaleOrder}`}>Sale Order</th>
-            <th className={`${styles.matHeaderCell} ${styles.matColumnDriverExpensePaid}`}>Driver Expense Paid</th>
-            <th className={`${styles.matHeaderCell} ${styles.matColumnDriverExpenseExists}`}>Driver Expense Exists</th>
             <th className={`${styles.matHeaderCell} ${styles.matColumnEpodRequested}`}>ePOD Requested</th>
-            <th className={`${styles.matHeaderCell} ${styles.matColumnDelayPenaltyWaiveOff}`}>Delay Penalty Waive Off</th>
-            <th className={`${styles.matHeaderCell} ${styles.matColumnWaybillFlag}`}>Waybill Flag</th>
-            <th className={`${styles.matHeaderCell} ${styles.matColumnAdvanceAmount}`}>Advance Amount</th>
-            <th className={`${styles.matHeaderCell} ${styles.matColumnGpsVehicle}`}>GPS Vehicle</th>
             <th className={`${styles.matHeaderCell} ${styles.matColumnCommercialInvoiceExist}`}>Commercial Invoice Exist</th>
             <th
               className={`${styles.matHeaderCell} ${styles.matColumnLastLocation}`}
@@ -424,6 +447,62 @@ export const ShipmentsTable: React.FC<ShipmentsTableProps> = ({
                       />
                     )}
                   </a>
+
+                    {shipment.trip_tracker && shipment.trip_tracker.methods && (
+                      <span className={styles.trackingIconsWrapper}>
+                        {shipment.trip_tracker.methods.map((trip: string, idx: number) => {
+                          if (trip === "SIM") {
+                            return (
+                              <span
+                                key={`sim-${idx}`}
+                                className={styles.sim_tracking}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  downloadLocHistory("SIM", shipment._id);
+                                }}
+                                title="Sim Tracker"
+                                style={{ cursor: "pointer", marginLeft: 4 }}
+                              >
+                                <Image src={simTrackingIcon} alt="Sim Tracker" width={18} height={18} />
+                              </span>
+                            );
+                          }
+                          if (trip === "APP") {
+                            return (
+                              <span
+                                key={`app-${idx}`}
+                                className={styles.sim_tracking}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  downloadLocHistory("APP", shipment._id);
+                                }}
+                                title="Mobile Tracker"
+                                style={{ cursor: "pointer", marginLeft: 4 }}
+                              >
+                                <Image src={mobileIcon} alt="Mobile Tracker" width={18} height={18} />
+                              </span>
+                            );
+                          }
+                          if (trip === "GPS") {
+                            return (
+                              <span
+                                key={`gps-${idx}`}
+                                className={styles.sim_tracking}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  downloadLocHistory("GPS", shipment._id);
+                                }}
+                                title="GPS Tracker"
+                                style={{ cursor: "pointer", marginLeft: 4 }}
+                              >
+                                <Image src={gpsTrackingIcon} alt="GPS Tracker" width={18} height={18} />
+                              </span>
+                            );
+                          }
+                          return null;
+                        })}
+                      </span>
+                    )}
                 </td>
 
                 <td className={styles.matCell}>
@@ -520,33 +599,7 @@ export const ShipmentsTable: React.FC<ShipmentsTableProps> = ({
                     : "-"}
                 </td>
                 <td className={styles.matCell}>
-                  {shipment.status === "Completed" && shipment.carrier_parent_name === "Own Fleet"
-                    ? shipment.driver_expense_paid
-                      ? "Yes"
-                      : "No"
-                    : "-"}
-                </td>
-                <td className={styles.matCell}>
-                  {shipment.status === "Completed" && shipment.carrier_parent_name === "Own Fleet"
-                    ? shipment.driver_expense_exists && !shipment.driver_expense_paid
-                      ? "Yes"
-                      : "No"
-                    : "-"}
-                </td>
-                <td className={styles.matCell}>
                   {shipment.whatsApp?.isEpodRequested ? "Yes" : "No"}
-                </td>
-                <td className={styles.matCell}>
-                  {shipment.delay_penalty_waive_off?.status === "PENDING" ? "Pending" : "No"}
-                </td>
-                <td className={styles.matCell}>
-                  {shipment.waybillFlag ? "Yes" : "No"}
-                </td>
-                <td className={styles.matCell}>
-                  {shipment.advance_amount ? shipment.advance_amount : "-"}
-                </td>
-                <td className={styles.matCell}>
-                  {shipment.gpsVehicle ? "Yes" : "No"}
                 </td>
                 <td className={styles.matCell}>
                   {shipment.commercial_invoice_exist ? "Yes" : "No"}

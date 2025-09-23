@@ -120,6 +120,7 @@ interface Shipment {
   trip_tracker?: {
     last_location_address: string;
     last_location_at: string;
+    methods?: string[];
   };
   booked_by: string;
   ppd?: string;
