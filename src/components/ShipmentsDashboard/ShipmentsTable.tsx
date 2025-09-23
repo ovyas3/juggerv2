@@ -22,6 +22,7 @@ import {
   DollarSign,
   FileText,
   CheckCircle,
+  UserCheck
 } from "lucide-react";
 import { LocationDialog } from "../../components/ShipmentsDashboard/LocationTracking/LocationDialog";
 import greenSIM from "../../assets/green-SIM.svg";
@@ -92,6 +93,7 @@ interface ShipmentsTableProps {
   actionMenuOpenId: string | null;
   setActionMenuOpenId: (id: string | null) => void;
   closeActionMenu: () => void;
+  openSubscribeModal: (shipment: any) => void;
   // onViewDetails: (shipment: Shipment) => void;
   // onShare: (shipment: Shipment) => void;
   // onSendEmail: (shipment: Shipment) => void;
@@ -130,6 +132,7 @@ export const ShipmentsTable: React.FC<ShipmentsTableProps> = ({
   actionMenuOpenId,
   setActionMenuOpenId,
   closeActionMenu,
+  openSubscribeModal,
   // onViewDetails,
   // onShare,
   // onSendEmail,
@@ -192,6 +195,42 @@ const downloadLocHistory = async (type: "SIM" | "APP" | "GPS", shipmentId: strin
   setShowDownLoadLoader(false);
 };
 
+const  renderConsentAndSubscriptionIcons = (shipment: any, openSubscribeModal: (shipment: any) => void) => {
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 8, justifyContent: "center" }}>
+      {shipment.showGreenConsent ? (
+        <span title="Consent Given" style={{cursor: "default"}}>
+          <CheckCircle size={18} color="#22c55e" />
+        </span>
+      ) : shipment.showRedConsent ? (
+        <span title="Consent Not Given" style={{cursor: "default"}}>
+          <XCircle size={18} color="#ef4444" />
+        </span>
+      ) : (
+        <span title="Consent Not Available" style={{cursor: "default"}}>
+          <XCircle size={18} color="#9ca3af" />
+        </span>
+      )}
+      {shipment.showSubscriptionStatus && !shipment.gpsVehicle && (
+        <span
+          style={{ cursor: "pointer" }}
+          title={shipment.showGreenConsent ? "Subscribed" : "Not Subscribed"}
+          onClick={(e) => {
+            e.stopPropagation();
+            openSubscribeModal(shipment);
+          }}
+        >
+          {shipment.showGreenConsent ? (
+            <UserCheck size={18} color="#22c55e" />
+          ) : (
+            <UserCheck size={18} color="#ef4444" />
+          )}
+        </span>
+      )}
+    </div>
+  );
+}
+
   if (isAnalyticsView) return null;
 
   return (
@@ -200,10 +239,10 @@ const downloadLocHistory = async (type: "SIM" | "APP" | "GPS", shipmentId: strin
         isCompactView ? styles.compactView : ""
       }`}
       ref={tableRef}
+      data-shipment-type={shipmentType} 
     >
       <table
         className={`${styles.matTable} ${styles.table}`}
-        data-shipment-type={shipmentType}
       >
         <thead className={styles.matHeaderRow}>
           <tr className={styles.headerRow}>
@@ -269,7 +308,7 @@ const downloadLocHistory = async (type: "SIM" | "APP" | "GPS", shipmentId: strin
             </th>
 
             {shipmentType === "inbound" && (
-              <th className={styles.matHeaderCell}>Booked By</th>
+              <th className={`${styles.matHeaderCell} ${styles.matColumnBookedBy}`}>Booked By</th>
             )}
 
             <th className={`${styles.matHeaderCell} ${styles.matColumnVehicleNumber}`}>Vehicle Number</th>
@@ -285,20 +324,17 @@ const downloadLocHistory = async (type: "SIM" | "APP" | "GPS", shipmentId: strin
             <th className={`${styles.matHeaderCell} ${styles.matColumnEpod}`}>
               ePOD
             </th>
-            <th
-              className={`${styles.matHeaderCell} ${styles.matColumnConsent}`}
-            >
-              Consent
-            </th>
-            <th
-              className={`${styles.matHeaderCell} ${styles.matColumnSubscribed}`}
-            >
-              Subscribed
-            </th>
+            <th className={`${styles.matHeaderCell} ${styles.matColumnConsent}`}>
+  Consent / Subscribed
+</th>
             <th className={`${styles.matHeaderCell} ${styles.matColumnSerialNo}`}>Serial No.</th>
             <th className={`${styles.matHeaderCell} ${styles.matColumnEpodReceived}`}>ePOD Received</th>
-            <th className={`${styles.matHeaderCell} ${styles.matColumnPpdUpdated}`}>PPD Updated</th>
-            <th className={`${styles.matHeaderCell} ${styles.matColumnPpd}`}>PPD</th>
+            <th className={`${styles.matHeaderCell} ${styles.matColumnPpd}`}>
+  erp Reference
+</th>
+<th className={`${styles.matHeaderCell} ${styles.matColumnDoNumber}`}>
+  OBD Number
+</th>
             <th className={`${styles.matHeaderCell} ${styles.matColumnDelayed}`}>Delayed</th>
             <th className={`${styles.matHeaderCell} ${styles.matColumnSaleOrder}`}>Sale Order</th>
             <th className={`${styles.matHeaderCell} ${styles.matColumnEpodRequested}`}>ePOD Requested</th>
@@ -537,14 +573,8 @@ const downloadLocHistory = async (type: "SIM" | "APP" | "GPS", shipmentId: strin
                 </td>
 
                 <td className={`${styles.matCell} ${styles.matColumnConsent}`}>
-                  {renderConsentCell(shipment)}
-                </td>
-
-                <td
-                  className={`${styles.matCell} ${styles.matColumnSubscribed}`}
-                >
-                  {renderSubscriptionCell(shipment)}
-                </td>
+  {renderConsentAndSubscriptionIcons(shipment, openSubscribeModal)}
+</td>
 
                 <td className={styles.matCell}>
                   {shipment.serial_number
@@ -555,15 +585,20 @@ const downloadLocHistory = async (type: "SIM" | "APP" | "GPS", shipmentId: strin
                   {shipment.whatsApp?.isEpodReceived ? "Yes" : "No"}
                 </td>
                 <td className={styles.matCell}>
-                  {shipment.ppd_updated ? (
-                    <span title="PPD Updated">
-                      <CheckCircle size={16} color="#22c55e" />
-                    </span>
-                  ) : (
-                    "-"
-                  )}
-                </td>
-                <td className={styles.matCell}>{shipment.ppd || "-"}</td>
+  <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
+    {shipment.ppd_updated ? (
+      <span title="PPD Updated">
+        <CheckCircle size={16} color="#22c55e" />
+      </span>
+    ) : (
+      <span title="PPD Not Updated" style={{ color: "#9ca3af", fontSize: 16, lineHeight: 1 }}>–</span>
+    )}
+    <span>{shipment.ppd ? shipment.ppd : <span title="No PPD Available" style={{ color: "#9ca3af", fontSize: 16, lineHeight: 1 }}>–</span>}</span>
+  </span>
+</td>
+<td className={styles.matCell}>
+  {shipment.do_number || "-"}
+</td>
                 <td className={styles.matCell}>
                   {shipment.delayed_shipment ? (
                     <span style={{ color: "#e03e3e" }}>Yes</span>
@@ -613,7 +648,7 @@ const downloadLocHistory = async (type: "SIM" | "APP" | "GPS", shipmentId: strin
                 <td className={`${styles.matCell} ${styles.matColumnFreightPrice}`}>
                   {shipment.frieght_price
                     ? formatCurrency(shipment.frieght_price)
-                    : "N/A"}
+                    : "-"}
                 </td>
 
                 <td

@@ -6,6 +6,7 @@ import ModalHeader from "@/components/UI/ModalHeader/ModalHeader";
 interface LocationDialogProps {
   address: string;
   lastUpdated?: string;
+  lastUpdatedColor?: string;
   children: React.ReactNode;
   isOpen: boolean;
   onClose: () => void;
@@ -15,6 +16,7 @@ interface LocationDialogProps {
 export function LocationDialog({
   address,
   lastUpdated,
+  lastUpdatedColor,
   children,
   isOpen,
   onClose,
@@ -56,7 +58,15 @@ export function LocationDialog({
             {lastUpdated && (
               <div className={styles.section}>
                 <span className={styles.label}>Last Updated</span>
-                <p className={styles.value}>{toShortDateTime(lastUpdated)}</p>
+               <p
+                  className={styles.value}
+                  style={{
+                    color: lastUpdatedColor || "#374151",
+                    fontWeight: 600,
+                  }}
+                >
+                  {toShortDateTime(lastUpdated)}
+                </p>
               </div>
             )}
           </div>

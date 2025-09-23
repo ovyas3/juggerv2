@@ -1256,6 +1256,11 @@ table.matTable {
   max-width: 70px !important;
 }
 
+.matColumnBookedBy {
+  min-width: 120px !important;
+  max-width: 120px !important;
+}
+
 .matColumnVehicleNumber {
   min-width: 120px !important;
   max-width: 120px !important;
@@ -1458,17 +1463,17 @@ table.matTable {
 
 /* Add this after your existing .tableContainer.compactView styles */
 .tableContainer.compactView .matColumnSelect { left: 0 !important; }
-.tableContainer.compactView .matColumnSno { left: 52px !important; }
-.tableContainer.compactView .matColumnStatus { left: 102px !important; }
-.tableContainer.compactView .matColumnSIN { left: 152px !important; }
-.tableContainer.compactView .matColumnPickup { left: 267px !important; }
-.tableContainer.compactView .matColumnDelivery { left: 522px !important; }
-.tableContainer.compactView .matColumnCarrier { left: 777px !important; }
+.tableContainer.compactView .matColumnSno { left: 53px !important; }
+.tableContainer.compactView .matColumnStatus { left: 103px !important; }
+.tableContainer.compactView .matColumnSIN { left: 153px !important; }
+.tableContainer.compactView .matColumnPickup { left: 268px !important; }
+.tableContainer.compactView .matColumnDelivery { left: 523px !important; }
+.tableContainer.compactView .matColumnCarrier { left: 778px !important; }
 
 /* Shipment type specific adjustments for compact view */
-.tableContainer.compactView[data-shipment-type="inbound"] .matColumnCarrier { left: 522px !important; }
-.tableContainer.compactView[data-shipment-type="outbound"] .matColumnDelivery { left: 522px !important; }
-.tableContainer.compactView[data-shipment-type="outbound"] .matColumnCarrier { left: 777px !important; }
+.tableContainer.compactView[data-shipment-type="inbound"] .matColumnCarrier { left: 523px !important; }
+.tableContainer.compactView[data-shipment-type="outbound"] .matColumnDelivery { left: 268px !important; }
+.tableContainer.compactView[data-shipment-type="outbound"] .matColumnCarrier { left: 523px !important; }
 
 /* Details popup styles */
 .detailsPopupDialog {
@@ -3280,8 +3285,8 @@ select.didFloatingSelect::-ms-expand {
 .matColumnSelect {
   position: sticky;
   left: 0;
-  min-width: 48px;
-  width: 48px;
+  min-width: 53px;
+  width: 53px;
   top: 0;
   z-index: 30;
   background: #ebeef7;
@@ -3365,14 +3370,9 @@ select.didFloatingSelect::-ms-expand {
   display: none;
 }
 
-/* Adjust left positions when columns are hidden */
-[data-shipment-type="inbound"] .matColumnDateTime {
-  left: 476px;
-}
-
 [data-shipment-type="inbound"] .matColumnCarrier {
   position: sticky !important;
-  left: 517px !important;
+  left: 523px !important;
   min-width: 200px !important;
   width: 200px !important;
   z-index: 23 !important;
@@ -3387,21 +3387,17 @@ select.didFloatingSelect::-ms-expand {
 
 [data-shipment-type="outbound"] .matColumnDelivery {
   position: sticky !important;
-  left: 262px !important;
-  min-width: 250px !important;
+  left: 268px !important;
   max-width: 250px !important;
-  width: 200px !important;
+  width: 250px !important;
   z-index: 25 !important;
   background: #ebeef7 !important;
 }
 
-[data-shipment-type="outbound"] .matColumnDateTime {
-  left: 476px;
-}
 
 [data-shipment-type="outbound"] .matColumnCarrier {
   position: sticky !important;
-  left: 512px !important;
+  left: 523px !important;
   min-width: 200px !important;
   width: 200px !important;
   z-index: 23 !important;

@@ -776,7 +776,6 @@ const actionMenuCategories = {
     { icon: PlusCircle, label: "Add DO Details", color: "text-blue-600", onClick: handleAddDODetails },
     { icon: Edit, label: "Update Shipment Status", color: "text-yellow-600", onClick: handleUpdateShipmentStatus },
     { icon: AlertCircle, label: "Mark Fault Device", color: "text-red-600", onClick: handleMarkFaultDevice },
-    { icon: AlertCircle, label: "Missed Shipment", color: "text-red-600", onClick: handleMissedShipment },
     { icon: AlertCircle, label: "Missed Event", color: "text-red-600", onClick: handleMissedEvent },
   ],
   "Advanced": [
@@ -805,16 +804,14 @@ const closeActionMenu = () => {
   }, [showAttachDialog]);
 
   const subFilters = [
-    { key: "pending", label: "Pending", count: 0, color: "#2980b9" },
-    { key: "approved", label: "Approved", count: 0, color: "#27ae60" },
-    { key: "accepted", label: "Accepted", count: 0, color: "#1abc9c" },
     { key: "towards_pickup", label: "Towards Pickup", count: 0, color: "#16a085" },
     { key: "at_pickup", label: "At Pickup", count: 0, color: "#3498db" },
-    { key: "about_to_reach", label: "About to Reach", count: 0, color: "#34495e" },
     { key: "in_transit", label: "In Transit", count: 0, color: "#f39c12" },
-    { key: "at_delivery", label: "At Delivery", count: 0, color: "#f1948a" },
+    { key: "about_to_reach", label: "About to Reach", count: 0, color: "#34495e" },
+    { key: "at_delivery", label: "At Delivery", count: 0, color: "#667eea" },
     { key: "completed", label: "Completed", count: 0, color: "#2ecc40" },
     { key: "cancelled", label: "Cancelled", count: 0, color: "#e74c3c" },
+    // { key: "delayed", label: "Delayed", count: 0, color: "#ed8936" },
   ];
 
   const analyticsLifeCycle = [
@@ -1590,29 +1587,21 @@ const closeActionMenu = () => {
   };
   const statusColors: Record<string, string> = {
     Completed: "#2ecc40",
-    Approved: "#27ae60",
-    Pending: "#2980b9",
     "In Transit": "#f39c12",
     Cancelled: "#e74c3c",
-    Assigned: "#8e44ad",
     "Towards Pickup": "#16a085",
     "At Pickup": "#3498db",
     "At Delivery": "#f1948a",
-    Accepted: "#1abc9c",
     "About to Reach": "#34495e",
   };
 
   const statusLabels: Record<string, string> = {
     Completed: "Completed",
-    Approved: "Approved",
-    Pending: "Pending",
     "In Transit": "In Transit",
     Cancelled: "Cancelled",
-    Assigned: "Assigned",
     "Towards Pickup": "Towards Pickup",
     "At Pickup": "At Pickup",
     "At Delivery": "At Delivery",
-    Accepted: "Accepted",
     "About to Reach": "About to Reach",
   };
 
@@ -1734,12 +1723,23 @@ const renderLastLocationCell = (shipment: any) => {
     setLocationDialogState({ isOpen: false });
   };
 
+  let lastUpdatedColor = "#22c55e"; 
+  if (shipment.trip_tracker?.last_location_at) {
+    const last = new Date(shipment.trip_tracker.last_location_at).getTime();
+    const now = Date.now();
+    const diffMinutes = (now - last) / (1000 * 60);
+    if (diffMinutes > 60) {
+      lastUpdatedColor = "#ef4444";
+    }
+  }
+
   return (
     <div>
       {shipment.trip_tracker?.last_location_address ? (
         <LocationDialog
           address={shipment.trip_tracker.last_location_address}
           lastUpdated={shipment.trip_tracker?.last_location_at}
+          lastUpdatedColor={lastUpdatedColor}
           isOpen={isDialogOpen}
           onClose={handleLocationDialogClose}
           shipmentId={shipment.sin}
@@ -1751,7 +1751,7 @@ const renderLastLocationCell = (shipment: any) => {
             title="View location"
             onClick={handleLocationClick}
           >
-            <MapPin className={styles.locationIcon} />
+            <MapPin className={styles.locationIcon} color={lastUpdatedColor} />
           </Button>
         </LocationDialog>
       ) : (
@@ -2285,21 +2285,20 @@ const applyFilter = () => {
 
   const hasSelected = selectedShipmentsArray.length > 0; 
 
+  const handleMissedShipmentHeader = () => {
+  if (!selectedShipmentsArray.length) {
+    showMessage("Please select at least one shipment", "error");
+    return;
+  }
+  const shipment = shipments.find(s => s._id === selectedShipmentsArray[0]);
+  if (shipment) {
+    setSelectedShipmentForMissed(shipment);
+    setShowMissedShipmentModal(true);
+  }
+};
+
   return (
     <div className={styles.main}>
-      <div className={styles.shipmentsMainHeader}>
-        {/* <div className={styles.filterGroup}>
-          <label className={styles.checkboxLabel}>
-            <input
-              type="checkbox"
-              checked={odcFilter === true}
-              onChange={(e) => setOdcFilter(e.target.checked)}
-            />
-            <span>ODC Shipment(s)</span>
-          </label>
-        </div> */}
-        
-      </div>
       <div className={styles.tabsContainer}>
         <div className={styles.tabsGroup}>
           <div
@@ -2346,21 +2345,28 @@ const applyFilter = () => {
           isTechnova={isTechnova}
           isLoading={isLoading}
           hasSelectedShipments={selectedShipmentsArray.length > 0}
+          onMissedShipment={handleMissedShipmentHeader} 
         />
 
-        <span
-    style={{ padding: "0px 3px", cursor: "pointer", verticalAlign: "middle" }}
-    onClick={openInvoiceVideos}
-    title={
-      shipmentType === "inbound"
-        ? helpDataInbound[0].data
-        : shipmentType === "outbound"
-        ? helpDataOutbound[0].data
-        : helpDataOthers[0].data
-    }
-  >
-<HelpCircle className={styles.helpIcon} style={{ width: 22, height: 22, verticalAlign: "middle" }} />
-  </span>
+        {
+          shipmentType !== "all" && (
+            <span
+            style={{ padding: "0px 3px", cursor: "pointer", verticalAlign: "middle" }}
+            onClick={openInvoiceVideos}
+            title={
+              shipmentType === "inbound"
+                ? helpDataInbound[0].data
+                : shipmentType === "outbound"
+                ? helpDataOutbound[0].data
+                : helpDataOthers[0].data
+            }
+          >
+        <HelpCircle className={styles.helpIcon} style={{ width: 22, height: 22, verticalAlign: "middle" }} />
+          </span>
+          )
+        }
+
+
 
         <div className={styles.refresh} onClick={clearFilters}>
           <RefreshCw className={styles.lucideIcon} />
@@ -2393,6 +2399,17 @@ const applyFilter = () => {
     );
   })}
 </div>
+
+        <div className={styles.filterGroup}>
+          <label className={styles.checkboxLabel}>
+            <input
+              type="checkbox"
+              checked={odcFilter === true}
+              onChange={(e) => setOdcFilter(e.target.checked)}
+            />
+            <span>ODC Shipment(s)</span>
+          </label>
+        </div>
 
 
       </div>
@@ -2650,6 +2667,7 @@ const applyFilter = () => {
                   actionMenuOpenId={actionMenuOpenId}
   setActionMenuOpenId={setActionMenuOpenId}
   closeActionMenu={closeActionMenu}
+    openSubscribeModal={openSubscribeModal}
               />
             )}
           </div>

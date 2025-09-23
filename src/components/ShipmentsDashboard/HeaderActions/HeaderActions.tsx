@@ -1,6 +1,6 @@
 // HeaderActions.tsx
 import React, { useEffect, useRef, useState } from "react";
-import { RefreshCw, RotateCw, Send, FileText, Upload, MoreHorizontal } from "lucide-react";
+import { RefreshCw, RotateCw, Send, FileText, Upload, MoreHorizontal, AlertCircle } from "lucide-react";
 import styles from "./HeaderActions.module.css";
 import BulkUpload from "../SpecialFeatures/BulkUpload";
 
@@ -13,6 +13,7 @@ interface HeaderActionsProps {
   isTechnova?: boolean;
   isLoading?: boolean;
   hasSelectedShipments?: boolean;
+  onMissedShipment?: () => void; 
 }
 
 const HeaderActions: React.FC<HeaderActionsProps> = ({
@@ -24,6 +25,7 @@ const HeaderActions: React.FC<HeaderActionsProps> = ({
   isTechnova = false,
   isLoading = false,
   hasSelectedShipments = false,
+  onMissedShipment,
 }) => {
   const [open, setOpen] = useState(false);
   const [showBulkUpload, setShowBulkUpload] = useState(false);
@@ -126,6 +128,18 @@ const HeaderActions: React.FC<HeaderActionsProps> = ({
             >
               <Upload className={styles.lucideIcon} />
               Bulk Upload
+            </button>
+            <button
+              className={styles.menuItem}
+              role="menuitem"
+              onClick={() => {
+                setOpen(false);
+                onMissedShipment && onMissedShipment();
+              }}
+              disabled={!hasSelectedShipments || isLoading}
+            >
+              <AlertCircle className={styles.lucideIcon} />
+              Missed Shipment
             </button>
           </div>
         )}
