@@ -14,7 +14,7 @@
     background: #fff;
     border-radius: 8px;
     box-shadow: 0 4px 28px rgba(0,0,0,0.18);
-    width: 480px;
+    width: 660px;
     max-width: 96vw;
     padding: 0;
     overflow: hidden;
@@ -129,7 +129,7 @@
   }
 
   .button:hover {
-    filter: brightness(0.95);
+    background-color: #4338ca;
   }
   
   .submitButtonYes .button {

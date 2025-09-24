@@ -211,7 +211,7 @@ const SubscribeModal = ({ open, onClose, shipment }: { open: boolean, onClose: (
             <div className={styles.text}>
               {/* Customize disclaimer as needed */}
               Unsubscribe and Subscribe to send SMS<br />
-              SIM tracking request status takes at least 1 hour to update.
+              SIM tracking request status takes at least 1 hour to update
             </div>
           </div>
         </div>

@@ -4,6 +4,15 @@ import styles from "./CreatePaymentAdvanceModal.module.css";
 import ModalHeader from "@/components/UI/ModalHeader/ModalHeader";
 import { httpsGet, httpsPost } from "@/utils/Communication";
 import { useSnackbar } from "@/hooks/snackBar";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/UI/select";
+import { DatePicker } from "antd";
+import dayjs from "dayjs";
 
 interface ShipmentItem {
   _id: string;
@@ -321,16 +330,20 @@ const CreatePaymentAdviceModal: React.FC<CreatePaymentAdviceModalProps> = ({
         <div className={styles.paymentMode}>
           <div className={styles.paymentModeSelect}>
             <span>Payment Mode</span>
-            <select
+            <Select
               value={paymentType}
-              onChange={(e) => setPaymentType(e.target.value)}
-              className={styles.selectInput}
+              onValueChange={(value) => setPaymentType(value)}
             >
-              <option value="bank">Bank Transfer (NEFT/RTGS)</option>
-              <option value="UPI">UPI</option>
-              <option value="cheque">Cheque</option>
-              <option value="cash">Cash</option>
-            </select>
+              <SelectTrigger className={styles.selectTrigger}>
+                <SelectValue placeholder="Select payment mode" />
+              </SelectTrigger>
+              <SelectContent className={styles.selectContent}>
+                <SelectItem className={styles.selectItem} value="bank">Bank Transfer (NEFT/RTGS)</SelectItem>
+                <SelectItem className={styles.selectItem} value="UPI">UPI</SelectItem>
+                <SelectItem className={styles.selectItem} value="cheque">Cheque</SelectItem>
+                <SelectItem className={styles.selectItem} value="cash">Cash</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           <div className={styles.tdsInput} style={{ marginTop: "16px" }}>
             <span style={{ marginRight: "5px" }}>TDS %: </span>
@@ -341,7 +354,7 @@ const CreatePaymentAdviceModal: React.FC<CreatePaymentAdviceModalProps> = ({
         <div className={styles.paymentDetails}>
           {paymentType === "bank" && (
             <div className={styles.transactionId}>
-              <span>UTR Number</span>
+              <span className={styles.label}>UTR Number</span>
               <input
                 type="text"
                 value={request.payer_info.UTR_no}
@@ -355,13 +368,14 @@ const CreatePaymentAdviceModal: React.FC<CreatePaymentAdviceModalProps> = ({
                   }))
                 }
                 placeholder="Enter UTR Number"
+                className={styles.inputField}
               />
             </div>
           )}
 
           {paymentType === "UPI" && (
             <div className={styles.transactionId}>
-              <span>Transaction ID</span>
+              <span className={styles.label}>Transaction ID</span>
               <input
                 type="text"
                 value={request.payer_info.transaction_ID}
@@ -383,16 +397,19 @@ const CreatePaymentAdviceModal: React.FC<CreatePaymentAdviceModalProps> = ({
             paymentType === "UPI" ||
             paymentType === "cash") && (
             <div className={styles.transactionId}>
-              <span>Date of Payment</span>
-              <input
-                type="date"
-                value={request.payment_date}
-                onChange={(e) =>
+              <span className={styles.label}>Date of Payment</span>
+              <DatePicker
+                style={{ width: "180px" }}
+                placeholder="Select Payment Date"
+                value={request.payment_date ? dayjs(request.payment_date) : null}
+                onChange={(date) =>
                   setRequest((prev: any) => ({
                     ...prev,
-                    payment_date: e.target.value,
+                    payment_date: date ? date.format("YYYY-MM-DD") : "",
                   }))
                 }
+                format="DD/MM/YYYY"
+                className={styles.dateInput}
               />
             </div>
           )}
@@ -400,7 +417,7 @@ const CreatePaymentAdviceModal: React.FC<CreatePaymentAdviceModalProps> = ({
           {paymentType === "cheque" && (
             <>
               <div className={styles.transactionId}>
-                <span>Cheque Number</span>
+                <span className={styles.label}>Cheque Number</span>
                 <input
                   type="text"
                   value={request.payer_info.cheque_no}
@@ -417,19 +434,22 @@ const CreatePaymentAdviceModal: React.FC<CreatePaymentAdviceModalProps> = ({
                 />
               </div>
               <div className={styles.transactionId}>
-                <span>Cheque Date</span>
-                <input
-                  type="date"
-                  value={request.payer_info.cheque_date}
-                  onChange={(e) =>
+                <span className={styles.label}>Cheque Date</span>
+                <DatePicker
+                  style={{ width: "180px" }}
+                  placeholder="Select Cheque Date"
+                  value={request.payer_info.cheque_date ? dayjs(request.payer_info.cheque_date) : null}
+                  onChange={(date) =>
                     setRequest((prev: any) => ({
                       ...prev,
                       payer_info: {
                         ...prev.payer_info,
-                        cheque_date: e.target.value,
+                        cheque_date: date ? date.format("YYYY-MM-DD") : "",
                       },
                     }))
                   }
+                  format="DD/MM/YYYY"
+                  className={styles.datePicker}
                 />
               </div>
             </>
@@ -490,7 +510,7 @@ const CreatePaymentAdviceModal: React.FC<CreatePaymentAdviceModalProps> = ({
                           parseFloat(e.target.value) || 0
                         )
                       }
-                      className={styles.amountInput}
+                      className={styles.inputField}
                     />
                   </td>
                   <td>

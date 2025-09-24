@@ -55,9 +55,9 @@ const RecalculateDistanceModal: React.FC<RecalculateDistanceModalProps> = ({
         />
 
         <div className={styles.modalBody}>
-          <div className={styles.sinNumber}>
+          {/* <div className={styles.sinNumber}>
             <p>SIN: {sin || "Not available"}</p>
-          </div>
+          </div> */}
 
           <div className={styles.addressesContainer}>
             <div className={styles.addressBox}>

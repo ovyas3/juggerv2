@@ -5,6 +5,13 @@ import ModalHeader from "@/components/UI/ModalHeader/ModalHeader";
 import Loader from "@/components/UI/Loader/Loader";
 import styles from "./UpdateCarrierFreight.module.css";
 import { useSnackbar } from "@/hooks/snackBar";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../UI/select";
 
 interface FreightData {
   freight: number | string;
@@ -106,44 +113,70 @@ const UpdateCarrierFreight: React.FC<UpdateCarrierFreightProps> = ({
   };
 
   // Input change handler
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
-  ) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
 
-    setFreightData((prev) => ({
+    // For number inputs, prevent negative values and minus symbol
+    if (['freight', 'weight', 'weight_price', 'price'].includes(name)) {
+      // Prevent typing minus symbol
+      if (value.includes('-')) {
+        return;
+      }
+      
+      // If the value is empty, allow it (for clearing the field)
+      if (value === '') {
+        setFreightData(prev => ({
+          ...prev,
+          [name]: ''
+        }));
+        return;
+      }
+      
+      // Check if the value is a valid positive number
+      const numValue = parseFloat(value);
+      if (isNaN(numValue) || numValue < 0) {
+        return; // Don't update if not a valid positive number
+      }
+      
+      // Update the state with the valid number
+      setFreightData(prev => ({
+        ...prev,
+        [name]: numValue
+      }));
+      
+      // Special handling for weight/price calculation
+      if ((name === 'weight' || name === 'weight_price') && freightData.weight && freightData.weight_price) {
+        calculateFreightValues();
+      }
+      return;
+    }
+
+    // For non-number inputs, update normally
+    setFreightData(prev => ({
       ...prev,
-      [name]:
-        name === "freight" ||
-        name === "weight" ||
-        name === "weight_price" ||
-        name === "price"
-          ? value === "" ? "" : parseFloat(value)
-          : value,
+      [name]: value
     }));
 
-    // If entering freight, clear weight/price/uom
-    if (name === "freight" && value) {
-      setFreightData((prev) => ({
+    // Handle clearing of related fields
+    if (name === 'freight' && value) {
+      setFreightData(prev => ({
         ...prev,
-        weight: "",
-        weight_price: "",
-        uom: "KG",
+        weight: '',
+        weight_price: '',
+        uom: 'KG',
       }));
     }
 
-    if (
-      (name === "weight" || name === "weight_price" || name === "uom") &&
-      value
-    ) {
-      setFreightData((prev) => ({
+    if ((name === 'weight' || name === 'weight_price' || name === 'uom') && value) {
+      setFreightData(prev => ({
         ...prev,
-        freight: "",
+        freight: '',
       }));
-      setTimeout(calculateFreightValues, 0);
+      if (name !== 'uom') {
+        setTimeout(calculateFreightValues, 0);
+      }
     }
   };
-
 
   const calculateFreightValues = () => {
     if (freightData.weight && freightData.weight_price) {
@@ -197,22 +230,22 @@ const UpdateCarrierFreight: React.FC<UpdateCarrierFreightProps> = ({
     };
 
     if (freightType === "rate") {
-  if (manualPrice) payload.price = manualPrice;
-  if (freightData.freight) payload.price = freightData.freight;
-  if (freightData.weight && freightData.weight_price) {
-    payload.weight = freightData.weight;
-    payload.price_per_weight = freightData.weight_price;
-    payload.uom = freightData.uom;
-  }
-} else {
-  // client_rate
-  if (freightData.freight) payload.client_price = freightData.freight;
-  if (freightData.weight && freightData.weight_price) {
-    payload.weight = freightData.weight;
-    payload.price_per_weight = freightData.weight_price;
-    payload.uom = freightData.uom;
-  }
-}
+      if (manualPrice) payload.price = manualPrice;
+      if (freightData.freight) payload.price = freightData.freight;
+      if (freightData.weight && freightData.weight_price) {
+        payload.weight = freightData.weight;
+        payload.price_per_weight = freightData.weight_price;
+        payload.uom = freightData.uom;
+      }
+    } else {
+      // client_rate
+      if (freightData.freight) payload.client_price = freightData.freight;
+      if (freightData.weight && freightData.weight_price) {
+        payload.weight = freightData.weight;
+        payload.price_per_weight = freightData.weight_price;
+        payload.uom = freightData.uom;
+      }
+    }
 
     try {
       const url =
@@ -234,6 +267,34 @@ const UpdateCarrierFreight: React.FC<UpdateCarrierFreightProps> = ({
       setLoading(false);
     }
   };
+
+  // Put these inside UpdateCarrierFreight component
+const preventMinusKey: React.KeyboardEventHandler<HTMLInputElement> = (e) => {
+  const k = e.key;
+  // Block minus, plus, and scientific notation keys
+  if (k === '-' || k === '+' || k === 'e' || k === 'E' || e.code === 'Minus' || e.code === 'NumpadSubtract') {
+    e.preventDefault();
+  }
+};
+
+const preventInvalidBeforeInput: React.FormEventHandler<HTMLInputElement> = (e) => {
+  // React's nativeEvent carries the inserted character
+  const data = (e as unknown as React.SyntheticEvent & { nativeEvent: InputEvent }).nativeEvent?.data ?? '';
+  if (data && /[^0-9.]/.test(data)) {
+    e.preventDefault();
+  }
+};
+
+const sanitizeOnPaste: React.ClipboardEventHandler<HTMLInputElement> = (e) => {
+  const text = e.clipboardData.getData('text');
+  if (/[-+eE]/.test(text) || /[^\d.]/.test(text)) {
+    e.preventDefault();
+    const clean = text.replace(/[^0-9.]/g, ''); // keep only digits and one dot
+    const name = e.currentTarget.name as 'freight' | 'weight' | 'weight_price' | 'price';
+    setFreightData(prev => ({ ...prev, [name]: clean }));
+  }
+};
+
 
   if (!open) return null;
 
@@ -263,6 +324,9 @@ const UpdateCarrierFreight: React.FC<UpdateCarrierFreightProps> = ({
                   placeholder="Freight Amount"
                   step="0.01"
                   min="0"
+                  onKeyDown={preventMinusKey}
+  onBeforeInput={preventInvalidBeforeInput}
+  onPaste={sanitizeOnPaste}
                 />
               </div>
 
@@ -285,18 +349,26 @@ const UpdateCarrierFreight: React.FC<UpdateCarrierFreightProps> = ({
                     />
                   </div>
                   <div className={styles.uomSelect}>
-                    <select
-                      name="uom"
+                    <Select
                       value={freightData.uom}
-                      onChange={handleInputChange}
-                      className={styles.selectField}
+                      onValueChange={(value) =>
+                        handleInputChange({
+                          target: { name: "uom", value },
+                        } as any)
+                      }
+                      disabled={loading}
                     >
-                      {weightUnits.map((unit) => (
-                        <option key={unit} value={unit}>
-                          {unit}
-                        </option>
-                      ))}
-                    </select>
+                      <SelectTrigger className={styles.select}>
+                        <SelectValue placeholder="UOM" className={styles.selectValue} />
+                      </SelectTrigger>
+                      <SelectContent className={styles.selectUnitContent}>
+                        {weightUnits.map((unit) => (
+                          <SelectItem key={unit} value={unit} className={styles.selectItem}>
+                            {unit}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
                 <div className={styles.formGroup}>
@@ -315,37 +387,52 @@ const UpdateCarrierFreight: React.FC<UpdateCarrierFreightProps> = ({
 
               <hr className={styles.horizontalRuler} />
 
-             <div className={styles.formGroup}>
-  <input
-    type="number"
-    className={styles.inputField}
-    placeholder="Freight"
-    value={
-      freightData.freight !== ""
-        ? freightData.freight
-        : freightData.weight && freightData.weight_price
-        ? Number(freightData.weight) * Number(freightData.weight_price)
-        : ""
-    }
-    readOnly
-    disabled={freightType !== "rate"}
-  />
-</div>
+              <div className={styles.formGroup}>
+                <input
+                  type="number"
+                  className={styles.inputField}
+                  placeholder="Freight"
+                  value={
+                    freightData.freight !== ""
+                      ? freightData.freight
+                      : freightData.weight && freightData.weight_price
+                      ? Number(freightData.weight) * Number(freightData.weight_price)
+                      : ""
+                  }
+                  readOnly
+                  disabled={freightType !== "rate"}
+                />
+              </div>
 
               <div className={styles.finalDetailsSection}>
                 <div className={styles.formGroup}>
-                  <select
+                  <Select
                     value={selectedReason}
-                    onChange={handleReasonChange}
-                    className={styles.selectField}
+                    onValueChange={(value) => {
+                      setSelectedReason(value);
+                      setShowOtherReason(value === "Other");
+                      setFreightData((prev) => ({
+                        ...prev,
+                        reason: value !== "Other" ? value : "",
+                      }));
+                    }}
+                    disabled={loading}
                   >
-                    <option value="">Select Reason</option>
-                    {reasons.map((reason) => (
-                      <option key={reason} value={reason}>
-                        {reason}
-                      </option>
-                    ))}
-                  </select>
+                    <SelectTrigger className={styles.select}>
+                      <SelectValue placeholder="Select Reason" className={styles.selectValue} />
+                    </SelectTrigger>
+                    <SelectContent className={styles.selectContent}>
+                      {reasons.map((reason) => (
+                        <SelectItem
+                          key={reason}
+                          value={reason}
+                          className={styles.selectItem}
+                        >
+                          {reason}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 {showOtherReason && (

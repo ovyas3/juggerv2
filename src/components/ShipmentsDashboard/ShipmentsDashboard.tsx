@@ -757,7 +757,7 @@ const actionMenuCategories = {
   "Freight & Payment": [
     { icon: Truck, label: "Update Carrier Freight", color: "text-gray-600", onClick: (shipment: Shipment) => { closeAllDialogs(); handleOpenFreightModal(shipment._id, shipment.sin, 'rate'); } },
     { icon: Truck, label: "Flush Freight", color: "text-gray-600", onClick: handleFlushFreight },
-    { icon: CreditCard, label: "Create Advance Payment", color: "text-indigo-600", onClick: handleCreateAdvancePayment },
+    { icon: CreditCard, label: "Create Payment Advice", color: "text-indigo-600", onClick: handleCreateAdvancePayment },
     { icon: FileText, label: "Change Invoice Type", color: "text-brown-600", onClick: handleChangeInvoiceType },
   ],
   "Documents & Status": [
