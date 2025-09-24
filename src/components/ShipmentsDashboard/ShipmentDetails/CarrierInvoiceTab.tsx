@@ -1,7 +1,7 @@
 // components/ShipmentsDashboard/ShipmentDetails/CarrierInvoiceTab.tsx
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Box,
   Typography,
@@ -12,19 +12,20 @@ import {
   TableHead,
   TableRow,
   Paper,
-  Button,
   Chip,
   Link,
-  Tooltip,
+  Button,
   Modal,
   TextField,
   Select,
   MenuItem,
   FormControl,
   InputLabel,
+  CircularProgress,
+  Tooltip,
 } from "@mui/material";
 import { useSnackbar } from "@/hooks/snackBar";
-import { httpsPost } from "@/utils/Communication";
+import { httpsGet, httpsPost } from "@/utils/Communication";
 import { UserRoles } from "@/hooks/useUserRoles";
 
 // --- Interfaces ---
@@ -77,33 +78,88 @@ const CarrierInvoiceTab = ({
   onDataChange: () => void;
 }) => {
   const { showMessage } = useSnackbar();
+  const [invoices, setInvoices] = useState<CarrierInvoice[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [reasons, setReasons] = useState<string[]>([]);
   const [modalState, setModalState] = useState<ActionModalState>({
     open: false,
     type: null,
     title: "",
     text: "",
     isDisapprove: false,
-    reasons: ["Rate Issue", "Incorrect Charges", "POD not clear", "Other"],
+    reasons: [],
   });
   const [comments, setComments] = useState("");
   const [selectedReason, setSelectedReason] = useState("");
   const [currentInvoiceId, setCurrentInvoiceId] = useState<string | null>(null);
 
-  const invoices: CarrierInvoice[] = (shipmentData?.carrier_invoices || []).map(
-    (inv: any, index: number) => ({
-      id: inv._id,
-      version: index + 1,
-      invoiceNumber: inv.IINC?.custom || inv.IINC?.default || "N/A",
-      datetime: new Date(inv.created_at).toLocaleString(),
-      updatedBy: inv.carrier_user?.name || "N/A",
-      finalAmount: inv.final_amount,
-      status: inv.status,
-      comments: inv.comments || "No comments",
-      pdfLinks: inv.pdf_links || [inv.pdf_link].filter(Boolean),
-      disapprovalDoc: inv.disapprove_doc,
-      role_based: !!inv.approved_by?.logistics,
-    })
-  );
+  // This useEffect hook now fetches all three required pieces of data
+  useEffect(() => {
+    const fetchInvoiceData = async () => {
+      if (!shipmentData?._id) return;
+      setIsLoading(true);
+      try {
+        // Use Promise.all to hit all three endpoints concurrently
+        const [invoiceResponse, reasonsResponse, gstResponse] =
+          await Promise.all([
+            httpsGet(
+              `carrier_invoice/by_shipment?shipment_id=${shipmentData._id}`,
+              6
+            ),
+            httpsGet("constants/get_reasons?name=invoice"),
+            httpsGet(
+              `carrier_invoice/check_gst?shipment_id=${shipmentData._id}`,
+              6
+            ),
+          ]);
+
+        // 1. Process Invoice Data
+        if (invoiceResponse.data) {
+          const formattedInvoices = (invoiceResponse.data || []).map(
+            (inv: any, index: number) => ({
+              id: inv._id,
+              version: index + 1,
+              invoiceNumber: inv.IINC?.custom || inv.IINC?.default || "N/A",
+              datetime: new Date(inv.created_at).toLocaleString(),
+              updatedBy: inv.carrier_user?.name || "N/A",
+              finalAmount: inv.final_amount,
+              status: inv.status,
+              comments: inv.comments || "No comments",
+              pdfLinks: inv.pdf_links || [inv.pdf_link].filter(Boolean),
+              disapprovalDoc: inv.disapprove_doc,
+              role_based: !!inv.approved_by?.logistics,
+            })
+          );
+          setInvoices(formattedInvoices);
+        }
+
+        // 2. Process Reasons Data
+        if (
+          reasonsResponse.statusCode === 200 &&
+          reasonsResponse.data[0]?.reason
+        ) {
+          const fetchedReasons = [...reasonsResponse.data[0].reason, "Other"];
+          setReasons(fetchedReasons);
+          setModalState((prev) => ({ ...prev, reasons: fetchedReasons }));
+        }
+
+        // 3. Process GST/Transit Type Data (optional, store if needed later)
+        if (gstResponse.statusCode === 200) {
+          // You can store this in state if you need to display or use it
+          console.log("Transit Type:", gstResponse.data);
+        }
+      } catch (error: any) {
+        showMessage(
+          error.message || "Failed to fetch carrier invoice data.",
+          "error"
+        );
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchInvoiceData();
+  }, [shipmentData._id]);
 
   const getStatusChip = (status: CarrierInvoice["status"]) => {
     switch (status) {
@@ -127,131 +183,87 @@ const CarrierInvoiceTab = ({
     isDisapprove: boolean
   ) => {
     setCurrentInvoiceId(invoiceId);
-    setModalState({
+    setModalState((prev) => ({
+      ...prev,
       open: true,
       type,
       title,
       text,
       isDisapprove,
-      reasons: modalState.reasons,
-    });
+    }));
   };
 
   const handleCloseModal = () => {
-    setModalState({ ...modalState, open: false });
+    setModalState((prev) => ({ ...prev, open: false }));
     setComments("");
     setSelectedReason("");
     setCurrentInvoiceId(null);
   };
 
-  // --- CORRECTED: Separate, dedicated function for each API call ---
-
-  const approveInvoice = async (comment: string) => {
-    try {
-      await httpsPost(
-        "carrier_invoice/approve",
-        { invoice_id: currentInvoiceId, comments: comment },
-        1
-      );
-      showMessage("Invoice successfully approved.", "success");
-      onDataChange();
-    } catch (error: any) {
-      showMessage(error.message || "Approval failed.", "error");
-    } finally {
-      handleCloseModal();
-    }
-  };
-
-  const disapproveInvoice = async (comment: string) => {
-    if (!comment) {
-      showMessage(
-        "A reason or comment is required for disapproval.",
-        "warning"
-      );
-      return;
-    }
-    try {
-      await httpsPost(
-        "carrier_invoice/disapprove",
-        { invoice_id: currentInvoiceId, comments: comment },
-        1
-      );
-      showMessage("Invoice successfully disapproved.", "success");
-      onDataChange();
-    } catch (error: any) {
-      showMessage(error.message || "Disapproval failed.", "error");
-    } finally {
-      handleCloseModal();
-    }
-  };
-
-  const logisticsApproveInvoice = async (comment: string) => {
-    try {
-      await httpsPost(
-        "carrier_invoice/logi_approve",
-        { invoice_id: currentInvoiceId, comments: comment },
-        1
-      );
-      showMessage("Invoice approved by Logistics.", "success");
-      onDataChange();
-    } catch (error: any) {
-      showMessage(error.message || "Logistics approval failed.", "error");
-    } finally {
-      handleCloseModal();
-    }
-  };
-
-  const logisticsDisapproveInvoice = async (comment: string) => {
-    if (!comment) {
-      showMessage(
-        "A reason or comment is required for disapproval.",
-        "warning"
-      );
-      return;
-    }
-    try {
-      await httpsPost(
-        "carrier_invoice/logi_disapprove",
-        { invoice_id: currentInvoiceId, comments: comment },
-        1
-      );
-      showMessage("Invoice disapproved by Logistics.", "success");
-      onDataChange();
-    } catch (error: any) {
-      showMessage(error.message || "Logistics disapproval failed.", "error");
-    } finally {
-      handleCloseModal();
-    }
-  };
-
-  // This function now acts as a router to the correct handler
-  const handleSubmitModal = () => {
+  const handleSubmitModal = async () => {
     const finalComment = selectedReason === "Other" ? comments : selectedReason;
+    if (modalState.isDisapprove && !finalComment) {
+      showMessage(
+        "A reason or comment is required for disapproval.",
+        "warning"
+      );
+      return;
+    }
+
+    let endpoint = "";
     switch (modalState.type) {
       case "approve":
-        approveInvoice(finalComment);
+        endpoint = "carrier_invoice/approve";
         break;
       case "disapprove":
-        disapproveInvoice(finalComment);
+        endpoint = "carrier_invoice/disapprove";
         break;
       case "logi_approve":
-        logisticsApproveInvoice(finalComment);
+        endpoint = "carrier_invoice/logi_approve";
         break;
       case "logi_disapprove":
-        logisticsDisapproveInvoice(finalComment);
+        endpoint = "carrier_invoice/logi_disapprove";
         break;
       default:
-        handleCloseModal();
+        return;
+    }
+
+    try {
+      await httpsPost(
+        endpoint,
+        { invoice_id: currentInvoiceId, comments: finalComment },
+        1
+      );
+      showMessage(
+        `Invoice successfully ${
+          modalState.isDisapprove ? "disapproved" : "approved"
+        }.`,
+        "success"
+      );
+      onDataChange();
+    } catch (error: any) {
+      showMessage(
+        error.message ||
+          `${modalState.isDisapprove ? "Disapproval" : "Approval"} failed.`,
+        "error"
+      );
+    } finally {
+      handleCloseModal();
     }
   };
 
-  const handleCreateDebitNote = (invoiceId: string) =>
-    showMessage(`Action: Create Debit Note for ${invoiceId}`, "info");
+  if (isLoading) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", p: 4 }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   if (invoices.length === 0) {
     return (
       <Typography sx={{ p: 3, textAlign: "center", color: "text.secondary" }}>
-        No Carrier Invoices found.
+        No Carrier Invoices found for this shipment.
       </Typography>
     );
   }
@@ -311,92 +323,41 @@ const CarrierInvoiceTab = ({
                   ))}
                 </TableCell>
                 <TableCell>
-                  {invoice.status === "PENDING" &&
-                    (logisticsApproval ? (
-                      <Box sx={{ display: "flex", gap: 1 }}>
-                        <Button
-                          variant="contained"
-                          size="small"
-                          onClick={() =>
-                            handleOpenModal(
-                              invoice.role_based ? "approve" : "logi_approve",
-                              invoice.id,
-                              "Approve Invoice",
-                              "Are you sure?",
-                              false
-                            )
-                          }
-                        >
-                          Approve
-                        </Button>
-                        <Button
-                          variant="contained"
-                          color="error"
-                          size="small"
-                          onClick={() =>
-                            handleOpenModal(
-                              invoice.role_based
-                                ? "disapprove"
-                                : "logi_disapprove",
-                              invoice.id,
-                              "Disapprove Invoice",
-                              "Please provide a reason.",
-                              true
-                            )
-                          }
-                        >
-                          Disapprove
-                        </Button>
-                      </Box>
-                    ) : (
-                      <Box sx={{ display: "flex", gap: 1 }}>
-                        <Button
-                          variant="contained"
-                          color="success"
-                          size="small"
-                          onClick={() =>
-                            handleOpenModal(
-                              "approve",
-                              invoice.id,
-                              "Approve Invoice",
-                              "Are you sure?",
-                              false
-                            )
-                          }
-                        >
-                          Approve
-                        </Button>
-                        <Button
-                          variant="contained"
-                          color="error"
-                          size="small"
-                          onClick={() =>
-                            handleOpenModal(
-                              "disapprove",
-                              invoice.id,
-                              "Disapprove Invoice",
-                              "Please provide a reason.",
-                              true
-                            )
-                          }
-                        >
-                          Disapprove
-                        </Button>
-                      </Box>
-                    ))}
-                  {invoice.status === "DISAPPROVED" && (
-                    <Box
-                      sx={{ display: "flex", flexDirection: "column", gap: 1 }}
-                    >
-                      <Button variant="contained" size="small">
-                        Upload Doc
+                  {invoice.status === "PENDING" && (
+                    <Box sx={{ display: "flex", gap: 1 }}>
+                      <Button
+                        variant="contained"
+                        size="small"
+                        color="success"
+                        onClick={() =>
+                          handleOpenModal(
+                            invoice.role_based ? "approve" : "logi_approve",
+                            invoice.id,
+                            "Approve Invoice",
+                            "Are you sure?",
+                            false
+                          )
+                        }
+                      >
+                        Approve
                       </Button>
                       <Button
                         variant="contained"
                         size="small"
-                        onClick={() => handleCreateDebitNote(invoice.id)}
+                        color="error"
+                        onClick={() =>
+                          handleOpenModal(
+                            invoice.role_based
+                              ? "disapprove"
+                              : "logi_disapprove",
+                            invoice.id,
+                            "Disapprove Invoice",
+                            "Please provide a reason.",
+                            true
+                          )
+                        }
                       >
-                        Debit Note
+                        Disapprove
                       </Button>
                     </Box>
                   )}
@@ -423,7 +384,7 @@ const CarrierInvoiceTab = ({
                   label="Reason"
                   onChange={(e) => setSelectedReason(e.target.value)}
                 >
-                  {modalState.reasons.map((r) => (
+                  {reasons.map((r) => (
                     <MenuItem key={r} value={r}>
                       {r}
                     </MenuItem>

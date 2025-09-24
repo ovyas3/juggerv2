@@ -13,7 +13,7 @@ import {
   Paper,
   CircularProgress,
 } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
+// import CloseIcon from "@mui/icons-material/Close";
 import styles from "./ShipmentDetails.module.css";
 import { format } from "date-fns";
 import { httpsGet } from "@/utils/Communication";
@@ -28,6 +28,7 @@ import DeliveryTab from "./DeliveryTab";
 import FreightTab from "./CarrierInvoiceTab";
 import FourPlInvoiceTab from "./FourPlInvoiceTab";
 import LorryReceiptTab from "./LorryReceiptTab";
+import ClearIcon from '@mui/icons-material/Clear';
 import ChartTab from "./ChartTab";
 import MaterialsTab from "./MaterialsTab";
 import EventLogTab from "./EventLogTab";
@@ -110,65 +111,76 @@ const ShipmentDetails: React.FC<ShipmentDetailsProps> = ({
     !shipmentData?.carrier_invoices?.length;
   const canEditDeliveries = isShipmentManagement || enableDeliveryEdit;
 
-  const fetchDetails = useCallback(async () => {
-    if (!shipmentId) return;
-    setIsLoading(true);
-    try {
-      // --- CORRECTED: Fetch all data points concurrently ---
+ // In ShipmentDetails.tsx
+
+const fetchDetails = useCallback(async () => {
+  if (!shipmentId) return;
+  setIsLoading(true);
+  try {
       const [shipmentResponse, constantsResponse] = await Promise.all([
-        httpsGet(`shipment/one?shipmentId=${shipmentId}`),
-        httpsGet(`settings/constants`), // Fetch constants like in Angular
+          httpsGet(`shipment/one?shipmentId=${shipmentId}`),
+          httpsGet(`settings/constants`),
       ]);
 
-      // Replicate getting shipper info from localStorage
       const shippersRaw = localStorage.getItem("shippers");
-      const shippers: Shipper[] = shippersRaw ? JSON.parse(shippersRaw) : [];
+      // As you discovered, the roles string might be double-stringified. It's safer to handle that here too.
+      const shippers: any[] = shippersRaw ? JSON.parse(shippersRaw) : [];
+
+      // *** FIX STARTS HERE ***
+      // 1. Get the active shipper ID from local storage.
+      //    (Note: In Angular it was from a cookie, ensure it's in localStorage for React or adjust as needed)
+      const currentShipperId = localStorage.getItem('shipper_id');
+
+      // 2. Find the correct shipper object from the array. Default to the first one if not found.
+      const activeShipper = shippers.find(s => s._id === currentShipperId) || shippers[0];
+      // *** FIX ENDS HERE ***
 
       if (shipmentResponse.statusCode === 200) {
-        const apiDetail = shipmentResponse.data;
+          const apiDetail = shipmentResponse.data;
 
-        // Combine all data sources
-        const fullShipmentData = {
-          ...apiDetail,
-          constants: constantsResponse.data,
-          shippers, // Add shippers to the data object
-        };
+          const fullShipmentData = {
+              ...apiDetail,
+              constants: constantsResponse.data,
+              shippers,
+          };
 
-        const displayStatus = getShipmentStatusName(apiDetail.latest_status);
-        const displayDate = apiDetail.created_at
-          ? format(new Date(apiDetail.created_at), "dd-MMM-yyyy hh:mm a")
-          : "...";
-        setShipmentData({ ...fullShipmentData, displayStatus, displayDate });
+          const displayStatus = getShipmentStatusName(apiDetail.latest_status);
+          const displayDate = apiDetail.created_at
+              ? format(new Date(apiDetail.created_at), "dd-MMM-yyyy hh:mm a")
+              : "...";
+          setShipmentData({ ...fullShipmentData, displayStatus, displayDate });
 
-        const parentName =
-          shippers[0]?.parent_name || apiDetail.organization?.name || "";
+          // Use the activeShipper's name for conditional logic
+          const parentName = activeShipper?.parent_name || apiDetail.organization?.name || "";
 
-        // Using a broader, case-insensitive check to avoid mismatches
-        setIsMYKL(parentName === "MYK Laticrete India Private Limited");
-        setIsTechnova(parentName === "TechNova Imaging Systems Pvt Ltd");
-        setIsRSPL(parentName === "RSPL Limited");
+          setIsMYKL(parentName === "MYK Laticrete India Private Limited");
+          setIsTechnova(parentName === "TechNova Imaging Systems Pvt Ltd");
+          setIsRSPL(parentName === "RSPL Limited");
 
-        setShowFreight(
-          userRoles.owner ||
-            userRoles.finance ||
-            userRoles.ratecard ||
-            userRoles.unit_admin
-        );
-        setOwnFleet(apiDetail.own_fleet || false);
-        setShipmentType(shippers[0]?.type || "normal");
-        const hasCustomerData = apiDetail.deliveries?.some(
-          (d: any) => d.customer_data?.length > 0
-        );
-        setCustomerData(hasCustomerData ? [{}] : []);
+          setShowFreight(
+              userRoles.owner ||
+              userRoles.finance ||
+              userRoles.ratecard ||
+              userRoles.unit_admin
+          );
+          
+          // Set state based on the correct, active shipper
+          setOwnFleet(apiDetail.own_fleet || false);
+          setShipmentType(activeShipper?.type || "normal");
+
+          const hasCustomerData = apiDetail.deliveries?.some(
+              (d: any) => d.customer_data?.length > 0
+          );
+          setCustomerData(hasCustomerData ? [{}] : []);
       } else {
-        console.error("Failed to fetch shipment details");
+          console.error("Failed to fetch shipment details");
       }
-    } catch (error) {
+  } catch (error) {
       console.error("Error fetching shipment details:", error);
-    } finally {
+  } finally {
       setIsLoading(false);
-    }
-  }, [shipmentId]);
+  }
+}, [shipmentId, userRoles]); // Added userRoles to dependency array for correctness
 
   useEffect(() => {
     if (isOpen) {
@@ -315,7 +327,7 @@ const ShipmentDetails: React.FC<ShipmentDetailsProps> = ({
               onClick={onClose}
               sx={{ color: "white" }}
             >
-              <CloseIcon />
+              <ClearIcon />
             </IconButton>
           </Box>
         </Box>
