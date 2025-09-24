@@ -11,6 +11,7 @@ interface ConfirmationDialogProps {
   onConfirm: () => void;
   onCancel: () => void;
   isProcessing?: boolean;
+  sin?: string;
 }
 
 const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
@@ -21,14 +22,15 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
   cancelText = 'Cancel',
   onConfirm,
   onCancel,
-  isProcessing = false
+  isProcessing = false,
+  sin = ""
 }) => {
   if (!isOpen) return null;
 
   return (
     <div className={styles.overlay} onClick={onCancel}>
       <div className={styles.dialog} onClick={(e) => e.stopPropagation()}>
-        <ModalHeader title={title} onClose={onCancel} />
+        <ModalHeader title={`${title} - #${sin}`} onClose={onCancel} />
         <div className={styles.content}>
           <p className={styles.message}>{message}</p>
           <div className={styles.actions}>

@@ -1,9 +1,15 @@
-// UpdateStatusModal.tsx
 import React, { useState } from 'react';
 import styles from './UpdateStatusModal.module.css';
 import { useSnackbar } from "@/hooks/snackBar";
 import { httpsPost } from '@/utils/Communication';
 import ModalHeader from '../../UI/ModalHeader/ModalHeader';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/UI/select";
 
 interface StatusOption {
   name: string;
@@ -105,19 +111,26 @@ const UpdateStatusModal: React.FC<UpdateStatusModalProps> = ({
               </div>
 
               <div className={styles.reasonsMenu}>
-                <select 
-                  className={styles.inputSelect} 
+                <Select
                   value={selectedStatus}
-                  onChange={(e) => setSelectedStatus(e.target.value)}
+                  onValueChange={setSelectedStatus}
                   disabled={isLoading || isUpdating}
                 >
-                  <option value="">Select Status</option>
-                  {shipmentStatus.map(status => (
-                    <option key={status.value} value={status.value}>
-                      {status.name}
-                    </option>
-                  ))}
-                </select>
+                  <SelectTrigger className={styles.select}>
+                    <SelectValue placeholder="Select Status" />
+                  </SelectTrigger>
+                  <SelectContent className={styles.selectContent}>
+                    {shipmentStatus.map(status => (
+                      <SelectItem 
+                        key={status.value} 
+                        value={status.value}
+                        className={styles.selectItem}
+                      >
+                        {status.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
           </div>

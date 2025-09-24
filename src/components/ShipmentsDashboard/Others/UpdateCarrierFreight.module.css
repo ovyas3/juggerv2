@@ -94,6 +94,7 @@
   display: flex;
   flex-direction: column;
   gap: 16px; /* Spacing between rows */
+  margin-top: 10px;
 }
 
 .weightUomContainer {
@@ -182,4 +183,98 @@
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+/* Add to UpdateCarrierFreight.module.css */
+
+.select {
+  width: 100%;
+  min-height: 36px;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  font-size: 14px;
+  background-color: white;
+  transition: all 0.3s;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+}
+
+.select:hover {
+  border-color: #4F46E5;
+}
+
+.select:focus-within {
+  border-color: #4F46E5;
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+  outline: none;
+}
+
+.select[data-state="open"] {
+  border-color: #4F46E5;
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+}
+
+.selectContent {
+  background: white;
+  border-radius: 6px;
+  box-shadow: 0 3px 6px -4px rgba(0, 0, 0, 0.12), 
+              0 6px 16px 0 rgba(0, 0, 0, 0.08), 
+              0 9px 28px 8px rgba(0, 0, 0, 0.05);
+  padding: 4px;
+  z-index: 1000;
+  max-height: 250px;
+  overflow-y: auto;
+  width: 450px !important;
+  margin-top: 7px;
+}
+
+.selectUnitContent {
+  background: white;
+  border-radius: 6px;
+  box-shadow: 0 3px 6px -4px rgba(0, 0, 0, 0.12), 
+              0 6px 16px 0 rgba(0, 0, 0, 0.08), 
+              0 9px 28px 8px rgba(0, 0, 0, 0.05);
+  padding: 4px;
+  z-index: 1000;
+  max-height: 250px;
+  overflow-y: auto;
+  width: 150px !important;
+  margin-top: 7px;
+}
+
+.selectItem {
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #333;
+  transition: all 0.2s;
+}
+
+.selectItem:hover {
+  background-color: #f5f5f5;
+}
+
+.selectItem[data-highlighted] {
+  background-color: #4F46E5;
+  color: white;
+  outline: none;
+}
+
+.selectValue {
+  color: #333;
+  width: 100%;
+  text-align: left;
+  flex: 1;
+}
+
+.selectItem:global([data-state='checked']) svg { 
+  display: none !important; 
+}
+
+.selectContent :global([data-radix-select-item-indicator]) { 
+  display: none !important; 
 }

@@ -1,5 +1,6 @@
 import React from 'react';
 import styles from './OpenVideosModal.module.css';
+import ModalHeader from '@/components/UI/ModalHeader/ModalHeader';
 
 interface OpenVideosModalProps {
   show: boolean;
@@ -19,20 +20,10 @@ const OpenVideosModal: React.FC<OpenVideosModalProps> = ({
   return (
     <div className={styles.modalOverlay}>
       <div className={styles.uploadDialogMain}>
-        <div className={styles.header}>
-          <div className={styles.label}>
-            {title}
-          </div>
-          <div className={styles.close}>
-            <span 
-              className={`${styles.materialIcons} ${styles.closeButton}`} 
-              onClick={onClose}
-              title="Close"
-            >
-              close
-            </span>
-          </div>
-        </div>
+        <ModalHeader
+          title={title}
+          onClose={onClose}
+        />
         <div className={styles.body}>
           <div className={styles.videoContainer}>
             <div className={styles.videoWrapper}>

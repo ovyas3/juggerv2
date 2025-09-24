@@ -74,9 +74,13 @@
 }
 
 .confirmButton {
-  background: #e53935;
+  background: #d8511f;
   color: white;
   border: none;
+}
+
+.confirmButton:hover {
+  background: #df440e;
 }
 
 .cancelButton {

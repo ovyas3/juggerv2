@@ -1,10 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, MenuItem, Select, SelectChangeEvent, CircularProgress } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, MenuItem, CircularProgress } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { useSnackbar } from '@/hooks/snackBar';
 import { httpsGet, httpsPost } from '@/utils/Communication';
 import styles from './CancelShipmentModal.module.css';
 import ModalHeader from '../../UI/ModalHeader/ModalHeader';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/UI/select";
 
 interface CancelShipmentModalProps {
   open: boolean;
@@ -60,8 +67,7 @@ const CancelShipmentModal: React.FC<CancelShipmentModalProps> = ({
     }
   }, [open, showMessage]);
 
-  const handleReasonChange = (event: SelectChangeEvent<string>) => {
-    const value = event.target.value;
+  const handleReasonChange = (value: string) => {
     setSelectedReason(value);
     setShowCustomReason(value === 'Other');
     if (value !== 'Other') {
@@ -121,20 +127,20 @@ const CancelShipmentModal: React.FC<CancelShipmentModalProps> = ({
         <div className={styles.reasonsMenu}>
           <Select
             value={selectedReason}
-            onChange={handleReasonChange}
-            displayEmpty
-            fullWidth
+            onValueChange={(value) => handleReasonChange(value)}
             disabled={loading}
-            className={styles.select}
           >
-            <MenuItem value="" disabled>
-              Select a reason
-            </MenuItem>
-            {reasons.map((reason) => (
-              <MenuItem key={reason} value={reason}>
-                {reason}
-              </MenuItem>
-            ))}
+            <SelectTrigger className={styles.selectTrigger}>
+              <SelectValue placeholder="Select a reason" />
+            </SelectTrigger>
+            <SelectContent className={styles.selectContent}>
+              {reasons.map((reason) => (
+                <SelectItem key={reason} value={reason} className={styles.selectItem}>
+                  {reason}
+                </SelectItem>
+              ))}
+            </SelectContent>
+
           </Select>
         </div>
 
@@ -149,6 +155,19 @@ const CancelShipmentModal: React.FC<CancelShipmentModalProps> = ({
               onChange={(e) => setCustomReason(e.target.value)}
               disabled={loading}
               variant="outlined"
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  '&:hover fieldset': {
+                    border: '1px solid #4F46E5',  
+                    borderColor: '#4F46E5',
+                  },
+                  '&.Mui-focused fieldset': {
+                    border: '1px solid #4F46E5',
+                    borderColor: '#4F46E5',
+                    boxShadow: '0 0 0 2px rgba(79, 70, 229, 0.2)',
+                  },
+                },
+              }}
             />
           </div>
         )}

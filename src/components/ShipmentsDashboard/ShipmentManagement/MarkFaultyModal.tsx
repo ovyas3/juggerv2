@@ -11,9 +11,10 @@ const MarkFaultyModal: React.FC<{
   show: boolean;
   vehicleNumber: string;
   gpsProvider: string;
+  sin: string;
   onClose: () => void;
   onSuccess?: () => void;
-}> = ({ show, vehicleNumber, gpsProvider, onClose, onSuccess }) => {
+}> = ({ show, vehicleNumber, gpsProvider, sin, onClose, onSuccess }) => {
   const { showMessage } = useSnackbar();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -56,7 +57,7 @@ const MarkFaultyModal: React.FC<{
     <div className={styles.modalOverlay} onClick={onClose}>
       <div className={styles.dialogMain} onClick={e => e.stopPropagation()}>
         <ModalHeader
-        title='Mark Fault Device'
+        title={`Mark Fault Device - #${sin}`}
         onClose={onClose}
         />
 

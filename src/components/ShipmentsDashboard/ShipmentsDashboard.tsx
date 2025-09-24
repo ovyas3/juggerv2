@@ -3,22 +3,11 @@ import styles from "./ShipmentsDashboard.module.css";
 import EpodPreviewModal from "../ShipmentsDashboard/DocumentManagement/EpodPreviewModal";
 import {
   RefreshCw,
-  RotateCw,
-  Send,
   FileText,
   Upload,
   Truck,
-  IndianRupee,
-  TrendingUp,
-  Users,
   Clock,
-  Package2,
-  UserCheck,
-  ClipboardCheck,
-  CheckCircle2,
-  AlertTriangle,
   AlertCircle,
-  MoreHorizontal,
   Search,
   DoorOpen,
   Eye,
@@ -37,8 +26,8 @@ import {
   PlusCircle,
   UserPlus,
   Plus,
+  MapPin,
 } from "lucide-react";
-import MarkAsArrivedModal from "../ShipmentsDashboard/Others/MarkAsArrivedModal";
 import CompleteShipmentModal from "../ShipmentsDashboard/ShipmentManagement/CompleteShipmentModal";
 import {
   Button
@@ -58,32 +47,20 @@ import {
 } from "lucide-react";
 import { httpsGet, httpsPost } from "@/utils/Communication";
 import SubscribeModal from "./Communication/SubscribeModal";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "../UI/dropdown-menu";
-// import Button from "@mui/material/Button";
 import { ShipmentsTable } from "./ShipmentsTable";
 import { AnalyticsView } from "./AnalyticsView";
 import { AdvancedFilter } from "./AdvancedFilter/AdvancedFilter";
 import LocationModal from "../ShipmentsDashboard/LocationTracking/LocationModal";
 import ActiveCarriersModal from "../ShipmentsDashboard/SpecialFeatures/ActiveCarriersModal";
-// import FreightModal from "../ShipmentsDashboard/SpecialFeatures/FreightModal";
-// import DelayPenaltyModal from "../ShipmentsDashboard/SpecialFeatures/DelayPenaltyModal";
 import RerunShipmentModal from "../ShipmentsDashboard/ShipmentManagement/RerunShipmentModal";
 import PullFreightModal from "../ShipmentsDashboard/Financial/PullFreightModal";
 import AttachFilesModal from "../ShipmentsDashboard/DocumentManagement/AttachFilesModal";
-// import UpdateFreightModal from "./Modals/UpdateFreightModal";
 import UploadModal from "../ShipmentsDashboard/DocumentManagement/UploadModal";
-import AddRoambeeModal from "../ShipmentsDashboard/LocationTracking/AddRoambeeModal";
 import OpenVideosModal from "../ShipmentsDashboard/SpecialFeatures/OpenVideosModal";
 import AddDeliveryOrderModal from "../ShipmentsDashboard/SpecialFeatures/AddDeliveryOrderModal";
 import AddManagedByModal from "../ShipmentsDashboard/SpecialFeatures/AddManagedByModal";
 import IncreasePriceModal from "../ShipmentsDashboard/Financial/IncreasePriceModal";
 import UpdateStatusModal from "../ShipmentsDashboard/ShipmentManagement/UpdateStatusModal";
-import WarningModal from "../ShipmentsDashboard/SpecialFeatures/WarningModal";
 import HeaderActions from "../ShipmentsDashboard/HeaderActions/HeaderActions";
 import { useSnackbar } from "@/hooks/snackBar";
 import JdeBookShipment from "../ShipmentsDashboard/SpecialFeatures/JdeBookShipment";
@@ -95,7 +72,6 @@ import CreatePaymentAdvanceModal from "../ShipmentsDashboard/Financial/CreatePay
 import EditLocationsModal from "../ShipmentsDashboard/LocationTracking/EditLocationsModal";
 import PrintLRModal from "../ShipmentsDashboard/DocumentManagement/PrintLRModal";
 import AddGpsConnectionModal from "../ShipmentsDashboard/LocationTracking/AddGpsConnectionModal";
-import AddRemarkDialog from '../ShipmentsDashboard/LocationTracking/AddRemarkDialog';
 import ConfirmationDialog from '../UI/ConfirmationDialog/ConfirmationDialog';
 import RecalculateDistanceModal from '../ShipmentsDashboard/Financial/RecalculateDistanceModal';
 import InvoiceTypeModal from '../ShipmentsDashboard/Financial/InvoiceTypeModal';
@@ -107,9 +83,14 @@ import MissedEventModal from "./SpecialFeatures/MissedEventModal";
 import RetriggerEventModal from "./SpecialFeatures/RetriggerEventModal";
 import DriverExpenses from "./SpecialFeatures/DriverExpenses";
 import GeofenceEditor from "./SpecialFeatures/GeofenceEditor";
+import { LocationDialog } from "./LocationTracking/LocationDialog";
+import TotalFreightModal from "./SpecialFeatures/TotalFreightModal";
+import { HelpCircle } from "lucide-react";
 
-// Types
+
 interface Shipment {
+  drop: any;
+  organization: any;
   unique_code: any;
   epods: any;
   _id: string;
@@ -138,6 +119,7 @@ interface Shipment {
   trip_tracker?: {
     last_location_address: string;
     last_location_at: string;
+    methods?: string[];
   };
   booked_by: string;
   ppd?: string;
@@ -177,9 +159,10 @@ interface AnalyticsData {
   totalFreightValue: number;
   averageFreight: number;
   activeCarriers: number;
+  delayedShipments: number;
+  highPriority: number;
 }
 
-// 1. First, define the Location interface
 interface Location {
   _id: string;
   name: string;
@@ -201,33 +184,25 @@ const ShipmentsDashboard: React.FC = () => {
   // State management
   const [shipments, setShipments] = useState<Shipment[]>([]);
   const [totalShipments, setTotalShipments] = useState(0);
-  const [selectedShipments, setSelectedShipments] = useState<string[]>([]);
   const [shipmentType, setShipmentType] = useState<
     "all" | "outbound" | "inbound" | "others"
   >("all");
   const [isLoading, setIsLoading] = useState(false);
   const [showButtons, setShowButtons] = useState(false);
   const [isAnalyticsView, setIsAnalyticsView] = useState(false);
-  const [isCompactView, setIsCompactView] = useState(false);
+  const [isCompactView, setIsCompactView] = useState(true);
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(0);
   const [pageSize, setPageSize] = useState(100);
-
-  // Search and filters
-  const [searchQuery, setSearchQuery] = useState("");
   const [searchType, setSearchType] = useState("SIN");
-  const [selectedSubFilter, setSelectedSubFilter] = useState<string | null>(
-    null
-  );
 
   // Advanced filters
   const [invoiceNo, setInvoiceNo] = useState("");
   const [lrNumber, setLrNumber] = useState("");
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
-  const [vehicleNumber, setVehicleNumber] = useState("");
   const [mobile, setMobile] = useState("");
   const [selectedCarriers, setSelectedCarriers] = useState<FilterOption[]>([]);
   const [selectedOrganizations, setSelectedOrganizations] = useState<
@@ -244,6 +219,8 @@ const ShipmentsDashboard: React.FC = () => {
   const [isEpodModalOpen, setIsEpodModalOpen] = useState(false);
   const [selectedShipmentForEpod, setSelectedShipmentForEpod] =
     useState<Shipment | null>(null);
+  const [selectedShipmentForAttach, setSelectedShipmentForAttach] =
+    useState<Shipment | null>(null);
 
   // Analytics data
   const [analyticsData, setAnalyticsData] = useState<AnalyticsData>({
@@ -251,14 +228,18 @@ const ShipmentsDashboard: React.FC = () => {
     totalFreightValue: 117750,
     averageFreight: 14719,
     activeCarriers: 7,
+    delayedShipments: 2,
+    highPriority: 1,
   });
 
   // Modal states
   const [showShipmentDetails, setShowShipmentDetails] = useState(false);
-  const [selectedShipmentDetails, setSelectedShipmentDetails] =
-    useState<Shipment | null>(null);
   const [showLocationPopup, setShowLocationPopup] = useState(false);
-  const [locationPopupData, setLocationPopupData] = useState<any>(null);
+  const [locationPopupData, setLocationPopupData] = useState<{
+    type: string;
+    locations: any[];
+    shipmentSin: string;
+  } | null>(null);  
   const [showActiveCarriersPopup, setShowActiveCarriersPopup] = useState(false);
   const [showTotalFreightPopup, setShowTotalFreightPopup] = useState(false);
   const [showAverageFreightPopup, setShowAverageFreightPopup] = useState(false);
@@ -270,7 +251,6 @@ const ShipmentsDashboard: React.FC = () => {
   const [showWarningDialog, setShowWarningDialog] = useState(false);
   const [showUpdateStatusDialog, setShowUpdateStatusDialog] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
-  const [showAddRoambeeDialog, setShowAddRoambeeDialog] = useState(false);
   const [showLastKnownLocationDialog, setShowLastKnownLocationDialog] =
     useState(false);
   const [showOpenVideosDialog, setShowOpenVideosDialog] = useState(false);
@@ -279,9 +259,6 @@ const ShipmentsDashboard: React.FC = () => {
   const [showIncreasePriceDialog, setShowIncreasePriceDialog] = useState(false);
   const [showAddRemarkDialog, setShowAddRemarkDialog] = useState(false);
 
-  // Modal data states
-  const [shipmentDelayData, setShipmentDelayData] = useState<any>({});
-  const [selectedRerunOption, setSelectedRerunOption] = useState("");
   const [selectedShipmentSIN, setSelectedShipmentSIN] = useState("");
   const [pullFreightData, setPullFreightData] = useState<{
     _id: string;
@@ -301,30 +278,13 @@ const ShipmentsDashboard: React.FC = () => {
     sin: "",
     destinations: []
   });
-  const [freightPayload, setFreightPayload] = useState<any>({});
-  const [selectedShipmentStatus, setSelectedShipmentStatus] = useState("");
-  const [roambeeId, setRoambeeId] = useState("");
-  const [lastKnownLocationValue, setLastKnownLocationValue] = useState("");
-  const [lastKnownLocationTime, setLastKnownLocationTime] = useState("");
-  const [doNumber, setDoNumber] = useState("");
-  const [selectedCarrierManagedBy, setSelectedCarrierManagedBy] = useState<any>(
-    { id: "", name: "" }
-  );
   const [selectedDealerType, setSelectedDealerType] = useState("");
-  const [selectedReason, setSelectedReason] = useState("");
-  const [otherReason, setOtherReason] = useState("");
-  const [notify, setNotify] = useState(false);
-  const [other, setOther] = useState(false);
-  const [checked, setChecked] = useState(false);
 
   // Add these state variables at the top of your functional component
   const [showRoambeeModal, setShowRoambeeModal] = useState(false);
   const [selectedShipmentForRoambee, setSelectedShipmentForRoambee] =
     useState<Shipment | null>(null);
   const [isSubmittingRoambee, setIsSubmittingRoambee] = useState(false);
-
-  // Advanced search states
-  const [showAdvanceSearch, setShowAdvanceSearch] = useState(false);
 
   const [shipmentStatusName, setShipmentStatusName] = useState<string[]>([]);
 
@@ -366,32 +326,9 @@ const ShipmentsDashboard: React.FC = () => {
     averageFreight: 0,
     activeCarriers: 0,
   });
-  const [searchTerm, setSearchTerm] = useState("");
-  const [analyticsStatusDistribution, setAnalyticsStatusDistribution] =
-    useState<any[]>([]);
-  const [analyticsDivisionPerformance, setAnalyticsDivisionPerformance] =
-    useState<any[]>([]);
-  const [analyticsAlerts, setAnalyticsAlerts] = useState<any[]>([]);
   const [totalFreightData, setTotalFreightData] = useState<any[]>([]);
   const [averageFreightData, setAverageFreightData] = useState<any[]>([]);
-
-  // Additional states for functionality
-  const [roles, setRoles] = useState<any>({ owner: false, fleet: false });
-  const [functions, setFunctions] = useState<any>({
-    shipment_management: false,
-    hide_mobile: true,
-    hide_freight: true,
-  });
-  const [symbol, setSymbol] = useState("₹");
   const [userType, setUserType] = useState("");
-  const [dealerTypes, setDealerTypes] = useState<any[]>([]);
-  const [reasons, setReasons] = useState<any[]>([]);
-  const [delayReasons, setDelayReasons] = useState<any[]>([]);
-  const [weightUnits, setWeightUnits] = useState<any[]>(["KG", "MT", "TON"]);
-  const [shipmentStatuses, setShipmentStatuses] = useState<any[]>([]);
-  const [destinations, setDestinations] = useState<any[]>([]);
-  const [sampleLink, setSampleLink] = useState("");
-  const [videoURL, setVideoURL] = useState("");
 
   const [showLoader, setShowLoader] = useState<boolean>(false);
   const [shipmentsArray, setShipmentsArray] = useState<any[]>([]);
@@ -400,18 +337,13 @@ const ShipmentsDashboard: React.FC = () => {
   );
   const [isTechnova, setIsTechnova] = useState(false);
   const initialLoadDone = useRef(false);
-  const [showUpdateStatus, setShowUpdateStatus] = useState(false);
-  const [currentShipment, setCurrentShipment] = useState(null);
   const [showVideo, setShowVideo] = useState(false);
   const [videoUrl, setVideoUrl] = useState("");
   const [showAddDO, setShowAddDO] = useState(false);
-  const [currentShipmentNo, setCurrentShipmentNo] = useState("");
 
   const [showGpsModal, setShowGpsModal] = useState(false);
   const [selectedGps, setSelectedGps] = useState<string[]>([]);
 
-  const [showDelayReasonDialog, setShowDelayReasonDialog] = useState(false);
-  const [selectedShipmentForDelay, setSelectedShipmentForDelay] = useState<Shipment | null>(null);
 
   const [selectedShipmentForPriceIncrease, setSelectedShipmentForPriceIncrease] = useState<string>("");
 
@@ -422,100 +354,15 @@ const ShipmentsDashboard: React.FC = () => {
 
   const [showMissedShipmentModal, setShowMissedShipmentModal] = useState(false);
   const [selectedShipmentForMissed, setSelectedShipmentForMissed] = useState<Shipment | null>(null)
+  const [odcFilter, setOdcFilter] = useState<boolean>(false);
+  const [actionMenuOpenId, setActionMenuOpenId] = useState<string | null>(null);
 
-  const handleSaveDO = async (doNumber: string) => {
-    try {
-      // Call your API to save the DO number
-      // await saveDONumber(currentShipmentNo, doNumber);
-      setShowAddDO(false);
-      // Refresh your data or show success message
-    } catch (error) {
-      console.error("Failed to save DO number:", error);
-    }
-  };
+  const [locationDialogState, setLocationDialogState] = useState<{
+    isOpen: boolean;
+    shipmentId?: string;
+  }>({ isOpen: false });
 
-  const openLocationsPopup = (
-    type: string,
-    locations: any[],
-    shipment: any
-  ) => {
-    // Add date information to each location
-    const locationsWithDates = locations.map((loc) => ({
-      ...loc,
-      scheduledDate:
-        type === "pickup"
-          ? shipment.scheduledDate
-          : shipment.scheduledDeliveryDate,
-      actualDate:
-        type === "pickup"
-          ? shipment.actualPickupDate
-          : shipment.actualDeliveryDate,
-    }));
-
-    setLocationPopupData({
-      type: type.charAt(0).toUpperCase() + type.slice(1), // Capitalize first letter
-      locations: locationsWithDates,
-    });
-    setShowLocationPopup(true);
-  };
-
-  const openVideo = (url: string) => {
-    setVideoUrl(url);
-    setShowVideo(true);
-  };
-
-  useEffect(() => {
-    // Read 'shippers' from localStorage and parse
-    try {
-      const shipperData = JSON.parse(localStorage.getItem("shippers") || "[]");
-      if (
-        shipperData &&
-        shipperData.length > 0 &&
-        shipperData[0].parent_name === "TechNova Imaging Systems Pvt Ltd"
-      ) {
-        setIsTechnova(true);
-      } else {
-        setIsTechnova(false);
-      }
-    } catch (error) {
-      setIsTechnova(false);
-    }
-  }, []);
-
-  const handleDelayReasonSubmit = async (shipmentId: string, remark: string) => {
-    try {
-      const response = await httpsPost('shipment/delay', {
-        shipment_id: shipmentId,
-        reason: remark,
-        type: 'delay_reason'
-      });
-
-      if (response.statusCode === 200) {
-        // Refresh the shipment data or update the UI as needed
-        showMessage('Delay reason updated successfully', 'success');
-        // You might want to refresh the shipments list here
-        // fetchShipments(); 
-      } else {
-        throw new Error(response.message || 'Failed to update delay reason');
-      }
-    } catch (error: any) {
-      console.error('Error updating delay reason:', error);
-      showMessage(
-        error.message || 'Failed to update delay reason. Please try again.',
-        'error'
-      );
-    }
-  };
-
-  // Modal and dialog states
-  const [delayHistory, setDelayHistory] = useState<any[]>([]);
-  const [delaygpsRemoveHistory, setDelaygpsRemoveHistory] = useState<any[]>([]);
-  const [delayReasonType, setDelayReasonType] = useState("");
-  const [selectedShipmentNo, setSelectedShipmentNo] = useState("");
-  const [fromDateTsReRun, setFromDateTsReRun] = useState("");
-  const [toDateTsReRun, setToDateTsReRun] = useState("");
   const [freightType, setFreightType] = useState<'rate' | 'client_rate'>("rate");
-  const [selectedDestination, setSelectedDestination] = useState("");
   const [shipmentsFilter, setShipmentsFilter] = useState<any>({
     type_filter: "outbound",
   });
@@ -523,23 +370,10 @@ const ShipmentsDashboard: React.FC = () => {
   const [inputQuery, setInputQuery] = useState<string>("");
   const [searchValue, setSearchValue] = useState<string>("SIN");
 
-  const [shipmentSin, setShipmentSin] = useState("");
-  const [carrierSearch, setCarrierSearch] = useState("");
-  const [commercialInvoice, setCommercialInvoice] = useState(null);
-  const [fromDateString, setFromDateString] = useState("");
-  const [toDateString, setToDateString] = useState("");
-  const [transVehicle, setTransVehicle] = useState("");
-  const [selectedSegmentations, setSelectedSegmentations] = useState([]);
-  const [nonTracking, setNonTracking] = useState("");
-
-  const [showSubscribeModal, setShowSubscribeModal] = useState(false);
-  const [modalShipment, setModalShipment] = useState<Shipment | null>(null);
-
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedShipment, setSelectedShipment] = useState<Shipment | null>(
     null
   );
-  const [showIncreasePrice, setShowIncreasePrice] = useState(false);
 
   const [actionSearch, setActionSearch] = useState("");
 
@@ -550,10 +384,12 @@ const ShipmentsDashboard: React.FC = () => {
     open: boolean;
     type: 'delay' | 'gps';
     shipmentId: string | null;
+    sin: string;
   }>({
     open: false,
     type: 'delay',
-    shipmentId: null
+    shipmentId: null,
+    sin: ""
   });
 const [selectedShipmentForGps, setSelectedShipmentForGps] = useState<any>(null);
 const [showStatusModal, setShowStatusModal] = useState(false);
@@ -572,19 +408,120 @@ const [showDriverExpenses, setShowDriverExpenses] = useState(false);
 // Add this near other state declarations
 const [isGeofenceEditorOpen, setIsGeofenceEditorOpen] = useState(false);
 const [selectedShipmentForGeofence, setSelectedShipmentForGeofence] = useState<Shipment | null>(null);
+const [selectedSubFilters, setSelectedSubFilters] = useState<string[]>([]);
+// Add this state to store the location data for the modal
+const [combinedLocationData, setCombinedLocationData] = useState<{
+  combinedLocation: string;
+  pickupCity: string;
+  pickupId: string;
+  deliveryId: string;
+  currentLocation: number[];
+}>({
+  combinedLocation: '',
+  pickupCity: '',
+  pickupId: '',
+  deliveryId: '',
+  currentLocation: []
+});
+
+const handleSaveDO = async (doNumber: string) => {
+  try {
+    // Call your API to save the DO number
+    // await saveDONumber(currentShipmentNo, doNumber);
+    setShowAddDO(false);
+    // Refresh your data or show success message
+  } catch (error) {
+    console.error("Failed to save DO number:", error);
+  }
+};
+
+const helpDataInbound = [
+  { head: 'Help', data: 'View all the inbound shipments' },
+];
+const helpDataOutbound = [
+  { head: 'Help', data: 'View all the outbound shipments' },
+];
+const helpDataOthers = [
+  { head: 'Help', data: 'View all other shipments' },
+];
+
+const openInvoiceVideos = () => {
+  setShowOpenVideosDialog(true);
+};
+
+const openLocationsPopup = (
+  type: string,
+  locations: any[],
+  shipment: any
+) => {
+  if (!shipment) {
+    console.error('No shipment data provided');
+    return;
+  }
+  
+  const locationsArray = Array.isArray(locations) ? locations : [];
+  
+  // Add date information to each location
+  const locationsWithDates = locationsArray.map((loc) => ({
+    ...loc,
+    scheduledDate:
+      type === "pickup"
+        ? shipment.scheduledDate
+        : shipment.scheduledDeliveryDate,
+    actualDate:
+      type === "pickup"
+        ? shipment.actualPickupDate
+        : shipment.actualDeliveryDate,
+  }));
+
+  setLocationPopupData({
+    type: type.charAt(0).toUpperCase() + type.slice(1), // Capitalize first letter
+    locations: locationsWithDates,
+    shipmentSin: shipment.sin, // Changed from shipmentId to sin to match the LocationModal props
+  });
+  setShowLocationPopup(true);
+};
+useEffect(() => {
+  console.log('locationPopupData:', locationPopupData);
+}, []);
+
+const openVideo = (url: string) => {
+  setVideoUrl(url);
+  setShowVideo(true);
+};
+
+useEffect(() => {
+  // Read 'shippers' from localStorage and parse
+  try {
+    const shipperData = JSON.parse(localStorage.getItem("shippers") || "[]");
+    if (
+      shipperData &&
+      shipperData.length > 0 &&
+      shipperData[0].parent_name === "TechNova Imaging Systems Pvt Ltd"
+    ) {
+      setIsTechnova(true);
+    } else {
+      setIsTechnova(false);
+    }
+  } catch (error) {
+    setIsTechnova(false);
+  }
+}, []);
+
 
 // Add this with other handler functions
 const handleOpenGeofenceEditor = (shipment: Shipment) => {
+  closeAllDialogs();
   setSelectedShipmentForGeofence(shipment);
   setIsGeofenceEditorOpen(true);
-  closeAllDialogs();
 };
 
-  const handleOpenReasonDialog = (type: 'delay' | 'gps', shipmentId: string) => {
+  const handleOpenReasonDialog = (type: 'delay' | 'gps', shipmentId: string, sin: string) => {
     setReasonDialog({
       open: true,
       type,
-      shipmentId
+      shipmentId,
+      sin
     });
   };
 
@@ -647,379 +584,227 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
     }
   };
 
-  
-  const actionMenuCategories = {
-    "Quick Actions": [
-      { icon: Eye, label: "View", color: "text-blue-600" },
-      {
-        icon: Share2,
-        label: "Share",
-        color: "text-blue-500",
-        onClick: (shipment: Shipment) => {
-          // Generate the tracking URL based on your application's routing
-          closeAllDialogs();
-          const trackingUrl = `${window.location.origin}/track/${shipment.unique_code}`;
-          setShareUrl(trackingUrl);
-          setShareModalOpen(true);
-        },
-      },
-      {
-        icon: Mail,
-        label: "Mail",
-        color: "text-orange-600",
-        onClick: (shipment: Shipment) => {
-          closeAllDialogs();
-          setShipmentToMail(shipment);
-          setMailModalOpen(true);
-        },
-      },
-      {
-        icon: XCircle,
-        label: "Cancel",
-        color: "text-red-600",
-        onClick: (shipment: Shipment) => {
-          closeAllDialogs();
-          setShipmentToCancel(shipment);
-          setCancelModalOpen(true);
-        },
-      },
-    ],
-    "Tracking & GPS": [
-      { 
-        icon: Download, 
-        label: "SIM Tracking", 
-        color: "text-amber-600",
-        onClick: (shipment: Shipment) => {
-          closeAllDialogs();
-          setSelectedShipment(shipment);
-          setModalOpen(true);
-        }
-      },
-      {
-        icon: WifiOff,
-        label: "GPS Disconnection Reason",
-        color: "text-teal-600",
-        onClick: (shipment: Shipment) => handleOpenReasonDialog('gps', shipment._id)
-      },
-      { 
-        icon: Wifi, 
-        label: "Add GPS Connection", 
-        color: "text-amber-600",
-        onClick: (shipment: Shipment) => handleOpenGpsModal(shipment)
-      },
-      { icon: Clock, label: "Update Delay Reason", color: "text-teal-600", onClick: (shipment: Shipment) => {
-        closeAllDialogs();
-        handleOpenReasonDialog('delay', shipment._id)
-      } },
-    ],
-    "Location & Routes": [
-      {
-        icon: Edit,
-        label: "Edit Pickup Location",
-        color: "text-pink-600",
-        onClick: (shipment: Shipment) => handleOpenEditLocation(shipment, 'pickup'),
-        disabled: (shipment: Shipment) => 
-          ['Completed', 'Cancelled'].includes(shipment.status)
-      },
-      {
-        icon: Edit,
-        label: "Edit Delivery Location",
-        color: "text-pink-600",
-        onClick: (shipment: Shipment) => handleOpenEditLocation(shipment, 'delivery'),
-        disabled: (shipment: Shipment) => 
-          ['Completed', 'Cancelled'].includes(shipment.status)
-      },
-      {
-        icon: Route,
-        label: "Pull Freight with Routes",
-        color: "text-brown-600",
-        onClick: (shipment: Shipment) => {
-          closeAllDialogs();
-          setPullFreightData({
-            _id: shipment._id,
-            sin: shipment.sin,
-            vehicleNo: shipment.vehicleNumber || "",
-            pickup: shipment.from?.[0]?.location?.name || "",
-            destinations: shipment.to?.map(dest => ({
-              _id: dest.location?._id || "",
-              name: dest.location?.name || "",
-              city: dest.location?.city || ""
-            })) || []
-          });
-          setShowPullFreightDialog(true);
-        }
-      },
-      {
-        icon: Calculator,
-        label: "Recalculate Distance",
-        color: "text-pink-600",
-        onClick: (shipment: any) => {
-          closeAllDialogs();
-          handleRecalculateDistance(shipment)
-        }
-      },
-    ],
-    "Freight & Payment": [
-      {
-        icon: Truck,
-        label: "Update Carrier Freight",
-        color: "text-gray-600",
-        onClick: (shipment: Shipment) => {
-          closeAllDialogs();
-          handleOpenFreightModal(shipment._id, 'rate');
-        }
-      },
-      { 
-        icon: Truck, 
-        label: "Flush Freight", 
-        color: "text-gray-600",
-        onClick: handleFlushFreight
-      },
-      {
-        icon: CreditCard,
-        label: "Create Advance Payment",
-        color: "text-indigo-600",
-        onClick: (shipment: Shipment) => {
-          setSelectedShipmentForPayment(shipment);
-          setShowPaymentAdvanceModal(true);
-          closeAllDialogs();
-        },
-      },
-      {
-        icon: FileText,
-        label: "Change Invoice Type",
-        color: "text-brown-600",
-        onClick: (shipment: Shipment) => {
-          setSelectedShipmentForInvoiceType(shipment);
-          setIsInvoiceTypeModalOpen(true);
-          closeAllDialogs();
-        },
-      },
-    ],
-    "Documents & Status": [
-      {
-        icon: FileText,
-        label: "Upload Approval Documents",
-        color: "text-purple-600",
-        onClick: (shipment: Shipment) => {
-          console.log('Upload Approval Documents clicked');
-          closeAllDialogs();
-          console.log('Setting selected shipment and showing dialog');
-          setSelectedShipment(shipment);
-          setShowAttachDialog(true);
-        },
-      },
-      {
-        icon: Package,
-        label: "View Epods",
-        color: "text-brown-600",
-        onClick: (shipment: Shipment) => {
-          closeAllDialogs();
-          console.log('View Epods clicked, shipment:', shipment);
-          setSelectedShipmentForEpod(shipment);
-          console.log('After setSelectedShipmentForEpod, selectedShipmentForEpod:', shipment);
-          setIsEpodModalOpen(true);
-          console.log('After setIsEpodModalOpen, isEpodModalOpen:', true);
-        },
-      },
-      {
-        icon: CheckCircle,
-        label: "Complete Shipment",
-        color: "text-green-600",
-        onClick: (shipment: Shipment) => {
-          setSelectedShipmentForCompletion(shipment);
-          setShowCompleteShipmentModal(true);
-          closeAllDialogs();
-        },
-      },
-      {
-        icon: DoorOpen,
-        label: "Recalculate Customer Gate In/Out",
-        color: "text-pink-600",
-      },
-    ],
-    Other: [
-      {
-        icon: PlusCircle,
-        label: "Add Roambee ID",
-        color: "text-blue-600",
-        onClick: (shipment: Shipment) => {
-          setSelectedShipmentForRoambee(shipment);
-          setShowRoambeeModal(true);
-          closeAllDialogs();
-        },
-      },
-      // {
-      //   icon: CheckCircle,
-      //   label: "Complete Shipment",
-      //   color: "text-green-600",
-      //   onClick: (shipment: Shipment) => {
-      //     setShipmentForCompletion(shipment);
-      //     setShowCompleteShipmentModal(true);
-      //   }
-      // },
-      {
-        icon: CheckCircle,
-        label: "Submit Mark As Arrived",
-        color: "text-green-600",
-        onClick: (shipment: Shipment) => {
-          setSelectedShipmentForArrival(shipment);
-          setShowMarkAsArrivedModal(true);
-          closeAllDialogs();
-        },
-      },
-      //Create Payment Advice
-      {
-        icon: CreditCard,
-        label: "Create Payment Advance",
-        color: "text-indigo-600",
-        onClick: (shipment: Shipment) => handleCreatePaymentAdvice(shipment),
-      },
-      //Bulk Upload - Commercial Invoices
-      {
-        icon: Upload,
-        label: "Bulk Upload - Commercial Invoices",
-        color: "text-green-600",
-        onClick: (shipment: Shipment) => handleBulkUploadClick(shipment)
-      },
-    ],
-    Others: [
-      // Add DO Details
-      {
-        icon: PlusCircle,
-        label: "Add DO Details",
-        color: "text-blue-600",
-        onClick: (shipment: any) => {
-          closeAllDialogs();
-          setSelectedShipment(shipment);
-          setSelectedShipmentSIN(shipment.sin || shipment._id);
-          setShowAddDODialog(true);
-        },
-      },
-      // update shipment status
-      {
-        icon: Edit,
-        label: "Update Shipment Status",
-        color: "text-yellow-600",
-        onClick: (shipment: Shipment) => {
-          closeAllDialogs();
-          setSelectedShipmentForStatus(shipment);
-          setShowStatusModal(true);
-        }
-      },
-      // Mark as faulty
-      {
-        icon: AlertCircle,
-        label: "Mark Fault Device",
-        color: "text-red-600",
-        onClick: (shipment: Shipment) => {
-          closeAllDialogs();
-          setSelectedShipmentForFaulty(shipment);
-          setShowFaultyModal(true);
-        }
-      },
-       // Missed Shipment
-      {
-        icon: AlertCircle,
-        label: "Missed Shipment",
-        color: "text-red-600",
-        onClick: (shipment: Shipment) => {
-          closeAllDialogs();
-          setSelectedShipmentForMissed(shipment);
-          setShowMissedShipmentModal(true);
-        }
-      },
-      {
-        icon: AlertCircle,
-        label: "Missed Event",
-        color: "text-red-600",
-        onClick: (shipment: Shipment) => {
-          closeAllDialogs();
-          setSelectedShipmentForMissedEvent(shipment);
-          setShowMissedEventModal(true);
-        }
-      },
-    ],
-    Others1: [
-      // Add Managed By 
-      {
-        icon: UserPlus,
-        label: "Add Managed By",
-        color: "text-blue-600",
-        onClick: (shipment: Shipment) => {
-          closeAllDialogs();
-          setSelectedShipmentForManagedBy(shipment);
-          setShowAddManagedByModal(true);
-        }
-      },
-      // Retriggered missed shipment
-      {
-        icon: RefreshCw,
-        label: "ReTrigger Missed Events",
-        color: "text-blue-600",
-        onClick: (shipment: Shipment) => {
-          closeAllDialogs();
-          setSelectedShipmentForRetrigger(shipment);
-          setShowRetriggerEventModal(true);
-        }
-      },
-      //Reassign
-      {
-        icon: RefreshCw,
-        label: "Reassign",
-        color: "text-blue-600",
-      },
-      //Update Client Freight
-      {
-        icon: Edit,
-        label: "Update Client Freight",
-        color: "text-yellow-600",
-        onClick: (shipment: Shipment) => {
-          closeAllDialogs();
-          handleOpenFreightModal(shipment._id, 'client_rate');
-        }
-      },
-      //Add Driver Expenses
-      {
-        icon: Plus,
-        label: "Add Driver Expenses",
-        color: "text-green-600",
-        onClick: (shipment: Shipment) => {
-          closeAllDialogs();
-          handleDriverExpenseClick(shipment);
-        }
-      },
-    ],
-    Others2: [
-      //Add/Edit Geofence
-      {
-        icon: Plus,
-        label: "Add/Edit Geofence",
-        color: "text-green-600",
-        onClick: handleOpenGeofenceEditor,
-        disabled: (shipment: Shipment) => 
-          ['Completed', 'Cancelled'].includes(shipment.status)
-      },
-    ]
+  const handleShareShipment = (shipment: Shipment) => {
+  closeAllDialogs();
+  const trackingUrl = `${window.location.origin}/track/${shipment.unique_code}`;
+  setShareUrl(trackingUrl);
+  setSharedShipment(shipment);
+  setShareModalOpen(true);
+};
+
+const handleMailShipment = (shipment: Shipment) => {
+  closeAllDialogs();
+  setShipmentToMail(shipment);
+  setMailModalOpen(true);
+};
+
+const handleCancelShipment = (shipment: Shipment) => {
+  closeAllDialogs();
+  setShipmentToCancel(shipment);
+  setCancelModalOpen(true);
+};
+
+const handleSimTracking = (shipment: Shipment) => {
+  closeAllDialogs();
+  setSelectedShipment(shipment);
+  setModalOpen(true);
+};
+
+const handlePullFreightWithRoutes = (shipment: Shipment) => {
+  closeAllDialogs();
+  setPullFreightData({
+    _id: shipment._id,
+    sin: shipment.sin,
+    vehicleNo: shipment.vehicleNumber || "",
+    pickup: shipment.from?.[0]?.location?.name || "",
+    destinations: shipment.to?.map(dest => ({
+      _id: dest.location?._id || "",
+      name: dest.location?.name || "",
+      city: dest.location?.city || ""
+    })) || []
+  });
+  setShowPullFreightDialog(true);
+};
+
+const handleRecalculateDistanceClick = (shipment: Shipment) => {
+  closeAllDialogs();
+  handleRecalculateDistance(shipment);
+};
+
+const handleCreateAdvancePayment = (shipment: Shipment) => {
+  closeAllDialogs();
+  setSelectedShipmentForPayment(shipment);
+  setShowPaymentAdvanceModal(true);
+};
+
+const handleChangeInvoiceType = (shipment: Shipment) => {
+  closeAllDialogs();
+  setSelectedShipmentForInvoiceType(shipment);
+  setIsInvoiceTypeModalOpen(true);
+};
+
+const handleUploadApprovalDocuments = (shipment: Shipment) => {
+  closeAllDialogs();
+  setSelectedShipmentForAttach(shipment);
+  setShowAttachDialog(true);
+};
+
+const handleViewEpods = (shipment: Shipment) => {
+  closeAllDialogs();
+  setSelectedShipmentForEpod(shipment);
+  setIsEpodModalOpen(true);
+};
+
+const handleCompleteShipment = (shipment: Shipment) => {
+  closeAllDialogs();
+  setSelectedShipmentForCompletion(shipment);
+  setShowCompleteShipmentModal(true);
+};
+
+const handleMarkAsArrived = (shipment: Shipment) => {
+  closeAllDialogs();
+  setSelectedShipmentForArrival(shipment);
+  setShowMarkAsArrivedModal(true);
+};
+
+const handleBulkUploadCommercialInvoices = (shipment: Shipment) => {
+  handleBulkUploadClick(shipment);
+};
+
+const handleAddDODetails = (shipment: Shipment) => {
+  closeAllDialogs();
+  setSelectedShipment(shipment);
+  setSelectedShipmentSIN(shipment.sin || shipment._id);
+  setShowAddDODialog(true);
+};
+
+const handleUpdateShipmentStatus = (shipment: Shipment) => {
+  closeAllDialogs();
+  setSelectedShipmentForStatus(shipment);
+  setShowStatusModal(true);
+};
+
+const handleMarkFaultDevice = (shipment: Shipment) => {
+  closeAllDialogs();
+  setSelectedShipmentForFaulty(shipment);
+  setShowFaultyModal(true);
+};
+
+const handleMissedShipment = (shipment: Shipment) => {
+  closeAllDialogs();
+  setSelectedShipmentForMissed(shipment);
+  setShowMissedShipmentModal(true);
+};
+
+const handleMissedEvent = (shipment: Shipment) => {
+  closeAllDialogs();
+  setSelectedShipmentForMissedEvent(shipment);
+  setShowMissedEventModal(true);
+};
+
+const handleAddManagedBy = (shipment: Shipment) => {
+  closeAllDialogs();
+  setSelectedShipmentForManagedBy(shipment);
+  setShowAddManagedByModal(true);
+};
+
+const handleRetriggerMissedEvents = (shipment: Shipment) => {
+  closeAllDialogs();
+  setSelectedShipmentForRetrigger(shipment);
+  setShowRetriggerEventModal(true);
+};
+
+const handleAddDriverExpenses = (shipment: Shipment) => {
+  closeAllDialogs();
+  handleDriverExpenseClick(shipment);
+};
+
+  const handleCreatePaymentAdvice = (shipment: Shipment) => {
+    closeAllDialogs();
+    setSelectedShipmentForPayment(shipment);
+    setShowPaymentAdviceModal(true);
   };
+
+
+  
+const actionMenuCategories = {
+  "Quick Actions": [
+    { icon: Eye, label: "View", color: "text-blue-600" },
+    { icon: Share2, label: "Share", color: "text-blue-500", onClick: handleShareShipment },
+    { icon: Mail, label: "Mail", color: "text-orange-600", onClick: handleMailShipment },
+    { icon: XCircle, label: "Cancel", color: "text-red-600", onClick: handleCancelShipment },
+  ],
+  "Tracking & GPS": [
+    { icon: Download, label: "SIM Tracking", color: "text-amber-600", onClick: handleSimTracking },
+    { icon: WifiOff, label: "GPS Disconnection Reason", color: "text-teal-600", onClick: (shipment: Shipment) => handleOpenReasonDialog('gps', shipment._id, shipment.sin) },
+    { icon: Wifi, label: "Add GPS Connection", color: "text-amber-600", onClick: (shipment: Shipment) => handleOpenGpsModal(shipment) },
+    { icon: Clock, label: "Update Delay Reason", color: "text-teal-600", onClick: (shipment: Shipment) => { closeAllDialogs(); handleOpenReasonDialog('delay', shipment._id, shipment.sin); } },
+  ],
+  "Location & Routes": [
+    { icon: Edit, label: "Edit Pickup Location", color: "text-pink-600", onClick: (shipment: Shipment) => handleOpenEditLocation(shipment, 'pickup'), disabled: (shipment: Shipment) => ['Completed', 'Cancelled'].includes(shipment.status) },
+    { icon: Edit, label: "Edit Delivery Location", color: "text-pink-600", onClick: (shipment: Shipment) => handleOpenEditLocation(shipment, 'delivery'), disabled: (shipment: Shipment) => ['Completed', 'Cancelled'].includes(shipment.status) },
+    { icon: Route, label: "Pull Freight with Routes", color: "text-brown-600", onClick: handlePullFreightWithRoutes },
+    { icon: Calculator, label: "Recalculate Distance", color: "text-pink-600", onClick: handleRecalculateDistanceClick },
+  ],
+  "Freight & Payment": [
+    { icon: Truck, label: "Update Carrier Freight", color: "text-gray-600", onClick: (shipment: Shipment) => { closeAllDialogs(); handleOpenFreightModal(shipment._id, shipment.sin, 'rate'); } },
+    { icon: Truck, label: "Flush Freight", color: "text-gray-600", onClick: handleFlushFreight },
+    { icon: CreditCard, label: "Create Payment Advice", color: "text-indigo-600", onClick: handleCreateAdvancePayment },
+    { icon: FileText, label: "Change Invoice Type", color: "text-brown-600", onClick: handleChangeInvoiceType },
+  ],
+  "Documents & Status": [
+    { icon: FileText, label: "Upload Approval Documents", color: "text-purple-600", onClick: handleUploadApprovalDocuments },
+    { icon: Package, label: "View Epods", color: "text-brown-600", onClick: handleViewEpods },
+    { icon: CheckCircle, label: "Complete Shipment", color: "text-green-600", onClick: handleCompleteShipment },
+    { icon: DoorOpen, label: "Recalculate Customer Gate In/Out", color: "text-pink-600", onClick: (shipment: Shipment) => handleRecalculateGateInOut(shipment), disabled: (shipment: Shipment) => ["Completed", "Cancelled"].includes(shipment.status) },
+  ],
+  "Shipment Operations": [
+    { icon: RefreshCw, label: "Reassign", color: "text-blue-600" },
+    { icon: CheckCircle, label: "Submit Mark As Arrived", color: "text-green-600", onClick: handleMarkAsArrived },
+    { icon: CreditCard, label: "Create Payment Advance", color: "text-indigo-600", onClick: handleCreatePaymentAdvice },
+    { icon: Upload, label: "Bulk Upload - Commercial Invoices", color: "text-green-600", onClick: handleBulkUploadCommercialInvoices },
+  ],
+  "Shipment Management": [
+    { icon: PlusCircle, label: "Add DO Details", color: "text-blue-600", onClick: handleAddDODetails },
+    { icon: Edit, label: "Update Shipment Status", color: "text-yellow-600", onClick: handleUpdateShipmentStatus },
+    { icon: AlertCircle, label: "Mark Fault Device", color: "text-red-600", onClick: handleMarkFaultDevice },
+    { icon: AlertCircle, label: "Missed Event", color: "text-red-600", onClick: handleMissedEvent },
+  ],
+  "Advanced": [
+    { icon: UserPlus, label: "Add Managed By", color: "text-blue-600", onClick: handleAddManagedBy },
+    { icon: RefreshCw, label: "ReTrigger Missed Events", color: "text-blue-600", onClick: handleRetriggerMissedEvents },
+    { icon: Edit, label: "Update Client Freight", color: "text-yellow-600", onClick: (shipment: Shipment) => { closeAllDialogs(); handleOpenFreightModal(shipment._id, shipment.sin, 'client_rate'); } },
+    { icon: Plus, label: "Add Driver Expenses", color: "text-green-600", onClick: handleAddDriverExpenses },
+  ],
+  "Geofence & ePOD": [
+    { icon: Plus, label: "Add/Edit Geofence", color: "text-green-600", onClick: handleOpenGeofenceEditor, disabled: (shipment: Shipment) => ['Completed', 'Cancelled'].includes(shipment.status) },
+    { icon: Upload, label: "Upload ePOD", color: "text-green-600" },
+    { icon: Upload, label: "Request ePOD", color: "text-green-600" }, 
+  ]
+};
+
+
+
+const closeActionMenu = () => {
+  console.log("closeActionMenu executed, closing dropdown");
+  setActionMenuOpenId(null);
+};
 
   useEffect(() => {
     console.log('showAttachDialog state changed:', showAttachDialog);
   }, [showAttachDialog]);
 
-  // Sub filters data
   const subFilters = [
-    { key: "accepted", label: "Accepted", count: 156 },
-    { key: "at_pickup", label: "At Pickup", count: 23 },
-    { key: "in_transit", label: "In Transit", count: 53 },
-    { key: "completed", label: "Completed", count: 29 },
-    { key: "delayed", label: "Delayed", count: 12 },
-    { key: "today", label: "Today", count: 234 },
-    { key: "high_priority", label: "High Priority", count: 45 },
-    { key: "pending_epod", label: "Pending EPOD", count: 156 },
+    { key: "towards_pickup", label: "Towards Pickup", count: 0, color: "#16a085" },
+    { key: "at_pickup", label: "At Pickup", count: 0, color: "#3498db" },
+    { key: "in_transit", label: "In Transit", count: 0, color: "#f39c12" },
+    { key: "about_to_reach", label: "About to Reach", count: 0, color: "#34495e" },
+    { key: "at_delivery", label: "At Delivery", count: 0, color: "#667eea" },
+    { key: "completed", label: "Completed", count: 0, color: "#2ecc40" },
+    { key: "cancelled", label: "Cancelled", count: 0, color: "#e74c3c" },
+    // { key: "delayed", label: "Delayed", count: 0, color: "#ed8936" },
   ];
 
-  // Analytics lifecycle data
   const analyticsLifeCycle = [
     {
       stage: "Order Creation",
@@ -1077,22 +862,6 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
     },
   ];
 
-  const lucideIconMap = {
-    inventory_2: Package2, // closest to "inventory"
-    assignment_ind: UserCheck, // closest to "assignment/user"
-    local_shipping: Truck, // truck for shipping
-    transfer_within_a_station: RefreshCw, // movement/transfer
-    task_alt: ClipboardCheck, // completion/check
-    check_circle: CheckCircle2, // check mark
-  };
-
-  const lucideInsightIcons = {
-    check_circle: CheckCircle2,
-    warning: AlertTriangle,
-    trending_up: TrendingUp,
-    people: Users,
-  };
-
   const analyticsInsights = [
     {
       text: "Shipment volume increased by 12.5% compared to last week",
@@ -1113,7 +882,7 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
       text: "Carrier diversity remains stable with 7 active partners",
       icon: "people",
       color: "default",
-    }, // Changed 'grey' to 'default'
+    },
   ];
 
   const activeCarriersData = [
@@ -1143,115 +912,38 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
     },
   ];
 
-  // Effect
- 
-
   useEffect(() => {
     setShowButtons(selectedShipmentsArray.length > 0);
   }, [selectedShipmentsArray]);
 
-  // Event handlers
   const handleShipmentTypeChange = (
     type: "outbound" | "inbound" | "others" | "all"
   ) => {
     setShipmentType(type);
     setCurrentPage(0);
-    // Pass the type directly to fetchShipments to ensure it uses the correct type
     fetchShipments(type);
   };
 
   const handleSubFilterSelect = (filterKey: string) => {
-    const newSelectedFilter = selectedSubFilter === filterKey ? null : filterKey;
-
-    // 2. Set the state with the new value
-    setSelectedSubFilter(newSelectedFilter);
+    const updatedFilters = selectedSubFilters.includes(filterKey)
+      ? selectedSubFilters.filter(key => key !== filterKey)
+      : [...selectedSubFilters, filterKey];
   
-    // Reset page to 0 and fetch data with the new filter
+    setSelectedSubFilters(updatedFilters);
     setCurrentPage(0);
-    fetchShipments({
-      dashboard_filter: newSelectedFilter,
+  
+    const filterObj: any = {
       skip: 0,
       limit: pageSize,
-    });
-  };
-
-  const handleClearFilters = () => {
-    setInvoiceNo("");
-    setLrNumber("");
-    setFromDate("");
-    setToDate("");
-    setVehicleNumber("");
-    setMobile("");
-    setSelectedCarriers([]);
-    setSelectedOrganizations([]);
-    setSelectedMaterials([]);
-    setSelectedPickups([]);
-    setSelectedDeliveries([]);
-    setSearchQuery("");
-    fetchShipments();
-  };
-
-  const handleOpenShipmentDetails = (shipment: Shipment) => {
-    setSelectedShipmentDetails(shipment);
-    setShowShipmentDetails(true);
-  };
-
-  const handleOpenLocationsPopup = (
-    locations: any[],
-    type: string,
-    event: React.MouseEvent
-  ) => {
-    event.stopPropagation();
-    setLocationPopupData({ locations, type });
-    setShowLocationPopup(true);
-  };
-
-  const getStatusColor = (status: string) => {
-    const statusColors: { [key: string]: string } = {
-      Completed: "#28a745",
-      "In Transit": "#17a2b8",
-      "At Pickup": "#ffc107",
-      Pending: "#6c757d",
-      Cancelled: "#dc3545",
-      Assigned: "#007bff",
-      "Towards Pickup": "#fd7e14",
-      "At Delivery": "#20c997",
-      Accepted: "#6f42c1",
-      "About to Reach": "#e83e8c",
+      odc: odcFilter
     };
-    return statusColors[status] || "#6c757d";
+  
+    if (updatedFilters.length > 0) {
+      filterObj.status = updatedFilters;  
+    }
+    
+    fetchShipments(filterObj);
   };
-
-  const formatDateTime = (dateTime: string) => {
-    if (!dateTime) return "N/A";
-    return new Date(dateTime).toLocaleString("en-IN", {
-      day: "2-digit",
-      month: "short",
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: true,
-    });
-  };
-
-  const columnsToDisplay = [
-    "selected",
-    "sno",
-    "status",
-    "sin",
-    "pickup_drop",
-    "date_time",
-    "carrier",
-    "vehicle_number",
-    "track",
-    "driver",
-    "driver_phone",
-    "epod",
-    "consent",
-    "subscribed",
-    "last_location",
-    "freight",
-    "action",
-  ];
 
   const fetchDropdownData = async () => {
     try {
@@ -1290,76 +982,6 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
     }
   };
 
-  const handleShipmentClick = (shipment: any) => {
-    setCurrentShipment(shipment);
-    setShowUpdateStatus(true);
-  };
-
-  const handleStatusUpdate = async (statusId: any) => {
-    try {
-      // Call your API to update the status
-      // await updateShipmentStatus(currentShipment.id, statusId);
-      // Handle success (maybe show a success message and refresh the data)
-      setShowUpdateStatus(false);
-    } catch (error) {
-      console.error("Failed to update status:", error);
-    }
-  };
-
-  const handleTrackShipment = (shipment: any, e: React.MouseEvent) => {
-    e.stopPropagation();
-    // Open tracking modal or navigate to tracking page
-    console.log("Tracking shipment:", shipment.sin);
-  };
-
-  const handleMapView = (shipment: any, e: React.MouseEvent) => {
-    e.stopPropagation();
-    // Open map modal
-    console.log("Opening map for shipment:", shipment.sin);
-  };
-
-  const handleShareShipment = (shipment: any, e: React.MouseEvent) => {
-    e.stopPropagation();
-    // Open share modal
-    console.log("Sharing shipment:", shipment.sin);
-  };
-
-  const formatDate = (dateString: string): string => {
-    if (!dateString) return "N/A";
-    return new Date(dateString).toLocaleString();
-  };
-
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
-    // Show success message
-    console.log("Copied to clipboard:", text);
-  };
-
-  const handleAdvancedSearch = () => {
-    // const filters = {
-    //   fromDate,
-    //   toDate,
-    //   invoiceNo,
-    //   lrNumber,
-    //   materials: selectedMaterials.map(m => m._id),
-    //   pickups: selectedPickups.map(p => p._id),
-    //   deliveries: selectedDeliveries.map(d => d._id),
-    //   carriers: selectedCarriers.map(c => c._id),
-    //   status: shipmentStatusName,
-    //   mobile,
-    //   vehicleNo,
-    //   sin: shipmentSIN,
-    //   projectCode,
-    //   saleOrder,
-    //   purchaseOrder,
-    //   ppdNo,
-    //   organization: selectedOrganisation.id,
-    //   segmentations: selectedSegmentation
-    // };
-    // fetchShipments(filters);
-    // setShowAdvanceSearch(false);
-  };
-
   const shipmentStatus = [
     { name: "PNDG", value: "Pending" },
     { name: "ASN", value: "Assigned" },
@@ -1392,95 +1014,18 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
     setPpdNo("");
     setSelectedOrganisation({ name: "", id: "" });
     setSelectedSegmentation([]);
+    setOdcFilter(false);
+    setSelectedSubFilters([]);
 
     fetchShipments();
   };
 
-  // Pagination Functions
-  const handlePageChange = (newPage: number) => {
-    setCurrentPage(newPage);
-    fetchShipments({
-      skip: newPage * pageSize,
-      limit: pageSize,
-    });
-  };
-
-  const handlePageSizeChange = (newPageSize: number) => {
-    setPageSize(newPageSize);
-    setCurrentPage(0);
-    fetchShipments({
-      skip: 0,
-      limit: newPageSize,
-    });
-  };
-
-  // Modal Functions for all the dialog handlers
-  const openShipmentDetails = (shipment: any, tabIndex: number = 0) => {
-    // Open shipment details modal
-    console.log("Opening shipment details:", shipment);
-  };
-
-  const openAssignModal = (shipment: any, label: string = "Assign Driver") => {
-    // Open assign driver modal
-    console.log("Opening assign modal:", shipment);
-  };
-
-  const openCancelModal = (shipment: any) => {
-    // Open cancel shipment modal
-    console.log("Opening cancel modal:", shipment);
-  };
-
-  const showLastLocation = (shipment: any) => {
-    setLastKnownLocationValue(
-      shipment.trip_tracker?.last_location_address || "N/A"
-    );
-    setLastKnownLocationTime(
-      formatDate(shipment.trip_tracker?.last_location_at)
-    );
-    setShowLastKnownLocationDialog(true);
-  };
-
-  // Bulk Actions
-  const printInvoices = async () => {
-    if (selectedShipmentsArray.length === 0) {
-      alert("Please select shipments");
-      return;
-    }
-
-    const payload = { ids: selectedShipmentsArray };
-    try {
-      const response = await fetch("/api/reports/download_invoice_report", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      const data = await response.json();
-
-      if (data.statusCode === 200) {
-        window.open(data.data.link, "_blank");
-      }
-    } catch (error) {
-      console.error("Error printing invoices:", error);
-    }
-  };
-
-  const printLRs = () => {
-    if (selectedShipmentsArray.length === 0) {
-      alert("Please select shipments");
-      return;
-    }
-    // Open print LR modal
-    console.log("Printing LRs for:", selectedShipmentsArray);
-  };
-
-  // Initialize data on component mount
   useEffect(() => {
     fetchDropdownData();
     fetchOrganizations();
     fetchCarriers();
   }, []);
 
-  // Analytics Functions
   const toggleAnalyticsView = () => {
     setIsAnalyticsView(!isAnalyticsView);
   };
@@ -1491,97 +1036,6 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
 
   const openActiveCarriersPopup = () => {
     setShowActiveCarriersPopup(true);
-  };
-
-
-  // const getPullFreight = async (data: {
-  //   destination: string;
-  //   freightRate: string;
-  // }) => {
-  //   console.log(" getPullFreight ----");
-  //   try {
-  //     const response = await httpsGet(
-  //       `/api/freight_rate_route_code/get?destination=${encodeURIComponent(
-  //         data.destination
-  //       )}&shipment=${encodeURIComponent(pullFreightData.shipmentId)}`
-  //     );
-
-  //     if (response.statusCode === 200) {
-  //       alert(`New Freight Rate is ${response.data}`);
-  //       setShowPullFreightDialog(false);
-  //     }
-  //   } catch (error) {
-  //     console.error("Error getting freight rate:", error);
-  //     alert("Failed to get freight rate");
-  //   }
-  // };
-
-  const updateFreight = async () => {
-    try {
-      const response = await fetch("/api/shipment/update_freight", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(freightPayload),
-      });
-      const data = await response.json();
-
-      if (data.statusCode === 200) {
-        alert("Freight updated successfully");
-        setShowUpdateFreightDialog(false);
-        fetchShipments();
-      }
-    } catch (error) {
-      console.error("Error updating freight:", error);
-    }
-  };
-
-  const updateShipmentStatus = async () => {
-    if (!selectedShipmentStatus) {
-      alert("Please select a status");
-      return;
-    }
-
-    try {
-      const response = await fetch("/api/shipment/update_status", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          shipment: selectedShipmentSIN,
-          status: selectedShipmentStatus,
-        }),
-      });
-      const data = await response.json();
-
-      if (data.statusCode === 200) {
-        alert("Status updated successfully");
-        setShowUpdateStatusDialog(false);
-        fetchShipments();
-      }
-    } catch (error) {
-      console.error("Error updating status:", error);
-    }
-  };
-
-  const submitManagedBy = async () => {
-    try {
-      const response = await fetch("/api/shipment/add_managed_by", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          shipment: selectedShipmentSIN,
-          managedBy: selectedCarrierManagedBy.id,
-        }),
-      });
-      const data = await response.json();
-
-      if (data.statusCode === 200) {
-        alert("Carrier added successfully");
-        setShowAddManagedByDialog(false);
-        fetchShipments();
-      }
-    } catch (error) {
-      console.error("Error adding managed by:", error);
-    }
   };
 
   const submitIncreasePrice = async () => {
@@ -1598,115 +1052,6 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
     } catch (error) {
       console.error("Error recalculating freight:", error);
       showMessage("Error recalculating freight", "error");
-    }
-  };
-
-  const updateRemarks = async () => {
-    const url =
-      delayReasonType === "delayReason"
-        ? "/api/shipment/delay_reason"
-        : "/api/shipment/gps_disconnection_reason";
-
-    const payload =
-      delayReasonType === "delayReason"
-        ? {
-            _id: selectedShipmentSIN,
-            delay_reason:
-              selectedReason === "Others" ? otherReason : selectedReason,
-            ...(notify ? { notify } : {}),
-          }
-        : {
-            _id: selectedShipmentSIN,
-            reason: selectedReason === "Others" ? otherReason : selectedReason,
-          };
-
-    try {
-      const response = await fetch(url, {
-        method: delayReasonType === "delayReason" ? "PUT" : "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      const data = await response.json();
-
-      if (data.statusCode === 200) {
-        alert("Updated successfully");
-        setShowAddRemarkDialog(false);
-        fetchShipments();
-      }
-    } catch (error) {
-      console.error("Error updating remarks:", error);
-    }
-  };
-
-  const approveWaiveOff = async (status: string) => {
-    try {
-      const response = await fetch(
-        `/api/shipment/delay_penalty_waive_off/${selectedShipmentSIN}`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            status,
-            suggested_amount: shipmentDelayData.suggested_amount,
-          }),
-        }
-      );
-      const data = await response.json();
-
-      if (data.statusCode === 200) {
-        alert("Waive off processed successfully");
-        setShowDelayedShipmentDialog(false);
-        fetchShipments();
-      }
-    } catch (error) {
-      console.error("Error processing waive off:", error);
-    }
-  };
-
-  const handleSearch = (searchValue: string) => {
-    setSearchTerm(searchValue);
-    // Debounce the search
-    const timeoutId = setTimeout(() => {
-      fetchShipments({ search: searchValue });
-    }, 1000);
-
-    return () => clearTimeout(timeoutId);
-  };
-
-  const onRerunSubmit = async () => {
-    if (!selectedRerunOption) {
-      alert("Please select a status");
-      return;
-    }
-
-    try {
-      const response = await fetch("/api/re/run", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          shipment: selectedShipmentSIN,
-          status: selectedRerunOption,
-          startTime: fromDateTsReRun,
-          endTime: toDateTsReRun,
-        }),
-      });
-      const data = await response.json();
-
-      if (data.statusCode === 200) {
-        alert("Rerun successful");
-        setShowRerunDialog(false);
-      }
-    } catch (error) {
-      console.error("Error running rerun:", error);
-    }
-  };
-
-  // File handling functions
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (files) {
-      // Handle file upload logic
-      console.log("Files selected:", files);
     }
   };
 
@@ -1741,54 +1086,8 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
     }
   };
 
-  const attachFiles = async () => {
-    // Handle file attachment logic
-    console.log("Attaching files");
-  };
-
-  const uploadBulkShipments = async () => {
-    // Handle bulk upload logic
-    console.log("Uploading bulk shipments");
-  };
-
-  const submitRoambee = async () => {
-    if (!selectedShipmentForRoambee) return;
-
-    try {
-      setIsSubmittingRoambee(true);
-      // Replace with your actual API endpoint
-      const response = await httpsPost("shipment/add_roambee_id", {
-        shipmentId: selectedShipmentForRoambee._id,
-        roambeeId,
-      });
-
-      if (response.data.statusCode === 200) {
-        showMessage("Roambee ID added successfully", "success");
-        setShowRoambeeModal(false);
-        // Refresh the shipments list or update the specific shipment
-        fetchShipments();
-      }
-    } catch (error: any) {
-      showMessage(
-        error.response?.data?.message || "Failed to add Roambee ID",
-        "error"
-      );
-    } finally {
-      setIsSubmittingRoambee(false);
-    }
-  };
-
-  const handleWarningConfirm = (confirmed: boolean) => {
-    setShowWarningDialog(false);
-    if (confirmed) {
-      // Proceed with the action
-      console.log("Warning confirmed, proceeding...");
-    }
-  };
-
   const tableRef = useRef<HTMLDivElement>(null);
 
-  // Utility Functions
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("en-IN", {
       minimumFractionDigits: 0,
@@ -1827,12 +1126,20 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
       // (converted from Angular advance search logic)
     }
 
+    
     setShowLoader(true);
-
+    
     const filters: any = {};
 
-    // Use the provided type or fall back to the current shipmentType
-    const filterType = type || shipmentType;
+    if (odcFilter !== null) {
+      filters.odc = odcFilter;
+    }
+
+    if (typeof type === "object" && type !== null && !Array.isArray(type)) {
+    Object.assign(filters, type);
+  }
+
+    const filterType = shipmentType;
 
     if (filterType !== "all") {
       filters.type_filter = filterType;
@@ -1841,7 +1148,7 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
     filters.limit = pageSize;
     filters.skip = currentPage * pageSize;
 
-    if (inputQuery !== "" && inputQuery.length && searchValue) {
+    if (inputQuery !== "" && inputQuery.length > 0 && searchValue) {
       if (searchValue === "vehicle_no") {
         filters[searchValue] = inputQuery.toUpperCase();
       } else {
@@ -1859,7 +1166,6 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
     setShowButtons(false);
 
     try {
-      // Replace with your actual API call
       const response = await httpsPost("shipment/many", filters, {}, 5);
 
       console.log("Response:", response.data);
@@ -1870,13 +1176,11 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
         const result = response.data.shipments;
         const processedShipments: any[] = [];
 
-        // Complex data mapping (converted from Angular forEach logic)
         result.forEach((element: any) => {
           const temp: any = {
             material: [],
           };
 
-          // Basic properties
           temp._id = element._id;
           temp.sin = element.SIN;
           temp.do_number = element.do_number || "";
@@ -1894,7 +1198,6 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
           temp.gps_disconnection_reason = element.gps_disconnection_reason;
           temp.isSpotDriver = element.driver.driver_type === "temporary";
 
-          // Driver and vehicle information
           temp.driver_type =
             (element.assigned_driver && element.assigned_driver.driver_type) ||
             "N/A";
@@ -1940,7 +1243,6 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
 
           temp.notAccepted = !element.driver;
 
-          // Loading/unloading charges
           temp.loading_charges = element.others
             ? element.others.loading_charges
             : "";
@@ -1950,13 +1252,11 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
           temp.is_mykl = element.others ? element.others.s_mykl : false;
           temp.others = element.others;
 
-          // Materials
           const mat = element.materials || [];
           temp.driverType =
             (element.assigned_driver && element.assigned_driver.driver_type) ||
             "";
 
-          // GPS Vehicle logic
           temp.gpsVehicle = false;
           if (
             element.assigned_driver &&
@@ -1980,7 +1280,6 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
             temp.material.push(item);
           });
 
-          // Status determination
           const shipStatus = [
             { name: "PNDG", value: "Pending" },
             { name: "ASN", value: "Assigned" },
@@ -2000,7 +1299,6 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
               : shipStatus.find((item) => item.name === element.latest_status)
                   ?.value || "Unknown";
 
-          // Carrier information
           temp.carrier = element.carrier || "";
           temp.carrier_parent_name = element.carrier
             ? element.carrier.parent_name
@@ -2010,7 +1308,6 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
           temp.booked_by = element.shipper?.name || "";
           temp.order = element.order;
 
-          // Vehicle type information
           temp.reqVehicleType =
             element.vehicle_type && element.vehicle_type.name
               ? element.vehicle_type.name
@@ -2020,7 +1317,6 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
               ? element.vehicle_type._id
               : "N/A";
 
-          // Trip tracker information
           temp.tripTracker = !!(
             element.trip_tracker &&
             element.trip_tracker.methods &&
@@ -2034,11 +1330,9 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
               : [];
           temp.show_consent = temp.method.indexOf("SIM") !== -1;
 
-          // Location information
           temp.drop_num = element.deliveries?.length || 0;
           temp.drop = element.deliveries?.[0]?._id;
 
-          // Date information
           temp.pickDate = element.pickup_date;
           temp.scheduledDate = toShortDateTime(element.pickup_date);
           temp.actualDate = toShortDateTime(element.pickup_date);
@@ -2049,7 +1343,6 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
               ? toShortDateTime(element.pickups[0].finished_at)
               : "";
 
-          // Time and distance
           temp.estimatedTime = element.estimated
             ? timeConvert(element.estimated.duration)
             : "N/A";
@@ -2064,7 +1357,6 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
           temp.frieght_price = element.estimated?.price || "";
           temp.currentLocation = "";
 
-          // Delivery information
           temp.deliveryDate = element.delivery_date;
           temp.scheduledDeliveryDate = toShortDateTime(element.delivery_date);
           temp.actualDeliveryDate =
@@ -2076,7 +1368,6 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
                 )
               : "";
 
-          // Location IDs
           temp.lastDeliveryLocation =
             element.deliveries && element.deliveries.length
               ? element.deliveries[element.deliveries.length - 1].location._id
@@ -2086,11 +1377,9 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
               ? element.pickups[0].location._id
               : "";
 
-          // Shipper counts
           temp.inboundShippers = element.inbound_shippers?.length || 0;
           temp.outBoundShippers = element.outbound_shippers?.length || 0;
 
-          // Trans vehicle information
           let transVehicleNos: any[] = [];
           if (element.others && element.others.trans_vehicle) {
             element.others.trans_vehicle.forEach((vehicle: any) => {
@@ -2105,9 +1394,8 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
           }
           temp.trans_vehicle_no = transVehicleNos;
 
-          // Delay calculation
           temp.time_delay = element.trip_tracker?.total_delay || 0;
-          const delay_buffer = 0; // This should come from settings
+          const delay_buffer = 0;
           if (temp.time_delay > delay_buffer) {
             temp.delayed_shipment = true;
           } else if (
@@ -2120,7 +1408,6 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
             temp.delayed_shipment = false;
           }
 
-          // SIM tracking information
           temp.trackConsent = element.simTracking?.isConsent || false;
           temp.whatsApp = element.whatsapp || {};
           temp.showGreenConsent =
@@ -2133,10 +1420,8 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
           temp.subscriptionStatus = element.simTracking?.isSubscribed || false;
           temp.simTrackingCarrier = element.simTracking?.carrier || "";
 
-          // Delay deduction
           temp.delay_deduction = element.delay_deduction || 0;
 
-          // Disable share logic
           temp.disableShare = [
             "Assigned",
             "Completed",
@@ -2147,25 +1432,20 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
             !["Assigned", "Completed", "Cancelled"].includes(temp.status) &&
             temp.assigned !== "Pending";
 
-          // PPD and serial number
           temp.ppd = element.ppd || null;
           temp.serial_number = element.serial_number || null;
           temp.is_unplanned = element.is_unplanned || null;
           temp.ppd_updated = element.ppd_updated || false;
 
-          // Rate information
           temp.rate = element.rate || {};
           temp.client_rate = element.client_rate || {};
           temp.epods_available = element.epods_available || false;
-
-          // Invoice edit disable logic
           if (element.finished_at || temp.status === "Cancelled") {
             temp.disableInvoiceEdit = true;
           } else {
             temp.disableInvoiceEdit = false;
           }
 
-          // Finished and arrived timestamps
           temp.finished_at =
             element.deliveries &&
             element.deliveries.length &&
@@ -2179,7 +1459,6 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
               ? element.deliveries[element.deliveries.length - 1].arrived_at
               : null;
 
-          // Waybill flag
           if (element.carrier_waybills && element.carrier_waybills.length) {
             temp.waybillFlag = !!element.carrier_waybills[0].pdf_link;
           } else if (
@@ -2191,7 +1470,6 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
             temp.waybillFlag = false;
           }
 
-          // Commercial invoice existence check
           let commercial_invoice_exist = false;
           if (element.fourPL_waybills && element.fourPL_waybills.length) {
             if (
@@ -2253,7 +1531,7 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
 
   useEffect(() => {
     fetchShipments();
-  }, [currentPage, pageSize]);
+  }, [currentPage, pageSize, odcFilter]);
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -2270,7 +1548,6 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
     }
   };
 
-  // Event handlers
   const handleSelectAllShipments = (checked: boolean) => {
     if (checked) {
       const newSelected = shipmentsArray
@@ -2300,30 +1577,22 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
     setShowButtons(newSelected.length > 0);
   };
   const statusColors: Record<string, string> = {
-    Completed: "#2ecc40", // Bright Green
-    Approved: "#27ae60", // Deep Green
-    Pending: "#2980b9", // Strong Blue
-    "In Transit": "#f39c12", // Vivid Orange
-    Cancelled: "#e74c3c", // Bright Red
-    Assigned: "#8e44ad", // Purple
-    "Towards Pickup": "#16a085", // Teal
-    "At Pickup": "#3498db", // Sky Blue
-    "At Delivery": "#f1948a", // Pink
-    Accepted: "#1abc9c", // Aqua
-    "About to Reach": "#34495e", // Dark Blue-Grey
+    Completed: "#2ecc40",
+    "In Transit": "#f39c12",
+    Cancelled: "#e74c3c",
+    "Towards Pickup": "#16a085",
+    "At Pickup": "#3498db",
+    "At Delivery": "#f1948a",
+    "About to Reach": "#34495e",
   };
 
   const statusLabels: Record<string, string> = {
     Completed: "Completed",
-    Approved: "Approved",
-    Pending: "Pending",
     "In Transit": "In Transit",
     Cancelled: "Cancelled",
-    Assigned: "Assigned",
     "Towards Pickup": "Towards Pickup",
     "At Pickup": "At Pickup",
     "At Delivery": "At Delivery",
-    Accepted: "Accepted",
     "About to Reach": "About to Reach",
   };
 
@@ -2340,49 +1609,15 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
           borderRadius: "50%",
           margin: "0 auto",
         }}
-        title={statusLabels[status] || status} // Show status text on hover
+        title={statusLabels[status] || status}
       />
     );
   };
 
-  const renderSINCell = (shipment: any) => (
-    <div>
-      {shipment.sin}
-      {shipment.ppd && <span>-{shipment.ppd}</span>}
-      {shipment.serial_number && (
-        <span>
-          {shipment.is_unplanned ? " - US" : " - SS"}- {shipment.serial_number}
-        </span>
-      )}
-      {shipment.delayed_shipment && (
-        <span
-          title="Delay"
-          style={{
-            cursor: "default",
-            display: "inline-flex",
-            verticalAlign: "middle",
-            marginLeft: 8,
-          }}
-        >
-          <AlertCircle size={18} color="#e03e3e" />
-        </span>
-      )}
-      {shipment.sale_order && (
-        <div>
-          {shipment.sale_order.split(",")[0]}
-          {shipment.sale_order.split(",").length > 1 && (
-            <span title={shipment.sale_order.split(",").slice(1).join(",")}>
-              +{shipment.sale_order.split(",").length - 1}
-            </span>
-          )}
-        </div>
-      )}
-    </div>
-  );
   const renderLocationCell = (
     shipment: any,
     copyDestinationCode: (code: string) => void,
-    openLocationsPopup: (type: string, locations: any[]) => void,
+    openLocationsPopup: (type: string, locations: any[], shipment: any) => void,
     shipmentType: string,
     displayType: "pickup" | "delivery" = "pickup"
   ) => {
@@ -2391,7 +1626,6 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
     const firstLocation = locations?.[0]?.location;
     const additionalCount = locations?.length > 1 ? locations.length - 1 : 0;
 
-    // For 'inbound' and 'outbound' types, only show the relevant location type
     if (
       (shipmentType === "inbound" && !isPickup) ||
       (shipmentType === "outbound" && isPickup)
@@ -2401,7 +1635,6 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
 
     if (!firstLocation) return null;
 
-    // Get the appropriate date based on shipment type and location type
     const getDateText = () => {
       if (shipmentType === "others") {
         return isPickup
@@ -2441,7 +1674,7 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
               }`}
               onClick={(e) => {
                 e.stopPropagation();
-                openLocationsPopup(displayType, locations.slice(1));
+                openLocationsPopup(displayType, locations.slice(1), shipment);
               }}
               title={`Show ${additionalCount} additional ${
                 isPickup ? "pickup" : "delivery"
@@ -2466,8 +1699,60 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
       </div>
     );
   };
+const renderLastLocationCell = (shipment: any) => {
+  const isDialogOpen = locationDialogState.isOpen && locationDialogState.shipmentId === shipment._id;
+  
+  const handleLocationClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setLocationDialogState({
+      isOpen: true,
+      shipmentId: shipment._id
+    });
+  };
+
+  const handleLocationDialogClose = () => {
+    setLocationDialogState({ isOpen: false });
+  };
+
+  let lastUpdatedColor = "#22c55e"; 
+  if (shipment.trip_tracker?.last_location_at) {
+    const last = new Date(shipment.trip_tracker.last_location_at).getTime();
+    const now = Date.now();
+    const diffMinutes = (now - last) / (1000 * 60);
+    if (diffMinutes > 60) {
+      lastUpdatedColor = "#ef4444";
+    }
+  }
+
+  return (
+    <div>
+      {shipment.trip_tracker?.last_location_address ? (
+        <LocationDialog
+          address={shipment.trip_tracker.last_location_address}
+          lastUpdated={shipment.trip_tracker?.last_location_at}
+          lastUpdatedColor={lastUpdatedColor}
+          isOpen={isDialogOpen}
+          onClose={handleLocationDialogClose}
+          shipmentId={shipment.sin}
+        >
+          <Button
+            variant="ghost"
+            size="icon"
+            className={styles.locationButton}
+            title="View location"
+            onClick={handleLocationClick}
+          >
+            <MapPin className={styles.locationIcon} color={lastUpdatedColor} />
+          </Button>
+        </LocationDialog>
+      ) : (
+        "-"
+      )}
+    </div>
+  );
+};
+
   const renderDateTimeCell = (shipment: any, shipmentType: string) => {
-    // When shipmentType is 'others' show Pickup and Delivery times with badges
     if (shipmentType === "others") {
       return (
         <div className={styles.locTabs}>
@@ -2494,7 +1779,6 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
       );
     }
 
-    // Shipment Type 'inbound'
     if (shipmentType === "inbound") {
       return (
         <div className={styles.locTabs}>
@@ -2507,7 +1791,6 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
       );
     }
 
-    // Shipment Type 'outbound' or 'all'
     if (shipmentType === "outbound" || shipmentType === "all") {
       return (
         <div className={styles.locTabs}>
@@ -2523,7 +1806,6 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
       );
     }
 
-    // Default fallback
     return (
       <div className={styles.locTabs}>
         <div className={styles.locTile}>
@@ -2583,7 +1865,6 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
           openSubscribeModal(shipment);
         }}
       >
-        {/* Display color for consent status */}
         {shipment.showGreenConsent ? (
           <span className={styles.flagImgG}>Subscribed</span>
         ) : (
@@ -2592,87 +1873,6 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
       </div>
     ) : null;
   };
-
-  const handleAttachFiles = async (files: FileList) => {
-    setIsUploading(true);
-    try {
-      // Handle file upload here
-      console.log("Uploading files:", files);
-      // await uploadFiles(files);
-      setShowAttachModal(false);
-    } catch (error) {
-      console.error("Error uploading files:", error);
-    } finally {
-      setIsUploading(false);
-    }
-  };
-
-  const renderMaterialCell = (shipment: any) => (
-    <div>
-      {shipment.material?.map((item: any, i: number) => (
-        <span key={i}>
-          {item.name}
-          {i < shipment.material.length - 1 && ", "}
-        </span>
-      ))}
-    </div>
-  );
-
-  const filteredCarriers = allCarriers.filter((carrier) =>
-    carrier.name.toLowerCase().includes(carrierSearch.toLowerCase())
-  );
-
-  // const handleApply = () => {
-  //   const filters = {};
-  //   if (selectedOrganisation) filters.organizations = [selectedOrganisation.id || selectedOrganisation._id];
-  //   if (selectedMaterials.length) filters.materials = selectedMaterials.map((m) => m.id || m._id);
-  //   if (invoiceNo) filters.invoice_no = invoiceNo;
-  //   if (lrNumber) filters.lr_no = lrNumber;
-  //   if (shipmentSin) filters.SIN = shipmentSin;
-  //   if (shipmentStatus.length) filters.status = shipmentStatus;
-  //   if (projectCode) filters.project_code = projectCode;
-  //   if (ppdNo) filters.ppd_no = ppdNo;
-  //   if (selectedPickups.length) filters.pickups = selectedPickups.map((p) => p.id || p._id);
-  //   if (selectedCarriers.length) filters.carriers = selectedCarriers.map((c) => c.id || c._id);
-  //   if (commercialInvoice !== null) filters.commercial_invoice = commercialInvoice;
-  //   if (selectedDeliveries.length) filters.deliveries = selectedDeliveries.map((d) => d.id || d._id);
-  //   if (fromDateString) filters.from = fromDateString;
-  //   if (toDateString) filters.to = toDateString;
-  //   if (transVehicle) filters.trans_vehicle = transVehicle === "Trans";
-  //   if (saleOrder) filters.sale_order = saleOrder;
-  //   if (purchaseOrder) filters.purchase_order = purchaseOrder;
-  //   if (selectedSegmentations.length) filters.segmentations = selectedSegmentations;
-  //   if (nonTracking) filters.nonTracking = nonTracking === "Tracking" ? false : true;
-  //   if (mobile) filters.mobile = mobile;
-
-  //   if (onApply) onApply(filters);
-  // };
-
-  // const handleClear = () => {
-  //   setSelectedOrganisation(null);
-  //   setSelectedMaterials([]);
-  //   setInvoiceNo("");
-  //   setLrNumber("");
-  //   setShipmentSin("");
-  //   setShipmentStatus([]);
-  //   setProjectCode("");
-  //   setPpdNo("");
-  //   setSelectedPickups([]);
-  //   setSelectedCarriers([]);
-  //   setCarrierSearch("");
-  //   setCommercialInvoice(null);
-  //   setSelectedDeliveries([]);
-  //   setFromDateString("");
-  //   setToDateString("");
-  //   setTransVehicle("");
-  //   setSaleOrder("");
-  //   setPurchaseOrder("");
-  //   setSelectedSegmentations([]);
-  //   setNonTracking("");
-  //   setMobile("");
-
-  //   if (onClear) onClear();
-  // };
 
   const [showBulkUploadModal, setShowBulkUploadModal] = useState(false);
   const [selectedShipmentForBulkUpload, setSelectedShipmentForBulkUpload] = useState<any>(null);
@@ -2684,6 +1884,7 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
 
   const [shareModalOpen, setShareModalOpen] = useState(false);
   const [shareUrl, setShareUrl] = useState("");
+  const [sharedShipment, setSharedShipment] = useState<Shipment | null>(null);
 
   const [showJdeBookShipment, setShowJdeBookShipment] = useState(false);
   const [showBulkUpload, setShowBulkUpload] = useState(false);
@@ -2711,7 +1912,6 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
       } else {
         showMessage("Failed to update vehicle arrival", "error");
       }
-      // Refresh the shipments data
       fetchShipments();
     } catch (error) {
       console.error("Error updating vehicle arrival:", error);
@@ -2739,7 +1939,6 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
       } else {
         showMessage("Failed to update EPOD", "error");
       }
-      // Refresh the shipments data
       fetchShipments();
     } catch (error) {
       console.error("Error updating EPOD:", error);
@@ -2765,9 +1964,8 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
       if (response.statusCode === 200) {
         showMessage("Invoice details fetched successfully", "success");
       } else {
-        showMessage("Failed to fetch invoice details", "error");
+        showMessage(response.message || "Failed to fetch invoice details", "error");
       }
-      // Refresh the shipments data
       fetchShipments();
     } catch (error) {
       console.error("Error fetching invoice details:", error);
@@ -2788,9 +1986,7 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
   );
 
   const handleCancelSuccess = () => {
-    // Refresh the shipments list or update the specific shipment status
-    // For example:
-    fetchShipments(); // Assuming you have a function to refresh the shipments
+    fetchShipments();
   };
 
   const [mailModalOpen, setMailModalOpen] = useState(false);
@@ -2799,28 +1995,11 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
   const [showPaymentAdviceModal, setShowPaymentAdviceModal] = useState(false);
 
 
-  const handleCreatePaymentAdvice = (shipment: Shipment) => {
+  const handleRecalculateGateInOut = async (shipment: Shipment) => {
     closeAllDialogs();
-    setSelectedShipmentForPayment(shipment);
-    setShowPaymentAdviceModal(true);
-  };
-
-  const handlePaymentAdviceSubmit = async (data: any) => {
-    try {
-      // TODO: Replace with your actual API call
-      // const response = await httpsPost('carrier_bill_advice/create', data);
-      // if (response.success) {
-      //   // Handle success
-      //   setShowPaymentAdviceModal(false);
-      //   // Optionally refresh the data
-      //   fetchShipments();
-      // }
-      console.log("Payment advice data:", data);
-      setShowPaymentAdviceModal(false);
-    } catch (error) {
-      console.error("Error creating payment advice:", error);
-    }
-  };
+    setSelectedShipmentForRerun(shipment);
+    setShowRerunDialog(true);
+  }
 
   const [showEditLocationModal, setShowEditLocationModal] = useState(false);
   const [selectedLocationType, setSelectedLocationType] = useState<'pickup' | 'delivery'>('pickup');
@@ -2829,17 +2008,47 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
     deliveryLocations: []
   });
 
-  const handleOpenEditLocation = (shipment: any, type: 'pickup' | 'delivery') => {
-    setSelectedShipment(shipment);
-    setSelectedLocationType(type);
-    
-    // Fetch shipper preferences if not already loaded
-    if (shipment.organization?._id) {
-      fetchShipperPrefs(shipment.organization._id);
-    }
-    
-    setShowEditLocationModal(true);
-  };
+const handleOpenEditLocation = (shipment: any, type: 'pickup' | 'delivery') => {
+  setSelectedShipment(shipment);
+  setSelectedLocationType(type);
+  
+  let combinedLocation = '';
+  let pickupCity = '';
+  let pickupId = '';
+  let deliveryId = '';
+  let currentLocation: number[] = [];
+  
+  if (type === 'pickup' && shipment.from && shipment.from.length > 0) {
+    const location = shipment.from[0].location;
+    combinedLocation = `${location.name} - ${location.area}${location.city ? ` - ${location.city}` : ''}`;
+    pickupId = shipment.from[0].id;
+    pickupCity = location.city || '';
+  }
+  
+  if (type === 'delivery' && shipment.to && shipment.to.length > 0) {
+    const location = shipment.to[0].location;
+    combinedLocation = `${location.name} - ${location.area}${location.city ? ` - ${location.city}` : ''}`;
+    deliveryId = shipment.to[0].id;
+  }
+  
+  if (shipment.triptracker?.lastlocation) {
+    currentLocation = shipment.triptracker.lastlocation;
+  }
+  
+  if (shipment.organization?.id) {
+    fetchShipperPrefs(shipment.organization._id);
+  }
+  
+  setCombinedLocationData({
+    combinedLocation,
+    pickupCity,
+    pickupId,
+    deliveryId,
+    currentLocation
+  });
+  
+  setShowEditLocationModal(true);
+};
 
   const fetchShipperPrefs = async (orgId: string) => {
     try {
@@ -2867,77 +2076,42 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
     }
   };
 
-  const handleFetchLocations = async (date: Date | null) => {
-    if (!selectedShipment) return [];
-    
-    try {
-      // Implement your location fetching logic here
-      // This is a placeholder - replace with your actual API call
-      const response = await httpsGet('location/search', 
-      //   {
-      //   date: date?.toISOString(),
-      //   type: selectedLocationType,
-      //   shipmentId: selectedShipment._id
-      // }, 
-      4);
-      
-      return response.data || [];
-    } catch (error) {
-      console.error('Error fetching locations:', error);
-      showMessage('Failed to fetch locations', 'error');
-      return [];
-    }
-  };
+  const SearchTypes = [
+  { name: 'SIN', value: 'SIN' },
+  { name: 'Project Code', value: 'project_code' },
+  { name: 'Vehicle No', value: 'vehicle_no' },
+  { name: 'PO Number', value: 'purchase_order' },
+  { name: 'SO Number', value: 'sale_order' },
+  { name: 'PPD Number', value: 'ppd_no' },
+  { name: 'DO Number', value: 'do_number' },
+];
 
-  const handleEditSubmit = async (location: any, date: Date | null) => {
-    if (!selectedShipment) return;
-    
-    try {
-      const payload = {
-        shipmentId: selectedShipment._id,
-        locationId: location._id,
-        type: selectedLocationType,
-        date: date?.toISOString()
-      };
-      
-      const response = await httpsPost('shipment/update-location', payload, {}, 4);
-      
-      if (response.statusCode === 200) {
-        showMessage('Location updated successfully', 'success');
-        fetchShipments(); // Refresh the shipments list
-        setShowEditLocationModal(false);
-      } else {
-        throw new Error(response.message || 'Failed to update location');
-      }
-    } catch (error: any) {
-      console.error('Error updating location:', error);
-      showMessage(error.message || 'Failed to update location', 'error');
-    }
-  };
+const changeSearchType = (typeName: string, typeValue: string) => {
+  delete shipmentsFilter[searchValue];
+  setSearchType(typeName);
+  setSearchValue(typeValue);
+  setInputQuery("");
+};
 
-  const fetchLocations = async (date: Date | null) => {
-    try {
-      // TODO: Implement the API call to fetch locations
-      return [];
-    } catch (error) {
-      console.error("Error fetching locations:", error);
-      return [];
-    }
-  };
-
+const applyFilter = () => {
+  if (inputQuery.length <= 3) {
+    showMessage('Enter at least 4 characters to Search', 'error');
+    return;
+  }
+  
+  fetchShipments(shipmentsFilter);
+};
 
   const [isPrintLRModalOpen, setIsPrintLRModalOpen] = useState(false);
   const [selectedShipmentIds, setSelectedShipmentIds] = useState<string[]>([]);
 
   const handlePrintLR = (data: { type: string; copyTypes: string[] }) => {
-    // Handle the print LR action here
     console.log(
       "Printing LRs for shipment IDs:",
       selectedShipmentIds,
       "with data:",
       data
     );
-    // Add your API call or print logic here
   };
 
   const handleDownloadLRsClick = () => {
@@ -2946,7 +2120,6 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
       showMessage("Please select a shipment first", "error");
       return;
     }
-
     closeAllDialogs();
     setSelectedShipmentIds(selectedId);
     setIsPrintLRModalOpen(true);
@@ -2962,7 +2135,6 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
       showMessage("Please select a shipment first", "error");
       return;
     }
-
     closeAllDialogs();
     setSelectedShipmentForPriceIncrease(selectedId);
     setIsIncreasePriceModalOpen(true);
@@ -2984,7 +2156,6 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
     setShowWarningDialog(false);
     setShowUpdateStatusDialog(false);
     setShowUploadModal(false);
-    setShowAddRoambeeDialog(false);
     setShowLastKnownLocationDialog(false);
     setShowOpenVideosDialog(false);
     setShowAddDODialog(false);
@@ -3004,10 +2175,10 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
 
   const [showPaymentAdvanceModal, setShowPaymentAdvanceModal] = useState(false);
   const [selectedShipmentForPayment, setSelectedShipmentForPayment] = useState<Shipment | null>(null);
+  const [selectedShipmentForRerun, setSelectedShipmentForRerun] = useState<Shipment | null>(null);
 
   const handlePaymentAdvanceSubmit = async (paymentData: any) => {
     try {
-      // Add your payment submission logic here
       console.log('Submitting payment advance:', paymentData);
       // Example API call (uncomment and modify as needed):
       // const response = await httpsPost('payments/advance', {
@@ -3058,27 +2229,6 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
   }>>([]);
   const [isLoadingInvoices, setIsLoadingInvoices] = useState(false);
 
-  const fetchInvoiceData = async (shipmentId: string) => {
-    try {
-      setIsLoadingInvoices(true);
-      const response = await httpsGet(`/api/shipment/one/${shipmentId}`);
-      // Transform the response data to match the expected format
-      const invoiceItems = response.data.invoices?.map((inv: any) => ({
-        invoiceType: inv.invoiceType || 'CT',
-        invoice: inv.invoiceNumber || '',
-        shippedQty: inv.shippedQuantity || 0,
-        shippedNop: inv.shippedPieces || 0,
-        ...inv // Include all other invoice properties
-      })) || [];
-      setInvoiceData(invoiceItems);
-    } catch (error) {
-      console.error('Error fetching invoice data:', error);
-      // Show error toast or notification
-    } finally {
-      setIsLoadingInvoices(false);
-    }
-  };
-
   const handleInvoiceTypeChange = (item: any, newType: 'CT' | 'PT') => {
     setInvoiceData(prevData =>
       prevData.map(inv =>
@@ -3090,7 +2240,6 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
   const handleInvoiceTypeSubmit = async () => {
     try {
       setIsLoadingInvoices(true);
-      // Call your API to update invoice types
       await httpsPost('/api/update-invoice-types', {
         shipmentId: selectedShipmentForInvoiceType?._id,
         invoices: invoiceData.map(inv => ({
@@ -3098,14 +2247,10 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
           invoiceType: inv.invoiceType
         }))
       });
-      // Show success message
-      // Close the modal
       setIsInvoiceTypeModalOpen(false);
-      // Refresh the shipment data
       fetchShipments();
     } catch (error) {
       console.error('Error updating invoice types:', error);
-      // Show error toast or notification
     } finally {
       setIsLoadingInvoices(false);
     }
@@ -3113,36 +2258,37 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
 
   const [showUpdateFreightModal, setShowUpdateFreightModal] = useState(false);
   const [selectedShipmentForFreight, setSelectedShipmentForFreight] = useState<string | null>(null);
+  const [freightSIN, setFreightSIN] = useState<string>('');
 
-  const handleOpenFreightModal = (shipmentId: string, freightType: 'rate' | 'client_rate') => {
+  const handleOpenFreightModal = (shipmentId: string, sin: string, freightType: 'rate' | 'client_rate') => {
     setSelectedShipmentForFreight(shipmentId);
+    setFreightSIN(sin);
     setFreightType(freightType);
     setShowUpdateFreightModal(true);
   };
 
   const handleFreightUpdateSuccess = () => {
     setShowUpdateFreightModal(false);
-    fetchShipments(); // Refresh the shipments list
+    fetchShipments();
     showMessage('Freight updated successfully', 'success');
   };
 
+  const hasSelected = selectedShipmentsArray.length > 0; 
+
+  const handleMissedShipmentHeader = () => {
+  if (!selectedShipmentsArray.length) {
+    showMessage("Please select at least one shipment", "error");
+    return;
+  }
+  const shipment = shipments.find(s => s._id === selectedShipmentsArray[0]);
+  if (shipment) {
+    setSelectedShipmentForMissed(shipment);
+    setShowMissedShipmentModal(true);
+  }
+};
+
   return (
     <div className={styles.main}>
-      {/* Header */}
-      <div className={styles.shipmentsMainHeader}>
-        <h1 className={styles.pageTitle}>Shipments Dashboard</h1>
-        <HeaderActions
-          onFetchShipments={openFetchJdeShipment}
-          onUpdateVehicleArrival={uploadVehicleArrivalBackToJde}
-          onSendEPOD={updateEPODBackToJDE}
-          onFetchInvoiceDetails={fetchInvoiceDetails}
-          onBulkUpload={() => openBulkUpload("shipment")}
-          isTechnova={isTechnova}
-          isLoading={isLoading}
-          hasSelectedShipments={selectedShipmentsArray.length > 0}
-        />
-      </div>
-      {/* Tabs */}
       <div className={styles.tabsContainer}>
         <div className={styles.tabsGroup}>
           <div
@@ -3179,78 +2325,131 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
           </div>
         </div>
 
+        <div  className={styles.headerActions}>
+        <HeaderActions
+          onFetchShipments={openFetchJdeShipment}
+          onUpdateVehicleArrival={uploadVehicleArrivalBackToJde}
+          onSendEPOD={updateEPODBackToJDE}
+          onFetchInvoiceDetails={fetchInvoiceDetails}
+          onBulkUpload={() => openBulkUpload("shipment")}
+          isTechnova={isTechnova}
+          isLoading={isLoading}
+          hasSelectedShipments={selectedShipmentsArray.length > 0}
+          onMissedShipment={handleMissedShipmentHeader} 
+        />
+
+        {
+          shipmentType !== "all" && (
+            <span
+            style={{ padding: "0px 3px", cursor: "pointer", verticalAlign: "middle" }}
+            onClick={openInvoiceVideos}
+            title={
+              shipmentType === "inbound"
+                ? helpDataInbound[0].data
+                : shipmentType === "outbound"
+                ? helpDataOutbound[0].data
+                : helpDataOthers[0].data
+            }
+          >
+        <HelpCircle className={styles.helpIcon} style={{ width: 22, height: 22, verticalAlign: "middle" }} />
+          </span>
+          )
+        }
+
+
+
         <div className={styles.refresh} onClick={clearFilters}>
           <RefreshCw className={styles.lucideIcon} />
         </div>
-      </div>
-      {/* Sub Filters */}
-      <div className={styles.subFiltersContainer}>
-        <div className={styles.filterButtonsGroup}>
-          {subFilters.map((filter) => (
-            <button
-              key={filter.key}
-              className={`${styles.filterButton} ${
-                selectedSubFilter === filter.key ? styles.selected : ""
-              }`}
-              onClick={() => handleSubFilterSelect(filter.key)}
-            >
-              {filter.label}
-              <span className={styles.filterCount}>{filter.count}</span>
-            </button>
-          ))}
         </div>
       </div>
-      <div className={styles.header}>
-      <div className={styles.inputContainer}>
-     
-              
-        {/* Wrap the select in a container for custom arrow positioning */}
-        {/* <div className={styles.selectContainer}>
-          <select
-            value={searchType}
-            onChange={(e) => setSearchType(e.target.value)}
-            className={styles.perPageSelect}
-          >
-            <option value="SIN" className={styles.perPageItem}>SIN</option>
-            <option value="project_code" className={styles.perPageItem}>Project Code</option>
-            <option value="vehicle_no" className={styles.perPageItem}>Vehicle No</option>
-            <option value="purchase_order" className={styles.perPageItem}>PO Number</option>
-            <option value="sale_order" className={styles.perPageItem}>SO Number</option>
-            <option value="ppd_no" className={styles.perPageItem}>PPD Number</option>
-            <option value="do_number" className={styles.perPageItem}>DO Number</option>
-          </select>
-        </div> */}
-       <div className={styles.tableControls}>
-  <Select
-    value={searchType}
-    onValueChange={(value) => setSearchType(value)}
-  >
-    <SelectTrigger className={styles.perSinSelect}>
-      <SelectValue />
-    </SelectTrigger>
-    <SelectContent className={styles.perPageContent}>
-      <SelectItem value="SIN" className={styles.perPageItem}>SIN</SelectItem>
-      <SelectItem value="project_code" className={styles.perPageItem}>Project Code</SelectItem>
-      <SelectItem value="vehicle_no" className={styles.perPageItem}>Vehicle No</SelectItem>
-      <SelectItem value="purchase_order" className={styles.perPageItem}>PO Number</SelectItem>
-      <SelectItem value="sale_order" className={styles.perPageItem}>SO Number</SelectItem>
-      <SelectItem value="ppd_no" className={styles.perPageItem}>PPD Number</SelectItem>
-      <SelectItem value="do_number" className={styles.perPageItem}>DO Number</SelectItem>
-    </SelectContent>
-  </Select>
-
+      <div className={styles.subFiltersContainer}>
+<div className={styles.filterButtonsGroup}>
+  {subFilters.map((filter) => {
+    const isSelected = selectedSubFilters.includes(filter.key);
+    return (
+      <button
+        key={filter.key}
+        className={`${styles.filterButton} ${
+          isSelected ? styles.selected : ""
+        }`}
+        onClick={() => handleSubFilterSelect(filter.key)}
+        style={{
+          '--filter-color': filter.color,
+          '--filter-color-10': `${filter.color}1a`,
+          '--filter-color-20': `${filter.color}33`,
+          borderColor: filter.color,
+          color: isSelected ? filter.color : 'inherit',
+          backgroundColor: isSelected ? `${filter.color}1a` : 'transparent',
+        } as React.CSSProperties}
+      >
+        {filter.label}
+        {isSelected && <span className={styles.checkmark}>✓</span>}
+      </button>
+    );
+  })}
 </div>
-        <input
-          type="text"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder={`Enter ${searchType}`}
-          className={styles.inputSearch}
-        />
-      </div>
-{/* </div> */}
 
-        {/* All buttons are now wrapped in a single container */}
+        <div className={styles.filterGroup}>
+          <label className={styles.checkboxLabel}>
+            <input
+              type="checkbox"
+              checked={odcFilter === true}
+              onChange={(e) => setOdcFilter(e.target.checked)}
+            />
+            <span>ODC Shipment(s)</span>
+          </label>
+        </div>
+
+
+      </div>
+      <div className={styles.header}>
+      <div className={styles.tableControls}>
+  <div className={styles.inputSearchContainer}>
+    <Select
+      value={searchType}
+      onValueChange={(value) => {
+        const selectedType = SearchTypes.find(type => type.name === value);
+        if (selectedType) {
+          changeSearchType(selectedType.name, selectedType.value);
+        }
+      }}
+    >
+      <SelectTrigger className={styles.perSinSelect}>
+        <SelectValue placeholder={searchType} />
+      </SelectTrigger>
+      <SelectContent className={styles.perPageContent}>
+        {SearchTypes.map((type) => (
+          <SelectItem key={type.value} value={type.name} className={styles.perPageItem}>
+            {type.name}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+    
+    <div className={styles.searchInputContainer}>
+      <input
+        type="text"
+        placeholder="Search ..."
+        name="filter"
+        value={inputQuery}
+        onChange={(e) => setInputQuery(e.target.value)}
+        className={styles.inputSearch}
+        onKeyPress={(e) => {
+          if (e.key === 'Enter') {
+            applyFilter();
+          }
+        }}
+      />
+      <Search
+        className={styles.searchIcon}
+        onClick={applyFilter}
+      />
+    </div>
+  </div>
+  
+</div>
+
         <div className={styles.buttonContainer}>
           <div
             className={`${styles.button} ${styles.advancedSearchSubmitButton}`}
@@ -3281,7 +2480,6 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
     </SelectContent>
   </Select>
 </div>
-   {/* </div> */}
 
           <div className={styles.button} onClick={toggleAnalyticsView}>
             {isAnalyticsView ? "Table View" : "Analytics View"}
@@ -3315,40 +2513,21 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
           materialsArray={materialsArray}
           allCarriers={allCarriers}
           segmentations={segmentations}
-          pickLocations={pickupLocations} // Add your pickup locations array here
-          deliverLocations={deliveryLocations} // Add your delivery locations array here
-          shipStatus={shipmentStatus} // Add your shipment status array here
+          pickLocations={pickupLocations}
+          deliverLocations={deliveryLocations}
+          shipStatus={shipmentStatus}
           onApply={(filters) => {
             console.log("Applied filters:", filters);
-            // Handle filter application here (e.g., update state, fetch filtered data)
           }}
           onClear={() => {
             console.log("Filters cleared");
-            // Handle filter clear here (e.g., reset filters, fetch all data)
           }}
           onClose={() => {
             console.log("Close filter");
-            // Handle close action (e.g., hide the filter panel)
             setShowAdvancedSearch(false);
           }}
         />
       )}
-      {/* Action buttons */}
-      {/* {showButtons && (
-        <div className={styles.bulkActions}>
-          <div className={styles.submitButton}>
-            <div className={styles.button}>
-              Download LRs
-            </div>
-          </div>
-          <div className={styles.submitButton}>
-            <div className={styles.button} style={{ width: '150px' }}>
-              Recalculate Freight
-            </div>
-          </div>
-        </div>
-      )} */}
-      {/* Analytics View */}
       {isAnalyticsView ? (
         <AnalyticsView
           analyticsData={analyticsData}
@@ -3360,18 +2539,13 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
           openActiveCarriersPopup={openActiveCarriersPopup}
         />
       ) : (
-        /* Table View */
         <div className={styles.section}>
-          {/* Header with search and filters */}
-
-          {/* Table */}
           <div
-            className={`${styles.tableContainer} ${
+            className={`${styles.tableDivContainer} ${
               isCompactView ? styles.compactView : ""
             }`}
             data-shipment-type={shipmentType}
           >
-            {/* Pagination */}
             <div className={styles.tableHeader}>
               <div className={styles.tableInfo}>
                 <span className={styles.resultsCount}>
@@ -3452,17 +2626,7 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
              
                   </div>
 
-            <div className={styles.statusLegend}>
-              {Object.entries(statusLabels).map(([status, label]) => (
-                <div key={status} className={styles.legendItem}>
-                  <div
-                    className={styles.legendColor}
-                    style={{ backgroundColor: statusColors[status] || "#666" }}
-                  />
-                  <span className={styles.legendText}>{label}</span>
-                </div>
-              ))}
-            </div>
+
 
             {!isAnalyticsView && (
               <ShipmentsTable
@@ -3480,7 +2644,6 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
                 setActionSearch={setActionSearch}
                 actionMenuCategories={actionMenuCategories}
                 renderStatusCell={renderStatusCell}
-                renderSINCell={renderSINCell}
                 renderLocationCell={renderLocationCell}
                 renderDateTimeCell={renderDateTimeCell}
                 renderVehicleCell={renderVehicleCell}
@@ -3490,16 +2653,21 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
                 copyDestinationCode={copyDestinationCode}
                 openLocationsPopup={openLocationsPopup}
                 formatCurrency={formatCurrency}
+                renderLastLocationCell={renderLastLocationCell}
+                  actionMenuOpenId={actionMenuOpenId}
+  setActionMenuOpenId={setActionMenuOpenId}
+  closeActionMenu={closeActionMenu}
+    openSubscribeModal={openSubscribeModal}
               />
             )}
           </div>
         </div>
       )}
-      {/* Modals */}
       {showLocationPopup && locationPopupData && (
         <LocationModal
+          shipmentSin={locationPopupData?.shipmentSin || ""}
           show={showLocationPopup}
-          type={locationPopupData?.type || ""}
+          type={locationPopupData?.type as "Delivery" | "Pickup"}
           locations={locationPopupData?.locations || []}
           onClose={() => setShowLocationPopup(false)}
         />
@@ -3511,7 +2679,6 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
           shipment={selectedShipment}
         />
       )}
-      {/* Active Carriers Popup */}
       {showActiveCarriersPopup && (
         <ActiveCarriersModal
           show={showActiveCarriersPopup}
@@ -3519,60 +2686,27 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
           onClose={() => setShowActiveCarriersPopup(false)}
         />
       )}
-      {/* Total Freight Popup */}
-      {/* {showTotalFreightPopup && (
-        <FreightModal
+      {showTotalFreightPopup && (
+        <TotalFreightModal
           show={showTotalFreightPopup}
           title="Total Freight Breakdown"
-          data={totalFreightData}
-          showPercentage={true}
+          totalFreightData={totalFreightData}
           onClose={() => setShowTotalFreightPopup(false)}
         />
-      )} */}
-      {/* {showAverageFreightPopup && (
+      )}
+      {showAverageFreightPopup && (
         <TotalFreightModal
           show={showAverageFreightPopup}
           title="Average Freight Details"
-          data={averageFreightData}
+          totalFreightData={averageFreightData}
           onClose={() => setShowAverageFreightPopup(false)}
         />
-      )} */}
-      {/* Delayed Shipment Dialog */}
-      {/* {showDelayedShipmentDialog && (
-        <DelayPenaltyModal
-          show={showDelayedShipmentDialog}
-          delayData={{
-            sin: shipmentDelayData.sin,
-            penalty: shipmentDelayData.penalty,
-            reason: shipmentDelayData.reason,
-            status: shipmentDelayData.status,
-            suggested_amount: shipmentDelayData.suggested_amount,
-          }}
-          onClose={() => setShowDelayedShipmentDialog(false)}
-          onApprove={(status) => approveWaiveOff(status)}
-        />
-      )} */}
-      {/* Rerun Dialog */}
-      {showRerunDialog && (
-        <RerunShipmentModal
-          show={showRerunDialog}
-          shipmentSIN={selectedShipmentSIN}
-          onClose={() => setShowRerunDialog(false)}
-          onSubmit={({ status, fromDate, toDate }) => {
-            setSelectedRerunOption(status);
-            setFromDateTsReRun(fromDate);
-            setToDateTsReRun(toDate);
-            onRerunSubmit();
-          }}
-        />
       )}
-
-      {/* Pull Freight Dialog */}
       {showPullFreightDialog && (
   <PullFreightModal
-    _id={pullFreightData._id}  // Changed from shipmentId to _id
+    _id={pullFreightData._id} 
     show={showPullFreightDialog}
-    sin={pullFreightData.sin}  // Changed from pullFreightData.SIN to pullFreightData.sin
+    sin={pullFreightData.sin} 
     vehicleNo={pullFreightData.vehicleNo}
     pickup={pullFreightData.pickup}
     destinations={pullFreightData.destinations}
@@ -3581,42 +2715,22 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
     }}
     onGetFreight={async (data) => {
       try {
-        // Handle the freight data here
         console.log('Freight data:', data);
-        // Add your freight handling logic here
       } catch (error) {
         console.error('Error handling freight:', error);
       }
     }}
   />
 )}
-
-      {showRoambeeModal && selectedShipmentForRoambee && (
-        <AddRoambeeModal
-          show={showRoambeeModal}
-          shipmentNo={selectedShipmentForRoambee?.sin || ""}
-          shipmentId={selectedShipmentForRoambee?._id || ""}
-          onClose={() => {
-            setShowRoambeeModal(false);
-            setSelectedShipmentForRoambee(null);
-          }}
-          onSuccess={() => {
-            fetchShipments();
-          }}
-          isLoading={isSubmittingRoambee}
-        />
-      )}
-
-      {showAttachDialog && selectedShipment && (
+      {showAttachDialog && selectedShipmentForAttach && (
         <AttachFilesModal
           show={showAttachDialog}
           onClose={() => setShowAttachDialog(false)}
           onAttach={() => {
-            // This will be called after successful upload
-            // You can refresh the shipments list or update the UI as needed
-            fetchShipments(); // Assuming you have a function to refresh the shipments
+            fetchShipments(); 
           }}
-          shipmentId={selectedShipment._id || ""} // Make sure to use the correct property name
+          shipmentId={selectedShipmentForAttach._id || ""} 
+          sin={selectedShipmentForAttach.sin || ""}
         />
       )}
 
@@ -3634,153 +2748,29 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
       setSelectedShipmentForStatus(null);
     }}
     onSuccess={() => {
-      fetchShipments(); // Refresh the shipments list
+      fetchShipments(); 
     }}
   />
 )}
 
-      {/*      
-     
-      
-      {showUpdateFreightDialog && (
-        <IncreasePriceModal
-           show={showIncreasePrice}
-  shipmentId={selectedShipmentId}
-  onClose={() => setShowIncreasePrice(false)}
-  onSubmit={async (dealerType) => {
-    try {
-      // Call your API here
-      await api.updateShipmentPrice(selectedShipmentId, dealerType);
-      setShowIncreasePrice(false);
-      // Optionally refresh the shipment data
-    } catch (error) {
-      console.error('Failed to update price:', error);
-    }
-  }}
-  isLoading={isLoading}
-        />
-      )}
-     
-      {showWarningDialog && (
-        <WarningModal
-          show={showWarningDialog}
-          message="Driver is already assigned to this shipment. Do you want to continue?"
-          onConfirm={() => handleWarningConfirm(true)}
-          onCancel={() => setShowWarningDialog(false)}
-          confirmText="Continue"
-          cancelText="Cancel"
-        />
-      )}
-     
-      {showUpdateStatusDialog && (
-        <UpdateStatusModal
-           show={showUpdateStatus}
-           shipmentNo={currentShipment.shipmentNumber}
-           shipmentDetails={{
-        from: {
-          location: currentShipment.pickupLocation
-        },
-        to: {
-          location: currentShipment.deliveryLocation
-        }
-      }}
-      statusOptions={currentShipment.availableStatuses}
-      onUpdate={handleStatusUpdate}
-      onClose={() => setShowUpdateStatus(false)}
-      isLoading={isUpdatingStatus}
-      dIndex={1}
-        />
-      )}
-     
-      {showUploadDialog && (
-        <UploadModal
-          show={showUploadDialog}
-          onClose={() => setShowUploadDialog(false)}
-          onUpload={handleUpload}
-          isLoading={false}
-        />
-      )}
-     
-      
-     
-      {showOpenVideosDialog && (
+
+
+            {showOpenVideosDialog && (
         <OpenVideosModal
-         show={showVideo}
+           show={showOpenVideosDialog}
   videoUrl={videoUrl}
-  onClose={() => setShowVideo(false)}
-  title="Shipment Loading Video"
+  onClose={() => setShowOpenVideosDialog(false)}
+  title={
+    shipmentType === "inbound"
+      ? helpDataInbound[0]?.data
+      : shipmentType === "outbound"
+      ? helpDataOutbound[0]?.data
+      : helpDataOthers[0]?.data
+  }
         />
-      )}
-     
-      {showAddDODialog && (
-        <AddDeliveryOrderModal
-  show={showAddDO}
-  shipmentNo={currentShipmentNo}
-  onSave={handleSaveDO}
-  onClose={() => setShowAddDO(false)}
-  isLoading={isSaving}
-/>
       )}
 
-      {showAddManagedByDialog && (
-        <AddManagedByModal
-          show={showAddManagedByDialog}
-          shipmentId={selectedShipmentSIN || ""}
-          currentManagedBy={
-            selectedCarrierManagedBy.id
-              ? {
-                  type: "user",
-                  id: selectedCarrierManagedBy.id,
-                  name: selectedCarrierManagedBy.name,
-                }
-              : undefined
-          }
-          users={[
-            {
-              id: "user1",
-              name: "John Doe",
-              email: "john@example.com",
-              role: "Manager",
-            },
-            {
-              id: "user2",
-              name: "Jane Smith",
-              email: "jane@example.com",
-              role: "Supervisor",
-            },
-          ]}
-          teams={[
-            { id: "team1", name: "Logistics Team", memberCount: 5 },
-            { id: "team2", name: "Customer Support", memberCount: 3 },
-          ]}
-          onSave={handleSaveManagedBy}
-          onClose={() => setShowAddManagedByDialog(false)}
-          isLoading={false}
-        />
-      )}
-      
-      {showIncreasePriceDialog && (
-        <IncreasePriceModal
-          show={showIncreasePriceDialog}
-          shipmentId={selectedShipmentSIN || ""}
-          currentPrice={1000}
-          onSave={handleSavePriceIncrease}
-          onClose={() => setShowIncreasePriceDialog(false)}
-          isLoading={false}
-          approvers={[
-            {
-              id: "approver1",
-              name: "Approver One",
-              email: "approver1@example.com",
-            },
-            {
-              id: "approver2",
-              name: "Approver Two",
-              email: "approver2@example.com",
-            },
-          ]}
-        />
-      )} */}
+
       {showJdeBookShipment && (
         <JdeBookShipment
           open={showJdeBookShipment}
@@ -3788,7 +2778,7 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
           ltl={true}
           onSuccess={() => {
             showMessage("Shipment created successfully", "success");
-            fetchShipments(); // Refresh the shipments list
+            fetchShipments(); 
           }}
         />
       )}
@@ -3799,13 +2789,14 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
     onClose={handleCloseReasonDialog}
     type={reasonDialog.type}
     shipmentId={reasonDialog.shipmentId}
+    sin={reasonDialog.sin}
     history={
       reasonDialog.type === 'delay' 
         ? shipments.find(s => s._id === reasonDialog.shipmentId)?.delay_reason || []
         : shipments.find(s => s._id === reasonDialog.shipmentId)?.gps_disconnection_reason || []
     }
     onSuccess={() => {
-      fetchShipments(); // Refresh the shipments list
+      fetchShipments(); 
       showMessage('Reason updated successfully', 'success');
     }}
   />
@@ -3824,15 +2815,19 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
           }
           onSuccess={() => {
             showMessage("Bulk upload completed successfully", "success");
-            fetchShipments(); // Refresh the shipments list
+            fetchShipments(); 
           }}
         />
       )}
-      {shareModalOpen && (
+      {shareModalOpen && sharedShipment && (
         <ShareModal
           open={shareModalOpen}
-          onClose={() => setShareModalOpen(false)}
+          onClose={() => {
+            setShareModalOpen(false);
+            setSharedShipment(null);
+          }}
           trackingUrl={shareUrl}
+          sin={sharedShipment.sin}
         />
       )}
       {cancelModalOpen && shipmentToCancel && (
@@ -3856,22 +2851,6 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
           shipment={shipmentToMail}
         />
       )}
-      {/* {showPaymentAdviceModal && selectedShipmentForPayment && (
-        <CreatePaymentAdviceModal
-          show={showPaymentAdviceModal}
-          onClose={() => {
-            setShowPaymentAdviceModal(false);
-            setSelectedShipmentForPayment(null);
-          }}
-          onSubmit={handlePaymentAdviceSubmit}
-          data={{
-            shipmentAdvice: true,
-            shipment: selectedShipmentForPayment,
-            carrier: selectedShipmentForPayment.carrier_parent_name || ''
-          }}
-          isLoading={false}
-        />
-      )} */}
       {showUploadModal && (
         <UploadModal
           show={showUploadModal}
@@ -3896,22 +2875,41 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
       )}
 {showEditLocationModal && selectedShipment && (
   <EditLocationsModal
-  show={showEditLocationModal}
-  onClose={() => setShowEditLocationModal(false)}
-  addLocationsType={selectedLocationType}
-  shipmentId={selectedShipment._id}
-  shipperPrefs={shipperPrefs}
-  orderNumber={selectedShipment.sin}
-  // pickupId={selectedShipment.from?.[0]?._id || ""}
-  // deliveryId={selectedShipment.to?.[0]?._id || ""}
-  elementOrderId={selectedShipment._id}
-  // currentLocation={selectedShipment.trip_tracker?.last_location || []}
-  onEditSuccess={() => {
-    setShowEditLocationModal(false);
-    fetchShipments();
-  }}
+    show={showEditLocationModal}
+    onClose={() => {
+      setShowEditLocationModal(false);
+      setCombinedLocationData({
+        combinedLocation: '',
+        pickupCity: '',
+        pickupId: '',
+        deliveryId: '',
+        currentLocation: []
+      });
+    }}
+    addLocationsType={selectedLocationType}
+    shipmentId={selectedShipment._id}
+    shipperPrefs={shipperPrefs}
+    orderNumber={selectedShipment.sin}
+    pickupId={combinedLocationData.pickupId}
+    deliveryId={combinedLocationData.deliveryId}
+    elementOrderId={selectedShipment.organization._id}
+    currentLocation={combinedLocationData.currentLocation}
+    combinedLocation={combinedLocationData.combinedLocation} 
+    pickupCity={combinedLocationData.pickupCity} 
+    onEditSuccess={() => {
+      setShowEditLocationModal(false);
+      fetchShipments();
+      setCombinedLocationData({
+        combinedLocation: '',
+        pickupCity: '',
+        pickupId: '',
+        deliveryId: '',
+        currentLocation: []
+      });
+    }}
   />
 )}
+
 
       {showGpsModal && selectedShipmentForGps && (
         <AddGpsConnectionModal
@@ -3926,10 +2924,11 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
         attachedDriverId={selectedShipmentForGps.assigned_driver?._id}
         vehicleId={selectedShipmentForGps.assigned_driver?.vehicle_type?._id || ""}
         onSuccess={() => {
-          fetchShipments(); // Refresh the shipments list
+          fetchShipments(); 
           showMessage('GPS connection added successfully', 'success');
         }}
-        isLoading={false} // Set to true when making API call
+        isLoading={false} 
+        sin={selectedShipmentForGps.sin}
         />
       )}
 
@@ -3938,12 +2937,13 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
     show={showFaultyModal}
     vehicleNumber={selectedShipmentForFaulty.vehicleNumber || ''}
     gpsProvider={selectedShipmentForFaulty.gpsProvider || 'GPS Device'}
+    sin={selectedShipmentForFaulty.sin}
     onClose={() => {
       setShowFaultyModal(false);
       setSelectedShipmentForFaulty(null);
     }}
     onSuccess={() => {
-      fetchShipments(); // Refresh the shipments list
+      fetchShipments(); 
     }}
   />
 )}
@@ -3979,8 +2979,9 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
             do_numbers: selectedShipmentForEpod.serial_number
               ? [selectedShipmentForEpod.serial_number]
               : [],
-            invoices: [], // Add invoice data if available
-            carrier_waybills: [], // Add waybill data if available
+            invoices: [], 
+            carrier_waybills: [], 
+            sin: selectedShipmentForEpod.sin,
           }}
         />
       )}
@@ -4010,7 +3011,6 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
           shipmentId={selectedShipmentForPayment._id}
           data={{
             shipment: selectedShipmentForPayment,
-            // Add any additional required data here
           }}
         />
       )}
@@ -4023,6 +3023,7 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
           onConfirm={confirmFlushFreight}
           onCancel={() => setShowFlushFreightConfirm(false)}
           isProcessing={isFlushingFreight}
+          sin={shipmentToFlush?.sin}
         />
       )}
       {showRecalculateDistanceModal && selectedShipmentForRecalculation && (
@@ -4030,7 +3031,7 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
           show={showRecalculateDistanceModal}
           onClose={() => setShowRecalculateDistanceModal(false)}
           shipmentId={selectedShipmentForRecalculation._id}
-          orderSIN={selectedShipmentForRecalculation.sin}
+          sin={selectedShipmentForRecalculation.sin}
           pickupAddresses={selectedShipmentForRecalculation.from.map(f => 
             `${f.location.name}${f.location.city ? `, ${f.location.city}` : ''}`
           )}
@@ -4051,6 +3052,7 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
           onTypeChange={handleInvoiceTypeChange}
           onSubmit={handleInvoiceTypeSubmit}
           loading={isLoadingInvoices}
+          sin={selectedShipmentForInvoiceType.sin}
         />
       )}
       {selectedShipmentForFreight && (
@@ -4060,45 +3062,40 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
         shipmentId={selectedShipmentForFreight}
         onSuccess={handleFreightUpdateSuccess}
         freightType={freightType}
+        sin={freightSIN}
       />
       )}
-      {selectedShipmentForArrival && (
-        <MarkAsArrivedModal
-          show={showMarkAsArrivedModal}
-          onClose={() => setShowMarkAsArrivedModal(false)}
-          onSubmit={(data) => {
-            // Handle the arrival submission
-            console.log('Mark as arrived:', data);
-            // You might want to make an API call here
-            setShowMarkAsArrivedModal(false);
-          }}
-          shipment={{
-            _id: selectedShipmentForArrival._id,
-            orderNo: selectedShipmentForArrival.sin,
-            from: selectedShipmentForArrival.from?.[0]?.location?.name,
-            to: selectedShipmentForArrival.to?.[0]?.location?.name,
-          }}
-        />
-      )}
-      {selectedShipmentForCompletion && (
-        <CompleteShipmentModal
-          show={showCompleteShipmentModal}
-          onClose={() => setShowCompleteShipmentModal(false)}
-          onSubmit={(data) => {
-            // Handle the completion submission
-            console.log('Complete shipment:', data);
-            // You might want to make an API call here
-            setShowCompleteShipmentModal(false);
-          }}
-          shipment={{
-            _id: selectedShipmentForCompletion._id,
-            sin: selectedShipmentForCompletion.sin || '',
-            from: selectedShipmentForCompletion.from?.[0]?.location?.name,
-            to: selectedShipmentForCompletion.to?.[0]?.location?.name,
-            // shipmentType: selectedShipmentForCompletion.shipmentType || ''
-          }}
-        />
-      )}
+     {selectedShipmentForArrival && (
+  <CompleteShipmentModal
+    show={showMarkAsArrivedModal}
+    onClose={() => setShowMarkAsArrivedModal(false)}
+    shipment={{
+      _id: selectedShipmentForArrival._id,
+      sin: selectedShipmentForArrival.sin,
+      from: selectedShipmentForArrival.from?.[0]?.location?.name,
+      to: selectedShipmentForArrival.to?.[0]?.location?.name,
+      shipmentType: "arrived", 
+      drop: selectedShipmentForArrival.drop,
+    }}
+    fetchShipments={fetchShipments}
+    setShowCompleteShipmentModal={setShowMarkAsArrivedModal}
+  />
+)}
+{selectedShipmentForCompletion && (
+  <CompleteShipmentModal
+    show={showCompleteShipmentModal}
+    onClose={() => setShowCompleteShipmentModal(false)}
+    shipment={{
+      _id: selectedShipmentForCompletion._id,
+      sin: selectedShipmentForCompletion.sin || '',
+      from: selectedShipmentForCompletion.from?.[0]?.location?.name,
+      to: selectedShipmentForCompletion.to?.[0]?.location?.name,
+      shipmentType: "complete",
+    }}
+    fetchShipments={fetchShipments}
+    setShowCompleteShipmentModal={setShowCompleteShipmentModal}
+  />
+)}
       {showBulkUploadModal && (
         <BulkUploadShipments
           open={showBulkUploadModal}
@@ -4106,9 +3103,9 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
           type="commercial_invoice"
           shipmentId={selectedShipmentForBulkUpload?._id}
           onSuccess={() => {
-            // Refresh the shipments list or perform any other success action
             fetchShipments();
           }}
+          sin={selectedShipmentForBulkUpload?.sin}
         />
       )}
 
@@ -4120,8 +3117,9 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
       setSelectedShipmentForMissed(null);
     }}
     onSuccess={() => {
-      fetchShipments(); // Refresh the shipments list
+      fetchShipments(); 
     }}
+    sin={selectedShipmentForMissed?.sin || ""}
   />
 )}
 
@@ -4134,8 +3132,9 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
       setSelectedShipmentForMissedEvent(null);
     }}
     onSuccess={() => {
-      fetchShipments(); // Refresh the shipments list
+      fetchShipments();   
     }}
+    sin={selectedShipmentForMissedEvent.sin || ""}
   />
 )}
 
@@ -4149,7 +3148,7 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
       setSelectedShipmentForManagedBy(null);
     }}
     onSuccess={() => {
-      fetchShipments(); // Refresh the shipments list
+      fetchShipments(); 
     }}
   />
 )}
@@ -4163,7 +3162,7 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
       setSelectedShipmentForRetrigger(null);
     }}
     onSuccess={() => {
-      fetchShipments(); // Refresh the shipments list
+      fetchShipments(); 
     }}
   />
 )}
@@ -4174,12 +3173,18 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
         onClose={() => setShowDriverExpenses(false)}
         shipment={selectedShipment}
         onSuccess={() => {
-          // Refresh the shipments data or show success message
-          // You might want to add a refresh function here
           setShowDriverExpenses(false);
         }}
       />
     )}
+
+{showRerunDialog && (
+  <RerunShipmentModal
+    show={showRerunDialog}
+    shipmentId={selectedShipmentForRerun?._id || ""}
+    onClose={() => setShowRerunDialog(false)}
+  />
+)}
 
 {isGeofenceEditorOpen && selectedShipmentForGeofence && (
   <GeofenceEditor
@@ -4190,7 +3195,7 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
       pickDate: selectedShipmentForGeofence.scheduledDate || new Date().toISOString(),
       deliverDate: selectedShipmentForGeofence.scheduledDeliveryDate || new Date().toISOString(),
       to: (selectedShipmentForGeofence.to || []).map((dest: any, index: number) => ({
-        _id: dest._id || `temp-${index}`, // Ensure _id is provided
+        _id: dest._id || `temp-${index}`,
         location: {
           _id: dest.location?._id || `loc-${index}`,
           name: dest.location?.name || '',
@@ -4206,7 +3211,7 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
   />
 )}
 
-    // </div>
+    </div>
   );
 };
 

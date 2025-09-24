@@ -1,14 +1,20 @@
 import React, { useState, useEffect } from "react";
-import { Dialog, DialogContent, DialogTitle, IconButton, Select, MenuItem, Button } from "@mui/material";
-import CloseIcon from '@mui/icons-material/Close';
-import DownloadIcon from '@mui/icons-material/Download';
-import PreviewIcon from '@mui/icons-material/Preview';
-import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import { Button } from "@mui/material";
+import DownloadIcon from "@mui/icons-material/Download";
+import PreviewIcon from "@mui/icons-material/Preview";
+import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import styles from "./EpodPreviewModal.module.css";
 import service from "@/utils/timeService";
 import { useSnackbar } from "@/hooks/snackBar";
 import { httpsPost } from "@/utils/Communication";
-import ModalHeader from "../../UI/ModalHeader/ModalHeader";
+import ModalHeader from "@/components/UI/ModalHeader/ModalHeader";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/UI/select";
 
 interface EpodPreviewModalProps {
   open: boolean;
@@ -19,6 +25,7 @@ interface EpodPreviewModalProps {
     do_numbers: string[];
     invoices: any[];
     carrier_waybills: any[];
+    sin: string;
   };
 }
 
@@ -43,9 +50,9 @@ const EpodPreviewModal = ({ open, onClose, data }: EpodPreviewModalProps) => {
 
   const handleImagePreview = (imageUrl: string) => {
     if (!imageUrl) return;
-    
-    const extension = imageUrl.split('.').pop()?.toLowerCase();
-    if (extension === 'pdf') {
+
+    const extension = imageUrl.split(".").pop()?.toLowerCase();
+    if (extension === "pdf") {
       setPreviewPdf(imageUrl);
       setIsPdf(true);
       setIsImage(false);
@@ -56,11 +63,13 @@ const EpodPreviewModal = ({ open, onClose, data }: EpodPreviewModalProps) => {
     }
   };
 
-  const handleDeliveryChange = (event: any) => {
-    const delivery = data.deliveries.find(d => d.location.name === event.target.value);
+  const handleDeliveryChange = (value: string) => {
+    const delivery = data.deliveries.find((d) => d.location.name === value);
     if (delivery) {
       setSelectedDelivery(delivery);
-      handleImagePreview(delivery.epods[0]);
+      if (delivery.epods?.length > 0) {
+        handleImagePreview(delivery.epods[0]);
+      }
     }
   };
 
@@ -68,22 +77,22 @@ const EpodPreviewModal = ({ open, onClose, data }: EpodPreviewModalProps) => {
     try {
       setIsLoading(true);
       const response = await httpsPost(
-        'v1/shipment/approveEpod',
-        { 
-          delivery: selectedDelivery._id, 
-          approved: true 
+        "v1/shipment/approveEpod",
+        {
+          delivery: selectedDelivery._id,
+          approved: true,
         },
         {},
-        4 // version
+        4
       );
-  
+
       if (response.statusCode === 200) {
-        showMessage('EPOD approved successfully', 'success');
-        onClose(); // Close the modal on success
+        showMessage("EPOD approved successfully", "success");
+        onClose();
       }
     } catch (error: any) {
-      console.error('Error approving EPOD:', error);
-      showMessage(error.message || 'Failed to approve EPOD', 'error');
+      console.error("Error approving EPOD:", error);
+      showMessage(error.message || "Failed to approve EPOD", "error");
     } finally {
       setIsLoading(false);
     }
@@ -91,30 +100,30 @@ const EpodPreviewModal = ({ open, onClose, data }: EpodPreviewModalProps) => {
 
   const handleReject = async () => {
     if (!rejectReason) {
-      showMessage('Please provide a reason for rejection', 'error');
+      showMessage("Please provide a reason for rejection", "error");
       return;
     }
-  
+
     try {
       setIsLoading(true);
       const response = await httpsPost(
-        'v1/shipment/approveEpod',
-        { 
-          delivery: selectedDelivery._id, 
-          approved: false, 
-          reason: rejectReason 
+        "v1/shipment/approveEpod",
+        {
+          delivery: selectedDelivery._id,
+          approved: false,
+          reason: rejectReason,
         },
         {},
-        4 // version
+        4
       );
-  
+
       if (response.statusCode === 200) {
-        showMessage('EPOD has been rejected', 'success');
-        onClose(); // Close the modal on success
+        showMessage("EPOD has been rejected", "success");
+        onClose();
       }
     } catch (error) {
-      console.error('Error rejecting EPOD:', error);
-      showMessage('Something went wrong', 'error');
+      console.error("Error rejecting EPOD:", error);
+      showMessage("Something went wrong", "error");
     } finally {
       setIsLoading(false);
       setIsRejecting(false);
@@ -123,10 +132,20 @@ const EpodPreviewModal = ({ open, onClose, data }: EpodPreviewModalProps) => {
 
   if (!selectedDelivery) return null;
 
-  const { location, epods = [], finished_at, epod_uploaded_date, _id } = selectedDelivery;
-  const { invoices = [], carrier_waybills = [], pickups = [], do_numbers = [] } = data;
+  const {
+    location,
+    epods = [],
+    finished_at,
+    epod_uploaded_date,
+    _id,
+  } = selectedDelivery;
+  const {
+    invoices = [],
+    carrier_waybills = [],
+    pickups = [],
+    do_numbers = [],
+  } = data;
 
-  // Calculate derived values
   const totalWeight = invoices.reduce((acc, curr) => {
     const invoiceNetWeight = curr.commercial_invoices?.reduce(
       (sum: number, ci: any) => sum + (ci.net_weight || 0),
@@ -136,37 +155,55 @@ const EpodPreviewModal = ({ open, onClose, data }: EpodPreviewModalProps) => {
   }, 0);
 
   const noOfPieces = invoices.reduce((acc, curr) => {
-    return acc + (curr.commercial_invoices?.reduce(
-      (sum: number, ci: any) => sum + (ci.nop || 0),
-      0
-    ) || 0);
+    return (
+      acc +
+      (curr.commercial_invoices?.reduce(
+        (sum: number, ci: any) => sum + (ci.nop || 0),
+        0
+      ) || 0)
+    );
   }, 0);
 
   const receivedQty = invoices.reduce((acc, curr) => {
-    return acc + (curr.commercial_invoices?.reduce(
-      (sum: number, ci: any) => sum + (ci.others?.received_quantity || 0),
-      0
-    ) || 0);
-  }, 0);;
+    return (
+      acc +
+      (curr.commercial_invoices?.reduce(
+        (sum: number, ci: any) => sum + (ci.others?.received_quantity || 0),
+        0
+      ) || 0)
+    );
+  }, 0);
 
-  const invoiceNumber = invoices.length > 0
-    ? invoices.flatMap(i => i.commercial_invoices?.map((c: any) => c.num) || [])
-    : ['N/A'];
+  const invoiceNumber =
+    invoices.length > 0
+      ? invoices.flatMap(
+          (i) => i.commercial_invoices?.map((c: any) => c.num) || []
+        )
+      : ["N/A"];
 
-  const lrNumber = carrier_waybills.length > 0
-    ? carrier_waybills.map(c => c.CWB?.custom || c.CWB?.default || '').filter(Boolean).join(', ')
-    : 'N/A';
+  const lrNumber =
+    carrier_waybills.length > 0
+      ? carrier_waybills
+          .map((c) => c.CWB?.custom || c.CWB?.default || "")
+          .filter(Boolean)
+          .join(", ")
+      : "N/A";
 
-  const plantCode = pickups[0]?.location?.reference || 'N/A';
+  const plantCode = pickups[0]?.location?.reference || "N/A";
 
   return (
     <div className={styles.modalOverlay} onClick={onClose}>
-      <div className={styles.epodPreviewDialog} onClick={(e) => e.stopPropagation()}>
+      <div
+        className={styles.epodPreviewDialog}
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className={styles.epodPreviewContainer}>
-          <ModalHeader title="Epods Preview" onClose={onClose} />
+          <ModalHeader
+            title={`Epods Preview - #${data.sin}`}
+            onClose={onClose}
+          />
           <div className={styles.epodPreviewBody}>
             <div className={styles.previewContainer}>
-              {/* Main Preview Area */}
               <div className={styles.mainPreview}>
                 {isImage && (
                   <img
@@ -191,7 +228,9 @@ const EpodPreviewModal = ({ open, onClose, data }: EpodPreviewModalProps) => {
                     <DownloadIcon />
                   </a>
                   <button
-                    onClick={() => window.open(isImage ? previewImage : previewPdf, '_blank')}
+                    onClick={() =>
+                      window.open(isImage ? previewImage : previewPdf, "_blank")
+                    }
                     className={styles.actionButton}
                   >
                     <PreviewIcon />
@@ -199,17 +238,16 @@ const EpodPreviewModal = ({ open, onClose, data }: EpodPreviewModalProps) => {
                 </div>
               </div>
 
-              {/* Thumbnails */}
               <div className={styles.thumbnailContainer}>
                 {epods.map((epod: string, index: number) => {
-                  const ext = epod.split('.').pop()?.toLowerCase();
+                  const ext = epod.split(".").pop()?.toLowerCase();
                   return (
                     <div
                       key={index}
                       className={styles.thumbnail}
                       onClick={() => handleImagePreview(epod)}
                     >
-                      {ext === 'pdf' ? (
+                      {ext === "pdf" ? (
                         <PictureAsPdfIcon className={styles.pdfIcon} />
                       ) : (
                         <img
@@ -224,39 +262,47 @@ const EpodPreviewModal = ({ open, onClose, data }: EpodPreviewModalProps) => {
               </div>
             </div>
 
-            {/* Details Panel */}
             <div className={styles.detailsPanel}>
               <div className={styles.deliverySelector}>
                 <Select
-                  fullWidth
-                  value={selectedDelivery?.location?.name || ''}
-                  onChange={handleDeliveryChange}
-                  className={styles.selectInput}
+                  value={selectedDelivery?.location?.name || ""}
+                  onValueChange={handleDeliveryChange}
                 >
-                  {data.deliveries.map((delivery) => (
-                    <MenuItem
-                      key={delivery._id}
-                      value={delivery.location.name}
-                    >
-                      {delivery.location.name}
-                    </MenuItem>
-                  ))}
+                  <SelectTrigger className={styles.select}>
+                    <SelectValue placeholder="Select delivery location" />
+                  </SelectTrigger>
+                  <SelectContent className={styles.selectContent}>
+                    {data.deliveries.map((delivery) => (
+                      <SelectItem key={delivery._id} value={delivery.location.name} className={styles.selectItem}>
+                        {delivery.location.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
                 </Select>
               </div>
 
               <div className={styles.detailsSection}>
                 <div className={styles.detailRow}>
                   <span className={styles.detailLabel}>Customer Name:</span>
-                  <span className={styles.detailValue} title={location?.name}>{location?.name}</span>
+                  <span className={styles.detailValue} title={location?.name}>
+                    {location?.name}
+                  </span>
                 </div>
                 <div className={styles.detailRow}>
                   <span className={styles.detailLabel}>Epod Upload Date:</span>
                   <span className={styles.detailValue}>
-                    {epod_uploaded_date ? service.utcToist(epod_uploaded_date, 'dd-MMM-yy, hh:mm a') : 'N/A'}
+                    {epod_uploaded_date
+                      ? service.utcToist(
+                          epod_uploaded_date,
+                          "dd-MMM-yy, hh:mm a"
+                        )
+                      : "N/A"}
                   </span>
                 </div>
                 <div className={styles.detailRow}>
-                  <span className={styles.detailLabel}>Received Qty by Customer:</span>
+                  <span className={styles.detailLabel}>
+                    Received Qty by Customer:
+                  </span>
                   <span className={styles.detailValue}>{receivedQty}</span>
                 </div>
               </div>
@@ -276,8 +322,11 @@ const EpodPreviewModal = ({ open, onClose, data }: EpodPreviewModalProps) => {
                 </div>
                 <div className={styles.detailRow}>
                   <span className={styles.detailLabel}>DO Numbers:</span>
-                  <span className={styles.detailValue} title={do_numbers.join(', ')}>
-                    {do_numbers.join(', ')}
+                  <span
+                    className={styles.detailValue}
+                    title={do_numbers.join(", ")}
+                  >
+                    {do_numbers.join(", ")}
                   </span>
                 </div>
               </div>
@@ -285,8 +334,11 @@ const EpodPreviewModal = ({ open, onClose, data }: EpodPreviewModalProps) => {
               <div className={styles.detailsSection}>
                 <div className={styles.detailRow}>
                   <span className={styles.detailLabel}>Invoice Number:</span>
-                  <span className={styles.detailValue} title={invoiceNumber.join(', ')}>
-                    {invoiceNumber.join(', ')}
+                  <span
+                    className={styles.detailValue}
+                    title={invoiceNumber.join(", ")}
+                  >
+                    {invoiceNumber.join(", ")}
                   </span>
                 </div>
                 <div className={styles.detailRow}>
@@ -296,9 +348,13 @@ const EpodPreviewModal = ({ open, onClose, data }: EpodPreviewModalProps) => {
                   </span>
                 </div>
                 <div className={styles.detailRow}>
-                  <span className={styles.detailLabel}>Delivery Completion Date:</span>
+                  <span className={styles.detailLabel}>
+                    Delivery Completion Date:
+                  </span>
                   <span className={styles.detailValue}>
-                    {finished_at ? service.utcToist(finished_at, 'dd-MMM-yy, hh:mm a') : 'N/A'}
+                    {finished_at
+                      ? service.utcToist(finished_at, "dd-MMM-yy, hh:mm a")
+                      : "N/A"}
                   </span>
                 </div>
               </div>

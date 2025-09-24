@@ -67,7 +67,7 @@ const Header = ({ setReloadOnHeaderChange, isMapHelper, getAllShipment, isShipme
       case "/ptpkDashboard":
         return "PTPK Dashboard"
       case "/shipmentsDashboard":
-        return "Shipments Dashboard"
+        return "Shipments List"
       case "/anomalydashboard":
         return "Anomaly Dashboard"
       case "/topDestination":

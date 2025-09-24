@@ -1,28 +1,30 @@
-import React, { useState } from 'react';
-import { 
-  Dialog, 
-  DialogTitle, 
-  DialogContent, 
-  DialogActions, 
-  Button, 
-  Box, 
-  Typography, 
-  Radio, 
-  FormControlLabel, 
-  Checkbox, 
+import React, { useState } from "react";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  Box,
+  Typography,
+  Radio,
+  FormControlLabel,
+  Checkbox,
   TextField,
   CircularProgress,
-  IconButton
-} from '@mui/material';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import { httpsPost } from '@/utils/Communication';
-import { DateTime } from 'luxon';
+  IconButton,
+} from "@mui/material";
+import { DatePicker } from "antd";
+import { SearchOutlined } from "@ant-design/icons";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { httpsPost } from "@/utils/Communication";
+import { DateTime } from "luxon";
+import dayjs from "dayjs";
 import { useSnackbar } from "@/hooks/snackBar";
-import styles from './JdeBookShipment.module.css';
-import { X } from 'lucide-react';
-import ModalHeader from '@/components/UI/ModalHeader/ModalHeader';
+import styles from "./JdeBookShipment.module.css";
+import { X } from "lucide-react";
+import ModalHeader from "@/components/UI/ModalHeader/ModalHeader";
 
 interface JdeBookShipmentProps {
   open: boolean;
@@ -43,11 +45,11 @@ interface SerialData {
   invoiceNumbers: string[];
 }
 
-const JdeBookShipment: React.FC<JdeBookShipmentProps> = ({ 
-  open, 
-  onClose, 
-  ltl, 
-  onSuccess 
+const JdeBookShipment: React.FC<JdeBookShipmentProps> = ({
+  open,
+  onClose,
+  ltl,
+  onSuccess,
 }) => {
   const { showMessage } = useSnackbar();
   const [isUnplanned, setIsUnplanned] = useState<boolean>(true);
@@ -57,20 +59,26 @@ const JdeBookShipment: React.FC<JdeBookShipmentProps> = ({
   const [searchFlag, setSearchFlag] = useState<boolean>(false);
   const [submitFlag, setSubmitFlag] = useState<boolean>(false);
   const [isBackToPickup, setIsBackToPickup] = useState<boolean>(false);
-  
+
   const [dataToShow, setDataToShow] = useState<TransporterData[]>([]);
   const [invoicesToShow, setInvoicesToShow] = useState<SerialData[]>([]);
-  const [selectedTransporter, setSelectedTransporter] = useState<string>('');
-  const [selectedSerial, setSelectedSerial] = useState<string>('');
-  const [selectedSerials, setSelectedSerials] = useState<Set<string>>(new Set());
-  
-  const serialNumbers = dataToShow.find(t => t.transporterCode === selectedTransporter)?.serialNumbers || [];
-  const invoices = invoicesToShow.find(s => s.serialNumber === selectedSerial)?.invoiceNumbers || [];
+  const [selectedTransporter, setSelectedTransporter] = useState<string>("");
+  const [selectedSerial, setSelectedSerial] = useState<string>("");
+  const [selectedSerials, setSelectedSerials] = useState<Set<string>>(
+    new Set()
+  );
+
+  const serialNumbers =
+    dataToShow.find((t) => t.transporterCode === selectedTransporter)
+      ?.serialNumbers || [];
+  const invoices =
+    invoicesToShow.find((s) => s.serialNumber === selectedSerial)
+      ?.invoiceNumbers || [];
   const invoiceForUnplanned = isUnplanned;
 
   const handleSearch = async () => {
     if (!pickupDate) {
-      showMessage('Please select a date', 'error');
+      showMessage("Please select a date", "error");
       return;
     }
 
@@ -79,17 +87,17 @@ const JdeBookShipment: React.FC<JdeBookShipmentProps> = ({
     setSubmitFlag(false);
     setLoading(true);
 
-    const url = isUnplanned 
-      ? 'jde/unplannedShipment/fetch' 
-      : 'jde/secondaryShipment/fetch';
+    const url = isUnplanned
+      ? "jde/unplannedShipment/fetch"
+      : "jde/secondaryShipment/fetch";
 
     try {
       const payload = {
-        pickup_date: DateTime.fromJSDate(pickupDate).toFormat('dd/MM/yyyy')
+        pickup_date: pickupDate.toISOString(),
       };
 
       const response = await httpsPost(url, payload);
-      
+
       if (response.statusCode === 200) {
         const result = response.data;
         const formattedData = result.map((item: any) => ({
@@ -100,16 +108,19 @@ const JdeBookShipment: React.FC<JdeBookShipmentProps> = ({
         }));
 
         setDataToShow(formattedData);
-        
+
         if (formattedData.length > 0) {
           setSelectedTransporter(formattedData[0].transporterCode);
           setSearchFlag(true);
         } else {
-          showMessage('No Shipment Present for this date!', 'warning');
+          showMessage("No Shipment Present for this date!", "warning");
         }
       }
     } catch (error: any) {
-      showMessage(error.response?.data?.message || 'Error fetching data', 'error');
+      showMessage(
+        error.response?.data?.message || "Error fetching data",
+        "error"
+      );
       onClose();
     } finally {
       setSearchLoader(false);
@@ -119,31 +130,33 @@ const JdeBookShipment: React.FC<JdeBookShipmentProps> = ({
 
   const handleSubmitSearch = async () => {
     if (!pickupDate) {
-      showMessage('Please select a date', 'error');
+      showMessage("Please select a date", "error");
       return;
     }
 
     setLoading(true);
-    const url = isUnplanned 
-      ? 'jde/unplannedShipment/fetch' 
-      : 'jde/secondaryShipment/fetch';
+    const url = isUnplanned
+      ? "jde/unplannedShipment/fetch"
+      : "jde/secondaryShipment/fetch";
 
     try {
       const payload = {
-        pickup_date: DateTime.fromJSDate(pickupDate).toFormat('dd/MM/yyyy'),
+        pickup_date: DateTime.fromJSDate(pickupDate).toFormat("dd/MM/yyyy"),
         transporters: dataToShow
-          .filter(transporter => 
-            transporter.serialNumbers.some(sn => selectedSerials.has(sn))
+          .filter((transporter) =>
+            transporter.serialNumbers.some((sn) => selectedSerials.has(sn))
           )
-          .map(transporter => ({
+          .map((transporter) => ({
             transporterCode: transporter.transporterCode,
             transporterName: transporter.transporterName,
-            serialNumbers: transporter.serialNumbers.filter(sn => selectedSerials.has(sn))
-          }))
+            serialNumbers: transporter.serialNumbers.filter((sn) =>
+              selectedSerials.has(sn)
+            ),
+          })),
       };
 
       const response = await httpsPost(url, payload);
-      
+
       if (response.statusCode === 200) {
         const result = response.data;
         const formattedData = result.map((item: any) => ({
@@ -152,14 +165,17 @@ const JdeBookShipment: React.FC<JdeBookShipmentProps> = ({
         }));
 
         setInvoicesToShow(formattedData);
-        
+
         if (formattedData.length > 0) {
           setSelectedSerial(formattedData[0].serialNumber);
           setSubmitFlag(true);
         }
       }
     } catch (error: any) {
-      showMessage(error.response?.data?.message || 'Error submitting search', 'error');
+      showMessage(
+        error.response?.data?.message || "Error submitting search",
+        "error"
+      );
     } finally {
       setLoading(false);
     }
@@ -167,40 +183,45 @@ const JdeBookShipment: React.FC<JdeBookShipmentProps> = ({
 
   const handleBookShipment = async () => {
     if (!pickupDate) {
-      showMessage('Please select a date', 'error');
+      showMessage("Please select a date", "error");
       return;
     }
 
     setLoading(true);
-    const url = invoiceForUnplanned 
-      ? '/v1/jde/unplannedShipment/bookShipment' 
-      : '/v1/jde/secondaryShipment/bookShipment';
+    const url = invoiceForUnplanned
+      ? "/v1/jde/unplannedShipment/bookShipment"
+      : "/v1/jde/secondaryShipment/bookShipment";
 
     try {
       const payload = {
-        pickup_date: DateTime.fromJSDate(pickupDate).toFormat('dd/MM/yyyy'),
+        pickup_date: DateTime.fromJSDate(pickupDate).toFormat("dd/MM/yyyy"),
         is_back_to_pickup: isBackToPickup,
         transporters: dataToShow
-          .filter(transporter => 
-            transporter.serialNumbers.some(sn => selectedSerials.has(sn))
+          .filter((transporter) =>
+            transporter.serialNumbers.some((sn) => selectedSerials.has(sn))
           )
-          .map(transporter => ({
+          .map((transporter) => ({
             transporterCode: transporter.transporterCode,
             transporterName: transporter.transporterName,
             vehicle_type: transporter.vehicle_type,
-            serialNumbers: transporter.serialNumbers.filter(sn => selectedSerials.has(sn))
-          }))
+            serialNumbers: transporter.serialNumbers.filter((sn) =>
+              selectedSerials.has(sn)
+            ),
+          })),
       };
 
       const response = await httpsPost(url, payload);
-      
+
       if (response.statusCode === 200) {
-        showMessage('Shipment Booked!', 'success');
+        showMessage("Shipment Booked!", "success");
         onSuccess();
         handleClose();
       }
     } catch (error: any) {
-      showMessage(error.response?.data?.message || 'Error booking shipment', 'error');
+      showMessage(
+        error.response?.data?.message || "Error booking shipment",
+        "error"
+      );
     } finally {
       setLoading(false);
     }
@@ -227,8 +248,8 @@ const JdeBookShipment: React.FC<JdeBookShipmentProps> = ({
   const handleSelectAll = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
       const allSerials = new Set<string>();
-      dataToShow.forEach(transporter => {
-        transporter.serialNumbers.forEach(serial => allSerials.add(serial));
+      dataToShow.forEach((transporter) => {
+        transporter.serialNumbers.forEach((serial) => allSerials.add(serial));
       });
       setSelectedSerials(allSerials);
     } else {
@@ -239,8 +260,8 @@ const JdeBookShipment: React.FC<JdeBookShipmentProps> = ({
   const handleClose = () => {
     setDataToShow([]);
     setInvoicesToShow([]);
-    setSelectedTransporter('');
-    setSelectedSerial('');
+    setSelectedTransporter("");
+    setSelectedSerial("");
     setSelectedSerials(new Set());
     setSearchFlag(false);
     setSubmitFlag(false);
@@ -249,14 +270,14 @@ const JdeBookShipment: React.FC<JdeBookShipmentProps> = ({
   };
 
   return (
-    <Dialog 
-      open={open} 
+    <Dialog
+      open={open}
       onClose={onClose}
-      maxWidth="md"
+      maxWidth="sm"
       fullWidth
       className={styles.container}
+      // style={{maxWidth: "400px"}}
     >
-
       <ModalHeader title="Fetch & Book Shipment`s" onClose={onClose} />
 
       <DialogContent>
@@ -287,30 +308,26 @@ const JdeBookShipment: React.FC<JdeBookShipmentProps> = ({
           />
         </Box>
 
-        <Box className={styles.datePickerContainer}>
-          <LocalizationProvider dateAdapter={AdapterDateFns}>
-            <DatePicker
-              label="Pickup Date"
-              value={pickupDate}
-              onChange={(newValue) => setPickupDate(newValue)}
-            //   renderInput={(params: any) => <TextField {...params} fullWidth 
-            //   />}
-            />
-          </LocalizationProvider>
-          <button 
+        <div className={styles.datePickerContainer}>
+          <DatePicker
+            style={{ width: "200px", marginRight: "8px", height: "40px" }}
+            placeholder="Select Pickup Date"
+            value={pickupDate ? dayjs(pickupDate) : null}
+            onChange={(date) => setPickupDate(date ? date.toDate() : null)}
+            format="DD/MM/YYYY"
+            popupStyle={{ zIndex: 99999 }}
+          />
+          <button
+            // type="primary"
+            // icon={<SearchOutlined />}
             onClick={handleSearch}
+            // loading={searchLoader}
             disabled={loading || searchLoader}
             className={styles.searchButton}
           >
-            {searchLoader ? <CircularProgress size={24} /> : 'Search'}
+            {searchLoader ? <CircularProgress size={24} /> : "Search"}
           </button>
-        </Box>
-{/* 
-        {loading && (
-          <Box className={styles.loadingContainer}>
-            <CircularProgress />
-          </Box>
-        )} */}
+        </div>
 
         {searchFlag && !submitFlag && (
           <>
@@ -322,13 +339,20 @@ const JdeBookShipment: React.FC<JdeBookShipmentProps> = ({
                 <FormControlLabel
                   control={
                     <Checkbox
-                      checked={serialNumbers.length > 0 && serialNumbers.every(sn => selectedSerials.has(sn))}
+                      checked={
+                        serialNumbers.length > 0 &&
+                        serialNumbers.every((sn) => selectedSerials.has(sn))
+                      }
                       onChange={(e) => {
                         const newSelectedSerials = new Set(selectedSerials);
                         if (e.target.checked) {
-                          serialNumbers.forEach(sn => newSelectedSerials.add(sn));
+                          serialNumbers.forEach((sn) =>
+                            newSelectedSerials.add(sn)
+                          );
                         } else {
-                          serialNumbers.forEach(sn => newSelectedSerials.delete(sn));
+                          serialNumbers.forEach((sn) =>
+                            newSelectedSerials.delete(sn)
+                          );
                         }
                         setSelectedSerials(newSelectedSerials);
                       }}
@@ -338,32 +362,31 @@ const JdeBookShipment: React.FC<JdeBookShipmentProps> = ({
                   label="Select All"
                   className={styles.serialItem}
                 />
-                
+
                 {serialNumbers.map((serial) => (
-                  <Box 
-                    key={serial}
-                    className={styles.serialItem}
-                  >
-                    <Checkbox 
+                  <Box key={serial} className={styles.serialItem}>
+                    <Checkbox
                       checked={selectedSerials.has(serial)}
                       onChange={() => handleToggleSerial(serial)}
                       size="small"
                       className={styles.serialCheckbox}
                     />
-                    <Typography className={styles.serialNumber}>{serial}</Typography>
+                    <Typography className={styles.serialNumber}>
+                      {serial}
+                    </Typography>
                   </Box>
                 ))}
               </Box>
             </Box>
-            
-            <Box className={styles.submitButton}>
-              <Button 
-                variant="contained" 
+
+            <Box>
+              <button
                 onClick={handleSubmitSearch}
                 disabled={selectedSerials.size === 0}
+                className={styles.submitButton}
               >
                 Submit
-              </Button>
+              </button>
             </Box>
           </>
         )}
@@ -374,22 +397,24 @@ const JdeBookShipment: React.FC<JdeBookShipmentProps> = ({
               <Typography variant="subtitle2">Serial Numbers</Typography>
               <Typography variant="subtitle2">Invoices</Typography>
             </Box>
-            
+
             <Box className={styles.serialInvoicesContainer}>
               <Box className={styles.serialColumn}>
                 {invoicesToShow.map((item) => (
-                  <Box 
+                  <Box
                     key={item.serialNumber}
                     onClick={() => handleSelectSerial(item.serialNumber)}
                     className={`${styles.serialItemSelectable} ${
-                      selectedSerial === item.serialNumber ? styles.serialItemSelected : ''
+                      selectedSerial === item.serialNumber
+                        ? styles.serialItemSelected
+                        : ""
                     }`}
                   >
                     {item.serialNumber}
                   </Box>
                 ))}
               </Box>
-              
+
               <Box className={styles.invoiceColumn}>
                 {invoices.length > 0 ? (
                   invoices.map((invoice, index) => (
@@ -398,29 +423,31 @@ const JdeBookShipment: React.FC<JdeBookShipmentProps> = ({
                     </Box>
                   ))
                 ) : (
-                  <Typography color="textSecondary">No invoices available</Typography>
+                  <Typography color="textSecondary">
+                    No invoices available
+                  </Typography>
                 )}
               </Box>
             </Box>
-            
+
             <Box className={styles.footer}>
               <FormControlLabel
                 control={
-                  <Checkbox 
+                  <Checkbox
                     checked={isBackToPickup}
                     onChange={(e) => setIsBackToPickup(e.target.checked)}
                   />
                 }
                 label="Make First Pickup as Last Delivery"
               />
-              
-              <Button 
-                variant="contained" 
+
+              <button
                 onClick={handleBookShipment}
                 disabled={loading}
+                className={styles.bookShipmentButton}
               >
-                {loading ? 'Processing...' : 'Book Shipment'}
-              </Button>
+                {loading ? "Processing..." : "Book Shipment"}
+              </button>
             </Box>
           </>
         )}

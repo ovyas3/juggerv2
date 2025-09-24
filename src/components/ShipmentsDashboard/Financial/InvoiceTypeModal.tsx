@@ -1,24 +1,24 @@
-import React from 'react';
-import { useTranslation } from 'react-i18next';
-import styles from './InvoiceTypeModal.module.css';
-import ModalHeader from '@/components/UI/ModalHeader/ModalHeader';
+import React from "react";
+import styles from "./InvoiceTypeModal.module.css";
+import ModalHeader from "@/components/UI/ModalHeader/ModalHeader";
 
 interface InvoiceItem {
-  invoiceType: 'CT' | 'PT';
+  invoiceType: "CT" | "PT";
   invoice: string;
   shippedQty: number | string;
   shippedNop: number | string;
-  [key: string]: any; // For any additional properties
+  [key: string]: any; 
 }
 
 interface InvoiceTypeModalProps {
-  show: boolean; 
+  show: boolean;
   shipmentId: string;
   onClose: () => void;
   onSubmit: () => void;
-  onTypeChange: (item: InvoiceItem, newType: 'CT' | 'PT') => void;
+  onTypeChange: (item: InvoiceItem, newType: "CT" | "PT") => void;
   invoiceData: InvoiceItem[];
   loading?: boolean;
+  sin?: string;
 }
 
 const InvoiceTypeModal: React.FC<InvoiceTypeModalProps> = ({
@@ -29,39 +29,37 @@ const InvoiceTypeModal: React.FC<InvoiceTypeModalProps> = ({
   onTypeChange,
   invoiceData,
   loading = false,
+  sin = "",
 }) => {
   if (!show) return null;
 
-  const { t } = useTranslation();
-
   const columns = [
-    { key: 'sno', label: 'S.No.' },
-    { key: 'invoice_type', label: 'Invoice Type' },
-    { key: 'invoice', label: 'Invoice' },
-    { key: 'shippedQuantity', label: 'Shipped Quantity (MT)' },
-    { key: 'shippedNoOfPieces', label: 'Shipped No Of Pieces' },
-    { key: 'actions', label: 'Action' },
+    { key: "sno", label: "S.No." },
+    { key: "invoice_type", label: "Invoice Type" },
+    { key: "invoice", label: "Invoice" },
+    { key: "shippedQuantity", label: "Shipped Quantity (MT)" },
+    { key: "shippedNoOfPieces", label: "Shipped No Of Pieces" },
+    { key: "actions", label: "Action" },
   ];
 
   return (
     <div className={styles.modalOverlay} onClick={onClose}>
-      <div className={styles.modal} onClick={e => e.stopPropagation()}>
+      <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
         <ModalHeader
-          title='Update Invoice Type'
+          title={`Update Invoice Type - #${sin}`}
           onClose={onClose}
         />
 
         <div className={styles.content}>
-            <div className={styles.tableHeader}>
-              <div className={styles.label}>Invoices</div>
-            </div>
+          <div className={styles.tableHeader}>
+            <div className={styles.label}>Invoices</div>
+          </div>
           <div className={styles.tableContainer}>
-            
             <div className={styles.tableWrapper}>
               <table className={styles.table}>
                 <thead>
                   <tr>
-                    {columns.map(column => (
+                    {columns.map((column) => (
                       <th key={column.key} className={styles.tableHeaderCell}>
                         {column.label}
                       </th>
@@ -77,10 +75,10 @@ const InvoiceTypeModal: React.FC<InvoiceTypeModalProps> = ({
                       <td className={styles.tableCell}>{item.shippedQty}</td>
                       <td className={styles.tableCell}>{item.shippedNop}</td>
                       <td className={styles.tableCell}>
-                        {item.invoiceType === 'CT' ? (
+                        {item.invoiceType === "CT" ? (
                           <button
                             className={styles.typeButton}
-                            onClick={() => onTypeChange(item, 'PT')}
+                            onClick={() => onTypeChange(item, "PT")}
                             disabled={loading}
                           >
                             Mark as PT
@@ -88,7 +86,7 @@ const InvoiceTypeModal: React.FC<InvoiceTypeModalProps> = ({
                         ) : (
                           <button
                             className={styles.typeButton}
-                            onClick={() => onTypeChange(item, 'CT')}
+                            onClick={() => onTypeChange(item, "CT")}
                             disabled={loading}
                           >
                             Mark as CT
@@ -108,11 +106,7 @@ const InvoiceTypeModal: React.FC<InvoiceTypeModalProps> = ({
               onClick={onSubmit}
               disabled={loading}
             >
-              {loading ? (
-                <span className={styles.loading} />
-              ) : (
-                t('Submit')
-              )}
+              {loading ? <span className={styles.loading} /> : "Submit"}
             </button>
           </div>
         </div>

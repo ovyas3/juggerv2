@@ -553,5 +553,8 @@
   },
   "UpdateCarrierFreight": {
     "updateFreight": "Update Freight"
+  },
+  "MAILMODAL":{
+    "emailAddress": "Email Address"
   }
 }

@@ -1,109 +1,103 @@
-.dialogContent {
-    background: white;
-    border-radius: 4px;
-    width: 450px;
-    max-width: 90%;
-    max-height: 90vh;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    padding: 0;
-    position: fixed;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 1000;
-  }
-  
-  .header {
-    width: 100%;
-    border: 2px solid #4F46E5;
-    padding: 0 12px;
-    display: flex;
-    align-items: center;
-    background-color: #4F46E5;
-    border-radius: 1px;
-    height: 48px;
-    color: white;
-    font-weight: 500;
-    font-size: 16px;
-  }
-  
-  .title {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 19px;
-  }
-  
-  .icon {
-    color: white;
-    font-size: 20px;
-  }
-  
-  .body {
-    padding: 20px 24px;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    color: #1f2937;
-    font-size: 14px;
-  }
-  
-  .section {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
-  
-  .label {
-    font-size: 12px;
-    color: #6b7280;
-    font-weight: 600;
-  }
-  
-  .value {
-    font-size: 14px;
-    color: #333;
-    word-break: break-word;
-  }
-/* In global.css only, but more specific: */
-.lastKnownDialog [data-radix-dialog-close] {
-    display: none !important;
-  }
-  
-  
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
 
-  .headerRow {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: #4F46E5;
-    color: #fff;
-    border-radius: 4px 4px 0 0;
-    height: 48px;
-    padding: 0 16px;
-  }
-  
-  .titleIcon {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  
-  .closeButton {
-    background: none;
-    border: none;
-    color: #fff;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    padding: 4px;
-    border-radius: 4px;
-  }
-  
-  .closeButton:hover {
-    background: rgba(0,0,0,0.1);
-  }
-  
+.modal {
+  background: white;
+  border-radius: 4px;
+  width: 450px;
+  max-width: 90%;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.header {
+  width: 100%;
+  border: 2px solid #4f46e5;
+  padding: 0 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #4f46e5;
+  margin: 0 auto;
+  border-radius: 1px;
+  color: #fff;
+  height: 48px;
+}
+
+.titleIcon {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.icon {
+  width: 20px;
+  height: 20px;
+}
+
+.title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.closeButton {
+  background-color: #908be6;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  transition: background-color 0.2s;
+}
+
+.closeButton:hover {
+  background-color: #7c7ae0;
+}
+
+.body {
+  width: 90%;
+  padding: 20px 10px;
+  margin: 0 auto;
+}
+
+.section {
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.label {
+  font-weight: 600;
+  font-size: 14px;
+  color: #6b7280;
+  display: block;
+  margin-bottom: 4px;
+  text-align: start;
+}
+
+.value {
+  font-size: 14px;
+  color: #374151;
+  margin: 0;
+  line-height: 1.5;
+  text-align: start;
+}
