@@ -1,5 +1,4 @@
 import React from "react";
-import { useTranslation } from "react-i18next";
 import styles from "./InvoiceTypeModal.module.css";
 import ModalHeader from "@/components/UI/ModalHeader/ModalHeader";
 
@@ -33,8 +32,6 @@ const InvoiceTypeModal: React.FC<InvoiceTypeModalProps> = ({
   sin = "",
 }) => {
   if (!show) return null;
-
-  const { t } = useTranslation();
 
   const columns = [
     { key: "sno", label: "S.No." },
@@ -109,7 +106,7 @@ const InvoiceTypeModal: React.FC<InvoiceTypeModalProps> = ({
               onClick={onSubmit}
               disabled={loading}
             >
-              {loading ? <span className={styles.loading} /> : t("Submit")}
+              {loading ? <span className={styles.loading} /> : "Submit"}
             </button>
           </div>
         </div>
