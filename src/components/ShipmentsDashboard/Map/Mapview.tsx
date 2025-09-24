@@ -8,7 +8,6 @@ import GeofenceLayer from "./Geofencelayer";
 import styles from "./Mapview.module.css";
 import searchIcon from '../../../assets/search_icon_new.svg';
 import filterIcon from '../../../assets/filter-icon.svg';
-// const CONTAINER_STYLE = { width: "100%", height: "616px" };
 import ontime from '../../../assets/on_time.svg';
 import twotofour from '../../../assets/two_fours_hrs.svg';
 import fourtoeight from '../../../assets/four_eight_hrs.svg';
@@ -44,14 +43,13 @@ import ModalHeader from "@/components/UI/ModalHeader/ModalHeader";
 import { DatePicker } from "antd";
 import dayjs from "dayjs";
 
-// TOWARDS PICKUP (cardinal)
+
 import dirN from "../../../assets/parkingout.svg";
 import dirE from "../../../assets/tare_weight.svg";
 import dirS from "../../../assets/gross_weight.svg";
 import dirW from "../../../assets/gate_in.svg";
-import dirC from "../../../assets/ewaybill.svg"; // “center” / very close
+import dirC from "../../../assets/ewaybill.svg"; 
 
-// IN PLANT (stages)
 import po_gi from "../../../assets/parkingout.svg";
 import gi_tw from "../../../assets/gate_in.svg";
 import tw_gw from "../../../assets/tare_weight.svg";
@@ -61,7 +59,6 @@ import tc_iv from "../../../assets/test_certificate.svg";
 import iv_ew from "../../../assets/invoice.svg";
 import ew_only from "../../../assets/post_goods.svg";
 
-// AT DELIVERY (detention)
 import det_0_12 from "../../../assets/green_at_delivery_icon.svg";
 import det_12_24 from "../../../assets/light_red_at_delivery_icon.svg";
 import det_24_plus from "../../../assets/red_at_delivery_icon.svg";
@@ -78,41 +75,6 @@ import  AttachFilesModal from "../DocumentManagement/AttachFilesModal";
 import CreateAdvancePaymentModal  from "../Financial/CreatePaymentAdvanceModal";
 import { MarkerClusterer, SuperClusterAlgorithm, type Renderer } from "@googlemaps/markerclusterer";
 
-// const clusterRenderer: Renderer = {
-//   render: ({ count, position }) =>
-//     new google.maps.Marker({
-//       position,
-//       // Blue bubble with the count in the middle
-//       icon: {
-//         url: `data:image/svg+xml;utf8,${encodeURIComponent(`
-//           <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 44 44">
-//             <defs>
-//               <filter id="s" x="-50%" y="-50%" width="200%" height="200%">
-//                 <feDropShadow dx="0" dy="1.5" stdDeviation="2" flood-color="#000" flood-opacity=".25"/>
-//               </filter>
-//             </defs>
-//             <circle cx="22" cy="22" r="16" fill="#3b82f6" filter="url(#s)"/>
-//           </svg>
-//         `)}`,
-//         scaledSize: new google.maps.Size(44, 44),
-//       },
-//       label: {
-//         text: String(count),
-//         fontSize: "14px",
-//         fontWeight: "700",
-//         color: "#fff",
-//       },
-//       zIndex: google.maps.Marker.MAX_ZINDEX + count,
-//     }),
-// };
-// Define the shape of a Location object
-// interface ShipmentLocation {
-//   _id: string;
-//   city: string;
-//   area: string;
-//   pincode: string;
-//   name: string;
-// }
 interface Location {
   name?: string;
   address?: string;
@@ -124,7 +86,6 @@ interface Location {
   _id?: string;
 }
 
-// Define the shape of a Driver object
 interface Driver {
   _id: string;
   mobile: string;
@@ -145,16 +106,14 @@ interface Driver {
 interface CancelModalProps {
   open: boolean;
   onClose: () => void;
-  shipmentId: string; // The ID passed from Mapview.tsx
+  shipmentId: string;
 }
-// Define the shape of a Carrier object
 interface Carrier {
   _id: string;
   name: string;
   parent_name: string;
 }
 
-// Define the shape of a TripTracker object
 interface TripTracker {
   last_location_address?: string;
 }
@@ -163,7 +122,6 @@ interface ShipmentMaterial {
   name?: string;
 }
 
-// Define the main Shipment object
 interface Shipment {
   _id: string;
   SIN: string;
@@ -173,21 +131,19 @@ interface Shipment {
   shipper: { _id: string; name: string };
   status: string;
   materials?: ShipmentMaterial[]; 
-  // vehicle_type:string;
-  vehicle_type: { // <-- Change this to an object
+  vehicle_type: { 
     _id: string;
     name: string;
     capacity: number;
   };
   latest_status: string;
-  driver?: Driver; // Note: The driver property might be optional based on your data.
-  assigned_driver?: Driver; // The driver data is also under this key
+  driver?: Driver; 
+  assigned_driver?: Driver; 
   vehicle_no: string;
   trip_tracker?: TripTracker;
   pickup_date:string;
   delivery_date:string;
   unique_code:string;
-  // Add other properties you might need from your API response
 }
 interface ShipmentLocation {
   _id?: string;
@@ -208,124 +164,7 @@ export function inIndia(lat: number, lng: number): boolean {
     lng >= INDIA_BBOX.minLng && lng <= INDIA_BBOX.maxLng
   );
 }
-//
-// function drawGeoFences(data: any[], map: google.maps.Map) {
-//   console.log("[GEOFENCE] draw start. items:", data?.length);
-//   const overlays: Array<google.maps.MVCObject> = [];
-//   const bounds = new google.maps.LatLngBounds();
 
-//   if (!map || !Array.isArray(data)) return { overlays, bounds };
-
-//   const STYLE = {
-//     fillColor: "#2962FF",
-//     fillOpacity: 0.01,
-//     strokeColor: "#2962FF",
-  
-//     strokeOpacity: 0.4,
-//     strokeWeight: 1,
-//     clickable: false,
-//   } as const;
-
-//   const LL = (lon: any, lat: any) => new google.maps.LatLng(Number(lat), Number(lon));
- 
-//   // function ringToPath(ring: number[][]): google.maps.LatLngLiteral[] {
-//   //   const path: google.maps.LatLngLiteral[] = [];
-//   //   for (const pt of ring || []) {
-//   //     if (!Array.isArray(pt) || pt.length < 2) continue;
-//   //     let lng = Number(pt[0]), lat = Number(pt[1]);
-  
-//   //     // auto-swap if someone sent [lat,lng]
-//   //     if ((Math.abs(lat) > 60 && Math.abs(lng) <= 60) || lng < -180 || lng > 180) {
-//   //       [lat, lng] = [lng, lat];
-//   //     }
-//   //     if (lat < -90 || lat > 90 || lng < -180 || lng > 180) continue;
-//   //     if (!inIndia(lat, lng)) continue;  // ignore out-of-India
-//   //     path.push({ lat, lng });
-//   //   }
-//   //   return path;
-//   // }
-//   // const addPolygon = (rings: number[][][]) => {
-//   //   // rings = [outerRing, hole1, hole2, ...]; each ring = [[lon,lat], ...]
-//   //   const paths = (rings || []).map((ring) =>
-//   //     (ring || [])
-//   //       .filter((pt) => Array.isArray(pt) && pt.length >= 2)
-//   //       .map(([lon, lat]) => LL(lon, lat))
-//   //   );
-//   //   if (!paths.length || !paths[0].length) return;
-
-//   //   const polygon = new google.maps.Polygon({ paths, map, ...STYLE });
-//   //   // extend bounds by outer ring vertices
-//   //   paths[0].forEach((p) => bounds.extend(p));
-//   //   overlays.push(polygon);
-//   // };
-
-//   // const addMultiPolygon = (polys: number[][][][]) => {
-//   //   (polys || []).forEach((rings) => addPolygon(rings));
-//   // };
-
-//   // const addCircle = (v: any) => {
-//   //   let lon: number, lat: number, radius: number;
-//   //   if (Array.isArray(v)) {
-//   //     [lon, lat, radius] = v;
-//   //   } else if (Array.isArray(v?.center) && v?.radius != null) {
-//   //     [lon, lat] = v.center;
-//   //     radius = Number(v.radius);
-//   //   } else {
-//   //     return;
-//   //   }
-//   //   const center = LL(lon, lat);
-//   //   const circle = new google.maps.Circle({ center, radius, map, ...STYLE });
-//   //   const cb = circle.getBounds?.();
-//   //   if (cb) bounds.union(cb); else bounds.extend(center);
-//   //   overlays.push(circle);
-//   // };
-  
-
-//   try {
-//     (data || []).forEach((it) => {
-//       const gf = it?.geo_fence;
-//       if (!gf || !gf.type || !gf.coordinates) return;
-//       if (gf.type === "Polygon") addPolygon(gf.coordinates);
-//       else if (gf.type === "MultiPolygon") addMultiPolygon(gf.coordinates);
-//       else if (gf.type === "Circle") addCircle(gf.coordinates);
-//       // unsupported -> skip silently
-//     });
-//   } catch {
-//     // bad geometry -> skip silently
-//   }
-
-//   return { overlays, bounds };
-// }
-// const fences = [
-//   {
-//     type: "Polygon" as const,
-//     coordinates: [
-//       [ [77.58,12.98], [77.62,12.98], [77.62,13.01], [77.58,13.01], [77.58,12.98] ] // [lng,lat]
-//     ]
-//   },
-//   {
-//     type: "MultiPolygon" as const,
-//     coordinates: [
-//       [ // polygon A
-//         [ [72.82,18.94], [72.85,18.94], [72.85,18.97], [72.82,18.97], [72.82,18.94] ] // outer
-//       ],
-//       [ // polygon B
-//         [ [72.79,18.93], [72.81,18.93], [72.81,18.95], [72.79,18.95], [72.79,18.93] ]
-//       ]
-//     ]
-//   }
-// ];
-// const toLatLng = (item: any) => {
-//   const lat =
-//     typeof item?.latitude === "number"
-//       ? item.latitude
-//       : item?.geo_point?.coordinates?.[1]; // GeoJSON [lng, lat] -> [1]
-//   const lng =
-//     typeof item?.longitude === "number"
-//       ? item.longitude
-//       : item?.geo_point?.coordinates?.[0]; // GeoJSON [lng, lat] -> [0]
-//   return Number.isFinite(lat) && Number.isFinite(lng) ? { lat, lng } : null;
-// };
 const toLatLng = (item: any) => {
   if (!item) return null;
 
@@ -357,16 +196,13 @@ const toLatLng = (item: any) => {
 };
 
 export default function Mapview() {
-  // IMPORTANT: don’t hardcode the key in code you commit
   const apiKey = "AIzaSyDr0k02Q0b6SF2xum80HvY7I4kAWUCOR2U";
   const formRef = useRef<HTMLFormElement>(null);
   const [mapRef, setMapRef] = useState<google.maps.Map | null>(null);
   const [shipmentGroup, setShipmentGroup] = useState(""); 
   const [SelectMaterials, setSelectedMaterials] = useState<string>("");
-  // const [materialsList, setMaterialsList] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [geoFences, setGeoFences] = useState<any[]>([]);
-  // state
 const [infoFromMapClick, setInfoFromMapClick] = useState(false);
 type LegendItem = { key: LegendKey; label: string; icon: any };
 
@@ -380,23 +216,15 @@ const STATUS_ITEMS: LegendItem[] = [
   { key: "20+",   label: "Beyond 20 Hours", icon: beyondtwenty },
 ] satisfies Array<{ key: LegendKey; label: string; icon: any }>;
 
-//   const geofenceOverlaysRef = useRef<
-//   Array<google.maps.Polygon | google.maps.Circle | google.maps.Polyline>
-// >([]);
-// Mapview.tsx (around line 282)
 const geofenceOverlaysRef = useRef<
-  // **Change the type here to include Marker**
   Array<google.maps.Polygon | google.maps.Circle | google.maps.Polyline | google.maps.Marker>
 >([]);
-// map instance
 
 const [locationsList, setLocationsList] = useState<Array<{ id: string; label: string }>>([]);
 const [selectedStatus, setSelectedStatus] = useState('in_transit');
 
-// Selected values (store ids)
-const [selectedLocation, setSelectedLocation] = useState<string>(""); // delivery location id
-const [selectedCarrier, setSelectedCarrier] = useState<string>("");   // carrier id
-// Distinct lists
+const [selectedLocation, setSelectedLocation] = useState<string>(""); 
+const [selectedCarrier, setSelectedCarrier] = useState<string>("");   
 const [vehicleSearch, setVehicleSearch] = useState<string>("");
 const vehicleDebounceRef = useRef<number | null>(null);
 
@@ -408,15 +236,10 @@ const [carriersList, setCarriersList] =
   useState<Array<{ id: string; label: string }>>([]);
   const [appliedSearchFilters, setAppliedSearchFilters] = useState<any>(null);
   const [shipmentsData, setShipmentsData] =useState<Shipment[]>([]);
-// Selected values
 const [selectedPickupLocation, setSelectedPickupLocation] = useState<string>("");
 const [selectedDeliveryLocation, setSelectedDeliveryLocation] = useState<string>("");
-// In-Plant event stage (short codes)
 const [inPlantStage, setInPlantStage] = useState<string>("");
-// Draft value for vehicle number (used only inside the modal)
-// near your other useState calls
 const [unitLocations, setUnitLocations] = useState<any[]>([]);
-// Add this new useEffect near the bottom of your existing imports/hooks:
   const [error, setError] = useState<string | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [selectedShipment, setSelectedShipment] = useState<Shipment | null>(null);
@@ -446,14 +269,8 @@ const [materialBuckets, setMaterialBuckets] =
     dateTo: "",
     vehicle: ""
   });
-  // India-ish bounding box
-// const INDIA_BBOX = { minLat: 5, maxLat: 38.9, minLng: 68, maxLng: 98 };
-// const inIndia = (lat: number, lng: number) =>
-//   lat >= INDIA_BBOX.minLat && lat <= INDIA_BBOX.maxLat &&
-//   lng >= INDIA_BBOX.minLng && lng <= INDIA_BBOX.maxLng;
 const INDIA_BBOX = { minLat: 5, maxLat: 38.9, minLng: 68, maxLng: 98 };
 const handleAttachDone: () => void = () => {
-  // optional: refetch, toast, etc.
   closeModal();
 };
 
@@ -480,13 +297,10 @@ function inIndia(lat: number, lng: number): boolean {
     lng >= INDIA_BBOX.minLng && lng <= INDIA_BBOX.maxLng
   );
 }
-// Wrap your existing toLatLng so callers can “only-India”
 const toLatLngIndia = (item: any) => {
   const p = toLatLng(item);
   return p && inIndia(p.lat, p.lng) ? p : null;
 };
-
-  // path data returned by v1/shipment/path
 type PathData = {
   sim: any[];
   app: any[];
@@ -497,7 +311,6 @@ type PathData = {
 
 const [pathData, setPathData] = useState<PathData | null>(null);
 const [pathVisible, setPathVisible] = useState({ gps: false, app: false, sim: false });
-// const pathOverlaysRef = useRef<Array<google.maps.MVCObject>>([]);
 const pathOverlaysRef = useRef<
   Array<
     google.maps.Polyline | google.maps.Marker | google.maps.Polygon | google.maps.Circle
@@ -505,7 +318,6 @@ const pathOverlaysRef = useRef<
 >([]);
 const [activeHalt, setActiveHalt] = useState<any | null>(null);
 const [haltInfoPos, setHaltInfoPos] = useState<google.maps.LatLngLiteral | null>(null);
-// P/D markers + popup
 const pdOverlaysRef = useRef<Array<google.maps.Marker>>([]);
 const [pdInfo, setPdInfo] = useState<{
   pos: google.maps.LatLngLiteral;
@@ -519,27 +331,6 @@ const [pdInfo, setPdInfo] = useState<{
 function clearPDMarkers() {
   pdOverlaysRef.current.forEach(m => m.setMap(null));
   pdOverlaysRef.current = [];
-}
-
-// function locToLatLng(loc?: { lat?: any; lng?: any }) {
-//   const lat = Number(loc?.lat), lng = Number(loc?.lng);
-//   return isValidLatLng(lat, lng) ? { lat, lng } : null;
-// }
-// replace your current helper
-function locToLatLng(loc?: any) {
-  if (!loc) return null;
-  // try all the shapes we see in your data
-  const lat = Number(
-    loc?.lat ??
-    loc?.latitude ??
-    loc?.geo_point?.coordinates?.[1]
-  );
-  const lng = Number(
-    loc?.lng ??
-    loc?.longitude ??
-    loc?.geo_point?.coordinates?.[0]
-  );
-  return isValidLatLng(lat, lng) ? { lat, lng } : null;
 }
 
 function pdMarkerIcon(kind: "P"|"D"): google.maps.Symbol {
@@ -567,7 +358,7 @@ function addPDMarker(
     map,
     icon: pdMarkerIcon(kind),
     label: {
-      text: (kind + seq) as string,         // "P1"/"P2"/"D1"/"D2"
+      text: (kind + seq) as string,         
       color: "#ffffff",
       fontWeight: "700",
       fontSize: "25px",
@@ -583,192 +374,7 @@ function addPDMarker(
   return marker;
 }
 
-// function drawPickupDeliveryMarkers() {
-//   if (!mapRef) return;
-//   clearPDMarkers();
 
-//   // draw for *visible* shipments only
-//   for (const s of visibleShipments || []) {
-//     // Pickups: P1, P2...
-//     (s.pickups || []).forEach((p, i) => {
-//       // const pos = locToLatLng(p?.location);
-//       const pos = toLatLng(p?.location);
-   
-//       if (!pos) return;
-//       addPDMarker(mapRef!, pos, "P", i + 1, {
-//         name: p?.location?.name,
-//         address: p?.location?.address,
-//         sin: s.SIN,
-//       });
-//     });
-
-//     // Deliveries: D1, D2...
-//     (s.deliveries || []).forEach((d, i) => {
-//       // const pos = locToLatLng(d?.location);
-//       const pos = toLatLng(d?.location);
-//       if (!pos) return;
-//       addPDMarker(mapRef!, pos, "D", i + 1, {
-//         name: d?.location?.name,
-//         address: d?.location?.address,
-//         sin: s.SIN,
-//       });
-//     });
-//   }
-// }
-// function drawPDForShipment(s: Shipment) {
-//   if (!mapRef || !s) return;
-//   console.group(`[PD] draw for SIN ${s.SIN}`);                   // 👈
-//   console.log("[PD] pickups raw:", s.pickups);
-//   console.log("[PD] deliveries raw:", s.deliveries);
-// console.log("pickup is working");
-//   // clear old P/D
-//   clearPDMarkers();
-
-//   const b = new google.maps.LatLngBounds();
-//   let added = 0;
-
-//   // P1, P2, ...
-//   (s.pickups || []).forEach((p, i) => {
-//     const pos = toLatLng(p?.location);
-//     console.debug(`[PD] P${i+1} loc →`, p?.location, "→", pos);  
-//     if (!pos) return;
-//     addPDMarker(mapRef!, pos, "P", i + 1, {
-//       name: p?.location?.name,
-//       address: p?.location?.address,
-//       sin: s.SIN,
-//     });
-//     b.extend(pos);
-//     added++;
-//   });
-
-//   // D1, D2, ...
-//   (s.deliveries || []).forEach((d, i) => {
-//     const pos = toLatLng(d?.location);
-//     console.debug(`[PD] D${i+1} loc →`, d?.location, "→", pos);  // 👈
-//     if (!pos) return;
-//     addPDMarker(mapRef!, pos, "D", i + 1, {
-//       name: d?.location?.name,
-//       address: d?.location?.address,
-//       sin: s.SIN,
-//     });
-//     b.extend(pos);
-//     added++;
-//   });
-
-//   if (added && !b.isEmpty()) mapRef.fitBounds(b, 64);
-// }
-
-// function drawPDForShipment(s: Shipment) {
-//   // console.groupCollapsed("[PD] draw", s?.SIN ?? s?._id ?? "unknown");
-//   console.group("[PD] draw", s?.SIN ?? s?._id ?? "unknown");
-//   // 1) hard guards
-//   if (!s) { console.warn("[PD] no shipment"); console.groupEnd(); return; }
-//   if (!(window as any).google || !google.maps) {
-//     console.warn("[PD] google maps not ready");
-//     console.groupEnd();
-//     return;
-//   }
-//   // const map = mapRef?.current as google.maps.Map | null;
-//   const map = mapRef as google.maps.Map | null;
-//   if (!map) {
-//     console.warn("[PD] mapRef.current is null");
-//     console.groupEnd();
-//     return;
-//   }
-
-//   // 2) map container sanity (height/overlay)
-//   const div = map.getDiv() as HTMLElement;
-//   const rect = div.getBoundingClientRect();
-//   console.log("[PD] map size", { w: rect.width, h: rect.height });
-
-//   // 3) unwrap raw arrays to location objects
-//   const pickupDoc = s?.pickups?.[0] ?? null;
-//   const deliveryDoc = s?.deliveries?.[s?.deliveries?.length - 1] ?? null;
-//   const pRaw = pickupDoc?.location ?? null;
-//   const dRaw = deliveryDoc?.location ?? null;
-
-//   console.log("[PD] pickups raw:", s?.pickups);
-//   console.log("[PD] deliveries raw:", s?.deliveries);
-//   console.log("[PD] pRaw:", pRaw, "dRaw:", dRaw);
-
-//   // 4) tolerant parser (lat/lng | latitude/longitude | geo_point.coordinates | coordinates)
-//   const toLatLng = (v: any): google.maps.LatLngLiteral | null => {
-//     if (!v) return null;
-//     const n = (x: any) => { const y = Number(x); return Number.isFinite(y) ? y : NaN; };
-
-//     let lat = n(v?.lat), lng = n(v?.lng);
-//     if (!Number.isFinite(lat) || !Number.isFinite(lng)) { lat = n(v?.latitude); lng = n(v?.longitude); }
-//     if (!Number.isFinite(lat) || !Number.isFinite(lng)) { // GeoJSON at root
-//       const c = v?.coordinates;
-//       if (Array.isArray(c) && c.length >= 2) { lng = n(c[0]); lat = n(c[1]); }
-//     }
-//     if (!Number.isFinite(lat) || !Number.isFinite(lng)) { // nested geo_point
-//       const gc = v?.geo_point?.coordinates;
-//       if (Array.isArray(gc) && gc.length >= 2) { lng = n(gc[0]); lat = n(gc[1]); }
-//     }
-//     if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
-
-//     const inRange = (a:number,b:number)=> a>=-90&&a<=90&&b>=-180&&b<=180;
-//     if (!inRange(lat,lng) && inRange(lng,lat)) {
-//       console.warn("[PD] lat/lng looked swapped → fixing");
-//       return { lat: lng, lng: lat };
-//     }
-//     return inRange(lat,lng) ? { lat, lng } : null;
-//   };
-
-//   const p = toLatLng(pRaw);
-//   const d = toLatLng(dRaw);
-//   console.table({
-//     pickup_parsed: p || "❌",
-//     delivery_parsed: d || "❌",
-//   });
-
-//   // 5) clear old + add markers
-//   clearPDMarkers();
-
-//   let added = 0;
-//   const b = new google.maps.LatLngBounds();
-
-//   if (p) {
-//     addPDMarker(map, p, "P", 1, { sin: s?.SIN });
-//     b.extend(p);
-//     added++;
-//   } else {
-//     console.warn("[PD] pickup invalid/missing lat/lng");
-//   }
-
-//   if (d) {
-//     addPDMarker(map, d, "D", 1, { sin: s?.SIN });
-//     b.extend(d);
-//     added++;
-//   } else {
-//     console.warn("[PD] delivery invalid/missing lat/lng");
-//   }
-
-//   console.log("[PD] markers added:", added);
-
-//   if (added > 0 && !b.isEmpty()) {
-//     map.fitBounds(b, 60);
-//   } else {
-//     // drop a test marker to prove overlays/map are rendering
-//     const ctr = map.getCenter();
-//     console.warn("[PD] no PD markers created → TEST marker @ map center");
-//     const test = new google.maps.Marker({ map, position: ctr, label: "TEST" });
-//     setTimeout(() => test.setMap(null), 1500);
-//   }
-
-//   console.groupEnd();
-// }
-
-// helper right above drawPDForShipment
-// const resolveLoc = (v: any) =>
-//   toLatLng(v) ||
-//   toLatLng(v?.location) ||
-//   toLatLng(v?.loc) ||
-//   toLatLng(v?.geo) ||
-//   null;
-
-// --- Geocoding fallback for P/D ---
 const geocoderRef = useRef<google.maps.Geocoder | null>(null);
 const geocodeCacheRef = useRef<Map<string, google.maps.LatLngLiteral>>(new Map());
 
@@ -802,16 +408,13 @@ const locKey = (loc:any) => loc?._id || buildAddress(loc) || JSON.stringify(loc 
 async function ensureLatLngFromLocation(loc:any): Promise<google.maps.LatLngLiteral | null> {
   if (!loc) return null;
 
-  // 1) try direct fields first
   const direct = resolveLoc(loc);
   if (direct) return direct;
 
-  // 2) cache
   const key = locKey(loc);
   const cached = geocodeCacheRef.current.get(key);
   if (cached) return cached;
 
-  // 3) geocode from address
   const address = buildAddress(loc);
   if (!address || !geocoderRef.current) return null;
 
@@ -829,12 +432,10 @@ async function ensureLatLngFromLocation(loc:any): Promise<google.maps.LatLngLite
   return null;
 }
 
-// make the caller handle the promise (or just ignore; markers will pop in)
 async function drawPDForShipment(s: Shipment) {
   console.groupCollapsed("[PD] draw", s?.SIN ?? s?._id ?? "unknown");
 
   if (!(window as any).google || !google.maps) { console.warn("[PD] maps not ready"); console.groupEnd(); return; }
-  // const map = mapRef?.current as google.maps.Map | null;
   const map = mapRef as unknown as google.maps.Map | null;
   if (!map) { console.warn("[PD] mapRef.current is null"); console.groupEnd(); return; }
 
@@ -843,7 +444,6 @@ async function drawPDForShipment(s: Shipment) {
   const pRaw = pickupDoc?.location ?? null;
   const dRaw = deliveryDoc?.location ?? null;
 
-  // try direct; then geocode if needed
   const p = (resolveLoc(pRaw)) || (await ensureLatLngFromLocation(pRaw));
   const d = (resolveLoc(dRaw)) || (await ensureLatLngFromLocation(dRaw));
 
@@ -868,9 +468,7 @@ async function drawPDForShipment(s: Shipment) {
 }
 
 
-  /** Angular parity: pick the *last* arrived delivery’s arrived_at. */
 function arrivalIsoFromDeliveries(s: Shipment): string | undefined {
-  // deliveries: [{ arrived: boolean, arrived_at: ISO, ... }]
   const lastArrived = Array.isArray(s?.deliveries)
     ? (s.deliveries as any[]).filter(d => d?.arrived === true).slice(-1)[0]
     : undefined;
@@ -880,7 +478,6 @@ function arrivalIsoFromDeliveries(s: Shipment): string | undefined {
     lastArrived?.arrivedAt ||
     lastArrived?.arrival_time;
 
-  // strict fallback chain (optional but practical)
   return (
     arrivedAt ||
     (s as any)?.delivery_gate_in ||
@@ -894,10 +491,6 @@ function clearPathOverlays() {
   pathOverlaysRef.current = [];
 }
 
-// function addOverlay(o: google.maps.MVCObject) {
-//   pathOverlaysRef.current.push(o);
-//   return o;
-// }
 function addOverlay(
   o: google.maps.Polyline | google.maps.Marker | google.maps.Polygon | google.maps.Circle
 ) {
@@ -947,11 +540,10 @@ function addMarker(map: google.maps.Map, pos: google.maps.LatLngLiteral, label?:
     };
   
     if (pathData) {
-      if (vis.gps) drawLine(pathData.gps, "#2563EB", 22);  // blue
-      if (vis.app) drawLine(pathData.app, "#16A34A", 21);  // green
-      if (vis.sim) drawLine(pathData.sim, "#7C3AED", 20);  // purple
+      if (vis.gps) drawLine(pathData.gps, "#2563EB", 22);  
+      if (vis.app) drawLine(pathData.app, "#16A34A", 21);  
+      if (vis.sim) drawLine(pathData.sim, "#7C3AED", 20);  
   
-      // halts as red pins
       (pathData.haltData || []).forEach((h: any) => {
         const p = toLatLng(h);
         if (!p) return;
@@ -964,12 +556,9 @@ function addMarker(map: google.maps.Map, pos: google.maps.LatLngLiteral, label?:
       });
     }
   
-    // pickup & delivery markers for the selected shipment
     const p = selectedShipment?.pickups?.[0]?.location;
     const d = selectedShipment?.deliveries?.slice(-1)?.[0]?.location;
   
-    // const pli = p?.lat && p?.lng ? { lat: Number(p.lat), lng: Number(p.lng) } : null;
-    // const dli = d?.lat && d?.lng ? { lat: Number(d.lat), lng: Number(d.lng) } : null;
     const pli = toLatLng(p);
     const dli = toLatLng(d);
     if (pli) { addMarker(mapRef!, pli, "P", "#1D4ED8", 70); b.extend(pli); }
@@ -978,11 +567,9 @@ function addMarker(map: google.maps.Map, pos: google.maps.LatLngLiteral, label?:
       const p = driverPos(s);
       if (p) b.extend(p);
     }
-    // zoom to what we drew
     if (!b.isEmpty()) mapRef!.fitBounds(b, 64);
   }
   
-// replace your existing path fetch with this
 async function fetchShipmentPathById(shipmentId: string) {
   if (!shipmentId) return null;
 
@@ -990,7 +577,6 @@ async function fetchShipmentPathById(shipmentId: string) {
   const res = await httpsGet(`shipment/path?${qs}`, 0);
   const raw = (res?.data ?? res) || {};
 
-  // normalize shape
   return {
     gps: raw.gps ?? [],
     app: raw.app ?? [],
@@ -1000,92 +586,9 @@ async function fetchShipmentPathById(shipmentId: string) {
   };
 }
 
-// 
 
-//   if (!shipmentId) return;
-
-//   // Optional: pass date range if your UI has them
-//   const qs = new URLSearchParams({
-//     shipment: shipmentId,
-//     ...(dateFrom ? { from: new Date(dateFrom).toISOString() } : {}),
-//     ...(dateTo   ? { to:   new Date(dateTo).toISOString() }   : {}),
-//   }).toString();
-
-//   // GET with query string (same util you used elsewhere)
-//   const res = await httpsGet(`shipment/path?${qs}`, 0);
-//   const payload = (res?.data ?? res) as any;
-
-//   const sim  = payload?.sim  ?? [];
-//   const app  = payload?.app  ?? [];
-//   const gps  = payload?.gps  ?? [];
-//   const halt = payload?.haltData ?? [];
-
-//   setPathData({
-//     sim, app, gps, haltData: halt,
-//     meta: { is_fastag_enabled: payload?.is_fastag_enabled, unique_code: payload?.unique_code }
-//   });
-
-//   // default: show what’s available (you can change the default)
-//   setPathVisible({ gps: gps.length > 0, app: app.length > 0, sim: sim.length > 0 });
-
-//   // draw once after fetching
-//   drawPathsAndHalts({ gps: gps.length > 0, app: app.length > 0, sim: sim.length > 0 });
-// }
-
-  
-//   // Reset all modal drafts + selected filters, then refetch
-// const handleClearFilters = () => {
-//   // drafts (modal local state)
-//   setDraftMaterials("-");
-//   setDraftPickupLocation("");
-//   setDraftDeliveryLocation("");
-//   setDraftCarrier("");
-//   setDraftStatus("");
-//   setDraftInPlantStage("");
-//   setDraftShipmentId("");
-//   setDraftDateFrom("");
-//   setDraftDateTo("");
-//   setDraftVehicle("");
-
-//   // active filters shown in the header bar / applied to API
-//   setSelectedMaterials("");
-//   setSelectedPickupLocation("");
-//   setSelectedDeliveryLocation("");
-//   setSelectedCarrier("");
-//   setSelectedStatus("all"); // or "" if you prefer truly empty
-//   setInPlantStage("");
-//   setShipmentIdSearch("");
-//   setDateFrom("");
-//   setDateTo("");
-//   setVehicleSearch("");
-
-//   // refetch with defaults (no filter)
-//   fetchShipments({
-//     status: "all",
-//     inPlantStage: "",
-//     material: "",
-//     pickups: "",
-//     deliveries: "",
-//     carrier_id: "",
-//     SIN: "",
-//     from: "",
-//     to: "",
-//     vehicle_no: "",
-//     group: "all",
-//   });
-// };
-const handleClearFilters = () => {
-  // Reset all state variables
-//   setDraftMaterials("");
-//   setDraftPickupLocation("");
-  // ... (rest of the clear logic)
-
-  // Re-fetch with the new, cleared state
-  fetchShipments();
-};
-// call this from your shipment card onClick
 const onShipmentCardClick = async (shipment: any) => {
-  setSelectedShipment(shipment);           // still needed for P/D pins, etc.
+  setSelectedShipment(shipment);         
   drawPDForShipment(shipment);
   const data = await fetchShipmentPathById(shipment._id);
   if (!data) return;
@@ -1094,17 +597,14 @@ const onShipmentCardClick = async (shipment: any) => {
   const hasAPP = !!data.app?.length;
   const hasSIM = !!data.sim?.length;
 
-  // if nothing exists → clear everything and bail
   if (!(hasGPS || hasAPP || hasSIM)) {
     clearPathOverlays();
     setPathData(null);
     setPathVisible({ gps: false, app: false, sim: false });
-    return; // chips won't render because pathData is null
+    return;
   }
 
-  // we have at least one track → save, show only what exists, draw once
   setPathData(data);
-  // const vis = { gps: hasGPS, app: hasAPP, sim: hasSIM };
   const vis = { gps: false, app: false, sim: false };
   setPathVisible(vis);
   drawPathsAndHalts(vis);
@@ -1114,7 +614,7 @@ const onShipmentCardClick = async (shipment: any) => {
     options: MaterialOption[];
     buckets: MaterialBuckets;
   } {
-    const idToName = new Map<string, string>();        // pass 1: learn names by id
+    const idToName = new Map<string, string>();        
     const rawItems: Array<{ id: string; name: string }> = [];
   
     for (const s of shipments || []) {
@@ -1127,7 +627,6 @@ const onShipmentCardClick = async (shipment: any) => {
       }
     }
   
-    // pass 2: resolve name (prefer m.name, else learned id→name); bucket by name
     const buckets: MaterialBuckets = {};
     const UNKNOWN_KEY = "__unknown__";
     const UNKNOWN_LABEL = "Unknown";
@@ -1135,23 +634,21 @@ const onShipmentCardClick = async (shipment: any) => {
     for (const { id, name } of rawItems) {
       const resolvedName = name || (id ? idToName.get(id) || "" : "");
       if (!resolvedName) {
-        // still unnamed → put under a single "Unknown" bucket (or skip if you prefer)
         if (!buckets[UNKNOWN_KEY]) buckets[UNKNOWN_KEY] = { label: UNKNOWN_LABEL, ids: [] };
         if (id && !buckets[UNKNOWN_KEY].ids.includes(id)) buckets[UNKNOWN_KEY].ids.push(id);
         continue;
       }
   
-      const key = resolvedName.toLowerCase(); // de-dupe case-insensitively
+      const key = resolvedName.toLowerCase(); 
       if (!buckets[key]) buckets[key] = { label: resolvedName, ids: [] };
       if (id && !buckets[key].ids.includes(id)) buckets[key].ids.push(id);
     }
   
-    // Build options list; hide "Unknown" unless it’s the only thing we have
     const entries = Object.entries(buckets);
     const onlyUnknown = entries.length === 1 && entries[0][0] === UNKNOWN_KEY;
   
     const options = entries
-      .filter(([k]) => onlyUnknown || k !== UNKNOWN_KEY) // drop Unknown if others exist
+      .filter(([k]) => onlyUnknown || k !== UNKNOWN_KEY)
       .map(([key, b]) => ({ key, label: b.label }))
       .sort((a, b) => a.label.localeCompare(b.label));
   
@@ -1161,28 +658,20 @@ const onShipmentCardClick = async (shipment: any) => {
 type StatusTab = "all" | "in_plant" | "towards_pickup" | "in_transit" | "at_delivery";
 
 type LegendKey =
-  // in_transit
   | "on" | "2-4" | "4-8" | "8-12" | "12-16" | "16-20" | "20+"
-  // at_delivery
   | "0-12" | "12-24" | "24+"
-  // towards_pickup
   | "N" | "E" | "S" | "W" | "C"
-  // in_plant
   | "PO" | "GI" | "TW" | "GW" | "PG" | "TC" | "IV" | "EW"
-  // all
   | "ALL_IN_PLANT" | "ALL_TP" | "ALL_IT" | "ALL_AD";
 
 
 const [activeLegend, setActiveLegend] = useState<LegendKey | null>(null);
 
-useEffect(() => { setActiveLegend(null); }, [selectedStatus]); // reset when switching tabs
-// in_transit
+useEffect(() => { setActiveLegend(null); }, [selectedStatus]); 
 function delayHours(s:any){ const a=s?.tripTrackerDetails?.total_delay; const v=Number(a); return Number.isFinite(v)?v:0; }
 
 
-// at_delivery
 type DetentionBucket = "0-12" | "12-24" | "24+";
-// ---- date -> epoch ms helpers (local timezone) ----
 type D = string | number | Date | undefined | null;
 
 const toStartOfDayMs = (v: D): number | undefined => {
@@ -1199,26 +688,10 @@ const toEndOfDayMs = (v: D): number | undefined => {
   return d.getTime();
 };
 
-// Mapview.tsx (Around line 750) - Verification (Assuming hoursBetween works)
-// function detentionBucket(s: Shipment): DetentionBucket {
-//   // Let's assume you have a reliable 'timeArrivedAtDelivery' field for precision
-//   // For now, stick to the provided logic, assuming `s.delivery_date` is the proxy start time.
-//   const arrivedIso = s.delivery_date || null; 
-
-//   if (!arrivedIso) return "0-12"; // Default
-
-//   const h = hoursBetween(arrivedIso, undefined); // end time defaults to Date.now()
-//   if (!Number.isFinite(h)) return "0-12"; 
-  
-//   // These return values MUST match the keys in the LEGEND_ITEMS object:
-//   if (h < 12) return "0-12";
-//   if (h < 24) return "12-24";
-//   return "24+";
-// }
 function detentionBucket(arrivedIso?: string): DetentionBucket {
-  if (!arrivedIso) return "0-12"; // default
+  if (!arrivedIso) return "0-12"; 
 
-  const h = hoursBetween(arrivedIso, undefined); // compare with now
+  const h = hoursBetween(arrivedIso, undefined); 
   if (!Number.isFinite(h)) return "0-12";
 
   if (h < 12) return "0-12";
@@ -1240,30 +713,25 @@ const containerStyle = useMemo(() => {
 }, [selectedStatus]);
 
 
-// towards_pickup
-// function driverPos(s:any){ /* your existing helper */ }
+
 
 function tpBucket(s:any): Extract<LegendKey,"N"|"E"|"S"|"W"|"C"> {
   const from = driverPos(s); const to = firstPickupLatLng(s);
   if (!from || !to) return "C";
-  return cardinalDirection(from, to); // returns N/E/S/W/C
+  return cardinalDirection(from, to);
 }
 
-// in_plant
 function plantBucket(s:any): Extract<LegendKey,"PO"|"GI"|"TW"|"GW"|"PG"|"TC"|"IV"|"EW"> {
   const code = String(s?.eventStatus || s?.latest_status || "").toUpperCase();
   const allowed = new Set(["PO","GI","TW","GW","PG","TC","IV","EW"]);
-  // return (allowed.has(code) ? (code as any) : "PO");
   return (allowed.has(code) ? (code as any) : undefined as any);
 }
 
-// all
 function allBucket(s:any): Extract<LegendKey,"ALL_IN_PLANT"|"ALL_TP"|"ALL_IT"|"ALL_AD"> {
   const code = String(s?.latest_status || "").toUpperCase();
   if (code === "INPL") return "ALL_IN_PLANT";
   if (code === "SP")   return "ALL_TP";
   if (code === "ALD")  return "ALL_AD";
-  // ITNS/ABTR → In Transit
   return "ALL_IT";
 }
 const LEGEND_ITEMS: Record<StatusTab, Array<{key:LegendKey; label:string; icon:any}>> = {
@@ -1316,7 +784,6 @@ const visibleShipments = useMemo(() => {
       arr = arr.filter(s => delayBucket(s) === activeLegend);
       break;
     case "at_delivery":
-      // arr = arr.filter(s => detentionBucket(s) === activeLegend);
       arr = arr.filter(s => detentionBucket(arrivalIsoFromDeliveries(s)) === activeLegend);
       break;
     case "towards_pickup":
@@ -1326,9 +793,6 @@ const visibleShipments = useMemo(() => {
       arr = arr.filter(s => plantBucket(s) === activeLegend);
       break;
     case "all":
-      // Either: switch the tab when user clicks a category…
-      //   if (activeLegend === "ALL_IN_PLANT") setSelectedStatus("in_plant");
-      // …or filter in-place by latest_status:
       arr = arr.filter(s => {
         const k = allBucket(s);
         return k === activeLegend;
@@ -1338,12 +802,11 @@ const visibleShipments = useMemo(() => {
   return arr;
 }, [shipmentsData, selectedStatus, activeLegend]);
 type GeoFence =
-  | { type: "Polygon"; coordinates: number[][][] }           // [ [ [lng,lat], ... ]  , [hole], ... ]
-  | { type: "MultiPolygon"; coordinates: number[][][][] };   // [ [ [ring], [ring] ], [ [ring] ] ]
+  | { type: "Polygon"; coordinates: number[][][] }          
+  | { type: "MultiPolygon"; coordinates: number[][][][] };   
 
 
 
-// Style like your screenshot (soft blue fill, thin stroke)
 const GEOFENCE_STYLE: google.maps.PolygonOptions & google.maps.CircleOptions = {
   strokeColor: "#1D4ED8",
   strokeOpacity: 0.9,
@@ -1355,15 +818,14 @@ const GEOFENCE_STYLE: google.maps.PolygonOptions & google.maps.CircleOptions = {
 };
 
 function blueRingSvg({
-  size = 64,            // pixel size of the badge
-  core = 6,             // inner dot radius (px)
-  ring1 = 16,           // first ring radius
-  ring2 = 22,           // second ring radius
-  ring3 = 30,           // outer ring radius
+  size = 64,            
+  core = 6,             
+  ring1 = 16,           
+  ring2 = 22,           
+  ring3 = 30,           
 } = {}) {
   const s = size;
   const c = s / 2;
-  // colors + opacities tuned to match your Angular look
   return `data:image/svg+xml;utf8,${encodeURIComponent(`
     <svg xmlns="http://www.w3.org/2000/svg" width="${s}" height="${s}" viewBox="0 0 ${s} ${s}">
       <defs>
@@ -1391,11 +853,11 @@ function addBlueRingMarker(map: google.maps.Map, lat: number, lng: number, sizeP
     position: { lat, lng },
     map,
     clickable: false,
-    zIndex: 999, // above fences, below info windows
+    zIndex: 999, 
     icon: {
       url,
       scaledSize: new google.maps.Size(sizePx, sizePx),
-      anchor: new google.maps.Point(sizePx / 2, sizePx / 2), // center the badge at the point
+      anchor: new google.maps.Point(sizePx / 2, sizePx / 2), 
     },
   });
   geofenceOverlaysRef.current.push(marker);
@@ -1406,54 +868,10 @@ useEffect(() => {
   fetchShipments();
   
 }, []);
-function isValidLatLng(lat?: number, lng?: number) {
-  if (typeof lat !== "number" || typeof lng !== "number") return false;
-  if (!isFinite(lat) || !isFinite(lng)) return false;
-  return lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180 && !(Math.abs(lat) < 1e-6 && Math.abs(lng) < 1e-6);
-}
-const handleAttach = (files: File[]) => {
-  // …do your upload, then close
-  closeModal();
-};
+
 const handleCreateAdvance = (payload: any) => {
-  // …create payment advice, then close
   closeModal();
 };
-// Mapview.tsx (REPLACED CODE - Around line 258)
-// Mapview.tsx (Around line 251) - VERIFIED CODE FOR ROBUSTNESS
-// function ringToPath(ring: any): google.maps.LatLngLiteral[] {
-//   const path: google.maps.LatLngLiteral[] = [];
-//   if (!Array.isArray(ring)) return path;
-
-//   for (const pair of ring) {
-//     if (!Array.isArray(pair) || pair.length < 2) {
-//       console.warn("Skipping malformed coordinate pair:", pair);
-//       continue;
-//     }
-//     // coerce
-//     let lng = Number(pair[0]);
-//     let lat = Number(pair[1]);
-
-//     if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
-//       console.warn("Skipping non-finite coordinate pair:", pair);
-//       continue;
-//     }
-
-//     // auto-swap if it looks like [lat, lng]
-//     if ((Math.abs(lat) > 60 && Math.abs(lng) <= 60) || (lng < -180 || lng > 180)) {
-//       const t = lat; lat = lng; lng = t;
-//     }
-
-//     if (lat < -90 || lat > 90 || lng < -180 || lng > 180) {
-//       console.warn("Skipping out-of-range pair:", pair);
-//       continue;
-//     }
-//     path.push({ lat, lng });
-//   }
-//   return path;
-// }
-
-// type ModalType = "cancel" | "share" | "mail" | "upload" | "advance" | null;
 
 const [menu, setMenu] = useState<{
   open: boolean;
@@ -1463,18 +881,6 @@ const [menu, setMenu] = useState<{
   placement: "above" | "below";
 }>({ open: false, x: 0, y: 0, shipmentId: undefined, placement: "below" });
 
-// type ModalType = 'cancel' | 'share' | 'mail' |  'upload' | 'advance' | null;
-// // type ModalState = { type: ModalType; shipment?: { _id: string; sin: string } };
-// // const [modal, setModal] = useState<ModalState>({ type: null });
-// type ModalState =
-//   | { type: "cancel";  shipment: { _id: string; sin: string } }   // needs object
-//   | { type: "mail";    shipment: { _id: string; sin: string } }   // needs object
-//   | { type: "share";   shipment: { _id: string; sin: string } }   // needs object
-//   | { type: "upload";  shipmentId: string }                       // needs id
-//   | { type: "advance"; shipmentId: string }                       // needs id
-//   | { type: null };
-
-// const [modal, setModal] = useState<ModalState>({ type: null });
 type ModalType = "cancel" | "mail" | "share" | "upload" | "advance" | null;
 
 type ModalState =
@@ -1496,38 +902,18 @@ function openShareModal(s: { _id: string; SIN: string }) {
 function openAttachModal(id: string)  { setModal({ type: "upload",  shipmentId: id }); }
 function openAdvanceModal(id: string) { setModal({ type: "advance", shipmentId: id }); }
 
-// const closeModal = () => setModal({ type: null });
-
-// const [modal, setModal] = useState<{ type: ModalType; shipmentId?: string }>({
-//   type: null,
-//   shipmentId: undefined,
-// });
-// ---------- Driver position ----------
-// function driverPos(s: Shipment): { lat: number; lng: number } | null {
-//   // prefer assigned_driver.geo_point (GeoJSON [lng,lat])
-//   const coords = s?.assigned_driver?.geo_point?.coordinates;
-//   if (Array.isArray(coords) && coords.length >= 2) {
-//     const lng = Number(coords[0]); const lat = Number(coords[1]);
-//     if (Number.isFinite(lat) && Number.isFinite(lng)) return { lat, lng };
-//   }
-//   // fallbacks (if your API also flattens lat/lng)
-//   const lat = (s as any)?.assigned_driver?.latitude ?? (s as any)?.latitude;
-//   const lng = (s as any)?.assigned_driver?.longitude ?? (s as any)?.longitude;
-//   return Number.isFinite(lat) && Number.isFinite(lng) ? { lat, lng } : null;
-// }
 function driverPos(s: Shipment): { lat: number; lng: number } | null {
-  // Prefer GeoJSON if present
-  const coords = s?.assigned_driver?.geo_point?.coordinates; // usually [lng, lat]
+  const coords = s?.assigned_driver?.geo_point?.coordinates; 
   let lat: number | undefined;
   let lng: number | undefined;
 
   if (Array.isArray(coords) && coords.length >= 2) {
-    // Start with “GeoJSON order”
     let cLng = Number(coords[0]);
     let cLat = Number(coords[1]);
 
-    // Auto-swap if it *looks* like [lat, lng] slipped through
-    // (lat looks huge/invalid, or "lng" out of range)
+    if ((Math.abs(cLat) > 60 && Math.abs(cLng) <= 60) || cLng < -180 || cLng > 180) {
+      const t = cLat; cLat = cLng; cLng = t;
+    }
     if ((Math.abs(cLat) > 60 && Math.abs(cLng) <= 60) || cLng < -180 || cLng > 180) {
       const t = cLat; cLat = cLng; cLng = t;
     }
@@ -1535,28 +921,18 @@ function driverPos(s: Shipment): { lat: number; lng: number } | null {
     lat = cLat;
     lng = cLng;
   } else {
-    // Fallbacks (flat lat/lng)
     lat = Number((s as any)?.assigned_driver?.latitude ?? (s as any)?.latitude);
     lng = Number((s as any)?.assigned_driver?.longitude ?? (s as any)?.longitude);
   }
 
   if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
 
-  // Keep the “ignore obviously wrong” rule, but apply it *after* the swap heuristic
   if (!inIndia(lat, lng)) return null;
 
   return { lat, lng };
 }
 
 
-
-// ---------- First pickup lat/lng (for Towards Pickup bearing) ----------
-// function firstPickupLatLng(s: Shipment): { lat: number; lng: number } | null {
-//   const p = s?.pickups?.[0]?.location;
-//   if (!p) return null;
-//   const lat = Number(p.lat); const lng = Number(p.lng);
-//   return Number.isFinite(lat) && Number.isFinite(lng) ? { lat, lng } : null;
-// }
 function firstPickupLatLng(s: Shipment): { lat: number; lng: number } | null {
   const p = s?.pickups?.[0]?.location;
   if (!p) return null;
@@ -1564,19 +940,12 @@ function firstPickupLatLng(s: Shipment): { lat: number; lng: number } | null {
   const res = (Number.isFinite(lat) && Number.isFinite(lng)) ? { lat, lng } : null;
   return res && inIndia(res.lat, res.lng) ? res : null;
 }
-// ---------- In-Transit: delay buckets ----------
-// function delayHours(s: Shipment): number {
-//   // Angular code uses tripTrackerDetails.total_delay (hours)
-//   const a = (s as any)?.tripTrackerDetails?.total_delay;
-//   const b = (s as any)?.trip_tracker?.total_delay; // fallback if you store it here
-//   const v = Number.isFinite(a) ? a : Number(b);
-//   return Number.isFinite(v) ? v : 0;
-// }
+
 
 type DelayBucket = "on" | "2-4" | "4-8" | "8-12" | "12-16" | "16-20" | "20+";
 function delayBucket(s: Shipment): DelayBucket {
   const h = delayHours(s);
-  if (h < 2)      return "on";   // ⬅️ Angular-aligned threshold
+  if (h < 2)      return "on";   
   if (h < 4)      return "2-4";
   if (h < 8)      return "4-8";
   if (h < 12)     return "8-12";
@@ -1598,22 +967,20 @@ function inTransitIcon(s: Shipment): string {
 }
 function allViewIcon(s: Shipment): string | null {
   const code = String(s?.latest_status || "").toUpperCase();
-  // map Angular’s buckets:
   if (code === "INPL") return srcOf(catInPlant);
-  if (code === "SP")   return srcOf(catTowardsPickup);        // Scheduled / Towards Pickup
+  if (code === "SP")   return srcOf(catTowardsPickup);        
   if (code === "ALD")  return srcOf(catAtDelivery);
   if (code === "ITNS" || code === "ABTR") return srcOf(catInTransit);
-  return srcOf(catInTransit); // safe default
+  return srcOf(catInTransit); 
 }
 function getMarkerIconForShipment(s: Shipment): google.maps.Icon | undefined {
   let url: string | null = null;
 
   if (selectedStatus === "towards_pickup") {
-    // Use bearing to the first pickup
     const from = driverPos(s);
     const to   = firstPickupLatLng(s);
     if (from && to) {
-      const dir = cardinalDirection(from, to); // N/E/S/W/C
+      const dir = cardinalDirection(from, to); 
       const m = { N: dirN, E: dirE, S: dirS, W: dirW, C: dirC };
       url = srcOf(m[dir]);
     }
@@ -1623,17 +990,15 @@ function getMarkerIconForShipment(s: Shipment): google.maps.Icon | undefined {
   }
   else if (selectedStatus === "at_delivery") {
     if (activeLegend && detentionBucket(arrivalIsoFromDeliveries(s)) !== activeLegend) {
-      return undefined; // don’t render this marker
+      return undefined; 
     }
     url = atDeliveryIcon(s);
   }
   else if (selectedStatus === "in_transit") {
-    // Delay buckets + optional legend filter
     const iconUrl = inTransitIcon(s);
     if (!activeLegend) {
       url = iconUrl;
     } else {
-      // show only shipments matching the clicked legend bucket
       if (delayBucket(s) === (activeLegend as DelayBucket)) url = iconUrl;
       else url = null;
     }
@@ -1644,62 +1009,7 @@ function getMarkerIconForShipment(s: Shipment): google.maps.Icon | undefined {
 
   return url ? markerIcon(url, 30) : undefined;
 }
-// function getMarkerIconForShipment(s: Shipment): google.maps.Icon | undefined {
-//   let url: string | null = null;
 
-//   switch (selectedStatus as StatusTab) {
-//     case "in_transit":
-//       if (activeLegend && delayBucket(s) !== activeLegend) return undefined;
-//       url = inTransitIcon(s); // your existing map -> icon
-//       break;
-
-//     case "at_delivery":
-//       if (activeLegend && detentionBucket(s) !== activeLegend) return undefined;
-//       url = atDeliveryIcon(s);
-//       break;
-
-//     case "towards_pickup":
-//       if (activeLegend && tpBucket(s) !== activeLegend) return undefined;
-//       url = directionIconFor(s); // use your cardinalDirection → icon map
-//       break;
-
-//     case "in_plant":
-//       if (activeLegend && plantBucket(s) !== activeLegend) return undefined;
-//       url = inPlantStageIcon(s);
-//       break;
-
-//     case "all":
-//       if (activeLegend && allBucket(s) !== activeLegend) return undefined;
-//       url = allViewIcon(s);
-//       break;
-//   }
-
-//   return url ? markerIcon(url, 30) : undefined;
-// }
-
-// const visibleShipments = useMemo(() => {
-//   let arr = Array.isArray(shipmentsData) ? shipmentsData : [];
-
-//   // Towards Pickup requires both driver & first pickup coords to compute direction
-//   if (selectedStatus === "towards_pickup") {
-//     arr = arr.filter(s => driverPos(s) && firstPickupLatLng(s));
-//   }
-
-//   if (selectedStatus === "in_plant" && inPlantStage) {
-//     const code = mapInPlantStageToEventCode(inPlantStage);
-//     if (code) {
-//       arr = arr.filter(s => String(s.latest_status || "").toUpperCase() === code);
-//     }
-//   }
-
-//   if (selectedStatus === "in_transit" && activeLegend) {
-//     arr = arr.filter(s => delayBucket(s) === (activeLegend as DelayBucket));
-//   }
-
-//   // (Optional) apply your delivery-location / carrier dropdowns here
-
-//   return arr;
-// }, [shipmentsData, selectedStatus, inPlantStage, activeLegend]);
 useEffect(() => {
   if (!mapRef || visibleShipments.length === 0) return;
   const b = new google.maps.LatLngBounds();
@@ -1711,153 +1021,18 @@ useEffect(() => {
   if (added) mapRef.fitBounds(b, 64);
 }, [mapRef, visibleShipments]);
 
-// const openModal = (type: Exclude<ModalType, null>, shipmentId?: string) => {
-//   console.log(`[openModal] Type: ${type}, Shipment ID Received: ${shipmentId}`); 
-//   setModal({ type, shipmentId });
-//   // close the menu when opening a modal
-//   setMenu((m) => ({ ...m, open: false }));
-// };
-// const openModal = (type: Exclude<ModalType, null>, shipmentId?: string) => {
-//   console.log('[openModal] Type:', type, 'Shipment ID Received:', shipmentId);
 
-  // SIN is the shipment id in your system → feed both fields
-  // const shipment =
-  //   shipmentId ? { sin: String(shipmentId)}  : undefined;
   function openModal(type: Exclude<ModalType, null>, shipmentId: string) {
-    // ensure we always get an id for any modal that opens
     const id = String(shipmentId);
   
     if (type === "upload" || type === "advance") {
-      setModal({ type, shipmentId: id }); // expects string id
+      setModal({ type, shipmentId: id }); 
     } else {
-      setModal({ type, shipment: { _id: id, sin: id } }); // expects object
+      setModal({ type, shipment: { _id: id, sin: id } }); 
     }
   }
   
-//     const shipment =
-//     shipmentId 
-//     ? { 
-//         // FIX: Include the required '_id' property.
-//         _id: String(shipmentId), // Using shipmentId (SIN) as the _id
-//         sin: String(shipmentId) 
-//       }  
-//     : undefined;
-//     setModal({ type, shipment });
-
-
-// };
-
-// const closeModal = () => setModal({ type: null, shipment: undefined });
-// const closeModal = () => setModal({ type: null }); 
-const closeModal = () => setModal({ type: null }); // no extra props
-
-
-
-function clearGeofenceOverlays() {
-  geofenceOverlaysRef.current.forEach(o => o.setMap(null));
-  geofenceOverlaysRef.current = [];
-}
-// Converts a GeoJSON ring [[lng,lat], ...] ➜ google paths [{lat,lng}, ...]
-function ringToPath(ring: any): google.maps.LatLngLiteral[] {
-  const path: google.maps.LatLngLiteral[] = [];
-  if (!Array.isArray(ring)) return path;
-
-  for (const pt of ring) {
-    if (!Array.isArray(pt) || pt.length < 2) continue;
-    let lng = Number(pt[0]);
-    let lat = Number(pt[1]);
-
-    // auto-swap if someone sent [lat,lng]
-    if ((Math.abs(lat) > 60 && Math.abs(lng) <= 60) || lng < -180 || lng > 180) {
-      [lat, lng] = [lng, lat];
-    }
-
-    // basic sanity
-    if (lat < -90 || lat > 90 || lng < -180 || lng > 180) continue;
-
-    // (optional) keep only India-ish points; comment out if you want everything
-    // const inIndia = (a:number,b:number)=> a>=5 && a<=38.9 && b>=68 && b<=98;
-    // if (!inIndia(lat, lng)) continue;
-
-    path.push({ lat, lng });
-  }
-  return path;
-}
-
-
-// function drawGeoFencesOnMap(data: any[], map: google.maps.Map) {
-//      console.log("[GEOFENCE] draw start. items:", data?.length);
-//      clearGeofenceOverlays();
-//      const bounds = new google.maps.LatLngBounds();
-//      let added = 0;
-  
-//      for (const item of data || []) {
-//        const gf = item?.geo_fence;
-//        const type = String(gf?.type || "").toLowerCase();
-//        if (!type || !gf?.coordinates) continue;
-  
-//        if (type === "circle") {
-//          let lng = Number(gf.coordinates[0]);
-//          let lat = Number(gf.coordinates[1]);
-//          const radius = Number(gf.coordinates[2] ?? 250);
-//          if ((Math.abs(lat) > 60 && Math.abs(lng) <= 60) || (lng < -180 || lng > 180)) {
-//           const t = lat; lat = lng; lng = t;
-//          }
-//          if (!Number.isFinite(lat) || !Number.isFinite(lng) || !Number.isFinite(radius)) continue;
-//         //  const c = new google.maps.Circle({ ...GEOFENCE_STYLE, center: { lat, lng }, radius, map });
-//         //  geofenceOverlaysRef.current.push(c);
-//         //  const cb = c.getBounds?.();
-//         //  cb ? bounds.union(cb) : bounds.extend({ lat, lng });
-//          addBlueRingMarker(map, lat, lng, 64);
-//          added++;
-//         continue;
-//        }
-  
-//       // if ((type === "polygon" || type === "multipolygon") && Array.isArray(gf.coordinates)) {
-//       //    const multiPolys: number[][][][] = type === "multipolygon" ? gf.coordinates : [gf.coordinates];
-//       //   for (const rings of multiPolys) {
-//       //      const paths = (rings || []).map(ringToPath).filter(p => p.length >= 3);
-//       //      if (!paths.length) continue;
-//       //      const p = new google.maps.Polygon({ ...GEOFENCE_STYLE, paths, map });
-//       //   geofenceOverlaysRef.current.push(p);
-//       //     paths[0].forEach(pt => bounds.extend(pt as any));
-//       //      added++;
-//       //    }
-//       // }
-//       if ((type === "polygon" || type === "multipolygon") && Array.isArray(gf.coordinates)) {
-//         // MultiPolygon wraps an array of Polygons: [[rings], [rings]]
-//         // Polygon is just an array of rings: [rings]
-//         const polygonRings: number[][][] = type === "multipolygon"
-//           // Flatten the MultiPolygon structure down to an array of all its rings
-//           ? gf.coordinates.flat(1) as number[][][] 
-//           : gf.coordinates as number[][][];
-
-//         for (const rings of polygonRings) {
-//           // 'rings' here is an array of coordinates for ONE polygon's exterior/holes: [[lon,lat], [lon,lat], ...]
-
-//           // 1. Convert all rings (exterior + holes) using ringToPath
-//           // paths will be: [[{lat,lng}, ...], [{lat,lng}, ...]]
-//           const paths = (rings || []).map(ringToPath).filter(p => p.length >= 3);
-          
-//           if (!paths.length) continue;
-          
-//           // 2. The paths property takes an array of rings/paths for the Polygon
-//           const p = new google.maps.Polygon({ ...GEOFENCE_STYLE, paths, map });
-          
-//           geofenceOverlaysRef.current.push(p);
-          
-//           // 3. Extend bounds using the OUTERMOST ring (paths[0])
-//           paths[0].forEach(pt => bounds.extend(pt as any));
-//           added++;
-//         }
-//       }
-//      }
-  
-//      console.log("[GEOFENCE] overlays added:", added, "bounds empty?", bounds.isEmpty());
-//      return { added: added > 0, bounds };
-//    }
-
-
+const closeModal = () => setModal({ type: null }); 
 
 useEffect(() => {
   const fetchGeoFences = async () => {
@@ -1869,24 +1044,20 @@ console.log("API raw:", raw);
 console.log("Items extracted:", items);
 console.log("Unit sample:", items[0]);
 
-const DEFAULT_RADIUS_METERS = 1000; // tune as needed
+const DEFAULT_RADIUS_METERS = 1000; 
 
 const fences = items
   .map((loc: any) => {
-    // Prefer geo_fence if backend starts sending it later
     const gf = loc?.geo_fence;
     if (gf?.type && gf?.coordinates) return { geo_fence: gf };
 
-    // Fallback to geo_point -> Circle
     const gp = loc?.geo_point;
     const coords = gp?.coordinates;
-    // coords are [lon, lat] in your payload
     if (!Array.isArray(coords) || coords.length < 2) return null;
 
     const lon = Number(coords[0]);
     const lat = Number(coords[1]);
 
-    // filter garbage / origin-like points
     if (!Number.isFinite(lat) || !Number.isFinite(lon)) return null;
     if (!inIndia(lat, lon)) return null;   
     if (Math.abs(lat) < 0.0001 && Math.abs(lon) < 0.0001) return null;
@@ -1901,7 +1072,7 @@ const fences = items
   .filter(Boolean);
 console.log("Geo fence is",fences);
 setGeoFences(fences);
-      setUnitLocations(unitsRes?.data ?? []); // optional: for unit markers
+      setUnitLocations(unitsRes?.data ?? []);   
     } catch (err) {
       console.error("Error fetching geo-fences:", err);
     }
@@ -1909,41 +1080,8 @@ setGeoFences(fences);
 
   fetchGeoFences();
 }, []);
-const setAndFetch = <T,>(setter: (v: T) => void) => (v: T) => {
-  setter(v);
-  fetchShipments(); // same as how status triggers an immediate fetch
-};
-
-// useEffect(() => {
-//     if (!mapRef) { console.log("[GEOFENCE] mapRef not ready"); return; }
-//      if (!geoFences || geoFences.length === 0) { console.log("[GEOFENCE] no fences to draw"); return; }
-//      const { added, bounds } = drawGeoFencesOnMap(geoFences, mapRef);
-//     if (added && !bounds.isEmpty()) {
-//        console.log("[GEOFENCE] fitting bounds");
-//        mapRef.fitBounds(bounds, 64);
-//    } else {
-//        console.log("[GEOFENCE] nothing added or empty bounds");
-//      }
-//      return () => clearGeofenceOverlays();
-//    }, [geoFences, mapRef]);
 
 
-
-// useEffect(() => {
-//   if (mapRef && geoFences.length > 0) {
-//     drawGeoFences(geoFences, mapRef);
-//   }
-// }, [geoFences, mapRef]);
-// Style like your screenshot (soft blue fill, thin stroke)
-
-
-
-
-
-// Draw everything and return whether anything was added
-
-
-// One function to open the modal and prefill all draft fields
 const openFiltersWithSnapshot = (patch?: Partial<{
   materials: string;
   pickupLocation: string;
@@ -1956,8 +1094,6 @@ const openFiltersWithSnapshot = (patch?: Partial<{
   from_date: string;
   to_date: string;
 }>) => {
-  // Don't read from main state - only use the patch parameter
-  // This keeps the form independent from main view changes
   setFormDrafts({
     materials: patch?.materials ?? "",
     pickupLocation: patch?.pickupLocation ?? "",
@@ -1974,17 +1110,15 @@ const openFiltersWithSnapshot = (patch?: Partial<{
 };
 
 
-// fixed order (same as UI)
 const EVENT_STATUS_ORDER = ["PO","GI","TW","GW","PG","TC","IV","EW"] as const;
 type EventCode = typeof EVENT_STATUS_ORDER[number];
 
 const isEventCode = (v: string): v is EventCode =>
   EVENT_STATUS_ORDER.includes(v as EventCode);
 
-// UI already gives us "PO" | "GI" | ... so just validate
 const mapInPlantStageToEventCode = (stage: string) =>
   isEventCode(stage) ? stage : null;
-// For Towards Pickup: need current driver position + first pickup location
+
 // ---------- Direction / distance ----------
 type LatLng = { lat: number; lng: number };
 
@@ -2005,22 +1139,20 @@ function bearingDeg(a: LatLng, b: LatLng) {
   const y = Math.sin(λ2-λ1) * Math.cos(φ2);
   const x = Math.cos(φ1)*Math.sin(φ2) - Math.sin(φ1)*Math.cos(φ2)*Math.cos(λ2-λ1);
   const θ = Math.atan2(y, x);
-  return (θ * 180/Math.PI + 360) % 360; // 0..360
+  return (θ * 180/Math.PI + 360) % 360; 
 }
 
-/** Collapse to N/E/S/W; if very close, return 'C' (center). */
 function cardinalDirection(from: LatLng, to: LatLng): "N"|"E"|"S"|"W"|"C" {
   const distKm = haversineKm(from, to);
-  if (distKm < 2) return "C"; // close enough
+  if (distKm < 2) return "C";
 
-  const brg = bearingDeg(from, to); // 0=N, 90=E, 180=S, 270=W
+  const brg = bearingDeg(from, to); 
   if (brg >= 45 && brg < 135) return "E";
   if (brg >= 135 && brg < 225) return "S";
   if (brg >= 225 && brg < 315) return "W";
   return "N";
 }
 
-// ---------- In-Plant stage mapping ----------
 const INPLANT_LABEL: Record<EventCode, string> = {
   PO: "Parking Out → Gate In",
   GI: "Gate In → Tare Weight",
@@ -2043,7 +1175,6 @@ const INPLANT_ICON: Record<EventCode, any> = {
   EW: ew_only,
 };
 
-// ---------- At-Delivery detention ----------
 function hoursBetween(isoStart?: string, isoEnd?: string) {
   const a = isoStart ? new Date(isoStart).getTime() : NaN;
   const b = isoEnd ? new Date(isoEnd).getTime() : Date.now();
@@ -2051,38 +1182,15 @@ function hoursBetween(isoStart?: string, isoEnd?: string) {
   return Math.max(0, (b - a) / 36e5);
 }
 
-/** Buckets: '0-12' | '12-24' | '24+' */
-// function detentionBucket(startIso?: string, endIso?: string) {
-//   const h = hoursBetween(startIso, endIso);
-//   if (!Number.isFinite(h)) return "0-12";
-//   if (h < 12) return "0-12";
-//   if (h < 24) return "12-24";
-//   return "24+";
-// }
 
-// ---------- Marker icon builder ----------
 function markerIcon(url: string, size = 30): google.maps.Icon {
   return {
     url,
     scaledSize: new google.maps.Size(size, size),
-    labelOrigin: new google.maps.Point(size / 2, -6), // ← nudge label above icon
+    labelOrigin: new google.maps.Point(size / 2, -6),
   };
 }
 
-
-function pickupDirectionIcon(s: Shipment): string | null {
-  const from = toLatLng(s.assigned_driver as any);
-  const pLoc = s?.pickups?.[0]?.location;
-  if (!from || !pLoc?.lat || !pLoc?.lng) return null;
-  const to = { lat: Number(pLoc.lat), lng: Number(pLoc.lng) };
-
-  const dir = cardinalDirection(from, to);
-  const map = { N: dirN, E: dirE, S: dirS, W: dirW, C: dirC };
-  const icon = map[dir];
-  return srcOf(icon) || null;
-}
-
-// For In Plant: take shipment.latest_status if it’s one of the stage codes; else the filter value
 function inPlantStageIcon(s: Shipment, fallbackCode?: string): string | null {
   const code = (EVENT_STATUS_ORDER as readonly string[])
     .find(k => (s.latest_status || "").toUpperCase() === k)
@@ -2093,32 +1201,6 @@ function inPlantStageIcon(s: Shipment, fallbackCode?: string): string | null {
   return srcOf(icon) || null;
 }
 
-// For At Delivery: compute detention hours since arrival (choose your own field!)
-// function atDeliveryIcon(s: Shipment): string | null {
-//   // Pick your source of "arrived at delivery" time:
-//   const arrivedIso =
-//     (s as any)?.delivery_gate_in ||      // if you have it
-//     (s as any)?.at_delivery_time ||      // or this
-//     s.delivery_date ||                   // fallback
-//     null;
-
-//   const bucket = detentionBucket(arrivedIso, undefined);
-//   if (bucket === "0-12") return srcOf(det_0_12);
-//   if (bucket === "12-24") return srcOf(det_12_24);
-//   return srcOf(det_24_plus);
-// }
-// function atDeliveryIcon(s: Shipment): string | null {
-//   const arrivedIso =
-//     (s as any)?.delivery_gate_in ||
-//     (s as any)?.at_delivery_time ||
-//     s.delivery_date || 
-//     null;
-
-//   const bucket = detentionBucket(arrivedIso);
-//   if (bucket === "0-12") return srcOf(det_0_12);
-//   if (bucket === "12-24") return srcOf(det_12_24);
-//   return srcOf(det_24_plus);
-// }
 function atDeliveryIcon(s: Shipment): string | null {
   const bucket = detentionBucket(arrivalIsoFromDeliveries(s));
   if (bucket === "0-12") return srcOf(det_0_12);
@@ -2126,45 +1208,6 @@ function atDeliveryIcon(s: Shipment): string | null {
   return srcOf(det_24_plus);
 }
 
-
-// Main selector based on the current filter (selectedStatus)
-// function getMarkerIconForShipment(s: Shipment): google.maps.Icon | undefined {
-//   let url: string | null = null;
-
-//   if (selectedStatus === "towards_pickup") {
-//     url = pickupDirectionIcon(s);
-//   } else if (selectedStatus === "in_plant") {
-//     url = inPlantStageIcon(s, inPlantStage);
-//   } else if (selectedStatus === "at_delivery") {
-//     url = atDeliveryIcon(s);
-//   } else if (selectedStatus === "in_transit") {
-//     // You already have your “vehicle by hours” logic; if you map that to icons,
-//     // just set url = srcOf(the_in_transit_icon_for_this_shipment)
-//     // or leave null to use your existing in-transit branch.
-//   }
-
-//   return url ? markerIcon(url, 30) : undefined;
-// }
-
-
-
-  // kind: "delivery" | "pickup" | "both"
-// const computeDistinctLocations = (shipments: Shipment[], kind: "delivery" | "pickup" | "both" = "delivery") => {
-//   const byId = new Map<string, string>();
-//   const take = (loc?: ShipmentLocation) => {
-//     if (!loc?._id) return;
-//     const label = (loc.name || loc.city || "").trim();
-//     if (!label) return;
-//     if (!byId.has(loc._id)) byId.set(loc._id, label);
-//   };
-
-//   for (const sh of shipments ?? []) {
-//     if (kind !== "pickup") for (const d of sh.deliveries ?? []) take(d.location);
-//     if (kind !== "delivery") for (const p of sh.pickups ?? []) take(p.location);
-//   }
-//   // stable sort alphabetically
-//   return Array.from(byId, ([id, label]) => ({ id, label })).sort((a, b) => a.label.localeCompare(b.label));
-// };
 const computeDistinctLocations = (
   shipments: Shipment[],
   kind: "delivery" | "pickup" | "both" = "delivery"
@@ -2176,7 +1219,7 @@ const computeDistinctLocations = (
     const name = String(loc?.name ?? "").trim();
     if (!id) return;
     if (!byId.has(id)) {
-      byId.set(id, name || id);   // fall back to id if no name
+      byId.set(id, name || id);   
     }
   };
 
@@ -2201,18 +1244,15 @@ const computeDistinctCarriers = (shipments: Shipment[]) => {
   }
   return Array.from(byId, ([id, label]) => ({ id, label })).sort((a, b) => a.label.localeCompare(b.label));
 };
-// Initial load only
-
 
 useEffect(() => {
   fetchShipments();
 }, [shipmentGroup, selectedStatus, inPlantStage]);
 
 useEffect(() => {
-  // if user clears the box, refetch with other filters
   const t = window.setTimeout(() => {
     fetchShipments();
-  }, 400); // 300–500ms is comfy
+  }, 400); 
   return () => window.clearTimeout(t);
 }, [vehicleSearch]);
 
@@ -2229,22 +1269,10 @@ useEffect(() => {
   setMaterialsList(options);
   setMaterialBuckets(buckets);
 
-  // (optional) auto-select the first item if nothing chosen yet
-  // if (!selectedLocation && locs[0]) setSelectedLocation(locs[0].id);
-  // if (!selectedCarrier && carrs[0]) setSelectedCarrier(carrs[0].id);
 }, [shipmentsData]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // normalize asset imports to a URL (works with file-loader/SVGR default)
 const srcOf = (m: any): string => (typeof m === "string" ? m : m?.src ?? m?.default?.src ?? "");
 const MENU_W = 280;
-
-// const [menu, setMenu] = useState<{
-//   open: boolean;
-//   x: number;
-//   y: number;
-//   shipmentId?: string;
-//   placement: "above" | "below";
-// }>({ open: false, x: 0, y: 0, shipmentId: undefined, placement: "below" });
 
 const [mounted, setMounted] = useState(false);
 useEffect(() => setMounted(true), []);
@@ -2262,54 +1290,14 @@ const actionItems = useMemo(
 );
 const openActionMenu = (evt: React.MouseEvent<HTMLButtonElement>, shipmentId?: string) => {
   const rect = (evt.currentTarget as HTMLElement).getBoundingClientRect();
-  let x = rect.right - MENU_W;                         // align right edge of menu with button
+  let x = rect.right - MENU_W;                         
   x = Math.max(12, Math.min(x, window.innerWidth - MENU_W - 12));
   const y = rect.top;
-  // const y = Math.min(rect.bottom + 8, window.innerHeight - 12); 
   setMenu({ open: true, x, y, shipmentId, placement: "above"});
 };
-// const computeDistinctMaterials = (shipments: Shipment[]) => {
-//   const seen = new Map<string, string>();
-//   for (const sh of shipments ?? []) {
-//     for (const m of sh.materials ?? []) {
-//       const raw = typeof m === "string" ? m : m?.name;
-//       if (!raw) continue;
-//       const trimmed = raw.trim();
-//       if (!trimmed) continue;
-//       const key = trimmed.toLowerCase(); // de-dupe case-insensitively
-//       if (!seen.has(key)) seen.set(key, trimmed);
-//     }
-//   }
-//   return Array.from(seen.values()).sort((a, b) => a.localeCompare(b));
-// };
-// const computeDistinctMaterials = (shipments: Shipment[]) => {
-//      // Prefer de-duplication by material _id; fall back to name
-//      const byId = new Map<string, { id: string; label: string }>();
-//      const byNameKey = new Map<string, { id: string; label: string }>();
-//      for (const sh of shipments ?? []) {
-//        for (const m of sh.materials ?? []) {
-//         const id = (m as any)?._id || "";
-//         const name = ((m as any)?.name || (typeof m === "string" ? m : "") || "").trim();
-//          if (!id && !name) continue;
-//          if (id) {
-//            if (!byId.has(id)) byId.set(id, { id, label: name || id });
-//          } else {
-//           const key = name.toLowerCase();
-//            if (!byNameKey.has(key)) byNameKey.set(key, { id: name, label: name });
-//          }
-//        }
-//      }
-//      const list = [...byId.values(), ...byNameKey.values()];
-//      return list.sort((a, b) => a.label.localeCompare(b.label));
-//    };
 
-// useEffect(() => {
-//   setMaterialsList(computeDistinctMaterials(shipmentsData));
-
-// }, [shipmentsData])
 useEffect(() => {
   if (!mapRef) return;
-  // drawPickupDeliveryMarkers();
   console.log("[PD] effect fired. visible:", visibleShipments.length);
   return () => clearPDMarkers();
 }, [mapRef, visibleShipments]);
@@ -2324,7 +1312,7 @@ useEffect(() => {
     closeActionMenu();
   };
   const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") closeActionMenu(); };
-  const onScroll = () => closeActionMenu(); // any scroll closes it (keeps life simple)
+  const onScroll = () => closeActionMenu(); 
   window.addEventListener("mousedown", onDown);
   window.addEventListener("keydown", onKey);
   window.addEventListener("scroll", onScroll, true);
@@ -2336,7 +1324,6 @@ useEffect(() => {
 }, [menu.open]);
 
 
-// UI -> API status mapping: always an UPPERCASE array
 const mapStatusToApi = (s: string): string[] => {
   switch (s) {
     case "all":             return ["ALL"];
@@ -2348,7 +1335,6 @@ const mapStatusToApi = (s: string): string[] => {
   }
 };
 
-  // Function to close the sidebar
   const closeSidebar = () => {
     setIsSidebarOpen(false);
     setSelectedShipment(null);
@@ -2364,109 +1350,6 @@ const mapStatusToApi = (s: string): string[] => {
     const ampm = hr24 >= 12 ? "PM" : "AM";
     return `${day}-${mon}, ${hr}:${min} ${ampm}`;
   };
-  // const buildApiFilters = () => {
-  //   const f: any = { limit: 50, skip: 0 };
-  //   if (selectedStatus === "in_plant") {
-  //     const code = mapInPlantStageToEventCode(inPlantStage);
-  //     if (code) f.event_status = code;
-     
-  //   }
-  //   if (vehicleSearch.trim()) {
-  //     f.vehicle_no = vehicleSearch.trim().toUpperCase().replace(/\s+/g, "");
-  //   }
-  //   f.status = mapStatusToApi(selectedStatus);
-  //    if (shipmentIdSearch.trim()) {
-  //        // adjust the key to what your API expects (e.g., sin / SIN / shipment_id)
-  //       f.sin = shipmentIdSearch.trim().toUpperCase();
-  //      }
-      
-  //     //  if (SelectMaterials && SelectMaterials !== "__no_materials__") {
-  //     //    f.material = SelectMaterials;
-  //     //  }
-  //     if (sMaterial && sMaterial !== "__no_materials__") {
-  //       const bucket = materialBuckets[sMaterial]; // sMaterial is the name key (lowercased)
-  //       if (bucket?.ids?.length) {
-  //         f.materials = bucket.ids; // <-- ARRAY OF IDS
-  //       }
-  //     }
-  //     if (selectedPickupLocation && selectedPickupLocation !== "__no_pickups__") {
-  //        f.pickups = selectedPickupLocation;
-  //      }
-  //      if (selectedDeliveryLocation && selectedDeliveryLocation !== "__no_locations__") {
-  //        f.deliveries= selectedDeliveryLocation;
-  //      }
-  //     if (selectedCarrier && selectedCarrier !== "__no_carriers__") {
-  //        f.carriers= selectedCarrier;
-  //      }
-  //      if (dateFrom) f.from_date = dateFrom;   // yyyy-mm-dd
-  //      if (dateTo)   f.to_date   = dateTo;
-  //   return f;
-  // };
-  // const buildApiFilters = (overrides?: Partial<{
-  //   status: string;
-  //   inPlantStage: string;
-  //   material: string;
-  //   pickups: string;
-  //   deliverys: string;
-  //   carrier_id: string;
-  //   sin: string;           // shipment id
-  //   from_date: string;
-  //   to_date: string;
-  //   vehicle_no: string;
-  //   group: string;
-  // }>) => {
-  //   const f: any = { limit: 50, skip: 0 };
-  
-  //   const sStatus        = overrides?.status                 ?? selectedStatus;
-  //   const sInPlant       = overrides?.inPlantStage           ?? inPlantStage;
-  //   const sMaterial      = overrides?.material               ?? SelectMaterials;
-  //   const sPickup        = overrides?.pickups     ?? selectedPickupLocation;
-  //   const sDelivery      = overrides?.deliveries   ?? selectedDeliveryLocation;
-  //   const sCarrier       = overrides?.carrier_id             ?? selectedCarrier;
-  //   const sSin           = overrides?.SIN                   ?? shipmentIdSearch;
-  //   const sFrom          = overrides?.from                  ?? dateFrom;
-  //   const sTo            = overrides?.to                     ?? dateTo;
-  //   const sVehicle       = overrides?.vehicle_no             ?? vehicleSearch;
-  //   const sGroup         = overrides?.group                  ?? shipmentGroup;
-  //   const fromMs = toStartOfDayMs(sFrom);
-  // const toMs   = toEndOfDayMs(sTo);
-  //   // status
-  //   f.status = mapStatusToApi(sStatus);
-  
-  //   // in-plant event status (array)
-  //   if (sStatus === "in_plant") {
-  //     const code = mapInPlantStageToEventCode(sInPlant);
-  //     if (code) f.event_status = [code];
-  //    // keep if backend uses ordering
-  //   }
-  
-  //   // vehicle
-  
-  
-  //   // other filters
-  //   if (sSin?.trim())                 f.SIN = sSin.trim().toUpperCase();
-  //   // if (sMaterial && sMaterial !== "__no_materials__")           f.material = sMaterial;
-  //   if (sMaterial && sMaterial !== "__no_materials__") {
-  //     const bucket = materialBuckets[sMaterial]; // sMaterial is the name key (lowercased)
-  //     if (bucket?.ids?.length) {
-  //       f.materials = bucket.ids;  // <-- ARRAY OF IDS
-  //     }
-  //   }
-  //   if (sPickup && sPickup !== "__no_pickups__")                 f.pickup_location_id = sPickup;
-  //   if (sDelivery && sDelivery !== "__no_locations__")           f.delivery_location_id = sDelivery;
-  //   if (sCarrier && sCarrier !== "__no_carriers__")              f.carrier_id = sCarrier;
-  //   // if (sFrom) f.from = sFrom;
-  //   // if (sTo)   f.to  = sTo;
-  //   if (sVehicle && sVehicle.trim()) {
-  //     f.vehicle_no = sVehicle.trim();
-  //   }
-  //   if (fromMs !== undefined) f.from = fromMs;
-  //   if (toMs   !== undefined) f.to   = toMs;
-  
-  //   if (sGroup && sGroup !== "all") f.group = sGroup;
-  
-  //   return f;
-  // };
 
   const handleSearchClearDrafts = () => {
     setFormDrafts({
@@ -2482,44 +1365,11 @@ const mapStatusToApi = (s: string): string[] => {
       vehicle: ""
     });
     
-    // Force form reset for any additional form elements
     if (formRef.current) {
       formRef.current.reset();
     }
   };
   
-
-// NEW: apply drafts → live filters, then fetch once
-// const handleSearchApply = () => {
-//   setSelectedMaterials(draftMaterials);
-//   setSelectedPickupLocation(draftPickupLocation);
-//   setSelectedDeliveryLocation(draftDeliveryLocation);
-//   setSelectedCarrier(draftCarrier);
-//   setSelectedStatus(draftStatus || "all");
-//   setInPlantStage(draftInPlantStage);
-//   setShipmentIdSearch(draftShipmentId);
-//   setDateFrom(draftDateFrom);
-//   setDateTo(draftDateTo);
-//   setVehicleSearch(draftVehicle);
-
-//   // fetchShipments({
-//   //   status: draftStatus || "all",
-//   //   inPlantStage: draftInPlantStage,
-//   //   material: draftMaterials,
-//   //   pickup_location_id: draftPickupLocation,
-//   //   delivery_location_id: draftDeliveryLocation,
-//   //   carrier_id: draftCarrier,
-//   //   sin: draftShipmentId,
-//   //   from_date: draftDateFrom,
-//   //   to_date: draftDateTo,
-//   //   vehicle_no: draftVehicle,
-//   //   group: shipmentGroup || "all",
-//   // });
-
-//   setIsFilterOpen(false);
-// };
-// mapview.tsx
-
 const handleSearchApply = () => {
     const filters: any = { limit: 50, skip: 0 };
     
@@ -2559,8 +1409,7 @@ const handleSearchApply = () => {
   
     if (formDrafts.dateFrom) filters.from = toStartOfDayMs(formDrafts.dateFrom);
     if (formDrafts.dateTo) filters.to = toEndOfDayMs(formDrafts.dateTo);
-  
-    // Update the main filter state
+
     setSelectedMaterials(formDrafts.materials);
     setSelectedPickupLocation(formDrafts.pickupLocation);
     setSelectedDeliveryLocation(formDrafts.deliveryLocation);
@@ -2573,22 +1422,6 @@ const handleSearchApply = () => {
     setVehicleSearch(formDrafts.vehicle);
   
     fetchShipments(filters);
-    setIsFilterOpen(false);
-  };
-// NEW: cancel just closes and restores drafts to current live filters
-const handleSearchCancel = () => {
-    setFormDrafts({
-      materials: SelectMaterials ?? "",
-      pickupLocation: selectedPickupLocation ?? "",
-      deliveryLocation: selectedDeliveryLocation ?? "",
-      carrier: selectedCarrier ?? "",
-      status: selectedStatus ?? "",
-      inPlantStage: inPlantStage ?? "",
-      shipmentId: shipmentIdSearch ?? "",
-      dateFrom: dateFrom ?? "",
-      dateTo: dateTo ?? "",
-      vehicle: vehicleSearch ?? ""
-    });
     setIsFilterOpen(false);
   };
 
@@ -2607,153 +1440,12 @@ const handleSearchCancel = () => {
   
     if (added) mapRef.fitBounds(bounds, 64);
   }, [mapRef, unitLocations]);
-  
-  // useEffect(() => {
-  //   const fetchShipments = async () => {
-  //     setLoading(true);
-  //     setError(null);
-  
-  //     const filters = buildApiFilters();
-  //     try {
-  //       const res = await httpsPost("shipment/many", filters, {}, 5);
-  
-  //       // Shape-safe extraction
-  //       const shipments =
-  //         res?.data?.data?.shipments ??
-  //         res?.data?.shipments ??
-  //         res?.shipments ??
-  //         [];
-  
-  //       if (!Array.isArray(shipments)) {
-  //         console.warn("Unexpected shipments shape:", res);
-  //         setError("Unexpected API response.");
-  //         setShipmentsData([]);
-  //         setTotalShipments(0);
-  //         setTrackingCount(0);
-  //         setNonTrackingCount(0);
-  //       } else {
-  //         setShipmentsData(shipments);
-  //         let tracking = 0;
-  //         let nonTracking = 0;
-    
-  //         shipments.forEach((shipment) => {
-  //           // Check for location data in the assigned_driver object
-  //           const hasLocation =
-  //             shipment.assigned_driver &&
-  //             shipment.assigned_driver.geo_point &&
-  //             shipment.assigned_driver.geo_point.coordinates &&
-  //             shipment.assigned_driver.geo_point.coordinates.length > 0;
-    
-  //           if (hasLocation) {
-  //             tracking += 1;
-  //           } else {
-  //             nonTracking += 1;
-  //           }
-  //         });
-    
-  //         // Update state with the calculated counts
-  //         setShipmentsData(shipments);
-  //         setTotalShipments(shipments.length);
-  //         setTrackingCount(tracking);
-  //         setNonTrackingCount(nonTracking);
-  //       }
-        
-  
-  //     } catch (e: any) {
-  //       console.error("Error fetching shipments:", e);
-  //       setError(e?.message || "Could not load shipments.");
-  //       setShipmentsData([]);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-  
-  //   fetchShipments();
-  // }, [  vehicleSearch ,SelectMaterials,
-  //   selectedDeliveryLocation,
-  //   selectedCarrier,
-  //   inPlantStage,  
-   
-  //   shipmentGroup, selectedStatus ]);
- 
-  // const fetchShipments = async () => {
-  //   setLoading(true);
-  //   setError(null);
-  
-  //   try {
-  //     const filters: any = { limit: 50, skip: 0 };
-  //     const fromMs = toStartOfDayMs(dateFrom);
-  //     const toMs = toEndOfDayMs(dateTo);
-  
-  //     filters.status = mapStatusToApi(selectedStatus);
-  //     if (selectedStatus === 'in_plant') {
-  //       const code = mapInPlantStageToEventCode(inPlantStage);
-  //       if (code) filters.event_status = [code];
-  //     }
-  //     if (shipmentIdSearch.trim()) {
-  //       filters.sin = shipmentIdSearch.trim().toUpperCase();
-  //     }
-  //     if (SelectMaterials && SelectMaterials !== "__no_materials__") {
-  //       const bucket = materialBuckets[SelectMaterials];
-  //       if (bucket?.ids?.length) {
-  //         filters.materials = bucket.ids;
-  //       }
-  //     }
-  //     if (selectedPickupLocation && selectedPickupLocation !== "__no_pickups__") {
-  //       filters.pickups = selectedPickupLocation;
-  //     }
-  //     if (selectedDeliveryLocation && selectedDeliveryLocation !== "__no_locations__") {
-  //       filters.deliveries = selectedDeliveryLocation;
-  //     }
-  //     if (selectedCarrier && selectedCarrier !== "__no_carriers__") {
-  //       filters.carriers = selectedCarrier;
-  //     }
-  //     if (vehicleSearch.trim()) {
-  //       filters.vehicle_no = vehicleSearch.trim();
-  //     }
-  //     if (fromMs !== undefined) filters.from = fromMs;
-  //     if (toMs !== undefined) filters.to = toMs;
-  //     if (shipmentGroup && shipmentGroup !== "all") filters.group = shipmentGroup;
-  
-  //     const res = await httpsPost("shipment/many", filters, {}, 5);
-  //     const shipments = res?.data?.data?.shipments ?? res?.data?.shipments ?? res?.shipments ?? [];
-  
-  //     if (!Array.isArray(shipments)) {
-  //       setError("Unexpected API response.");
-  //       setShipmentsData([]);
-  //       setTotalShipments(0);
-  //       setTrackingCount(0);
-  //       setNonTrackingCount(0);
-  //       return;
-  //     }
-  
-  //     let tracking = 0, nonTracking = 0;
-  //     shipments.forEach((s) => {
-  //       const coords = s.assigned_driver?.geo_point?.coordinates ?? [];
-  //       coords.length ? tracking++ : nonTracking++;
-  //     });
-  
-  //     setShipmentsData(shipments);
-  //     setTotalShipments(shipments.length);
-  //     setTrackingCount(tracking);
-  //     setNonTrackingCount(nonTracking);
-  //   } catch (e: any) {
-  //     console.error("Error fetching shipments:", e);
-  //     setError(e?.message || "Could not load shipments.");
-  //     setShipmentsData([]);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-  // mapview.tsx
-// mapview.tsx
 
 const buildApiFilters = () => {
   const f: any = { limit: 100, skip: 0 };
   const fromMs = toStartOfDayMs(dateFrom);
   const toMs = toEndOfDayMs(dateTo);
 
-  // Apply filters from component state
   f.status = mapStatusToApi(selectedStatus);
   if (selectedStatus === 'in_plant') {
     const code = mapInPlantStageToEventCode(inPlantStage);
@@ -2782,7 +1474,6 @@ const buildApiFilters = () => {
   }
   if (fromMs !== undefined) f.from = fromMs;
   if (toMs !== undefined) f.to = toMs;
-  // if (shipmentGroup && shipmentGroup !== "all") f.group = shipmentGroup;
 
   return f;
 };
@@ -2791,9 +1482,6 @@ const fetchShipments = async (appliedFilters?: any) => {
   setError(null);
 
   try {
-    // Use the provided filters if available, otherwise build from current state
-    // const filters = appliedFilters || buildApiFilters();
-// after — always run through the builder so we map names → ids
 const filters = buildApiFilters();
 
     const res = await httpsPost("shipment/many", filters, {}, 5);
@@ -2826,58 +1514,23 @@ const filters = buildApiFilters();
     setLoading(false);
   }
 };
-  function directionIconFor(s: Shipment): string | null {
-    const from = driverPos(s);
-    const to = firstPickupLatLng(s);
-    if (!from || !to) return null;
-  
-    const dir = cardinalDirection(from, to); // returns "N", "E", "S", "W", or "C"
-    const map: Record<string, any> = {
-      N: dirN,
-      E: dirE,
-      S: dirS,
-      W: dirW,
-      C: dirC,
-    };
-  
-    return srcOf(map[dir]) ?? null;
-  }
-  // const { isLoaded } = useJsApiLoader({
-  //   id: "google-map-script",
-  //   googleMapsApiKey: apiKey ?? "",
-  //   libraries: ["geometry"], // ← add this
-  // });
+
   const { isLoaded, loadError } = useJsApiLoader({
     id: "google-map-script",
     googleMapsApiKey: apiKey ?? "",
     libraries: ["geometry"],
   });
   
-  // const { isLoaded, loadError } = useJsApiLoader({
-  //   id: "google-map-script",
-  //   googleMapsApiKey: apiKey ?? "",
-  // });
 
-  // Default to 'In Transit' or 'In Plant'
-  
-  // const handleStatusChange = (event) => {
-  //   setSelectedStatus(event.target.value);
-  // };
-  // If you must keep it, change the definition to this:
-const handleStatusChange = (event: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
-  setSelectedStatus(event.target.value);
-};
   const [isOpen, setIsOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
 
-  // helper to normalize a location into {name, city}
 const stopFromLoc = (loc?: any) => {
   const name = (loc?.name || loc?.area || loc?.city || "—").toString().trim();
   const city = (loc?.city || "").toString().trim();
   return { name, city };
 };
 
-// build arrays for pickups / deliveries
 const makeStops = (arr: any[] | undefined, kind: "pickup" | "delivery") =>
   (arr ?? []).map((item, i) => {
     const { name, city } = stopFromLoc(item?.location);
@@ -2890,7 +1543,6 @@ const makeStops = (arr: any[] | undefined, kind: "pickup" | "delivery") =>
     };
   });
 
-// --- Bounds helpers ---
 const lastGeofenceBoundsRef = useRef<google.maps.LatLngBounds | null>(null);
 
 function getIndiaBounds() {
@@ -2904,7 +1556,6 @@ function collectBounds(): google.maps.LatLngBounds | null {
   if (!mapRef) return null;
   const b = new google.maps.LatLngBounds();
 
-  // 1) Vehicles (visible list)
   for (const s of visibleShipments || []) {
     const p = driverPos(s);
     if (p) b.extend(p);
@@ -2958,26 +1609,6 @@ const fitAll = useCallback((pad = 64) => {
   },[isFilterOpen]); 
   const handleClear = () => formRef.current?.reset();
 
-  // function geoFenceToPolygons(gf: GeoFence): google.maps.LatLngLiteral[][][] {
-  //   const type = gf.type.toLowerCase();
-  //   if (type === "polygon") {
-  //     // Polygon → array of rings → paths: [outer, hole1, ...]
-  //     const rings = (gf as any).coordinates as number[][][];
-  //     const paths = rings.map(ringToPath).filter(r => r.length >= 3);
-  //     return paths.length ? [paths] : [];
-  //   }
-  //   if (type === "multipolygon") {
-  //     // MultiPolygon → array of polygons → each polygon is array of rings
-  //     const polys = (gf as any).coordinates as number[][][][];
-  //     const out: google.maps.LatLngLiteral[][][] = [];
-  //     for (const rings of polys) {
-  //       const paths = (rings || []).map(ringToPath).filter(r => r.length >= 3);
-  //       if (paths.length) out.push(paths);
-  //     }
-  //     return out;
-  //   }
-  //   return [];
-  // }
   useEffect(() => {
     console.log("Maps loader:", { isLoaded, loadError, hasKey: Boolean(apiKey) });
     if (loadError) console.error("Maps load error:", loadError);
@@ -2999,20 +1630,9 @@ const fitAll = useCallback((pad = 64) => {
   }, [isLoaded, loadError, mapRef, geoFences]);
   const handleShipmentClick = (shipment: Shipment) => {
     setSelectedShipment(shipment);
-    setIsSidebarOpen(true); // Assuming you want to open the sidebar on click
-    // Optionally, close the menu if it was open
+    setIsSidebarOpen(true); 
     if (menu.open) closeActionMenu();
   };
-  // Replace the existing useEffect:
-// useEffect(() => {
-//   if (!mapRef) return;                 
-//   if (!geoFences || geoFences.length === 0) return;
-
-//   // *** CHANGE: Call the correct function name ***
-//   const { added, bounds } = drawGeoFencesOnMap(geoFences, mapRef); // <--- CORRECTED FUNCTION CALL
-  
-//   if (added && !bounds.isEmpty()) mapRef.fitBounds(bounds, 64); // Use 'added' flag
-// Collect Lat/Lngs for all visible vehicles
 function vehiclesLatLngs(list: Shipment[]): google.maps.LatLngLiteral[] {
   const pts: google.maps.LatLngLiteral[] = [];
   for (const s of list || []) {
@@ -3052,22 +1672,15 @@ function fitToAllVehicles(list: Shipment[] = visibleShipments) {
 {modal.type === "cancel" && (
   
   <CancelModal
-    open={true} // The modal is open
-    onClose={closeModal} // Pass the function to close the modal
-    shipment={modal.shipment!} // The shipment object
-    onCancelSuccess={fetchShipments} // Pass a function to refresh the data after a successful cancellation
+    open={true} 
+    onClose={closeModal} 
+    shipment={modal.shipment!} 
+    onCancelSuccess={fetchShipments} 
   />
 )}
 
 
- {/* {modal.type === "share" && (
-  <ShareModal
-    open
-    onClose={closeModal}
-    shipment={modal.shipmentId!}
-  />
- 
-)} */}
+
 {modal.type === "share" && (
   <ShareModal
     open
@@ -3086,21 +1699,7 @@ function fitToAllVehicles(list: Shipment[] = visibleShipments) {
   />
 )}
 
-{/* Upload Approval Documents */}
 
-
-{/* Create Advance Payment */}
-{/* {modal.type === "upload" && (
-  <AttachFilesModal
-    show={true}
-    onClose={closeModal}
-    onAttach={handleAttachDone}
-    // shipment={modal.shipment!}
-    shipmentId={modal.shipment!} 
-    isLoading={false}
-  />
- 
-)} */}
 {modal.type === "upload" && (
   <AttachFilesModal
     show
@@ -3111,15 +1710,7 @@ function fitToAllVehicles(list: Shipment[] = visibleShipments) {
   />
 )}
 
-{/* {modal.type === "advance" && (
-  <CreateAdvancePaymentModal 
-    show={true}
-    onClose={closeModal}
-    onSubmit={handleCreateAdvance}
-    shipmentId={modal.shipment!}
-    data={undefined}   // or pass your initial data object if needed
-  />
-)} */}
+
 {modal.type === "advance" && (
   <CreateAdvancePaymentModal
     show
@@ -3434,18 +2025,7 @@ function fitToAllVehicles(list: Shipment[] = visibleShipments) {
     </>
   )}
 
-  {/* {selectedStatus === "at_delivery" && (
-    <>
-      {[{k:"0-12",l:"0–12 hrs",i:det_0_12},
-        {k:"12-24",l:"12–24 hrs",i:det_12_24},
-        {k:"24+",l:"Beyond 24 hrs",i:det_24_plus}].map(({k,l,i}) => (
-        <span key={k} className={styles.legendItem}>
-          <img className={styles.legendIcon} src={srcOf(i)} alt="" />
-          <span className={styles.legendText}>{l}</span>
-        </span>
-      ))}
-    </>
-  )} */}
+
   {selectedStatus === "at_delivery" && (
   <>
     {[
@@ -3468,21 +2048,6 @@ function fitToAllVehicles(list: Shipment[] = visibleShipments) {
   </>
 )}
 
-    {/* {selectedStatus === "all" && (
-      <>
-      {[
-        { key: "in_plant", label: "In Plant", icon: catInPlant },
-        { key: "towards_pickup", label: "Towards Pickup", icon: catTowardsPickup },
-        { key: "in_transit", label: "In Transit", icon: catInTransit },
-        { key: "at_delivery", label: "At Delivery", icon: catAtDelivery },
-      ].map(({ key, label, icon }) => (
-        <span key={key} className={styles.legendItem}>
-          <img className={styles.legendIcon} src={srcOf(icon)} alt="" />
-          <span className={styles.legendText}>{label}</span>
-        </span>
-      ))}
-    </>
-    )} */}
 {selectedStatus === "all" && (
   <>
     {[
@@ -3527,36 +2092,6 @@ function fitToAllVehicles(list: Shipment[] = visibleShipments) {
   </div>
 )}
 
-  {/* {selectedStatus === "in_transit" && (
-  // 1) type the items so `key` is LegendKey (not plain string)
-const STATUS_ITEMS = [
-  { key: "on",   label: "On Time",         icon: ontime },
-  { key: "2-4",  label: "2 - 4 Hours",     icon: twotofour },
-  { key: "4-8",  label: "4 - 8 Hours",     icon: fourtoeight },
-  { key: "8-12", label: "8 - 12 Hours",    icon: eighttotwelve },
-  { key: "12-16",label: "12 - 16 Hours",   icon: twelvetosixteen },
-  { key: "16-20",label: "16 - 20 Hours",   icon: sixteentotwenty },
-  { key: "20+",  label: "Beyond 20 Hours", icon: beyondtwenty },
-] satisfies Array<{ key: LegendKey; label: string; icon: any }>
-
-// 2) render (note: only one leading `{`, not `{{`)
-{STATUS_ITEMS.map(({ key, label, icon }) => (
-  <button
-    key={key}
-    type="button"
-    className={`${styles.legendItem} ${activeLegend === key ? styles.legendActive : ""}`}
-    onClick={() => setActiveLegend(prev => (prev === key ? null : key))}
-    aria-pressed={activeLegend === key}
-    title={label}
-  >
-    <img
-      className={styles.legendIcon}
-      src={(icon as any).src ?? (icon as any)}
-      alt=""
-    />
-    <span className={styles.legendText}>{label}</span>
-  </button>
-))} */}
 
   
 </div>)}
@@ -3575,34 +2110,21 @@ const STATUS_ITEMS = [
         {isLoaded && (
         
           <GoogleMap
-            // onLoad={(map) => {
-            //   setMapRef(map);
-            //   map.setCenter({ lat: 22.9734, lng: 78.6569 }); // India-ish
-            //   map.setZoom(5);
-             
-            // }}
             onLoad={(m) => { setMapRef(m); m.fitBounds(getIndiaBounds(), 64); }}
             onUnmount={() => setMapRef(null)}
-            // mapContainerStyle={CONTAINER_STYLE}
             mapContainerStyle={containerStyle}
-            // center={center}
-            // defaultCenter={{ lat: 22.9734, lng: 78.6569 }} // India fallback
-            // defaultZoom={5}
-            // defaultCenter={{ lat: 22.9734, lng: 78.6569 }} // fallback
-            // zoom={5}
             options={{
                 streetViewControl: false,
                 fullscreenControl: true,
                 mapTypeControl: true,
                 mapTypeControlOptions: {
-                  style: google.maps.MapTypeControlStyle.DROPDOWN_MENU,   // ← dropdown like your screenshot
-                  position: google.maps.ControlPosition.TOP_LEFT,          // ← top-left
-                  mapTypeIds: ["roadmap", "satellite", "terrain"],         // ← include Terrain
+                  style: google.maps.MapTypeControlStyle.DROPDOWN_MENU,   
+                  position: google.maps.ControlPosition.TOP_LEFT,          
+                  mapTypeIds: ["roadmap", "satellite", "terrain"],         
                 },
               }}
          
           >
-             {/* <GeofenceLayer map={map} fences={fences} /> */}
           
 <GeofenceLayer
   map={mapRef}
@@ -3611,52 +2133,6 @@ const STATUS_ITEMS = [
     .filter((gf: any) => gf && (gf.type === "Polygon" || gf.type === "MultiPolygon"))}
 />
 
-             {/* {unitLocations?.map((loc: any) => {
-    const pos = toLatLng(loc);
-    if (!pos) return null;
-    return (
-      <Marker
-        key={loc._id ?? loc.token ?? `${pos.lat},${pos.lng}`}
-        position={pos}
-       
-      />
-    );
-  })} */}
-  {/* {mapRef && activeHalt && haltInfoPos && (
-  <InfoWindow
-    position={haltInfoPos}
-    onCloseClick={() => { setActiveHalt(null); setHaltInfoPos(null); }}
-  >
-    <div style={{ maxWidth: 240 }}>
-      <div style={{ fontWeight: 600, marginBottom: 4 }}>Halt</div>
-      <div><b>Duration:</b> {activeHalt?.halt_duration ?? activeHalt?.duration ?? "-"} mins</div>
-      <div><b>Start:</b> {fmtTime(activeHalt?.start_time || activeHalt?.from)}</div>
-      <div><b>End:</b> {fmtTime(activeHalt?.end_time || activeHalt?.to)}</div>
-      {activeHalt?.address ? <div style={{ marginTop: 4 }}>{activeHalt.address}</div> : null}
-    </div>
-  </InfoWindow>
-)} */}
-{/* Halt InfoWindow */}
-{/* {mapRef && activeHalt && haltInfoPos && (
-  <InfoWindow
-    position={haltInfoPos}
-    onCloseClick={() => { setActiveHalt(null); setHaltInfoPos(null); }}
-  >
-    <div >
-      <div className={styles.haltCardHeader}>Halt Info</div>
-      <div className={styles.haltDivider} />
-
-      <div className={styles.haltRow}>
-        <span className={styles.haltKey}>Duration:</span>
-        <span className={`${styles.haltVal} ${styles.haltStrong}`}>
-        {activeHalt?.halt_duration ?? activeHalt?.duration ?? "-"} mins
-        </span>
-      </div>
-
-    
-    </div>
-  </InfoWindow>
-)} */}
 {pdInfo && (
   <InfoWindow
     position={pdInfo.pos}
@@ -3688,13 +2164,6 @@ const STATUS_ITEMS = [
     <div className={styles.haltCard}>
       <div className={styles.haltHeader}>
         <span className={styles.haltTitle}>Halt Info</span>
-        {/* <button
-          className={styles.haltClose}
-          aria-label="Close"
-          onClick={() => { setActiveHalt(null); setHaltInfoPos(null); }}
-        >
-          ×
-        </button> */}
       </div>
 
       <div className={styles.haltDivider} />
@@ -3918,15 +2387,10 @@ const STATUS_ITEMS = [
     <div
       key={shipment?._id ?? shipment?.SIN}
       className={styles.shipmentCard}
-      // onClick={() =>{
-      //   fetchShipmentPathById(shipment._id);
-      //   handleShipmentClick?.(shipment)}
-      // } 
       onClick={(e) => {
         e.stopPropagation?.();
-        setSelectedShipment(shipment);      // keeps P/D markers working
-        setInfoFromMapClick(false);         // suppress InfoWindow
-        // fetchShipmentPathById(shipment._id);
+        setSelectedShipment(shipment);     
+        setInfoFromMapClick(false);         
         onShipmentCardClick(shipment);
       }}
       
@@ -3943,37 +2407,7 @@ const STATUS_ITEMS = [
 
     
       <div className={styles.routeSection}>
-      {/* {pickups.map((s) => (
-    <div className={styles.stopRow} key={s.key}>
-      <span className={`${styles.stopBadge} ${styles.pickupBadge}`}>
-       
-        {s.label}
-      </span>
-      <div className={styles.stopPill}>
-        {s.name}{" - "}{s.city || "—"}
-      </div>
-    </div>
-   
-  ))}
- {pickups.length > 0 && deliveries.length > 0 && (
-  <div className={styles.routeDots} aria-hidden="true">
-    <span />
-    <span />
-    <span />
-  </div>
-)}
 
-  
-  {deliveries.map((s) => (
-    <div className={styles.stopRow} key={s.key}>
-      <span className={`${styles.stopBadge} ${styles.deliveryBadge}`}>
-        {s.label}
-      </span>
-      <div className={styles.stopPill}>
-        {s.name}{" - "}{s.city || "—"}
-      </div>
-    </div>
-  ))} */}
   {stops.map((s, idx) => (
   <React.Fragment key={s.key}>
     <div className={styles.stopRow}>
