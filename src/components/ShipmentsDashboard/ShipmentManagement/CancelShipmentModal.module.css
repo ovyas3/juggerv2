@@ -16,6 +16,7 @@
   font-weight: 400;
   color: #fff;
   background-color: #4f46e5;
+  background-color: #4f46e5;
   margin: 0;
 }
 
@@ -182,6 +183,17 @@
   .submitButton {
     width: 100%;
   }
+}
+
+.selectItem :global(.radix-select-item-indicator) { display: none !important; }
+.selectItem :global([data-state='checked']) svg { display: none !important; }
+
+.selectItem:global([data-state='checked']) svg { 
+  display: none !important; 
+}
+
+.selectContent :global([data-radix-select-item-indicator]) { 
+  display: none !important; 
 }
 
 .selectItem :global(.radix-select-item-indicator) { display: none !important; }

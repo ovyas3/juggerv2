@@ -421,6 +421,7 @@ const  renderConsentAndSubscriptionIcons = (shipment: any, openSubscribeModal: (
                       (type: string, locs: any) =>
                         openLocationsPopup(type, locs, shipment),
                       shipmentType,
+             
                       "delivery"
                     )}
                   </td>
