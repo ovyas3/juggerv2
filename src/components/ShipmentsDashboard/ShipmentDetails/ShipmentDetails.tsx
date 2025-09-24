@@ -208,6 +208,7 @@ const fetchDetails = useCallback(async () => {
           showFreight={showFreight}
           ownFleet={ownFleet}
           type={shipmentType}
+          isMykl = {isMYKL}
         />
       ),
     },
