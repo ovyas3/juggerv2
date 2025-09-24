@@ -1,14 +1,14 @@
 'use client'
 
-import ShipmentsDashboard from "@/components/ShipmentsDashboard/shipmentsDashboard";
+import ShipmentsDashboard from "@/components/ShipmentsDashboard/ShipmentsDashboard";
 import React from "react";
 import SideDrawer from "@/components/Drawer/Drawer";
 import MobileDrawer from "@/components/Drawer/mobile_drawer";
-import MobileHeader from "@/components/Header/mobileHeader";
+// import MobileHeader from "@/components/Header/mobileHeader";
 import Header from "@/components/Header/header";
 import { useMediaQuery, useTheme } from '@mui/material';
 
-export default function shipmentsDashboard() {
+export default function ShipmentsDashboardPage() {
     const theme = useTheme();
     const mobile = useMediaQuery(theme.breakpoints.down('sm'));
     return (<div>

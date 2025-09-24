@@ -514,9 +514,9 @@
   height: 38px; /* Match input height */
 }
 
-.button:hover {
+/* .button:hover {
   background-color: #4338ca;
-}
+} */
 
 .matSelect {
   position: relative;
@@ -1261,7 +1261,7 @@ table.matTable {
   cursor: pointer;
   margin-top: 1px;
   margin-bottom: 1px;
-  background-color: #2962ff;
+  background-color: #4338ca;
   border: none;
 }
 

@@ -37,8 +37,9 @@ import dynamic from "next/dynamic"
 import TollGateIcon from '../../assets/toll_gate_icon_passed.svg';
 import Mapmark from '../../assets/mapMarker.svg';
 
-import type { ViewState } from "react-map-gl";
-import type { MapRef } from "react-map-gl";
+// import type { ViewState } from "react-map-gl";
+// import type { MapRef } from "react-map-gl";
+// import Map, { NavigationControl } from "react-map-gl/maplibre";
 
 
 import { Ruler, BadgeCheck, PauseCircle, GitBranch } from "lucide-react" // NEW

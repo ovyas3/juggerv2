@@ -20,7 +20,7 @@
 
 .carrierMenuItem {
   /* This is a good fallback, but the nested rule is more reliable */
-  font-size: 12px !important;
+  font-size: 13px !important;
   /* You may also want to adjust padding to make the items more compact */
   padding-top: 4px !important;
   padding-bottom: 4px !important;
@@ -35,7 +35,7 @@
 
 /* This is the most crucial rule for the text inside */
 .carrierMenuItem :global(.MuiListItemText-primary) {
-  font-size: 12px !important; /* Set your desired font size here */
+  font-size: 13px !important; /* Set your desired font size here */
 }
   
   .searchHeader {
@@ -121,6 +121,33 @@
   }
   
   .carrierSelected {
+    height: 27px !important;
+    border-radius: 5px !important;
+    padding-left: 10px !important;
+    width: 97% !important;
+  }
+  .carrierMenuItemText {
+    /* Allow text to wrap to the next line */
+    white-space: normal !important;
+ 
+    /* Ensure the text itself wraps */
+    word-break: break-word !important;
+    
+    /* Optionally, you might need to adjust the line height or padding */
+  }
+  .pickupSelected {
+    height: 27px !important;
+    border-radius: 5px !important;
+    padding-left: 10px !important;
+    width: 97% !important;
+  }
+  /* If the ListItemText is rendering the text in a child span/p, 
+     you might need to target the secondary class of the text: */
+  .carrierMenuItemText span {
+    white-space: normal !important;
+    word-break: break-word !important;
+  }
+  .deliverySelected {
     height: 27px !important;
     border-radius: 5px !important;
     padding-left: 10px !important;

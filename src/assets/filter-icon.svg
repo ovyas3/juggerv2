@@ -1,0 +1,12 @@
+<svg id="filter-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+  <path id="Path_15706" data-name="Path 15706" d="M0,0H24V24H0Z" fill="none"/>
+  <circle id="Ellipse_61" data-name="Ellipse 61" cx="2" cy="2" r="2" transform="translate(4 8)" fill="none" stroke="#71747a" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+  <line id="Line_1159" data-name="Line 1159" y2="4" transform="translate(6 4)" fill="none" stroke="#71747a" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+  <line id="Line_1160" data-name="Line 1160" y2="8" transform="translate(6 12)" fill="none" stroke="#71747a" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+  <circle id="Ellipse_62" data-name="Ellipse 62" cx="2" cy="2" r="2" transform="translate(10 14)" fill="none" stroke="#71747a" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+  <line id="Line_1161" data-name="Line 1161" y2="10" transform="translate(12 4)" fill="none" stroke="#71747a" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+  <line id="Line_1162" data-name="Line 1162" y2="2" transform="translate(12 18)" fill="none" stroke="#71747a" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+  <circle id="Ellipse_63" data-name="Ellipse 63" cx="2" cy="2" r="2" transform="translate(16 5)" fill="none" stroke="#71747a" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+  <line id="Line_1163" data-name="Line 1163" y2="1" transform="translate(18 4)" fill="none" stroke="#71747a" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+  <line id="Line_1164" data-name="Line 1164" y2="11" transform="translate(18 9)" fill="none" stroke="#71747a" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+</svg>

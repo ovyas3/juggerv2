@@ -40,6 +40,7 @@ import {
 } from "lucide-react";
 import MarkAsArrivedModal from "../ShipmentsDashboard/Others/MarkAsArrivedModal";
 import CompleteShipmentModal from "../ShipmentsDashboard/ShipmentManagement/CompleteShipmentModal";
+import Link from 'next/link';
 import {
   Button
 } from "../UI/button";
@@ -115,6 +116,10 @@ interface Shipment {
   _id: string;
   sin: string;
   status: string;
+  materials: Material[]; 
+  pickups?: LocationDetails[]; 
+  deliveries?: LocationDetails[];
+  carrier?: Carrier; 
   from: Array<{
     location: { name: string; city: string; _id: string };
     finished_at?: string;
@@ -159,7 +164,25 @@ interface Shipment {
   gps_disconnection_reason?: any[];
   delay_reason?: any[];
 }
-
+interface Carrier {
+  _id: string;
+  name: string;
+  parent_name: string;
+  // ... other carrier properties if they exist in your data
+}
+interface LocationDetails {
+  location: Location;
+}
+interface Location {
+  _id: string;
+  name: string;
+  area: string;
+  city: string;
+}
+interface Material {
+  _id: string;
+  name: string;
+}
 interface Insight {
   text: string;
   icon: string;
@@ -210,6 +233,8 @@ const ShipmentsDashboard: React.FC = () => {
   const [isAnalyticsView, setIsAnalyticsView] = useState(false);
   const [isCompactView, setIsCompactView] = useState(false);
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
+  // Inside ShipmentsDashboard.js, with other state variables
+const [rawShipmentResponse, setRawShipmentResponse] = useState<any | null>(null);
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(0);
@@ -1253,42 +1278,42 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
     "action",
   ];
 
-  const fetchDropdownData = async () => {
-    try {
-      const response = await fetch("/api/dropdowns");
-      const data = await response.json();
+  // const fetchDropdownData = async () => {
+  //   try {
+  //     const response = await fetch("/api/dropdowns");
+  //     const data = await response.json();
 
-      if (data.statusCode === 200) {
-        setMaterialsArray(data.data.materials || []);
-        setLocationsArray(data.data.locations || []);
-        setPickupLocations(data.data.pickup_locations || []);
-        setDeliveryLocations(data.data.delivery_locations || []);
-        setSegmentations(data.data.segmentations || []);
-      }
-    } catch (error) {
-      console.error("Error fetching dropdown data:", error);
-    }
-  };
+  //     if (data.statusCode === 200) {
+  //       // setMaterialsArray(data.data.materials || []);
+  //       setLocationsArray(data.data.locations || []);
+  //       setPickupLocations(data.data.pickup_locations || []);
+  //       setDeliveryLocations(data.data.delivery_locations || []);
+  //       setSegmentations(data.data.segmentations || []);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error fetching dropdown data:", error);
+  //   }
+  // };
 
-  const fetchOrganizations = async () => {
-    try {
-      const response = await fetch("/api/organizations");
-      const data = await response.json();
-      setOrganizations(data.data || []);
-    } catch (error) {
-      console.error("Error fetching organizations:", error);
-    }
-  };
+  // const fetchOrganizations = async () => {
+  //   try {
+  //     const response = await fetch("/api/organizations");
+  //     const data = await response.json();
+  //     setOrganizations(data.data || []);
+  //   } catch (error) {
+  //     console.error("Error fetching organizations:", error);
+  //   }
+  // };
 
-  const fetchCarriers = async () => {
-    try {
-      const response = await httpsGet("carriers", 0);
-      const data = response.data;
-      setAllCarriers(data || []);
-    } catch (error) {
-      console.error("Error fetching carriers:", error);
-    }
-  };
+  // const fetchCarriers = async () => {
+  //   try {
+  //     const response = await httpsGet("carriers", 0);
+  //     const data = response.data;
+  //     setAllCarriers(data || []);
+  //   } catch (error) {
+  //     console.error("Error fetching carriers:", error);
+  //   }
+  // };
 
   const handleShipmentClick = (shipment: any) => {
     setCurrentShipment(shipment);
@@ -1474,11 +1499,11 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
   };
 
   // Initialize data on component mount
-  useEffect(() => {
-    fetchDropdownData();
-    fetchOrganizations();
-    fetchCarriers();
-  }, []);
+  // useEffect(() => {
+  //   fetchDropdownData();
+  //   fetchOrganizations();
+  //   fetchCarriers();
+  // }, []);
 
   // Analytics Functions
   const toggleAnalyticsView = () => {
@@ -1863,14 +1888,129 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
       const response = await httpsPost("shipment/many", filters, {}, 5);
 
       console.log("Response:", response.data);
-
+      setRawShipmentResponse(response.data);
       if (response.statusCode === 200) {
         console.log("Response:", "calling");
         setTotalShipments(response.data.count);
         const result = response.data.shipments;
         const processedShipments: any[] = [];
+        // setPickupLocations(data.data.pickup_locations || []);
+        //       setDeliveryLocations(data.data.delivery_locations || []);
+        const allPickupLocations: Location[] = [];
 
-        // Complex data mapping (converted from Angular forEach logic)
+        result.forEach((shipment: Shipment) => {
+          if (shipment.pickups && Array.isArray(shipment.pickups)) {
+            shipment.pickups.forEach(pickup => {
+              // Check if the location is already in our array
+              const isDuplicate = allPickupLocations.some(
+                (existingLoc) => existingLoc._id === pickup.location._id
+              );
+  
+              // If it's not a duplicate, add it to our array
+              if (pickup.location && pickup.location._id && !isDuplicate) {
+                allPickupLocations.push({
+                  _id: pickup.location._id,
+                  name: pickup.location.name,
+                  area: pickup.location.area,
+                  city: pickup.location.city,
+                });
+              }
+            });
+          }
+        });
+        console.log("Unique pickup locations collected:", allPickupLocations);
+      
+        setPickupLocations(allPickupLocations);
+        const allDeliveryLocations: Location[] = [];
+
+        result.forEach((shipment: Shipment) => {
+          if (shipment.deliveries && Array.isArray(shipment.deliveries)) {
+            shipment.deliveries.forEach((delivery) => {
+              // Check if the location is already in our array
+              const isDuplicate = allDeliveryLocations.some(
+                (existingLoc) => existingLoc._id === delivery.location._id
+              );
+    
+              // If it's not a duplicate, add it to our array
+              if (delivery.location && delivery.location._id && !isDuplicate) {
+                allDeliveryLocations.push({
+                  _id: delivery.location._id,
+                  name: delivery.location.name,
+                  area: delivery.location.area,
+                  city: delivery.location.city,
+                });
+              }
+            });
+          }
+        });
+    
+        console.log("Unique delivery locations collected:", allDeliveryLocations);
+        // set the state
+        setDeliveryLocations(allDeliveryLocations);
+       
+        const allCarriers: Carrier[] = [];
+
+        result.forEach((shipment: Shipment) => {
+          if (shipment.carrier && shipment.carrier._id) {
+            // 1. Declare and assign 'currentCarrier' inside the 'if' block
+            const currentCarrier = shipment.carrier;
+        
+            // 2. Safely use 'currentCarrier' inside the same 'if' block
+            const isDuplicate = allCarriers.some(
+              (existingCarrier) => existingCarrier._id === currentCarrier._id
+            );
+        
+            if (!isDuplicate) {
+              allCarriers.push(currentCarrier);
+            }
+          }
+        });
+        
+        console.log("Unique carriers collected:", allCarriers)
+        setAllCarriers(allCarriers || []);
+      
+        // const uniqueMaterials = new Set();
+        // const allMaterials: Material[] = [];
+  
+   
+        // result.forEach((shipment:Shipment) => {
+        //     if (shipment.materials && Array.isArray(shipment.materials)) {
+        //         shipment.materials.forEach((material: Material) => {
+        //             if (material && material._id && !uniqueMaterials.has(material._id)) {
+        //                 uniqueMaterials.add(material._id);
+        //                 allMaterials.push(material);
+        //             }
+        //         });
+        //     }
+        // });
+        // console.log("Unique materials extracted from shipments:", allMaterials);
+      
+        // setMaterialsArray(allMaterials);
+     // Build a distinct materials list (first by name, keep id for backend)
+
+     const seenMaterialIds = new Set<string>();
+const uniqueMaterials: Material[] = [];
+
+for (const sh of (result as Shipment[])) {
+  if (!Array.isArray(sh.materials)) continue;
+
+  for (const m of sh.materials) {
+    if (!m?._id) continue;               // must have id (we submit ids)
+    const id = String(m._id);
+    if (seenMaterialIds.has(id)) continue;
+
+    seenMaterialIds.add(id);
+    uniqueMaterials.push({ _id: id, name: m.name ?? "" });
+  }
+}
+
+// Optional: sort for nicer UX
+uniqueMaterials.sort((a, b) => a.name.localeCompare(b.name));
+
+// Update the state once with the DISTINCT list
+setMaterialsArray(uniqueMaterials);
+        
+  
         result.forEach((element: any) => {
           const temp: any = {
             material: [],
@@ -3263,8 +3403,10 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
           >
             Advanced Search
           </div>
+          <Link href="/Mapview">
 
-          <div className={styles.button}>Map View</div>
+          <button className={styles.button}>Map View</button>
+          </Link>
 
           <div className={styles.tableControls}>
   <Select onValueChange={(value) => openBulkUpload(value)}>
@@ -3314,6 +3456,8 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
           organizations={organizations}
           materialsArray={materialsArray}
           allCarriers={allCarriers}
+          limit={pageSize}
+          skip={currentPage * pageSize}
           segmentations={segmentations}
           pickLocations={pickupLocations} // Add your pickup locations array here
           deliverLocations={deliveryLocations} // Add your delivery locations array here
@@ -4206,7 +4350,7 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
   />
 )}
 
-    // </div>
+     </div>
   );
 };
 

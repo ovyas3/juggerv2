@@ -96,7 +96,11 @@ const EditLocationsModal: React.FC<EditLocationsModalProps> = ({
 
   const fetchProximityLocations = async (city: string) => {
     try {
-      const response = await httpsGet('location/city_proximity', { city }, 4);
+      const response =  await httpsGet(
+        `location/city_proximity?city=${encodeURIComponent(city)}`,
+        4
+      );
+      // await httpsGet('location/city_proximity', { city }, 4);
       if (response.statusCode === 200) {
         // Uncomment when turf is installed
         // const locations = response.data.map((l: any) => {

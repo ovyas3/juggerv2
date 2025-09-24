@@ -30,9 +30,10 @@ const InvoiceTypeModal: React.FC<InvoiceTypeModalProps> = ({
   invoiceData,
   loading = false,
 }) => {
+  const { t } = useTranslation();
   if (!show) return null;
 
-  const { t } = useTranslation();
+
 
   const columns = [
     { key: 'sno', label: 'S.No.' },
