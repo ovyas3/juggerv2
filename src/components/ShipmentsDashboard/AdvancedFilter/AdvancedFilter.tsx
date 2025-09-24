@@ -175,7 +175,8 @@ export const AdvancedFilter: React.FC<AdvancedFilterProps> = ({
     // Rerun if the selectedOrganisation changes to fetch specific materials/locations for that org
   }, 
   // [selectedOrganisation]
-); 
+
+  [] ); 
   // Shipment Status options: value = ABBR sent to backend, name = Full text shown in UI
 const SHIP_STATUS: { value: string; name: string }[] = [
   { value: "PNDG", name: "Pending" },
@@ -529,7 +530,6 @@ const handleApply = async () => {
                 <MenuItem key={status.value} value={status.name} className={styles.carrierMenuItem}>
                   <Checkbox
                     checked={shipmentStatusValue.indexOf(status.name) > -1}
-                    className={styles.smallCheckbox}
                     className={styles.smallCheckbox}
                   />
                   <ListItemText primary={status.name} />

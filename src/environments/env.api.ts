@@ -1,8 +1,8 @@
 export const environment = {
-    API_URL: 'https://live-api.instavans.com/api/thor/v1/',
-    API_URL_DASHBOARD: 'https://live-api.instavans.com/api/thanos/v1/',
-    API_URL_DASHBOARD2: 'https://live-api.instavans.com/api/thanos/v2/',
-    API_URL_DASHBOARD3: 'https://live-api.instavans.com/api/thanos2/v1/',
+    API_URL: 'https://dev-api.instavans.com/api/thor/v1/',
+    API_URL_DASHBOARD: 'https://dev-api.instavans.com/api/thanos/v1/',
+    API_URL_DASHBOARD2: 'https://dev-api.instavans.com/api/thanos/v2/',
+    API_URL_DASHBOARD3: 'https://dev-api.instavans.com/api/thanos2/v1/',
     GOOGLE_MAP_API: 'https://www.google.com/',
     BASE_URL:'https://smartdashbaord.instavans.com/',
     DEV_ETMS:'https://etms.instavans.com/',

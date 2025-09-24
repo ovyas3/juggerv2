@@ -140,6 +140,7 @@ const CancelShipmentModal: React.FC<CancelShipmentModalProps> = ({
                 </SelectItem>
               ))}
             </SelectContent>
+
           </Select>
         </div>
 
@@ -154,6 +155,19 @@ const CancelShipmentModal: React.FC<CancelShipmentModalProps> = ({
               onChange={(e) => setCustomReason(e.target.value)}
               disabled={loading}
               variant="outlined"
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  '&:hover fieldset': {
+                    border: '1px solid #4F46E5',  
+                    borderColor: '#4F46E5',
+                  },
+                  '&.Mui-focused fieldset': {
+                    border: '1px solid #4F46E5',
+                    borderColor: '#4F46E5',
+                    boxShadow: '0 0 0 2px rgba(79, 70, 229, 0.2)',
+                  },
+                },
+              }}
             />
           </div>
         )}
