@@ -56,7 +56,6 @@ import RerunShipmentModal from "../ShipmentsDashboard/ShipmentManagement/RerunSh
 import PullFreightModal from "../ShipmentsDashboard/Financial/PullFreightModal";
 import AttachFilesModal from "../ShipmentsDashboard/DocumentManagement/AttachFilesModal";
 import UploadModal from "../ShipmentsDashboard/DocumentManagement/UploadModal";
-import AddRoambeeModal from "../ShipmentsDashboard/LocationTracking/AddRoambeeModal";
 import OpenVideosModal from "../ShipmentsDashboard/SpecialFeatures/OpenVideosModal";
 import AddDeliveryOrderModal from "../ShipmentsDashboard/SpecialFeatures/AddDeliveryOrderModal";
 import AddManagedByModal from "../ShipmentsDashboard/SpecialFeatures/AddManagedByModal";
@@ -252,7 +251,6 @@ const ShipmentsDashboard: React.FC = () => {
   const [showWarningDialog, setShowWarningDialog] = useState(false);
   const [showUpdateStatusDialog, setShowUpdateStatusDialog] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
-  const [showAddRoambeeDialog, setShowAddRoambeeDialog] = useState(false);
   const [showLastKnownLocationDialog, setShowLastKnownLocationDialog] =
     useState(false);
   const [showOpenVideosDialog, setShowOpenVideosDialog] = useState(false);
@@ -663,12 +661,6 @@ const handleCompleteShipment = (shipment: Shipment) => {
   setShowCompleteShipmentModal(true);
 };
 
-const handleAddRoambeeId = (shipment: Shipment) => {
-  closeAllDialogs();
-  setSelectedShipmentForRoambee(shipment);
-  setShowRoambeeModal(true);
-};
-
 const handleMarkAsArrived = (shipment: Shipment) => {
   closeAllDialogs();
   setSelectedShipmentForArrival(shipment);
@@ -767,7 +759,7 @@ const actionMenuCategories = {
     { icon: DoorOpen, label: "Recalculate Customer Gate In/Out", color: "text-pink-600", onClick: (shipment: Shipment) => handleRecalculateGateInOut(shipment), disabled: (shipment: Shipment) => ["Completed", "Cancelled"].includes(shipment.status) },
   ],
   "Shipment Operations": [
-    { icon: PlusCircle, label: "Add Roambee ID", color: "text-blue-600", onClick: handleAddRoambeeId },
+    { icon: RefreshCw, label: "Reassign", color: "text-blue-600" },
     { icon: CheckCircle, label: "Submit Mark As Arrived", color: "text-green-600", onClick: handleMarkAsArrived },
     { icon: CreditCard, label: "Create Payment Advance", color: "text-indigo-600", onClick: handleCreatePaymentAdvice },
     { icon: Upload, label: "Bulk Upload - Commercial Invoices", color: "text-green-600", onClick: handleBulkUploadCommercialInvoices },
@@ -781,7 +773,6 @@ const actionMenuCategories = {
   "Advanced": [
     { icon: UserPlus, label: "Add Managed By", color: "text-blue-600", onClick: handleAddManagedBy },
     { icon: RefreshCw, label: "ReTrigger Missed Events", color: "text-blue-600", onClick: handleRetriggerMissedEvents },
-    { icon: RefreshCw, label: "Reassign", color: "text-blue-600" },
     { icon: Edit, label: "Update Client Freight", color: "text-yellow-600", onClick: (shipment: Shipment) => { closeAllDialogs(); handleOpenFreightModal(shipment._id, shipment.sin, 'client_rate'); } },
     { icon: Plus, label: "Add Driver Expenses", color: "text-green-600", onClick: handleAddDriverExpenses },
   ],
@@ -2165,7 +2156,6 @@ const applyFilter = () => {
     setShowWarningDialog(false);
     setShowUpdateStatusDialog(false);
     setShowUploadModal(false);
-    setShowAddRoambeeDialog(false);
     setShowLastKnownLocationDialog(false);
     setShowOpenVideosDialog(false);
     setShowAddDODialog(false);
@@ -2732,23 +2722,6 @@ const applyFilter = () => {
     }}
   />
 )}
-
-      {showRoambeeModal && selectedShipmentForRoambee && (
-        <AddRoambeeModal
-          show={showRoambeeModal}
-          shipmentNo={selectedShipmentForRoambee?.sin || ""}
-          shipmentId={selectedShipmentForRoambee?._id || ""}
-          onClose={() => {
-            setShowRoambeeModal(false);
-            setSelectedShipmentForRoambee(null);
-          }}
-          onSuccess={() => {
-            fetchShipments();
-          }}
-          isLoading={isSubmittingRoambee}
-        />
-      )}
-
       {showAttachDialog && selectedShipmentForAttach && (
         <AttachFilesModal
           show={showAttachDialog}

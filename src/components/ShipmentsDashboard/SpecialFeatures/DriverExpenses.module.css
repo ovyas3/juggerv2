@@ -394,12 +394,12 @@
 }
 
 /* Custom styles for DatePicker focus */
-.datepicker-filled .ant-picker.ant-picker-focused {
+.datepickerFilled .ant-picker.ant-picker-focused {
   border-color: #4f46e5 !important;
   box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2) !important;
 }
 
-.datepicker-empty .ant-picker.ant-picker-focused {
+.datepickerEmpty .ant-picker.ant-picker-focused {
   border-color: #d32f2f !important;
   box-shadow: 0 0 0 2px rgba(211, 47, 47, 0.2) !important;
 }

@@ -1,9 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  Select,
-  MenuItem,
-  Button,
-} from "@mui/material";
+import { Button } from "@mui/material";
 import DownloadIcon from "@mui/icons-material/Download";
 import PreviewIcon from "@mui/icons-material/Preview";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
@@ -11,7 +7,14 @@ import styles from "./EpodPreviewModal.module.css";
 import service from "@/utils/timeService";
 import { useSnackbar } from "@/hooks/snackBar";
 import { httpsPost } from "@/utils/Communication";
-import ModalHeader from "../../UI/ModalHeader/ModalHeader";
+import ModalHeader from "@/components/UI/ModalHeader/ModalHeader";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/UI/select";
 
 interface EpodPreviewModalProps {
   open: boolean;
@@ -60,13 +63,13 @@ const EpodPreviewModal = ({ open, onClose, data }: EpodPreviewModalProps) => {
     }
   };
 
-  const handleDeliveryChange = (event: any) => {
-    const delivery = data.deliveries.find(
-      (d) => d.location.name === event.target.value
-    );
+  const handleDeliveryChange = (value: string) => {
+    const delivery = data.deliveries.find((d) => d.location.name === value);
     if (delivery) {
       setSelectedDelivery(delivery);
-      handleImagePreview(delivery.epods[0]);
+      if (delivery.epods?.length > 0) {
+        handleImagePreview(delivery.epods[0]);
+      }
     }
   };
 
@@ -262,16 +265,19 @@ const EpodPreviewModal = ({ open, onClose, data }: EpodPreviewModalProps) => {
             <div className={styles.detailsPanel}>
               <div className={styles.deliverySelector}>
                 <Select
-                  fullWidth
                   value={selectedDelivery?.location?.name || ""}
-                  onChange={handleDeliveryChange}
-                  className={styles.selectInput}
+                  onValueChange={handleDeliveryChange}
                 >
-                  {data.deliveries.map((delivery) => (
-                    <MenuItem key={delivery._id} value={delivery.location.name}>
-                      {delivery.location.name}
-                    </MenuItem>
-                  ))}
+                  <SelectTrigger className={styles.select}>
+                    <SelectValue placeholder="Select delivery location" />
+                  </SelectTrigger>
+                  <SelectContent className={styles.selectContent}>
+                    {data.deliveries.map((delivery) => (
+                      <SelectItem key={delivery._id} value={delivery.location.name} className={styles.selectItem}>
+                        {delivery.location.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
                 </Select>
               </div>
 

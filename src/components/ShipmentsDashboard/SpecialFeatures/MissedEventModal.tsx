@@ -288,17 +288,19 @@ const MissedEventModal: React.FC<MissedEventModalProps> = ({
               <textarea
                 value={eventData}
                 readOnly
-                style={{
-                  width: "450px",
-                  height: "108px",
-                  border: "1px solid black",
-                  textAlign: "left" as const,
-                  background: "#FFFFFF",
-                  opacity: 1,
-                  padding: "8px",
-                  fontFamily: "monospace",
-                  fontSize: "12px",
-                }}
+                // style={{
+                //   width: "450px",
+                //   height: "108px",
+                //   border: "1px solid #4f46e5",
+                //   textAlign: "left" as const,
+                //   background: "#FFFFFF",
+                //   opacity: 1,
+                //   padding: "8px",
+                //   fontFamily: "monospace",
+                //   fontSize: "12px",
+                //   borderRadius: "5px",
+                // }}
+                className={styles.dataTextarea}
               />
             </div>
           </div>

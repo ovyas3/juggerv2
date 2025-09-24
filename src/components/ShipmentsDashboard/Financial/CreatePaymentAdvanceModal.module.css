@@ -195,8 +195,18 @@
 }
 
 .cancelButton {
-  background-color: #f5f5f5;
-  border: 1px solid #ccc;
+  background-color: #e54131;
+  border: 1px solid #e54131;
+  color: white;
+}
+
+.cancelButton:hover {
+  background-color: #ec2918;
+}
+
+.cancelButton:disabled {
+  background-color: #9fa8da;
+  cursor: not-allowed;
 }
 
 .loading {

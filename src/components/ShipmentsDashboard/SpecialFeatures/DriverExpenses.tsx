@@ -400,7 +400,7 @@ const DriverExpenses: React.FC<DriverExpensesProps> = ({
                       }}
                       popupStyle={{ zIndex: 99999 }}
                       status={!expense.expenseDate ? "error" : ""}
-                      className={expense.expenseDate ? "datepicker-filled" : "datepicker-empty"}
+                      className={expense.expenseDate ? "datepickerFilled" : "datepickerEmpty"}
                     />
                   </TableCell>
                   <TableCell className={styles.cell}>
@@ -424,11 +424,15 @@ const DriverExpenses: React.FC<DriverExpensesProps> = ({
                         sx={{
                           '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
                             borderColor: expense.expenseType ? '#4f46e5' : '#d32f2f',
-                            borderWidth: '2px',
+                            borderWidth: '1px',
+                            boxShadow: expense.expenseType ? '0 0 0 2px rgba(79, 70, 229, 0.2)' : '0 0 0 2px rgba(211, 47, 47, 0.2)',
+                            // box-shadow: expense.expenseType ? '0 0 0 2px rgba(79, 70, 229, 0.2)' : '0 0 0 2px rgba(211, 47, 47, 0.2)',
                           },
                           '&.Mui-focused:not(.Mui-error) .MuiOutlinedInput-notchedOutline': {
                             borderColor: '#4f46e5',
-                            borderWidth: '2px',
+                            borderWidth: '1px',
+                            boxShadow: '0 0 0 2px rgba(79, 70, 229, 0.2)',
+                            // box-shadow: '0 0 0 2px rgba(79, 70, 229, 0.2)',
                           }
                         }}
                       >
@@ -462,11 +466,13 @@ const DriverExpenses: React.FC<DriverExpensesProps> = ({
                         sx={{
                           '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
                             borderColor: expense.paymentMode ? '#4f46e5' : '#d32f2f',
-                            borderWidth: '2px',
+                            borderWidth: '1px',
+                            boxShadow: expense.paymentMode ? '0 0 0 2px rgba(79, 70, 229, 0.2)' : '0 0 0 2px rgba(211, 47, 47, 0.2)',
                           },
                           '&.Mui-focused:not(.Mui-error) .MuiOutlinedInput-notchedOutline': {
                             borderColor: '#4f46e5',
-                            borderWidth: '2px',
+                            borderWidth: '1px',
+                            boxShadow: '0 0 0 2px rgba(79, 70, 229, 0.2)',
                           }
                         }}
                       >
@@ -495,7 +501,8 @@ const DriverExpenses: React.FC<DriverExpensesProps> = ({
   sx={{
     '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
       borderColor: '#4f46e5',
-      borderWidth: '2px',
+      borderWidth: '1px',
+      boxShadow: '0 0 0 2px rgba(79, 70, 229, 0.2)',
     }
   }}
 />
@@ -522,11 +529,13 @@ const DriverExpenses: React.FC<DriverExpensesProps> = ({
                       sx={{
                         '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
                           borderColor: (expense.expenseAmount && expense.expenseAmount > 0) ? '#4f46e5' : '#d32f2f',
-                          borderWidth: '2px',
+                          borderWidth: '1px',
+                          boxShadow: (expense.expenseAmount && expense.expenseAmount > 0) ? '0 0 0 2px rgba(79, 70, 229, 0.2)' : '0 0 0 2px rgba(211, 47, 47, 0.2)',
                         },
                         '& .MuiOutlinedInput-root.Mui-focused:not(.Mui-error) .MuiOutlinedInput-notchedOutline': {
                           borderColor: '#4f46e5',
-                          borderWidth: '2px',
+                          borderWidth: '1px',
+                          boxShadow: '0 0 0 2px rgba(79, 70, 229, 0.2)',
                         }
                       }}
                     />
@@ -547,7 +556,8 @@ const DriverExpenses: React.FC<DriverExpensesProps> = ({
   sx={{
     '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
       borderColor: '#4f46e5',
-      borderWidth: '2px',
+      borderWidth: '1px',
+      boxShadow: '0 0 0 2px rgba(79, 70, 229, 0.2)',
     }
   }}
 />
@@ -570,11 +580,13 @@ const DriverExpenses: React.FC<DriverExpensesProps> = ({
                         sx={{
                           '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
                             borderColor: expense.comment ? '#4f46e5' : '#d32f2f',
-                            borderWidth: '2px',
+                            borderWidth: '1px',
+                            boxShadow: expense.comment ? '0 0 0 2px rgba(79, 70, 229, 0.2)' : '0 0 0 2px rgba(211, 47, 47, 0.2)',
                           },
                           '& .MuiOutlinedInput-root.Mui-focused:not(.Mui-error) .MuiOutlinedInput-notchedOutline': {
                             borderColor: '#4f46e5',
-                            borderWidth: '2px',
+                            borderWidth: '1px',
+                            boxShadow: '0 0 0 2px rgba(79, 70, 229, 0.2)',
                           }
                         }}
                       />
@@ -601,7 +613,7 @@ const DriverExpenses: React.FC<DriverExpensesProps> = ({
                         className={styles.iconButton}
                         sx={{ color: "#3f84a7" }}
                       >
-                        <ContentCopyIcon fontSize="small" />
+                        <ContentCopyIcon fontSize="small" style={{ color: "#4f46e5" }} />
                       </IconButton>
 
                       {index === expenses.length - 1 && (
@@ -612,7 +624,7 @@ const DriverExpenses: React.FC<DriverExpensesProps> = ({
                           className={styles.iconButton}
                           sx={{ color: "#2962Ff" }}
                         >
-                          <AddCircleOutlineIcon fontSize="small" />
+                          <AddCircleOutlineIcon fontSize="small" style={{ color: "#4f46e5" }} />
                         </IconButton>
                       )}
                     </div>

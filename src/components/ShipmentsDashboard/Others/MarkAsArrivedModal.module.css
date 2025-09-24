@@ -89,24 +89,32 @@
   width: 100%;
 }
 
+
 .dateInput {
-  width: 100%;
-  padding: 10px 15px;
-  border: 1px solid #d9d9d9;
-  border-radius: 6px;
+  width: 200px;
+  padding: 8px 12px;
+  outline: none;
+  border: 1px solid #4f46e5;
+  border-radius: 4px;
   font-size: 14px;
-  transition: all 0.3s;
+  font-family: "Muli", sans-serif;
 }
 
 .dateInput:hover {
-  border-color: #4F46E5;
+  border: 1px solid #4f46e5;
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
 }
 
-.dateInput:focus,
-.dateInput:focus-visible {
-  border-color: #4F46E5;
-  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+.dateInput:focus {
   outline: none;
+  border: 1px solid #4f46e5;
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+}
+
+.dateInput:focus-visible {
+  outline: none;
+  border: 1px solid #4f46e5;
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
 }
 
 .calendarIcon {
