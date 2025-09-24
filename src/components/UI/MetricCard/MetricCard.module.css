@@ -1,0 +1,135 @@
+.card {
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+  border-left: 4px solid #9ca3af;
+  padding: 16px;
+  background-color: white;
+  transition: all 0.2s ease;
+}
+
+.card:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card:active {
+  transform: translateY(1px);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.title {
+  font-size: 14px;
+  font-weight: 500;
+  color: #4b5563;
+}
+
+.iconContainer {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: #f3f4f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.value {
+  font-size: 24px;
+  font-weight: 700;
+  color: #111827;
+  margin: 16px 0;
+}
+
+.trend {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+}
+
+.trendUp {
+  color: #10b981;
+}
+
+.trendDown {
+  color: #ef4444;
+}
+
+.trendNeutral {
+  color: #6b7280;
+}
+
+/* Skeleton styles */
+.skeletonCard {
+  background-color: #f3f4f6;
+  border-left: 4px solid #9ca3af;
+  border-radius: 8px;
+  padding: 16px;
+  overflow: hidden;
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.skeletonHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.skeletonIcon {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: #e5e7eb;
+}
+
+.skeletonTitle {
+  height: 16px;
+  width: 75%;
+  background-color: #e5e7eb;
+  border-radius: 4px;
+}
+
+.skeletonValue {
+  height: 32px;
+  width: 50%;
+  background-color: #e5e7eb;
+  border-radius: 4px;
+  margin: 16px 0;
+}
+
+.skeletonTrend {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.skeletonTrendDot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: #e5e7eb;
+}
+
+.skeletonTrendText {
+  height: 12px;
+  width: 25%;
+  background-color: #e5e7eb;
+  border-radius: 4px;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}

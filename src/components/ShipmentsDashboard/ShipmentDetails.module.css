@@ -1,0 +1,279 @@
+/* Main container */
+.container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    max-height: 100vh;
+    overflow-y: auto;
+    width: 100%;
+    max-width: 500px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Header */
+  .header {
+    padding: 16px;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+  }
+  
+  .headerContent {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 8px;
+  }
+  
+  .shipmentHeader {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  
+  .shipmentIcon {
+    font-size: 36px !important;
+    color: #3f51b5;
+  }
+  
+  .shipmentNumber {
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  
+  .headerActions {
+    display: flex;
+    gap: 4px;
+  }
+  
+  .deliveryInfo {
+    margin-top: 8px;
+    font-size: 0.875rem;
+  }
+  
+  .delayedText {
+    color: #f44336;
+    font-weight: 500;
+    margin-left: 4px;
+  }
+  
+  .delayReason {
+    margin-left: 4px;
+    color: #f44336;
+    font-style: italic;
+  }
+  
+  /* Progress Bar */
+  .progressContainer {
+    padding: 8px 16px;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+  }
+  
+  .progressBar {
+    height: 8px;
+    border-radius: 4px;
+    margin-bottom: 4px;
+  }
+  
+  .progressLabels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.7rem;
+    color: #6c757d;
+  }
+  
+  /* Sections */
+  .section {
+    padding: 16px;
+  }
+  
+  .sectionTitle {
+    color: #495057;
+    font-weight: 600;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+  }
+  
+  /* List items */
+  .listIcon {
+    min-width: 36px;
+    color: #6c757d;
+  }
+  
+  /* Materials List */
+  .materialsList {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .materialItem {
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    padding: 8px 12px;
+    border-left: 3px solid #3f51b5;
+  }
+  
+  .materialName {
+    font-weight: 500;
+    margin-bottom: 4px;
+  }
+  
+  .materialDetails {
+    display: flex;
+    gap: 16px;
+    font-size: 0.8rem;
+    color: #6c757d;
+    flex-wrap: wrap;
+  }
+  
+  .materialDetail {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  
+  /* Timeline */
+  .timeline {
+    position: relative;
+    padding-left: 20px;
+    margin-top: 8px;
+  }
+  
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 6px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background-color: #e0e0e0;
+  }
+  
+  .timelineItem {
+    position: relative;
+    margin-bottom: 16px;
+    padding-left: 20px;
+  }
+  
+  .timelineDot {
+    position: absolute;
+    left: 0;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    transform: translateX(-50%);
+    top: 4px;
+    border: 2px solid #fff;
+    box-shadow: 0 0 0 2px #3f51b5;
+  }
+  
+  .timelineContent {
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    padding: 8px 12px;
+  }
+  
+  .timelineHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+  }
+  
+  .timelineTitle {
+    font-weight: 500;
+    font-size: 0.9rem;
+  }
+  
+  .timelineTime {
+    font-size: 0.7rem;
+    color: #6c757d;
+  }
+  
+  .timelineLocation {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.8rem;
+    color: #6c757d;
+    margin-top: 4px;
+  }
+  
+  .timelineNotes {
+    margin-top: 4px;
+    font-size: 0.8rem;
+    color: #495057;
+    background-color: #fff;
+    padding: 4px 8px;
+    border-radius: 4px;
+    border: 1px solid #e9ecef;
+  }
+  
+  /* Actions */
+  .actions {
+    display: flex;
+    justify-content: space-around;
+    padding: 12px 16px;
+    background-color: #f8f9fa;
+    border-top: 1px solid #e9ecef;
+  }
+  
+  .actionButton {
+    text-transform: none;
+    font-size: 0.8rem;
+    padding: 4px 8px;
+    border-radius: 4px;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 600px) {
+    .container {
+      max-width: 100%;
+      border-radius: 0;
+      max-height: 80vh;
+    }
+    
+    .header {
+      padding: 12px;
+    }
+    
+    .section {
+      padding: 12px;
+    }
+    
+    .shipmentIcon {
+      font-size: 32px !important;
+    }
+    
+    .materialDetails {
+      flex-direction: column;
+      gap: 4px;
+    }
+  }
+  
+  /* Scrollbar styling */
+  .container::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+  }
+  
+  .container::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+  }
+  
+  .container::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+  }
+  

@@ -1,57 +1,77 @@
 // src/components/ShipmentsDashboard/Modals/LocationDialog.tsx
-import { Button } from "@/components/UI/button";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/UI/dialog";
 import { MapPin, X } from "lucide-react";
 import styles from "./LocationDialog.module.css";
+import ModalHeader from "@/components/UI/ModalHeader/ModalHeader";
 
 interface LocationDialogProps {
   address: string;
   lastUpdated?: string;
+  lastUpdatedColor?: string;
   children: React.ReactNode;
+  isOpen: boolean;
+  onClose: () => void;
+  shipmentId?: string;
 }
 
+export function LocationDialog({
+  address,
+  lastUpdated,
+  lastUpdatedColor,
+  children,
+  isOpen,
+  onClose,
+  shipmentId,
+}: LocationDialogProps) {
+  if (!isOpen) {
+    return <>{children}</>;
+  }
 
+  const toShortDateTime = (date: any, format?: string) => {
+    if (!date) return "";
+    const dateObj = new Date(date);
+    return dateObj.toLocaleString("en-US", {
+      day: "2-digit",
+      month: "short",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    });
+  };
 
-export function LocationDialog({ address, lastUpdated, children }: LocationDialogProps) {
-    return (
-      <Dialog>
-        <DialogTrigger asChild>
-          {children}
-        </DialogTrigger>
-        <DialogContent className={`lastKnownDialog ${styles.dialogContent}`}>
-        <div className={styles.headerRow}>
-          <div className={styles.titleIcon}>
-            <MapPin className={styles.icon} />
-            <DialogTitle className={styles.title}>Last Known Location</DialogTitle>
-          </div>
-          <DialogClose asChild>
-            <button className={styles.closeButton} aria-label="Close">
-              <X size={20} />
-            </button>
-          </DialogClose>
-        </div>
-        <div className={styles.body}>
-          <div className={styles.section}>
-            <span className={styles.label}>Address</span>
-            <p className={styles.value}>{address || 'No address available'}</p>
-          </div>
-          {lastUpdated && (
+  return (
+    <>
+      {children}
+      <div className={styles.modalOverlay} onClick={onClose}>
+        <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+          <ModalHeader
+            title={`Last Known Location - #${shipmentId}`}
+            onClose={onClose}
+          />
+
+          <div className={styles.body}>
             <div className={styles.section}>
-              <span className={styles.label}>Last Updated</span>
+              <span className={styles.label}>Address</span>
               <p className={styles.value}>
-                {new Date(lastUpdated).toLocaleString()}
+                {address || "No address available"}
               </p>
             </div>
-          )}
+            {lastUpdated && (
+              <div className={styles.section}>
+                <span className={styles.label}>Last Updated</span>
+               <p
+                  className={styles.value}
+                  style={{
+                    color: lastUpdatedColor || "#374151",
+                    fontWeight: 600,
+                  }}
+                >
+                  {toShortDateTime(lastUpdated)}
+                </p>
+              </div>
+            )}
+          </div>
         </div>
-      </DialogContent>
-      </Dialog>
-    );
-  }
+      </div>
+    </>
+  );
+}

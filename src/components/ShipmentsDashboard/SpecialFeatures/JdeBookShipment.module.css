@@ -13,6 +13,7 @@
   display: flex;
   gap: 16px;
   margin-bottom: 16px;
+  align-items: center;
 }
 
 .radioGroup {
@@ -24,8 +25,7 @@
 }
 
 .serialList {
-  maxHeight: 300px;
-  overflowY: 'auto';
+  max-height: 300px;
   padding: 8px;
   border: 1px solid #e0e0e0;
   border-radius: 4px;
@@ -42,17 +42,52 @@
 }
 
 .serialCheckbox {
-  marginRight: 8px;
+  margin-right: 8px;
 }
 
 .serialNumber {
-  flexGrow: 1;
+  flex-grow: 1;
 }
 
 .submitButton {
   display: flex;
   justify-content: flex-end;
-  marginTop: 16px;
+  margin-top: 16px;
+  width: 80px;
+  display: grid;
+  place-items: center;
+  height: 39px;
+  border-radius: 4px;
+  color: white;
+  float: right;
+  margin: 15px;
+  cursor: pointer;
+  border: none;
+  background-color: #4F46E5;
+  color: white;
+}
+
+.submitButton:hover {
+  background-color: #4338ca;
+}
+
+.bookShipmentButton {
+  width: 80px;
+  display: grid;
+  place-items: center;
+  height: 39px;
+  border-radius: 4px;
+  color: white;
+  float: right;
+  margin: 15px;
+  cursor: pointer;
+  border: none;
+  background-color: #4F46E5;
+  color: white;
+}
+
+.bookShipmentButton:hover {
+  background-color: #4338ca;
 }
 
 .serialInvoicesContainer {
@@ -60,18 +95,18 @@
   border: 1px solid #e0e0e0;
   border-radius: 4px;
   overflow: hidden;
-  marginBottom: 16px;
+  margin-bottom: 16px;
 }
 
 .serialColumn, .invoiceColumn {
   width: 50%;
-  maxHeight: 300px;
-  overflowY: auto;
+  max-height: 300px;
+  overflow-y: auto;
   padding: 8px;
 }
 
 .serialColumn {
-  borderRight: 1px solid #e0e0e0;
+  border-right: 1px solid #e0e0e0;
 }
 
 .serialItemSelectable {
@@ -99,21 +134,21 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  marginTop: 16px;
+  margin-top: 16px;
 }
 
 .loadingContainer {
   display: flex;
-  justifyContent: center;
-  alignItems: center;
-  minHeight: 200px;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
 }
 
 .searchButton {
   width: 80px;
   display: grid;
   place-items: center;
-  height: 30px;
+  height: 39px;
   border-radius: 4px;
   color: white;
   float: right;
@@ -122,4 +157,16 @@
   border: none;
   background-color: #4F46E5;
   color: white;
+}
+
+.searchButton:hover {
+  background-color: #4338ca;
+}
+
+.datePickerContainer :global(.ant-picker-dropdown) {
+  z-index: 9999 !important;
+}
+
+.datePickerContainer :global(.ant-picker-panel-container) {
+  z-index: 9999 !important;
 }

@@ -1,14 +1,14 @@
-// RetriggerEventModal.tsx
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import { useSnackbar } from "@/hooks/snackBar";
-import { httpsPost } from '@/utils/Communication';
-import styles from './RetriggerEventModal.module.css';
-import ModalHeader from '@/components/UI/ModalHeader/ModalHeader';
+import { httpsPost } from "@/utils/Communication";
+import styles from "./RetriggerEventModal.module.css";
+import ModalHeader from "@/components/UI/ModalHeader/ModalHeader";
 
 interface RetriggerEventModalProps {
   show: boolean;
   shipment: {
     _id: string;
+    sin: string;
     others?: {
       SAPShipmentDocNum?: string;
       ShipmentCost?: string;
@@ -23,7 +23,7 @@ const RetriggerEventModal: React.FC<RetriggerEventModalProps> = ({
   show,
   shipment,
   onClose,
-  onSuccess
+  onSuccess,
 }) => {
   const { showMessage } = useSnackbar();
   const [isLoading, setIsLoading] = useState<Record<number, boolean>>({});
@@ -31,27 +31,27 @@ const RetriggerEventModal: React.FC<RetriggerEventModalProps> = ({
     show: boolean;
     type: number | null;
     message: string;
-  }>({ show: false, type: null, message: '' });
+  }>({ show: false, type: null, message: "" });
 
   const events = [
     {
       id: 1,
-      name: 'Vehicle Data Updation',
-      data: shipment.others?.SAPShipmentDocNum || '',
-      endpoint: '/v1/sendAllocationData'
+      name: "Vehicle Data Updation",
+      data: shipment.others?.SAPShipmentDocNum || "",
+      endpoint: "/v1/sendAllocationData",
     },
     {
       id: 2,
-      name: 'Shipment Cost Updation',
-      data: shipment.others?.ShipmentCost || '',
-      endpoint: '/v1/sendShipCostData'
+      name: "Shipment Cost Updation",
+      data: shipment.others?.ShipmentCost || "",
+      endpoint: "/v1/sendShipCostData",
     },
     {
       id: 3,
-      name: 'Commercial Invoice Updation',
-      data: shipment.others?.Invoice || '',
-      endpoint: '/v1/sendInvoiceData'
-    }
+      name: "Commercial Invoice Updation",
+      data: shipment.others?.Invoice || "",
+      endpoint: "/v1/sendInvoiceData",
+    },
   ];
 
   const handleRetriggerClick = (type: number, data: string) => {
@@ -59,7 +59,7 @@ const RetriggerEventModal: React.FC<RetriggerEventModalProps> = ({
       setShowConfirm({
         show: true,
         type,
-        message: `Data already present for this event - ${data}. Do you want to Proceed?`
+        message: `Data already present for this event - ${data}. Do you want to Proceed?`,
       });
     } else {
       retriggerEvent(type, true);
@@ -67,18 +67,18 @@ const RetriggerEventModal: React.FC<RetriggerEventModalProps> = ({
   };
 
   const retriggerEvent = async (type: number, shouldTrigger: boolean) => {
-    setShowConfirm({ show: false, type: null, message: '' });
-    
+    setShowConfirm({ show: false, type: null, message: "" });
+
     if (!shouldTrigger) {
       onClose();
       return;
     }
 
-    const event = events.find(e => e.id === type);
+    const event = events.find((e) => e.id === type);
     if (!event) return;
 
     try {
-      setIsLoading(prev => ({ ...prev, [type]: true }));
+      setIsLoading((prev) => ({ ...prev, [type]: true }));
       const response = await httpsPost(
         event.endpoint,
         { shipment_id: shipment._id },
@@ -87,18 +87,18 @@ const RetriggerEventModal: React.FC<RetriggerEventModalProps> = ({
       );
 
       if (response.statusCode === 200) {
-        showMessage('Event re-triggered successfully', 'success');
+        showMessage("Event re-triggered successfully", "success");
         onSuccess?.();
         onClose();
       }
     } catch (error: any) {
-      console.error('Error retriggering event:', error);
+      console.error("Error retriggering event:", error);
       showMessage(
-        error.response?.data?.message || 'Failed to retrigger event',
-        'error'
+        error.response?.data?.message || "Failed to retrigger event",
+        "error"
       );
     } finally {
-      setIsLoading(prev => ({ ...prev, [type]: false }));
+      setIsLoading((prev) => ({ ...prev, [type]: false }));
     }
   };
 
@@ -106,9 +106,8 @@ const RetriggerEventModal: React.FC<RetriggerEventModalProps> = ({
 
   return (
     <div className={styles.overlay} onClick={onClose}>
-      <div className={styles.modal} onClick={e => e.stopPropagation()}>
-
-        <ModalHeader title="Missed Events" onClose={onClose} />
+      <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+        <ModalHeader title={`Missed Events - #${shipment.sin}`} onClose={onClose} />
 
         <div className={styles.tableContainer}>
           <table className={styles.table}>
@@ -123,14 +122,14 @@ const RetriggerEventModal: React.FC<RetriggerEventModalProps> = ({
               {events.map((event) => (
                 <tr key={event.id}>
                   <td>{event.name}</td>
-                  <td>{event.data || '-'}</td>
+                  <td>{event.data || "-"}</td>
                   <td>
                     <button
                       className={styles.retriggerButton}
                       onClick={() => handleRetriggerClick(event.id, event.data)}
                       disabled={isLoading[event.id]}
                     >
-                      {isLoading[event.id] ? 'Processing...' : 'Re-Trigger'}
+                      {isLoading[event.id] ? "Processing..." : "Re-Trigger"}
                     </button>
                   </td>
                 </tr>
@@ -140,7 +139,6 @@ const RetriggerEventModal: React.FC<RetriggerEventModalProps> = ({
         </div>
       </div>
 
-      {/* Confirmation Dialog */}
       {showConfirm.show && (
         <div className={styles.confirmOverlay}>
           <div className={styles.confirmModal}>
@@ -148,13 +146,17 @@ const RetriggerEventModal: React.FC<RetriggerEventModalProps> = ({
             <div className={styles.confirmButtons}>
               <button
                 className={styles.confirmButton}
-                onClick={() => showConfirm.type && retriggerEvent(showConfirm.type, true)}
+                onClick={() =>
+                  showConfirm.type && retriggerEvent(showConfirm.type, true)
+                }
               >
                 Yes
               </button>
               <button
                 className={styles.cancelButton}
-                onClick={() => setShowConfirm({ show: false, type: null, message: '' })}
+                onClick={() =>
+                  setShowConfirm({ show: false, type: null, message: "" })
+                }
               >
                 No
               </button>

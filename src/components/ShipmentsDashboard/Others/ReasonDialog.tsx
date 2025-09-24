@@ -1,11 +1,10 @@
-// ReasonDialog.tsx
-import React, { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
-import { httpsGet, httpsPost } from '@/utils/Communication';
-import ModalHeader from '@/components/UI/ModalHeader/ModalHeader';
-import styles from './ReasonDialog.module.css';
+import React, { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
+import { httpsGet, httpsPost } from "@/utils/Communication";
+import ModalHeader from "@/components/UI/ModalHeader/ModalHeader";
+import styles from "./ReasonDialog.module.css";
 import { useSnackbar } from "@/hooks/snackBar";
-import { format } from 'date-fns';
+import { format } from "date-fns";
 
 interface ReasonHistory {
   updated_at: string;
@@ -24,40 +23,46 @@ interface ReasonGroup {
 interface ReasonDialogProps {
   open: boolean;
   onClose: () => void;
-  type: 'delay' | 'gps';
+  type: "delay" | "gps";
   shipmentId: string;
+  sin: string;
   onSuccess: () => void;
-  history?: ReasonHistory[]; // Add history prop
+  history?: ReasonHistory[]; 
 }
 
-const ReasonDialog: React.FC<ReasonDialogProps> = ({ 
-  open, 
-  onClose, 
-  type, 
-  shipmentId, 
-  onSuccess, 
-  history: initialHistory = [] // Default to empty array if not provided
+const ReasonDialog: React.FC<ReasonDialogProps> = ({
+  open,
+  onClose,
+  type,
+  shipmentId,
+  sin,
+  onSuccess,
+  history: initialHistory = [], 
 }) => {
   const { t } = useTranslation();
   const { showMessage } = useSnackbar();
-  const [selectedReason, setSelectedReason] = useState<string>('');
-  const [otherReason, setOtherReason] = useState<string>('');
+  const [selectedReason, setSelectedReason] = useState<string>("");
+  const [otherReason, setOtherReason] = useState<string>("");
   const [notify, setNotify] = useState<boolean>(false);
   const [reasons, setReasons] = useState<ReasonGroup[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
-  
-  const isDelayReason = type === 'delay';
-  const historyLabel = isDelayReason ? 'Delay Reason History' : 'GPS Disconnection Reason History';
-  const apiEndpoint = isDelayReason ? 'delay-reason' : 'gps-disconnect-reason';
-  const historyKey = isDelayReason ? 'remark' : 'reason';
 
-  // Sort history by date in descending order
+  const isDelayReason = type === "delay";
+  const historyLabel = isDelayReason
+    ? "Delay Reason History"
+    : "GPS Disconnection Reason History";
+  const apiEndpoint = isDelayReason ? "delay-reason" : "gps-disconnect-reason";
+  const historyKey = isDelayReason ? "remark" : "reason";
+
   const sortedHistory = [...initialHistory]
     .map((item: any) => ({
       ...item,
-      updated_at: item.updated_at || item.created_at
+      updated_at: item.updated_at || item.created_at,
     }))
-    .sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime());
+    .sort(
+      (a, b) =>
+        new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
+    );
 
   useEffect(() => {
     if (open) {
@@ -68,24 +73,28 @@ const ReasonDialog: React.FC<ReasonDialogProps> = ({
   const fetchReasons = async () => {
     try {
       setLoading(true);
-      const endpoint = isDelayReason 
-        ? 'constants/get_reasons?name=jspl_delay_reasons' 
-        : 'constants/get_reasons?name=gps_disconnection_reasons';
-      
+      const endpoint = isDelayReason
+        ? "constants/get_reasons?name=jspl_delay_reasons"
+        : "constants/get_reasons?name=gps_disconnection_reasons";
+
       const response = await httpsGet(endpoint);
-      
+
       if (response.statusCode === 200 && response.data) {
-        const reasonsData = Object.entries(response.data[0].reason).map(([groupName, groupValues]) => ({
-          name: groupName,
-          groupValues: groupValues as string[]
-        }));
-        
-        // Add "Others" as a separate option
-        setReasons([...reasonsData, { name: 'Other', groupValues: ['Others'] }]);
+        const reasonsData = Object.entries(response.data[0].reason).map(
+          ([groupName, groupValues]) => ({
+            name: groupName,
+            groupValues: groupValues as string[],
+          })
+        );
+
+        setReasons([
+          ...reasonsData,
+          { name: "Other", groupValues: ["Others"] },
+        ]);
       }
     } catch (error) {
       console.error(`Error fetching ${apiEndpoint} types:`, error);
-      showMessage('Failed to fetch reasons', 'error');
+      showMessage("Failed to fetch reasons", "error");
     } finally {
       setLoading(false);
     }
@@ -94,24 +103,24 @@ const ReasonDialog: React.FC<ReasonDialogProps> = ({
   const handleSubmit = async () => {
     if (!selectedReason) return;
 
-    const endpoint = isDelayReason 
-      ? 'shipment/delay_reason' 
-      : 'shipment/gps_disconnection_reason';
+    const endpoint = isDelayReason
+      ? "shipment/delay_reason"
+      : "shipment/gps_disconnection_reason";
 
     try {
       setLoading(true);
-      const reason = selectedReason === 'Others' ? otherReason : selectedReason;
+      const reason = selectedReason === "Others" ? otherReason : selectedReason;
 
       const response = await httpsPost(
-        endpoint, 
+        endpoint,
         {
           reason,
           _id: shipmentId,
-          ...(isDelayReason && { notify })
+          ...(isDelayReason && { notify }),
         },
         4
       );
-      
+
       if (response.statusCode === 200) {
         showMessage("Reason updated successfully", "success");
         onSuccess?.();
@@ -119,7 +128,7 @@ const ReasonDialog: React.FC<ReasonDialogProps> = ({
       }
     } catch (error) {
       console.error(`Error submitting ${endpoint}:`, error);
-      showMessage('Failed to update reason', 'error');
+      showMessage("Failed to update reason", "error");
     } finally {
       setLoading(false);
     }
@@ -127,7 +136,7 @@ const ReasonDialog: React.FC<ReasonDialogProps> = ({
 
   const formatDate = (dateString: string) => {
     try {
-      return format(new Date(dateString), 'dd MMM yyyy hh:mm a');
+      return format(new Date(dateString), "dd MMM yyyy hh:mm a");
     } catch (e) {
       return dateString;
     }
@@ -137,9 +146,13 @@ const ReasonDialog: React.FC<ReasonDialogProps> = ({
 
   return (
     <div className={styles.modalOverlay} onClick={onClose}>
-      <div className={styles.modal} onClick={e => e.stopPropagation()}>
+      <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
         <ModalHeader
-          title={t(isDelayReason ? 'Update Delay Reason' : 'GPS Disconnection Reason')}
+          title={t(
+            isDelayReason
+              ? `Delay Reason History - #${sin}`
+              : `GPS Disconnection Reason History - #${sin}`
+          )}
           onClose={onClose}
         />
 
@@ -147,9 +160,11 @@ const ReasonDialog: React.FC<ReasonDialogProps> = ({
           <div className={styles.formSection}>
             <div className={styles.inputGroup}>
               <label className={styles.label}>
-                {isDelayReason ? 'Select Delay Reason' : 'Select GPS Disconnection Reason'}
+                {isDelayReason
+                  ? "Select Delay Reason"
+                  : "Select GPS Disconnection Reason"}
               </label>
-              <select 
+              <select
                 className={styles.select}
                 value={selectedReason}
                 onChange={(e) => setSelectedReason(e.target.value)}
@@ -168,7 +183,7 @@ const ReasonDialog: React.FC<ReasonDialogProps> = ({
                 <option value="Others">Others</option>
               </select>
 
-              {selectedReason === 'Others' && (
+              {selectedReason === "Others" && (
                 <div className={styles.otherReasonContainer}>
                   <input
                     type="text"
@@ -181,7 +196,7 @@ const ReasonDialog: React.FC<ReasonDialogProps> = ({
                 </div>
               )}
 
-              {isDelayReason && (
+              {/* {isDelayReason && ( */}
                 <div className={styles.checkboxContainer}>
                   <input
                     type="checkbox"
@@ -190,18 +205,25 @@ const ReasonDialog: React.FC<ReasonDialogProps> = ({
                     onChange={(e) => setNotify(e.target.checked)}
                     disabled={loading}
                   />
-                  <label htmlFor="notifyCheckbox" className={styles.checkboxLabel}>
+                  <label
+                    htmlFor="notifyCheckbox"
+                    className={styles.checkboxLabel}
+                  >
                     Notify Customer
                   </label>
                 </div>
-              )}
+              {/* )} */}
 
-              <button 
+              <button
                 className={styles.submitButton}
                 onClick={handleSubmit}
-                disabled={loading || !selectedReason || (selectedReason === 'Others' && !otherReason)}
+                disabled={
+                  loading ||
+                  !selectedReason ||
+                  (selectedReason === "Others" && !otherReason)
+                }
               >
-                {loading ? 'Submitting...' : 'Submit'}
+                {loading ? "Submitting..." : "Submit"}
               </button>
             </div>
           </div>
@@ -223,7 +245,7 @@ const ReasonDialog: React.FC<ReasonDialogProps> = ({
                       <tr key={index} className={styles.historyRow}>
                         <td>{index + 1}</td>
                         <td>{formatDate(item.updated_at)}</td>
-                        <td>{item[historyKey] || 'N/A'}</td>
+                        <td>{item[historyKey] || "N/A"}</td>
                       </tr>
                     ))}
                   </tbody>

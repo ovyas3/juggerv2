@@ -22,6 +22,7 @@ import {
   DollarSign,
   FileText,
   CheckCircle,
+  UserCheck
 } from "lucide-react";
 import { LocationDialog } from "../../components/ShipmentsDashboard/LocationTracking/LocationDialog";
 import greenSIM from "../../assets/green-SIM.svg";
@@ -29,6 +30,13 @@ import redSIM from "../../assets/red-SIM.svg";
 import spotdrivericon from "../../assets/spotdriver-blue.svg";
 import Image from "next/image";
 import { environment } from "@/environments/env.api";
+import { toTitleCase } from "@/utils/stringUtils"
+import simTrackingIcon from "../../assets/sim_tracking.svg";
+import gpsTrackingIcon from "../../assets/gps_tracking.svg";
+import mobileIcon from "../../assets/mobile.svg";
+import { httpsPost } from "@/utils/Communication";
+import { useSnackbar } from "@/hooks/snackBar";
+
 
 interface Shipment {
   _id: string;
@@ -41,6 +49,7 @@ interface Shipment {
   trip_tracker?: {
     last_location_address?: string;
     last_location_at?: string;
+    methods?: string[];
   };
   frieght_price?: number;
   [key: string]: any; // For additional properties
@@ -62,7 +71,6 @@ interface ShipmentsTableProps {
   setActionSearch: (value: string) => void;
   actionMenuCategories: any;
   renderStatusCell: (shipment: Shipment) => React.ReactNode;
-  renderSINCell: (shipment: Shipment) => React.ReactNode;
   renderLocationCell: (
     shipment: Shipment,
     copyDestinationCode: any,
@@ -81,6 +89,11 @@ interface ShipmentsTableProps {
   copyDestinationCode: any;
   openLocationsPopup: any;
   formatCurrency: (amount: number) => string;
+  renderLastLocationCell: (shipment: Shipment) => React.ReactNode;
+  actionMenuOpenId: string | null;
+  setActionMenuOpenId: (id: string | null) => void;
+  closeActionMenu: () => void;
+  openSubscribeModal: (shipment: any) => void;
   // onViewDetails: (shipment: Shipment) => void;
   // onShare: (shipment: Shipment) => void;
   // onSendEmail: (shipment: Shipment) => void;
@@ -106,16 +119,20 @@ export const ShipmentsTable: React.FC<ShipmentsTableProps> = ({
   setActionSearch,
   actionMenuCategories,
   renderStatusCell,
-  renderSINCell,
   renderLocationCell,
   renderDateTimeCell,
   renderVehicleCell,
+  renderLastLocationCell,
   renderConsentCell,
   renderSubscriptionCell,
   handleSelectShipment,
   copyDestinationCode,
   openLocationsPopup,
   formatCurrency,
+  actionMenuOpenId,
+  setActionMenuOpenId,
+  closeActionMenu,
+  openSubscribeModal,
   // onViewDetails,
   // onShare,
   // onSendEmail,
@@ -125,7 +142,9 @@ export const ShipmentsTable: React.FC<ShipmentsTableProps> = ({
   // onUpdateFreight,
   // onViewEpods,
 }) => {
+  const { showMessage } = useSnackbar();
   const [actionSearchState, setActionSearchState] = useState("");
+  const [showDownLoadLoader, setShowDownLoadLoader] = useState(false);
 
   const shouldShowAction = (actionName: string): boolean => {
     if (!actionSearchState) return true;
@@ -157,6 +176,61 @@ export const ShipmentsTable: React.FC<ShipmentsTableProps> = ({
   //   };
 
 
+const downloadLocHistory = async (type: "SIM" | "APP" | "GPS", shipmentId: string) => {
+  setShowDownLoadLoader(true);
+  try {
+    const payload = { shipment: shipmentId, method: type };
+    const response = await httpsPost("reports/path_report", payload, {}, 1);
+    if (response && response.data && response.data.link) {
+      window.open(response.data.link, "_blank");
+    }
+    if(response && response.error){
+     showMessage(response.message, "error");
+    }
+  } catch (err: any) {
+    console.error("Error downloading location history:", err);
+    setShowDownLoadLoader(false);
+    showMessage(err?.error?.message || "Failed to download location history", "error");
+  }
+  setShowDownLoadLoader(false);
+};
+
+const  renderConsentAndSubscriptionIcons = (shipment: any, openSubscribeModal: (shipment: any) => void) => {
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 8, justifyContent: "center" }}>
+      {shipment.showGreenConsent ? (
+        <span title="Consent Given" style={{cursor: "default"}}>
+          <CheckCircle size={18} color="#22c55e" />
+        </span>
+      ) : shipment.showRedConsent ? (
+        <span title="Consent Not Given" style={{cursor: "default"}}>
+          <XCircle size={18} color="#ef4444" />
+        </span>
+      ) : (
+        <span title="Consent Not Available" style={{cursor: "default"}}>
+          <XCircle size={18} color="#9ca3af" />
+        </span>
+      )}
+      {shipment.showSubscriptionStatus && !shipment.gpsVehicle && (
+        <span
+          style={{ cursor: "pointer" }}
+          title={shipment.showGreenConsent ? "Subscribed" : "Not Subscribed"}
+          onClick={(e) => {
+            e.stopPropagation();
+            openSubscribeModal(shipment);
+          }}
+        >
+          {shipment.showGreenConsent ? (
+            <UserCheck size={18} color="#22c55e" />
+          ) : (
+            <UserCheck size={18} color="#ef4444" />
+          )}
+        </span>
+      )}
+    </div>
+  );
+}
+
   if (isAnalyticsView) return null;
 
   return (
@@ -165,16 +239,17 @@ export const ShipmentsTable: React.FC<ShipmentsTableProps> = ({
         isCompactView ? styles.compactView : ""
       }`}
       ref={tableRef}
+      data-shipment-type={shipmentType} 
     >
-     <table
-  className={`${styles.matTable} ${styles.table} ${
-    ["all", "others"].includes(shipmentType) ? "" : styles.noDelivery
-  }`}
->
+      <table
+        className={`${styles.matTable} ${styles.table}`}
+      >
         <thead className={styles.matHeaderRow}>
           <tr className={styles.headerRow}>
-            <th className={`${styles.matHeaderCell} ${styles.matColumnSelect} ${styles.stickyTop} ${styles.stickyColumn}`}>
-            Select
+            <th
+              className={`${styles.matHeaderCell} ${styles.matColumnSelect} ${styles.stickyTop} ${styles.stickyColumn}`}
+            >
+              Select
               {/* <input
                 type="checkbox"
                 onChange={(e) => handleSelectAllShipments(e.target.checked)}
@@ -185,68 +260,85 @@ export const ShipmentsTable: React.FC<ShipmentsTableProps> = ({
                 }
               /> */}
             </th>
-            <th className={`${styles.matHeaderCell} ${styles.matColumnSno} ${styles.stickyTop} ${styles.stickyColumn}`}>
-              S.No
-            </th>
-            <th className={`${styles.matHeaderCell} ${styles.matColumnStatus} ${styles.stickyTop}${styles.stickyColumn}`}>
-              Status
-            </th>
-            <th className={`${styles.matHeaderCell} ${styles.matColumnSIN} ${styles.stickyTop} ${styles.stickyColumn}`}>
-              SIN
+            <th
+              className={`${styles.matHeaderCell} ${styles.matColumnSno} ${styles.stickyTop} ${styles.stickyColumn}`}
+            >
+              S.No.
             </th>
             <th
-              className={`${styles.matHeaderCell} ${styles.matColumnPickup} ${styles.stickyTop} ${styles.stickyColumn}`}
+              className={`${styles.matHeaderCell} ${styles.matColumnStatus} ${styles.stickyTop}${styles.stickyColumn}`}
             >
-              {shipmentType === "outbound" ? "Delivery" : "Pickup"}
+              Status
             </th>
-            {["all", "others"].includes(shipmentType) && (
+            <th
+              className={`${styles.matHeaderCell} ${styles.matColumnSIN} ${styles.stickyTop} ${styles.stickyColumn}`}
+            >
+              SIN
+            </th>
+            {/* Pickup Column - Hide for outbound */}
+            {shipmentType !== "outbound" && (
+              <th
+                className={`${styles.matHeaderCell} ${styles.matColumnPickup} ${styles.stickyTop} ${styles.stickyColumn}`}
+              >
+                Pickup
+              </th>
+            )}
+
+            {/* Delivery Column - Hide for inbound */}
+            {shipmentType !== "inbound" && (
               <th
                 className={`${styles.matHeaderCell} ${styles.matColumnDelivery} ${styles.stickyTop} ${styles.stickyColumn}`}
               >
                 Delivery
               </th>
             )}
+
             {/* <th className={`${styles.matHeaderCell} ${styles.matColumnDateTime}`}>Date & Time</th> */}
             {/* <th
               className={`${styles.matHeaderCell} ${styles.matColumnCarrier}`}
             > */}
-        <th
-  className={`${styles.matHeaderCell} ${styles.matColumnCarrier} ${
-    ["all", "others"].includes(shipmentType)
-      ? styles.leftAfterDelivery   // Pickup(200) + Delivery(200) = 400
-      : styles.leftAfterPickup     // Pickup only = 200
-  }`}
->
+            <th
+              className={`${styles.matHeaderCell} ${styles.matColumnCarrier} ${
+                ["all", "others"].includes(shipmentType)
+                  ? styles.leftAfterDelivery // Pickup(200) + Delivery(200) = 400
+                  : styles.leftAfterPickup // Pickup only = 200
+              }`}
+            >
               Carrier
             </th>
 
             {shipmentType === "inbound" && (
-              <th className={styles.matHeaderCell}>Booked By</th>
+              <th className={`${styles.matHeaderCell} ${styles.matColumnBookedBy}`}>Booked By</th>
             )}
 
-            <th className={styles.matHeaderCell}>Vehicle Number</th>
+            <th className={`${styles.matHeaderCell} ${styles.matColumnVehicleNumber}`}>Vehicle Number</th>
             <th className={`${styles.matHeaderCell} ${styles.matColumnTrack}`}>
               Track
             </th>
-            <th className={styles.matHeaderCell}>Driver</th>
+            <th className={`${styles.matHeaderCell} ${styles.matColumnDriver}`}>Driver</th>
             <th
               className={`${styles.matHeaderCell} ${styles.matColumnDriverPhone}`}
             >
-              Driver Phone
+              Phone
             </th>
             <th className={`${styles.matHeaderCell} ${styles.matColumnEpod}`}>
-              EPOD
+              ePOD
             </th>
-            <th
-              className={`${styles.matHeaderCell} ${styles.matColumnConsent}`}
-            >
-              Consent
-            </th>
-            <th
-              className={`${styles.matHeaderCell} ${styles.matColumnSubscribed}`}
-            >
-              Subscribed
-            </th>
+            <th className={`${styles.matHeaderCell} ${styles.matColumnConsent}`}>
+  Consent / Subscribed
+</th>
+            <th className={`${styles.matHeaderCell} ${styles.matColumnSerialNo}`}>Serial No.</th>
+            <th className={`${styles.matHeaderCell} ${styles.matColumnEpodReceived}`}>ePOD Received</th>
+            <th className={`${styles.matHeaderCell} ${styles.matColumnPpd}`}>
+  erp Reference
+</th>
+<th className={`${styles.matHeaderCell} ${styles.matColumnDoNumber}`}>
+  OBD Number
+</th>
+            <th className={`${styles.matHeaderCell} ${styles.matColumnDelayed}`}>Delayed</th>
+            <th className={`${styles.matHeaderCell} ${styles.matColumnSaleOrder}`}>Sale Order</th>
+            <th className={`${styles.matHeaderCell} ${styles.matColumnEpodRequested}`}>ePOD Requested</th>
+            <th className={`${styles.matHeaderCell} ${styles.matColumnCommercialInvoiceExist}`}>Commercial Invoice Exist</th>
             <th
               className={`${styles.matHeaderCell} ${styles.matColumnLastLocation}`}
             >
@@ -299,29 +391,34 @@ export const ShipmentsTable: React.FC<ShipmentsTableProps> = ({
                   {renderStatusCell(shipment)}
                 </td>
                 <td className={`${styles.matCell} ${styles.matColumnSIN}`}>
-                  {renderSINCell(shipment)}
+                  {shipment.sin}
                 </td>
-               
-                <td
-                  className={`${styles.matCell} ${styles.matColumnPickup} ${styles.stickyColumn}`}
-                >
-                  {renderLocationCell(
-                    shipment,
-                    copyDestinationCode,
-                    (type: string, locs: any[]) =>
-                      openLocationsPopup(type, locs, shipment),
-                    shipmentType,
-                    "pickup"
-                  )}
-                </td>
-                {["all", "others"].includes(shipmentType) && (
+
+                {/* Pickup Cell - Hide for outbound */}
+                {shipmentType !== "outbound" && (
+                  <td
+                    className={`${styles.matCell} ${styles.matColumnPickup} ${styles.stickyColumn}`}
+                  >
+                    {renderLocationCell(
+                      shipment,
+                      copyDestinationCode,
+                      (type: string, locs: any) =>
+                        openLocationsPopup(type, locs, shipment),
+                      shipmentType,
+                      "pickup"
+                    )}
+                  </td>
+                )}
+
+                {/* Delivery Cell - Hide for inbound */}
+                {shipmentType !== "inbound" && (
                   <td
                     className={`${styles.matCell} ${styles.matColumnDelivery} ${styles.stickyColumn}`}
                   >
                     {renderLocationCell(
                       shipment,
                       copyDestinationCode,
-                      (type: string, locs: any[]) =>
+                      (type: string, locs: any) =>
                         openLocationsPopup(type, locs, shipment),
                       shipmentType,
              
@@ -329,18 +426,21 @@ export const ShipmentsTable: React.FC<ShipmentsTableProps> = ({
                     )}
                   </td>
                 )}
+
                 {/* <td className={`${styles.matCell} ${styles.matColumnDateTime}`}>
                   {renderDateTimeCell(shipment, shipmentType)}
                 </td> */}
                 {/* <td className={`${styles.matCell} ${styles.matColumnCarrier}`}> */}
                 <td
-  className={`${styles.matCell} ${styles.matColumnCarrier} ${styles.stickyColumn} ${
-    ["all", "others"].includes(shipmentType)
-      ? styles.leftAfterDelivery
-      : styles.leftAfterPickup
-  }`}
->
-                  {shipment.carrier_parent_name}
+                  className={`${styles.matCell} ${styles.matColumnCarrier} ${
+                    styles.stickyColumn
+                  } ${
+                    ["all", "others"].includes(shipmentType)
+                      ? styles.leftAfterDelivery
+                      : styles.leftAfterPickup
+                  }`}
+                >
+                  {toTitleCase(shipment.carrier_parent_name)}
                 </td>
 
                 {shipmentType === "inbound" && (
@@ -384,22 +484,79 @@ export const ShipmentsTable: React.FC<ShipmentsTableProps> = ({
                       />
                     )}
                   </a>
+
+                    {shipment.trip_tracker && shipment.trip_tracker.methods && (
+                      <span className={styles.trackingIconsWrapper}>
+                        {shipment.trip_tracker.methods.map((trip: string, idx: number) => {
+                          if (trip === "SIM") {
+                            return (
+                              <span
+                                key={`sim-${idx}`}
+                                className={styles.sim_tracking}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  downloadLocHistory("SIM", shipment._id);
+                                }}
+                                title="Sim Tracker"
+                                style={{ cursor: "pointer", marginLeft: 4 }}
+                              >
+                                <Image src={simTrackingIcon} alt="Sim Tracker" width={18} height={18} />
+                              </span>
+                            );
+                          }
+                          if (trip === "APP") {
+                            return (
+                              <span
+                                key={`app-${idx}`}
+                                className={styles.sim_tracking}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  downloadLocHistory("APP", shipment._id);
+                                }}
+                                title="Mobile Tracker"
+                                style={{ cursor: "pointer", marginLeft: 4 }}
+                              >
+                                <Image src={mobileIcon} alt="Mobile Tracker" width={18} height={18} />
+                              </span>
+                            );
+                          }
+                          if (trip === "GPS") {
+                            return (
+                              <span
+                                key={`gps-${idx}`}
+                                className={styles.sim_tracking}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  downloadLocHistory("GPS", shipment._id);
+                                }}
+                                title="GPS Tracker"
+                                style={{ cursor: "pointer", marginLeft: 4 }}
+                              >
+                                <Image src={gpsTrackingIcon} alt="GPS Tracker" width={18} height={18} />
+                              </span>
+                            );
+                          }
+                          return null;
+                        })}
+                      </span>
+                    )}
                 </td>
 
                 <td className={styles.matCell}>
-                  <div>{shipment.driverName}
-                  {shipment.isSpotDriver  && (
-        <span 
-         
-        > <img 
-        src={spotdrivericon.src} 
-        alt="Spot Driver" 
-        title="Spot Driver"
-        style={{ height: '12px', width: '12px' }}
-      /></span>
-      )}
+                  <div>
+                    {toTitleCase(shipment.driverName || "")}
+                    {shipment.isSpotDriver && (
+                      <span>
+                        {" "}
+                        <img
+                          src={spotdrivericon.src}
+                          alt="Spot Driver"
+                          title="Spot Driver"
+                          style={{ height: "12px", width: "12px" }}
+                        />
+                      </span>
+                    )}
                   </div>
-
                 </td>
 
                 <td
@@ -417,55 +574,99 @@ export const ShipmentsTable: React.FC<ShipmentsTableProps> = ({
                 </td>
 
                 <td className={`${styles.matCell} ${styles.matColumnConsent}`}>
-                  {renderConsentCell(shipment)}
-                </td>
+  {renderConsentAndSubscriptionIcons(shipment, openSubscribeModal)}
+</td>
 
-                <td
-                  className={`${styles.matCell} ${styles.matColumnSubscribed}`}
-                >
-                  {renderSubscriptionCell(shipment)}
+                <td className={styles.matCell}>
+                  {shipment.serial_number
+                    ? `${shipment.is_unplanned ? "US" : "SS"} - ${shipment.serial_number}`
+                    : "-"}
+                </td>
+                <td className={styles.matCell}>
+                  {shipment.whatsApp?.isEpodReceived ? "Yes" : "No"}
+                </td>
+                <td className={styles.matCell}>
+  <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
+    {shipment.ppd_updated ? (
+      <span title="PPD Updated">
+        <CheckCircle size={16} color="#22c55e" />
+      </span>
+    ) : (
+      <span title="PPD Not Updated" style={{ color: "#9ca3af", fontSize: 16, lineHeight: 1 }}>–</span>
+    )}
+    <span>{shipment.ppd ? shipment.ppd : <span title="No PPD Available" style={{ color: "#9ca3af", fontSize: 16, lineHeight: 1 }}>–</span>}</span>
+  </span>
+</td>
+<td className={styles.matCell}>
+  {shipment.do_number || "-"}
+</td>
+                <td className={styles.matCell}>
+                  {shipment.delayed_shipment ? (
+                    <span style={{ color: "#e03e3e" }}>Yes</span>
+                  ) : (
+                    "No"
+                  )}
+                </td>
+                <td className={styles.matCell}>
+                  {shipment.sale_order
+                    ? (() => {
+                        const orders = shipment.sale_order.split(",");
+                        return (
+                          <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                            <span>{orders[0]}</span>
+                            {orders.length > 1 && (
+                              <span
+                                className={styles.buble_round}
+                                title={orders.slice(1).join(",")}
+                                style={{
+                                  background: "#e5e7eb",
+                                  borderRadius: "50%",
+                                  padding: "0 6px",
+                                  fontSize: "12px",
+                                  marginLeft: "4px",
+                                }}
+                              >
+                                +{orders.length - 1}
+                              </span>
+                            )}
+                          </span>
+                        );
+                      })()
+                    : "-"}
+                </td>
+                <td className={styles.matCell}>
+                  {shipment.whatsApp?.isEpodRequested ? "Yes" : "No"}
+                </td>
+                <td className={styles.matCell}>
+                  {shipment.commercial_invoice_exist ? "Yes" : "No"}
                 </td>
 
                 <td
                   className={`${styles.matCell} ${styles.matColumnLastLocation}`}
                 >
-                  {shipment.trip_tracker?.last_location_address ? (
-                    <LocationDialog
-                      address={shipment.trip_tracker.last_location_address}
-                      lastUpdated={shipment.trip_tracker?.last_location_at}
-                    >
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className={styles.locationButton}
-                        title="View location"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          console.log("Location button clicked");
-                        }}
-                      >
-                        <MapPin className={styles.locationIcon} />
-                      </Button>
-                    </LocationDialog>
-                  ) : (
-                    "-"
-                  )}
+                  {renderLastLocationCell(shipment)}
                 </td>
-                <td className={styles.matCell}>
+                <td className={`${styles.matCell} ${styles.matColumnFreightPrice}`}>
                   {shipment.frieght_price
                     ? formatCurrency(shipment.frieght_price)
-                    : "N/A"}
+                    : "-"}
                 </td>
 
                 <td
                   className={`${styles.cellActions} ${styles.matColumnActions} ${styles.stickyRight}`}
                 >
                   <div className={styles.quickActions}>
-                    <DropdownMenu>
+                    <DropdownMenu
+                      open={actionMenuOpenId === shipment._id}
+                      onOpenChange={(open) => {
+                        setActionMenuOpenId(open ? shipment._id : null);
+                      }}
+                    >
                       <DropdownMenuTrigger asChild>
                         <button
                           className={styles.actionsMenuButton}
                           title="More actions"
+                          onClick={() => setActionMenuOpenId(shipment._id)}
                         >
                           <MoreHorizontal className={styles.actionIcon} />
                         </button>
@@ -479,7 +680,7 @@ export const ShipmentsTable: React.FC<ShipmentsTableProps> = ({
                         sideOffset={15}
                       >
                         <div className={styles.actionMenuSearch}>
-                          <Search className={styles.searchIcon} />
+                          <Search className={styles.TableSearchIcon} />
                           <input
                             type="text"
                             placeholder="Search actions..."
@@ -489,6 +690,9 @@ export const ShipmentsTable: React.FC<ShipmentsTableProps> = ({
                             }
                             value={actionSearchState}
                           />
+                          <div className={styles.shipmentInfo}>
+                            <div className={styles.shipmentSin}>#{shipment.sin}</div>
+                          </div>
                         </div>
                         <div className={styles.actionCategoriesGrid}>
                           {Object.entries(actionMenuCategories)
@@ -528,6 +732,9 @@ export const ShipmentsTable: React.FC<ShipmentsTableProps> = ({
                                           className={styles.actionMenuItem}
                                           onSelect={(e) => {
                                             e.preventDefault();
+                                            console.log("DropdownMenuItem onSelect triggered for:", item.label);
+                                            closeActionMenu();
+                                            console.log("closeActionMenu called from DropdownMenuItem");
                                             if (item.onClick) {
                                               item.onClick(shipment);
                                             }

@@ -530,6 +530,7 @@ const handleApply = async () => {
                   <Checkbox
                     checked={shipmentStatusValue.indexOf(status.name) > -1}
                     className={styles.smallCheckbox}
+                    className={styles.smallCheckbox}
                   />
                   <ListItemText primary={status.name} />
                 </MenuItem>
@@ -693,6 +694,11 @@ const handleApply = async () => {
                   paper: styles.carrierDropdownPaper,
                 },
               }}
+              MenuProps={{
+                classes: {
+                  paper: styles.carrierDropdownPaper,
+                },
+              }}
             >
               <div className={styles.searchInputWrapper}>
                 <input
@@ -706,8 +712,10 @@ const handleApply = async () => {
               </div>
               {filteredCarriers.map((carrier) => (
                 <MenuItem key={carrier._id} value={carrier._id} className={styles.carrierMenuItem}>
+                <MenuItem key={carrier._id} value={carrier._id} className={styles.carrierMenuItem}>
                   <Checkbox
                     checked={selectedCarriers.indexOf(carrier._id) > -1}
+                    className={styles.smallCheckbox}
                     className={styles.smallCheckbox}
                   />
                   <ListItemText
@@ -753,6 +761,20 @@ const handleApply = async () => {
                           <CalendarTodayIcon className={styles.dateIcon} />
                         </InputAdornment>
                       ),
+                    }}
+                    slotProps={{
+                      textField: {
+                          className: styles.input,
+                          size: 'small',
+                          InputProps: {
+                              endAdornment: (
+                                  <InputAdornment position="end">
+                                      <CalendarTodayIcon className={styles.dateIcon} />
+                                  </InputAdornment>
+                              ),
+                          },
+                      },
+                  }}
                     }}
                     slotProps={{
                       textField: {

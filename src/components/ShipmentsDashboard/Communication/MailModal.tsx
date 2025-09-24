@@ -1,18 +1,17 @@
 import React, { useState } from "react";
 import {
   Dialog,
-  DialogTitle,
   DialogContent,
   TextField,
   IconButton,
   CircularProgress,
 } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
 import EmailIcon from "@mui/icons-material/Email";
 import { useSnackbar } from "@/hooks/snackBar";
 import { httpsPost } from "@/utils/Communication";
 import styles from "./MailModal.module.css";
-import ModalHeader from '../../UI/ModalHeader/ModalHeader';
+import ModalHeader from "../../UI/ModalHeader/ModalHeader";
+import { useTranslations } from "next-intl";
 
 interface MailModalProps {
   open: boolean;
@@ -27,6 +26,7 @@ const MailModal: React.FC<MailModalProps> = ({ open, onClose, shipment }) => {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const { showMessage } = useSnackbar();
+  const t = useTranslations("MAILMODAL");
 
   const validateEmail = (email: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -57,8 +57,7 @@ const MailModal: React.FC<MailModalProps> = ({ open, onClose, shipment }) => {
       if (response.statusCode === 200) {
         showMessage("Email sent successfully", "success");
         handleClose();
-      }
-      else {
+      } else {
         showMessage(response.message, "error");
       }
     } catch (error: any) {
@@ -84,14 +83,14 @@ const MailModal: React.FC<MailModalProps> = ({ open, onClose, shipment }) => {
       fullWidth
       classes={{ paper: styles.dialogPaper }}
     >
-      <ModalHeader 
-        title="Share Tracking URL Via Email" 
-        onClose={onClose} 
+      <ModalHeader
+        title={`Share Tracking URL Via Email - #${shipment.sin}`}
+        onClose={onClose}
       />
 
       <DialogContent className={styles.body}>
         <div className={styles.inputContainer}>
-          <div className={styles.label}>Email Address</div>
+          <div className={styles.label}>{t("emailAddress")}</div>
           <div className={styles.inputWrapper}>
             <TextField
               fullWidth
@@ -102,6 +101,19 @@ const MailModal: React.FC<MailModalProps> = ({ open, onClose, shipment }) => {
               onChange={(e) => setEmail(e.target.value)}
               disabled={loading}
               className={styles.input}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  '&:hover fieldset': {
+                    border: '1px solid #4F46E5',  
+                    borderColor: '#4F46E5',
+                  },
+                  '&.Mui-focused fieldset': {
+                    border: '1px solid #4F46E5',
+                    borderColor: '#4F46E5',
+                    boxShadow: '0 0 0 2px rgba(79, 70, 229, 0.2)',
+                  },
+                },
+              }}
               onKeyPress={(e) => {
                 if (e.key === "Enter") {
                   handleSendEmail();
@@ -113,7 +125,7 @@ const MailModal: React.FC<MailModalProps> = ({ open, onClose, shipment }) => {
               disabled={loading}
               className={styles.mailButton}
             >
-              {loading ? <CircularProgress size={24} /> : <EmailIcon />}
+              {loading ? <CircularProgress size={24} /> : <EmailIcon style={{color:"#4F46E5", width:"24px", height:"24px"}} />}
             </IconButton>
           </div>
         </div>

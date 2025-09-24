@@ -47,10 +47,70 @@
 
 .reasonsMenu {
   margin-bottom: 16px;
+  width: 100%;
 }
 
 .select {
   width: 100%;
+}
+
+.selectTrigger {
+  width: 100%;
+  min-height: 40px;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  font-size: 14px;
+  padding: 8px 12px;
+  background-color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.selectTrigger:hover {
+  border-color: #4f46e5;
+}
+
+.selectTrigger:focus {
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+  outline: none;
+}
+
+.selectTrigger[data-disabled] {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.selectContent {
+  background-color: #fff;
+  border-radius: 4px;
+  box-shadow: 0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 9px 28px 8px rgba(0, 0, 0, 0.05);
+  z-index: 1001;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.selectItem {
+  padding: 8px 12px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.selectItem:hover {
+  background-color: #f5f5f5;
+}
+
+.selectItem[data-highlighted] {
+  background-color: #e6f7ff;
+}
+
+.selectItem[data-disabled] {
+  color: #999;
+  cursor: not-allowed;
 }
 
 .reasonBox {
