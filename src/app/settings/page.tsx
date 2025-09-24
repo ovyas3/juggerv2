@@ -430,7 +430,3 @@ export default function JPCSettingsPage() {
     </ThemeProvider>
   );
 }
-
-// Export the CustomDropdown for use in other components
-export { CustomDropdown };
-export type { CustomDropdownProps };
