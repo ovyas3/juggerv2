@@ -2604,7 +2604,7 @@ const applyFilter = () => {
           >
             Advanced Search
           </div>
-          <Link href="/Mapview">
+          <Link href="/Mapview" style={{textDecoration: "none"}}>
 
           <button className={styles.button}>Map View</button>
           </Link>

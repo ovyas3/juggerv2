@@ -399,17 +399,6 @@ const [selectedCarrier, setSelectedCarrier] = useState<string>("");   // carrier
 // Distinct lists
 const [vehicleSearch, setVehicleSearch] = useState<string>("");
 const vehicleDebounceRef = useRef<number | null>(null);
-// Draft values used only inside the Search Shipments modal
-const [draftMaterials, setDraftMaterials] = useState<string>("");
-
-const [draftPickupLocation, setDraftPickupLocation] = useState<string>("");
-const [draftDeliveryLocation, setDraftDeliveryLocation] = useState<string>("");
-const [draftCarrier, setDraftCarrier] = useState<string>("");
-const [draftStatus, setDraftStatus] = useState<string>("");
-const [draftInPlantStage, setDraftInPlantStage] = useState<string>("");
-const [draftShipmentId, setDraftShipmentId] = useState<string>("");
-const [draftDateFrom, setDraftDateFrom] = useState<string>("");
-const [draftDateTo, setDraftDateTo] = useState<string>("");
 
 const [pickupLocationsList, setPickupLocationsList] =
   useState<Array<{ id: string; label: string }>>([]);
@@ -425,7 +414,6 @@ const [selectedDeliveryLocation, setSelectedDeliveryLocation] = useState<string>
 // In-Plant event stage (short codes)
 const [inPlantStage, setInPlantStage] = useState<string>("");
 // Draft value for vehicle number (used only inside the modal)
-const [draftVehicle, setDraftVehicle] = useState<string>("");
 // near your other useState calls
 const [unitLocations, setUnitLocations] = useState<any[]>([]);
 // Add this new useEffect near the bottom of your existing imports/hooks:
@@ -446,6 +434,18 @@ const [materialBuckets, setMaterialBuckets] =
   useState<Record<string, { label: string; ids: string[] }>>({});
   type MaterialOption = { key: string; label: string };
   type MaterialBuckets = Record<string, { label: string; ids: string[] }>;
+  const [formDrafts, setFormDrafts] = useState({
+    materials: "",
+    pickupLocation: "",
+    deliveryLocation: "",
+    carrier: "",
+    status: "",
+    inPlantStage: "",
+    shipmentId: "",
+    dateFrom: "",
+    dateTo: "",
+    vehicle: ""
+  });
   // India-ish bounding box
 // const INDIA_BBOX = { minLat: 5, maxLat: 38.9, minLng: 68, maxLng: 98 };
 // const inIndia = (lat: number, lng: number) =>
@@ -456,6 +456,22 @@ const handleAttachDone: () => void = () => {
   // optional: refetch, toast, etc.
   closeModal();
 };
+
+const updateFormDraft = (field: keyof typeof formDrafts, value: string) => {
+  setFormDrafts(prev => ({ ...prev, [field]: value }));
+};
+  
+
+const onFormMaterialChange = (value: string) => updateFormDraft("materials", value);
+const onFormPickupChange = (value: string) => updateFormDraft("pickupLocation", value);
+const onFormDeliveryChange = (value: string) => updateFormDraft("deliveryLocation", value);
+const onFormCarrierChange = (value: string) => updateFormDraft("carrier", value);
+const onFormStatusChange = (value: string) => updateFormDraft("status", value);
+const onFormInPlantChange = (value: string) => updateFormDraft("inPlantStage", value);
+const onFormShipmentIdChange = (value: string) => updateFormDraft("shipmentId", value);
+const onFormVehicleChange = (value: string) => updateFormDraft("vehicle", value);
+const onFormDateFromChange = (value: string) => updateFormDraft("dateFrom", value);
+const onFormDateToChange = (value: string) => updateFormDraft("dateTo", value);
 
 
 function inIndia(lat: number, lng: number): boolean {
@@ -1060,8 +1076,8 @@ async function fetchShipmentPathById(shipmentId: string) {
 // };
 const handleClearFilters = () => {
   // Reset all state variables
-  setDraftMaterials("");
-  setDraftPickupLocation("");
+//   setDraftMaterials("");
+//   setDraftPickupLocation("");
   // ... (rest of the clear logic)
 
   // Re-fetch with the new, cleared state
@@ -1898,11 +1914,6 @@ const setAndFetch = <T,>(setter: (v: T) => void) => (v: T) => {
   fetchShipments(); // same as how status triggers an immediate fetch
 };
 
-
-const onMaterialChange  = setAndFetch<string>(setSelectedMaterials);
-const onPickupChange    = setAndFetch<string>(setSelectedPickupLocation);
-const onDeliveryChange  = setAndFetch<string>(setSelectedDeliveryLocation);
-
 // useEffect(() => {
 //     if (!mapRef) { console.log("[GEOFENCE] mapRef not ready"); return; }
 //      if (!geoFences || geoFences.length === 0) { console.log("[GEOFENCE] no fences to draw"); return; }
@@ -1945,18 +1956,23 @@ const openFiltersWithSnapshot = (patch?: Partial<{
   from_date: string;
   to_date: string;
 }>) => {
-  setDraftMaterials(patch?.materials ?? SelectMaterials ?? "");
-  setDraftPickupLocation(patch?.pickupLocation ?? selectedPickupLocation ?? "");
-  setDraftDeliveryLocation(patch?.deliveryLocation ?? selectedDeliveryLocation ?? "");
-  setDraftCarrier(patch?.carrier ?? selectedCarrier ?? "");
-  setDraftStatus(patch?.status ?? selectedStatus ?? "");
-  setDraftInPlantStage(patch?.inPlant ?? inPlantStage ?? "");
-  setDraftShipmentId(patch?.sin ?? shipmentIdSearch ?? "");
-  setDraftDateFrom(patch?.from_date ?? dateFrom ?? "");
-  setDraftDateTo(patch?.to_date ?? dateTo ?? "");
-  setDraftVehicle(patch?.vehicle ?? vehicleSearch ?? "");
+  // Don't read from main state - only use the patch parameter
+  // This keeps the form independent from main view changes
+  setFormDrafts({
+    materials: patch?.materials ?? "",
+    pickupLocation: patch?.pickupLocation ?? "",
+    deliveryLocation: patch?.deliveryLocation ?? "",
+    carrier: patch?.carrier ?? "",
+    status: patch?.status ?? "",
+    inPlantStage: patch?.inPlant ?? "",
+    shipmentId: patch?.sin ?? "",
+    dateFrom: patch?.from_date ?? "",
+    dateTo: patch?.to_date ?? "",
+    vehicle: patch?.vehicle ?? ""
+  });
   setIsFilterOpen(true);
 };
+
 
 // fixed order (same as UI)
 const EVENT_STATUS_ORDER = ["PO","GI","TW","GW","PG","TC","IV","EW"] as const;
@@ -2189,9 +2205,9 @@ const computeDistinctCarriers = (shipments: Shipment[]) => {
 
 
 useEffect(() => {
-  // any of these changing should refresh the list
   fetchShipments();
-}, [shipmentGroup, selectedStatus, inPlantStage, SelectMaterials, selectedDeliveryLocation, selectedCarrier]);
+}, [shipmentGroup, selectedStatus, inPlantStage]);
+
 useEffect(() => {
   // if user clears the box, refetch with other filters
   const t = window.setTimeout(() => {
@@ -2452,18 +2468,26 @@ const mapStatusToApi = (s: string): string[] => {
   //   return f;
   // };
 
-const handleSearchClearDrafts = () => {
-  setDraftMaterials("");
-  setDraftPickupLocation("");
-  setDraftDeliveryLocation("");
-  setDraftCarrier("");
-  setDraftStatus("");
-  setDraftInPlantStage("");
-  setDraftShipmentId("");
-  setDraftDateFrom("");
-  setDraftDateTo("");
-  setDraftVehicle("");
-};
+  const handleSearchClearDrafts = () => {
+    setFormDrafts({
+      materials: "",
+      pickupLocation: "",
+      deliveryLocation: "",
+      carrier: "",
+      status: "",
+      inPlantStage: "",
+      shipmentId: "",
+      dateFrom: "",
+      dateTo: "",
+      vehicle: ""
+    });
+    
+    // Force form reset for any additional form elements
+    if (formRef.current) {
+      formRef.current.reset();
+    }
+  };
+  
 
 // NEW: apply drafts → live filters, then fetch once
 // const handleSearchApply = () => {
@@ -2497,59 +2521,76 @@ const handleSearchClearDrafts = () => {
 // mapview.tsx
 
 const handleSearchApply = () => {
-  const filters: any = { limit: 50, skip: 0 };
-
-  filters.status = mapStatusToApi(draftStatus || "all");
-  console.log("The sttaus is ",filters.status);
-  if (draftStatus === 'in_plant') {
-    const code = mapInPlantStageToEventCode(draftInPlantStage);
-    if (code) filters.event_status = [code];
-  }
-  if (draftShipmentId.trim()) {
-    filters.sin = draftShipmentId.trim().toUpperCase();
-  }
-  if (draftMaterials && draftMaterials !== "__no_materials__") {
-    const bucket = materialBuckets[draftMaterials];
-    if (bucket?.ids?.length) {
-      filters.materials = bucket.ids;
+    const filters: any = { limit: 50, skip: 0 };
+    
+    filters.status = mapStatusToApi(formDrafts.status || "all");
+    
+    if (formDrafts.status === 'in_plant') {
+      const code = mapInPlantStageToEventCode(formDrafts.inPlantStage);
+      if (code) filters.event_status = [code];
     }
-  }
-  if (draftPickupLocation && draftPickupLocation !== "__no_pickups__") {
-    filters.pickups = draftPickupLocation;
-  }
-  if (draftDeliveryLocation && draftDeliveryLocation !== "__no_locations__") {
-    filters.deliveries= draftDeliveryLocation;
-  }
-  if (draftCarrier && draftCarrier !== "__no_carriers__") {
-    filters.carriers = draftCarrier;
-  }
-  if (draftVehicle.trim()) {
-    filters.vehicle_no = draftVehicle.trim();
-  }
-  if (draftDateFrom) filters.from = toStartOfDayMs(draftDateFrom);
-  if (draftDateTo) filters.to = toEndOfDayMs(draftDateTo);
-  // if (shipmentGroup && shipmentGroup !== "all") filters.group = shipmentGroup;
-
-  // Now, call the API with the new filters
-  fetchShipments(filters);
-
-  // Finally, close the modal
-  setIsFilterOpen(false);
-};
+  
+    if (formDrafts.shipmentId.trim()) {
+      filters.sin = formDrafts.shipmentId.trim().toUpperCase();
+    }
+  
+    if (formDrafts.materials && formDrafts.materials !== "__no_materials__") {
+      const bucket = materialBuckets[formDrafts.materials];
+      if (bucket?.ids?.length) {
+        filters.materials = bucket.ids;
+      }
+    }
+  
+    if (formDrafts.pickupLocation && formDrafts.pickupLocation !== "__no_pickups__") {
+      filters.pickups = formDrafts.pickupLocation;
+    }
+  
+    if (formDrafts.deliveryLocation && formDrafts.deliveryLocation !== "__no_locations__") {
+      filters.deliveries = formDrafts.deliveryLocation;
+    }
+  
+    if (formDrafts.carrier && formDrafts.carrier !== "__no_carriers__") {
+      filters.carriers = formDrafts.carrier;
+    }
+  
+    if (formDrafts.vehicle.trim()) {
+      filters.vehicle_no = formDrafts.vehicle.trim();
+    }
+  
+    if (formDrafts.dateFrom) filters.from = toStartOfDayMs(formDrafts.dateFrom);
+    if (formDrafts.dateTo) filters.to = toEndOfDayMs(formDrafts.dateTo);
+  
+    // Update the main filter state
+    setSelectedMaterials(formDrafts.materials);
+    setSelectedPickupLocation(formDrafts.pickupLocation);
+    setSelectedDeliveryLocation(formDrafts.deliveryLocation);
+    setSelectedCarrier(formDrafts.carrier);
+    setSelectedStatus(formDrafts.status);
+    setInPlantStage(formDrafts.inPlantStage);
+    setShipmentIdSearch(formDrafts.shipmentId);
+    setDateFrom(formDrafts.dateFrom);
+    setDateTo(formDrafts.dateTo);
+    setVehicleSearch(formDrafts.vehicle);
+  
+    fetchShipments(filters);
+    setIsFilterOpen(false);
+  };
 // NEW: cancel just closes and restores drafts to current live filters
 const handleSearchCancel = () => {
-  setDraftMaterials(SelectMaterials ?? "");
-  setDraftPickupLocation(selectedPickupLocation ?? "");
-  setDraftDeliveryLocation(selectedDeliveryLocation ?? "");
-  setDraftCarrier(selectedCarrier ?? "");
-  setDraftStatus(selectedStatus ?? "");
-  setDraftInPlantStage(inPlantStage ?? "");
-  setDraftShipmentId(shipmentIdSearch ?? "");
-  setDraftDateFrom(dateFrom ?? "");
-  setDraftDateTo(dateTo ?? "");
-  setDraftVehicle(vehicleSearch ?? "");
-  setIsFilterOpen(false);
-};
+    setFormDrafts({
+      materials: SelectMaterials ?? "",
+      pickupLocation: selectedPickupLocation ?? "",
+      deliveryLocation: selectedDeliveryLocation ?? "",
+      carrier: selectedCarrier ?? "",
+      status: selectedStatus ?? "",
+      inPlantStage: inPlantStage ?? "",
+      shipmentId: shipmentIdSearch ?? "",
+      dateFrom: dateFrom ?? "",
+      dateTo: dateTo ?? "",
+      vehicle: vehicleSearch ?? ""
+    });
+    setIsFilterOpen(false);
+  };
 
   useEffect(() => {
     if (!mapRef || !Array.isArray(unitLocations) || unitLocations.length === 0) return;
@@ -3105,7 +3146,8 @@ function fitToAllVehicles(list: Shipment[] = visibleShipments) {
       className={styles.searchInput}
       placeholder="Search Vehicle No"
       onChange={(e) => {
-        setVehicleSearch(e.target.value);
+        const value = e.target.value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+        setVehicleSearch(value);
         // optional: reset page if you paginate
         // setCurrentPage(0);
       }}
@@ -3139,269 +3181,221 @@ function fitToAllVehicles(list: Shipment[] = visibleShipments) {
 </div>
 
 <div style={{ display: "flex", justifyContent: "space-between" }}>
-    <div>
-        <div className={styles.controlsRow}>
-        <div className={styles.noTicks}>
-          <Select value={shipmentGroup} onValueChange={setShipmentGroup} >
-        <SelectTrigger className={styles.perPageSelect}>
-<SelectValue placeholder="All Shipments" />
-</SelectTrigger>
-<SelectContent className={styles.perPageContent}>
-<SelectItem value="all" className={styles.perPageItem}>All Shipments</SelectItem>
-<SelectItem value="outbound" className={styles.perPageItem}>Outbound Shipments</SelectItem>
-<SelectItem value="inbound" className={styles.perPageItem}>Inbound Shipments</SelectItem>
-<SelectItem value="other" className={styles.perPageItem}>Other Shipments</SelectItem>
-
-</SelectContent>
-</Select>
-</div>
-         
-          <Select value={selectedStatus} onValueChange={setSelectedStatus}>
-        <SelectTrigger className={styles.perPageSelect}>
-<SelectValue placeholder="Towards Pickup" />
-</SelectTrigger>
-<SelectContent className={styles.perPageContent}>
-<SelectItem value="towards_pickup" className={styles.perPageItem}>Towards Pickup</SelectItem>
-<SelectItem value="in_plant" className={styles.perPageItem}>In Plant</SelectItem>
-<SelectItem value="in_transit" className={styles.perPageItem}>In Transit</SelectItem>
-<SelectItem value="at_delivery" className={styles.perPageItem}>At Delivery</SelectItem>
-<SelectItem value="all" className={styles.perPageItem}>All</SelectItem>
-
-</SelectContent>
-</Select>
-         
-       
-
-          {selectedStatus === 'towards_pickup' && (
-       
-         <Select >
-         <SelectTrigger className={styles.perPageSelect}>
- <SelectValue placeholder="Estimated arrival in" />
- </SelectTrigger>
- <SelectContent className={styles.perPageContent}>
-
- <SelectItem value="2000" className={styles.perPageItem}>24 hours</SelectItem>
- <SelectItem value="3000" className={styles.perPageItem}>48 hours</SelectItem>
- <SelectItem value="4000" className={styles.perPageItem}>72 hours</SelectItem>
-
- 
- </SelectContent>
- </Select>
-      )}
-        {selectedStatus === 'in_plant' && (
-           <Select value={inPlantStage} onValueChange={setInPlantStage} >
-           <SelectTrigger className={styles.perPageSelect}>
-   <SelectValue placeholder="Event status"/>
-   </SelectTrigger>
-   <SelectContent className={styles.perPageContent}>
-   <SelectItem value="PO" className={styles.perPageItem}> Parking Out - Gate In</SelectItem>
-   <SelectItem value="GI" className={styles.perPageItem}> Gate In - Tare Weight</SelectItem>
-   <SelectItem value="TW" className={styles.perPageItem}>Tare Weight - Gross Weight</SelectItem>
-   <SelectItem value="GW" className={styles.perPageItem}>Gross Weight - Post Goods</SelectItem>
-   <SelectItem value="PG" className={styles.perPageItem}>Post Goods - Test Certificate</SelectItem>
-   <SelectItem value="TC" className={styles.perPageItem}>Test Certificate - Invoice</SelectItem>
-   <SelectItem value="IV" className={styles.perPageItem}>Invoice - Ewaybill</SelectItem>
-   <SelectItem value="EW" className={styles.perPageItem}>Ewaybill</SelectItem>
-   </SelectContent>
-   </Select>
-        
-      )}
-          {/* {selectedStatus !== 'towards_pickup'&& selectedStatus !== 'all' && (
-             <Select  value={SelectMaterials} onValueChange={setSelectedMaterials}>
-             <SelectTrigger className={styles.perPageSelect}>
-     <SelectValue />
-     </SelectTrigger>
-     <SelectContent className={styles.perPageContent}>
-     <SelectItem value="12" className={styles.perPageItem}>Chemicals </SelectItem>
-     <SelectItem value="14" className={styles.perPageItem}> PLATES</SelectItem>
-     <SelectItem value="15" className={styles.perPageItem}>Plates+Chemicals</SelectItem>
-     <SelectItem value="18" className={styles.perPageItem}>Plates+Chemicals+Film</SelectItem>
-  
-     </SelectContent>
-     </Select>
-        )} */}
-        {selectedStatus !== 'towards_pickup' && selectedStatus !== 'all' && (
-  <Select value={SelectMaterials} onValueChange={setSelectedMaterials}>
-    <SelectTrigger className={styles.perPageSelect}>
-      <SelectValue placeholder="Materials" />
-    </SelectTrigger>
-    <SelectContent className={styles.perPageContent}>
-      {materialsList.length === 0 ? (
-        <SelectItem value="__no_materials__" disabled className={styles.perPageItem}>
-          No materials found
-        </SelectItem>
-      ) : (
-        // materialsList.map((mat) => (
-        //   <SelectItem key={mat} value={mat} className={styles.perPageItem}>
-        //     {mat}
-        //   </SelectItem>
-        // ))
-        materialsList.map((m) => (
-                <SelectItem key={m.key} value={m.key} className={styles.perPageItem}>
-                   {m.label}
-                </SelectItem>
-               ))
-      )}
-    </SelectContent>
-  </Select>
-)}
-          {(selectedStatus === 'in_transit' || selectedStatus === 'at_delivery' ) && (
-       <>
-        {/* <Select >
-             <SelectTrigger className={styles.perPageSelect}>
-     <SelectValue />
-     </SelectTrigger>
-     <SelectContent className={styles.perPageContent}>
-     <SelectItem value="1" className={styles.perPageItem}>Mumbai </SelectItem>
-     <SelectItem value="2" className={styles.perPageItem}> Bengaluru</SelectItem>
-    
-  
-     </SelectContent>
-     </Select> */}
-      <Select value={selectedDeliveryLocation} onValueChange={setSelectedDeliveryLocation}>
-      <SelectTrigger className={styles.perPageSelect}>
-        <SelectValue placeholder="Customer Location" />
-      </SelectTrigger>
-      <SelectContent className={styles.perPageContent}>
-        {deliveryLocationsList.length === 0 ? (
-          <SelectItem value="__no_locations__" disabled className={styles.perPageItem}>
-            No locations found
-          </SelectItem>
-        ) : (
-          deliveryLocationsList.map((loc) => (
-            <SelectItem key={loc.id} value={loc.id} className={styles.perPageItem}>
-              {loc.label}
-            </SelectItem>
-          ))
-        )}
-      </SelectContent>
-    </Select>
-     {/* <Select >
-             <SelectTrigger className={styles.perPageSelect}>
-     <SelectValue />
-     </SelectTrigger>
-     <SelectContent className={styles.perPageContent}>
-     <SelectItem value="abc" className={styles.perPageItem}>ABC Logistics</SelectItem>
-     <SelectItem value="xyz" className={styles.perPageItem}>XYZ Transport</SelectItem>
-    
-  
-     </SelectContent>
-     </Select> */}
-      <Select value={selectedCarrier} onValueChange={setSelectedCarrier}>
-      <SelectTrigger className={styles.perPageSelect}>
-        <SelectValue placeholder="Carrier" />
-      </SelectTrigger>
-      <SelectContent className={styles.perPageContent}>
-        {carriersList.length === 0 ? (
-          <SelectItem value="__no_carriers__" disabled className={styles.perPageItem}>
-            No carriers found
-          </SelectItem>
-        ) : (
-          carriersList.map((c) => (
-            <SelectItem key={c.id} value={c.id} className={styles.perPageItem}>
-              {c.label}
-            </SelectItem>
-          ))
-        )}
-      </SelectContent>
-    </Select>
-     
-       
-            </>  )}
-         
-          
+  <div>
+    <div className={styles.controlsRow}>
+      <div className={styles.noTicks}>
+        <Select value={shipmentGroup} onValueChange={setShipmentGroup}>
+          <SelectTrigger className={styles.select}>
+            <SelectValue placeholder="All Shipments" className={styles.selectValue} />
+          </SelectTrigger>
+          <SelectContent className={styles.selectContent}>
+            <SelectItem value="all" className={styles.selectItem}>All Shipments</SelectItem>
+            <SelectItem value="outbound" className={styles.selectItem}>Outbound Shipments</SelectItem>
+            <SelectItem value="inbound" className={styles.selectItem}>Inbound Shipments</SelectItem>
+            <SelectItem value="other" className={styles.selectItem}>Other Shipments</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
       
-          
-</div>
-          {/* <div className={styles.searchWrap}>
-            <input
-              className={styles.search}
-              type="text"
-              placeholder="Search Vehicle No"
-            />
-            <button className={styles.iconBtn} aria-label="Search">🔍</button>
-          </div> */}
-            {/* {selectedStatus === 'in_transit' && ( */}
-           <div className={styles.controlsRowRight}>
-         
-      {selectedStatus === 'in_transit' && ( 
-         
-              <Select >
-             <SelectTrigger className={styles.perPageSelect}>
-     
-     <SelectValue placeholder="ETA" />
-     </SelectTrigger>
-     <SelectContent className={styles.perPageContent}>
-     <SelectItem value="within" className={styles.perPageItem}>Within ETA</SelectItem>
-     <SelectItem value="beyond" className={styles.perPageItem}>Beyonnd ETA</SelectItem>
-    
-  
-     </SelectContent>
-     </Select>
-            )}
-          {selectedStatus === 'at_delivery' && (
-            <Select >
-            <SelectTrigger className={styles.perPageSelect}>
-    <SelectValue placeholder="Detention" />
-    </SelectTrigger>
-    <SelectContent className={styles.perPageContent}>
-    <SelectItem value="0" className={styles.perPageItem}>0 - 12 Hours</SelectItem>
-    <SelectItem value="12" className={styles.perPageItem}>12 - 24 Hours</SelectItem>
-    <SelectItem value="24" className={styles.perPageItem}> Beyond 24 Hours</SelectItem>
-   
- 
-    </SelectContent>
-    </Select>
-       
+      <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+        <SelectTrigger className={styles.select}>
+          <SelectValue placeholder="Towards Pickup" className={styles.selectValue} />
+        </SelectTrigger>
+        <SelectContent className={styles.selectContent}>
+          <SelectItem value="towards_pickup" className={styles.selectItem}>Towards Pickup</SelectItem>
+          <SelectItem value="in_plant" className={styles.selectItem}>In Plant</SelectItem>
+          <SelectItem value="in_transit" className={styles.selectItem}>In Transit</SelectItem>
+          <SelectItem value="at_delivery" className={styles.selectItem}>At Delivery</SelectItem>
+          <SelectItem value="all" className={styles.selectItem}>All</SelectItem>
+        </SelectContent>
+      </Select>
+      
+      {selectedStatus === 'towards_pickup' && (
+        <Select>
+          <SelectTrigger className={styles.select}>
+            <SelectValue placeholder="Estimated arrival in" className={styles.selectValue} />
+          </SelectTrigger>
+          <SelectContent className={styles.selectContent}>
+            <SelectItem value="2000" className={styles.selectItem}>24 hours</SelectItem>
+            <SelectItem value="3000" className={styles.selectItem}>48 hours</SelectItem>
+            <SelectItem value="4000" className={styles.selectItem}>72 hours</SelectItem>
+          </SelectContent>
+        </Select>
       )}
-  {selectedStatus === 'in_transit' && ( 
-     <Select >
-     <SelectTrigger className={styles.perPageSelect}>
-
-<SelectValue placeholder="Delay" />
-</SelectTrigger>
-<SelectContent className={styles.perPageContent}>
-<SelectItem value="2" className={styles.perPageItem}>2–4 hrs</SelectItem>
-<SelectItem value="4" className={styles.perPageItem}>4–8 hrs</SelectItem>
-<SelectItem value="8" className={styles.perPageItem}>8–12 hrs</SelectItem>
-<SelectItem value="12" className={styles.perPageItem}>12-16 hrs</SelectItem>
-<SelectItem value="16" className={styles.perPageItem}>16–20 hrs</SelectItem>
-<SelectItem value="20" className={styles.perPageItem}>Beyond 20hrs</SelectItem>
-
-
-</SelectContent>
-</Select>
-         )}
-          </div>
-         
-          </div>
-         
-<div className={styles.shipmentrack}>
-        <div className={styles.totalShipments}>
+      
+      {selectedStatus === 'in_plant' && (
+        <Select value={inPlantStage} onValueChange={setInPlantStage}>
+          <SelectTrigger className={styles.select}>
+            <SelectValue placeholder="Event status" className={styles.selectValue}/>
+          </SelectTrigger>
+          <SelectContent className={styles.selectContent}>
+            <SelectItem value="PO" className={styles.selectItem}>Parking Out - Gate In</SelectItem>
+            <SelectItem value="GI" className={styles.selectItem}>Gate In - Tare Weight</SelectItem>
+            <SelectItem value="TW" className={styles.selectItem}>Tare Weight - Gross Weight</SelectItem>
+            <SelectItem value="GW" className={styles.selectItem}>Gross Weight - Post Goods</SelectItem>
+            <SelectItem value="PG" className={styles.selectItem}>Post Goods - Test Certificate</SelectItem>
+            <SelectItem value="TC" className={styles.selectItem}>Test Certificate - Invoice</SelectItem>
+            <SelectItem value="IV" className={styles.selectItem}>Invoice - Ewaybill</SelectItem>
+            <SelectItem value="EW" className={styles.selectItem}>Ewaybill</SelectItem>
+          </SelectContent>
+        </Select>
+      )}
+      
+      {selectedStatus !== 'towards_pickup' && selectedStatus !== 'all' && (
+        <Select 
+          value={SelectMaterials || undefined} 
+          onValueChange={(value) => {
+            setSelectedMaterials(value);
+            // Let useEffect handle the API call
+          }}
+        >
+          <SelectTrigger className={styles.select}>
+            <SelectValue placeholder="Materials" className={styles.selectValue}/>
+          </SelectTrigger>
+          <SelectContent className={styles.selectContent}>
+            {materialsList.length === 0 ? (
+              <SelectItem value="__no_materials__" disabled className={styles.selectItem}>
+                No materials found
+              </SelectItem>
+            ) : (
+              materialsList.map((m) => (
+                <SelectItem key={m.key} value={m.key} className={styles.selectItem}>
+                  {m.label}
+                </SelectItem>
+              ))
+            )}
+          </SelectContent>
+        </Select>
+      )}
+      
+      {(selectedStatus === 'in_transit' || selectedStatus === 'at_delivery') && (
+        <>
+          <Select 
+            value={selectedDeliveryLocation || undefined} 
+            onValueChange={(value) => {
+              setSelectedDeliveryLocation(value);
+              // Let useEffect handle the API call
+            }}
+          >
+            <SelectTrigger className={styles.select}>
+              <SelectValue placeholder="Customer Location" className={styles.selectValue}/>
+            </SelectTrigger>
+            <SelectContent className={styles.selectContent}>
+              {deliveryLocationsList.length === 0 ? (
+                <SelectItem value="__no_locations__" disabled className={styles.selectItem}>
+                  No locations found
+                </SelectItem>
+              ) : (
+                deliveryLocationsList.map((loc) => (
+                  <SelectItem key={loc.id} value={loc.id} className={styles.selectItem}>
+                    {loc.label}
+                  </SelectItem>
+                ))
+              )}
+            </SelectContent>
+          </Select>
+          
+          <Select 
+            value={selectedCarrier || undefined} 
+            onValueChange={(value) => {
+              setSelectedCarrier(value);
+            }}
+          >
+            <SelectTrigger className={styles.select}>
+              <SelectValue placeholder="Carrier" className={styles.selectValue}/>
+            </SelectTrigger>
+            <SelectContent className={styles.selectContent}>
+              {carriersList.length === 0 ? (
+                <SelectItem value="__no_carriers__" disabled className={styles.selectItem}>
+                  No carriers found
+                </SelectItem>
+              ) : (
+                carriersList.map((c) => (
+                  <SelectItem key={c.id} value={c.id} className={styles.selectItem}>
+                    {c.label}
+                  </SelectItem>
+                ))
+              )}
+            </SelectContent>
+          </Select>
+        </>
+      )}
+    </div>
+    
+    {/* Right side controls */}
+    <div className={styles.controlsRowRight}>
+      {selectedStatus === 'in_transit' && ( 
+        <Select>
+          <SelectTrigger className={styles.select}>
+            <SelectValue placeholder="ETA" className={styles.selectValue}/>
+          </SelectTrigger>
+          <SelectContent className={styles.selectContent}>
+            <SelectItem value="within" className={styles.selectItem}>Within ETA</SelectItem>
+            <SelectItem value="beyond" className={styles.selectItem}>Beyond ETA</SelectItem>
+          </SelectContent>
+        </Select>
+      )}
+      
+      {selectedStatus === 'at_delivery' && (
+        <Select>
+          <SelectTrigger className={styles.select}>
+            <SelectValue placeholder="Detention" className={styles.selectValue}/>
+          </SelectTrigger>
+          <SelectContent className={styles.selectContent}>
+            <SelectItem value="0" className={styles.selectItem}>0 - 12 Hours</SelectItem>
+            <SelectItem value="12" className={styles.selectItem}>12 - 24 Hours</SelectItem>
+            <SelectItem value="24" className={styles.selectItem}>Beyond 24 Hours</SelectItem>
+          </SelectContent>
+        </Select>
+      )}
+      
+      {selectedStatus === 'in_transit' && ( 
+        <Select>
+          <SelectTrigger className={styles.select}>
+            <SelectValue placeholder="Delay" className={styles.selectValue}/>
+          </SelectTrigger>
+          <SelectContent className={styles.selectContent}>
+            <SelectItem value="2" className={styles.selectItem}>2–4 hrs</SelectItem>
+            <SelectItem value="4" className={styles.selectItem}>4–8 hrs</SelectItem>
+            <SelectItem value="8" className={styles.selectItem}>8–12 hrs</SelectItem>
+            <SelectItem value="12" className={styles.selectItem}>12-16 hrs</SelectItem>
+            <SelectItem value="16" className={styles.selectItem}>16–20 hrs</SelectItem>
+            <SelectItem value="20" className={styles.selectItem}>Beyond 20hrs</SelectItem>
+          </SelectContent>
+        </Select>
+      )}
+    </div>
+  </div>
+  
+  {/* Shipment tracking stats */}
+  <div className={styles.shipmentrack}>
+    <div className={styles.totalShipments}>
       <span className={styles.totalLabel}>Total Shipments</span>
       <span className={styles.totalValue}>
         {totalShipments}
-
-        </span>
-  </div>
-  {(selectedStatus != 'in_transit' &&
-  <div className={styles.totalShipments}>
-      <span className={styles.totalLabel}>Tracking</span>
-      <span className={styles.totalValue}>
-        {trackingCount} 
-
-        </span>
-  </div>)}
-  {(selectedStatus != 'in_transit' &&
-  <div className={styles.totalShipments}>
-      <span className={styles.totalLabel}>Non Tracking</span>
-      <span className={styles.totalValue}>
-        {nonTrackingCount}
-    
-        </span>
-  </div>)}
-  </div>
+      </span>
     </div>
+    
+    {selectedStatus !== 'in_transit' && (
+      <div className={styles.totalShipments}>
+        <span className={styles.totalLabel}>Tracking</span>
+        <span className={styles.totalValue}>
+          {trackingCount}
+        </span>
+      </div>
+    )}
+    
+    {selectedStatus !== 'in_transit' && (
+      <div className={styles.totalShipments}>
+        <span className={styles.totalLabel}>Non Tracking</span>
+        <span className={styles.totalValue}>
+          {nonTrackingCount}
+        </span>
+      </div>
+    )}
+  </div>
+</div>
+
       </div>
 
       {/* Map */}
@@ -3847,11 +3841,11 @@ const STATUS_ITEMS = [
         </button>
   </div>
       </div>
-      <div className={styles.legendDock}>
-  <div className={styles.legendBar}>{/* your existing legend items */}</div>
 
-  {/* show nothing unless the selected shipment has any path */}
-  {selectedShipment && pathData && (pathData.gps?.length || pathData.app?.length || pathData.sim?.length) ? (
+{selectedShipment && pathData && (pathData.gps?.length || pathData.app?.length || pathData.sim?.length) ? (
+  <div className={styles.legendDock}>
+    <div className={styles.legendBar}>{/* your existing legend items */}</div>
+    
     <div className={styles.pathChips}>
       {pathData.gps?.length ? (
         <button
@@ -3883,8 +3877,9 @@ const STATUS_ITEMS = [
         </button>
       ) : null}
     </div>
-  ) : null}
-</div>
+  </div>
+) : null}
+
 
 
 
@@ -4101,236 +4096,234 @@ const STATUS_ITEMS = [
   className={styles.modalHeader}   />
 
 
-            <form
-              ref={formRef}
-              className={styles.modalBody}
-              onSubmit={(e) => {
-                e.preventDefault();
-                setSelectedMaterials(draftMaterials);
-  setSelectedPickupLocation(draftPickupLocation);
-  setSelectedDeliveryLocation(draftDeliveryLocation);
-  setSelectedCarrier(draftCarrier);
-  setSelectedStatus(draftStatus);
-  setInPlantStage(draftInPlantStage);
-  setShipmentIdSearch(draftShipmentId);
-  setDateFrom(draftDateFrom);
-  setDateTo(draftDateTo);
-  setVehicleSearch(draftVehicle);
-
-  // 2) fetch immediately with those exact draft values
-  fetchShipments({
-    material: draftMaterials,
-    pickups: draftPickupLocation,
-    deliveries: draftDeliveryLocation,
-    carriers: draftCarrier,
-    status: draftStatus,
- 
-    SIN: draftShipmentId,
-    from: draftDateFrom,
-    to: draftDateTo,
-    vehicle_no: draftVehicle,
-  });
-          
-                setIsFilterOpen(false);
-              }} >
-           
-           
-              <div className={styles.field}>
- <label>Materials</label>
- <Select value={draftMaterials || undefined} onValueChange={
-
-  onMaterialChange
-  }>
-
-    <SelectTrigger className={styles.perPageSelect}>
-      <SelectValue />
-    </SelectTrigger>
-   <SelectContent className={styles.perPageContent}>
-   {/* <SelectItem value="-" className={styles.perPageItem}>
-     Materials
-     </SelectItem> */}
-      {materialsList.length === 0 ? (
-        <SelectItem value="__no_materials__" disabled className={styles.perPageItem}>
-         No materials found
-        </SelectItem>
-      ) : (      
-      // materialsList.map((mat) => (
-      //     <SelectItem key={mat} value={mat} className={styles.perPageItem}>
-      //       {mat}
-      //    </SelectItem>
-      materialsList.map((m) => (
-               <SelectItem key={m.key} value={m.key} className={styles.perPageItem}>
-                 {m.label}
-               </SelectItem>
-             
-       ))
-      )}
-    </SelectContent>
- 
- </Select>
-</div>
-              {/* <div className={styles.field}>
-                <label>Pickup Location</label>
-                <select className={styles.input}></select>
-              </div> */}
-              <div className={styles.field}>
-  <label>Pickup Location</label>
-  <Select value={draftPickupLocation || undefined} onValueChange={
-    // setDraftPickupLocation
-    onPickupChange
-    }>
-    <SelectTrigger className={styles.perPageSelect}>
-      <SelectValue />
-    </SelectTrigger>
-    <SelectContent className={styles.perPageContent}>
-      {pickupLocationsList.length === 0 ? (
-        <SelectItem value="__no_pickups__" disabled className={styles.perPageItem}>
-          No pickup locations
-        </SelectItem>
-      ) : (
-       pickupLocationsList.map((loc) => (
-          <SelectItem key={loc.id} value={loc.id} className={styles.perPageItem}>
-           {loc.label}
+<form
+  ref={formRef}
+  className={styles.modalBody}
+  onSubmit={(e) => {
+    e.preventDefault();
+    handleSearchApply();
+  }}
+>
+  {/* Materials */}
+  <div className={styles.field}>
+    <label>Materials</label>
+    <Select value={formDrafts.materials || undefined} onValueChange={onFormMaterialChange} key={`materials-${formDrafts.materials}`}>
+      <SelectTrigger className={styles.select}>
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent className={styles.selectContent}>
+        {materialsList.length === 0 ? (
+          <SelectItem
+            value="__no_materials__"
+            disabled
+            className={styles.selectItem}
+          >
+            No materials found
           </SelectItem>
-       ))
-     )}
-    </SelectContent>
-  </Select>
-</div>
-
-              {/* Row 2 */}
-              {/* <div className={styles.field}>
-                <label>Delivery Location</label>
-                <select className={styles.input}></select>
-              </div> */}
-              <div className={styles.field}>
-  <label>Delivery Location</label>
-  <Select value={draftDeliveryLocation || undefined} onValueChange={
-    onDeliveryChange
-    // setDraftDeliveryLocation
-    }>
-   <SelectTrigger className={styles.perPageSelect}>
-      <SelectValue  />
-    </SelectTrigger>
-   <SelectContent className={styles.perPageContent}>
-      {deliveryLocationsList.length === 0 ? (
-        <SelectItem value="__no_locations__" disabled className={styles.perPageItem}>
-         No locations found
-        </SelectItem>
-      ) : (
-       deliveryLocationsList.map((loc) => (
-          <SelectItem key={loc.id} value={loc.id} className={styles.perPageItem}>
-            {loc.label}
-          </SelectItem>
-        ))
-      )}
-    </SelectContent>
- </Select>
-</div>
-              {/* <div className={styles.field}>
-                <label>From</label>
-                <input type="date" className={styles.input} />
-              </div>
-              <div className={styles.field}>
-                <label>To</label>
-                <input type="date" value={draftDateTo} onChange={(e) => setDraftDateTo(e.target.value)} />
-              </div> */}
-
-<div className={styles.field}>
-  <label>From</label>
-  <DatePicker
-
-    value={draftDateFrom ? dayjs(draftDateFrom, "YYYY-MM-DD") : null}
-    onChange={(_, s) => setDraftDateFrom((s as string) || "")}
-    format="YYYY-MM-DD"
-    allowClear
-  />
-</div>
-
-<div className={styles.field}>
-  <label>To</label>
-  <DatePicker
- 
-    value={draftDateTo ? dayjs(draftDateTo, "YYYY-MM-DD") : null}
-    onChange={(_, s) => setDraftDateTo((s as string) || "")}
-    format="YYYY-MM-DD"
-    allowClear
-  />
-</div>
-
-
-              {/* Row 3 */}
-              {/* <div className={styles.field}>
-                <label>Shipment Status</label>
-                <select className={styles.input}>
-                  <option>In Transit</option>
-                  <option>Towards Pickup</option>
-                  <option>In Plant</option>
-                  <option>At Delivery</option>
-                  <option>All</option>
-                </select>
-              </div> */}
-              <div className={styles.field}>
-  <label>Shipment Status</label>
-  <Select value={draftStatus || undefined}  onValueChange={(val) => {
-    setDraftStatus(val);
-    // setSelectedStatus(val);   // 🔑 this is what drives the map + API
-  }}>
-    <SelectTrigger className={styles.perPageSelect}>
-    <SelectValue  />
-    </SelectTrigger>
-    <SelectContent className={styles.perPageContent}>
-      <SelectItem value="in_transit"     className={styles.perPageItem}>In Transit</SelectItem>
-     <SelectItem value="towards_pickup" className={styles.perPageItem}>Towards Pickup</SelectItem>
-      <SelectItem value="in_plant"       className={styles.perPageItem}>In Plant</SelectItem>
-      <SelectItem value="at_delivery"    className={styles.perPageItem}>At Delivery</SelectItem>
-      <SelectItem value="all"            className={styles.perPageItem}>All</SelectItem>
-    </SelectContent>
- </Select>
+        ) : (
+          materialsList.map((m) => (
+            <SelectItem key={m.key} value={m.key} className={styles.selectItem}>
+              {m.label}
+            </SelectItem>
+          ))
+        )}
+      </SelectContent>
+    </Select>
   </div>
-              {/* <div className={styles.field}>
-                <label>Shipment ID</label>
-                <input className={styles.input} placeholder="Enter shipment ID" />
-              </div> */}
-              <div className={styles.field}>
-  <label>Shipment ID</label>
-  <input   className={`${styles.inputstyle}`} value={draftShipmentId} onChange={(e) => setDraftShipmentId(e.target.value)}/>
-</div>
-              {/* <div className={styles.field}>
-                <label>Vehicle Number</label>
-                <input className={styles.input} placeholder="Enter full vehicle no." />
-              </div> */}
-              <div className={styles.field}>
-  <label>Vehicle Number</label>
-  <input className={`${styles.inputstyle}`} value={draftVehicle}
-       onChange={(e) => setDraftVehicle(e.target.value)} />
-  {/* <input className={`${styles.inputstyle}`} value={draftShipmentId} onChange={(e) => setDraftShipmentId(e.target.value)}/> */}
-</div>
 
-              <div className={styles.modalFooter}>
-                <button type="button" className={styles.btnGrey} 
-                 onClick={() => {
-                
-                  setDraftMaterials("");
-                  setDraftPickupLocation("");
-                  setDraftDeliveryLocation("");
-                  setDraftCarrier("");
-                  setDraftStatus("");
-                  setDraftInPlantStage("");
-                  setDraftShipmentId("");
-                  setDraftDateFrom("");
-                  setDraftDateTo("");
-                  setDraftVehicle("");
-                }}
-              
-                >
-                  Clear
-                </button>
-                <button type="submit" className={styles.btnPrimary}>
-                  Submit
-                </button>
-              </div>
-            </form>
+  {/* Pickup Location */}
+  <div className={styles.field}>
+    <label>Pickup Location</label>
+    <Select value={formDrafts.pickupLocation || undefined} onValueChange={onFormPickupChange} key={`pickup-${formDrafts.pickupLocation}`} >
+      <SelectTrigger className={styles.select}>
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent className={styles.selectContent}>
+        {pickupLocationsList.length === 0 ? (
+          <SelectItem
+            value="__no_pickups__"
+            disabled
+            className={styles.selectItem}
+          >
+            No pickup locations
+          </SelectItem>
+        ) : (
+          pickupLocationsList.map((loc) => (
+            <SelectItem
+              key={loc.id}
+              value={loc.id}
+              className={styles.selectItem}
+            >
+              {loc.label}
+            </SelectItem>
+          ))
+        )}
+      </SelectContent>
+    </Select>
+  </div>
+
+  <div className={styles.field}>
+    <label>Delivery Location</label>
+    <Select value={formDrafts.deliveryLocation || undefined} onValueChange={onFormDeliveryChange} key={`delivery-${formDrafts.deliveryLocation}`}>
+      <SelectTrigger className={styles.select}>
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent className={styles.selectContent}>
+        {deliveryLocationsList.length === 0 ? (
+          <SelectItem
+            value="__no_locations__"
+            disabled
+            className={styles.selectItem}
+          >
+            No locations found
+          </SelectItem>
+        ) : (
+          deliveryLocationsList.map((loc) => (
+            <SelectItem
+              key={loc.id}
+              value={loc.id}
+              className={styles.selectItem}
+            >
+              {loc.label}
+            </SelectItem>
+          ))
+        )}
+      </SelectContent>
+    </Select>
+  </div>
+
+  <div className={styles.field}>
+    <label>Carrier</label>
+    <Select value={formDrafts.carrier || undefined} onValueChange={onFormCarrierChange} key={`carrier-${formDrafts.carrier}`}>
+      <SelectTrigger className={styles.select}>
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent className={styles.selectContent}>
+        {carriersList.length === 0 ? (
+          <SelectItem
+            value="__no_carriers__"
+            disabled
+            className={styles.selectItem}
+          >
+            No carriers found
+          </SelectItem>
+        ) : (
+          carriersList.map((c) => (
+            <SelectItem
+              key={c.id}
+              value={c.id}
+              className={styles.selectItem}
+            >
+              {c.label}
+            </SelectItem>
+          ))
+        )}
+      </SelectContent>
+    </Select>
+  </div>
+
+  <div className={styles.field}>
+    <label>Shipment Status</label>
+    <Select value={formDrafts.status || undefined} onValueChange={onFormStatusChange} key={`status-${formDrafts.status}`}>
+      <SelectTrigger className={styles.select}>
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent className={styles.selectContent}>
+        <SelectItem value="intransit" className={styles.selectItem}>In Transit</SelectItem>
+        <SelectItem value="towardspickup" className={styles.selectItem}>Towards Pickup</SelectItem>
+        <SelectItem value="inplant" className={styles.selectItem}>In Plant</SelectItem>
+        <SelectItem value="atdelivery" className={styles.selectItem}>At Delivery</SelectItem>
+        <SelectItem value="all" className={styles.selectItem}>All</SelectItem>
+      </SelectContent>
+    </Select>
+  </div>
+
+  {formDrafts.status === 'inplant' && (
+    <div className={styles.field}>
+      <label>In Plant Stage</label>
+      <Select value={formDrafts.inPlantStage || undefined} onValueChange={onFormInPlantChange} key={`inPlantStage-${formDrafts.inPlantStage}`}>
+        <SelectTrigger className={styles.select}>
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent className={styles.selectContent}>
+          <SelectItem value="PO" className={styles.selectItem}>Parking Out - Gate In</SelectItem>
+          <SelectItem value="GI" className={styles.selectItem}>Gate In - Tare Weight</SelectItem>
+          <SelectItem value="TW" className={styles.selectItem}>Tare Weight - Gross Weight</SelectItem>
+          <SelectItem value="GW" className={styles.selectItem}>Gross Weight - Post Goods</SelectItem>
+          <SelectItem value="PG" className={styles.selectItem}>Post Goods - Test Certificate</SelectItem>
+          <SelectItem value="TC" className={styles.selectItem}>Test Certificate - Invoice</SelectItem>
+          <SelectItem value="IV" className={styles.selectItem}>Invoice - Ewaybill</SelectItem>
+          <SelectItem value="EW" className={styles.selectItem}>Ewaybill</SelectItem>
+        </SelectContent>
+      </Select>
+    </div>
+  )}
+
+
+  <div className={styles.field}>
+    <label>Shipment ID</label>
+    <input 
+      className={styles.input} 
+      value={formDrafts.shipmentId} 
+      onChange={(e) => {
+        const value = e.target.value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+        onFormShipmentIdChange(value);
+      }}
+      placeholder="Enter shipment ID"
+      maxLength={15}
+    />
+  </div>
+
+  <div className={styles.field}>
+    <label>Vehicle Number</label>
+    <input 
+      className={styles.input} 
+      value={formDrafts.vehicle} 
+      onChange={(e) => {
+        const value = e.target.value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+        onFormVehicleChange(value);
+      }}
+      placeholder="Enter vehicle number"
+      maxLength={15}
+    />
+  </div>
+
+
+  <div className={styles.field}>
+    <label>From</label>
+    <DatePicker
+      value={formDrafts.dateFrom ? dayjs(formDrafts.dateFrom, "YYYY-MM-DD") : null}
+      onChange={(_, s) => onFormDateFromChange(s as string)}
+      format="YYYY-MM-DD"
+      allowClear
+      className={styles.dateInput}
+      key={`dateFrom-${formDrafts.dateFrom}`}
+    />
+  </div>
+
+
+  <div className={styles.field}>
+    <label>To</label>
+    <DatePicker
+      value={formDrafts.dateTo ? dayjs(formDrafts.dateTo, "YYYY-MM-DD") : null}
+      onChange={(_, s) => onFormDateToChange(s as string)}
+      format="YYYY-MM-DD"
+      allowClear
+      className={styles.dateInput}
+      key={`dateTo-${formDrafts.dateTo}`}
+    />
+  </div>
+
+  <div className={styles.modalActions}>
+    <button type="button" onClick={handleSearchClearDrafts} className={styles.clearBtn}>
+      Clear
+    </button>
+    <button type="submit" className={styles.applyBtn}>
+      Apply
+    </button>
+  </div>
+</form>
+
           </div>
         </div>
       

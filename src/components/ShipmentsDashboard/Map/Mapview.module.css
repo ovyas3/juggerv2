@@ -2,8 +2,8 @@
     width: 100%;
     position: relative;          /* gives a sane positioning context */
     --sidebar-w: 350px;
-    /* display: flex; */
-  /* height: 70vh; */
+    contain: layout style; 
+    transform: translateZ(0); 
   }
   .lightScope {
     color-scheme: light; /* forces light native menus inside only */
@@ -31,7 +31,9 @@
     flex-wrap: wrap;
     gap: 12px;
     align-items: center;
+    justify-content: flex-start; /* Align items to start instead of stretching */
   }
+
   .cardDivider {
     height: 1px;                /* thin line */
     width: 100%;                /* stretch across the card */
@@ -59,18 +61,50 @@
     background-color: #fff !important;   /* white dropdown background */
     color: #111827 !important;           /* dark text */
   }
+
   .select {
-    appearance: none;
-    background: #fff url("data:image/svg+xml;utf8,<svg fill='black' height='16' viewBox='0 0 24 24' width='16' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>") no-repeat right 12px center;
-    background-color: #fff;   
-    /* color: #111827;            */
-    border: 1px solid #d0d5dd;
-    border-radius: 4px;
-    padding: 8px 12px;
+    width: 100%;
+    min-width: 200px;
+    max-width: 200px;
+    min-height: 36px;
+    border: 1px solid #4F46E5;
+    border-radius: 6px;
     font-size: 14px;
-    min-width: 160px;
-    line-height: 1.2;
+    background-color: #fff;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
+
+  .select:hover {
+    border: 1px solid #4F46E5;
+    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+    outline: none;
+  }
+  
+  .select:focus-within,
+  .select[data-state="open"] {
+    border: 1px solid #4F46E5;
+    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+    outline: none;
+  }
+
+  .selectValue {
+    color: #333;
+    width: 100%;
+    flex: 1;
+    text-align: left;
+    min-width: 0;                
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
   .totalShipments {
     display: flex;
     align-items: center;
@@ -78,11 +112,68 @@
     margin-left: auto; 
     flex-direction: column;
   }
+
+  .selectContent {
+    background: #fff;
+    border-radius: 6px;
+    box-shadow:
+      0 3px 6px -4px rgba(0, 0, 0, 0.12),
+      0 6px 16px 0 rgba(0, 0, 0, 0.08),
+      0 9px 28px 8px rgba(0, 0, 0, 0.05);
+    padding: 4px;
+    z-index: 1000;
+    max-height: 250px;
+    overflow-y: auto;
+    margin-top: 7px;
+    width: 300px !important;
+    position: absolute; 
+    transform: translateZ(0); 
+    will-change: transform; 
+    contain: content;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .selectItem {
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+    transition: all 0.2s;
+  }
+  .selectItem:hover { background-color: #f5f5f5; }
+  .selectItem[data-highlighted] {
+    background-color: #4F46E5;
+    color: #fff;
+    outline: none;
+  }
   
   .totalLabel {
     font-size: 12px;
     font-weight: 500;
     color: #111827;
+  }
+
+.inputControl {
+  width: auto; 
+  min-width: 160px; 
+  max-width: 220px; 
+  min-height: 36px;
+  border: 1px solid #4F46E5;
+  border-radius: 6px;
+  font-size: 14px;
+  background: #fff;
+  padding: 8px 12px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  white-space: nowrap;
+}
+  .inputControl:hover,
+  .inputControl:focus,
+  .inputControl:active {
+    border: 1px solid #4F46E5;
+    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+    outline: none;
   }
   
   .totalValue {
@@ -254,7 +345,7 @@
   
   /* dialog */
   .modal {
-    width: min(600px, 92vw);
+    width: min(700px, 92vw);
     max-height: min(41.5vh, 500px); 
     background: #fff;
     border-radius: 16px;
@@ -290,8 +381,10 @@
   .field {
     display: flex;
     flex-direction: column;
-  
-    gap: 8px;
+    position: relative;
+    margin-bottom: 12px;
+    contain: layout style;
+    z-index: 1;
   }
   
   .field label {
@@ -323,8 +416,32 @@
     padding: 8px 12px;
     font-size: 12px;
     background: #fff;
-    color: #c3c9e8 !important;
   }
+
+  .input {
+    border-color: #4F46E5 !important;
+    border-radius: 6px;
+    height: 36px;
+    width: 200px;
+  }
+
+  .input:focus {
+    border: 1px solid #4F46E5;
+    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+    outline: none;
+  }
+
+  .input:hover {
+    border: 1px solid #4F46E5;
+    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+    outline: none;
+  }
+
+  .input:active {
+    border: 1px solid #4F46E5;
+    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+    outline: none;
+  } 
   
   .modalFooter {
     display: flex;
@@ -387,7 +504,7 @@
     appearance: none;
     -webkit-appearance: none;
     background: transparent;
-    border: 1px solid transparent; /* reserve space so active border won't grow */
+    border: 1px solid transparent; /* reserve space so active border won’t grow */
     border-radius: 8px;
     box-shadow: none;
     margin: 0;
@@ -783,17 +900,6 @@
   /* helps when names are one long token (no spaces) */
   overflow-wrap: anywhere; 
 }
-
-/* subtle vertical connector (between P1 and D1) if you keep it */
-/* .routeDots {
-  height: 10px;                   
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-justify-content: center;     
-  row-gap: 2px;  
-} */
-/* Centers a short vertical run of three dots between rows */
 
 .perPageContent {
   background: #fff;
@@ -1235,4 +1341,119 @@ justify-content: center;
   .haltCard { background: #f8f8f9; color: #050505; }
   .haltTitle { color: #f87171; }
   .haltDivider { background: rgba(5,5,5,.14); }
+}
+
+.selectItem:global([data-state='checked']) svg { 
+  display: none !important; 
+}
+
+.selectContent :global([data-radix-select-item-indicator]) { 
+  display: none !important; 
+}
+
+.modalActions {
+  display: flex;
+  min-width: min(663px, 88vw);
+  gap: 20px;
+  justify-content: flex-end;
+}
+
+.clearBtn {
+  border: 2px solid #d8511f;
+  align-items: center;
+  background-color: #d8511f;
+  border-radius: 1px;
+  height: 38px;
+  padding: 0px 20px;
+  box-sizing: border-box;
+  border-radius: 5px;
+  color: #fff;
+}
+
+.clearBtn:hover {
+  background-color: #d6440e;
+  color: #fff;
+  border-color: #d6440e;
+}
+
+.clearBtn:active {
+  background-color: #d6440e;
+  color: #fff;
+  border-color: #d6440e;
+}
+
+.applyBtn {
+  border: 2px solid #4F46E5;
+  align-items: center;
+  background-color: #4F46E5;
+  border-radius: 1px;
+  height: 38px;
+  padding: 0px 20px;
+  border-radius: 5px;
+  box-sizing: border-box;
+  color: #fff;
+}
+
+.applyBtn:hover {
+  background-color: #4F46E5;
+  color: #fff;
+  border-color: #4F46E5;
+}
+
+.applyBtn:active {
+  background-color: #4F46E5;
+  color: #fff;
+  border-color: #4F46E5;
+}
+
+.selectWrapper [data-radix-popper-content-wrapper] {
+    position: absolute !important;
+    top: 100% !important;
+    left: 0 !important;
+    transform: none !important;
+    pointer-events: none;
+    width: 0;
+    height: 0;
+    overflow: visible;
+}
+
+.selectWrapper [data-radix-popper-content-wrapper] > * {
+    pointer-events: auto;
+}
+
+.selectWrapper [data-radix-select-trigger] {
+    width: 100%;
+    min-width: 200px;
+}
+
+.selectWrapper [data-radix-select-content] {
+    transform: none !important;
+    -webkit-transform: none !important;
+}
+
+.dateInput {
+  width: 200px;
+  padding: 6px 12px;
+  outline: none;
+  border: 1px solid #4f46e5;
+  border-radius: 4px;
+  font-size: 14px;
+  font-family: "Muli", sans-serif;
+}
+
+.dateInput:hover {
+  border: 1px solid #4f46e5;
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+}
+
+.dateInput:focus {
+  outline: none;
+  border: 1px solid #4f46e5;
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+}
+
+.dateInput:focus-visible {
+  outline: none;
+  border: 1px solid #4f46e5;
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
 }
