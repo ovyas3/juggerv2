@@ -774,7 +774,7 @@ const PickupTab = ({
                         </Typography>
                       </Box>
                     </Box>
-                    <Box sx={{ pl: "40px" }}>
+                    <Box sx={{ pl: "28px" }}>
                       <Typography variant="body2">
                         Scheduled:{" "}
                         <strong>{formatDateTime(pickup.scheduled_at)}</strong>
@@ -967,12 +967,10 @@ const PickupTab = ({
                       </Box>
                     </Paper>
                   </Grid>
-                  {isEditingTimes && (
-                  <Box sx={{ display: 'flex', justifyContent: 'flex-end', p: 1, mt: 1 , paddingLeft: '919px'}}>
+                  <Box sx={{ display: 'flex', justifyContent: 'flex-end', p: 1, paddingLeft: '919px', paddingTop: '0px' }}>
                     <Button
                       variant="contained"
                       size="small"
-                      
                       onClick={() => handleUploadClick(pickup._id + "_doc")}
                       sx={{
                         backgroundColor: '#4F46E5',
@@ -982,7 +980,8 @@ const PickupTab = ({
                         textTransform: 'capitalize',
                         height: '30px',
                         fontSize: '0.875rem',
-                        textAlign: 'end'
+                        textAlign: 'end',
+                        
                       }}
                      
                     >
@@ -995,7 +994,6 @@ const PickupTab = ({
                       onChange={(e) => handleFileChange(e, pickup._id, 'pickup_doc')}
                     />
                   </Box>
-                )}
                 </Grid>
 
                
@@ -1231,6 +1229,7 @@ const PickupTab = ({
                           <IconButton
                             size="small"
                             onClick={() => handleAddNumber(pickup._id)}
+                            
                           >
                             <AddIcon />
                           </IconButton>

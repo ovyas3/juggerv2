@@ -49,11 +49,13 @@ const ShipmentDetailsTab = ({
   showFreight,
   ownFleet,
   type,
+  isMykl,
 }: {
   shipmentData: any;
   showFreight: boolean;
   ownFleet: boolean;
   type: string;
+  isMykl: boolean;
 }) => {
   if (!shipmentData) {
     return <Typography>Loading details...</Typography>;
@@ -136,6 +138,12 @@ const ShipmentDetailsTab = ({
         </Grid>
         <Grid item xs={6} sx={{ textAlign: "right" }}>
           <Typography variant="body2" sx={{ color: "#09337e" }}>
+            {isMykl && (
+              <>
+                Sale Order Id: <strong>{shipmentData.sale_order || "N/A"}</strong>
+                <span style={{ margin: '0 8px' }}>|</span>
+              </>
+            )}
             Order ID: <strong>{shipmentData.order?.OIN || "N/A"}</strong>
           </Typography>
         </Grid>
@@ -380,7 +388,7 @@ const ShipmentDetailsTab = ({
               />
 
               <Box sx={{ display: "flex", alignItems: "center", mt: 1 }}>
-                <Typography variant="body2" sx={{ mr: 2 }}>
+                <Typography variant="body2" sx={{ mr: 2 , color: "text.secondary"}}>
                  Documents:
                 </Typography>
                 {shipmentData.docs?.length > 0 ? (
@@ -406,7 +414,7 @@ const ShipmentDetailsTab = ({
                     ))}
                   </Box>
                 ) : (
-                  <Typography variant="body2">No Documents Found</Typography>
+                  <Typography variant="body2">No documents found</Typography>
                 )}
               </Box>
             </Box>

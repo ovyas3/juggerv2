@@ -60,7 +60,7 @@
 }
 .uploading_epod_button{
   padding: 5px;
-  background-color: rgb(25, 118, 210);
+  background-color: #4f46e5;
   color: rgb(255, 255, 255);
   border: none;
   border-radius: 3px;
@@ -71,7 +71,7 @@
 
 .done_button{
   padding: 5px;
-  background-color: rgb(25, 118, 210);
+  background-color: #4f46e5;
   color: rgb(255, 255, 255);
   border: none;
   border-radius: 3px;
@@ -81,7 +81,7 @@
 }
 .uploading_picture_button{
   padding: 5px;
-  background-color: rgb(25, 118, 210);
+  background-color: #4f46e5;
   color: rgb(255, 255, 255);
   border: none;
   border-radius: 3px;

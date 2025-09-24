@@ -469,7 +469,7 @@ const DeliveryTab = ({
                                       <CircularProgress size={16} />
                                     ) : (
                                       <SaveIcon
-                                        color="primary"
+                                        sx={{ color: '#4F46E5' }}
                                         fontSize="small"
                                       />
                                     )}

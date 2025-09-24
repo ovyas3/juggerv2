@@ -495,25 +495,24 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
                         isLast={ciIndex === invoicesToRender.length - 1}
                       >
                         <Box sx={{ display: "flex", alignItems: "center" }}>
-                          <IconButton
-                            size="small"
-                            onClick={() => onRemoveRow(groupIndex, ciIndex)}
-                            disabled={invoicesToRender.length <= 1}
-                          >
-                            <RemoveCircleOutlineIcon
-                              color={
-                                invoicesToRender.length <= 1
-                                  ? "disabled"
-                                  : "error"
-                              }
-                            />
-                          </IconButton>
-                          <IconButton
-                            size="small"
-                            onClick={() => onAddRow(groupIndex)}
-                          >
-                            <AddCircleOutlineIcon color="primary" />
-                          </IconButton>
+                          {invoicesToRender.length > 1 && (
+                            <IconButton
+                              size="small"
+                              onClick={() => onRemoveRow(groupIndex, ciIndex)}
+                            >
+                              <RemoveCircleOutlineIcon color="error" />
+                            </IconButton>
+                          )}
+                          {ciIndex === invoicesToRender.length - 1 && (
+                            <IconButton
+                              size="small"
+                              onClick={() => onAddRow(groupIndex)}
+                            >
+                              <AddCircleOutlineIcon
+                                sx={{ color: "#4f46e5" }}
+                              />
+                            </IconButton>
+                          )}
                         </Box>
                       </InvoiceFieldWrapper>
                     ))}
