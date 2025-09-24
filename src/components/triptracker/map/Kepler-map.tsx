@@ -14,6 +14,7 @@ import tollPassedUrl from "../../../assets/toll_gate_icon_passed.svg";
 import type { LatLngExpression, LatLngBoundsExpression } from "leaflet";
 import { useMap, useMapEvents } from "react-leaflet"; 
 import polyline from "@mapbox/polyline";
+import { DateTime } from 'luxon';
 
 
 
@@ -723,7 +724,8 @@ function convertUtcToIst24hr(utcDateString: string | undefined): string {
   // If the time is midnight, reformat the hour to "24"
   if (timePart && timePart.startsWith('00:00')) {
     const datePart = formattedString.split(', ')[0];
-    const newTimePart = timePart.replace('00:', '24:');
+    const newTimePart = timePart 
+    // .replace('00:', '24:');
     return `${datePart}, ${newTimePart}`;
   }
 
@@ -773,6 +775,8 @@ setProgressPercentage(newProgress);
       setDayRunDetails(extractedDetails);
       // Assuming it's encoded
         console.log("Decoded Day Run Polylines:", decodedDayRuns);
+        console.log("Day Run Details:", extractedDetails);
+        console.log("Show Day Run State:", showDayRun);
       // Update the state with the day run polylines
       setDayRunPolylines(decodedDayRuns);
 
@@ -781,10 +785,11 @@ setProgressPercentage(newProgress);
         const deliveryDate = new Date(shipment.delivery_date);
         
         // Format the time to a locale-specific time string (e.g., "12:40 PM")
-        const formattedTime = deliveryDate.toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        });
+        // const formattedTime = deliveryDate.toLocaleTimeString([], {
+        //   hour: "2-digit",
+        //   minute: "2-digit",
+        // });
+        const formattedTime = DateTime.fromJSDate(deliveryDate).setZone('Asia/Kolkata').toFormat('dd MMM yyyy, HH:mm');
 
         // Update the ETA state
         setEta(formattedTime);
@@ -1213,7 +1218,9 @@ useEffect(() => {
         html: mapPinSvg,
         className: styles.mapEmoji,
         iconSize: [100, 100],
-        iconAnchor: [15, 15],
+        // move anchor aboce the point so it points correctly
+        // iconAnchor: [15, 15],
+        iconAnchor: [18, 30],
       });
   
       const deviationIcon = new L.DivIcon({
@@ -1966,7 +1973,7 @@ if (haltPopupRef.current && mapRef.current) { try { mapRef.current.closePopup(ha
   <Polyline
     key={`ship-delivery-poly-${i}`}
     positions={coords}
-    pathOptions={{ color: "#ef4444", weight: 4, opacity: 0.9, dashArray: "6, 6" }}
+    pathOptions={{ color: "#ef4444", weight: 2, opacity: 0.9, dashArray: "2, 2", fill: true }}
   />
 ))}
 
@@ -2129,7 +2136,7 @@ if (haltPopupRef.current && mapRef.current) { try { mapRef.current.closePopup(ha
             </Marker>
           </div>
         ))}
-
+        
        
       </MapContainer>
       {/* Enhanced Magnifier Tool with Custom Settings */}
@@ -2592,6 +2599,48 @@ if (haltPopupRef.current && mapRef.current) { try { mapRef.current.closePopup(ha
           <span>Day run</span>
         </button>
       </div>
+
+      {/* Day Run Table */}
+      {showDayRun && (
+        <div className={`${styles.dayRunTable} ${showMagnifierSettings ? styles.statusShift : ""} ${!isFullscreen ? styles.smallText : ""}`}>
+          <div className={styles.tableHeader}>
+            <h3>Day Run Details</h3>
+            <button onClick={() => setShowDayRun(false)} className={styles.iconBtnPlain}>
+              <svg className={styles.iconSm} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+          <div className={styles.tableContent}>
+            {dayRunDetails.length > 0 ? (
+              <table className={styles.table}>
+                <thead>
+                  <tr>
+                    <th>Day</th>
+                    <th>Start Time</th>
+                    <th>Distance</th>
+                    <th>Duration</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {dayRunDetails.map((run, index) => (
+                    <tr key={index}>
+                      <td>{index + 1}</td>
+                      <td>{run.startTime}</td>
+                      <td>{run.distance}</td>
+                      <td>{run.time}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <div style={{ padding: '12px', textAlign: 'center', color: '#6b7280', fontSize: '12px' }}>
+                No day run data available
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
     </div>
   );

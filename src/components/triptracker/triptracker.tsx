@@ -1,5 +1,6 @@
 "use client"
-import { useState,useEffect } from "react"
+import { useState,useEffect } from "react";
+import Image from 'next/image';
 import {
   Truck,
   MapPin,
@@ -21,7 +22,6 @@ import {
   Navigation,
  // Add this for Fastag
   AppWindow,
-  Zap,
  
   AlertOctagon
 } from "lucide-react"
@@ -36,6 +36,10 @@ import dynamic from "next/dynamic"
 // // Add this line with your other imports
 import TollGateIcon from '../../assets/toll_gate_icon_passed.svg';
 import Mapmark from '../../assets/mapMarker.svg';
+import fullLogo from '@/assets/SmartTruck_tracker.svg'
+
+// import type { ViewState } from "react-map-gl";
+// import type { MapRef } from "react-map-gl";
 
 
 import { Ruler, BadgeCheck, PauseCircle, GitBranch } from "lucide-react" // NEW
@@ -133,18 +137,18 @@ const [mapState, setMapState] = useState({
   showDeviations: false,
 });
   // simple example data for map (replace with your real points)
-  const points = [                                       // <-- NEW sample (or wire your data)
-    {coordinates: [72.8777, 19.0760], ts: Date.now()-86400000, source: "GPS"},
-    {coordinates: [73.8567, 18.5204], ts: Date.now()-43200000, source: "SIM"},
-    {coordinates: [86.2029, 22.8046], ts: Date.now()-100000,    source: "APP"},
-  ] as any
+  // const points = [                                       // <-- NEW sample (or wire your data)
+  //   {coordinates: [72.8777, 19.0760], ts: Date.now()-86400000, source: "GPS"},
+  //   {coordinates: [73.8567, 18.5204], ts: Date.now()-43200000, source: "SIM"},
+  //   {coordinates: [86.2029, 22.8046], ts: Date.now()-100000,    source: "APP"},
+  // ] as any
 
   const [activeTimelineTab, setActiveTimelineTab] = useState<"timeline" | "tollHistory" | "documents">("timeline")
-  const ePods = [
-    { id: "epod1", name: "ePOD - Gate 3", url: "/epods/epod1.jpg", thumb: "/epods/epod1-thumb.jpg" },
-    { id: "epod2", name: "ePOD - Delivery Note", url: "/epods/epod2.jpg", thumb: "/epods/epod2-thumb.jpg" },
-    { id: "epod3", name: "ePOD - Driver Sign", url: "/epods/epod3.jpg", thumb: "/epods/epod3-thumb.jpg" },
-  ]
+  // const ePods = [
+  //   { id: "epod1", name: "ePOD - Gate 3", url: "/epods/epod1.jpg", thumb: "/epods/epod1-thumb.jpg" },
+  //   { id: "epod2", name: "ePOD - Delivery Note", url: "/epods/epod2.jpg", thumb: "/epods/epod2-thumb.jpg" },
+  //   { id: "epod3", name: "ePOD - Driver Sign", url: "/epods/epod3.jpg", thumb: "/epods/epod3-thumb.jpg" },
+  // ]
   // ADDED — confirm popover + map highlight flags
 const [confirm, setConfirm] = useState<{ open: boolean; kind?: "deviation" | "stoppage" }>({ open: false });
 
@@ -528,38 +532,162 @@ const intermediateStops = pickupLocations.slice(1);
 const finalDestination = deliveryLocations?.[deliveryLocations.length - 1];
 const lastDelivery = apiData?.deliveries?.[apiData.deliveries.length - 1];
 // Add these variables before the 'return' statement
-const totalDistanceKm = Math.round(((apiData?.trip_tracker?.travelled_distance || 0) + (apiData?.trip_tracker?.remaining_distance || 0)) / 1000);
+const totalDistanceKm = Math.round(((apiData?.estimated?.distance || 0)) / 1000);
 const travelledDistanceKm = Math.round((apiData?.trip_tracker?.travelled_distance || 0) / 1000);
 const remainingDistanceKm = Math.round((apiData?.trip_tracker?.remaining_distance || 0) / 1000);
 const progressPercentage = totalDistanceKm > 0 ? (travelledDistanceKm / totalDistanceKm) * 100 : 0;
 // Add this new function to calculate the on-time percentage
-const getOnTimePercentage = (startDate: string, eta: string, actualDelivery: string) => {
-  const start = new Date(startDate);
-  const etaDate = new Date(eta);
-  const actualDate = new Date(actualDelivery);
+// const getOnTimePercentage = (startDate: string, eta: string, actualDelivery: string) => {
+//   const start = new Date(startDate);
+//   const etaDate = new Date(eta);
+//   const actualDate = new Date(actualDelivery);
 
-  // Fallback if dates are invalid
-  if (isNaN(start.getTime()) || isNaN(etaDate.getTime()) || isNaN(actualDate.getTime())) {
-    return 0;
+//   // Fallback if dates are invalid
+//   if (isNaN(start.getTime()) || isNaN(etaDate.getTime()) || isNaN(actualDate.getTime())) {
+//     return 0;
+//   }
+
+//   const tatMs = etaDate.getTime() - start.getTime(); // promised duration
+//   const actualMs = actualDate.getTime() - start.getTime(); // actual duration
+
+//   if (tatMs <= 0 || actualMs <= 0) {
+//     return 0; // Invalid input
+//   }
+
+//   let percentage = (tatMs / actualMs) * 100;
+//   if (percentage > 100) percentage = 100; // cap at 100%
+
+//   return Math.round(percentage); // clean integer %
+// };
+const getOnTimePercentage = (shipmentData: any, actualDelivery?: string) => {
+  console.log({
+    pickup: shipmentData?.pickup_date,
+    delivery: shipmentData?.delivery_date,
+    actualDelivery,
+    traveled: shipmentData?.trip_tracker?.travelled_distance,
+    estimated: shipmentData?.estimated?.distance,
+    dayRunAvg: shipmentData?.dayRun?.avg_distance,
+    latestStatus: shipmentData?.latest_status,
+  });
+
+  const start = new Date(shipmentData?.pickup_date);
+  const etaDate = new Date(shipmentData?.delivery_date);
+  const endDate = actualDelivery ? new Date(actualDelivery) : new Date();
+  
+  const numberOfDays = Math.ceil((endDate.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+  const etaDays = Math.ceil((etaDate.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+  
+  // Distance calculations
+  const traveled_distance = shipmentData?.trip_tracker?.travelled_distance || 0;
+  const estimated_distance = shipmentData?.estimated?.distance || 0;
+  const averageDistanceDayRun = shipmentData?.dayRun?.avg_distance || 0;
+  
+  // Use dayRun average if available, otherwise calculate from traveled distance
+  const dailyDistanceCapacity = averageDistanceDayRun > 0 
+    ? averageDistanceDayRun 
+    : (traveled_distance > 0 && numberOfDays > 0) 
+      ? (traveled_distance / 1000) / numberOfDays 
+      : 0;
+  
+  // Calculate remaining distance
+  const remaining_distance = Math.max(0, (estimated_distance / 1000) - (traveled_distance / 1000));
+  
+  // Predict days needed to complete remaining distance
+  const predictedDaysToComplete = dailyDistanceCapacity > 0 
+    ? Math.ceil(remaining_distance / dailyDistanceCapacity) 
+    : 0;
+  
+  const currentDate = new Date();
+  const predictedCompletionDate = new Date(currentDate.getTime() + (predictedDaysToComplete * 24 * 60 * 60 * 1000));
+  
+  const isDelivered = shipmentData?.latest_status === "CPTD";
+  const deliveryDate = isDelivered ? endDate : predictedCompletionDate;
+  
+  // Calculate progress percentages
+  const timeProgress = numberOfDays / etaDays;
+  const distanceProgress = estimated_distance > 0 ? (traveled_distance / estimated_distance) : 0;
+  const timeProgressPercent = Math.round(timeProgress * 100);
+  const distanceProgressPercent = Math.round(distanceProgress * 100);
+  
+  // Calculate days remaining
+  const daysRemainingToETA = Math.max(0, Math.ceil((etaDate.getTime() - currentDate.getTime()) / (1000 * 60 * 60 * 24)));
+  
+  let onTimePercentage: number;
+  let prediction: "early" | "on-time" | "delayed";
+  let context: string;
+  
+  if (isDelivered) {
+    const deliveryDelay = Math.max(0, deliveryDate.getTime() - etaDate.getTime()) / (1000 * 60 * 60 * 24);
+    onTimePercentage = deliveryDelay === 0 ? 100 : Math.max(0, 100 - (deliveryDelay * 10));
+    
+    if (deliveryDelay === 0) {
+      prediction = "on-time";
+      context = "Delivered exactly on schedule";
+    } else if (endDate < etaDate) {
+      prediction = "early";
+      const earlyDays = Math.ceil((etaDate.getTime() - endDate.getTime()) / (1000 * 60 * 60 * 24));
+      context = `Delivered ${earlyDays} day${earlyDays > 1 ? 's' : ''} early`;
+    } else {
+      prediction = "delayed";
+      const lateDays = Math.ceil(deliveryDelay);
+      context = `Delivered ${lateDays} day${lateDays > 1 ? 's' : ''} late`;
+    }
+  } else {
+    // For ongoing shipments
+    if (distanceProgress >= timeProgress) {
+      onTimePercentage = Math.min(100, 80 + (20 * (distanceProgress / timeProgress)));
+    } else {
+      const behindRatio = timeProgress / Math.max(distanceProgress, 0.1);
+      onTimePercentage = Math.max(0, 80 / behindRatio);
+    }
+    
+    // Predict delivery outcome
+    const predictedDelayDays = predictedDaysToComplete - daysRemainingToETA;
+    
+    if (predictedDelayDays <= 0) {
+      prediction = "early";
+      const earlyDays = Math.abs(predictedDelayDays);
+      if (earlyDays === 0) {
+        prediction = "on-time";
+        context = `${distanceProgressPercent}% complete • On track for on-time delivery`;
+      } else {
+        context = `${distanceProgressPercent}% complete • Expected ${earlyDays} day${earlyDays > 1 ? 's' : ''} early`;
+      }
+    } else {
+      prediction = "delayed";
+      context = `${distanceProgressPercent}% complete • Expected ${predictedDelayDays} day${predictedDelayDays > 1 ? 's' : ''} delay`;
+    }
+    
+    // Add performance context
+    if (distanceProgress > timeProgress) {
+      const performanceRatio = (distanceProgress / timeProgress);
+      if (performanceRatio > 1.2) {
+        context += ` • Excellent progress`;
+      } else {
+        context += ` • Good progress`;
+      }
+    } else if (distanceProgress < timeProgress * 0.8) {
+      context += ` • Behind schedule`;
+    }
   }
-
-  const tatMs = etaDate.getTime() - start.getTime(); // promised duration
-  const actualMs = actualDate.getTime() - start.getTime(); // actual duration
-
-  if (tatMs <= 0 || actualMs <= 0) {
-    return 0; // Invalid input
-  }
-
-  let percentage = (tatMs / actualMs) * 100;
-  if (percentage > 100) percentage = 100; // cap at 100%
-
-  return Math.round(percentage); // clean integer %
+  
+  return {
+    onTimePercentage: Math.round(onTimePercentage * 100) / 100,
+    prediction,
+    context,
+    details: {
+      distanceProgress: distanceProgressPercent,
+      timeProgress: timeProgressPercent,
+      daysRemaining: daysRemainingToETA,
+      predictedDaysToComplete,
+      isDelivered
+    }
+  };
 };
 
 // Now you can call this function with your API data
 const onTimePercentage = getOnTimePercentage(
-  apiData?.pickup_date,
-  apiData?.delivery_date,
+  apiData,
   finalDestination?.finished_at
 );
 const calculateEtaDelta = (etaDateString:any,actualDateString:any) => {
@@ -601,14 +729,28 @@ const totalQuantity = apiData?.invoices?.reduce((sum:number, invoice:Invoice) =>
       <header className="header">
         <div className="header-content">
           <div className="header-logo-section">
-            <div className="logo-icon-wrapper tooltip">
-              <Truck className="logo-icon" />
+            <Image
+              src={fullLogo}
+              alt='logo'
+              style={{
+                  height: '55px',
+                  width: '35%',
+                  marginLeft: '23px',
+                  background: '#251351eb',
+                  padding: '10px',
+                  borderRadius: '25px'
+              }}
+            />
+            {/* <div className="logo-icon-wrapper tooltip"> */}
+              {/* <Truck className="logo-icon" /> */}
+              {/* <NextImage src="/assets/SmartTruck_tracker.svg" alt="Truck Logo" width={40} height={40} /> */}
               {/* <span className="tooltip-content">SmartTruck Dashboard</span> */}
-            </div>
-            <div>
+              
+            {/* </div> */}
+            {/* <div>
               <h1 className="logo-title">SmartTruck</h1>
               <p className="logo-subtitle">TRIP TRACKER</p>
-            </div>
+            </div> */}
             <div className="header-customer-info">
               <div className="customer-icon-wrapper">
               <Building2 className="customer-icon" />
@@ -837,42 +979,40 @@ const totalQuantity = apiData?.invoices?.reduce((sum:number, invoice:Invoice) =>
           onClick={() => handleKpiClick("eta-delta")}
         >
           <div className="kpi-icon-badge"><Clock className="kpi-icon" /></div>
-      
+            {apiData?.latest_status=="CPTD"?(
             <div className="kpi-value"> {etaDelta.isLate ? (
-      `Late by ${etaDelta.hours}h ${etaDelta.minutes}m`
-    ) : (
-      `Early by ${etaDelta.hours}h ${etaDelta.minutes}m`
-    )}</div>
+              `Late by ${etaDelta.hours}h ${etaDelta.minutes}m`
+            ) : (
+              `Early by ${etaDelta.hours}h ${etaDelta.minutes}m`
+            )}</div>): (<div className="kpi-value">{shipmentStatus}</div>)}
            
-            <div className="kpi-label"> {apiData?.latest_status=="CPTD"?'Delivered':'ETA Delta'}</div>
-            <div className="kpi-label">{formatTimestamp(finalDestination?.finished_at)}</div>
+            <div className="kpi-label"> {apiData?.latest_status=="CPTD"?'Delivered':''}</div>
+            <div className="kpi-label">{finalDestination?.finished_at ? formatTimestamp(finalDestination?.finished_at) : `ETA: ${formatTimestamp(apiData?.delivery_date)}`}</div>
           
          
-            <div className="tooltip-content tooltip-lg">
-    <div className="tooltip-title">ETA Delta</div>
+            {finalDestination?.finished_at ? (
+              <div className="tooltip-content tooltip-lg">
+              <div className="tooltip-title">ETA Delta</div>
 
-    <div className="tooltip-row">
-      <span className="tooltip-key">Planned delivery:</span>
-      <span className="tooltip-val">{formatEta(apiData?.delivery_date)}</span>
-    </div>
+              <div className="tooltip-row">
+                <span className="tooltip-key">Planned delivery:</span>
+                <span className="tooltip-val">{formatEta(apiData?.delivery_date)}</span>
+              </div>
 
-    <div className="tooltip-row">
-      <span className="tooltip-key">Actual delivery:</span>
-      <span className="tooltip-val">{formatEta(finalDestination?.finished_at)}</span>
-    </div>
+              <div className="tooltip-row">
+                <span className="tooltip-key">Actual delivery:</span>
+                <span className="tooltip-val">{formatEta(finalDestination?.finished_at)}</span>
+              </div>
 
-    <div className="tooltip-row">
-      <span className="tooltip-key">Delta:</span>
-      <span className="tooltip-val">{etaDelta.isLate ? (
-      `Late by ${etaDelta.hours}h ${etaDelta.minutes}m`
-    ) : (
-      `Early by ${etaDelta.hours}h ${etaDelta.minutes}m`
-    )}</span>
-    </div>
-
-   
- 
-</div>
+              <div className="tooltip-row">
+                <span className="tooltip-key">Delta:</span>
+                <span className="tooltip-val">{etaDelta.isLate ? (
+                `Late by ${etaDelta.hours}h ${etaDelta.minutes}m`
+              ) : (
+                `Early by ${etaDelta.hours}h ${etaDelta.minutes}m`
+              )}</span>
+            </div>
+            </div>): <></> }
 
           </div>
 {/* 
@@ -898,7 +1038,16 @@ const totalQuantity = apiData?.invoices?.reduce((sum:number, invoice:Invoice) =>
                 </div>
               </div>
               <div className="progress-bar">
-                <div className="progress-bar-fill"></div>
+                <div 
+                  className="progress-bar-fill"
+                  style={{ 
+                    width: `${Math.min(progressPercentage, 100)}%`,
+                    transition: 'width 0.8s ease-in-out',
+                    background: progressPercentage > 0 ? 'linear-gradient(90deg, #22c55e 0%, #16a34a 50%, #15803d 100%)' : '#e5e7eb',
+                    boxShadow: progressPercentage > 0 ? '0 0 10px rgba(34, 197, 94, 0.3)' : 'none',
+                    animation: progressPercentage > 0 ? 'progressPulse 2s ease-in-out infinite alternate' : 'none'
+                  }}
+                ></div>
               </div>
             </div>
             <div className="kpi-label">{apiData?.latest_status=="ITNS"?(<>Distance Metrics ({progressPercentage.toFixed(0)}%)</>):("")}</div>
@@ -930,24 +1079,24 @@ const totalQuantity = apiData?.invoices?.reduce((sum:number, invoice:Invoice) =>
           onClick={() => handleKpiClick("on-time")}
         >
           <div className="kpi-icon-badge"><BadgeCheck className="kpi-icon" /></div>
-            <div className="kpi-value">{onTimePercentage}</div>
+            <div className="kpi-value">{onTimePercentage.onTimePercentage}</div>
             <div className="kpi-label">On-Time%</div>
-            {/* <span className="tooltip-content">100% on-time delivery rate</span> */}
+            {/* <span className="tooltip-content">{onTimePercentage.context}</span> */}
             <div className="tooltip-content tooltip-lg">
            
       <div className="tooltip-title">On-Time%</div>
 
       <div className="tooltip-row">
-        <span className="tooltip-key">On-time deliveries:</span>
-        <span className="tooltip-val">1/1</span>
+        <span className="tooltip-key">On-time Prediction:</span>
+        <span className="tooltip-val">{onTimePercentage.onTimePercentage} %</span>
       </div>
       <div className="tooltip-row">
         <span className="tooltip-key">SLA deadline:</span>
-        <span className="tooltip-val">15-Aug 10:00</span>
+        <span className="tooltip-val">{ formatTimestamp(apiData?.delivery_date)}</span>
       </div>
       <div className="tooltip-row">
         <span className="tooltip-key">Status:</span>
-        <span className="tooltip-val">On track</span>
+        <span className="tooltip-val">{onTimePercentage.context}</span>
       </div>
     </div>
           </div>
@@ -1111,7 +1260,7 @@ const totalQuantity = apiData?.invoices?.reduce((sum:number, invoice:Invoice) =>
           </div>
           <div className="detail-item">
             <div className="detail-label">Shipper</div>
-            <div className="detail-value"> {`${apiData?.shipper?.parent_name} (${apiData?.shipper?.name})` ?? 'N/A'}</div>
+            <div className="detail-value"> {`${apiData?.shipper?.parent_name} (${apiData?.shipper?.name})` || 'N/A'}</div>
           </div>
           <div className="detail-grid">
             <div className="detail-item">
