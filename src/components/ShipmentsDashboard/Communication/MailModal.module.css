@@ -54,6 +54,7 @@
 .mailButton {
   margin-left: 8px;
   color: #2962FF;
+  margin-right: -15px !important;
 }
 
 .mailButton:disabled {

@@ -785,10 +785,10 @@ const actionMenuCategories = {
     { icon: Edit, label: "Update Client Freight", color: "text-yellow-600", onClick: (shipment: Shipment) => { closeAllDialogs(); handleOpenFreightModal(shipment._id, shipment.sin, 'client_rate'); } },
     { icon: Plus, label: "Add Driver Expenses", color: "text-green-600", onClick: handleAddDriverExpenses },
   ],
-  "Geofence & EPOD": [
+  "Geofence & ePOD": [
     { icon: Plus, label: "Add/Edit Geofence", color: "text-green-600", onClick: handleOpenGeofenceEditor, disabled: (shipment: Shipment) => ['Completed', 'Cancelled'].includes(shipment.status) },
-    { icon: Upload, label: "Upload EPOD", color: "text-green-600" },
-    { icon: Upload, label: "Request EPOD", color: "text-green-600" }, 
+    { icon: Upload, label: "Upload ePOD", color: "text-green-600" },
+    { icon: Upload, label: "Request ePOD", color: "text-green-600" }, 
   ]
 };
 

@@ -105,7 +105,7 @@ const HeaderActions: React.FC<HeaderActionsProps> = ({
               disabled={!hasSelectedShipments || isLoading}
             >
               <Send className={styles.lucideIcon} />
-              Send EPOD Back To JDE
+              Send ePOD Back To JDE
             </button>
 
             <button

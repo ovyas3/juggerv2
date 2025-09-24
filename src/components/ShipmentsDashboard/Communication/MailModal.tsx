@@ -101,6 +101,19 @@ const MailModal: React.FC<MailModalProps> = ({ open, onClose, shipment }) => {
               onChange={(e) => setEmail(e.target.value)}
               disabled={loading}
               className={styles.input}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  '&:hover fieldset': {
+                    border: '1px solid #4F46E5',  
+                    borderColor: '#4F46E5',
+                  },
+                  '&.Mui-focused fieldset': {
+                    border: '1px solid #4F46E5',
+                    borderColor: '#4F46E5',
+                    boxShadow: '0 0 0 2px rgba(79, 70, 229, 0.2)',
+                  },
+                },
+              }}
               onKeyPress={(e) => {
                 if (e.key === "Enter") {
                   handleSendEmail();
@@ -112,7 +125,7 @@ const MailModal: React.FC<MailModalProps> = ({ open, onClose, shipment }) => {
               disabled={loading}
               className={styles.mailButton}
             >
-              {loading ? <CircularProgress size={24} /> : <EmailIcon />}
+              {loading ? <CircularProgress size={24} /> : <EmailIcon style={{color:"#4F46E5", width:"24px", height:"24px"}} />}
             </IconButton>
           </div>
         </div>

@@ -65,7 +65,7 @@ const ShareModal: React.FC<ShareModalProps> = ({
                 onClick={handleWhatsAppShare}
                 className={styles.whatsappButton}
               >
-                <WhatsAppIcon fontSize="small" />
+                <WhatsAppIcon fontSize="small" style={{color:"#fff", width:"25px", height:"25px", backgroundColor:"#25D366", borderRadius: "50%"}} />
               </IconButton>
             </div>
           </div>
