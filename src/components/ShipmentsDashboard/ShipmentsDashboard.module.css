@@ -3486,7 +3486,7 @@ select.didFloatingSelect::-ms-expand {
   border: 1px solid #e2e8f0;
 }
 
-.searchContainer {
+/* .searchContainer {
   position: relative;
   padding: 0 12px 8px;
   margin-bottom: 8px;
@@ -3501,7 +3501,7 @@ select.didFloatingSelect::-ms-expand {
   color: #64748b;
   width: 16px;
   height: 16px;
-}
+} */
 
 .searchInput {
   width: 100%;
