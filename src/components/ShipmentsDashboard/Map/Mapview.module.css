@@ -340,7 +340,7 @@
     align-items: center;
     justify-content: center;
     padding: 24px;
-    z-index: 1000;
+    z-index: 2147483600;
   }
   
   /* dialog */
@@ -351,6 +351,7 @@
     border-radius: 16px;
     box-shadow: 0 20px 60px rgba(16, 24, 40, 0.3);
     overflow: hidden;
+    z-index: 2147483601;
   }
   
   .modalHeader {
@@ -881,7 +882,7 @@
 .stopPill {
   border: 1px solid #e7e7ea;
   border-radius: 10px;
-  height: calc(2em * 2);
+  /* height: calc(2em * 2); */
   padding: 10px 12px;
   background: #fff;
   font-size: 12px;
@@ -1201,6 +1202,20 @@
   pointer-events: none;     
 }
 
+.legendDock::before,
+.legendDock::after,
+.legendBar::before,
+.legendBar::after,
+.legendDock *::before,
+.legendDock *::after {
+  content: none !important;
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
 
 /* When legend sits inside the dock, drop its absolute positioning */
 /* .legendDock .legendBar {
@@ -1219,6 +1234,11 @@
 .legendDock .legendBar::after {
   content: none !important;
   display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
 }
 .pathChips {
   display: flex;
@@ -1356,6 +1376,16 @@
   min-width: min(663px, 88vw);
   gap: 20px;
   justify-content: flex-end;
+  margin-Top: -8px;
+}
+.pdPickupTitle {
+  color: #16a34a; /* Green for Pickup */
+  font-family: 500;
+}
+
+.pdDeliveryTitle {
+  color: #f97316; 
+  font-family: 500;/* Orange for Delivery */
 }
 
 .clearBtn {

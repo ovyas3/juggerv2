@@ -2137,7 +2137,8 @@ const renderLastLocationCell = (shipment: any) => {
     locations: [],
     deliveryLocations: []
   });
-
+  const limit = pageSize;
+  const skip = currentPage * pageSize;
 const handleOpenEditLocation = (shipment: any, type: 'pickup' | 'delivery') => {
   setSelectedShipment(shipment);
   setSelectedLocationType(type);
@@ -2592,8 +2593,8 @@ const applyFilter = () => {
           >
             Advanced Search
           </div>
-          <Link href="/Mapview" style={{textDecoration: "none"}}>
-
+          {/* <Link href="/Mapview" style={{textDecoration: "none"}}> */}
+         <Link href={{ pathname: "/Mapview", query: { limit: String(limit), skip: String(skip) } }} style={{textDecoration: "none"}}>
           <button className={styles.button}>Map View</button>
           </Link>
 

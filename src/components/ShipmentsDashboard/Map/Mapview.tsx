@@ -29,6 +29,7 @@ import mail from "../../../assets/mailround.svg";
 import upload from "../../../assets/attachFiles.svg";
 import doc from "../../../assets/Doc-icon.svg";
 import { httpsGet } from "@/utils/Communication";
+import { useSearchParams } from "next/navigation";
 
 import header from "../../UI/ModalHeader/ModalHeader";
 import { Col } from "antd";
@@ -77,7 +78,7 @@ import { MarkerClusterer, SuperClusterAlgorithm, type Renderer } from "@googlema
 
 interface Location {
   name?: string;
-  address?: string;
+  area?: string;
   lat?: number;
   lng?: number;
   state?: string;
@@ -205,6 +206,26 @@ export default function Mapview() {
   const [geoFences, setGeoFences] = useState<any[]>([]);
 const [infoFromMapClick, setInfoFromMapClick] = useState(false);
 type LegendItem = { key: LegendKey; label: string; icon: any };
+// at top of component body (client component)
+// const portalTarget = typeof window !== 'undefined' ? document.body : null;
+const [portalTarget, setPortalTarget] = useState<Element | null>(null);
+const searchParams = useSearchParams();
+
+const limitFromUrl = useMemo(() => {
+  const n = Number(searchParams.get("limit"));
+  return Number.isFinite(n) && n > 0 ? n : 100; // fallback to your old default
+}, [searchParams]);
+
+const skipFromUrl = useMemo(() => {
+  const n = Number(searchParams.get("skip"));
+  return Number.isFinite(n) && n >= 0 ? n : 0; // fallback to your old default
+}, [searchParams]);
+
+
+useEffect(() => {
+  // only run on client
+  setPortalTarget(document.body);
+}, []);
 
 const STATUS_ITEMS: LegendItem[] = [
   { key: "on",    label: "On Time",         icon: ontime },
@@ -278,6 +299,14 @@ const updateFormDraft = (field: keyof typeof formDrafts, value: string) => {
   setFormDrafts(prev => ({ ...prev, [field]: value }));
 };
   
+// add once in the component
+useEffect(() => {
+  if (isFilterOpen) {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = prev; };
+  }
+}, [isFilterOpen]);
 
 const onFormMaterialChange = (value: string) => updateFormDraft("materials", value);
 const onFormPickupChange = (value: string) => updateFormDraft("pickupLocation", value);
@@ -324,8 +353,10 @@ const [pdInfo, setPdInfo] = useState<{
   kind: "P" | "D";
   seq: number;
   name?: string;
-  address?: string;
+  area?: string;
   shipmentSIN?: string;
+  city?: string;
+
 } | null>(null);
 
 function clearPDMarkers() {
@@ -350,7 +381,7 @@ function addPDMarker(
   pos: google.maps.LatLngLiteral,
   kind: "P"|"D",
   seq: number,
-  meta?: { name?: string; address?: string; sin?: string },
+  meta?: { name?: string; address?: string; area?: string; sin?: string,city?:string },
 ) {
   console.debug(`[PD] add ${kind}${seq}`, { pos, meta });   
   const marker = new google.maps.Marker({
@@ -361,13 +392,13 @@ function addPDMarker(
       text: (kind + seq) as string,         
       color: "#ffffff",
       fontWeight: "700",
-      fontSize: "25px",
+      fontSize: "13px",
     },
     zIndex: 80,
   });
   marker.addListener("click", () => {
     console.debug(`[PD] click ${kind}${seq}`, meta); 
-    setPdInfo({ pos, kind, seq, name: meta?.name, address: meta?.address, shipmentSIN: meta?.sin });
+    setPdInfo({ pos, kind, seq, name: meta?.name, area: meta?.area, shipmentSIN: meta?.sin,city:meta?.city });
   });
   pdOverlaysRef.current.push(marker);
   console.debug(`[PD] overlays now`, pdOverlaysRef.current.length); // 👈
@@ -432,6 +463,41 @@ async function ensureLatLngFromLocation(loc:any): Promise<google.maps.LatLngLite
   return null;
 }
 
+// async function drawPDForShipment(s: Shipment) {
+//   console.groupCollapsed("[PD] draw", s?.SIN ?? s?._id ?? "unknown");
+
+//   if (!(window as any).google || !google.maps) { console.warn("[PD] maps not ready"); console.groupEnd(); return; }
+//   const map = mapRef as unknown as google.maps.Map | null;
+//   if (!map) { console.warn("[PD] mapRef.current is null"); console.groupEnd(); return; }
+
+//   const pickupDoc = s?.pickups?.[0] ?? null;
+//   const deliveryDoc = s?.deliveries?.[s?.deliveries?.length - 1] ?? null;
+//   const pRaw = pickupDoc?.location ?? null;
+//   const dRaw = deliveryDoc?.location ?? null;
+
+//   const p = (resolveLoc(pRaw)) || (await ensureLatLngFromLocation(pRaw));
+//   const d = (resolveLoc(dRaw)) || (await ensureLatLngFromLocation(dRaw));
+
+//   console.table({ pickup_parsed: p || "❌", delivery_parsed: d || "❌" });
+
+//   clearPDMarkers();
+//   let added = 0; const b = new google.maps.LatLngBounds();
+
+//   if (p) { addPDMarker(map, p, "P", 1, { sin: s?.SIN }); b.extend(p); added++; }
+//   else   { console.warn("[PD] pickup invalid/missing lat/lng"); }
+
+//   if (d) { addPDMarker(map, d, "D", 1, { sin: s?.SIN }); b.extend(d); added++; }
+//   else   { console.warn("[PD] delivery invalid/missing lat/lng"); }
+
+//   if (added && !b.isEmpty()) map.fitBounds(b, 60);
+//   else {
+//     const ctr = map.getCenter();
+//     const test = new google.maps.Marker({ map, position: ctr, label: "TEST" });
+//     setTimeout(() => test.setMap(null), 1500);
+//   }
+//   console.groupEnd();
+// }
+
 async function drawPDForShipment(s: Shipment) {
   console.groupCollapsed("[PD] draw", s?.SIN ?? s?._id ?? "unknown");
 
@@ -439,35 +505,49 @@ async function drawPDForShipment(s: Shipment) {
   const map = mapRef as unknown as google.maps.Map | null;
   if (!map) { console.warn("[PD] mapRef.current is null"); console.groupEnd(); return; }
 
-  const pickupDoc = s?.pickups?.[0] ?? null;
-  const deliveryDoc = s?.deliveries?.[s?.deliveries?.length - 1] ?? null;
-  const pRaw = pickupDoc?.location ?? null;
-  const dRaw = deliveryDoc?.location ?? null;
-
-  const p = (resolveLoc(pRaw)) || (await ensureLatLngFromLocation(pRaw));
-  const d = (resolveLoc(dRaw)) || (await ensureLatLngFromLocation(dRaw));
-
-  console.table({ pickup_parsed: p || "❌", delivery_parsed: d || "❌" });
-
   clearPDMarkers();
   let added = 0; const b = new google.maps.LatLngBounds();
 
-  if (p) { addPDMarker(map, p, "P", 1, { sin: s?.SIN }); b.extend(p); added++; }
-  else   { console.warn("[PD] pickup invalid/missing lat/lng"); }
+  // Draw all pickup markers
+  for (let i = 0; i < (s?.pickups?.length ?? 0); i++) {
+    const pickupDoc = s.pickups[i];
+    const pRaw = pickupDoc?.location ?? null;
+    const p = resolveLoc(pRaw) || (await ensureLatLngFromLocation(pRaw));
+    
+    if (p) {
+      addPDMarker(map, p, "P", i + 1, { sin: s?.SIN, name: pRaw?.name, area: pRaw?.area,city: pRaw?.city });
+      b.extend(p);
+      added++;
+    } else {
+      console.warn(`[PD] pickup ${i + 1} invalid/missing lat/lng`);
+    }
+  }
 
-  if (d) { addPDMarker(map, d, "D", 1, { sin: s?.SIN }); b.extend(d); added++; }
-  else   { console.warn("[PD] delivery invalid/missing lat/lng"); }
+  // Draw all delivery markers
+  for (let i = 0; i < (s?.deliveries?.length ?? 0); i++) {
+    const deliveryDoc = s.deliveries[i];
+    const dRaw = deliveryDoc?.location ?? null;
+    const d = resolveLoc(dRaw) || (await ensureLatLngFromLocation(dRaw));
+    
+    if (d) {
+      addPDMarker(map, d, "D", i + 1, { sin: s?.SIN, name: dRaw?.name, area: dRaw?.area,city: dRaw?.city });
+      b.extend(d);
+      added++;
+    } else {
+      console.warn(`[PD] delivery ${i + 1} invalid/missing lat/lng`);
+    }
+  }
 
-  if (added && !b.isEmpty()) map.fitBounds(b, 60);
-  else {
+  if (added && !b.isEmpty()) {
+    map.fitBounds(b, 60);
+  } else {
+    // Fallback if no valid locations found
     const ctr = map.getCenter();
     const test = new google.maps.Marker({ map, position: ctr, label: "TEST" });
     setTimeout(() => test.setMap(null), 1500);
   }
   console.groupEnd();
 }
-
-
 function arrivalIsoFromDeliveries(s: Shipment): string | undefined {
   const lastArrived = Array.isArray(s?.deliveries)
     ? (s.deliveries as any[]).filter(d => d?.arrived === true).slice(-1)[0]
@@ -1442,7 +1522,12 @@ const handleSearchApply = () => {
   }, [mapRef, unitLocations]);
 
 const buildApiFilters = () => {
-  const f: any = { limit: 100, skip: 0 };
+  // const f: any = { limit: 100, skip: 0 };
+  const f: any = {
+    // ... your other filters
+    limit: limitFromUrl,
+    skip: skipFromUrl,
+  };
   const fromMs = toStartOfDayMs(dateFrom);
   const toMs = toEndOfDayMs(dateTo);
 
@@ -2133,19 +2218,22 @@ function fitToAllVehicles(list: Shipment[] = visibleShipments) {
     .filter((gf: any) => gf && (gf.type === "Polygon" || gf.type === "MultiPolygon"))}
 />
 
-{pdInfo && (
+{/* {pdInfo && (
   <InfoWindow
     position={pdInfo.pos}
     onCloseClick={() => setPdInfo(null)}
   >
-    <div className={styles.haltCard}>
+    <div 
+    // className={styles.haltCard }
+    >
       <div className={styles.haltCardHeader}>
         {pdInfo.kind}{pdInfo.seq} • {pdInfo.shipmentSIN}
       </div>
       <div className={styles.haltDivider} />
       <div className={styles.haltRow}>
         <span className={styles.haltKey}>Name:</span>
-        <span className={styles.haltVal}>{pdInfo.name || "-"}</span>
+        <strong>
+        <span className={styles.haltVal}>{pdInfo.name || "-"}</span></strong>
       </div>
       <div className={styles.haltRow}>
         <span className={styles.haltKey}>Address:</span>
@@ -2153,7 +2241,7 @@ function fitToAllVehicles(list: Shipment[] = visibleShipments) {
       </div>
     </div>
   </InfoWindow>
-)}
+)} */}
 
 {mapRef && activeHalt && haltInfoPos && (
   <InfoWindow
@@ -2185,27 +2273,34 @@ function fitToAllVehicles(list: Shipment[] = visibleShipments) {
     <div className={styles.haltCard}>
       <div className={styles.haltHeader}>
         <span className={
-          `${styles.haltTitle} ${pdInfo.kind === "P" ? styles.pdPickupTitle : styles.pdDeliveryTitle}`
+          ` ${pdInfo.kind === "P" ? styles.pdPickupTitle : styles.pdDeliveryTitle}`
         }>
           {pdInfo.kind === "P" ? "Pickup" : "Delivery"} {pdInfo.seq}
         </span>
-        <button className={styles.haltClose} onClick={() => setPdInfo(null)}>×</button>
+        {/* <button className={styles.haltClose} onClick={() => setPdInfo(null)}>×</button> */}
       </div>
 
       <div className={styles.haltDivider} />
 
       <div className={styles.haltRow}>
         <span className={styles.haltKey}>Name:</span>
-        <span className={styles.haltVal}>{pdInfo.name || "-"}</span>
+        <strong>
+        <span className={styles.haltVal}>{pdInfo.name || "-"}</span></strong>
       </div>
       <div className={styles.haltRow}>
         <span className={styles.haltKey}>Address:</span>
-        <span className={styles.haltVal}>{pdInfo.address || "-"}</span>
+        <strong>
+        <span className={styles.haltVal}>{pdInfo.area || "-"}</span></strong>
       </div>
       <div className={styles.haltRow}>
+        <span className={styles.haltKey}>City:</span>
+        <strong>
+        <span className={styles.haltVal}>{pdInfo.city || "-"}</span></strong>
+      </div>
+      {/* <div className={styles.haltRow}>
         <span className={styles.haltKey}>Shipment:</span>
         <span className={`${styles.haltVal} ${styles.haltStrong}`}>{pdInfo.shipmentSIN || "-"}</span>
-      </div>
+      </div> */}
     </div>
   </InfoWindow>
 )}
@@ -2316,6 +2411,7 @@ function fitToAllVehicles(list: Shipment[] = visibleShipments) {
     <div className={styles.legendBar}>{/* your existing legend items */}</div>
     
     <div className={styles.pathChips}>
+
       {pathData.gps?.length ? (
         <button
           type="button"
@@ -2324,7 +2420,7 @@ function fitToAllVehicles(list: Shipment[] = visibleShipments) {
         >
           GPS
         </button>
-      ) : null}
+        ) : null}  
 
       {pathData.app?.length ? (
         <button
@@ -2334,9 +2430,9 @@ function fitToAllVehicles(list: Shipment[] = visibleShipments) {
         >
           APP
         </button>
-       ) : null} 
+       ) : null}  
 
-      {pathData.sim?.length ? (
+      {pathData.sim?.length ? ( 
         <button
           type="button"
           className={`${styles.chip} ${pathVisible.sim ? styles.chipSimOn : styles.chipSimOff}`}
@@ -2344,10 +2440,10 @@ function fitToAllVehicles(list: Shipment[] = visibleShipments) {
         >
           SIM
         </button>
-      ) : null}
+     ) : null} 
     </div>
   </div>
-) : null}
+ ) : null} 
 
 
 
@@ -2512,7 +2608,9 @@ function fitToAllVehicles(list: Shipment[] = visibleShipments) {
 
         </div>
       
-      {isFilterOpen && (
+      {isFilterOpen ? (portalTarget
+      ? createPortal(
+
         <div
           className={styles.modalOverlay}
           onClick={(e) => e.target === e.currentTarget && setIsFilterOpen(false)} >
@@ -2759,9 +2857,9 @@ function fitToAllVehicles(list: Shipment[] = visibleShipments) {
 </form>
 
           </div>
-        </div>
-      
-      )}
+        </div>,   portalTarget  ) : null)
+        : null}
+     
       
   
       {mounted && menu.open && createPortal(
