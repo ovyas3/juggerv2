@@ -317,6 +317,11 @@ const  renderConsentAndSubscriptionIcons = (shipment: any, openSubscribeModal: (
             </th>
             <th className={`${styles.matHeaderCell} ${styles.matColumnDriver}`}>Driver</th>
             <th
+              className={`${styles.matHeaderCell} ${styles.matColumnSpotDriver}`}
+            >
+              Spot Driver
+            </th>
+            <th
               className={`${styles.matHeaderCell} ${styles.matColumnDriverPhone}`}
             >
               Phone
@@ -543,20 +548,22 @@ const  renderConsentAndSubscriptionIcons = (shipment: any, openSubscribeModal: (
                 </td>
 
                 <td className={styles.matCell}>
-                  <div>
-                    {toTitleCase(shipment.driverName || "")}
-                    {shipment.isSpotDriver && (
-                      <span>
-                        {" "}
-                        <img
-                          src={spotdrivericon.src}
-                          alt="Spot Driver"
-                          title="Spot Driver"
-                          style={{ height: "12px", width: "12px" }}
-                        />
-                      </span>
-                    )}
-                  </div>
+                  <div>{toTitleCase(shipment.driverName || "")}</div>
+                </td>
+
+                <td
+                  className={`${styles.matCell} ${styles.matColumnSpotDriver}`}
+                >
+                  {shipment.isSpotDriver ? (
+                    <img
+                      src={spotdrivericon.src}
+                      alt="Spot Driver"
+                      title="Spot Driver"
+                      style={{ height: "20px", width: "20px" }}
+                    />
+                  ) : (
+                    <span className={styles.flagImgR}>✗</span>
+                  )}
                 </td>
 
                 <td
