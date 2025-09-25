@@ -1,4 +1,4 @@
-import Reactfrom 'react';
+import React from 'react';
 import styles from './OrdersPopuo.module.css';
 import ModalHeader from '../UI/ModalHeader/ModalHeader';
 
