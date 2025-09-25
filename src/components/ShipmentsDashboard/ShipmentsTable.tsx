@@ -36,7 +36,7 @@ import gpsTrackingIcon from "../../assets/gps_tracking.svg";
 import mobileIcon from "../../assets/mobile.svg";
 import { httpsPost } from "@/utils/Communication";
 import { useSnackbar } from "@/hooks/snackBar";
-
+import OrdersPopup from "./OrdersPopup";
 
 interface Shipment {
   _id: string;
@@ -145,6 +145,17 @@ export const ShipmentsTable: React.FC<ShipmentsTableProps> = ({
   const { showMessage } = useSnackbar();
   const [actionSearchState, setActionSearchState] = useState("");
   const [showDownLoadLoader, setShowDownLoadLoader] = useState(false);
+  const [showOrdersPopup, setShowOrdersPopup] = useState(false);
+  const [selectedOrders, setSelectedOrders] = useState<string[]>([]);
+
+  const handleBubbleClick = (orders: string[]) => {
+    setSelectedOrders(orders);
+    setShowOrdersPopup(true);
+  };
+
+  const closeOrdersPopup = () => {
+    setShowOrdersPopup(false);
+  };
 
   const shouldShowAction = (actionName: string): boolean => {
     if (!actionSearchState) return true;
@@ -317,6 +328,16 @@ const  renderConsentAndSubscriptionIcons = (shipment: any, openSubscribeModal: (
             </th>
             <th className={`${styles.matHeaderCell} ${styles.matColumnDriver}`}>Driver</th>
             <th
+              className={`${styles.matHeaderCell} ${styles.matColumnDestinationCode}`}
+            >
+              Destination Code
+            </th>
+            <th
+              className={`${styles.matHeaderCell} ${styles.matColumnSpotDriver}`}
+            >
+              Spot Driver
+            </th>
+            <th
               className={`${styles.matHeaderCell} ${styles.matColumnDriverPhone}`}
             >
               Phone
@@ -356,14 +377,14 @@ const  renderConsentAndSubscriptionIcons = (shipment: any, openSubscribeModal: (
         <tbody>
           {showLoader ? (
             <tr>
-              <td colSpan={19} className={styles.matCell}>
+              <td colSpan={20} className={styles.matCell}>
                 Loading...
               </td>
             </tr>
           ) : shipmentsArray.length === 0 ? (
             <tr>
               <td
-                colSpan={19}
+                colSpan={20}
                 className={`${styles.matCell} ${styles.noOrders}`}
               >
                 No shipments found
@@ -421,6 +442,7 @@ const  renderConsentAndSubscriptionIcons = (shipment: any, openSubscribeModal: (
                       (type: string, locs: any) =>
                         openLocationsPopup(type, locs, shipment),
                       shipmentType,
+             
                       "delivery"
                     )}
                   </td>
@@ -542,20 +564,26 @@ const  renderConsentAndSubscriptionIcons = (shipment: any, openSubscribeModal: (
                 </td>
 
                 <td className={styles.matCell}>
-                  <div>
-                    {toTitleCase(shipment.driverName || "")}
-                    {shipment.isSpotDriver && (
-                      <span>
-                        {" "}
-                        <img
-                          src={spotdrivericon.src}
-                          alt="Spot Driver"
-                          title="Spot Driver"
-                          style={{ height: "12px", width: "12px" }}
-                        />
-                      </span>
-                    )}
-                  </div>
+                  <div>{toTitleCase(shipment.driverName || "")}</div>
+                </td>
+
+                <td className={`${styles.matCell} ${styles.matColumnDestinationCode}`}>
+                  {shipment.destination_code || "-"}
+                </td>
+
+                <td
+                  className={`${styles.matCell} ${styles.matColumnSpotDriver}`}
+                >
+                  {shipment.isSpotDriver ? (
+                    <img
+                      src={spotdrivericon.src}
+                      alt="Spot Driver"
+                      title="Spot Driver"
+                      style={{ height: "20px", width: "20px" }}
+                    />
+                  ) : (
+                    <span className={styles.flagImgR}>✗</span>
+                  )}
                 </td>
 
                 <td
@@ -611,18 +639,24 @@ const  renderConsentAndSubscriptionIcons = (shipment: any, openSubscribeModal: (
                     ? (() => {
                         const orders = shipment.sale_order.split(",");
                         return (
-                          <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                          <span style={{ display: "flex", alignItems: "center",justifyContent: "center", gap: 8 }}>
                             <span>{orders[0]}</span>
                             {orders.length > 1 && (
                               <span
                                 className={styles.buble_round}
-                                title={orders.slice(1).join(",")}
+                                onClick={() => handleBubbleClick(orders.slice(1))}
                                 style={{
-                                  background: "#e5e7eb",
+                                  background: "#EDE7F6",
                                   borderRadius: "50%",
-                                  padding: "0 6px",
+                                  padding: "0px 3px",
                                   fontSize: "12px",
-                                  marginLeft: "4px",
+                                  width: "22px",
+                                  height: "22px",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  cursor: "pointer",
+                                  color: "#5e35b1"
                                 }}
                               >
                                 +{orders.length - 1}
@@ -763,6 +797,12 @@ const  renderConsentAndSubscriptionIcons = (shipment: any, openSubscribeModal: (
           )}
         </tbody>
       </table>
+      {showOrdersPopup && (
+        <OrdersPopup 
+          orders={selectedOrders} 
+          onClose={closeOrdersPopup} 
+        />
+      )}
     </div>
   );
 };

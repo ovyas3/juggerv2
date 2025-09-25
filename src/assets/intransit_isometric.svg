@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="32" height="32" viewBox="0 0 32 32">
+  <defs>
+    <clipPath id="clip">
+      <use xlink:href="#fill"/>
+    </clipPath>
+    <clipPath id="clip-2">
+      <use xlink:href="#fill-2"/>
+    </clipPath>
+    <clipPath id="clip-3">
+      <use xlink:href="#fill-3"/>
+    </clipPath>
+  </defs>
+  <g id="intransit_isometric" transform="translate(-7575 -2133)">
+    <g id="shortages" transform="translate(7417 1793)">
+      <g id="Group_19425" data-name="Group 19425" transform="translate(158 340)">
+        <g id="Group_19414" data-name="Group 19414" transform="translate(0 0)">
+          <g id="Group_19410" data-name="Group 19410" transform="translate(6.2 5.373)">
+            <g id="electricity_bill" data-name="electricity bill" transform="translate(0 0)">
+              <path id="Path_16271" data-name="Path 16271" d="M16.8,11.434l12.8,3.93-12.8,3.9L4,15.364Z" transform="translate(-4 -11.434)" fill="#fff" stroke="#0d0d0d" stroke-linecap="round" stroke-linejoin="round" stroke-width="0.4"/>
+              <path id="Path_16272" data-name="Path 16272" d="M32.8,16.348V29.816L20,33.67V20.244Z" transform="translate(-7.2 -12.416)" fill="#fff" stroke="#0d0d0d" stroke-linecap="round" stroke-linejoin="round" stroke-width="0.4"/>
+              <path id="Path_16281" data-name="Path 16281" d="M16.8,20.244V33.67L4,29.757V16.348Z" transform="translate(-4 -12.416)" fill="#2962ff" stroke="#0d0d0d" stroke-linecap="round" stroke-linejoin="round" stroke-width="0.4"/>
+            </g>
+            <path id="Path_16354" data-name="Path 16354" d="M175.189,85.084c.188.135,1.795,2.342,2.383,3.2.049.034-.074-.047,0,0,0-2.024,0-3.95,0-5.97-.29-.04-4.6-1.414-4.8-1.408,0-.732-.007,4.006.006,5.98C172.79,86.905,175.062,85.185,175.189,85.084Z" transform="translate(-168.769 -75.534)" fill="#ffd600"/>
+          </g>
+          <rect id="Rectangle_4160" data-name="Rectangle 4160" width="32" height="32" fill="none"/>
+        </g>
+        <g id="Rectangle_4194" data-name="Rectangle 4194" transform="translate(0 7.326)" fill="#fff" stroke="#000" stroke-width="1">
+          <rect id="fill" width="7.159" height="0.4" stroke="none"/>
+          <path d="M0,-0.09999999403953552h7.159082412719727M6.659082412719727,0v0.4000000059604645M7.159082412719727,0.5h-7.159082412719727M0.5,0.4000000059604645v-0.4000000059604645" fill="none" clip-path="url(#clip)"/>
+        </g>
+        <g id="Rectangle_4195" data-name="Rectangle 4195" transform="translate(3.58 9.099)" fill="#fff" stroke="#000" stroke-width="1">
+          <rect id="fill-2" width="1.87" height="0.4" stroke="none"/>
+          <path d="M0,-0.09999999403953552h1.869919776916504M1.369919776916504,0v0.4000000059604645M1.869919776916504,0.5h-1.869919776916504M0.5,0.4000000059604645v-0.4000000059604645" fill="none" clip-path="url(#clip-2)"/>
+        </g>
+        <g id="Rectangle_4211" data-name="Rectangle 4211" transform="translate(1.58 10.9)" fill="#fff" stroke="#000" stroke-width="1">
+          <rect id="fill-3" width="3.87" height="0.4" stroke="none"/>
+          <path d="M0,-0.09999999403953552h3.869919776916504M3.369919776916504,0v0.4000000059604645M3.869919776916504,0.5h-3.869919776916504M0.5,0.4000000059604645v-0.4000000059604645" fill="none" clip-path="url(#clip-3)"/>
+        </g>
+      </g>
+    </g>
+    <g id="Group_19501" data-name="Group 19501" transform="translate(-10.237 -27.285)">
+      <path id="Path_16489" data-name="Path 16489" d="M7608.146,2180.1l4.543-2.842-1.564-1.017.525-1.362,3.052,1.916-2.887,5.469-.893-.6,1.251-2.47-4.027,2.538Z" fill="#f8d849"/>
+      <path id="Path_16490" data-name="Path 16490" d="M7610.758,2174.285l-.549,1.4.929.561.523-1.366Z" fill="#131722"/>
+      <path id="Path_16491" data-name="Path 16491" d="M7607.237,2179.529l4.536-2.867,1,.635-4.633,2.824Z" fill="#131722"/>
+      <path id="Path_16492" data-name="Path 16492" d="M7607.237,2179.536l.908.586v1.593l-.908-.568Z" fill="#131722"/>
+      <path id="Path_16493" data-name="Path 16493" d="M7609.984,2181.09l.926.6,1.232-2.5-1.74,1.1Z" fill="#131722"/>
+    </g>
+  </g>
+</svg>

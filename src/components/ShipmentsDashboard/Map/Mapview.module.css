@@ -1,0 +1,1459 @@
+.wrapper {
+    width: 100%;
+    position: relative;          /* gives a sane positioning context */
+    --sidebar-w: 350px;
+    contain: layout style; 
+    transform: translateZ(0); 
+  }
+  .lightScope {
+    color-scheme: light; /* forces light native menus inside only */
+  }
+  /* Control bar */
+  .controls {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: none;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    display: flex;
+  flex-direction: column;
+  row-gap: 8px; 
+  }
+  .noTicks [data-radix-select-item-indicator] {
+    display: none !important;
+  }
+  .noTicks [data-radix-select-item] {
+    padding-left: 12px !important;
+  }
+  
+  .controlsRow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    justify-content: flex-start; /* Align items to start instead of stretching */
+  }
+
+  .cardDivider {
+    height: 1px;                /* thin line */
+    width: 100%;                /* stretch across the card */
+    background-color: #e5e7eb;  /* soft gray, tailwind’s gray-200 */
+    margin: 8px 0;              /* space around divider */
+    border: none;               /* remove default hr styles if applied */
+  }
+  
+  /* .select {
+    appearance: none;
+    background: #fff;
+    border: 1px solid #d0d5dd;
+    border-radius: 4px;
+    padding: 8px 12px;
+    font-size: 14px;
+    min-width: 160px;
+    line-height: 1.2;
+  } */
+  .shipmentrack{
+  display:flex;
+  flex-wrap: row;
+  gap:10px;
+  }
+  .select option {
+    background-color: #fff !important;   /* white dropdown background */
+    color: #111827 !important;           /* dark text */
+  }
+
+  .select {
+    width: 100%;
+    min-width: 200px;
+    max-width: 200px;
+    min-height: 36px;
+    border: 1px solid #4F46E5;
+    border-radius: 6px;
+    font-size: 14px;
+    background-color: #fff;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .select:hover {
+    border: 1px solid #4F46E5;
+    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+    outline: none;
+  }
+  
+  .select:focus-within,
+  .select[data-state="open"] {
+    border: 1px solid #4F46E5;
+    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+    outline: none;
+  }
+
+  .selectValue {
+    color: #333;
+    width: 100%;
+    flex: 1;
+    text-align: left;
+    min-width: 0;                
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .totalShipments {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto; 
+    flex-direction: column;
+  }
+
+  .selectContent {
+    background: #fff;
+    border-radius: 6px;
+    box-shadow:
+      0 3px 6px -4px rgba(0, 0, 0, 0.12),
+      0 6px 16px 0 rgba(0, 0, 0, 0.08),
+      0 9px 28px 8px rgba(0, 0, 0, 0.05);
+    padding: 4px;
+    z-index: 1000;
+    max-height: 250px;
+    overflow-y: auto;
+    margin-top: 7px;
+    width: 300px !important;
+    position: absolute; 
+    transform: translateZ(0); 
+    will-change: transform; 
+    contain: content;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .selectItem {
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+    transition: all 0.2s;
+  }
+  .selectItem:hover { background-color: #f5f5f5; }
+  .selectItem[data-highlighted] {
+    background-color: #4F46E5;
+    color: #fff;
+    outline: none;
+  }
+  
+  .totalLabel {
+    font-size: 12px;
+    font-weight: 500;
+    color: #111827;
+  }
+
+.inputControl {
+  width: auto; 
+  min-width: 160px; 
+  max-width: 220px; 
+  min-height: 36px;
+  border: 1px solid #4F46E5;
+  border-radius: 6px;
+  font-size: 14px;
+  background: #fff;
+  padding: 8px 12px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  white-space: nowrap;
+}
+  .inputControl:hover,
+  .inputControl:focus,
+  .inputControl:active {
+    border: 1px solid #4F46E5;
+    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+    outline: none;
+  }
+  
+  .totalValue {
+    background: #eef4ff;
+    color: #111827;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 6px;
+  }
+  /* Style dropdown list (works in most browsers) */
+  .select option {
+    background-color: #fff;   /* white background for options */
+    color: #111827;           /* dark text */
+  }
+  
+  
+  .searchWrap {
+    display: flex;
+    align-items: center;
+    border: 1px solid #d0d5dd;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #fff;
+    flex: 1 1 260px; /* grows on wide screens, wraps on narrow */
+    max-width: 420px;
+  }
+  
+  .search {
+    border: none;
+    outline: none;
+    padding: 8px 10px;
+    font-size: 14px;
+    width: 100%;
+  }
+  
+  .iconBtn {
+    border: none;
+    background: transparent;
+    padding: 8px 10px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  
+  /* Map card */
+  .mapCard {
+    position: relative;
+    background: #ffffff;
+
+
+ 
+    overflow: hidden;
+  }
+  
+  .alert {
+    padding: 12px 16px;
+    color: #b42318;
+    background: #fef3f2;
+    border-top: 1px solid #fecdca;
+    font-size: 14px;
+  }
+  
+  /* Responsive tweaks */
+  @media (max-width: 768px) {
+    .select {
+      min-width: 140px;
+    }
+    .searchWrap {
+      flex: 1 1 100%;
+      max-width: none;
+    }
+  }
+  .headerBar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    /* background: #f9f9fb; */
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 4px;
+    gap: 16px;
+  }
+  .controlsRowRight {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 14px; 
+   
+    gap: 12px;
+    margin-left: 345px; 
+    /* justify-content: center;  
+    column-gap: 12px;
+    row-gap: 10px;
+    transform: translateX(-40px);  */
+    /* padding-right: 200px;  
+   */
+  }
+  
+  .title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #111827;
+    white-space: nowrap;
+  }
+  
+  .searchWrap {
+    display: flex;
+    align-items: center;
+    border: 1px solid #d0d5dd;
+    border-radius: 8px;
+    background: #fff;
+    flex: 1;
+    max-width: 500px;
+    padding: 0 8px;
+  }
+  
+  .searchIcon {
+    font-size: 16px;
+    margin-right: 8px;
+    color: #6b7280;
+  }
+  
+  .searchInput {
+    border: none;
+    outline: none;
+    flex: 1;
+    padding: 8px;
+    font-size: 14px;
+  }
+  
+  .filterIcon {
+    font-size: 16px;
+    margin-left: 8px;
+    color: #6b7280;
+    cursor: pointer;
+  }
+  
+  .shipmentsBtn {
+    background: #eef4ff;
+    color: #2563eb;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 8px 16px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+  }
+  
+  /* filter button inside search bar */
+.filterBtn {
+    border: none;
+    background: transparent;
+    padding: 6px 8px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+  }
+  
+  /* overlay */
+  .modalOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(17, 24, 39, 0.55); /* dim page */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    z-index: 1000;
+  }
+  
+  /* dialog */
+  .modal {
+    width: min(700px, 92vw);
+    max-height: min(41.5vh, 500px); 
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(16, 24, 40, 0.3);
+    overflow: hidden;
+  }
+  
+  .modalHeader {
+    background: #1f4ddf;      /* blue header */
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+  }
+  
+  .closeBtn {
+    border: none;
+    background: transparent;
+    color: #fff;
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+  }
+  
+  .modalBody {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    padding: 18px;
+  }
+  
+  .field {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    margin-bottom: 12px;
+    contain: layout style;
+    z-index: 1;
+  }
+  
+  .field label {
+    font-size: 12px;
+    color: #475467;
+  }
+  .perPageContent {
+    background: #fff;
+    border: 1px solid #c3c9e8;
+    border-radius: 8px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 8px 0;
+    z-index: 20001;
+  }
+ 
+  .inputstyle{
+    height: 35px !important;
+    background: #fff;
+    border-radius: 8px;
+    padding: 8px 0;
+    border: 2px solid #c3c9e8;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  .input,
+  .modalBody select.input {
+    height: 30px;
+    border: 1px solid #c3c9e8 !important;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 12px;
+    background: #fff;
+  }
+
+  .input {
+    border-color: #4F46E5 !important;
+    border-radius: 6px;
+    height: 36px;
+    width: 200px;
+  }
+
+  .input:focus {
+    border: 1px solid #4F46E5;
+    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+    outline: none;
+  }
+
+  .input:hover {
+    border: 1px solid #4F46E5;
+    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+    outline: none;
+  }
+
+  .input:active {
+    border: 1px solid #4F46E5;
+    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+    outline: none;
+  } 
+  
+  .modalFooter {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top:10px;
+    padding: 12px 15px 20px;
+  }
+  
+  .btnGrey {
+    background: #6b7280;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 18px;
+    cursor: pointer;
+  }
+  
+  .btnPrimary {
+    background: #e11d48; /* pinkish submit */
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 18px;
+    cursor: pointer;
+  }
+  
+  @media (max-width: 900px) {
+    .modalBody { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 600px) {
+    .modalBody { grid-template-columns: 1fr; }
+  }
+  /* make the map card a positioning context */
+.mapCard {
+    position: relative;
+    background: #fff;
+    overflow: hidden; /* keep if you’re using a single-card look */
+  }
+  
+  /* Top-center pill */
+  .legendBar {
+    position: absolute;
+    top: 6px;
+    left: 50%;
+  
+    transform: translateX(-50%);
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 12px 24px rgba(16, 24, 40, 0.16);
+    padding: 2px 6px;
+    height: 69px;   
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 2;
+    pointer-events: auto; /* don’t block map drag/zoom */
+  }
+  .legendItem {
+    appearance: none;
+    -webkit-appearance: none;
+    background: transparent;
+    border: 1px solid transparent; /* reserve space so active border won’t grow */
+    border-radius: 8px;
+    box-shadow: none;
+    margin: 0;
+    display: inline-flex;
+    flex-direction: column;   /* icon above text */
+    align-items: center;
+    justify-content: center;
+    padding: 2px 4px;         /* keep same padding for active */
+    gap: 2px;
+    font-size: 10px;
+    line-height: 1.1;
+    cursor: pointer;
+    white-space: normal;      /* allow wrap for long labels */
+    text-align: center;
+  }
+  /* Each item */
+  /* .legendItem {
+     white-space: wrap; 
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    font-size: 10px;
+    font-weight: 600;
+    color: #111827;
+    pointer-events: auto; 
+    padding: 0px 4px;
+    max-width: 88px;           
+    text-align: center;
+    border-radius: 10px;
+  } */
+  
+  /* highlight the last one like your screenshot */
+  /* .legendActive {
+    background: #f2f4f7;
+  } */
+  .legendActive {
+    background: #f2f4f7;             /* light chip */
+    border-color: #e5e7eb;           /* subtle outline */
+    box-shadow: none;                /* ← kill any shadow that makes it look raised */
+    padding: 4px 6px;                /* ← same as .legendItem so it doesn’t grow */
+    border-radius: 8px;
+  }
+
+
+/* Each item is now a button; stack icon above label */
+/* .legendItem {
+    pointer-events: auto;
+    display: inline-flex;
+    flex-direction: column;  
+    align-items: center;
+    justify-content: center;
+    gap: 4px;                
+    font-size: 11px;
+    font-weight: 600;
+    color: #111827;
+    padding: 6px 8px;
+    border-radius: 10px;
+    border: none;            
+    background: transparent; 
+    cursor: pointer;
+    white-space: nowrap;
+  } */
+  
+  /* icon size */
+  .legendIcon {
+    width: 32px;     /* was 16–24–40; pick what looks right */
+    height: 32px;
+    display: block;
+  }
+  
+  /* label text */
+  .legendText {
+    white-space: normal;         /* allow multi-line */
+    line-height: 1.5;
+    display: block;
+  }
+  
+  /* only when user clicks (selected) */
+  .legendActive {
+    background: #f2f4f7;      /* light grey chip */
+  }
+  .noTicks [data-radix-select-item-indicator] {
+    display: none !important;
+}
+.noTicks [data-radix-select-item] {
+    padding-left: 12px !important;
+}
+   /* floating Support button (bottom-center on the map) */
+.supportBtn {
+    position: absolute;
+    left: 14%;
+    bottom: 0px;
+    transform: translateX(-50%);
+    z-index: 100;
+    background:#4f46e5;             /* brand blue */
+    color: #fff;
+    font-weight: 700;
+    font-size: 16px;
+    padding: 12px 24px;
+    border: none;
+
+    box-shadow: 0 10px 24px rgba(16, 24, 40, 0.25);
+    cursor: pointer;
+  }
+  
+  /* keep it usable on small screens */
+  @media (max-width: 480px) {
+    .supportBtn {
+      font-size: 14px;
+      padding: 10px 18px;
+      bottom: 12px;
+    }
+  }
+  
+
+
+  /* Mapview.module.css */
+
+.customSelect {
+  position: relative;
+  display: inline-block;
+}
+
+.selectTrigger {
+  border: 1px solid #DFE3EB;
+  border-radius: 4px;
+  padding: 9px;
+  font-size: 13px;
+  width: 172px;
+  cursor: pointer;
+  background-color: #fff;
+  color: #000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.selectTrigger::after {
+  content: '▼';
+  font-size: 10px;
+}
+
+.options {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  border: 1px solid #ccc;
+  border-top: none;
+  background-color: #fff;
+  z-index: 10;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.option {
+  padding: 10px;
+  cursor: pointer;
+  border-bottom: 1px solid #eee;
+}
+
+.option:hover {
+  background-color: #f0f0f0;
+}
+.sidebar {
+  position: absolute;
+  top: auto;
+  bottom:0;
+  left: 0;
+  width: 0; 
+   height: 76%;
+  background-color: #fff;
+  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+  overflow-x: hidden;
+  transition: width 0.3s ease-in-out;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebarOpen {
+  /* width: 350px; */
+  width: var(--sidebar-w); 
+  padding: 0px 0px 0px 0px;
+}
+
+.sidebarHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.sidebarHeader h3 {
+  font-size: 1.5rem;
+  color: #333;
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  font-size: 2rem;
+  cursor: pointer;
+  color: #555;
+}
+
+.sidebarContent {
+  flex-grow: 1;
+  overflow-y: auto;
+}
+/* Mapview.module.css */
+
+.sidebarToggleButton {
+   position: absolute;
+  top: 50%;
+  left: 0;  
+   /* transform: translateY(-50%) translateX(-100%);   */
+  width: 30px;
+  height: 60px;
+  background-color: #4338ca;
+  border: 1px solid #d0d5dd;
+  border-left: none; 
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px; 
+  cursor: pointer;
+  z-index: 11;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: #fff;
+  transition: transform 0.3s ease-in-out; 
+}
+/* Mapview.module.css */
+.vehicleLabel {
+  background: #111827;
+  color: #fff !important;
+  font-size: 7px !important;
+  font-weight: 400;
+  padding: 3px 4px;
+  border-radius: 888px;
+  border: 1px solid rgba(0,0,0,.25);
+  box-shadow: 0 2px 6px rgba(0,0,0,.25);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+/* Mapview.module.css */
+.infoCard {
+  min-width: 360px;
+  max-width: 420px;
+  font-size: 13px;
+  color: #111827;
+  margin-bottom: 20px;
+  /* padding: 8px 12px;   */
+}
+
+
+.infoCard .infoRow:first-child {
+  margin-top: 0;
+  /* Optional: Ensure the bottom margin is maintained, though margin-bottom should still apply */
+  /* margin-bottom: 8px; */ 
+}
+.infoRow {
+   /* margin: 9.0; */
+   margin-bottom: 8px; }
+.infoHr  { border: 0; border-top: 1px solid #e5e7eb; margin: 10px 0; }
+
+.sidebarToggleButtonActive {
+  left: var(--sidebar-w);                         /* slide to the drawer’s right edge */
+  /* flip the tab’s rounded corners/borders so it “attaches” to the drawer */
+  border-left: 1px solid #d0d5dd;
+  border-right: none;
+  border-top-right-radius: 0;
+  transform: rotate(180deg);
+  border-bottom-right-radius: 0;
+  border-top-left-radius: 8px;
+  border-bottom-left-radius: 8px;
+  box-shadow: 0 4px 12px rgba(16, 24, 40, 0.12);
+}
+/* ----- CARD WRAPPER ----- */
+.shipmentCard {
+  background: #ffffff;
+  border: 1px solid #e7e7ea;
+  border-radius: 14px;
+  box-shadow: 0 12px 24px rgba(16, 24, 40, 0.08);
+  padding: 0;                 /* header/body handle their own padding */
+  overflow: hidden;
+  margin-bottom: 16px;
+  cursor: pointer;
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.shipmentCard:hover {
+  box-shadow: 0 16px 28px rgba(16, 24, 40, 0.12);
+  transform: translateY(-1px);
+}
+
+/* ----- HEADER ----- */
+.cardHeader {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 12px;
+  background: #f6f7f9;
+  padding: 14px 16px;
+  border-bottom: 1px solid #ececf1;
+}
+
+.headerLeft {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.headerIcon {
+  width: 28px;
+  height: 28px;
+}
+
+.headerLabel {
+  font-size: 12px;
+  color: #667085;             /* muted label */
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  text-transform: none;
+}
+
+.shipmentID {
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.4px;
+  color: #111827;
+}
+
+/* ----- ROUTE SECTION ----- */
+.routeSection {
+  padding: 10px 14px 5px;
+  display: grid;
+  gap: 3px;
+}
+
+.stopRow {
+  display: grid;
+  grid-template-columns: 36px 1fr;
+  align-items: center;
+  gap: 5px;
+}
+
+.stopBadge {
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+  border: 2px solid #d0d5dd;
+  background: #fff;
+}
+
+.pickupBadge {
+  border-color: #22c55e;      /* green */
+  color: #22c55e;
+}
+
+.deliveryBadge {
+  border-color: #ef4444;      /* red */
+  color: #ef4444;
+}
+.pickupPill { min-width: 200px; }
+.deliveryPill { min-width: 200px; }
+
+.stopPill {
+  border: 1px solid #e7e7ea;
+  border-radius: 10px;
+  height: calc(2em * 2);
+  padding: 10px 12px;
+  background: #fff;
+  font-size: 12px;
+  display: flex;             /* flexbox container */
+  align-items: center;       /* vertical center */
+  justify-content: center; 
+  align-items: center;
+  text-align: center;
+  color: #111827;
+  line-height: 1.2;
+  overflow: hidden;
+  white-space: normal;          /* was: nowrap */
+  overflow: visible;            /* was: hidden (ok to keep hidden if you prefer) */
+  text-overflow: clip;          /* was: ellipsis (or just remove this line) */
+
+  /* helps when names are one long token (no spaces) */
+  overflow-wrap: anywhere; 
+}
+
+.perPageContent {
+  background: #fff;
+  border: 1px solid #c3c9e8;
+  border-radius: 8px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 8px 0;
+  z-index: 20001;
+}
+/* Tighten left padding on options after removing the icon */
+.perPageContent [role="option"],
+.dropdownContent [role="option"] {
+  padding-left: 12px !important; /* match your .perPageItem padding */
+}
+.legendItem:hover {
+  background: #f3f4f6; /* light grey hover */
+}
+.activeLegend {
+  border-color: #9ca3af; /* grey */
+  background: #e5e7eb;  /* active shade */
+}
+
+/* If you’re styling items via your own class, make it win */
+.perPageItem,
+.dropdownItem {
+  padding: 8px 12px !important;
+}
+
+/* Hide shadcn/Radix check icon in Select menus */
+.perPageContent [data-radix-select-item-indicator],
+.dropdownContent [data-radix-select-item-indicator] {
+  display: none !important;
+}
+
+/* Styles for each individual option in the dropdown list */
+.perPageItem {
+  font-size: 13px;
+  font-weight: 500;
+  color: #22223b;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.noTicks [data-radix-select-item-indicator] {
+  display: none !important;
+}
+.noTicks [data-radix-select-item] {
+  padding-left: 12px !important;
+}
+
+
+
+.perPageSelect {
+  width: 175px;
+  height: 37px;
+  background: #fff;
+  border: 2px solid #c3c9e8; /* subtle blue-gray */
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #22223b;
+  box-shadow: none;
+  transition: border 0.2s;
+  appearance: none;
+  padding: 4px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.routeDots {
+  grid-column: 1;                /* put it in the badge column */
+  align-self: start;            /* vertically center between the two rows */
+         /* horizontally center under badges */
+  display: flex;
+  flex-direction: column;
+  align-items:start;
+  gap: 2px;   
+  margin-left: 5px;                   /* space between the dots */
+  height: 12px;                  /* controls how close the pills sit */
+  pointer-events: none;
+}
+.routeDots > span {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #9aa3b2;           /* soft grey */
+}
+
+
+/* ----- META SECTION (shipper/carrier/vehicle/driver) ----- */
+.metaSection {
+  padding: 12px 16px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;  /* two columns */
+  gap: 12px 16px;
+}
+
+.metaItem {
+  display: grid;
+  grid-template-columns: 22px 1fr;
+  align-items: start;
+  gap: 10px;
+  min-width: 0;
+}
+
+.metaIcon {
+  width: 20px;
+  height: 20px;
+  opacity: 0.9;
+}
+
+.metaText {
+  font-size: 11px;
+  color: #111827;
+  line-height: 1.25;
+  overflow: hidden;
+  
+  word-break: break-word;     /* or: overflow-wrap: anywhere; */
+  overflow-wrap: anywhere;
+}
+
+/* ----- TIME + ACTION ROW ----- */
+.timeRow {
+  padding: 12px 16px 14px;
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 10px;
+  align-items: center;
+}
+
+.timeItem {
+  font-size: 10px;
+  color: #111827;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.timeLabel {
+  color: #667085;
+  margin-right: 4px;
+}
+
+/* ----- ACTION BUTTON ----- */
+.actionBtn {
+  justify-self: end;
+  appearance: none;
+  border: 1px solid #1d4ed8;
+  background: #4f46e5;
+  color: #fff;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 1;
+  padding: 6px 8px;
+  border-radius: 5px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.actionBtn:hover {
+  background: #4338ca;
+  border-color: #4338ca;
+}
+
+.caret {
+  display: inline-block;
+  width: 0; height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 6px solid #ffffff; /* white triangle */
+}
+
+/* ----- LIST CONTAINER (make sure it scrolls nicely) ----- */
+.shipmentListContainer {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  overflow-y: auto;
+  padding: 8px 12px 12px;
+  border-right: 1px solid #e0e0e0;
+}
+
+/* responsive tweak */
+@media (max-width: 420px) {
+  .metaSection { grid-template-columns: 1fr; }
+  .timeRow { grid-template-columns: 1fr; }
+  .actionBtn { justify-self: start; }
+}
+/* Three dashed lines centered under the badge (icon) column */
+.routeConnector {
+  height: 12px;           /* vertical gap between pickup and delivery rows */
+  width: 36px;            /* match .stopRow grid’s first column width */
+  margin-left: 6px;       /* nudges into the badge column; tweak 4–10px if needed */
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  gap: 4px;               /* horizontal spacing between the three lines */
+}
+
+/* Popup container (portaled to body) */
+.actionMenu {
+  position: fixed;           /* important: not clipped by sidebar scroll */
+  z-index: 2000;
+  background: #ffffff;
+  border: 1px solid #ececf1;
+  border-radius: 12px;
+  box-shadow: 0 18px 40px rgba(16, 24, 40, 0.18);
+  padding: 6px 0;
+  overflow: hidden;
+  transform: translateY(8px); 
+}
+
+/* Each row */
+.actionMenuItem {
+  display: grid;
+  grid-template-columns: 22px 1fr;
+  align-items: center;
+  gap: 1px;
+  padding: 10px 14px;
+  cursor: pointer;
+  user-select: none;
+  outline: none;
+}
+
+.actionMenuItem:hover,
+.actionMenuItem:focus {
+  background: #f5f8ff;
+}
+
+/* Icon + label */
+.actionMenuIcon {
+  width: 18px;
+  height: 18px;
+  display: block;
+  opacity: 0.95;
+}
+
+.actionMenuText {
+  font-size: 12px;
+  color: #0f172a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.actionMenuAbove {
+  transform: translateY(calc(-100% - 8px)); /* lift fully above + 8px gap */
+}
+
+/* Cap the overall menu */
+.perPageContent,
+.dropdownContent {
+  max-height: 300px;                 /* ← set the fixed panel height you want */
+  padding: 4px 0;
+}
+
+/* Make the inner viewport scroll */
+.perPageContent [data-radix-select-viewport],
+.dropdownContent [data-radix-select-viewport] {
+  max-height: inherit;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch; /* smoother on iOS */
+}
+
+/* (Optional) hide Radix scroll buttons if you don’t want them */
+.perPageContent [data-radix-select-scroll-up-button],
+.perPageContent [data-radix-select-scroll-down-button],
+.dropdownContent [data-radix-select-scroll-up-button],
+.dropdownContent [data-radix-select-scroll-down-button] {
+  display: none;
+}
+
+/* (Optional) tidy scrollbar (webkit) */
+.perPageContent [data-radix-select-viewport]::-webkit-scrollbar,
+.dropdownContent [data-radix-select-viewport]::-webkit-scrollbar {
+  width: 8px;
+}
+.perPageContent [data-radix-select-viewport]::-webkit-scrollbar-thumb,
+.dropdownContent [data-radix-select-viewport]::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 8px;
+}
+.perPageContent [data-radix-select-viewport]::-webkit-scrollbar-track,
+.dropdownContent [data-radix-select-viewport]::-webkit-scrollbar-track {
+  background: transparent;
+}
+/* Container that holds legend + chips in one row, top-center over the map */
+.legendDock {
+  position: absolute;
+  top: 25%;
+  left: 80%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 5;              
+  pointer-events: none;     
+}
+
+
+/* When legend sits inside the dock, drop its absolute positioning */
+/* .legendDock .legendBar {
+  position: static !important;
+  left: auto !important;
+  transform: none !important;
+  margin: 0;
+  pointer-events: none;     
+} */
+.legendDock .legendBar {
+  position: static;              
+  pointer-events: none;          
+  background-clip: padding-box;    
+}
+.legendDock .legendBar::before,
+.legendDock .legendBar::after {
+  content: none !important;
+  display: none !important;
+}
+.pathChips {
+  display: flex;
+  gap: 8px;
+  pointer-events: auto;      /* buttons clickable */
+  padding: 0;                /* no outer padding box */
+  background: transparent;   /* 🔥 no outer layer */
+  border: none;              /* 🔥 no border */
+  box-shadow: none;          /* 🔥 no shadow */
+}
+
+/* base pill */
+.chip {
+  all: unset;                              /* reset */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 14px;
+  min-height: 18px;
+  border-radius: 9999px;                   /* fully rounded */
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .2px;
+  color: #fff;                             /* white text on solid bg */
+  cursor: pointer;
+  transition: transform .08s ease, filter .14s ease, opacity .14s ease;
+}
+
+/* hover/active micro feedback */
+.chip:hover { transform: translateY(-0.5px); }
+.chip:active { transform: translateY(0); }
+
+/* OFF state: same color family, just dim it */
+.chipOff { opacity: .45; }
+
+/* solid backgrounds == path colors */
+.chipGps { background: #2563EB; }   /* GPS line color */
+.chipApp { background: #16A34A; }   /* APP line color */
+.chipSim { background: #7C3AED; }   /* SIM line color */
+
+/* kill any leftover dot styles from older versions */
+.pathChips button::before { content: none !important; }
+/* Mapview.module.css */
+.chipGpsOn  { background: #2563EB; }
+.chipGpsOff { background: #2563EB; opacity: .55; }
+
+.chipAppOn  { background: #16A34A; }
+.chipAppOff { background: #16A34A; opacity: .55; }
+
+.chipSimOn  { background: #7C3AED; }
+.chipSimOff { background: #7C3AED; opacity: .55; }
+/* container (keep your existing .haltPopup base if you have it) */
+/* Halt popup card */
+/* Hide Google Maps default close (the big grey X) */
+/* :global(.gm-ui-hover-effect) { display: none !important; } */
+
+
+
+
+/* Card */
+.haltCard {
+  min-width: 240px;
+  max-width: 300px;
+  background: #FFFFFF !important;
+  border-radius: 14px;
+  /* box-shadow: 0 14px 28px rgba(0,0,0,.18); */
+  padding: 12px 14px;
+  color: #0f172a;
+}
+.pdPickupTitle { color: #16a34a; }  /* green */
+.pdDeliveryTitle { color: #f97316; } /* orange */
+
+/* Header row with title + close */
+.haltHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.haltTitle {
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: .2px;
+  color: #e80d0d; /* red-500 */
+}
+
+.haltClose {
+  border: 0;
+  background: transparent;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  color: #9ca3af;           /* gray-400 */
+}
+.haltClose:hover { color: #4b5563; } /* gray-600 */
+
+/* Thin grey divider */
+.haltDivider {
+  height: 1px;
+  background: rgba(15,23,42,.12);
+  border-radius: 1px;
+  margin: 8px 0;
+}
+
+/* Key/Value rows */
+.haltRow {
+  display: grid;
+  grid-template-columns: 92px 1fr;
+  column-gap: 10px;
+  row-gap: 2px;
+  padding: 4px 0;
+}
+
+.haltKey { font-size: 13px;color: #0f172a; }
+.haltVal { font-size: 13px; color: #0f172a; word-break: break-word; }
+.haltStrong { font-weight: 800; }
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+  .haltCard { background: #f8f8f9; color: #050505; }
+  .haltTitle { color: #f87171; }
+  .haltDivider { background: rgba(5,5,5,.14); }
+}
+
+.selectItem:global([data-state='checked']) svg { 
+  display: none !important; 
+}
+
+.selectContent :global([data-radix-select-item-indicator]) { 
+  display: none !important; 
+}
+
+.modalActions {
+  display: flex;
+  min-width: min(663px, 88vw);
+  gap: 20px;
+  justify-content: flex-end;
+}
+
+.clearBtn {
+  border: 2px solid #d8511f;
+  align-items: center;
+  background-color: #d8511f;
+  border-radius: 1px;
+  height: 38px;
+  padding: 0px 20px;
+  box-sizing: border-box;
+  border-radius: 5px;
+  color: #fff;
+}
+
+.clearBtn:hover {
+  background-color: #d6440e;
+  color: #fff;
+  border-color: #d6440e;
+}
+
+.clearBtn:active {
+  background-color: #d6440e;
+  color: #fff;
+  border-color: #d6440e;
+}
+
+.applyBtn {
+  border: 2px solid #4F46E5;
+  align-items: center;
+  background-color: #4F46E5;
+  border-radius: 1px;
+  height: 38px;
+  padding: 0px 20px;
+  border-radius: 5px;
+  box-sizing: border-box;
+  color: #fff;
+}
+
+.applyBtn:hover {
+  background-color: #4F46E5;
+  color: #fff;
+  border-color: #4F46E5;
+}
+
+.applyBtn:active {
+  background-color: #4F46E5;
+  color: #fff;
+  border-color: #4F46E5;
+}
+
+.selectWrapper [data-radix-popper-content-wrapper] {
+    position: absolute !important;
+    top: 100% !important;
+    left: 0 !important;
+    transform: none !important;
+    pointer-events: none;
+    width: 0;
+    height: 0;
+    overflow: visible;
+}
+
+.selectWrapper [data-radix-popper-content-wrapper] > * {
+    pointer-events: auto;
+}
+
+.selectWrapper [data-radix-select-trigger] {
+    width: 100%;
+    min-width: 200px;
+}
+
+.selectWrapper [data-radix-select-content] {
+    transform: none !important;
+    -webkit-transform: none !important;
+}
+
+.dateInput {
+  width: 200px;
+  padding: 6px 12px;
+  outline: none;
+  border: 1px solid #4f46e5;
+  border-radius: 4px;
+  font-size: 14px;
+  font-family: "Muli", sans-serif;
+}
+
+.dateInput:hover {
+  border: 1px solid #4f46e5;
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+}
+
+.dateInput:focus {
+  outline: none;
+  border: 1px solid #4f46e5;
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+}
+
+.dateInput:focus-visible {
+  outline: none;
+  border: 1px solid #4f46e5;
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+}
