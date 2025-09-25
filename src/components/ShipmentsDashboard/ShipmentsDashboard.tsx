@@ -1825,18 +1825,6 @@ const closeActionMenu = () => {
               +{additionalCount}
             </button>
           )}
-          {!isPickup && shipment.destination_code && (
-            <button
-              className={styles.copyButton}
-              onClick={(e) => {
-                e.stopPropagation();
-                copyDestinationCode(shipment.destination_code);
-              }}
-              title="Copy destination code"
-            >
-              📋
-            </button>
-          )}
         </div>
       </div>
     );
