@@ -4371,17 +4371,23 @@ select.didFloatingSelect::-ms-expand {
 
 .TableSearchIcon {
   position: absolute;
-  right: 10px;
-  top: 50%;
+  top: 16px;
   transform: translateY(-50%);
   width: 23px;
   height: 23px;
   cursor: pointer;
   color: #5e6488;
   transition: color 0.2s ease;
-  left: 350px;
+  right: 5px;
 }
 
 .TableSearchIcon:hover {
   color: #4f46e5;
+}
+
+.actionSearchContainer {
+  display: flex;
+  flex-direction: row-reverse;
+  width: 100%;
+  position: relative;
 }

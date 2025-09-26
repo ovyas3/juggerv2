@@ -713,16 +713,18 @@ const  renderConsentAndSubscriptionIcons = (shipment: any, openSubscribeModal: (
                         sideOffset={15}
                       >
                         <div className={styles.actionMenuSearch}>
-                          <Search className={styles.TableSearchIcon} />
-                          <input
-                            type="text"
-                            placeholder="Search actions..."
-                            className={styles.actionSearchInput}
-                            onChange={(e) =>
-                              setActionSearchState(e.target.value)
-                            }
-                            value={actionSearchState}
-                          />
+                          <div className={styles.actionSearchContainer}>
+                            <Search className={styles.TableSearchIcon} />
+                            <input
+                              type="text"
+                              placeholder="Search actions..."
+                              className={styles.actionSearchInput}
+                              onChange={(e) =>
+                                setActionSearchState(e.target.value)
+                              }
+                              value={actionSearchState}
+                            />
+                          </div>
                           <div className={styles.shipmentInfo}>
                             <div className={styles.shipmentSin}>#{shipment.sin}</div>
                           </div>
