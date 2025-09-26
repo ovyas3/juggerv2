@@ -370,7 +370,7 @@ function addPDMarker(
     setPdInfo({ pos, kind, seq, name: meta?.name, address: meta?.address, shipmentSIN: meta?.sin });
   });
   pdOverlaysRef.current.push(marker);
-  console.debug(`[PD] overlays now`, pdOverlaysRef.current.length); // 👈
+  console.debug(`[PD] overlays now`, pdOverlaysRef.current.length);
   return marker;
 }
 
@@ -700,12 +700,12 @@ function detentionBucket(arrivedIso?: string): DetentionBucket {
 }
 
 const MAP_HEIGHTS: Record<StatusTab | "default", number> = {
-  in_transit: 570,
-  at_delivery: 570,
-  in_plant: 605,
-  towards_pickup: 605,
-  all: 605,
-  default: 605,
+  in_transit: 635,
+  at_delivery: 635,
+  in_plant: 635,
+  towards_pickup: 635,
+  all: 635,
+  default: 635,
 };
 const containerStyle = useMemo(() => {
   const h = MAP_HEIGHTS[(selectedStatus as StatusTab) ?? "default"] ?? MAP_HEIGHTS.default;
@@ -1772,11 +1772,11 @@ function fitToAllVehicles(list: Shipment[] = visibleShipments) {
 </div>
 
 <div style={{ display: "flex", justifyContent: "space-between" }}>
-  <div>
+  <div style={{ display: "flex", alignItems: "center" , justifyContent: "center"}}>
     <div className={styles.controlsRow}>
       <div className={styles.noTicks}>
         <Select value={shipmentGroup} onValueChange={setShipmentGroup}>
-          <SelectTrigger className={styles.select}>
+          <SelectTrigger className={`${styles.select} ${styles.selectTrigger}`}>
             <SelectValue placeholder="All Shipments" className={styles.selectValue} />
           </SelectTrigger>
           <SelectContent className={styles.selectContent}>
@@ -1789,7 +1789,7 @@ function fitToAllVehicles(list: Shipment[] = visibleShipments) {
       </div>
       
       <Select value={selectedStatus} onValueChange={setSelectedStatus}>
-        <SelectTrigger className={styles.select}>
+        <SelectTrigger className={`${styles.select} ${styles.selectTrigger}`}>
           <SelectValue placeholder="Towards Pickup" className={styles.selectValue} />
         </SelectTrigger>
         <SelectContent className={styles.selectContent}>
@@ -1803,7 +1803,7 @@ function fitToAllVehicles(list: Shipment[] = visibleShipments) {
       
       {selectedStatus === 'towards_pickup' && (
         <Select>
-          <SelectTrigger className={styles.select}>
+          <SelectTrigger className={`${styles.select} ${styles.selectTrigger}`}>
             <SelectValue placeholder="Estimated arrival in" className={styles.selectValue} />
           </SelectTrigger>
           <SelectContent className={styles.selectContent}>
@@ -1816,7 +1816,7 @@ function fitToAllVehicles(list: Shipment[] = visibleShipments) {
       
       {selectedStatus === 'in_plant' && (
         <Select value={inPlantStage} onValueChange={setInPlantStage}>
-          <SelectTrigger className={styles.select}>
+          <SelectTrigger className={`${styles.select} ${styles.selectTrigger}`}>
             <SelectValue placeholder="Event status" className={styles.selectValue}/>
           </SelectTrigger>
           <SelectContent className={styles.selectContent}>
@@ -1840,7 +1840,7 @@ function fitToAllVehicles(list: Shipment[] = visibleShipments) {
             // Let useEffect handle the API call
           }}
         >
-          <SelectTrigger className={styles.select}>
+          <SelectTrigger className={`${styles.select} ${styles.selectTrigger}`}>
             <SelectValue placeholder="Materials" className={styles.selectValue}/>
           </SelectTrigger>
           <SelectContent className={styles.selectContent}>
@@ -1868,7 +1868,7 @@ function fitToAllVehicles(list: Shipment[] = visibleShipments) {
               // Let useEffect handle the API call
             }}
           >
-            <SelectTrigger className={styles.select}>
+            <SelectTrigger className={`${styles.select} ${styles.selectTrigger}`}>
               <SelectValue placeholder="Customer Location" className={styles.selectValue}/>
             </SelectTrigger>
             <SelectContent className={styles.selectContent}>
@@ -1892,7 +1892,7 @@ function fitToAllVehicles(list: Shipment[] = visibleShipments) {
               setSelectedCarrier(value);
             }}
           >
-            <SelectTrigger className={styles.select}>
+            <SelectTrigger className={`${styles.select} ${styles.selectTrigger}`}>
               <SelectValue placeholder="Carrier" className={styles.selectValue}/>
             </SelectTrigger>
             <SelectContent className={styles.selectContent}>
@@ -1911,13 +1911,10 @@ function fitToAllVehicles(list: Shipment[] = visibleShipments) {
           </Select>
         </>
       )}
-    </div>
-    
-    {/* Right side controls */}
-    <div className={styles.controlsRowRight}>
+
       {selectedStatus === 'in_transit' && ( 
         <Select>
-          <SelectTrigger className={styles.select}>
+          <SelectTrigger className={`${styles.select} ${styles.selectTrigger}`}>
             <SelectValue placeholder="ETA" className={styles.selectValue}/>
           </SelectTrigger>
           <SelectContent className={styles.selectContent}>
@@ -1929,7 +1926,7 @@ function fitToAllVehicles(list: Shipment[] = visibleShipments) {
       
       {selectedStatus === 'at_delivery' && (
         <Select>
-          <SelectTrigger className={styles.select}>
+          <SelectTrigger className={`${styles.select} ${styles.selectTrigger}`}>
             <SelectValue placeholder="Detention" className={styles.selectValue}/>
           </SelectTrigger>
           <SelectContent className={styles.selectContent}>
@@ -1942,7 +1939,7 @@ function fitToAllVehicles(list: Shipment[] = visibleShipments) {
       
       {selectedStatus === 'in_transit' && ( 
         <Select>
-          <SelectTrigger className={styles.select}>
+          <SelectTrigger className={`${styles.select} ${styles.selectTrigger}`}>
             <SelectValue placeholder="Delay" className={styles.selectValue}/>
           </SelectTrigger>
           <SelectContent className={styles.selectContent}>
@@ -2274,7 +2271,7 @@ function fitToAllVehicles(list: Shipment[] = visibleShipments) {
     <InfoWindow position={pos} onCloseClick={() => setSelectedShipment(null)}>
       <div className={styles.infoCard}>
         <div className={styles.infoRow}>
-          SIN: {""}
+          <span className={styles.infoKey}>SIN:</span> {""}
           <a
             href={`/triptracker?uniqueCode=${selectedShipment.unique_code}`}
             target="_blank"
@@ -2282,16 +2279,16 @@ function fitToAllVehicles(list: Shipment[] = visibleShipments) {
           >  {selectedShipment.SIN}</a>
         </div>
 
-        <div className={styles.infoRow}>Vehicle Number:<strong> {vNo}</strong></div>
-        <div className={styles.infoRow}>Carrier:<strong> {carrier}</strong></div>
-        <div className={styles.infoRow}>Driver:<strong> {driverName}</strong></div>
-        <div className={styles.infoRow}>Driver Mobile:<strong> {driverMobile}</strong></div>
+        <div className={styles.infoRow}><span className={styles.infoKey}>Vehicle Number:</span><strong> {vNo}</strong></div>
+        <div className={styles.infoRow}><span className={styles.infoKey}>Carrier:</span><strong> {carrier}</strong></div>
+        <div className={styles.infoRow}><span className={styles.infoKey}>Driver:</span><strong> {driverName}</strong></div>
+        <div className={styles.infoRow}><span className={styles.infoKey}>Driver Mobile:</span><strong> {driverMobile}</strong></div>
 
         <hr className={styles.infoHr} />
 
-        <div className={styles.infoRow}>Customer:<strong> {customer}</strong></div>
-        <div className={styles.infoRow}>Destination:<strong> {destination}</strong></div>
-        <div className={styles.infoRow}>Material:<strong> {material}</strong></div>
+        <div className={styles.infoRow}><span className={styles.infoKey}>Customer:</span><strong> {customer}</strong></div>
+        <div className={styles.infoRow}><span className={styles.infoKey}>Destination:</span><strong> {destination}</strong></div>
+        <div className={styles.infoRow}><span className={styles.infoKey}>Material:</span><strong> {material}</strong></div>
       </div>
     </InfoWindow>
   );
@@ -2542,7 +2539,7 @@ function fitToAllVehicles(list: Shipment[] = visibleShipments) {
   <div className={styles.field}>
     <label>Materials</label>
     <Select value={formDrafts.materials || undefined} onValueChange={onFormMaterialChange} key={`materials-${formDrafts.materials}`}>
-      <SelectTrigger className={styles.select}>
+      <SelectTrigger className={`${styles.select} ${styles.selectTrigger}`}>
         <SelectValue />
       </SelectTrigger>
       <SelectContent className={styles.selectContent}>
@@ -2569,7 +2566,7 @@ function fitToAllVehicles(list: Shipment[] = visibleShipments) {
   <div className={styles.field}>
     <label>Pickup Location</label>
     <Select value={formDrafts.pickupLocation || undefined} onValueChange={onFormPickupChange} key={`pickup-${formDrafts.pickupLocation}`} >
-      <SelectTrigger className={styles.select}>
+      <SelectTrigger className={`${styles.select} ${styles.selectTrigger}`}>
         <SelectValue />
       </SelectTrigger>
       <SelectContent className={styles.selectContent}>
@@ -2599,7 +2596,7 @@ function fitToAllVehicles(list: Shipment[] = visibleShipments) {
   <div className={styles.field}>
     <label>Delivery Location</label>
     <Select value={formDrafts.deliveryLocation || undefined} onValueChange={onFormDeliveryChange} key={`delivery-${formDrafts.deliveryLocation}`}>
-      <SelectTrigger className={styles.select}>
+      <SelectTrigger className={`${styles.select} ${styles.selectTrigger}`}>
         <SelectValue />
       </SelectTrigger>
       <SelectContent className={styles.selectContent}>
@@ -2629,7 +2626,7 @@ function fitToAllVehicles(list: Shipment[] = visibleShipments) {
   <div className={styles.field}>
     <label>Carrier</label>
     <Select value={formDrafts.carrier || undefined} onValueChange={onFormCarrierChange} key={`carrier-${formDrafts.carrier}`}>
-      <SelectTrigger className={styles.select}>
+      <SelectTrigger className={`${styles.select} ${styles.selectTrigger}`}>
         <SelectValue />
       </SelectTrigger>
       <SelectContent className={styles.selectContent}>
@@ -2659,7 +2656,7 @@ function fitToAllVehicles(list: Shipment[] = visibleShipments) {
   <div className={styles.field}>
     <label>Shipment Status</label>
     <Select value={formDrafts.status || undefined} onValueChange={onFormStatusChange} key={`status-${formDrafts.status}`}>
-      <SelectTrigger className={styles.select}>
+      <SelectTrigger className={`${styles.select} ${styles.selectTrigger}`}>
         <SelectValue />
       </SelectTrigger>
       <SelectContent className={styles.selectContent}>
@@ -2676,7 +2673,7 @@ function fitToAllVehicles(list: Shipment[] = visibleShipments) {
     <div className={styles.field}>
       <label>In Plant Stage</label>
       <Select value={formDrafts.inPlantStage || undefined} onValueChange={onFormInPlantChange} key={`inPlantStage-${formDrafts.inPlantStage}`}>
-        <SelectTrigger className={styles.select}>
+        <SelectTrigger className={`${styles.select} ${styles.selectTrigger}`}>
           <SelectValue />
         </SelectTrigger>
         <SelectContent className={styles.selectContent}>
