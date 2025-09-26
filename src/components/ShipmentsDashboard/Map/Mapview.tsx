@@ -30,6 +30,7 @@ import upload from "../../../assets/attachFiles.svg";
 import doc from "../../../assets/Doc-icon.svg";
 import { httpsGet } from "@/utils/Communication";
 import { useSearchParams } from "next/navigation";
+import { StopsPreview } from "./StopsPreview";
 
 import header from "../../UI/ModalHeader/ModalHeader";
 import { Col } from "antd";
@@ -2500,6 +2501,7 @@ function fitToAllVehicles(list: Shipment[] = visibleShipments) {
         </div>
         <div className={styles.shipmentID}>{shipment?.SIN ?? "—"}</div>
       </div>
+      <StopsPreview shipment={shipment} centered  anchorWithin={document.querySelector(`.${styles.sidebar}`) as HTMLElement} />
 
     
       <div className={styles.routeSection}>
