@@ -201,7 +201,148 @@ interface ShipperPrefs {
   locations: Location[];
   deliveryLocations: Location[];
 }
+type ParentFlags = {
+  parentRaw: string | null;  // e.g., "TechNova Imaging Systems Pvt Ltd"
+  parent: string;            // normalized, e.g., "technova"
+  isTechnova: boolean;
+  isMykl: boolean;
+  isModenik: boolean;
+  isEmami: boolean;
+  isjspl: boolean;
+ isbmw: boolean;
+  istatapower: boolean;
+ };
+ 
+ 
+ // Try a few common keys and shapes you already use in LS
+//  function readParentFromLocalStorage(): string | null {
+//   const keys = ["parent", "shippers", "shipper", "selectedShipper"];
+//   for (const k of keys) {
+//     const raw = localStorage.getItem(k);
+//     if (!raw) continue;
+ 
+ 
+//     // If JSON, try known fields; else treat as plain string
+//     try {
+//       if (raw.trim().startsWith("{") || raw.trim().startsWith("[")) {
+//         const obj = JSON.parse(raw);
+//         const name =
+//           obj?.parent_name ||
+//           obj?.parent?.name ||
+//           obj?.parent ||
+//           obj?.name ||
+//           obj?.company ||
+//           null;
+//         if (typeof name === "string" && name.trim()) return name.trim();
+//       } else {
+//         if (raw.trim()) return raw.trim();
+//       }
+//     } catch {
+//       if (raw.trim()) return raw.trim();
+//     }
+//   }
+//   return null;
+//  }
+// Corrected readParentFromLocalStorage function
+function readParentFromLocalStorage(): string | null {
+  const keys = ["parent", "shippers", "shipper", "selectedShipper"];
+  for (const k of keys) {
+    const raw = localStorage.getItem(k);
+    if (!raw) continue;
 
+    try {
+      // Check if it's a JSON object or array
+      if (raw.trim().startsWith("{") || raw.trim().startsWith("[")) {
+        const obj = JSON.parse(raw);
+
+        let parentName = null;
+        if (Array.isArray(obj) && obj.length > 0) {
+          // If it's an array, get the parent_name from the first object
+          parentName = obj[0]?.parent_name || null;
+        } else if (typeof obj === "object") {
+          // If it's a single object, get the parent_name directly
+          parentName =
+            obj?.parent_name ||
+            obj?.parent?.name ||
+            obj?.parent ||
+            obj?.name ||
+            obj?.company ||
+            null;
+        }
+
+        if (typeof parentName === "string" && parentName.trim()) {
+          return parentName.trim();
+        }
+      } else {
+        // Handle a simple string value
+        if (raw.trim()) {
+          return raw.trim();
+        }
+      }
+    } catch {
+      // If parsing fails, fall back to the raw string
+      if (raw.trim()) {
+        return raw.trim();
+      }
+    }
+  }
+  return null;
+}
+ function normalizeName(n: string | null): string {
+  if (!n) return "";
+  return n
+  .toLowerCase()
+  .replace(/&/g, "and")
+  .replace(/[^a-z0-9]+/g, "") // keep only a-z0-9
+  .replace(/(privatelimited|private|limited|ltd|llp|plc|co|company|systems|imaging|india|pvt)/g, "");
+}
+
+
+// Map normalized name to flags; include common typos/variants
+// function getParentFlags(): ParentFlags {
+// const raw = readParentFromLocalStorage();
+// const norm = normalizeName(raw);
+
+// const isTechnova = raw === "TechNova Imaging Systems Pvt Ltd";
+//   const isMykl     = raw === "MYK Laticrete India Private Limited";
+  
+//   // Use the normalized name or raw name for partial matches.
+//   // The original code uses .includes() for JSPL, so let's replicate that.
+//   const isjspl = rawLower.includes('jsp') || rawLower.includes('jspl angul');
+// // // include typo “techonva” and spacing variants
+// // const isTechnova = /(TechNova|techonva)/.test(norm);
+// // const isMykl     = /mykl/.test(norm);
+// const isModenik  = /Modenik/.test(norm);
+// const isEmami    = /Emami/.test(norm);
+// // const isjspl=/JSPL/.test(norm);
+// const isbmw=/bmw/.test(norm);
+// const istatapower=/tatpower/.test(norm);
+
+
+// return { parentRaw: raw, parent: norm, isTechnova, isMykl, isModenik, isEmami,isjspl,isbmw,istatapower };
+// }
+function getParentFlags(): ParentFlags {
+  const raw = readParentFromLocalStorage();
+  const norm = normalizeName(raw);
+  console.log("Raw parent name from local storage:", raw);
+  console.log("Normalized parent name:", norm);
+
+  const isTechnova = raw === "TechNova Imaging Systems Pvt Ltd";
+  const isMykl     = raw === "MYK Laticrete India Private Limited";
+  
+  // Use a case-insensitive check and trim for robustness
+  const rawLower = raw?.toLowerCase().trim() ?? '';
+  const isjspl = rawLower.includes('jsp') || rawLower.includes('jspl angul');
+  console.log("isjspl check (rawLower):", rawLower);
+  console.log("isjspl result:", isjspl);
+  // You had these in the original function as well.
+  const isModenik  = /modenik/.test(norm);
+  const isEmami    = /emami/.test(norm);
+  const isbmw      = /bmw/.test(norm);
+  const istatapower= /tatpower/.test(norm);
+
+  return { parentRaw: raw, parent: norm, isTechnova, isMykl, isModenik, isEmami, isjspl, isbmw, istatapower };
+}
 const ShipmentsDashboard: React.FC = () => {
   const { showMessage } = useSnackbar();
   // State management
@@ -331,6 +472,7 @@ const [rawShipmentResponse, setRawShipmentResponse] = useState<any | null>(null)
     name: "",
     id: "",
   });
+  const [parentFlags, setParentFlags] = React.useState<ParentFlags>(() => getParentFlags());
 
   // Filter and dropdown data
   const [materialsArray, setMaterialsArray] = useState<any[]>([]);
@@ -792,12 +934,18 @@ const actionMenuCategories = {
   "Shipment Management": [
     { icon: PlusCircle, label: "Add DO Details", color: "text-blue-600", onClick: handleAddDODetails },
     { icon: Edit, label: "Update Shipment Status", color: "text-yellow-600", onClick: handleUpdateShipmentStatus },
-    { icon: AlertCircle, label: "Mark Fault Device", color: "text-red-600", onClick: handleMarkFaultDevice },
-    { icon: AlertCircle, label: "Missed Event", color: "text-red-600", onClick: handleMissedEvent },
+    ...(parentFlags.isjspl
+      ? [{ icon: AlertCircle, label: "Mark Fault Device", color: "text-red-600", onClick: handleMarkFaultDevice }  as const]: []),,
+    ...(parentFlags.isjspl
+      ? [{ icon: AlertCircle, label: "Missed Event", color: "text-red-600", onClick: handleMissedEvent } as const]
+      : []),
+    // { icon: AlertCircle, label: "Missed Event", color: "text-red-600", onClick: handleMissedEvent },
   ],
   "Advanced": [
     { icon: UserPlus, label: "Add Managed By", color: "text-blue-600", onClick: handleAddManagedBy },
-    { icon: RefreshCw, label: "ReTrigger Missed Events", color: "text-blue-600", onClick: handleRetriggerMissedEvents },
+    ...(parentFlags.isMykl
+      ? [{ icon: RefreshCw, label: "ReTrigger Missed Events", color: "text-blue-600", onClick: handleRetriggerMissedEvents } as const]: []),
+    // { icon: RefreshCw, label: "ReTrigger Missed Events", color: "text-blue-600", onClick: handleRetriggerMissedEvents },
     { icon: Edit, label: "Update Client Freight", color: "text-yellow-600", onClick: (shipment: Shipment) => { closeAllDialogs(); handleOpenFreightModal(shipment._id, shipment.sin, 'client_rate'); } },
     { icon: Plus, label: "Add Driver Expenses", color: "text-green-600", onClick: handleAddDriverExpenses },
   ],
@@ -2008,7 +2156,7 @@ const renderLastLocationCell = (shipment: any) => {
 
   const [showBulkUploadModal, setShowBulkUploadModal] = useState(false);
   const [selectedShipmentForBulkUpload, setSelectedShipmentForBulkUpload] = useState<any>(null);
-
+ 
   const handleBulkUploadClick = (shipment: any) => {
     setSelectedShipmentForBulkUpload(shipment);
     setShowBulkUploadModal(true);
@@ -2139,7 +2287,8 @@ const renderLastLocationCell = (shipment: any) => {
     locations: [],
     deliveryLocations: []
   });
-
+  const limit = pageSize;
+  const skip = currentPage * pageSize;
 const handleOpenEditLocation = (shipment: any, type: 'pickup' | 'delivery') => {
   setSelectedShipment(shipment);
   setSelectedLocationType(type);
@@ -2464,8 +2613,9 @@ const applyFilter = () => {
           onSendEPOD={updateEPODBackToJDE}
           onFetchInvoiceDetails={fetchInvoiceDetails}
           onBulkUpload={() => openBulkUpload("shipment")}
-          isTechnova={isTechnova}
+          isTechnova={parentFlags.isTechnova}
           isLoading={isLoading}
+          isjspl={parentFlags.isjspl}
           hasSelectedShipments={selectedShipmentsArray.length > 0}
           onMissedShipment={handleMissedShipmentHeader} 
         />
@@ -2521,7 +2671,7 @@ const applyFilter = () => {
     );
   })}
 </div>
-
+ { isTechnova &&(
         <div className={styles.filterGroup}>
           <label className={styles.checkboxLabel}>
             <input
@@ -2531,7 +2681,7 @@ const applyFilter = () => {
             />
             <span>ODC Shipment(s)</span>
           </label>
-        </div>
+        </div>)}
 
 
       </div>
@@ -2594,8 +2744,8 @@ const applyFilter = () => {
           >
             Advanced Search
           </div>
-          <Link href="/Mapview" style={{textDecoration: "none"}}>
-
+          {/* <Link href="/Mapview" style={{textDecoration: "none"}}> */}
+         <Link href={{ pathname: "/Mapview", query: { limit: String(limit), skip: String(skip) } }} style={{textDecoration: "none"}}>
           <button className={styles.button}>Map View</button>
           </Link>
 
@@ -2769,6 +2919,8 @@ const applyFilter = () => {
                 isAnalyticsView={isAnalyticsView}
                 isCompactView={isCompactView}
                 tableRef={tableRef}
+                isjspl={parentFlags.isjspl} // Pass the JSPL flag
+                isTechnova={parentFlags.isTechnova} 
                 selectedShipmentsArray={selectedShipmentsArray}
                 handleSelectAllShipments={handleSelectAllShipments}
                 shipmentsArray={shipmentsArray}

@@ -106,7 +106,7 @@ export default function GeofenceLayer({
           }}
         />
       ))}
-
+{/* 
       {map && info && (
         <InfoWindow position={info.pos} onCloseClick={() => setInfo(null)}>
           <div style={{ minWidth: 180 }}>
@@ -116,7 +116,7 @@ export default function GeofenceLayer({
             <div style={{ fontSize: 12 }}>{info.title || "Polygon"}</div>
           </div>
         </InfoWindow>
-      )}
+      )} */}
     </>
   );
 }

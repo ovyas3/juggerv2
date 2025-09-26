@@ -45,6 +45,7 @@ interface Shipment {
   booked_by?: string;
   driverName?: string;
   driverMobile?: string;
+ 
   epods_available?: boolean;
   trip_tracker?: {
     last_location_address?: string;
@@ -59,6 +60,8 @@ interface Shipment {
 interface ShipmentsTableProps {
   isAnalyticsView: boolean;
   isCompactView: boolean;
+  isjspl: boolean; // Add this prop
+  isTechnova: boolean;
   tableRef: React.RefObject<HTMLDivElement>;
   selectedShipmentsArray: string[];
   handleSelectAllShipments: (checked: boolean) => void;
@@ -108,6 +111,8 @@ export const ShipmentsTable: React.FC<ShipmentsTableProps> = ({
   isAnalyticsView,
   isCompactView,
   tableRef,
+  isjspl, // Destructure the new prop
+  isTechnova,
   selectedShipmentsArray,
   handleSelectAllShipments,
   shipmentsArray,
@@ -350,12 +355,14 @@ const  renderConsentAndSubscriptionIcons = (shipment: any, openSubscribeModal: (
 </th>
             <th className={`${styles.matHeaderCell} ${styles.matColumnSerialNo}`}>Serial No.</th>
             <th className={`${styles.matHeaderCell} ${styles.matColumnEpodReceived}`}>ePOD Received</th>
+            {isTechnova &&(
             <th className={`${styles.matHeaderCell} ${styles.matColumnPpd}`}>
   erp Reference
-</th>
+</th>)}
+{isjspl && ( 
 <th className={`${styles.matHeaderCell} ${styles.matColumnDoNumber}`}>
   OBD Number
-</th>
+</th>)}
             <th className={`${styles.matHeaderCell} ${styles.matColumnDelayed}`}>Delayed</th>
             <th className={`${styles.matHeaderCell} ${styles.matColumnSaleOrder}`}>Sale Order</th>
             <th className={`${styles.matHeaderCell} ${styles.matColumnEpodRequested}`}>ePOD Requested</th>
@@ -612,6 +619,7 @@ const  renderConsentAndSubscriptionIcons = (shipment: any, openSubscribeModal: (
                 <td className={styles.matCell}>
                   {shipment.whatsApp?.isEpodReceived ? "Yes" : "No"}
                 </td>
+                {isTechnova && (
                 <td className={styles.matCell}>
   <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
     {shipment.ppd_updated ? (
@@ -623,10 +631,11 @@ const  renderConsentAndSubscriptionIcons = (shipment: any, openSubscribeModal: (
     )}
     <span>{shipment.ppd ? shipment.ppd : <span title="No PPD Available" style={{ color: "#9ca3af", fontSize: 16, lineHeight: 1 }}>–</span>}</span>
   </span>
-</td>
+</td>)}
+{isjspl &&(
 <td className={styles.matCell}>
   {shipment.do_number || "-"}
-</td>
+</td>)}
                 <td className={styles.matCell}>
                   {shipment.delayed_shipment ? (
                     <span style={{ color: "#e03e3e" }}>Yes</span>
