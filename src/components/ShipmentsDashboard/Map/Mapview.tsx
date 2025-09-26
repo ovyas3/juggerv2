@@ -2504,35 +2504,7 @@ function fitToAllVehicles(list: Shipment[] = visibleShipments) {
       <StopsPreview shipment={shipment} centered  anchorWithin={document.querySelector(`.${styles.sidebar}`) as HTMLElement} />
 
     
-      <div className={styles.routeSection}>
-
-  {stops.map((s, idx) => (
-  <React.Fragment key={s.key}>
-    <div className={styles.stopRow}>
-      <span
-        className={`${styles.stopBadge} ${
-          s.type === "pickup" ? styles.pickupBadge : styles.deliveryBadge
-        }`}
-      >
-        {s.label}
-      </span>
-      <div className={styles.stopPill}>
-        {s.name}{" - "}{s.city || "—"}
-      </div>
-    </div>
-
-    {/* connector only if not the last stop */}
-    {idx < stops.length - 1 && (
-      <div className={styles.routeDots} aria-hidden="true">
-        <span />
-        <span />
-        <span />
-      </div>
-    )}
-  </React.Fragment>
-))}
-
-      </div>
+     
 
       <hr className={styles.cardDivider} />
 
