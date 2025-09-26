@@ -258,7 +258,6 @@ const confirmYes = () => {
     setOpenTooltipId(openTooltipId === kpiId ? null : kpiId);
   }
   const getShipmentStatus = (statusCode: string) => {
-    console.log("shipment is called");
     let status = "";
   
     let statusClass = "";
@@ -353,10 +352,6 @@ useEffect(() => {
       }, 0);
       setDeviationCount(deviationCountFromApi);
       setTotalDeviationDistance(totalDistanceOffRoute);
-      // Debug logging
-      console.log("Deviation Count:", deviationCountFromApi);
-      console.log("Total Deviation Distance:", totalDistanceOffRoute);
-      console.log("Individual Deviations:", deviations.map((d: { distance: any; duration: any; }) => ({ distance: d.distance, duration: d.duration })));
       const allPickups  = shipmentData.shipment.pickups;
       setIntermediates(allPickups.slice(1).map((p:ShipmentStop)=> ({
         ...p,
@@ -965,12 +960,14 @@ const totalQuantity = apiData?.invoices?.reduce((sum:number, invoice:Invoice) =>
           setShowDeviations={() => setShowDeviationsOnMap(prev => !prev)}
           // showHaltPoints={showHaltPointsOnMap}
           showHaltPoints={showHaltPointsOnMap}
-          showStoppages={showStoppagesOnMap} 
+          showStoppages={showStoppagesOnMap}
           showGeofence
           isFullscreen
           isSatelliteView={isSatelliteViewLocal}
           onToggleFullscreen={() => setIsMapFull(false)}
           unique_code={uniqueCode}
+          geoFenceData={apiData?.geo_fence}
+          tripTrackerMethods={apiData?.trip_tracker?.methods || []}
           // apiData={apiData}
           // tollHistoryData={tollHistoryData}
           // haltData={haltData}
@@ -1570,6 +1567,8 @@ const totalQuantity = apiData?.invoices?.reduce((sum:number, invoice:Invoice) =>
       isSatelliteView={isSatelliteViewLocal}
       onToggleFullscreen={() => setIsMapFull(true)}
       unique_code={uniqueCode}
+      geoFenceData={apiData?.geo_fence}
+      tripTrackerMethods={apiData?.trip_tracker?.methods || []}
 
       // optional callbacks if you want to control toggles from dashboard:
       // onToggleGPSRoute={() => {/* set some local state if needed */}}

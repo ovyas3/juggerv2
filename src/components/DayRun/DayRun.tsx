@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { ChevronRight, Filter, Calendar, MessageSquare, X } from 'lucide-react';
+import { ChevronRight, ChevronDown, Filter, Calendar, MessageSquare, X, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import './DayRun.css';
 
 interface DayRun {
@@ -37,419 +37,129 @@ interface ProcessedVehicleData extends VehicleData {
   dayRunsCount: number;
 }
 
+interface DateTab {
+  id: string;
+  label: string;
+  date: string;
+  displayDate: string;
+}
+interface DayStatistics {
+  totalVehicles: number;
+  onTime: number;
+  delayed: number;
+  critical: number;
+  avgDistance: number;
+  totalDistance: number;
+}
+// Helper function to generate date tabs
+const generateDateTabs = (): DateTab[] => {
+  const tabs = [];
+  const today = new Date();
+  for (let i = 1; i <= 7; i++) {
+    const date = new Date(today);
+    date.setDate(today.getDate() - i);
+    tabs.push({
+      id: `T-${i}`,
+      label: `T-${i}`,
+      date: date.toISOString().split('T')[0],
+      displayDate: date.toLocaleDateString('en-GB', {
+        day: '2-digit',
+        month: 'short',
+        weekday: 'short'
+      })
+    });
+  }
+  return tabs;
+};
 const DayRun: React.FC = () => {
-  const [data, setData] = useState<ProcessedVehicleData[]>([]);
+  const [dateTabs] = useState(generateDateTabs());
+  const [expandedDay, setExpandedDay] = useState<string | null>(null);
+  const [dataByDate, setDataByDate] = useState<{[key: string]: ProcessedVehicleData[]}>({});
+  const [statisticsByDate, setStatisticsByDate] = useState<{[key: string]: DayStatistics}>({});
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
   const [modalVehicle, setModalVehicle] = useState<ProcessedVehicleData | null>(null);
   const [remarkModal, setRemarkModal] = useState<{vehicle: ProcessedVehicleData, day: number} | null>(null);
   const [filters, setFilters] = useState({
-    status: 'All', // All, On Time, Delay, Critical
-    dayRuns: 'All' // All, 1, 2, 3, 4+
+    status: 'All',
+    dayRuns: 'All'
   });
 
   useEffect(() => {
-    const mockVehicleData: VehicleData[] = [
-      // T-2 (11 Aug) Vehicles
-      {
-        _id: "veh_t2_001",
-        sn: 1,
-        vehicle: 'AP04GH3433',
-        doNumber: 'DO902349',
-        gateInNumber: 'GI908740',
-        gateOutTime: '11 Aug 18:20',
-        customer: 'JSW Steel L',
-        delivery: 'Patna',
-        totalDistance: 700,
-        promisedDeliveryDate: '15 Aug 17:30',
-        status: 'On Time',
-        remainingDistance: 200,
-        travelledDistance: 500,
-        avg_distance: 233.33,
-        dayRuns: [
-          {
-            _id: "run_t2_001_1",
-            start: "2024-08-11T18:20:00.000Z",
-            day: 1,
-            distance: 100,
-            travel_time: 8000,
-            remarks: "",
-            polyline: "sample_polyline_1"
-          },
-          {
-            _id: "run_t2_001_2",
-            start: "2024-08-12T06:00:00.000Z",
-            day: 2,
-            distance: 300,
-            travel_time: 15000,
-            remarks: "",
-            polyline: "sample_polyline_2"
-          },
-          {
-            _id: "run_t2_001_3",
-            start: "2024-08-13T06:00:00.000Z",
-            day: 3,
-            distance: 100,
-            travel_time: 8000,
-            remarks: "",
-            polyline: "sample_polyline_3"
-          }
-        ]
-      },
-      {
-        _id: "veh_t2_002",
-        sn: 2,
-        vehicle: 'KA04GH3422',
-        doNumber: 'DO902399',
-        gateInNumber: 'GI908741',
-        gateOutTime: '11 Aug 19:20',
-        customer: 'Tata Steel Lt',
-        delivery: 'Mysuru',
-        totalDistance: 820,
-        promisedDeliveryDate: '15 Aug 13:30',
-        status: 'Delay',
-        remainingDistance: 470,
-        travelledDistance: 350,
-        avg_distance: 116.67,
-        dayRuns: [
-          {
-            _id: "run_t2_002_1",
-            start: "2024-08-11T19:20:00.000Z",
-            day: 1,
-            distance: 150,
-            travel_time: 10000,
-            remarks: "",
-            polyline: "sample_polyline_1"
-          },
-          {
-            _id: "run_t2_002_2",
-            start: "2024-08-12T06:00:00.000Z",
-            day: 2,
-            distance: 100,
-            travel_time: 8000,
-            remarks: "",
-            polyline: "sample_polyline_2"
-          },
-          {
-            _id: "run_t2_002_3",
-            start: "2024-08-13T06:00:00.000Z",
-            day: 3,
-            distance: 100,
-            travel_time: 8000,
-            remarks: "",
-            polyline: "sample_polyline_3"
-          }
-        ]
-      },
-      {
-        _id: "veh_t2_003",
-        sn: 3,
-        vehicle: 'AP04GH4497',
-        doNumber: 'DO902387',
-        gateInNumber: 'GI908742',
-        gateOutTime: '11 Aug 18:30',
-        customer: 'SAIL',
-        delivery: 'Ranji',
-        totalDistance: 900,
-        promisedDeliveryDate: '15 Aug 15:30',
-        status: 'Delay',
-        remainingDistance: 500,
-        travelledDistance: 400,
-        avg_distance: 133.33,
-        dayRuns: [
-          {
-            _id: "run_t2_003_1",
-            start: "2024-08-11T18:30:00.000Z",
-            day: 1,
-            distance: 150,
-            travel_time: 10000,
-            remarks: "",
-            polyline: "sample_polyline_1"
-          },
-          {
-            _id: "run_t2_003_2",
-            start: "2024-08-12T06:00:00.000Z",
-            day: 2,
-            distance: 150,
-            travel_time: 10000,
-            remarks: "",
-            polyline: "sample_polyline_2"
-          },
-          {
-            _id: "run_t2_003_3",
-            start: "2024-08-13T06:00:00.000Z",
-            day: 3,
-            distance: 100,
-            travel_time: 8000,
-            remarks: "",
-            polyline: "sample_polyline_3"
-          }
-        ]
-      },
-      {
-        _id: "veh_t2_004",
-        sn: 4,
-        vehicle: 'KA04GH3423',
-        doNumber: 'DO247710',
-        gateInNumber: 'GI908743',
-        gateOutTime: '11 Aug 18:30',
-        customer: 'UltraTech Cc',
-        delivery: 'Raipur',
-        totalDistance: 670,
-        promisedDeliveryDate: '15 Aug 05:30',
-        status: 'On Time',
-        remainingDistance: 220,
-        travelledDistance: 450,
-        avg_distance: 150,
-        dayRuns: [
-          {
-            _id: "run_t2_004_1",
-            start: "2024-08-11T18:30:00.000Z",
-            day: 1,
-            distance: 200,
-            travel_time: 12000,
-            remarks: "",
-            polyline: "sample_polyline_1"
-          },
-          {
-            _id: "run_t2_004_2",
-            start: "2024-08-12T06:00:00.000Z",
-            day: 2,
-            distance: 100,
-            travel_time: 8000,
-            remarks: "",
-            polyline: "sample_polyline_2"
-          },
-          {
-            _id: "run_t2_004_3",
-            start: "2024-08-13T06:00:00.000Z",
-            day: 3,
-            distance: 150,
-            travel_time: 10000,
-            remarks: "",
-            polyline: "sample_polyline_3"
-          }
-        ]
-      },
-      // T-3 (10 Aug) Vehicles
-      {
-        _id: "veh_t3_001",
-        sn: 1,
-        vehicle: 'AP04GH3490',
-        doNumber: 'DO902322',
-        gateInNumber: 'GI908750',
-        gateOutTime: '10 Aug 18:20',
-        customer: 'JSW Steel L',
-        delivery: 'Coimbatore',
-        totalDistance: 1700,
-        promisedDeliveryDate: '15 Aug 17:30',
-        status: 'Delay',
-        remainingDistance: 930,
-        travelledDistance: 770,
-        avg_distance: 425,
-        dayRuns: [
-          {
-            _id: "run_t3_001_1",
-            start: "2024-08-10T18:20:00.000Z",
-            day: 1,
-            distance: 200,
-            travel_time: 12000,
-            remarks: "",
-            polyline: "sample_polyline_1"
-          },
-          {
-            _id: "run_t3_001_2",
-            start: "2024-08-11T06:00:00.000Z",
-            day: 2,
-            distance: 250,
-            travel_time: 15000,
-            remarks: "",
-            polyline: "sample_polyline_2"
-          },
-          {
-            _id: "run_t3_001_3",
-            start: "2024-08-12T06:00:00.000Z",
-            day: 3,
-            distance: 170,
-            travel_time: 12000,
-            remarks: "",
-            polyline: "sample_polyline_3"
-          },
-          {
-            _id: "run_t3_001_4",
-            start: "2024-08-13T06:00:00.000Z",
-            day: 4,
-            distance: 150,
-            travel_time: 10000,
-            remarks: "",
-            polyline: "sample_polyline_4"
-          }
-        ]
-      },
-      {
-        _id: "veh_t3_002",
-        sn: 2,
-        vehicle: 'KA04GH3465',
-        doNumber: 'DO902340',
-        gateInNumber: 'GI908751',
-        gateOutTime: '10 Aug 19:20',
-        customer: 'Tata Steel Lt',
-        delivery: 'Mysuru',
-        totalDistance: 1800,
-        promisedDeliveryDate: '14 Aug 13:30',
-        status: 'Critical',
-        remainingDistance: 930,
-        travelledDistance: 870,
-        avg_distance: 450,
-        dayRuns: [
-          {
-            _id: "run_t3_002_1",
-            start: "2024-08-10T19:20:00.000Z",
-            day: 1,
-            distance: 250,
-            travel_time: 15000,
-            remarks: "",
-            polyline: "sample_polyline_1"
-          },
-          {
-            _id: "run_t3_002_2",
-            start: "2024-08-11T06:00:00.000Z",
-            day: 2,
-            distance: 220,
-            travel_time: 13000,
-            remarks: "",
-            polyline: "sample_polyline_2"
-          },
-          {
-            _id: "run_t3_002_3",
-            start: "2024-08-12T06:00:00.000Z",
-            day: 3,
-            distance: 200,
-            travel_time: 12000,
-            remarks: "",
-            polyline: "sample_polyline_3"
-          },
-          {
-            _id: "run_t3_002_4",
-            start: "2024-08-13T06:00:00.000Z",
-            day: 4,
-            distance: 200,
-            travel_time: 12000,
-            remarks: "",
-            polyline: "sample_polyline_4"
-          }
-        ]
-      },
-      {
-        _id: "veh_t3_003",
-        sn: 3,
-        vehicle: 'AP04GH4455',
-        doNumber: 'DO902327',
-        gateInNumber: 'GI908752',
-        gateOutTime: '10 Aug 18:30',
-        customer: 'SAIL',
-        delivery: 'Jaipur',
-        totalDistance: 620,
-        promisedDeliveryDate: '13 Aug 15:30',
-        status: 'On Time',
-        remainingDistance: 2,
-        travelledDistance: 618,
-        avg_distance: 155,
-        dayRuns: [
-          {
-            _id: "run_t3_003_1",
-            start: "2024-08-10T18:30:00.000Z",
-            day: 1,
-            distance: 180,
-            travel_time: 12000,
-            remarks: "",
-            polyline: "sample_polyline_1"
-          },
-          {
-            _id: "run_t3_003_2",
-            start: "2024-08-11T06:00:00.000Z",
-            day: 2,
-            distance: 150,
-            travel_time: 10000,
-            remarks: "",
-            polyline: "sample_polyline_2"
-          },
-          {
-            _id: "run_t3_003_3",
-            start: "2024-08-12T06:00:00.000Z",
-            day: 3,
-            distance: 160,
-            travel_time: 11000,
-            remarks: "",
-            polyline: "sample_polyline_3"
-          },
-          {
-            _id: "run_t3_003_4",
-            start: "2024-08-13T06:00:00.000Z",
-            day: 4,
-            distance: 128,
-            travel_time: 9000,
-            remarks: "",
-            polyline: "sample_polyline_4"
-          }
-        ]
-      },
-      {
-        _id: "veh_t3_004",
-        sn: 4,
-        vehicle: 'KA04GH3439',
-        doNumber: 'DO247786',
-        gateInNumber: 'GI908753',
-        gateOutTime: '10 Aug 20:30',
-        customer: 'UltraTech Cc',
-        delivery: 'Raipur',
-        totalDistance: 2000,
-        promisedDeliveryDate: '15 Aug 05:30',
-        status: 'Critical',
-        remainingDistance: 1180,
-        travelledDistance: 820,
-        avg_distance: 500,
-        dayRuns: [
-          {
-            _id: "run_t3_004_1",
-            start: "2024-08-10T20:30:00.000Z",
-            day: 1,
-            distance: 180,
-            travel_time: 12000,
-            remarks: "",
-            polyline: "sample_polyline_1"
-          },
-          {
-            _id: "run_t3_004_2",
-            start: "2024-08-11T06:00:00.000Z",
-            day: 2,
-            distance: 190,
-            travel_time: 13000,
-            remarks: "",
-            polyline: "sample_polyline_2"
-          },
-          {
-            _id: "run_t3_004_3",
-            start: "2024-08-12T06:00:00.000Z",
-            day: 3,
-            distance: 250,
-            travel_time: 15000,
-            remarks: "",
-            polyline: "sample_polyline_3"
-          },
-          {
-            _id: "run_t3_004_4",
-            start: "2024-08-13T06:00:00.000Z",
-            day: 4,
-            distance: 200,
-            travel_time: 12000,
-            remarks: "",
-            polyline: "sample_polyline_4"
-          }
-        ]
-      }
-    ];
+    // Generate mock data for each date tab
+    const mockDataByDate: {[key: string]: VehicleData[]} = {};
+    const mockStatsByDate: {[key: string]: DayStatistics} = {};
 
+    dateTabs.forEach((tab, tabIndex) => {
+      const vehicles: VehicleData[] = [];
+
+      // Generate 4-8 vehicles per date tab for variety
+      const vehicleCount = 4 + Math.floor(Math.random() * 5);
+
+      for (let i = 0; i < vehicleCount; i++) {
+        const statuses: ('On Time' | 'Delay' | 'Critical')[] = ['On Time', 'Delay', 'Critical'];
+        const customers = ['JSW Steel L', 'Tata Steel Lt', 'SAIL', 'UltraTech Cc', 'Adani Ports'];
+        const cities = ['Chennai', 'Bangalore', 'Patna', 'Mysuru', 'Jaipur', 'Raipur', 'Coimbatore', 'Pune'];
+
+        const dayRunCount = 1 + Math.floor(Math.random() * 4);
+        const dayRuns: DayRun[] = [];
+        let totalDayRunDistance = 0;
+
+        for (let day = 1; day <= dayRunCount; day++) {
+          const distance = 100 + Math.floor(Math.random() * 250);
+          totalDayRunDistance += distance;
+
+          dayRuns.push({
+            _id: `run_${tab.id}_${i}_${day}`,
+            start: new Date(Date.now() - (tabIndex + 1) * 24 * 60 * 60 * 1000 - (day - 1) * 12 * 60 * 60 * 1000).toISOString(),
+            day: day,
+            distance: distance,
+            travel_time: 8000 + Math.floor(Math.random() * 10000),
+            remarks: "",
+            polyline: `sample_polyline_${day}`
+          });
+          }
+
+        const totalDistance = totalDayRunDistance + Math.floor(Math.random() * 150);
+        const travelledDistance = totalDayRunDistance;
+
+        vehicles.push({
+          _id: `veh_${tab.id}_${i}`,
+          sn: i + 1,
+          vehicle: `${['AP', 'KA', 'TN', 'MH', 'GJ'][Math.floor(Math.random() * 5)]}04GH${3400 + Math.floor(Math.random() * 100)}`,
+          doNumber: `DO${900000 + Math.floor(Math.random() * 10000)}`,
+          gateInNumber: `GI${900000 + Math.floor(Math.random() * 1000)}`,
+          gateOutTime: `${tab.displayDate.split(',')[1]?.trim() || tab.displayDate} ${18 + Math.floor(Math.random() * 3)}:${Math.floor(Math.random() * 6)}0`,
+          customer: customers[Math.floor(Math.random() * customers.length)],
+          delivery: cities[Math.floor(Math.random() * cities.length)],
+          totalDistance: totalDistance,
+          promisedDeliveryDate: `${15 + Math.floor(Math.random() * 3)} Aug ${10 + Math.floor(Math.random() * 10)}:30`,
+          status: statuses[Math.floor(Math.random() * statuses.length)],
+          remainingDistance: totalDistance - travelledDistance,
+          travelledDistance: travelledDistance,
+          avg_distance: totalDayRunDistance / dayRunCount,
+          dayRuns: dayRuns
+        });
+          }
+
+      mockDataByDate[tab.id] = vehicles;
+      // Calculate statistics for this day
+      const onTime = vehicles.filter(v => v.status === 'On Time').length;
+      const delayed = vehicles.filter(v => v.status === 'Delay').length;
+      const critical = vehicles.filter(v => v.status === 'Critical').length;
+      const totalDistance = vehicles.reduce((sum, v) => sum + v.totalDistance, 0);
+      const avgDistance = vehicles.length > 0 ? totalDistance / vehicles.length : 0;
+      mockStatsByDate[tab.id] = {
+        totalVehicles: vehicles.length,
+        onTime,
+        delayed,
+        critical,
+        avgDistance: Math.round(avgDistance),
+        totalDistance: Math.round(totalDistance)
+      };
+    });
+
+    // Process the data
     const processData = (vehicles: VehicleData[]): ProcessedVehicleData[] => {
       return vehicles.map(vehicle => {
         const totalDayRunDistance = vehicle.dayRuns.reduce((sum, dayRun) => sum + dayRun.distance, 0);
@@ -464,22 +174,37 @@ const DayRun: React.FC = () => {
       });
     };
 
-    const processedData = processData(mockVehicleData);
-    setData(processedData);
-  }, []);
+    const processedDataByDate: {[key: string]: ProcessedVehicleData[]} = {};
+    Object.keys(mockDataByDate).forEach(tabId => {
+      processedDataByDate[tabId] = processData(mockDataByDate[tabId]);
+    });
+    setDataByDate(processedDataByDate);
+    setStatisticsByDate(mockStatsByDate);
+  }, [dateTabs]);
 
-  // Pagination logic
-  const filteredData = data.filter(vehicle => {
+  // Get filtered data for expanded day
+  const getFilteredData = (dayId: string) => {
+    const dayData = dataByDate[dayId] || [];
+    return dayData.filter(vehicle => {
     const statusMatch = filters.status === 'All' || vehicle.status === filters.status;
     const dayRunsMatch = filters.dayRuns === 'All' ||
       (filters.dayRuns === '4+' ? vehicle.dayRunsCount >= 4 : vehicle.dayRunsCount === parseInt(filters.dayRuns));
     return statusMatch && dayRunsMatch;
   });
+  };
 
+  // Pagination for expanded view
+  const filteredData = expandedDay ? getFilteredData(expandedDay) : [];
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentData = filteredData.slice(startIndex, endIndex);
+  const currentPageData = filteredData.slice(startIndex, startIndex + itemsPerPage);
+  // Reset pagination when expanding different day
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [expandedDay]);
+  const toggleDayExpansion = (dayId: string) => {
+    setExpandedDay(expandedDay === dayId ? null : dayId);
+  };
 
   const openVehicleModal = (vehicle: ProcessedVehicleData) => {
     setModalVehicle(vehicle);
@@ -511,12 +236,83 @@ const DayRun: React.FC = () => {
     }
   };
 
+  const getPerformanceTrend = (dayId: string, previousDayId: string) => {
+    const currentStats = statisticsByDate[dayId];
+    const previousStats = statisticsByDate[previousDayId];
+    if (!currentStats || !previousStats) return { icon: Minus, class: 'neutral' };
+    const currentPerformance = (currentStats.onTime / currentStats.totalVehicles) * 100;
+    const previousPerformance = (previousStats.onTime / previousStats.totalVehicles) * 100;
+    if (currentPerformance > previousPerformance) {
+      return { icon: TrendingUp, class: 'positive' };
+    } else if (currentPerformance < previousPerformance) {
+      return { icon: TrendingDown, class: 'negative' };
+    } else {
+      return { icon: Minus, class: 'neutral' };
+    }
+  };
   return (
     <div className="day-run-container">
       <div className="day-run-content">
-        {/* Filter Section */}
-        <div className="filter-section">
-          <div className="filter-box">
+        <div className="page-header">
+          <h1>Day Run Analysis - Gate Out Date Overview</h1>
+          <p className="page-subtitle">7-day vehicle performance overview grouped by facility exit date</p>
+        </div>
+        {/* Compact Overview Cards */}
+        <div className="days-overview">
+          {dateTabs.map((tab, index) => {
+            const stats = statisticsByDate[tab.id];
+            const isExpanded = expandedDay === tab.id;
+            const previousDayId = dateTabs[index + 1]?.id;
+            const trend = previousDayId ? getPerformanceTrend(tab.id, previousDayId) : { icon: Minus, class: 'neutral' };
+            const TrendIcon = trend.icon;
+            return (
+              <div key={tab.id} className={`day-card ${isExpanded ? 'expanded' : ''}`}>
+                <div
+                  className="day-card-header"
+                  onClick={() => toggleDayExpansion(tab.id)}
+                >
+                  <div className="day-info">
+                    <div className="day-label-row">
+                      <span className="day-label">{tab.label}</span>
+                      <TrendIcon className={`trend-icon ${trend.class}`} />
+                    </div>
+                    <span className="day-date">{tab.displayDate}</span>
+                  </div>
+
+                  {stats && (
+                    <div className="day-stats">
+                      <div className="stat-group">
+                        <span className="stat-value">{stats.totalVehicles}</span>
+                        <span className="stat-label">Total</span>
+            </div>
+                      <div className="stat-group">
+                        <span className="stat-value green">{stats.onTime}</span>
+                        <span className="stat-label">On Time</span>
+                      </div>
+                      <div className="stat-group">
+                        <span className="stat-value orange">{stats.delayed}</span>
+                        <span className="stat-label">Delayed</span>
+                  </div>
+                      <div className="stat-group">
+                        <span className="stat-value red">{stats.critical}</span>
+                        <span className="stat-label">Critical</span>
+                  </div>
+                      <div className="stat-group">
+                        <span className="stat-value">{stats.avgDistance}km</span>
+                        <span className="stat-label">Avg Dist</span>
+                </div>
+              </div>
+            )}
+                  <div className="expand-icon">
+                    {isExpanded ? <ChevronDown /> : <ChevronRight />}
+          </div>
+        </div>
+                {/* Expanded Vehicle Details */}
+                {isExpanded && (
+                  <div className="day-card-content">
+                    {/* Filters for expanded view */}
+                    <div className="expanded-filters">
+                      <div className="filter-row">
             <div className="filter-item">
               <Filter className="filter-icon" />
               <label>Status:</label>
@@ -549,53 +345,26 @@ const DayRun: React.FC = () => {
           </div>
         </div>
 
-        {/* Summary Statistics */}
-        <div className="filter-section">
-          <div className="filter-box">
-            <div className="summary-header-item">
-              <span className="header-label">Total Vehicles</span>
-              <span className="header-value">{currentData.length}</span>
-            </div>
-            <div className="summary-header-item">
-              <span className="header-label">On Time</span>
-              <span className="header-value">{currentData.filter(v => v.status === 'On Time').length}</span>
-            </div>
-            <div className="summary-header-item">
-              <span className="header-label">Delayed</span>
-              <span className="header-value">{currentData.filter(v => v.status === 'Delay').length}</span>
-            </div>
-            <div className="summary-header-item">
-              <span className="header-label">Critical</span>
-              <span className="header-value">{currentData.filter(v => v.status === 'Critical').length}</span>
-            </div>
-          </div>
-        </div>
 
-        {/* Single Table */}
-        <div className="day-run-table-container">
-          <div className="day-section">
-            <div className="table-wrapper">
-              <table className="day-run-table">
+                    {/* Vehicle Table */}
+                    <div className="vehicles-table-container">
+                      <table className="vehicles-table">
                 <thead>
                   <tr>
                     <th>SN</th>
                     <th>Vehicle</th>
                     <th>DO Number</th>
-                    <th>Gate In Number</th>
-                    <th>Gate Out Time</th>
                     <th>Customer</th>
                     <th>Delivery</th>
-                    <th>Total Distance (Kms)</th>
-                    <th>Avg Distance/Day (Kms)</th>
+                            <th>Distance (Kms)</th>
                     <th>Day Runs</th>
-                    <th>Promised Delivery Date</th>
                     <th>Status</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {currentData.length > 0 ? (
-                    currentData.map((vehicle, index) => (
+                  {currentPageData.length > 0 ? (
+                    currentPageData.map((vehicle, index) => (
                       <tr key={vehicle._id} className="vehicle-row">
                         <td>
                           <div
@@ -606,16 +375,12 @@ const DayRun: React.FC = () => {
                             {startIndex + index + 1}
                           </div>
                         </td>
-                        <td>{vehicle.vehicle}</td>
-                        <td>{vehicle.doNumber}</td>
-                        <td>{vehicle.gateInNumber}</td>
-                        <td>{vehicle.gateOutTime}</td>
-                        <td>{vehicle.customer}</td>
-                        <td>{vehicle.delivery}</td>
-                        <td>{Math.round(vehicle.totalDistance)}</td>
-                        <td>{vehicle.avgDistancePerDay}</td>
-                        <td>{vehicle.dayRunsCount}</td>
-                        <td>{vehicle.promisedDeliveryDate}</td>
+                                <td className="font-mono">{vehicle.vehicle}</td>
+                                <td className="font-mono text-sm">{vehicle.doNumber}</td>
+                                <td className="text-sm">{vehicle.customer}</td>
+                                <td className="text-sm">{vehicle.delivery}</td>
+                                <td className="text-right">{Math.round(vehicle.totalDistance)}</td>
+                                <td className="text-center">{vehicle.dayRunsCount}</td>
                         <td>
                           <span className={`status-badge ${getStatusClass(vehicle.status)}`}>
                             {vehicle.status}
@@ -634,42 +399,42 @@ const DayRun: React.FC = () => {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan={13} style={{ textAlign: 'center', padding: '40px' }}>
-                        No vehicles match the current filters
+                              <td colSpan={9} className="no-data">
+                                No vehicles match the current filters
                       </td>
                     </tr>
                   )}
                 </tbody>
               </table>
             </div>
-          </div>
 
-          {/* Pagination */}
+                    {/* Pagination for expanded view */}
           {totalPages > 1 && (
-            <div className="filter-section">
-              <div className="filter-box" style={{ justifyContent: 'center' }}>
+                      <div className="expanded-pagination">
                 <button
                   className="action-btn"
                   onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                   disabled={currentPage === 1}
-                  style={{ marginRight: '10px' }}
                 >
                   Previous
                 </button>
-                <span style={{ margin: '0 15px', fontWeight: '500' }}>
-                  Page {currentPage} of {totalPages} ({filteredData.length} total vehicles)
+                        <span className="pagination-info">
+                          Page {currentPage} of {totalPages} ({filteredData.length} vehicles)
                 </span>
                 <button
                   className="action-btn"
                   onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                   disabled={currentPage === totalPages}
-                  style={{ marginLeft: '10px' }}
                 >
                   Next
                 </button>
               </div>
+                    )}
             </div>
           )}
+              </div>
+            );
+          })}
         </div>
 
         {/* Vehicle Detail Modal */}
