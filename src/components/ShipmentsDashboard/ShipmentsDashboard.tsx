@@ -820,13 +820,14 @@ const closeActionMenu = () => {
   }, [showAttachDialog]);
 
   const subFilters = [
-    { key: "towards_pickup", label: "Towards Pickup", count: 0, color: "#16a085" },
-    { key: "at_pickup", label: "At Pickup", count: 0, color: "#3498db" },
-    { key: "in_transit", label: "In Transit", count: 0, color: "#f39c12" },
-    { key: "about_to_reach", label: "About to Reach", count: 0, color: "#34495e" },
-    { key: "at_delivery", label: "At Delivery", count: 0, color: "#667eea" },
-    { key: "completed", label: "Completed", count: 0, color: "#2ecc40" },
-    { key: "cancelled", label: "Cancelled", count: 0, color: "#e74c3c" },
+    { key: "SP", label: "Towards Pickup", count: 0, color: "#16a085" },
+    { key: "AP", label: "At Pickup", count: 0, color: "#3498db" },
+    { key: "INPLANT", label: "In Plant", count: 0, color: "#a502b0" },
+    { key: "ITNS", label: "In Transit", count: 0, color: "#f39c12" },
+    // { key: "ALD", label: "About to Reach", count: 0, color: "#34495e" },
+    { key: "ALD", label: "At Delivery", count: 0, color: "#667eea" },
+    { key: "CPTD", label: "Completed", count: 0, color: "#2ecc40" },
+    { key: "CNCL", label: "Cancelled", count: 0, color: "#e74c3c" },
     // { key: "delayed", label: "Delayed", count: 0, color: "#ed8936" },
   ];
 
@@ -1724,8 +1725,9 @@ const closeActionMenu = () => {
     Cancelled: "#e74c3c",
     "Towards Pickup": "#16a085",
     "At Pickup": "#3498db",
-    "At Delivery": "#f1948a",
+    "At Delivery": "#667eea",
     "About to Reach": "#34495e",
+    "In Plant": "#a502b0",
   };
 
   const statusLabels: Record<string, string> = {
