@@ -23,7 +23,7 @@ import { usePathname } from "next/navigation";
 import dynamic from 'next/dynamic'
 
 const Header = ({ setReloadOnHeaderChange, isMapHelper, getAllShipment, isShipmentMapView }: any) => {
-  const isCorporateUser = getCookie("is_corporate_user") === "true";
+  // const isCorporateUser = getCookie("is_corporate_user") === "true";
   const router = useRouter();
   const pathname = usePathname();
   const [parent_name, setParentName] = useState<string>("");
@@ -31,7 +31,7 @@ const Header = ({ setReloadOnHeaderChange, isMapHelper, getAllShipment, isShipme
 
   useEffect(() => {
     const parent_name = getCookie("parent_name")?.toString() || "";
-    const shippersData = JSON.parse(localStorage.getItem("corporate_shipper") || "[]");
+    const shippersData = JSON.parse(localStorage.getItem("shippers") || "[]");
     setParentName(parent_name);
     setShippers(shippersData);
   }, []);
@@ -111,12 +111,12 @@ const Header = ({ setReloadOnHeaderChange, isMapHelper, getAllShipment, isShipme
             alignItems: "center",
           }}
         >
-          {isCorporateUser ? 
+          {/* {isCorporateUser ?  */}
             <div className="drop_down">
               {shippers.length && <Dropdown reload={setReloadOnHeaderChange} shippers={shippers} getAllShipment={getAllShipment} />}
             </div> :
             <div className="header_name">{parent_name}</div>
-          }
+          {/* } */}
           <div className="divder"></div>
           <div className="profile_pic">
             <ProfileDrop />
