@@ -889,15 +889,15 @@
 }
 
 .stopBadge {
-  width: 20px;
-  height: 20px;
+  width: 25px;
+  height: 25px;
   border-radius: 999px;
   font-size: 10px;
   font-weight: 700;
   display: grid;
   place-items: center;
   border: 2px solid #d0d5dd;
-  background: #fff;
+  background-color: rgba(220, 53, 69, 0.1);
 }
 
 .pickupBadge {
@@ -915,28 +915,16 @@
 .stopPill {
   border: 1px solid #e7e7ea;
   border-radius: 10px;
-  /* height: calc(2em * 2); */
-  min-height: 40px;  
+  min-height: 40px;
   padding: 10px 12px;
   background: #fff;
-  padding-right: 3px;
   font-size: 12px;
-  display: flex;             /* flexbox container */
-  align-items: center;       /* vertical center */
-  justify-content: center; 
+  display: flex;
   align-items: center;
-  text-align: center;
+  justify-content: flex-start;
   color: #111827;
   line-height: 1.2;
   overflow: hidden;
-  white-space: normal;          /* was: nowrap */
-  overflow: visible;            /* was: hidden (ok to keep hidden if you prefer) */
-  text-overflow: clip; 
-           /* was: ellipsis (or just remove this line) */
-  overflow: hidden;             /* keep content inside the pill */
-  white-space: normal; 
-  /* helps when names are one long token (no spaces) */
-  overflow-wrap: anywhere; 
 }
 
 .perPageContent {
@@ -1144,7 +1132,7 @@
   position: fixed;           /* important: not clipped by sidebar scroll */
   z-index: 2000;
   background: #ffffff;
-  border: 1px solid #ececf1;
+  /* border: 1px solid #ececf1; */
   border-radius: 12px;
   box-shadow: 0 18px 40px rgba(16, 24, 40, 0.18);
   padding: 0px 0;
@@ -1525,19 +1513,20 @@
   border: 1px solid #4f46e5;
   box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
 }
-/* Round extra-count badge */
+
 .extraCount {
-  all: unset;
+  flex-shrink: 0;
   display: inline-grid;
   place-items: center;
   width: 22px;
   height: 22px;
-  margin-left: 8px;
   border-radius: 999px;
   font-size: 11px;
   font-weight: 800;
   color: #fff;
   cursor: pointer;
+  border: none;
+  background: transparent;
 }
 
 .extraGreen { background: #22c55e; }   /* pickup */
@@ -1546,11 +1535,12 @@
 .stopMainText {
   font-weight: 400;
   margin-right: 8px;
-  white-space: nowrap;
-  width: 200px;
-  text-overflow: ellipsis;
+  white-space: wrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  flex: 1 !important;
+  min-width: 0 !important;
 }
-
 .stopMinorLabel {
   font-size: 10px;
   color: #6b7280;
@@ -1559,7 +1549,7 @@
 }
 
 /* Popup specifics (reuses .actionMenu skin) */
-.stopsPopup { min-width: 350px; }
+/* .stopsPopup { min-width: 350px; } */
 .stopsPopupHead {
   display: flex;
   align-items: center;
@@ -1576,7 +1566,7 @@
 .stopsPopupItem {
   display: grid;
   grid-template-columns: 10px 1fr;
-  gap: 14px;
+  gap: 23px;
   padding: 8px 10px;
   border-radius: 8px;
 }
@@ -1604,8 +1594,18 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.stopsPopup {
+  width: 530px !important;
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  z-index: 9999 !important;
+  background: white !important;
+  border-radius: 12px !important;
+  box-shadow: 0 20px 60px rgba(16, 24, 40, 0.3) !important;
+}
 
-.stopsPopup { width: 650px; }
 .select {
   width: 100%;
   min-width: 170px;
