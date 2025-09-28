@@ -916,8 +916,10 @@
   border: 1px solid #e7e7ea;
   border-radius: 10px;
   /* height: calc(2em * 2); */
+  min-height: 40px;  
   padding: 10px 12px;
   background: #fff;
+  padding-right: 3px;
   font-size: 12px;
   display: flex;             /* flexbox container */
   align-items: center;       /* vertical center */
@@ -929,8 +931,10 @@
   overflow: hidden;
   white-space: normal;          /* was: nowrap */
   overflow: visible;            /* was: hidden (ok to keep hidden if you prefer) */
-  text-overflow: clip;          /* was: ellipsis (or just remove this line) */
-
+  text-overflow: clip; 
+           /* was: ellipsis (or just remove this line) */
+  overflow: hidden;             /* keep content inside the pill */
+  white-space: normal; 
   /* helps when names are one long token (no spaces) */
   overflow-wrap: anywhere; 
 }
@@ -1143,7 +1147,7 @@
   border: 1px solid #ececf1;
   border-radius: 12px;
   box-shadow: 0 18px 40px rgba(16, 24, 40, 0.18);
-  padding: 6px 0;
+  padding: 0px 0;
   overflow: hidden;
   transform: translateY(8px); 
 }
@@ -1521,7 +1525,87 @@
   border: 1px solid #4f46e5;
   box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
 }
+/* Round extra-count badge */
+.extraCount {
+  all: unset;
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  margin-left: 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+  color: #fff;
+  cursor: pointer;
+}
 
+.extraGreen { background: #22c55e; }   /* pickup */
+.extraOrange { background: #f97316; }  /* delivery */
+
+.stopMainText {
+  font-weight: 400;
+  margin-right: 8px;
+  white-space: nowrap;
+  width: 200px;
+  text-overflow: ellipsis;
+}
+
+.stopMinorLabel {
+  font-size: 10px;
+  color: #6b7280;
+  margin-left: 4px;
+  text-transform: none;
+}
+
+/* Popup specifics (reuses .actionMenu skin) */
+.stopsPopup { min-width: 350px; }
+.stopsPopupHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px 4px 12px;
+}
+.stopsPopupBody {
+  max-height: 300px;
+ right: 70%;
+ bottom: 50%;
+  overflow-y: auto;
+  padding: 6px 6px 8px 6px;
+}
+.stopsPopupItem {
+  display: grid;
+  grid-template-columns: 10px 1fr;
+  gap: 14px;
+  padding: 8px 10px;
+  border-radius: 8px;
+}
+.stopsPopupItem:hover { background: #f8fafc; }
+.stopsItemDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: #9aa3b2;
+  margin-top: 6px;
+}
+.stopsItemText { min-width: 0; }
+.stopsItemName {
+  font-size: 12px;
+  font-weight: 700;
+  color: #0f172a;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.stopsItemMeta {
+  font-size: 11px;
+  color: #475467;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.stopsPopup { width: 650px; }
 .select {
   width: 100%;
   min-width: 170px;
