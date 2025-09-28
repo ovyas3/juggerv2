@@ -60,7 +60,8 @@ interface Shipment {
 interface ShipmentsTableProps {
   isAnalyticsView: boolean;
   isCompactView: boolean;
-  isjspl: boolean; // Add this prop
+  isjspl: boolean;
+  isMykl: boolean;
   isTechnova: boolean;
   tableRef: React.RefObject<HTMLDivElement>;
   selectedShipmentsArray: string[];
@@ -72,7 +73,7 @@ interface ShipmentsTableProps {
   showLoader: boolean;
   actionSearch: string;
   setActionSearch: (value: string) => void;
-  actionMenuCategories: any;
+  actionMenuCategories: (shipment: any) => any;
   renderStatusCell: (shipment: Shipment) => React.ReactNode;
   renderLocationCell: (
     shipment: Shipment,
@@ -111,7 +112,8 @@ export const ShipmentsTable: React.FC<ShipmentsTableProps> = ({
   isAnalyticsView,
   isCompactView,
   tableRef,
-  isjspl, // Destructure the new prop
+  isjspl, 
+  isMykl,
   isTechnova,
   selectedShipmentsArray,
   handleSelectAllShipments,
@@ -247,6 +249,7 @@ const  renderConsentAndSubscriptionIcons = (shipment: any, openSubscribeModal: (
   );
 }
 
+
   if (isAnalyticsView) return null;
 
   return (
@@ -332,11 +335,11 @@ const  renderConsentAndSubscriptionIcons = (shipment: any, openSubscribeModal: (
               Track
             </th>
             <th className={`${styles.matHeaderCell} ${styles.matColumnDriver}`}>Driver</th>
-            <th
+            {isMykl && <th
               className={`${styles.matHeaderCell} ${styles.matColumnDestinationCode}`}
             >
               Destination Code
-            </th>
+            </th>}
             <th
               className={`${styles.matHeaderCell} ${styles.matColumnSpotDriver}`}
             >
@@ -364,7 +367,7 @@ const  renderConsentAndSubscriptionIcons = (shipment: any, openSubscribeModal: (
   OBD Number
 </th>)}
             <th className={`${styles.matHeaderCell} ${styles.matColumnDelayed}`}>Delayed</th>
-            <th className={`${styles.matHeaderCell} ${styles.matColumnSaleOrder}`}>Sale Order</th>
+            {isMykl && <th className={`${styles.matHeaderCell} ${styles.matColumnSaleOrder}`}>Sale Order</th>}
             <th className={`${styles.matHeaderCell} ${styles.matColumnEpodRequested}`}>ePOD Requested</th>
             <th className={`${styles.matHeaderCell} ${styles.matColumnCommercialInvoiceExist}`}>Commercial Invoice Exist</th>
             <th
@@ -574,9 +577,9 @@ const  renderConsentAndSubscriptionIcons = (shipment: any, openSubscribeModal: (
                   <div>{toTitleCase(shipment.driverName || "")}</div>
                 </td>
 
-                <td className={`${styles.matCell} ${styles.matColumnDestinationCode}`}>
+                {isMykl && <td className={`${styles.matCell} ${styles.matColumnDestinationCode}`}>
                   {shipment.destination_code || "-"}
-                </td>
+                </td>}
 
                 <td
                   className={`${styles.matCell} ${styles.matColumnSpotDriver}`}
@@ -643,7 +646,7 @@ const  renderConsentAndSubscriptionIcons = (shipment: any, openSubscribeModal: (
                     "No"
                   )}
                 </td>
-                <td className={styles.matCell}>
+                {isMykl && <td className={styles.matCell}>
                   {shipment.sale_order
                     ? (() => {
                         const orders = shipment.sale_order.split(",");
@@ -676,6 +679,7 @@ const  renderConsentAndSubscriptionIcons = (shipment: any, openSubscribeModal: (
                       })()
                     : "-"}
                 </td>
+                }
                 <td className={styles.matCell}>
                   {shipment.whatsApp?.isEpodRequested ? "Yes" : "No"}
                 </td>
@@ -739,65 +743,49 @@ const  renderConsentAndSubscriptionIcons = (shipment: any, openSubscribeModal: (
                           </div>
                         </div>
                         <div className={styles.actionCategoriesGrid}>
-                          {Object.entries(actionMenuCategories)
-                            .filter(
-                              ([_, items]) =>
-                                actionSearchState === "" ||
-                                (items as any[]).some((item) =>
-                                  item.label
-                                    .toLowerCase()
-                                    .includes(actionSearchState.toLowerCase())
-                                )
-                            )
-                            .map(([category, items]) => (
-                              <div
-                                key={category}
-                                className={styles.actionCategory}
-                              >
-                                <div className={styles.actionCategoryHeader}>
-                                  {category}
-                                </div>
-                                <div className={styles.actionCategoryItems}>
-                                  {(items as any[])
-                                    .filter(
-                                      (item) =>
-                                        actionSearchState === "" ||
-                                        item.label
-                                          .toLowerCase()
-                                          .includes(
-                                            actionSearchState.toLowerCase()
-                                          )
-                                    )
-                                    .map((item, index) => {
-                                      const IconComponent = item.icon;
-                                      return (
-                                        <DropdownMenuItem
-                                          key={index}
-                                          className={styles.actionMenuItem}
-                                          onSelect={(e) => {
-                                            e.preventDefault();
-                                            console.log("DropdownMenuItem onSelect triggered for:", item.label);
-                                            closeActionMenu();
-                                            console.log("closeActionMenu called from DropdownMenuItem");
-                                            if (item.onClick) {
-                                              item.onClick(shipment);
-                                            }
-                                          }}
-                                        >
-                                          <IconComponent
-                                            className={`${
-                                              styles.actionMenuIcon
-                                            } ${item.color || ""}`}
-                                          />
-                                          <span className={styles.actionLabel}>
-                                            {item.label}
-                                          </span>
-                                        </DropdownMenuItem>
-                                      );
-                                    })}
-                                </div>
-                              </div>
-                            ))}
+                          {
+                         Object.entries(actionMenuCategories(shipment))
+                         .filter(([, items]) => {
+                           const visibleItems = (items as any[]).filter(item => item.show !== false);
+                           return visibleItems.length > 0;
+                         })
+                         .map(([category, items]) => (
+                           <div key={category} className={styles.actionCategory}>
+                             <div className={styles.actionCategoryHeader}>{category}</div>
+                             <div className={styles.actionCategoryItems}>
+                               {(items as any[])
+                                 .filter(item => {
+                                   if (item.show === false) return false;
+                                   if (actionSearchState && !item.label.toLowerCase().includes(actionSearchState.toLowerCase())) {
+                                     return false;
+                                   }
+                                   return true;
+                                 })
+                                 .map((item, index) => {
+                                   const IconComponent = item.icon;
+                                   const isDisabled = item.disabled && (typeof item.disabled === 'function' ? item.disabled(shipment) : item.disabled);
+                                   
+                                   return (
+                                     <DropdownMenuItem
+                                       key={index}
+                                       className={`${styles.actionMenuItem} ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                       disabled={isDisabled}
+                                       onSelect={(e) => {
+                                         e.preventDefault();
+                                         if (!isDisabled && item.onClick) {
+                                           item.onClick(shipment);
+                                         }
+                                         closeActionMenu();
+                                       }}
+                                     >
+                                       <IconComponent className={`${styles.actionMenuIcon} ${item.color}`} />
+                                       <span className={styles.actionLabel}>{item.label}</span>
+                                     </DropdownMenuItem>
+                                   );
+                                 })}
+                             </div>
+                           </div>
+                         ))}
                         </div>
                       </DropdownMenuContent>
                     </DropdownMenu>
