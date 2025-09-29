@@ -52,7 +52,6 @@ import { ShipmentsTable } from "./ShipmentsTable";
 import { AnalyticsView } from "./AnalyticsView";
 import { AdvancedFilter } from "./AdvancedFilter/AdvancedFilter";
 import ShipmentDetails from "./ShipmentDetails/ShipmentDetails"; 
-import ShipmentDetails from "./ShipmentDetails/ShipmentDetails"; 
 import LocationModal from "../ShipmentsDashboard/LocationTracking/LocationModal";
 import ActiveCarriersModal from "../ShipmentsDashboard/SpecialFeatures/ActiveCarriersModal";
 import RerunShipmentModal from "../ShipmentsDashboard/ShipmentManagement/RerunShipmentModal";
@@ -371,6 +370,8 @@ const ShipmentsDashboard: React.FC = () => {
   const [selectedShipmentId, setSelectedShipmentId] = useState<string | null>(null);
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
   const [defaultDetailsTab, setDefaultDetailsTab] = useState<string | undefined>(undefined);
+  const [rawShipmentResponse, setRawShipmentResponse] = useState<any | null>(null);
+
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(0);
