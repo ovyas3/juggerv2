@@ -157,7 +157,9 @@ export const ShipmentsTable: React.FC<ShipmentsTableProps> = ({
   const [showOrdersPopup, setShowOrdersPopup] = useState(false);
   const [selectedOrders, setSelectedOrders] = useState<string[]>([]);
 
-  const handleBubbleClick = (orders: string[]) => {
+  const handleBubbleClick = (orders: string[], e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
     setSelectedOrders(orders);
     setShowOrdersPopup(true);
   };
@@ -666,8 +668,8 @@ const  renderConsentAndSubscriptionIcons = (shipment: any, openSubscribeModal: (
                             <span>{orders[0]}</span>
                             {orders.length > 1 && (
                               <span
-                                className={styles.buble_round}
-                                onClick={() => handleBubbleClick(orders.slice(1))}
+                                className={`${styles.buble_round} no-row-click`}
+                                onClick={(e) => handleBubbleClick(orders.slice(1), e)}
                                 style={{
                                   background: "#EDE7F6",
                                   borderRadius: "50%",
