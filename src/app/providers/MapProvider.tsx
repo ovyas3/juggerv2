@@ -1,6 +1,7 @@
 "use client";
 import { useLoadScript } from "@react-google-maps/api";
 import { environment } from "@/environments/env.api";
+import { Loader2 } from "lucide-react";
 
 export default function MapsProvider({ children }: { children: React.ReactNode }) {
     const { isLoaded, loadError } = useLoadScript({
@@ -38,8 +39,8 @@ export default function MapsProvider({ children }: { children: React.ReactNode }
                 height: '100vh',
                 flexDirection: 'column'
             }}>
-                <div>Loading Google Maps...</div>
-                <div>Please wait while we load the map</div>
+                <Loader2 style={{ color: "#4f46e5", fontSize: "2rem", width: "40px", height: "40px" }} />
+                <p>Loading...</p>
             </div>
         );
     }

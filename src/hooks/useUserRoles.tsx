@@ -10,7 +10,6 @@ export interface UserRoles {
   ratecard: boolean;
   finance: boolean;
   shipment: boolean;
-  sales_person: boolean;
 }
 
 // This custom hook is the React equivalent of your getRoles() function
@@ -23,7 +22,6 @@ export const useUserRoles = (): UserRoles => {
     ratecard: false,
     finance: false,
     shipment: false,
-    sales_person: false,
   });
 
   useEffect(() => {
@@ -54,7 +52,6 @@ export const useUserRoles = (): UserRoles => {
             role.value === 'finance_administrator'
           ),
           shipment: storedRoles.some(role => role.value === 'shipment_administrator'),
-          sales_person: storedRoles.some(role => role.value === 'sales_person'),
         };
         setRoles(newRoles);
       }

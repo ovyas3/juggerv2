@@ -1,4 +1,6 @@
 "use client";
+import dynamic from "next/dynamic";
+import Header from "@/components/Header/header";
 
 import React from 'react';
 
