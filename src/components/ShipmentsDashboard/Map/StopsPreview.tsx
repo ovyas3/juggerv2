@@ -600,14 +600,14 @@ export const StopsPreview: React.FC<StopsPreviewProps> = ({
           {idxLabel('pickup', 0)}
         </span>
         <div className={`${styles.stopPill} ${styles.pickupPill}`}>
-          <Tooltip 
+          {/* <Tooltip 
             content={needsTruncation(formatStop(firstPickup)) ? formatStop(firstPickup) : null}
             show={needsTruncation(formatStop(firstPickup))}
-          >
+          > */}
             <span className={styles.stopMainText}>
               {formatStop(firstPickup)}
             </span>
-          </Tooltip>
+          {/* </Tooltip> */}
           
           {morePickups > 0 && (
             <button
@@ -632,14 +632,14 @@ export const StopsPreview: React.FC<StopsPreviewProps> = ({
           {idxLabel('delivery', 0)}
         </span>
         <div className={`${styles.stopPill} ${styles.deliveryPill}`}>
-          <Tooltip 
+          {/* <Tooltip 
             content={needsTruncation(formatStop(firstDelivery)) ? formatStop(firstDelivery) : null}
             show={needsTruncation(formatStop(firstDelivery))}
-          >
+          > */}
             <span className={styles.stopMainText}>
               {formatStop(firstDelivery)}
             </span>
-          </Tooltip>
+          {/* </Tooltip> */}
           
           {moreDeliveries > 0 && (
             <button

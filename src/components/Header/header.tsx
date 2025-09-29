@@ -114,7 +114,7 @@ const Header = ({ setReloadOnHeaderChange, isMapHelper, getAllShipment, isShipme
           {/* {isCorporateUser ?  */}
             <div className="drop_down">
               {shippers.length && <Dropdown reload={setReloadOnHeaderChange} shippers={shippers} getAllShipment={getAllShipment} />}
-            </div> :
+            </div> 
             <div className="header_name">{parent_name}</div>
           {/* } */}
           <div className="divder"></div>
