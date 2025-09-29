@@ -219,3 +219,74 @@
     width: 100%;
   }
 }
+
+
+/* BulkUpload.module.css additions/modifications */
+
+
+.dragDropBox {
+  border: 2px dashed #D1D5DB; 
+  border-radius: 6px;
+  padding: 10px;
+  text-align: center;
+  color: #6B7280; 
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  background-color: #F9FAFB;
+  margin-bottom: 16px; 
+}
+
+.dragDropBox.dragOver {
+  border-color: #4F46E5; 
+  background-color: #e0e7ff; 
+}
+
+.dragDropBox:hover {
+  border-color: #9CA3AF;
+  background-color: #F3F4F6;
+}
+
+.dragDropBox .uploadIcon {
+  color: #4F46E5; 
+  margin-bottom: 8px;
+}
+
+.chooseFileButton {
+
+  background-color: #4F46E5 !important; /* Ensure primary background */
+  color: white !important;
+  border-radius: 4px !important;
+  padding: 8px 16px !important;
+  text-transform: none !important; /* Keep text as is */
+  font-weight: 500 !important;
+  box-shadow: none !important; /* Remove default MUI button shadow if any */
+  margin-top: 8px;
+}
+
+.chooseFileButton:hover {
+  background-color: #4338CA !important; 
+}
+
+
+.fileInputLabel {
+  display: flex;
+  align-items: center;
+  justify-content: center; 
+  padding: 10px 16px;
+  background-color: #EDE7F6; /* Light purple */
+  color: #5E35B1; /* Darker purple text */
+  border: 1px solid #4f46e5;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 14px;
+  font-weight: 500;
+  text-transform: none;
+  margin-bottom: 16px;
+}
+
+.fileInputLabel:hover {
+  background-color: #4f46e5;
+  color: white;
+  border-color: #4f46e5;
+}

@@ -51,6 +51,8 @@ import SubscribeModal from "./Communication/SubscribeModal";
 import { ShipmentsTable } from "./ShipmentsTable";
 import { AnalyticsView } from "./AnalyticsView";
 import { AdvancedFilter } from "./AdvancedFilter/AdvancedFilter";
+import ShipmentDetails from "./ShipmentDetails/ShipmentDetails"; 
+import ShipmentDetails from "./ShipmentDetails/ShipmentDetails"; 
 import LocationModal from "../ShipmentsDashboard/LocationTracking/LocationModal";
 import ActiveCarriersModal from "../ShipmentsDashboard/SpecialFeatures/ActiveCarriersModal";
 import RerunShipmentModal from "../ShipmentsDashboard/ShipmentManagement/RerunShipmentModal";
@@ -366,14 +368,10 @@ const ShipmentsDashboard: React.FC = () => {
   const [showButtons, setShowButtons] = useState(false);
   const [isAnalyticsView, setIsAnalyticsView] = useState(false);
   const [isCompactView, setIsCompactView] = useState(true);
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+  const [selectedShipmentId, setSelectedShipmentId] = useState<string | null>(null);
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
-  // Inside ShipmentsDashboard.js, with other state variables
-const [rawShipmentResponse, setRawShipmentResponse] = useState<any | null>(null);
-const LoadingSpinner = () => (
-  <div className={styles.loadingOverlay}>
-    <div className={styles.spinner} />
-  </div>
-);
+  const [defaultDetailsTab, setDefaultDetailsTab] = useState<string | undefined>(undefined);
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(0);
@@ -519,6 +517,7 @@ const LoadingSpinner = () => (
     []
   );
   const [isTechnova, setIsTechnova] = useState(false);
+  const [isTata, setIsTata] = useState(false);
   const initialLoadDone = useRef(false);
   const [showVideo, setShowVideo] = useState(false);
   const [videoUrl, setVideoUrl] = useState("");
@@ -710,6 +709,24 @@ useEffect(() => {
   }
 }, []);
 
+useEffect(() => {
+  // Read 'shippers' from localStorage and parse
+  try {
+    const shipperData = JSON.parse(localStorage.getItem("shippers") || "[]");
+    if (
+      shipperData &&
+      shipperData.length > 0 &&
+      shipperData[0].parent_name === "Tata Power Ltd"
+    ) {
+      setIsTata(true);
+    } else {
+      setIsTata(false);
+    }
+  } catch (error) {
+    setIsTata(false);
+  }
+}, []);
+
 
 // Add this with other handler functions
 const handleOpenGeofenceEditor = (shipment: Shipment) => {
@@ -742,7 +759,14 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
     setSelectedShipment(shipment);
     setShowDriverExpenses(true);
   };
-  
+  const handleViewDetails = (shipmentId: string) => {
+    setSelectedShipmentId(shipmentId);
+    setIsDetailsModalOpen(true);
+  };
+  const handleCloseDetails = () => {
+    setIsDetailsModalOpen(false);
+    setSelectedShipmentId(null);
+  };
 
   const handleFlushFreight = async (shipment: Shipment) => {
     closeAllDialogs();
@@ -921,6 +945,14 @@ const handleAddDriverExpenses = (shipment: Shipment) => {
   handleDriverExpenseClick(shipment);
 };
 
+  const handleOpenDetailsOnTab = (shipment: Shipment, tab: string) => {
+    closeAllDialogs();
+    setDefaultDetailsTab(tab);
+    setSelectedShipmentId(shipment._id);
+    setIsDetailsModalOpen(true);
+  };
+
+
   const handleCreatePaymentAdvice = (shipment: Shipment) => {
     closeAllDialogs();
     setSelectedShipmentForPayment(shipment);
@@ -935,7 +967,11 @@ const actionMenuCategories = (shipment: Shipment) => {
         icon: Eye, 
         label: "View", 
         color: "text-blue-600",
-        show: true
+        show: true,
+        onClick: (shipment: Shipment) => {
+          closeAllDialogs();
+          handleViewDetails(shipment._id);
+        }
       },
       { 
         icon: Share2, 
@@ -2906,7 +2942,8 @@ const applyFilter = () => {
           onSendEPOD={updateEPODBackToJDE}
           onFetchInvoiceDetails={fetchInvoiceDetails}
           onBulkUpload={() => openBulkUpload("shipment")}
-          isTechnova={parentFlags.isTechnova}
+          isTechnova={isTechnova}
+          isTata={isTata}
           isLoading={isLoading}
           isjspl={parentFlags.isjspl}
           hasSelectedShipments={selectedShipmentsArray.length > 0}
@@ -3227,6 +3264,7 @@ const applyFilter = () => {
                 setActionSearch={setActionSearch}
                 actionMenuCategories={actionMenuCategories}
                 renderStatusCell={renderStatusCell}
+                onViewDetails={handleViewDetails}
                 renderLocationCell={renderLocationCell}
                 renderDateTimeCell={renderDateTimeCell}
                 renderVehicleCell={renderVehicleCell}
@@ -3260,6 +3298,14 @@ const applyFilter = () => {
           open={modalOpen}
           onClose={closeSubscribeModal}
           shipment={selectedShipment}
+        />
+      )}
+      {isDetailsModalOpen && selectedShipmentId && (
+        <ShipmentDetails
+          isOpen={isDetailsModalOpen}
+          onClose={handleCloseDetails}
+          shipmentId={selectedShipmentId}
+      
         />
       )}
       {showActiveCarriersPopup && (
@@ -3793,8 +3839,7 @@ const applyFilter = () => {
     }}
   />
 )}
-
-     </div>
+ </div>
   );
 };
 

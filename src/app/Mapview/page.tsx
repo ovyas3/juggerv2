@@ -1,20 +1,13 @@
-// src/app/Mapview/page.tsx
+"use client";
 import dynamic from "next/dynamic";
 import Header from "@/components/Header/header";
 
-const MapClient = dynamic(
-  () => import("@/components/ShipmentsDashboard/Map/Mapview"),
-  { ssr: false }
-);
+import React from 'react';
 
-export default function Page() {
+export default function MapviewPage() {
   return (
-
-    <div className="max-w-5xl mx-auto p-6">
-        <Header></Header>
-        <div style={{ marginTop: '45px' }}>
-      <MapClient />
-      </div>
+    <div>
+      <h1>Map View</h1>
     </div>
   );
 }

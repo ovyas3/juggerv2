@@ -1,10 +1,18 @@
 "use client"
 
-import Triptracker from "@/components/triptracker/triptracker"
 import { useMediaQuery, useTheme } from "@mui/material"
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 
+const Triptracker = dynamic(
+  () => import('@/components/triptracker/triptracker'),
+  { 
+    loading: () => <p>Loading tracker...</p>, // Optional loading component
+    ssr: false 
+  }
+);
+ 
 export default function TriptrackerPage() {
   const theme = useTheme()
   const mobile = useMediaQuery(theme.breakpoints.down("sm"))

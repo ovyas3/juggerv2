@@ -350,6 +350,7 @@ export default function PTPKDashboard() {
               isLoadingMetrics={isLoadingMetrics}
               dateType={dateType}
               onDateTypeChange={handleDateTypeChange}
+              
             />
           </Tabs>
         </div>
