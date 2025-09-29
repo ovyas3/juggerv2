@@ -1,0 +1,71 @@
+/* components/ShipmentsDashboard/ShipmentDetails/SecurityAppStagesTab.module.css */
+
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.noImagesContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 200px;
+    color: #666;
+}
+
+.loadingDetails {
+    padding: 16px;
+    background-color: #fdfdfd;
+}
+
+.loadingTitle {
+    font-weight: 600;
+    font-size: 1rem;
+    color: #333;
+    margin-bottom: 8px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 4px;
+}
+
+.stageContainer {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.stageHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 16px;
+    background-color: #f5f5f5;
+}
+
+.imageGallery {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    padding: 16px;
+    min-height: 120px;
+    align-items: center;
+}
+
+.thumbnail {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.thumbnail:hover {
+    transform: scale(1.05);
+}
+
+.noImagesText {
+    width: 100%;
+    text-align: center;
+}

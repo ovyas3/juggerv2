@@ -1,0 +1,52 @@
+/* components/ShipmentsDashboard/ShipmentDetails/ActivityTimelineTab.module.css */
+.timelineContainer {
+    position: relative;
+    padding: 0 20px;
+  }
+  
+  .event {
+    display: flex;
+    position: relative;
+    padding-bottom: 24px;
+    min-height: 60px;
+  }
+  
+  .timelineGraphic {
+    position: absolute;
+    left: 161px;
+    top: 12px;
+    bottom: 0;
+    width: 18px;
+    display: flex;
+    flex-direction: column;
+    padding-left: 25px;
+    align-items: center;
+  }
+  
+  .dot {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background-color: #4F46E5;
+    border: 3px solid white;
+    z-index: 1;
+  }
+  
+  .line {
+    flex-grow: 1;
+    width: 2px;
+    background-color: #e0e0e0;
+  }
+  
+  .timestamp {
+    text-align: right;
+    padding-right: 24px;
+    width: 150px;
+    flex-shrink: 0;
+    padding-top: 6px;
+  }
+  
+  .eventContent {
+    padding-left: 60px;
+    padding-top: 6px;
+  }

@@ -51,6 +51,7 @@ import SubscribeModal from "./Communication/SubscribeModal";
 import { ShipmentsTable } from "./ShipmentsTable";
 import { AnalyticsView } from "./AnalyticsView";
 import { AdvancedFilter } from "./AdvancedFilter/AdvancedFilter";
+import ShipmentDetails from "./ShipmentDetails/ShipmentDetails"; 
 import LocationModal from "../ShipmentsDashboard/LocationTracking/LocationModal";
 import ActiveCarriersModal from "../ShipmentsDashboard/SpecialFeatures/ActiveCarriersModal";
 import RerunShipmentModal from "../ShipmentsDashboard/ShipmentManagement/RerunShipmentModal";
@@ -365,6 +366,8 @@ const ShipmentsDashboard: React.FC = () => {
   const [showButtons, setShowButtons] = useState(false);
   const [isAnalyticsView, setIsAnalyticsView] = useState(false);
   const [isCompactView, setIsCompactView] = useState(true);
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+  const [selectedShipmentId, setSelectedShipmentId] = useState<string | null>(null);
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
   // Inside ShipmentsDashboard.js, with other state variables
 const [rawShipmentResponse, setRawShipmentResponse] = useState<any | null>(null);
@@ -736,7 +739,14 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
     setSelectedShipment(shipment);
     setShowDriverExpenses(true);
   };
-  
+  const handleViewDetails = (shipmentId: string) => {
+    setSelectedShipmentId(shipmentId);
+    setIsDetailsModalOpen(true);
+  };
+  const handleCloseDetails = () => {
+    setIsDetailsModalOpen(false);
+    setSelectedShipmentId(null);
+  };
 
   const handleFlushFreight = async (shipment: Shipment) => {
     closeAllDialogs();
@@ -929,7 +939,11 @@ const actionMenuCategories = (shipment: Shipment) => {
         icon: Eye, 
         label: "View", 
         color: "text-blue-600",
-        show: true
+        show: true,
+        onClick: (shipment: Shipment) => {
+          closeAllDialogs();
+          handleViewDetails(shipment._id);
+        }
       },
       { 
         icon: Share2, 

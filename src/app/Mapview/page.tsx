@@ -1,4 +1,3 @@
-// src/app/Mapview/page.tsx
 import dynamic from "next/dynamic";
 import Header from "@/components/Header/header";
 
