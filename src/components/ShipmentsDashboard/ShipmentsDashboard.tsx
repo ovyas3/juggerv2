@@ -363,6 +363,7 @@ const ShipmentsDashboard: React.FC = () => {
     "all" | "outbound" | "inbound" | "others"
   >("all");
   const [isLoading, setIsLoading] = useState(false);
+
   const [showButtons, setShowButtons] = useState(false);
   const [isAnalyticsView, setIsAnalyticsView] = useState(false);
   const [isCompactView, setIsCompactView] = useState(true);
@@ -2898,6 +2899,7 @@ const applyFilter = () => {
 
   return (
     <div className={styles.main}>
+        {showLoader && <LoadingSpinner />} 
       <div className={styles.tabsContainer}>
         <div className={styles.tabsGroup}>
           <div
@@ -3127,6 +3129,7 @@ const applyFilter = () => {
           allCarriers={allCarriers}
           limit={pageSize}
           skip={currentPage * pageSize}
+          odcFilter={odcFilter}
           segmentations={segmentations}
           pickLocations={pickupLocations}
           deliverLocations={deliveryLocations}
