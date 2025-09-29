@@ -3682,11 +3682,25 @@ select.didFloatingSelect::-ms-expand {
   font-size: 12px;
   transition: all 0.2s ease;
   cursor: pointer;
+  border: 1px solid #dcdae21a;
 }
 
 .actionMenuItem:hover {
-  background: rgba(139, 92, 246, 0.1);
-  transform: translateX(2px);
+    border: 1px solid #4F46E5;
+    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+    outline: none;
+}
+
+.actionMenuItem:focus {
+  border: 1px solid #4F46E5;
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+  outline: none;
+}
+
+.actionMenuItem:active {
+  border: 1px solid #4F46E5;
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+  outline: none;
 }
 
 .actionMenuIcon {
