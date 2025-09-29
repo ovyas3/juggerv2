@@ -39,22 +39,20 @@ export const useUserRoles = (): UserRoles => {
         // 3. Loop through the array and set boolean flags (identical logic to Angular)
         const newRoles: UserRoles = {
           owner: storedRoles.some(role => role.value === 'account_owner'),
-          fleet: storedRoles.some(role => 
-            role.value === 'fleet_shipment_executive' || 
+          fleet: storedRoles.some(role => role.value === 'fleet_shipment_executive' ||
             role.value === 'fleet_shipment_administrator'
           ),
           fleet_admin: storedRoles.some(role => role.value === 'fleet_shipment_administrator'),
           unit_admin: storedRoles.some(role => role.value === 'unit_administrator'),
-          ratecard: storedRoles.some(role => 
-            role.value === 'ratecard_administrator' || 
+          ratecard: storedRoles.some(role => role.value === 'ratecard_administrator' ||
             role.value === 'ratecard_executive'
           ),
-          finance: storedRoles.some(role => 
-            role.value === 'finance_executive' || 
+          finance: storedRoles.some(role => role.value === 'finance_executive' ||
             role.value === 'finance_administrator'
           ),
           shipment: storedRoles.some(role => role.value === 'shipment_administrator'),
           sales_person: storedRoles.some(role => role.value === 'sales_person'),
+
         };
         setRoles(newRoles);
       }
