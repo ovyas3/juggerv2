@@ -51,6 +51,7 @@ import SubscribeModal from "./Communication/SubscribeModal";
 import { ShipmentsTable } from "./ShipmentsTable";
 import { AnalyticsView } from "./AnalyticsView";
 import { AdvancedFilter } from "./AdvancedFilter/AdvancedFilter";
+import ShipmentDetails from "./ShipmentDetails/ShipmentDetails"; 
 import LocationModal from "../ShipmentsDashboard/LocationTracking/LocationModal";
 import ActiveCarriersModal from "../ShipmentsDashboard/SpecialFeatures/ActiveCarriersModal";
 import RerunShipmentModal from "../ShipmentsDashboard/ShipmentManagement/RerunShipmentModal";
@@ -364,7 +365,9 @@ const ShipmentsDashboard: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showButtons, setShowButtons] = useState(false);
   const [isAnalyticsView, setIsAnalyticsView] = useState(false);
-  const [isCompactView, setIsCompactView] = useState(true);
+  const [isCompactView, setIsCompactView] = useState(false);
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+  const [selectedShipmentId, setSelectedShipmentId] = useState<string | null>(null);
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
   // Inside ShipmentsDashboard.js, with other state variables
 const [rawShipmentResponse, setRawShipmentResponse] = useState<any | null>(null);
@@ -736,7 +739,14 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
     setSelectedShipment(shipment);
     setShowDriverExpenses(true);
   };
-  
+  const handleViewDetails = (shipmentId: string) => {
+    setSelectedShipmentId(shipmentId);
+    setIsDetailsModalOpen(true);
+  };
+  const handleCloseDetails = () => {
+    setIsDetailsModalOpen(false);
+    setSelectedShipmentId(null);
+  };
 
   const handleFlushFreight = async (shipment: Shipment) => {
     closeAllDialogs();
@@ -925,11 +935,19 @@ const handleAddDriverExpenses = (shipment: Shipment) => {
 const actionMenuCategories = (shipment: Shipment) => {
   return {
     "Quick Actions": [
-      { 
-        icon: Eye, 
-        label: "View", 
+      {
+        
+        icon: Eye,
+        
+        label: "View",
+        
         color: "text-blue-600",
         show: true
+     ,
+        onClick: (shipment: Shipment) => {
+          closeAllDialogs();
+          handleViewDetails(shipment._id);
+        }
       },
       { 
         icon: Share2, 
@@ -3224,6 +3242,7 @@ const applyFilter = () => {
                 setActionSearch={setActionSearch}
                 actionMenuCategories={actionMenuCategories}
                 renderStatusCell={renderStatusCell}
+                onViewDetails={handleViewDetails}
                 renderLocationCell={renderLocationCell}
                 renderDateTimeCell={renderDateTimeCell}
                 renderVehicleCell={renderVehicleCell}
@@ -3257,6 +3276,13 @@ const applyFilter = () => {
           open={modalOpen}
           onClose={closeSubscribeModal}
           shipment={selectedShipment}
+        />
+      )}
+      {isDetailsModalOpen && selectedShipmentId && (
+        <ShipmentDetails
+          isOpen={isDetailsModalOpen}
+          onClose={handleCloseDetails}
+          shipmentId={selectedShipmentId}
         />
       )}
       {showActiveCarriersPopup && (

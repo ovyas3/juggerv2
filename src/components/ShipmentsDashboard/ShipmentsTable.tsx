@@ -92,6 +92,7 @@ interface ShipmentsTableProps {
   handleSelectShipment: (id: string, checked: boolean) => void;
   copyDestinationCode: any;
   openLocationsPopup: any;
+  onViewDetails: (shipmentId: string) => void;
   formatCurrency: (amount: number) => string;
   renderLastLocationCell: (shipment: Shipment) => React.ReactNode;
   actionMenuOpenId: string | null;
@@ -136,6 +137,7 @@ export const ShipmentsTable: React.FC<ShipmentsTableProps> = ({
   copyDestinationCode,
   openLocationsPopup,
   formatCurrency,
+  onViewDetails,
   actionMenuOpenId,
   setActionMenuOpenId,
   closeActionMenu,
@@ -402,7 +404,7 @@ const  renderConsentAndSubscriptionIcons = (shipment: any, openSubscribeModal: (
             </tr>
           ) : (
             shipmentsArray.map((shipment, index) => (
-              <tr key={shipment._id} className={styles.matRow}>
+              <tr key={shipment._id} className={styles.matRow} onClick={() => onViewDetails(shipment._id)}>
                 <td className={`${styles.matCell} ${styles.matColumnSelect}`}>
                   <input
                     type="checkbox"

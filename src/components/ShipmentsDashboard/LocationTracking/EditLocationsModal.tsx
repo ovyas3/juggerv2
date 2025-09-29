@@ -181,7 +181,9 @@ const EditLocationsModal: React.FC<EditLocationsModalProps> = ({
 
   const fetchProximityLocations = async (city: any) => {
     try {
-      const response = await httpsGet(`location/city_proximity?city=${encodeURIComponent(city)}`, 4);
+      const pathWithParams = `location/city_proximity?city=${encodeURIComponent(city)}`;
+      const response = await httpsGet(pathWithParams, 4);
+     
       if (response.statusCode === 200) {
         const locations = response.data.map((l: any) => ({
           ...l,

@@ -1,0 +1,128 @@
+/* components/ShipmentsDashboard/ShipmentDetails/DeliveryTab.module.css */
+.deliveryPointCard {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 24px;
+  background-color: #ffffff;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.header {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.deliveryIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background-color: #d8511f;
+  color: white;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+.timestampsCard {
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 16px;
+  height: 100%;
+}
+
+.timestampsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+ 
+  padding-bottom: 8px;
+
+}
+
+.invoiceGroup {
+  background-color: #f9f9f9;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 16px;
+  margin-top: 16px;
+}
+.uploading_epod_button{
+  padding: 5px;
+  background-color: rgb(25, 118, 210);
+  color: rgb(255, 255, 255);
+  border: none;
+  border-radius: 3px;
+  margin-left: 407px;
+  align-items: flex-end;
+  margin-top: 8px;
+}
+
+.done_button{
+  padding: 5px;
+  background-color: rgb(25, 118, 210);
+  color: rgb(255, 255, 255);
+  border: none;
+  border-radius: 3px;
+  /* margin-left: 352px; */
+  align-items: flex-end;
+  /* margin-top: 8px; */
+}
+.uploading_picture_button{
+  padding: 5px;
+  background-color: rgb(25, 118, 210);
+  color: rgb(255, 255, 255);
+  border: none;
+  border-radius: 3px;
+  margin-left: 402px;
+  align-items: flex-end;
+  margin-top: 8px;
+}
+
+
+.packageStatus {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #f0f0f0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.galleryBox {
+  border: 2px dashed #e0e0e0;
+  border-radius: 4px;
+  padding: 16px;
+  min-height: 90px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 16px;
+}
+
+.galleryBox_1 {
+  border: 2px dashed #e0e0e0;
+  border-radius: 4px;
+  padding: 16px;
+  min-height: 120px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 16px;
+}

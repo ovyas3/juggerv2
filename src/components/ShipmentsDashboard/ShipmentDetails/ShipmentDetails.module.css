@@ -1,0 +1,40 @@
+/* components/ShipmentsDashboard/ShipmentDetails/ShipmentDetails.module.css */
+
+.modalPaper {
+    width: 1150px; /* Width from original Angular CSS */
+    max-width: 95vw;
+    height: 650px;
+    border: 8px solid #4F46E5; /* Updated theme color */
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    border-radius: 16px; 
+    overflow: hidden; 
+  }
+  
+  .modalHeader {
+    background-color: #4F46E5; /* Updated theme color */
+    color: white;
+    padding: 0px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  
+  .modalContentArea {
+    flex-grow: 1;
+    overflow: hidden; /* Prevent this level from scrolling */
+    padding: 0;
+    background-color: #f5f5f5; /* Light grey background for the tab area */
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .tabPanel {
+    flex-grow: 1;
+    overflow-y: auto; /* Allow individual tab panels to scroll */
+    padding: 16px;
+    background-color: #ffffff;
+  }
