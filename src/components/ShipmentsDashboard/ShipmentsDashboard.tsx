@@ -3816,8 +3816,7 @@ const applyFilter = () => {
     }}
   />
 )}
-
-     </div>
+ </div>
   );
 };
 
