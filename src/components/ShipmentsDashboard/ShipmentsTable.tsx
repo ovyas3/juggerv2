@@ -404,7 +404,16 @@ const  renderConsentAndSubscriptionIcons = (shipment: any, openSubscribeModal: (
             </tr>
           ) : (
             shipmentsArray.map((shipment, index) => (
-              <tr key={shipment._id} className={styles.matRow} onClick={() => onViewDetails(shipment._id)}>
+              <tr 
+                key={shipment._id} 
+                className={styles.matRow}
+                onClick={(e) => {
+                  if (!(e.target as HTMLElement).closest('button, a, input, [role="button"], .no-row-click')) {
+                    onViewDetails(shipment._id);
+                  }
+                }}
+                style={{ cursor: 'pointer' }}
+              >
                 <td className={`${styles.matCell} ${styles.matColumnSelect}`}>
                   <input
                     type="checkbox"
@@ -703,29 +712,38 @@ const  renderConsentAndSubscriptionIcons = (shipment: any, openSubscribeModal: (
                 <td
                   className={`${styles.cellActions} ${styles.matColumnActions} ${styles.stickyRight}`}
                 >
-                  <div className={styles.quickActions}>
+                  <div className={`${styles.quickActions} no-row-click`}>
                     <DropdownMenu
                       open={actionMenuOpenId === shipment._id}
                       onOpenChange={(open) => {
                         setActionMenuOpenId(open ? shipment._id : null);
                       }}
+                      modal={false}
                     >
                       <DropdownMenuTrigger asChild>
                         <button
-                          className={styles.actionsMenuButton}
+                          className={`${styles.actionsMenuButton} no-row-click`}
                           title="More actions"
-                          onClick={() => setActionMenuOpenId(shipment._id)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            e.preventDefault(); 
+                            setActionMenuOpenId(shipment._id)
+                          }}
                         >
                           <MoreHorizontal className={styles.actionIcon} />
                         </button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent
                         align="end"
-                        className={styles.actionMenuDropdown}
+                        className={`${styles.actionMenuDropdown} no-row-click`}
                         onInteractOutside={() => {
                           setActionSearchState("");
+                          setActionMenuOpenId(null);
                         }}
                         sideOffset={15}
+                        onClick={(e) => {
+                          e.stopPropagation(); 
+                        }}
                       >
                         <div className={styles.actionMenuSearch}>
                           <div className={styles.actionSearchContainer}>

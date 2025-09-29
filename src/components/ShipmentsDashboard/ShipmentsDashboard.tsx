@@ -969,7 +969,8 @@ const actionMenuCategories = (shipment: Shipment) => {
         label: "View", 
         color: "text-blue-600",
         show: true,
-        onClick: (shipment: Shipment) => {
+        onClick: (shipment: Shipment, e?: React.MouseEvent) => {
+          e?.stopPropagation();
           closeAllDialogs();
           handleViewDetails(shipment._id);
         }
@@ -978,7 +979,10 @@ const actionMenuCategories = (shipment: Shipment) => {
         icon: Share2, 
         label: "Share", 
         color: "text-blue-500", 
-        onClick: () => handleShareShipment(shipment),
+        onClick: (shipment: Shipment, e?: React.MouseEvent) => {
+          e?.stopPropagation();
+          handleShareShipment(shipment);
+        },
         show: true,
         disabled: shipment.status != 'Assigned' && shipment.status != 'Completed' && shipment.status != 'Cancelled' && shipment.assigned != 'Pending'
       },
@@ -986,7 +990,10 @@ const actionMenuCategories = (shipment: Shipment) => {
         icon: Mail, 
         label: "Mail", 
         color: "text-orange-600", 
-        onClick: () => handleMailShipment(shipment),
+        onClick: (shipment: Shipment, e?: React.MouseEvent) => {
+          e?.stopPropagation();
+          handleMailShipment(shipment);
+        },
         show: true,
         disabled: shipment.status != 'Assigned' && shipment.status != 'Completed' && shipment.status != 'Cancelled' && shipment.assigned != 'Pending'
       },
@@ -994,7 +1001,10 @@ const actionMenuCategories = (shipment: Shipment) => {
         icon: XCircle, 
         label: "Cancel", 
         color: "text-red-600", 
-        onClick: () => handleCancelShipment(shipment),
+        onClick: (shipment: Shipment, e?: React.MouseEvent) => {
+          e?.stopPropagation();
+          handleCancelShipment(shipment);
+        },
         show: shipment.status !== 'Completed' && shipment.status !== 'Cancelled'
       },
     ],
@@ -1004,7 +1014,10 @@ const actionMenuCategories = (shipment: Shipment) => {
         icon: Download, 
         label: "SIM Tracking", 
         color: "text-amber-600", 
-        onClick: () => handleSimTracking(shipment),
+        onClick: (shipment: Shipment, e?: React.MouseEvent) => {
+          e?.stopPropagation();
+          handleSimTracking(shipment);
+        },
         show: showTracking,
         disabled: (shipment.status === 'Completed' || shipment.status === 'Assigned' || shipment.status === 'Cancelled')
       },
@@ -1012,21 +1025,30 @@ const actionMenuCategories = (shipment: Shipment) => {
         icon: WifiOff, 
         label: "GPS Disconnection Reason", 
         color: "text-teal-600", 
-        onClick: () => handleOpenReasonDialog('gps', shipment._id, shipment.sin),
+        onClick: (shipment: Shipment, e?: React.MouseEvent) => {
+          e?.stopPropagation();
+          handleOpenReasonDialog('gps', shipment._id, shipment.sin);
+        },
         show: true
       },
       { 
         icon: Wifi, 
         label: "Add GPS Connection", 
         color: "text-amber-600", 
-        onClick: () => handleOpenGpsModal(shipment),
+        onClick: (shipment: Shipment, e?: React.MouseEvent) => {
+          e?.stopPropagation();
+          handleOpenGpsModal(shipment);
+        },
         show: !!shipment.carrier
       },
       { 
         icon: Clock, 
         label: "Update Delay Reason", 
         color: "text-teal-600", 
-        onClick: () => handleOpenReasonDialog('delay', shipment._id, shipment.sin),
+        onClick: (shipment: Shipment, e?: React.MouseEvent) => {
+          e?.stopPropagation();
+          handleOpenReasonDialog('delay', shipment._id, shipment.sin);
+        },
         show: true
       },
     ],
@@ -1036,21 +1058,30 @@ const actionMenuCategories = (shipment: Shipment) => {
         icon: Truck, 
         label: "Update Carrier Freight", 
         color: "text-gray-600", 
-        onClick: () => handleOpenFreightModal(shipment._id, shipment.sin, 'rate'),
+        onClick: (shipment: Shipment, e?: React.MouseEvent) => {
+          e?.stopPropagation();
+          handleOpenFreightModal(shipment._id, shipment.sin, 'rate');
+        },
         show: shipment.rate?.type === 'manual' && showFreight
       },
       { 
         icon: Truck, 
         label: "Update Client Freight", 
         color: "text-yellow-600", 
-        onClick: () => handleOpenFreightModal(shipment._id, shipment.sin, 'client_rate'),
+        onClick: (shipment: Shipment, e?: React.MouseEvent) => {
+          e?.stopPropagation();
+          handleOpenFreightModal(shipment._id, shipment.sin, 'client_rate');
+        },
         show: shipment.client_rate?.type === 'manual' && showFreight
       },
       { 
         icon: CreditCard, 
         label: "Create Payment Advice", 
         color: "text-indigo-600", 
-        onClick: () => handleCreateAdvancePayment(shipment),
+        onClick: (shipment: Shipment, e?: React.MouseEvent) => {
+          e?.stopPropagation();
+          handleCreateAdvancePayment(shipment);
+        },
         show: !shipment.isOwnFleet_shipment && shipment.status !== 'Cancelled'
       },
       { icon: FileText, label: "Change Invoice Type", color: "text-brown-600", onClick: handleChangeInvoiceType, show: true },
@@ -1061,21 +1092,30 @@ const actionMenuCategories = (shipment: Shipment) => {
         icon: PlusCircle, 
         label: "Add DO Details", 
         color: "text-blue-600", 
-        onClick: () => handleAddDODetails(shipment),
+        onClick: (shipment: Shipment, e?: React.MouseEvent) => {
+          e?.stopPropagation();
+          handleAddDODetails(shipment);
+        },
         show: shipment.status === 'Accepted'
       },
       { 
         icon: Edit, 
         label: "Update Shipment Status", 
         color: "text-yellow-600", 
-        onClick: () => handleUpdateShipmentStatus(shipment),
+        onClick: (shipment: Shipment, e?: React.MouseEvent) => {
+          e?.stopPropagation();
+          handleUpdateShipmentStatus(shipment);
+        },
         show: (roles.shipment_admin || roles.owner) && shipment.status === 'In Transit'
       },
       { 
         icon: CheckCircle, 
         label: "Complete Shipment", 
         color: "text-green-600", 
-        onClick: () => handleCompleteShipment(shipment),
+        onClick: (shipment: Shipment, e?: React.MouseEvent) => {
+          e?.stopPropagation();
+          handleCompleteShipment(shipment);
+        },
         show: (functions.shipment_management || (roles.owner || roles.fleet)) && 
               (!shipment.inboundShippers || 
                (selectedShipperLocationID === shipment.lastDeliveryLocation) || 
@@ -1086,7 +1126,10 @@ const actionMenuCategories = (shipment: Shipment) => {
         icon: CheckCircle, 
         label: "Submit Mark As Arrived", 
         color: "text-green-600", 
-        onClick: () => handleMarkAsArrived(shipment),
+        onClick: (shipment: Shipment, e?: React.MouseEvent) => {
+          e?.stopPropagation();
+          handleMarkAsArrived(shipment);
+        },
         show: functions.shipment_management || (roles.owner || roles.fleet),
         disabled: (shipment.status === 'Completed' || shipment.status === 'Cancelled')
       },
@@ -1102,7 +1145,10 @@ const actionMenuCategories = (shipment: Shipment) => {
             icon: AlertCircle, 
             label: "Mark Fault Device", 
             color: "text-red-600", 
-            onClick: () => handleMarkFaultDevice(shipment),
+            onClick: (shipment: Shipment, e?: React.MouseEvent) => {
+              e?.stopPropagation();
+              handleMarkFaultDevice(shipment);
+            },
             show: shipment.assigned_driver?.vehicle && !!shipment.assigned_driver.vehicle.gps
           } as const]: []),
       ...(parentFlags.isjspl
@@ -1110,7 +1156,10 @@ const actionMenuCategories = (shipment: Shipment) => {
             icon: AlertCircle, 
             label: "Missed Event", 
             color: "text-red-600", 
-            onClick: () => handleMissedEvent(shipment),
+            onClick: (shipment: Shipment, e?: React.MouseEvent) => {
+              e?.stopPropagation();
+              handleMissedEvent(shipment);
+            },
             show: true
           } as const] : []),
     ],
@@ -1120,14 +1169,20 @@ const actionMenuCategories = (shipment: Shipment) => {
         icon: FileText, 
         label: "Upload Approval Documents", 
         color: "text-purple-600", 
-        onClick: () => handleUploadApprovalDocuments(shipment),
+        onClick: (shipment: Shipment, e?: React.MouseEvent) => {
+          e?.stopPropagation();
+          handleUploadApprovalDocuments(shipment);
+        },
         show: shipment.rate?.type === 'manual'
       },
       { 
         icon: Package, 
         label: "View Epods", 
         color: "text-brown-600", 
-        onClick: () => handleViewEpods(shipment),
+        onClick: (shipment: Shipment, e?: React.MouseEvent) => {
+          e?.stopPropagation();
+          handleViewEpods(shipment);
+        },
         show: !!shipment.carrier
       },
       { 
@@ -1146,7 +1201,10 @@ const actionMenuCategories = (shipment: Shipment) => {
         icon: Upload, 
         label: "Bulk Upload - Commercial Invoices", 
         color: "text-green-600", 
-        onClick: () => handleBulkUploadCommercialInvoices(shipment),
+        onClick: (shipment: Shipment, e?: React.MouseEvent) => {
+          e?.stopPropagation();
+          handleBulkUploadCommercialInvoices(shipment);
+        },
         show: !shipment.disableInvoiceEdit && (shipmentType === 'outbound' || shipmentType === 'all')
       },
     ],
@@ -1156,7 +1214,10 @@ const actionMenuCategories = (shipment: Shipment) => {
         icon: UserPlus, 
         label: "Add Managed By", 
         color: "text-blue-600", 
-        onClick: () => handleAddManagedBy(shipment),
+        onClick: (shipment: Shipment, e?: React.MouseEvent) => {
+          e?.stopPropagation();
+          handleAddManagedBy(shipment);
+        },
         show: !!shipment.isOwnFleet_shipment
       },
       ...(parentFlags.isMykl
@@ -1164,19 +1225,31 @@ const actionMenuCategories = (shipment: Shipment) => {
             icon: RefreshCw, 
             label: "ReTrigger Missed Events", 
             color: "text-blue-600", 
-            onClick: () => handleRetriggerMissedEvents(shipment),
+            onClick: (shipment: Shipment, e?: React.MouseEvent) => {
+              e?.stopPropagation();
+              handleRetriggerMissedEvents(shipment);
+            },
             show: true
           } as const]: []),
       { 
         icon: Plus, 
         label: "Add Driver Expenses", 
         color: "text-green-600", 
-        onClick: () => handleAddDriverExpenses(shipment),
+        onClick: (shipment: Shipment, e?: React.MouseEvent) => {
+          e?.stopPropagation();
+          handleAddDriverExpenses(shipment);
+        },
         show: ((shipment.isOwnFleet_shipment && !shipment.carrier) || 
                shipment.status === 'Completed') && !!shipment.isVehicleId
       },
-      { icon: Plus, label: "Add/Edit Geofence", color: "text-green-600", onClick: () => handleOpenGeofenceEditor(shipment), show: true },
-      { icon: Truck, label: "Flush Freight", color: "text-gray-600", onClick: () => handleFlushFreight(shipment), show: true },
+      { icon: Plus, label: "Add/Edit Geofence", color: "text-green-600", onClick: (shipment: Shipment, e?: React.MouseEvent) => {
+        e?.stopPropagation();
+        handleOpenGeofenceEditor(shipment);
+      }, show: true },
+      { icon: Truck, label: "Flush Freight", color: "text-gray-600", onClick: (shipment: Shipment, e?: React.MouseEvent) => {
+        e?.stopPropagation();
+        handleFlushFreight(shipment);
+      }, show: true },
     ],
     
     "Location & Routes": [
@@ -1184,7 +1257,10 @@ const actionMenuCategories = (shipment: Shipment) => {
         icon: Edit, 
         label: "Edit Pickup Location", 
         color: "text-pink-600", 
-        onClick: () => handleOpenEditLocation(shipment, 'pickup'), 
+        onClick: (shipment: Shipment, e?: React.MouseEvent) => {
+          e?.stopPropagation();
+          handleOpenEditLocation(shipment, 'pickup'); 
+        },
         show: true,
         disabled: ['Completed', 'Cancelled'].includes(shipment.status) 
       },
@@ -1192,7 +1268,10 @@ const actionMenuCategories = (shipment: Shipment) => {
         icon: Edit, 
         label: "Edit Delivery Location", 
         color: "text-pink-600", 
-        onClick: () => handleOpenEditLocation(shipment, 'delivery'), 
+        onClick: (shipment: Shipment, e?: React.MouseEvent) => {
+          e?.stopPropagation();
+          handleOpenEditLocation(shipment, 'delivery'); 
+        },
         show: true,
         disabled: ['Completed', 'Cancelled'].includes(shipment.status) 
       },
@@ -1200,17 +1279,26 @@ const actionMenuCategories = (shipment: Shipment) => {
         icon: Calculator, 
         label: "Recalculate Distance", 
         color: "text-pink-600", 
-        onClick: () => handleRecalculateDistanceClick(shipment),
+        onClick: (shipment: Shipment, e?: React.MouseEvent) => {
+          e?.stopPropagation();
+          handleRecalculateDistanceClick(shipment);
+        },
         show: true
       },
       { 
         icon: Route, 
         label: "Pull Freight with Routes", 
         color: "text-brown-600", 
-        onClick: () => handlePullFreightWithRoutes(shipment),
+        onClick: (shipment: Shipment, e?: React.MouseEvent) => {
+          e?.stopPropagation();
+          handlePullFreightWithRoutes(shipment);
+        },
         show: true
       },
-      { icon: DoorOpen, label: "Recalculate Customer Gate In/Out", color: "text-pink-600", onClick: (shipment: Shipment) => handleRecalculateGateInOut(shipment), disabled: (shipment: Shipment) => ["Completed", "Cancelled"].includes(shipment.status), show: shipment.trip_tracker?.methods?.includes('GPS') },
+      { icon: DoorOpen, label: "Recalculate Customer Gate In/Out", color: "text-pink-600", onClick: (shipment: Shipment, e?: React.MouseEvent) => {
+        e?.stopPropagation();
+        handleRecalculateGateInOut(shipment);
+      }, disabled: (shipment: Shipment) => ["Completed", "Cancelled"].includes(shipment.status), show: shipment.trip_tracker?.methods?.includes('GPS') },
       // { 
       //   icon: RefreshCw, 
       //   label: "Rerun", 
@@ -3262,7 +3350,7 @@ const applyFilter = () => {
                 showLoader={showLoader}
                 actionSearch={actionSearch}
                 setActionSearch={setActionSearch}
-                actionMenuCategories={() => actionMenuCategories}
+                actionMenuCategories={actionMenuCategories}
                 renderStatusCell={renderStatusCell}
                 onViewDetails={handleViewDetails}
                 renderLocationCell={renderLocationCell}
