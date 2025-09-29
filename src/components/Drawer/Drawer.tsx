@@ -63,6 +63,8 @@ import HelpActive from "@/assets/help_active.svg";
 import HelpInactive from "@/assets/help_inactive.svg";
 import { environment } from '@/environments/env.api';
 import { useTranslations } from 'next-intl';
+import ShipmentActive from "@/assets/shipments-active.svg";
+import ShipmentInactive from "@/assets/shipments-inactive.svg";
 
 interface NavItem {
     id: string;
@@ -174,8 +176,8 @@ const navigationItems: NavItem[] = [
         id: 'shipmentsDashboard',
         label: 'Shipments List',
         icon: '',
-        activeIcon: RouteActiveIcon,
-        inactiveIcon: RouteInactiveIcon,
+        activeIcon: ShipmentActive,
+        inactiveIcon: ShipmentInactive,
         isImageIcon: true
     },
     {
