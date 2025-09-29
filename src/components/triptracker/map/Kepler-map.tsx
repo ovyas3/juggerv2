@@ -2222,6 +2222,27 @@ if (haltPopupRef.current && mapRef.current) { try { mapRef.current.closePopup(ha
   </Polyline>
 ))}
 
+{/* === FASTag Polyline (if available and enabled) === */}
+{showFastag && fastagPath.length > 0 && (
+  <Polyline
+    key="fastag-polyline"
+    positions={fastagPath}
+    pathOptions={{
+      color: "#ff6b35",
+      weight: 4,
+      opacity: 0.9,
+      dashArray: "5, 10"
+    }}
+  >
+    <Popup>
+      <div>
+        <h4>FASTag Route</h4>
+        <p>Route distance: {fastagPath.length} points</p>
+      </div>
+    </Popup>
+  </Polyline>
+)}
+
 {/* === Fence Path Polyline (if available and enabled) === */}
 {(() => {
   const shouldShowFence = (
@@ -2558,6 +2579,20 @@ if (haltPopupRef.current && mapRef.current) { try { mapRef.current.closePopup(ha
                     }}
                   />
                 ))}
+
+              {/* Show FASTag polyline in magnifier */}
+              {showFastag && fastagPath.length > 0 && (
+                <Polyline
+                  key="magnifier-fastag-polyline"
+                  positions={fastagPath}
+                  pathOptions={{
+                    color: "#ff6b35",
+                    weight: 4,
+                    opacity: 0.9,
+                    dashArray: "5, 10"
+                  }}
+                />
+              )}
 
               {/* Show toll plaza markers in magnifier */}
               {showFastag &&
