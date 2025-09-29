@@ -1386,7 +1386,7 @@ const closeActionMenu = () => {
   ) => {
     setShipmentType(type);
     setCurrentPage(0);
-    fetchShipments(type);
+    fetchShipments({ type_filter: type });
   };
 
   const handleSubFilterSelect = (filterKey: string) => {
@@ -1604,11 +1604,11 @@ const closeActionMenu = () => {
     Object.assign(filters, type);
   }
 
-    const filterType = shipmentType;
+  const filterType = type.type_filter || shipmentType;
 
-    if (filterType !== "all") {
-      filters.type_filter = filterType;
-    }
+  if (filterType && filterType !== "all") {
+    filters.type_filter = filterType;
+  }
 
     filters.limit = pageSize;
     filters.skip = currentPage * pageSize;
@@ -1622,11 +1622,6 @@ const closeActionMenu = () => {
     }
 
     setSelectedShipmentsArray([]);
-
-    if (shipmentType === "all") {
-      delete filters.dashboard_filter;
-      delete filters.type_filter;
-    }
 
     setShowButtons(false);
 
