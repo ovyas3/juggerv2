@@ -2899,7 +2899,6 @@ const applyFilter = () => {
 
   return (
     <div className={styles.main}>
-        {showLoader && <LoadingSpinner />} 
       <div className={styles.tabsContainer}>
         <div className={styles.tabsGroup}>
           <div
