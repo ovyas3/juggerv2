@@ -46,8 +46,6 @@
   left: 0;   
   background: #fff;     /* so it doesn't show content underneath */
 }
-/* --- Sticky column fixes for Pickup, Delivery, Carrier --- */
-
 /* Replace border-right with inset shadow to avoid white gap while scrolling */
 
 
@@ -4405,4 +4403,50 @@ select.didFloatingSelect::-ms-expand {
   flex-direction: row-reverse;
   width: 100%;
   position: relative;
+}
+
+.actionMenuItem:disabled,
+.actionMenuItem[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed !important;
+  background-color: #f3f4f6 !important;
+  color: #6b7280 !important;
+}
+
+.actionMenuItem:disabled .actionMenuIcon,
+.actionMenuItem[disabled] .actionMenuIcon {
+  opacity: 0.6;
+}
+
+.actionMenuItem:disabled .actionLabel,
+.actionMenuItem[disabled] .actionLabel {
+  color: #6b7280 !important;
+}
+
+.actionMenuItem {
+  display: flex;
+  align-items: center;
+  color: var(--foreground);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.actionMenuItem:hover:not(.actionMenuItemDisabled) {
+  background-color: var(--accent);
+}
+
+.actionMenuItemDisabled {
+  opacity: 0.6;
+  cursor: not-allowed !important;
+  background-color: #f3f4f6 !important;
+  pointer-events: none;
+}
+
+.actionMenuIconDisabled {
+  opacity: 0.6;
+}
+
+.actionLabelDisabled {
+  color: #6b7280 !important;
 }
