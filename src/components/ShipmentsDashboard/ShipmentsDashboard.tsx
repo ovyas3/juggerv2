@@ -3262,7 +3262,7 @@ const applyFilter = () => {
                 showLoader={showLoader}
                 actionSearch={actionSearch}
                 setActionSearch={setActionSearch}
-                actionMenuCategories={actionMenuCategories}
+                actionMenuCategories={() => actionMenuCategories}
                 renderStatusCell={renderStatusCell}
                 onViewDetails={handleViewDetails}
                 renderLocationCell={renderLocationCell}

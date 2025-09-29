@@ -1,6 +1,7 @@
 import React from "react";
 import styles from "./InvoiceTypeModal.module.css";
 import ModalHeader from "@/components/UI/ModalHeader/ModalHeader";
+import { useTranslations } from 'next-intl';
 
 interface InvoiceItem {
   invoiceType: "CT" | "PT";
@@ -31,7 +32,7 @@ const InvoiceTypeModal: React.FC<InvoiceTypeModalProps> = ({
   loading = false,
   sin = "",
 }) => {
-  const { t } = useTranslation();
+  // const { t } = useTranslation();
 
   if (!show) return null;
 
