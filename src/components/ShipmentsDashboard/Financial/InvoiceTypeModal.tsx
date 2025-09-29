@@ -31,6 +31,8 @@ const InvoiceTypeModal: React.FC<InvoiceTypeModalProps> = ({
   loading = false,
   sin = "",
 }) => {
+  const { t } = useTranslation();
+
   if (!show) return null;
 
   const columns = [

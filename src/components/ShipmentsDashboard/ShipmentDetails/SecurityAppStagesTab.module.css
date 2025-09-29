@@ -49,6 +49,17 @@
     padding: 16px;
     min-height: 120px;
     align-items: center;
+   
+}
+.imageGallery_2 {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    padding: 16px;
+    min-height: 120px;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
 }
 
 .thumbnail {

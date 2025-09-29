@@ -19,7 +19,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
+  width: 30px;
   height: 28px;
   border-radius: 50%;
   background-color: #d8511f;
@@ -28,6 +28,30 @@
   font-size: 0.9rem;
 }
 
+.pickupIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background-color: #0b7d2e;
+  color: white;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+.pickupLabel {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 8px;
+  border-radius: 12px;
+  background-color: #fdeee6; /* Light orange background */
+  color: #0b7d2e; /* Dark orange text */
+  font-weight: 500;
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
 .timestampsCard {
   border: 1px solid #e0e0e0;
   border-radius: 4px;
@@ -46,9 +70,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
- 
   padding-bottom: 8px;
-
 }
 
 .invoiceGroup {
@@ -58,7 +80,7 @@
   padding: 16px;
   margin-top: 16px;
 }
-.uploading_epod_button{
+.uploading_epod_button {
   padding: 5px;
   background-color: #4f46e5;
   color: rgb(255, 255, 255);
@@ -69,7 +91,7 @@
   margin-top: 8px;
 }
 
-.done_button{
+.done_button {
   padding: 5px;
   background-color: #4f46e5;
   color: rgb(255, 255, 255);
@@ -79,7 +101,7 @@
   align-items: flex-end;
   /* margin-top: 8px; */
 }
-.uploading_picture_button{
+.uploading_picture_button {
   padding: 5px;
   background-color: #4f46e5;
   color: rgb(255, 255, 255);
@@ -89,7 +111,6 @@
   align-items: flex-end;
   margin-top: 8px;
 }
-
 
 .packageStatus {
   margin-top: 16px;
@@ -125,4 +146,56 @@
   justify-content: center;
   text-align: center;
   gap: 16px;
+}
+
+/* New/Corrected Styles for EPOD buttons */
+.epodButtonContainer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.uploadEpodButton,
+.requestEpodButton {
+  background-color: #4f46e5;
+  color: white;
+  box-shadow: none;
+  text-transform: capitalize;
+}
+
+.requestEpodButton {
+  background-color: #0c6628;
+}
+
+.epodApprovalStatus {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.approvedText {
+  color: green;
+  font-weight: bold;
+}
+
+.disapprovedText {
+  color: red;
+  font-weight: bold;
+}
+
+.approveButton,
+.disapproveButton {
+  text-transform: capitalize;
+  color: white;
+  box-shadow: none;
+}
+
+.approveButton {
+  background-color: #0c6628;
+}
+
+.disapproveButton {
+  background-color: #d85120;
 }

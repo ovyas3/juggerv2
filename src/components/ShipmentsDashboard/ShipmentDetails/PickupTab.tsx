@@ -1,7 +1,7 @@
 // components/ShipmentsDashboard/ShipmentDetails/PickupTab.tsx
 "use client";
 
-import React, { useState, useRef, useMemo } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   Box,
   AppBar,
@@ -183,6 +183,10 @@ const PickupTab = ({
   canEditInvoices,
   ownFleet,
   userRoles,
+  isTechnova,
+  isEmami,
+  isBMWIL,
+  isTata
 }: {
   shipmentData: any;
   onDataChange: () => void;
@@ -190,6 +194,10 @@ const PickupTab = ({
   canEditInvoices: boolean;
   ownFleet: boolean;
   userRoles: UserRoles;
+  isTechnova: boolean;
+  isEmami: boolean;
+  isBMWIL: boolean;
+  isTata: boolean;
 }) => {
   const [activeSubTab, setActiveSubTab] = useState(0);
   const [isEditingTimestamps, setIsEditingTimestamps] = useState<
@@ -213,6 +221,7 @@ const PickupTab = ({
   const [newContainerData, setNewContainerData] = useState<
     Record<string, { container: string; seal: string }>
   >({});
+  
 
   const { showMessage } = useSnackbar();
   const fileInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
@@ -288,6 +297,24 @@ const PickupTab = ({
       setIsSavingTimestamps((prev) => ({ ...prev, [pickupId]: false }));
     }
   };
+
+  // useEffect(() => {
+  //   // Read 'shippers' from localStorage and parse
+  //   try {
+  //     const shipperData = JSON.parse(localStorage.getItem("shippers") || "[]");
+  //     if (
+  //       shipperData &&
+  //       shipperData.length > 0 &&
+  //       shipperData[0].parent_name === "TechNova Imaging Systems Pvt Ltd"
+  //     ) {
+  //       setIsTechnova(true);
+  //     } else {
+  //       setIsTechnova(false);
+  //     }
+  //   } catch (error) {
+  //     setIsTechnova(false);
+  //   }
+  // }, []);
 
    // --- Goods & Invoice Handlers ---
    const handleEditGoodsToggle = (pickupId: string) => {
@@ -685,7 +712,7 @@ const PickupTab = ({
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
-      <AppBar
+      {/* <AppBar
         position="relative"
         color="default"
         sx={{
@@ -744,7 +771,7 @@ const PickupTab = ({
             }}
           />
         </Tabs>
-      </AppBar>
+      </AppBar> */}
 
       <Box sx={{ flexGrow: 1, overflowY: "auto", position: "relative" }}>
         <TabPanel value={activeSubTab} index={0}>
@@ -776,13 +803,23 @@ const PickupTab = ({
                     </Box>
                     <Box sx={{ pl: "28px" }}>
                       <Typography variant="body2">
-                        Scheduled:{" "}
+                        Scheduled Pickup Date & Time:{" "}
                         <strong>{formatDateTime(pickup.scheduled_at)}</strong>
                       </Typography>
-                      <Typography variant="body2">
-                        DO Number:{" "}
-                        <strong>{shipmentData.do_numbers?.join(", ") || "N/A"}</strong>
-                      </Typography>
+                      {isEmami ? (
+                        <Typography variant="body2" sx={{ pl: "16px" }}>
+                          Loading Charges (₹):{" "}
+                          <strong>
+                            {shipmentData.others?.loading_charges || "N/A"}
+                          </strong>
+                        </Typography>
+                        ) : !isTechnova && !isTata && !isBMWIL ? (
+                          <Typography variant="body2" sx={{ pl: "16px" }}>
+                            DO Number:{" "}
+                            <strong>{shipmentData.do_numbers?.join(", ") || "N/A"}</strong>
+                          </Typography>
+                        ) : null
+                      }
                     </Box>
                   </Grid>
                   <Grid item xs={12} md={5} sx={{ padding: "16px" }}>
@@ -920,9 +957,9 @@ const PickupTab = ({
                               <Typography variant="body2" sx={labelStyle}>
                                 Arrival
                               </Typography>
-                              <Typography variant="body2" sx={valueStyle}>
+                              <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
                                 {pickup.arrived_at
-                                  ? formatDateTime(pickup.arrived_at)
+                                  ? `: ${formatDateTime(pickup.arrived_at)}`
                                   : ": N/A"}
                               </Typography>
                             </Box>
@@ -932,9 +969,9 @@ const PickupTab = ({
                               <Typography variant="body2" sx={labelStyle}>
                                 Loading Start
                               </Typography>
-                              <Typography variant="body2" sx={valueStyle}>
+                              <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
                                 {pickup.driver_act_loading_time?.start
-                                  ? formatDateTime(pickup.driver_act_loading_time.start)
+                                  ? `: ${formatDateTime(pickup.driver_act_loading_time.start)}`
                                  : ": N/A"}
                               </Typography>
                             </Box>
@@ -944,9 +981,9 @@ const PickupTab = ({
                               <Typography variant="body2" sx={labelStyle}>
                                 Loading Complete
                               </Typography>
-                              <Typography variant="body2" sx={valueStyle}>
+                              <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
                                 {pickup.driver_act_loading_time?.end
-                                  ? formatDateTime(pickup.driver_act_loading_time.end)
+                                  ? `: ${formatDateTime(pickup.driver_act_loading_time.end)}`
                                   : ": N/A"}
                               </Typography>
                             </Box>
@@ -956,9 +993,9 @@ const PickupTab = ({
                               <Typography variant="body2" sx={labelStyle}>
                                 Dispatched
                               </Typography>
-                              <Typography variant="body2" sx={valueStyle}>
+                              <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
                                 {pickup.finished_at
-                                  ? formatDateTime(pickup.finished_at)
+                                  ? `: ${formatDateTime(pickup.finished_at)}`
                                   : ": N/A"}
                               </Typography>
                             </Box>
@@ -1050,6 +1087,10 @@ const PickupTab = ({
                   onRemoveRow={(groupIndex, ciIndex) =>
                     handleRemoveRow(pickup._id, groupIndex, ciIndex)
                   }
+                  isTechnova = {isTechnova}
+                  isEmami = {isEmami}
+                  isBMWIL = {isBMWIL}
+                  shipmentData={shipmentData}
                 />
                 <Grid
                   container

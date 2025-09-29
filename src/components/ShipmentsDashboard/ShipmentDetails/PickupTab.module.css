@@ -26,6 +26,20 @@
   font-weight: bold;
   font-size: 0.9rem;
 }
+
+.pickupLabel {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 8px;
+  border-radius: 12px;
+  background-color: #e1f3e8; /* Light green background */
+  color: #0b7d2e; /* Dark green text */
+  font-weight: 500;
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+
 .scheduled_do{
   padding-left: 40px;
 }

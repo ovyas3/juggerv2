@@ -1,7 +1,7 @@
 // components/ShipmentsDashboard/ShipmentDetails/LorryReceiptTab.tsx
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
   Box,
   Typography,
@@ -22,43 +22,127 @@ import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Cancel";
 import { httpsPost } from "@/utils/Communication";
 import { useSnackbar } from "@/hooks/snackBar";
-import { UserRoles } from "@/hooks/useUserRoles"; // Import UserRoles interface
+import { UserRoles } from "@/hooks/useUserRoles";
+
+interface LocationInfo {
+  loc_name?: string;
+  area?: string;
+  seq?: number;
+}
+
+interface CombinedLorryReceipt {
+  _id: string;
+  type: "Shipper" | "Carrier" | "Technova";
+  lrNumber: string;
+  pick_info?: LocationInfo;
+  delivery_info?: LocationInfo;
+  consignor_copy?: string;
+  consignee_copy?: string;
+  driver_copy?: string;
+  file_copy?: string;
+  pdf_link?: string;
+  [key: string]: any; // Allow other properties from spread
+}
 
 const LorryReceiptTab = ({
   shipmentData,
   onDataChange,
   userRoles,
   ownFleet,
+  isTechnova,
 }: {
   shipmentData: any;
   onDataChange: () => void;
   userRoles: UserRoles;
   ownFleet: boolean;
+  isTechnova: boolean; // Explicitly passed as a prop
 }) => {
   const [editingLrId, setEditingLrId] = useState<string | null>(null);
   const [newLrValue, setNewLrValue] = useState("");
   const { showMessage } = useSnackbar();
 
-  // This logic correctly combines all LR sources
-  const lorryReceipts = [
-    ...(shipmentData?.carrier_waybills || []),
-    ...(shipmentData?.fourPL_waybills || []),
-    ...(shipmentData?.lrs || []),
-  ].map((lr) => ({ ...lr, type: lr.CWB ? "Shipper" : "Carrier" }));
+  const groupedLorryReceipts = useMemo(() => {
+    const combined: CombinedLorryReceipt[] = [];
 
-  console.log("Checking Lorry Receipt Source Data:", {
-    carrier_waybills: shipmentData?.carrier_waybills || "Not present or empty",
-    fourPL_waybills: shipmentData?.fourPL_waybills || "Not present or empty",
-    lrs: shipmentData?.lrs || "Not present or empty",
-  });
+    // Process Carrier Waybills (CWB)
+    // Angular logic: Sets type to 'Carrier' for carrier_waybills
+    (shipmentData?.carrier_waybills || []).forEach((lr: any) => {
+      combined.push({
+        ...lr,
+        type: "Carrier", // This should be "Carrier" to match Angular
+        lrNumber: lr.CWB?.manual || lr.CWB?.custom || lr.CWB?.default || "N/A",
+        pick_info: lr.pick_info,
+        delivery_info: lr.delivery_info,
+      });
+    });
 
-  // --- NEW: Added conditional logic for editing permissions ---
-  const canEditLr =
-    shipmentData.status !== "Completed" &&
-    shipmentData.status !== "Cancelled" &&
-    ownFleet &&
-    shipmentData.shipmentType !== "4pl" && // Assuming shipmentType is available in shipmentData
-    (userRoles.owner || userRoles.fleet_admin);
+    // Process 4PL Waybills (FWB)
+    // Angular logic: Sets type to '4PL' for fourPL_waybills
+    (shipmentData?.fourPL_waybills || []).forEach((lr: any) => {
+      combined.push({
+        ...lr,
+        type: "4PL", // This should be "4PL" to match Angular
+        lrNumber: lr.FWB?.manual || lr.FWB?.custom || lr.FWB?.default || "N/A",
+        pick_info: lr.pick_info,
+        delivery_info: lr.delivery_info,
+      });
+    });
+
+    // Process Technova's LRs (lrs)
+    // Angular logic: Sets type to 'Technova' for Technova LRs
+    (shipmentData?.lrs || []).forEach((lr: any) => {
+      combined.push({
+        ...lr,
+        type: "Technova",
+        lrNumber: lr.no || "N/A",
+        pick_info: {
+          loc_name: lr.pickup?.location?.name,
+          area: lr.pickup?.location?.area,
+          seq: lr.pickup?.sequence,
+        },
+        delivery_info: {
+          loc_name: lr.delivery?.location?.name,
+          area: lr.delivery?.location?.area,
+          seq: lr.delivery?.sequence,
+        },
+        technova: lr.technova,
+      });
+    });
+
+    const grouped = combined.reduce((acc, lr) => {
+      const pickSeq = lr.pick_info?.seq || 'N/A';
+      const delSeq = lr.delivery_info?.seq || 'N/A';
+      const key = `P${pickSeq}-D${delSeq}`;
+
+      if (!acc[key]) {
+        acc[key] = {
+          pick_info: lr.pick_info,
+          delivery_info: lr.delivery_info,
+          receipts: new Map(),
+        };
+      }
+      // Use lrNumber as the key to prevent duplicates
+      if (!acc[key].receipts.has(lr.lrNumber)) {
+        acc[key].receipts.set(lr.lrNumber, lr);
+      }
+      return acc;
+    }, {} as Record<string, { pick_info?: LocationInfo; delivery_info?: LocationInfo; receipts: Map<string, CombinedLorryReceipt> }>);
+
+    return Object.values(grouped).map(group => ({
+      ...group,
+      receipts: Array.from(group.receipts.values()),
+    }));
+  }, [shipmentData]);
+
+  const canEditLr = useMemo(() => {
+    return (
+      shipmentData.status !== "Completed" &&
+      shipmentData.status !== "Cancelled" &&
+      ownFleet &&
+      shipmentData.shipmentType !== "4pl" &&
+      (userRoles.owner || userRoles.fleet_admin)
+    );
+  }, [shipmentData, ownFleet, userRoles]);
 
   const handleEditStart = (lr: any) => {
     setEditingLrId(lr._id);
@@ -69,6 +153,7 @@ const LorryReceiptTab = ({
       lr.FWB?.manual ||
       lr.FWB?.custom ||
       lr.FWB?.default ||
+      (lr.type === "Technova" && lr.lrNumber !== "N/A" ? lr.lrNumber : "") ||
       "";
     setNewLrValue(currentNumber);
   };
@@ -80,12 +165,22 @@ const LorryReceiptTab = ({
 
   const handleSaveLr = async (lr: any) => {
     const isCWB = !!lr.CWB;
-    const endpoint = isCWB
-      ? "shipment/update_shipper_waybill"
-      : "shipment/update_waybill";
-    const payload = isCWB
-      ? { CWB_id: lr._id, CWB_no: newLrValue }
-      : { FWB_id: lr._id, FWB_no: newLrValue };
+    const isTechnovaLr = lr.type === "Technova";
+    
+    let endpoint = "";
+    let payload = {};
+
+    if (isTechnovaLr) {
+      showMessage("Technova LRs cannot be edited.", "warning");
+      handleEditCancel();
+      return;
+    } else if (isCWB) {
+      endpoint = "shipment/update_shipper_waybill";
+      payload = { CWB_id: lr._id, CWB_no: newLrValue };
+    } else { // FWB
+      endpoint = "shipment/update_waybill";
+      payload = { FWB_id: lr._id, FWB_no: newLrValue };
+    }
 
     try {
       await httpsPost(endpoint, payload);
@@ -97,7 +192,7 @@ const LorryReceiptTab = ({
     }
   };
 
-  if (!lorryReceipts || lorryReceipts.length === 0) {
+  if (!groupedLorryReceipts || groupedLorryReceipts.length === 0) {
     return (
       <Typography sx={{ p: 3, textAlign: "center", color: "text.secondary" }}>
         Lorry Receipt Not Generated.
@@ -152,122 +247,88 @@ const LorryReceiptTab = ({
           </TableRow>
         </TableHead>
         <TableBody>
-          {lorryReceipts.map((lr: any) => {
-            const isEditing = editingLrId === lr._id;
-            const lrNumber =
-              lr.CWB?.manual ||
-              lr.CWB?.custom ||
-              lr.CWB?.default ||
-              lr.FWB?.manual ||
-              lr.FWB?.custom ||
-              lr.FWB?.default ||
-              "N/A";
-
+          {groupedLorryReceipts.map((group, index) => {
             return (
-              <TableRow key={lr._id}>
+              <TableRow key={index}>
                 <TableCell sx={{ borderRight: "1px solid rgba(224, 224, 224, 1)" }}>
                   <Typography variant="body2">
-                    <span className={styles.pickupIcon}>P{lr.pick_info?.seq}</span> {lr.pick_info?.loc_name}
+                    <span className={styles.pickupIcon}>P{group.pick_info?.seq}</span> {group.pick_info?.loc_name}
                   </Typography>
                   <Typography variant="caption" color="text.secondary">
-                    {lr.pick_info?.area}
+                    {group.pick_info?.area}
                   </Typography>
                 </TableCell>
                 <TableCell sx={{ borderRight: "1px solid rgba(224, 224, 224, 1)" }}>
                   <Typography variant="body2">
-                    <span className={styles.deliveryIcon}>D{lr.delivery_info?.seq}</span> {" "}
-                    {lr.delivery_info?.loc_name}
+                    <span className={styles.deliveryIcon}>D{group.delivery_info?.seq}</span> {" "}
+                    {group.delivery_info?.loc_name}
                   </Typography>
                   <Typography variant="caption" color="text.secondary">
-                    {lr.delivery_info?.area}
+                    {group.delivery_info?.area}
                   </Typography>
                 </TableCell>
-                <TableCell sx={{ borderRight: "1px solid rgba(224, 224, 224, 1)", textAlign: "center" }}>{lr.type}
+                <TableCell sx={{ borderRight: "1px solid rgba(224, 224, 224, 1)", textAlign: "center", verticalAlign: 'top', paddingTop: '16px' }}>
+                  {/* Show unique types only */}
+                  {[...new Set(group.receipts.map(lr => lr.type))].join(', ')}
                 </TableCell>
-                <TableCell sx= {{ textAlign: "center" }}>
-                  {isEditing ? (
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 1,textAlign: "center", }}>
-                      <TextField
-                        size="small"
-                        variant="outlined"
-                        value={newLrValue}
-                        onChange={(e) => setNewLrValue(e.target.value)}
-                      />
-                      <IconButton
-                        color="primary"
-                        size="small"
-                        onClick={() => handleSaveLr(lr)}
-                      >
-                        <SaveIcon />
-                      </IconButton>
-                      <IconButton size="small" onClick={handleEditCancel}>
-                        <CancelIcon />
-                      </IconButton>
-                    </Box>
-                  ) : (
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 ,textAlign: "center",}}>
-                      <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                        {lrNumber}
-                      </Typography>
-                      {/* --- CORRECTED: Conditional rendering for edit icon --- */}
-                      {canEditLr && (
-                        <IconButton
+                <TableCell sx={{ textAlign: "center", verticalAlign: 'top', paddingTop: '16px' }}>
+                  <Box>
+                    {editingLrId && group.receipts.some(lr => lr._id === editingLrId) ? (
+                      <Box sx={{ display: "flex", alignItems: "center", gap: 1, justifyContent: 'center' }}>
+                        <TextField
                           size="small"
-                          onClick={() => handleEditStart(lr)}
-                        >
-                          <EditIcon fontSize="small" />
+                          variant="outlined"
+                          value={newLrValue}
+                          onChange={(e) => setNewLrValue(e.target.value)}
+                        />
+                        <IconButton color="primary" size="small" onClick={() => handleSaveLr(group.receipts.find(lr => lr._id === editingLrId))}>
+                          <SaveIcon />
                         </IconButton>
-                      )}
+                        <IconButton size="small" onClick={handleEditCancel}>
+                          <CancelIcon />
+                        </IconButton>
+                      </Box>
+                    ) : (
+                      <Box sx={{ display: "flex", alignItems: "center", gap: 1, justifyContent: 'center' }}>
+                        <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                          {group.receipts.map(lr => lr.lrNumber).join(', ')}
+                        </Typography>
+                        {canEditLr && group.receipts.length === 1 && group.receipts[0].type !== "Technova" && (
+                          <IconButton size="small" onClick={() => handleEditStart(group.receipts[0])}>
+                            <EditIcon fontSize="small" />
+                          </IconButton>
+                        )}
+                      </Box>
+                    )}
+                    <Box sx={{ mt: 1, display: "flex", flexDirection: "column", gap: 0.5, alignItems: 'center' }}>
+                      {group.receipts.flatMap(lr => [
+                        lr.consignor_copy && (
+                          <Link key={`${lr._id}-consignor`} href={lr.consignor_copy} target="_blank" rel="noopener" variant="caption">
+                            Download Consignor Copy ({lr.lrNumber})
+                          </Link>
+                        ),
+                        lr.consignee_copy && (
+                          <Link key={`${lr._id}-consignee`} href={lr.consignee_copy} target="_blank" rel="noopener" variant="caption">
+                            Download Consignee Copy ({lr.lrNumber})
+                          </Link>
+                        ),
+                        lr.driver_copy && (
+                          <Link key={`${lr._id}-driver`} href={lr.driver_copy} target="_blank" rel="noopener" variant="caption">
+                            Download Driver Copy ({lr.lrNumber})
+                          </Link>
+                        ),
+                        lr.file_copy && (
+                          <Link key={`${lr._id}-file`} href={lr.file_copy} target="_blank" rel="noopener" variant="caption">
+                            Download File Copy ({lr.lrNumber})
+                          </Link>
+                        ),
+                        lr.pdf_link && (
+                          <Link key={`${lr._id}-extra`} href={lr.pdf_link} target="_blank" rel="noopener" variant="caption">
+                            Download Extra ({lr.lrNumber})
+                          </Link>
+                        ),
+                      ].filter(Boolean))}
                     </Box>
-                  )}
-                  <Box
-                    sx={{
-                      mt: 1,
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: 0.5,
-                    }}
-                  >
-                    {lr.consignor_copy && (
-                      <Link
-                        href={lr.consignor_copy}
-                        target="_blank"
-                        rel="noopener"
-                        variant="caption"
-                      >
-                        Download Consignor Copy
-                      </Link>
-                    )}
-                    {lr.consignee_copy && (
-                      <Link
-                        href={lr.consignee_copy}
-                        target="_blank"
-                        rel="noopener"
-                        variant="caption"
-                      >
-                        Download Consignee Copy
-                      </Link>
-                    )}
-                    {lr.driver_copy && (
-                      <Link
-                        href={lr.driver_copy}
-                        target="_blank"
-                        rel="noopener"
-                        variant="caption"
-                      >
-                        Download Driver Copy
-                      </Link>
-                    )}
-                    {lr.file_copy && (
-                      <Link
-                        href={lr.file_copy}
-                        target="_blank"
-                        rel="noopener"
-                        variant="caption"
-                      >
-                        Download File Copy
-                      </Link>
-                    )}
                   </Box>
                 </TableCell>
               </TableRow>

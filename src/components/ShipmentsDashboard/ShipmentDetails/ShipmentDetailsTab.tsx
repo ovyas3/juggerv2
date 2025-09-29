@@ -1,7 +1,6 @@
-// components/ShipmentsDashboard/ShipmentDetails/ShipmentDetailsTab.tsx
-import React from "react";
+import React, { useMemo } from "react";
 import { Grid, Box, Typography, Link, Tooltip } from "@mui/material";
-import Image from "next/image"; // For local asset icons
+import Image from "next/image";
 
 // --- Helper to format duration ---
 const formatDuration = (seconds?: number): string => {
@@ -23,10 +22,8 @@ const formatDateTime = (dateString?: string): string => {
   if (!dateString) return "N/A";
   try {
     const date = new Date(dateString);
-    // Format: 18-Sep, 12:29 PM
-    return new Intl.DateTimeFormat("en-GB", {
-      day: "numeric", month: "short", hour: "numeric", minute: "2-digit", hour12: true
-    }).format(date).replace(/, /g, ', ').replace(' at', ',');
+    let formatted = new Intl.DateTimeFormat("en-GB", { day: 'numeric', month: 'short', year: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true }).format(date).replace(' at', ',');
+    return formatted.replace(/ (am|pm)$/i, (match) => match.toUpperCase());
   } catch (e) {
     return "N/A";
   }
@@ -43,6 +40,17 @@ const getDocIcon = (link: string) => {
   return "/assets/default-doc-icon.svg"; // A default icon
 };
 
+// Define types for the new data structure
+interface FormattedOrder {
+  sale_order: string;
+  invoices: string[];
+}
+
+interface DeliveryOrder {
+  deliveryId: string;
+  orders: FormattedOrder[];
+}
+
 // --- Main Component ---
 const ShipmentDetailsTab = ({
   shipmentData,
@@ -50,23 +58,86 @@ const ShipmentDetailsTab = ({
   ownFleet,
   type,
   isMykl,
+  isTata,
 }: {
   shipmentData: any;
   showFreight: boolean;
   ownFleet: boolean;
   type: string;
   isMykl: boolean;
+  isTata: boolean;
 }) => {
   if (!shipmentData) {
     return <Typography>Loading details...</Typography>;
   }
 
-  // --- Data derived from props ---
   const driver = shipmentData.driver || shipmentData.assigned_driver;
   const pickups = shipmentData.pickups || [];
   const deliveries = shipmentData.deliveries || [];
   const notAccepted = !shipmentData.driver && shipmentData.assigned_driver;
   const currencySymbol = shipmentData.currency_symbol || "₹";
+
+  const { singleSaleOrder, deliveryOrders } = useMemo(() => {
+    const hasDeliveryOrders = shipmentData.order?.delivery_locations?.some(
+      (d: any) => d.orders?.length > 0
+    );
+    const result: {
+      singleSaleOrder: string | null;
+      deliveryOrders: DeliveryOrder[];
+    } = {
+      singleSaleOrder: null,
+      deliveryOrders: [],
+    };
+
+    if (isTata) {
+      if (hasDeliveryOrders) {
+        const orderDeliveryMap = new Map<string, any[]>();
+        shipmentData.order.delivery_locations.forEach((delLoc: any) => {
+          const locId =
+            delLoc.loc_id?._id?.toString() || delLoc.loc_id?.toString();
+          if (delLoc.orders?.length > 0) {
+            orderDeliveryMap.set(locId, delLoc.orders);
+          }
+        });
+
+        shipmentData.deliveries.forEach((delivery: any) => {
+          const deliveryLocationId = delivery.location?._id?.toString() || "";
+          const ordersForDelivery =
+            orderDeliveryMap.get(deliveryLocationId) || [];
+          const formattedOrders: FormattedOrder[] = [];
+
+          ordersForDelivery.forEach((order: any) => {
+            const invoiceNumbers = (order.invoices || [])
+              .map((inv: any) => inv.invoice_number)
+              .filter(Boolean);
+            if (order.sale_order_number?.includes("/")) {
+              const parts = order.sale_order_number
+                .split("/")
+                .map((s: string) => s.trim());
+              parts.forEach((part: string) => {
+                formattedOrders.push({
+                  sale_order: part,
+                  invoices: invoiceNumbers,
+                });
+              });
+            } else if (order.sale_order_number) {
+              formattedOrders.push({
+                sale_order: order.sale_order_number,
+                invoices: invoiceNumbers,
+              });
+            }
+          });
+          result.deliveryOrders.push({
+            deliveryId: delivery._id.toString(),
+            orders: formattedOrders,
+          });
+        });
+      } else if (shipmentData.sale_order) {
+        result.singleSaleOrder = shipmentData.sale_order;
+      }
+    }
+    return result;
+  }, [isTata, shipmentData]);
 
   const getCircleStyles = (id: string): React.CSSProperties => {
     const baseStyle = {
@@ -87,8 +158,6 @@ const ShipmentDetailsTab = ({
     return { ...baseStyle, backgroundColor: "#e0e0e0", color: "black" };
   };
 
-
-
   const DetailRow = ({
     label,
     value,
@@ -103,19 +172,16 @@ const ShipmentDetailsTab = ({
         mb: 1.5,
       }}
     >
-      {/* Label Column */}
       <Typography
         variant="body2"
         sx={{
-          width: "130px", // Fixed width for alignment. Adjust if needed.
+          width: "130px",
           flexShrink: 0,
           color: "text.secondary",
         }}
       >
         {label}
       </Typography>
-
-      {/* Value Column */}
       <Typography
         variant="body2"
         sx={{
@@ -126,7 +192,6 @@ const ShipmentDetailsTab = ({
       </Typography>
     </Box>
   );
-  
 
   return (
     <>
@@ -140,8 +205,9 @@ const ShipmentDetailsTab = ({
           <Typography variant="body2" sx={{ color: "#09337e" }}>
             {isMykl && (
               <>
-                Sale Order Id: <strong>{shipmentData.sale_order || "N/A"}</strong>
-                <span style={{ margin: '0 8px' }}>|</span>
+                Sale Order Id:{" "}
+                <strong>{shipmentData.sale_order || "N/A"}</strong>
+                <span style={{ margin: "0 8px" }}>|</span>
               </>
             )}
             Order ID: <strong>{shipmentData.order?.OIN || "N/A"}</strong>
@@ -180,8 +246,7 @@ const ShipmentDetailsTab = ({
                   {p.location?.area || "N/A"}
                 </Typography>
                 <Typography variant="body2" display="block" sx={{ pl: "36px" }}>
-                 Pickup Time:{" "}
-                 <strong>{formatDateTime(p.scheduled_at)}</strong>
+                  Scheduled Pickup Date & Time: <strong>{formatDateTime(p.scheduled_at)}</strong>
                 </Typography>
               </Box>
             ))}
@@ -218,9 +283,33 @@ const ShipmentDetailsTab = ({
                   {d.location?.area || "N/A"}
                 </Typography>
                 <Typography variant="body2" display="block" sx={{ pl: "36px" }}>
-                  Delivery Time:{" "}
+                  Delivery Date & Time:{" "}
                   <strong>{formatDateTime(d.scheduled_at)}</strong>
                 </Typography>
+
+                {/* New logic for Tata Sale Order / Invoices */}
+                {isTata && (
+                  <Box sx={{ pl: "36px", mt: 1 }}>
+                    {singleSaleOrder && (
+                      <Typography variant="body2">
+                        Sale Order: <strong>{singleSaleOrder}</strong>
+                      </Typography>
+                    )}
+                    {!singleSaleOrder &&
+                      deliveryOrders
+                        .find((o) => o.deliveryId === d._id)
+                        ?.orders.map((order, orderIndex) => (
+                          <Typography variant="body2" key={orderIndex}>
+                            Sale Order / Invoice:{" "}
+                            <strong>
+                              {order.sale_order || "N/A"}
+                              {order.invoices?.length > 0 &&
+                                ` / ${order.invoices.join(", ")}`}
+                            </strong>
+                          </Typography>
+                        ))}
+                  </Box>
+                )}
               </Box>
             ))}
           </Box>
@@ -278,10 +367,22 @@ const ShipmentDetailsTab = ({
                 />
               </Grid>
               <Grid item xs={6} sx={{ pl: 2, overflowY: "auto" }}>
-                <DetailRow
-                  label="Sale Order"
-                  value={shipmentData.sale_order || "N/A"}
+              <DetailRow
+                  label="Project Code"
+                  value={
+                    shipmentData.project_codes?.length > 0
+                      ? shipmentData.project_codes
+                          .map((pc: any) => pc.name)
+                          .join(", ")
+                      : "N/A"
+                  }
                 />
+                {!isTata && (
+                  <DetailRow
+                    label="Sale Order"
+                    value={shipmentData.sale_order || "N/A"}
+                  />
+                )}
                 <DetailRow
                   label="Purchase Order"
                   value={
@@ -302,17 +403,8 @@ const ShipmentDetailsTab = ({
                       : "N/A"
                   }
                 />
-                <DetailRow
-                  label="Project Code"
-                  value={
-                    shipmentData.project_codes?.length > 0
-                      ? shipmentData.project_codes
-                          .map((pc: any) => pc.name)
-                          .join(", ")
-                      : "N/A"
-                  }
-                />
-                <DetailRow label="PPD" value={shipmentData.ppd || "N/A"} />
+                
+                <DetailRow label="PPD Number" value={shipmentData.ppd || "N/A"} />
               </Grid>
             </Grid>
           </Box>
@@ -338,7 +430,9 @@ const ShipmentDetailsTab = ({
             <Box sx={{ p: 2, flexGrow: 1, overflowY: "auto" }}>
               <DetailRow
                 label="Distance"
-                value={`${formatDistance(shipmentData.estimated?.distance)} kms | ${formatDistance(
+                value={`${formatDistance(
+                  shipmentData.estimated?.distance
+                )} kms | ${formatDistance(
                   shipmentData.trip_tracker?.travelled_distance
                 )} kms`}
               />
@@ -357,11 +451,14 @@ const ShipmentDetailsTab = ({
                   value={`${currencySymbol}${
                     shipmentData.estimated?.price || "N/A"
                   } | ${currencySymbol}${shipmentData.actual?.price || "N/A"}${
-                    shipmentData.rate
+                    shipmentData.rate &&
+                    (typeof shipmentData.weight_unit === "string" ||
+                      shipmentData.weight_unit?.name)
                       ? ` (Price per ${
-                          shipmentData.weight_unit || ""
+                          shipmentData.weight_unit?.name ||
+                          shipmentData.weight_unit
                         }: ${currencySymbol}${shipmentData.rate})`
-                      : ""
+                      : "" // Fallback to empty string if no valid unit
                   }`}
                 />
               )}
@@ -373,11 +470,14 @@ const ShipmentDetailsTab = ({
                   } | ${currencySymbol}${
                     shipmentData.actual?.client_price || "N/A"
                   }${
-                    shipmentData.client_rate
+                    shipmentData.client_rate &&
+                    (typeof shipmentData.client_weight_unit === "string" ||
+                      shipmentData.client_weight_unit?.name)
                       ? ` (Price per ${
-                          shipmentData.client_weight_unit || ""
+                          shipmentData.client_weight_unit?.name ||
+                          shipmentData.client_weight_unit
                         }: ${currencySymbol}${shipmentData.client_rate})`
-                      : ""
+                      : "" // Fallback to empty string if no valid unit
                   }`}
                 />
               )}
@@ -387,36 +487,34 @@ const ShipmentDetailsTab = ({
                 value={`100% | ${shipmentData.vehicleUtilization || "N/A"}`}
               />
 
-              <Box sx={{ display: "flex", alignItems: "center", mt: 1 }}>
-                <Typography variant="body2" sx={{ mr: 2 , color: "text.secondary"}}>
-                 Documents:
-                </Typography>
-                {shipmentData.docs?.length > 0 ? (
-                  <Box sx={{ display: "flex", gap: 1 }}>
-                    {shipmentData.docs.map((doc: any, index: number) => (
-                      <Tooltip
-                        title={`Download ${doc.link.split("/").pop()}`}
-                        key={index}
-                      >
-                        <Link
-                          href={doc.link}
-                          target="_blank"
-                          rel="noopener noreferrer"
+              <DetailRow
+                label="Documents"
+                value={
+                  shipmentData.docs?.length > 0 ? (
+                    <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
+                      {shipmentData.docs.map((doc: any, index: number) => (
+                        <Tooltip
+                          title={`Download ${doc.link.split("/").pop()}`}
+                          key={index}
                         >
-                          <Image
-                            src={getDocIcon(doc.link)}
-                            alt={doc.extension}
-                            width={24}
-                            height={24}
-                          />
-                        </Link>
-                      </Tooltip>
-                    ))}
-                  </Box>
-                ) : (
-                  <Typography variant="body2">No documents found</Typography>
-                )}
-              </Box>
+                          <Link
+                            href={doc.link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <Image
+                              src={getDocIcon(doc.link)}
+                              alt={doc.extension || "document"}
+                              width={24}
+                              height={24}
+                            />
+                          </Link>
+                        </Tooltip>
+                      ))}
+                    </Box>
+                  ) : ("No documents found")
+                }
+              />
             </Box>
           </Box>
         </Grid>

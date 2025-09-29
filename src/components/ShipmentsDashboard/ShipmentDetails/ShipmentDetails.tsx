@@ -92,8 +92,12 @@ const ShipmentDetails: React.FC<ShipmentDetailsProps> = ({
   const userRoles = useUserRoles();
 
   const [isMYKL, setIsMYKL] = useState(false);
+  const [isTata, setIsTata] = useState(false);
   const [isTechnova, setIsTechnova] = useState(false);
   const [isRSPL, setIsRSPL] = useState(false);
+  const [isBMWIL, setIsBMWIL] = useState(false);
+  const [isEmami, setIsEmami] = useState(false);
+  const [obdNumber, setObdNumber] = useState(0);
   const [showFreight, setShowFreight] = useState(false);
   const [ownFleet, setOwnFleet] = useState(false);
   const [shipmentType, setShipmentType] = useState("normal");
@@ -113,7 +117,7 @@ const ShipmentDetails: React.FC<ShipmentDetailsProps> = ({
 
  // In ShipmentDetails.tsx
 
-const fetchDetails = useCallback(async () => {
+ const fetchDetails = useCallback(async () => {
   if (!shipmentId) return;
   setIsLoading(true);
   try {
@@ -123,17 +127,9 @@ const fetchDetails = useCallback(async () => {
       ]);
 
       const shippersRaw = localStorage.getItem("shippers");
-      // As you discovered, the roles string might be double-stringified. It's safer to handle that here too.
-      const shippers: any[] = shippersRaw ? JSON.parse(shippersRaw) : [];
-
-      // *** FIX STARTS HERE ***
-      // 1. Get the active shipper ID from local storage.
-      //    (Note: In Angular it was from a cookie, ensure it's in localStorage for React or adjust as needed)
+      const shippers = shippersRaw ? JSON.parse(shippersRaw) : [];
       const currentShipperId = localStorage.getItem('shipper_id');
-
-      // 2. Find the correct shipper object from the array. Default to the first one if not found.
-      const activeShipper = shippers.find(s => s._id === currentShipperId) || shippers[0];
-      // *** FIX ENDS HERE ***
+      const activeShipper = shippers.find((s:any) => s._id === currentShipperId) || shippers[0];
 
       if (shipmentResponse.statusCode === 200) {
           const apiDetail = shipmentResponse.data;
@@ -145,17 +141,20 @@ const fetchDetails = useCallback(async () => {
           };
 
           const displayStatus = getShipmentStatusName(apiDetail.latest_status);
+
           const displayDate = apiDetail.created_at
               ? format(new Date(apiDetail.created_at), "dd-MMM-yyyy hh:mm a")
               : "...";
           setShipmentData({ ...fullShipmentData, displayStatus, displayDate });
 
-          // Use the activeShipper's name for conditional logic
           const parentName = activeShipper?.parent_name || apiDetail.organization?.name || "";
 
           setIsMYKL(parentName === "MYK Laticrete India Private Limited");
+          setIsEmami(parentName === "Emami Limited");
+          setIsTata(parentName === "Tata Power Ltd");
           setIsTechnova(parentName === "TechNova Imaging Systems Pvt Ltd");
           setIsRSPL(parentName === "RSPL Limited");
+          setIsBMWIL(parentName === "BMWISL");
 
           setShowFreight(
               userRoles.owner ||
@@ -163,15 +162,29 @@ const fetchDetails = useCallback(async () => {
               userRoles.ratecard ||
               userRoles.unit_admin
           );
-          
-          // Set state based on the correct, active shipper
+
           setOwnFleet(apiDetail.own_fleet || false);
           setShipmentType(activeShipper?.type || "normal");
 
           const hasCustomerData = apiDetail.deliveries?.some(
-              (d: any) => d.customer_data?.length > 0
+              (d:any) => d.customer_data?.length > 0
           );
           setCustomerData(hasCustomerData ? [{}] : []);
+          
+          // --- ADDED LOGIC TO CALCULATE OBD NUMBER ---
+          let obdCount = 0;
+          if (apiDetail.invoices && apiDetail.invoices.length > 0) {
+              apiDetail.invoices.forEach((invoiceGroup: any) => {
+                  (invoiceGroup.invoice || []).forEach((inv: any) => {
+                      if (inv.invoice_products?.length > 0) {
+                          obdCount++;
+                      }
+                  });
+              });
+          }
+          setObdNumber(obdCount);
+          // --- END ADDED LOGIC ---
+
       } else {
           console.error("Failed to fetch shipment details");
       }
@@ -209,6 +222,7 @@ const fetchDetails = useCallback(async () => {
           ownFleet={ownFleet}
           type={shipmentType}
           isMykl = {isMYKL}
+          isTata={isTata}
         />
       ),
     },
@@ -233,6 +247,10 @@ const fetchDetails = useCallback(async () => {
           canEditInvoices={canEditPickups}
           ownFleet={ownFleet}
           userRoles={userRoles}
+          isTechnova = {isTechnova}
+          isEmami = {isEmami}
+          isTata = {isTata}
+          isBMWIL = {isBMWIL}
         />
       ),
     },
@@ -251,6 +269,10 @@ const fetchDetails = useCallback(async () => {
           userRoles={userRoles}
           isShipmentManagement={isShipmentManagement}
           ownFleet={ownFleet}
+          isTechnova = {isTechnova}
+          isEmami = {isEmami}
+          isBMWIL = {isBMWIL}
+          materials={shipmentData?.materials}
         />
       ),
     },
@@ -263,6 +285,9 @@ const fetchDetails = useCallback(async () => {
           userRoles={userRoles}
           logisticsApproval={shipmentData?.logistics_approval_needed || false}
           onDataChange={fetchDetails}
+          obdNumber={obdNumber}
+          // isTechnova = {isTechnova}
+          // isEmami = {isEmami}
         />
       ),
     },
@@ -280,6 +305,7 @@ const fetchDetails = useCallback(async () => {
           onDataChange={fetchDetails}
           userRoles={userRoles}
           ownFleet={ownFleet}
+          isTechnova = {isTechnova}
         />
       ),
     },

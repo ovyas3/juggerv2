@@ -52,6 +52,7 @@ import { ShipmentsTable } from "./ShipmentsTable";
 import { AnalyticsView } from "./AnalyticsView";
 import { AdvancedFilter } from "./AdvancedFilter/AdvancedFilter";
 import ShipmentDetails from "./ShipmentDetails/ShipmentDetails"; 
+import ShipmentDetails from "./ShipmentDetails/ShipmentDetails"; 
 import LocationModal from "../ShipmentsDashboard/LocationTracking/LocationModal";
 import ActiveCarriersModal from "../ShipmentsDashboard/SpecialFeatures/ActiveCarriersModal";
 import RerunShipmentModal from "../ShipmentsDashboard/ShipmentManagement/RerunShipmentModal";
@@ -369,8 +370,7 @@ const ShipmentsDashboard: React.FC = () => {
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [selectedShipmentId, setSelectedShipmentId] = useState<string | null>(null);
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
-  // Inside ShipmentsDashboard.js, with other state variables
-const [rawShipmentResponse, setRawShipmentResponse] = useState<any | null>(null);
+  const [defaultDetailsTab, setDefaultDetailsTab] = useState<string | undefined>(undefined);
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(0);
@@ -516,6 +516,7 @@ const [rawShipmentResponse, setRawShipmentResponse] = useState<any | null>(null)
     []
   );
   const [isTechnova, setIsTechnova] = useState(false);
+  const [isTata, setIsTata] = useState(false);
   const initialLoadDone = useRef(false);
   const [showVideo, setShowVideo] = useState(false);
   const [videoUrl, setVideoUrl] = useState("");
@@ -704,6 +705,24 @@ useEffect(() => {
     }
   } catch (error) {
     setIsTechnova(false);
+  }
+}, []);
+
+useEffect(() => {
+  // Read 'shippers' from localStorage and parse
+  try {
+    const shipperData = JSON.parse(localStorage.getItem("shippers") || "[]");
+    if (
+      shipperData &&
+      shipperData.length > 0 &&
+      shipperData[0].parent_name === "Tata Power Ltd"
+    ) {
+      setIsTata(true);
+    } else {
+      setIsTata(false);
+    }
+  } catch (error) {
+    setIsTata(false);
   }
 }, []);
 
@@ -924,6 +943,14 @@ const handleAddDriverExpenses = (shipment: Shipment) => {
   closeAllDialogs();
   handleDriverExpenseClick(shipment);
 };
+
+  const handleOpenDetailsOnTab = (shipment: Shipment, tab: string) => {
+    closeAllDialogs();
+    setDefaultDetailsTab(tab);
+    setSelectedShipmentId(shipment._id);
+    setIsDetailsModalOpen(true);
+  };
+
 
   const handleCreatePaymentAdvice = (shipment: Shipment) => {
     closeAllDialogs();
@@ -2913,7 +2940,8 @@ const applyFilter = () => {
           onSendEPOD={updateEPODBackToJDE}
           onFetchInvoiceDetails={fetchInvoiceDetails}
           onBulkUpload={() => openBulkUpload("shipment")}
-          isTechnova={parentFlags.isTechnova}
+          isTechnova={isTechnova}
+          isTata={isTata}
           isLoading={isLoading}
           isjspl={parentFlags.isjspl}
           hasSelectedShipments={selectedShipmentsArray.length > 0}
@@ -3267,6 +3295,14 @@ const applyFilter = () => {
           open={modalOpen}
           onClose={closeSubscribeModal}
           shipment={selectedShipment}
+        />
+      )}
+      {isDetailsModalOpen && selectedShipmentId && (
+        <ShipmentDetails
+          isOpen={isDetailsModalOpen}
+          onClose={handleCloseDetails}
+          shipmentId={selectedShipmentId}
+      
         />
       )}
       {showActiveCarriersPopup && (
@@ -3800,8 +3836,7 @@ const applyFilter = () => {
     }}
   />
 )}
-
-     </div>
+ </div>
   );
 };
 
