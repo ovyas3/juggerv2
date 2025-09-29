@@ -3233,6 +3233,7 @@ const applyFilter = () => {
                 setActionSearch={setActionSearch}
                 actionMenuCategories={actionMenuCategories}
                 renderStatusCell={renderStatusCell}
+                onViewDetails={handleViewDetails}
                 renderLocationCell={renderLocationCell}
                 renderDateTimeCell={renderDateTimeCell}
                 renderVehicleCell={renderVehicleCell}
