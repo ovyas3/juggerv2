@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import Image from 'next/image';
 import { 
   Dialog, 
   DialogTitle, 
@@ -26,6 +27,7 @@ import { useSnackbar } from '@/hooks/snackBar';
 import { httpsGet, httpsPut, httpsPost } from '@/utils/Communication';
 import ModalHeader from '@/components/UI/ModalHeader/ModalHeader';
 import styles from "./GeofenceEditor.module.css";
+import GetPath from "../../../assets/get_path.svg";
 
 declare global {
   interface Window {
@@ -809,11 +811,11 @@ const GeofenceEditor: React.FC<GeofenceEditorProps> = ({
                 }
               }}
               startIcon={
-                <img 
-                  src="/assets/get_path.svg" 
+                <Image
+                  src={GetPath}
                   alt="Get Path" 
                   style={{ width: '16px', height: '16px' }} 
-                />
+                />  
               }
             >
               Get Path

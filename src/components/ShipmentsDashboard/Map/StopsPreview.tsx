@@ -520,6 +520,78 @@ export const StopsPreview: React.FC<StopsPreviewProps> = ({
     setPopup({ type, items, x: left, y: above ? rect.top - base.top : top, above });
   };
 
+  const Tooltip = ({ children, content, show }: any) => {
+    const [position, setPosition] = useState({ x: 0, y: 0, visible: false });
+    const tooltipRef = useRef(null);
+  
+    const handleMouseEnter = (e: any) => {
+      if (!show || !content) return;
+      
+      const rect = e.currentTarget.getBoundingClientRect();
+      setPosition({
+        x: rect.left + rect.width / 2,
+        y: rect.top - 8,
+        visible: true
+      });
+    };
+  
+    const handleMouseLeave = () => {
+      setPosition(prev => ({ ...prev, visible: false }));
+    };
+  
+    return (
+      <>
+        <span 
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+          style={{ cursor: show ? 'default' : 'auto' }}
+        >
+          {children}
+        </span>
+        {position.visible && content && createPortal(
+          <div
+            ref={tooltipRef}
+            style={{
+              position: 'fixed',
+              left: position.x,
+              top: position.y,
+              transform: 'translateX(-50%) translateY(-100%)',
+              background: '#111827',
+              color: '#fff',
+              padding: '6px 10px',
+              borderRadius: '6px',
+              fontSize: '12px',
+              whiteSpace: 'nowrap',
+              zIndex: 10000,
+              pointerEvents: 'none',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+            }}
+          >
+            {content}
+            <div
+              style={{
+                position: 'absolute',
+                top: '100%',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                width: 0,
+                height: 0,
+                borderLeft: '6px solid transparent',
+                borderRight: '6px solid transparent',
+                borderTop: '6px solid #111827'
+              }}
+            />
+          </div>,
+          document.body
+        )}
+      </>
+    );
+  };
+  
+  const needsTruncation = (text: any, maxLength = 20) => {
+    return text && text.length > maxLength;
+  };
+
   return (
     <div className={styles.routeSection}>
       {/* PICKUP ROW */}
@@ -528,8 +600,15 @@ export const StopsPreview: React.FC<StopsPreviewProps> = ({
           {idxLabel('pickup', 0)}
         </span>
         <div className={`${styles.stopPill} ${styles.pickupPill}`}>
-          <span className={styles.stopMainText}>{formatStop(firstPickup)}</span>
-         
+          <Tooltip 
+            content={needsTruncation(formatStop(firstPickup)) ? formatStop(firstPickup) : null}
+            show={needsTruncation(formatStop(firstPickup))}
+          >
+            <span className={styles.stopMainText}>
+              {formatStop(firstPickup)}
+            </span>
+          </Tooltip>
+          
           {morePickups > 0 && (
             <button
               className={`${styles.extraCount} ${styles.extraGreen}`}
@@ -553,7 +632,14 @@ export const StopsPreview: React.FC<StopsPreviewProps> = ({
           {idxLabel('delivery', 0)}
         </span>
         <div className={`${styles.stopPill} ${styles.deliveryPill}`}>
-          <span className={styles.stopMainText}>{formatStop(firstDelivery)}</span>
+          <Tooltip 
+            content={needsTruncation(formatStop(firstDelivery)) ? formatStop(firstDelivery) : null}
+            show={needsTruncation(formatStop(firstDelivery))}
+          >
+            <span className={styles.stopMainText}>
+              {formatStop(firstDelivery)}
+            </span>
+          </Tooltip>
           
           {moreDeliveries > 0 && (
             <button

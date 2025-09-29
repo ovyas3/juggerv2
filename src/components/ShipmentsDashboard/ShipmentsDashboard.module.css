@@ -3630,6 +3630,7 @@ select.didFloatingSelect::-ms-expand {
   border: 1px solid rgba(139, 92, 246, 0.1);
   box-shadow: 0 20px 40px rgba(139, 92, 246, 0.15);
   max-width: 500px !important;
+  min-width: 500px !important;
   max-height: 400px !important;   /* keep menu capped if desired */
   padding: 0;
 
@@ -4345,9 +4346,9 @@ select.didFloatingSelect::-ms-expand {
   font-size: 14px;
 }
 
-.actionCategory:not(:last-child) {
+/* .actionCategory:not(:last-child) {
   margin-bottom: 12px;
-}
+} */
 
 .actionCategoryHeader {
   font-weight: 600;
@@ -4371,17 +4372,23 @@ select.didFloatingSelect::-ms-expand {
 
 .TableSearchIcon {
   position: absolute;
-  right: 10px;
-  top: 50%;
+  top: 16px;
   transform: translateY(-50%);
   width: 23px;
   height: 23px;
   cursor: pointer;
   color: #5e6488;
   transition: color 0.2s ease;
-  left: 350px;
+  right: 5px;
 }
 
 .TableSearchIcon:hover {
   color: #4f46e5;
+}
+
+.actionSearchContainer {
+  display: flex;
+  flex-direction: row-reverse;
+  width: 100%;
+  position: relative;
 }
