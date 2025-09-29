@@ -2014,7 +2014,7 @@ const DeliveryTab = ({
                                 variant="caption"
                                 sx={{ color: "green", fontWeight: "bold" }}
                               >
-                                ePOD's are already Approved
+                                ePODs are already Approved
                               </Typography>
                               <Button
                                 onClick={() =>

@@ -67,15 +67,6 @@ const ShipmentDetailsTab = ({
   isMykl: boolean;
   isTata: boolean;
 }) => {
-  if (!shipmentData) {
-    return <Typography>Loading details...</Typography>;
-  }
-
-  const driver = shipmentData.driver || shipmentData.assigned_driver;
-  const pickups = shipmentData.pickups || [];
-  const deliveries = shipmentData.deliveries || [];
-  const notAccepted = !shipmentData.driver && shipmentData.assigned_driver;
-  const currencySymbol = shipmentData.currency_symbol || "₹";
 
   const { singleSaleOrder, deliveryOrders } = useMemo(() => {
     const hasDeliveryOrders = shipmentData.order?.delivery_locations?.some(
@@ -138,6 +129,18 @@ const ShipmentDetailsTab = ({
     }
     return result;
   }, [isTata, shipmentData]);
+
+  if (!shipmentData) {
+    return <Typography>Loading details...</Typography>;
+  }
+
+  const driver = shipmentData.driver || shipmentData.assigned_driver;
+  const pickups = shipmentData.pickups || [];
+  const deliveries = shipmentData.deliveries || [];
+  const notAccepted = !shipmentData.driver && shipmentData.assigned_driver;
+  const currencySymbol = shipmentData.currency_symbol || "₹";
+
+
 
   const getCircleStyles = (id: string): React.CSSProperties => {
     const baseStyle = {
