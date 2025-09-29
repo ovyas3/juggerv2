@@ -15,7 +15,7 @@ const ActivityTimelineTab = ({
   const timeline = shipmentData?.trails || [];
 
   const getUserInfo = (who: any) => {
-    if (!who) return { name: "System", role: "" };
+    if (!who) return { name: "N/A", role: "N/A" };
     if (who.driver) return { name: who.driver.name, role: "Driver" };
     if (who.attached_driver)
       return { name: who.attached_driver.name, role: "Driver" };
@@ -29,7 +29,7 @@ const ActivityTimelineTab = ({
   };
 
   return (
-    <Box className={styles.timelineContainer}>
+    <Box className={styles.timelineContainer} sx={{ overflowX: "auto", pb: 2 }}>
       {timeline.length > 0 ? (
         timeline.map((event: any, index: number) => {
           const userInfo = getUserInfo(event.who);
@@ -61,10 +61,12 @@ const ActivityTimelineTab = ({
 
               <Box className={styles.eventContent}>
                 <Box sx={{ display: "flex", alignItems: "center" }}>
-                  <Typography variant="subtitle2">
-                    {userInfo.name}
-                    {userInfo.role && ` (${userInfo.role})`}
-                  </Typography>
+                  <Typography variant="subtitle2">{userInfo.name}</Typography>
+                  {userInfo.role && (
+                    <Typography variant="caption" sx={{ ml: 0.5, color: 'text.secondary' }}>
+                      - {userInfo.role}
+                    </Typography>
+                  )}
 
                   {/* --- NEW: Conditionally render the map icon --- */}
                   {hasLocation && (

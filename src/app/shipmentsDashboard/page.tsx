@@ -1,6 +1,6 @@
 'use client'
 
-import ShipmentsDashboard from "@/components/ShipmentsDashboard/ShipmentsDashboard";
+import ShipmentsDashboardPage from "@/components/ShipmentsDashboard/ShipmentsDashboard";
 import ShipmentsDashboard from "@/components/ShipmentsDashboard/ShipmentsDashboard";
 import React from "react";
 import SideDrawer from "@/components/Drawer/Drawer";

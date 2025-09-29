@@ -11,7 +11,7 @@
   position: sticky;
   top: 0;             /* pin at the top */
   z-index: 5;         /* above body cells */
-  background: #ebeef7;    /* avoid text blending while scrolling */
+  background: #ebeef7;   
 }
 .matHeaderRow {
   position: relative;   /* no sticky here */
@@ -863,7 +863,7 @@
   position: sticky;
   right: 0;
   z-index: 1; /* A z-index is crucial to keep the column on top of others when scrolling */
-  background-color: #ebeef7; /* Match your table background to avoid seeing content underneath */
+  background-color: #ebeef7; 
 }
 
 .matHeaderRow {
@@ -1243,9 +1243,6 @@ table.matTable {
   max-width: 280px !important;
 }
 
-
-
-
 .matColumnSno {
   min-width: 50px !important;
   max-width: 50px !important;
@@ -1372,7 +1369,6 @@ table.matTable {
   border-left: none !important; 
 }
 
-
 .matHeaderCell.matColumnLastLocation {
   border-right: solid 1px #d2d2d2 !important;
 }
@@ -1384,8 +1380,6 @@ table.matTable {
 .matHeaderCell.matColumnCarrier {
   white-space: nowrap;
 }
-
-
 
 .matPaginator {
   position: relative;

@@ -33,10 +33,10 @@ interface CarrierInvoice {
   id: string;
   version: number;
   invoiceNumber: string;
-  datetime: string;
+  datetime: { date: string; time: string };
   updatedBy: string;
   finalAmount: number;
-  status: "PENDING" | "APPROVED" | "DISAPPROVED" | "BILLED";
+  status: "PENDING" | "APPROVED" | "DISAPPROVED" | "BILLED" | "PAYMENT_PAID";
   comments: string;
   pdfLinks: string[];
   disapprovalDoc?: string;
@@ -65,15 +65,32 @@ const modalStyle = {
   borderRadius: 2,
 };
 
+// --- Updated Date Formatting Function ---
+const formatDateTime = (dateString?: string): { date: string; time: string } => {
+  if (!dateString) return { date: "N/A", time: "" };
+  try {
+    const date = new Date(dateString);
+    // Date format: 26 Jul
+    const datePart = date.toLocaleString("en-GB", { day: "numeric", month: "short" });
+    // Time format: 9:00 PM
+    const timePart = date.toLocaleString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
+    return { date: datePart, time: timePart };
+  } catch (e) {
+    return { date: "N/A", time: "" };
+  }
+};
+
 // --- Main Component ---
 const CarrierInvoiceTab = ({
   shipmentData,
   logisticsApproval,
   onDataChange,
   userRoles,
+  obdNumber
 }: {
   shipmentData: any;
   userRoles: UserRoles;
+  obdNumber: number;
   logisticsApproval: boolean;
   onDataChange: () => void;
 }) => {
@@ -93,13 +110,11 @@ const CarrierInvoiceTab = ({
   const [selectedReason, setSelectedReason] = useState("");
   const [currentInvoiceId, setCurrentInvoiceId] = useState<string | null>(null);
 
-  // This useEffect hook now fetches all three required pieces of data
   useEffect(() => {
     const fetchInvoiceData = async () => {
       if (!shipmentData?._id) return;
       setIsLoading(true);
       try {
-        // Use Promise.all to hit all three endpoints concurrently
         const [invoiceResponse, reasonsResponse, gstResponse] =
           await Promise.all([
             httpsGet(
@@ -120,7 +135,7 @@ const CarrierInvoiceTab = ({
               id: inv._id,
               version: index + 1,
               invoiceNumber: inv.IINC?.custom || inv.IINC?.default || "N/A",
-              datetime: new Date(inv.created_at).toLocaleString(),
+              datetime: formatDateTime(inv.created_at),
               updatedBy: inv.carrier_user?.name || "N/A",
               finalAmount: inv.final_amount,
               status: inv.status,
@@ -145,7 +160,6 @@ const CarrierInvoiceTab = ({
 
         // 3. Process GST/Transit Type Data (optional, store if needed later)
         if (gstResponse.statusCode === 200) {
-          // You can store this in state if you need to display or use it
           console.log("Transit Type:", gstResponse.data);
         }
       } catch (error: any) {
@@ -161,19 +175,27 @@ const CarrierInvoiceTab = ({
     fetchInvoiceData();
   }, [shipmentData._id]);
 
-  const getStatusChip = (status: CarrierInvoice["status"]) => {
+  // --- MODIFIED getStatusChip FUNCTION ---
+  const getStatusText = (status: CarrierInvoice["status"]) => {
+    let color = "text.primary";
     switch (status) {
       case "APPROVED":
       case "BILLED":
-        return <Chip label={status} color="success" size="small" />;
+        color = "success.main";
+        break;
+      case "PAYMENT_PAID":
+        color = "success.main";
+        break;
       case "PENDING":
-        return <Chip label={status} color="warning" size="small" />;
+        color = "warning.main";
+        break;
       case "DISAPPROVED":
-        return <Chip label={status} color="error" size="small" />;
-      default:
-        return <Chip label={status} size="small" />;
+        color = "error.main";
+        break;
     }
+    return <Typography variant="body2" sx={{ color, fontWeight: 'bold', whiteSpace: 'nowrap' }}>{status}</Typography>;
   };
+  // ----------------------------------------
 
   const handleOpenModal = (
     type: ActionModalState["type"],
@@ -252,6 +274,30 @@ const CarrierInvoiceTab = ({
     }
   };
 
+  // --- Styled Table Components ---
+  const StyledTableCell = (props: any) => (
+    <TableCell
+      {...props}
+      align="center" // All cells are center aligned
+      sx={{ p: 1, fontSize: "0.8rem", ...props.sx }} // Reduced font size
+    />
+  );
+
+  const StyledTableHeadCell = (props: any) => (
+    <TableCell
+      {...props}
+      align="center"
+      sx={{
+        fontWeight: "bold",
+        color: "#09337e", // Header text color
+        backgroundColor: "#f5f5f5", // Light background color for header
+        whiteSpace: "nowrap",
+        p: 1,
+        ...props.sx,
+      }}
+    />
+  );
+
   if (isLoading) {
     return (
       <Box sx={{ display: "flex", justifyContent: "center", p: 4 }}>
@@ -271,60 +317,98 @@ const CarrierInvoiceTab = ({
   return (
     <>
       <TableContainer component={Paper} variant="outlined">
-        <Table stickyHeader size="small">
+        <Table stickyHeader size="small" sx={{ tableLayout: "fixed" }}>
           <TableHead>
             <TableRow>
-              <TableCell>Version</TableCell>
-              <TableCell>Invoice</TableCell>
-              <TableCell>Date & Time</TableCell>
-              <TableCell>Updated By</TableCell>
-              <TableCell align="right">Final Amount</TableCell>
-              <TableCell>Status</TableCell>
-              <TableCell>Comments</TableCell>
-              <TableCell>View</TableCell>
-              <TableCell>Actions</TableCell>
+              <StyledTableHeadCell sx={{ width: "7%" }}>Version</StyledTableHeadCell>
+              <StyledTableHeadCell sx={{ width: "15%" }}>Carrier Invoice No.</StyledTableHeadCell>
+              <StyledTableHeadCell sx={{ width: "10%" }}>Date & Time</StyledTableHeadCell>
+              <StyledTableHeadCell sx={{ width: "20%" }}>Generated <br></br>By</StyledTableHeadCell>
+              <StyledTableHeadCell sx={{ width: "10%" }}>
+                Final <br></br>Amount (₹)
+              </StyledTableHeadCell>
+              <StyledTableHeadCell sx={{ width: "10%" }}>Status</StyledTableHeadCell>
+              <StyledTableHeadCell sx={{ width: "15%" }}>Comments</StyledTableHeadCell>
+              <StyledTableHeadCell sx={{ width: "10%" }}>Documents</StyledTableHeadCell>
+              <StyledTableHeadCell sx={{ width: "10%" }}>Actions</StyledTableHeadCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {invoices.map((invoice) => (
-              <TableRow key={invoice.id}>
-                <TableCell>{invoice.version}</TableCell>
-                <TableCell>{invoice.invoiceNumber}</TableCell>
-                <TableCell>{invoice.datetime}</TableCell>
-                <TableCell>{invoice.updatedBy}</TableCell>
-                <TableCell align="right">
-                  {shipmentData.currency_symbol || "₹"}{" "}
-                  {invoice.finalAmount.toFixed(2)}
-                </TableCell>
-                <TableCell>{getStatusChip(invoice.status)}</TableCell>
-                <TableCell>
-                  <Tooltip title={invoice.comments} placement="top">
-                    <Typography
-                      noWrap
-                      variant="body2"
-                      sx={{ maxWidth: "150px" }}
-                    >
-                      {invoice.comments}
+              <TableRow key={invoice.id} hover>
+                <StyledTableCell>{invoice.version}</StyledTableCell>
+                
+                {/* DO NOT WRAP: Carrier Invoice */}
+                <StyledTableCell sx={{ whiteSpace: "nowrap", textAlign: "center" }}>
+                  <Tooltip title={invoice.invoiceNumber}>
+                    <Typography variant="body2" sx={{ fontWeight: "medium" }}>
+                        {invoice.invoiceNumber}
                     </Typography>
                   </Tooltip>
-                </TableCell>
-                <TableCell>
-                  {invoice.pdfLinks.map((link, index) => (
-                    <Link
-                      href={link}
-                      target="_blank"
-                      rel="noopener"
-                      key={index}
-                      sx={{ display: "block" }}
-                    >
-                      Download PDF{" "}
-                      {invoice.pdfLinks.length > 1 ? index + 1 : ""}
-                    </Link>
-                  ))}
-                </TableCell>
-                <TableCell>
+                  {/* --- ADD THIS LOGIC HERE --- */}
+                  {obdNumber > 0 && (
+                      <Typography variant="caption" sx={{ color: '#188c06', display: 'block', mt: 0.5 }}>
+                          OBD Number Available
+                      </Typography>
+                  )}
+                  {obdNumber <= 0 && (
+                      <Typography variant="caption" sx={{ color: '#E64F4F', display: 'block', mt: 0.5 }}>
+                          OBD Number Not Available
+                      </Typography>
+                  )}
+                  {/* --- END ADDED LOGIC --- */}
+                </StyledTableCell>
+
+                {/* DO NOT WRAP: Date & Time */}
+                <StyledTableCell sx={{ whiteSpace: "nowrap" }}>
+                  <Typography variant="body2" sx={{ fontWeight: "medium" }}>{invoice.datetime.date}</Typography>
+                  <Typography variant="caption" color="text.secondary">{invoice.datetime.time}</Typography>
+                </StyledTableCell>
+
+                {/* WRAP ALLOWED: Generated By */}
+                <StyledTableCell sx={{ whiteSpace: "normal" }}>
+                    {invoice.updatedBy}
+                </StyledTableCell>
+                
+                <StyledTableCell sx={{ whiteSpace: "nowrap" }}>
+                  
+                  {invoice.finalAmount.toFixed(2)}
+                </StyledTableCell>
+                
+                <StyledTableCell >{getStatusText(invoice.status)}</StyledTableCell>
+                
+                {/* WRAP ALLOWED: Comments */}
+                <StyledTableCell sx={{ whiteSpace: "normal" }}>
+                  <Typography variant="body2">
+                    {invoice.comments}
+                  </Typography>
+                </StyledTableCell>
+                
+                {/* WRAP ALLOWED: Documents */}
+                <StyledTableCell sx={{ whiteSpace: "normal" }}>
+                  {invoice.pdfLinks.length > 0 ? (
+                    <Box>
+                      <Tooltip title={invoice.pdfLinks[0]} placement="top">
+                        <Link
+                          href={invoice.pdfLinks[0]}
+                          target="_blank"
+                          rel="noopener"
+                          sx={{ display: "block", color: "#4f46E5", textDecoration: "underline" }}
+                        >
+                          Document - {invoice.invoiceNumber}
+                        </Link>
+                      </Tooltip>
+                    </Box>
+                  ) : (
+                    <Typography variant="body2" color="text.secondary">
+                        N/A
+                    </Typography>
+                  )}
+                </StyledTableCell>
+
+                <StyledTableCell sx={{ whiteSpace: "nowrap" }}>
                   {invoice.status === "PENDING" && (
-                    <Box sx={{ display: "flex", gap: 1 }}>
+                    <Box sx={{ display: "flex", gap: 1, justifyContent: 'center' }}>
                       <Button
                         variant="contained"
                         size="small"
@@ -361,7 +445,7 @@ const CarrierInvoiceTab = ({
                       </Button>
                     </Box>
                   )}
-                </TableCell>
+                </StyledTableCell>
               </TableRow>
             ))}
           </TableBody>

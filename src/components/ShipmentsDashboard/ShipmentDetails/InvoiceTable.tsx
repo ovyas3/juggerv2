@@ -1,9 +1,10 @@
-// components/ShipmentsDashboard/ShipmentDetails/InvoiceTable.tsx
+"use client";
+
 import React, { useState } from "react";
 import dayjs from "dayjs";
 import {
   Box,
-  Typography,
+  
   Table,
   TableBody,
   TableCell,
@@ -12,15 +13,17 @@ import {
   TableHead,
   TableRow,
   TextField,
+  Typography,
   IconButton,
   Menu,
   MenuItem,
   Button,
+  Tooltip,
 } from "@mui/material";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
-import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline"; 
-import styles from "./PickupTab.module.css";
+import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
+import styles from "./PickupTab.module.css";
 import CustomDateTimePicker from "@/components/UI/CustomDateTimePicker/CustomDateTimePicker";
 
 interface InvoiceTableProps {
@@ -37,6 +40,10 @@ interface InvoiceTableProps {
   onAddRow: (groupIndex: number) => void;
   onSave: () => void;
   onRemoveRow: (groupIndex: number, ciIndex: number) => void;
+  isTechnova: boolean;
+  isBMWIL: boolean;
+  isEmami: boolean; 
+  shipmentData: any; 
 }
 
 const formatDateTime = (dateString?: string | null): string => {
@@ -54,25 +61,13 @@ const textFieldStyles = {
     "&:hover fieldset": { borderColor: "#c0c0c0" },
     "&.Mui-focused fieldset": { borderColor: "#4F46E5" },
   },
-  "& .MuiInputBase-input": { padding: "8.5px 4px" }, // Reduced horizontal padding
+  "& .MuiInputBase-input": { padding: "8.5px 4px" },
 };
 
-// A small component to create a consistent vertical block for each invoice line
-const InvoiceFieldWrapper: React.FC<{
-  children: React.ReactNode;
-  isLast: boolean;
-}> = ({ children, isLast }) => (
-  <Box
-    sx={{
-      minHeight: "40px",
-      display: "flex",
-      alignItems: "center",
-      mb: isLast ? 0 : 2,
-    }}
-  >
-    {children}
-  </Box>
-);
+const capitalizeFirstLetter = (str: string) => {
+  if (!str) return "";
+  return str.charAt(0).toUpperCase() + str.slice(1);
+};
 
 const InvoiceTable: React.FC<InvoiceTableProps> = ({
   groupedInvoices,
@@ -83,6 +78,10 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
   onAddRow,
   onSave,
   onRemoveRow,
+  isTechnova,
+  isEmami,
+  isBMWIL,
+  shipmentData = {},
 }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [currentInvoice, setCurrentInvoice] = useState<any>(null);
@@ -118,8 +117,9 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
             <TableCell
               sx={{
                 fontWeight: "bold",
-                minWidth: "300px",
+                width: "380px",
                 color: "#09337e",
+                textAlign: "center",
                 backgroundColor: "#F5F5F5",
               }}
             >
@@ -129,7 +129,8 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
               sx={{
                 fontWeight: "bold",
                 color: "#09337e",
-                width: "280px", // Increased width
+                width: "180px", // Sufficient width for Invoice Number
+                textAlign: "center",
                 backgroundColor: "#F5F5F5",
               }}
             >
@@ -139,7 +140,8 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
               sx={{
                 fontWeight: "bold",
                 color: "#09337e",
-                width: "280px", // Increased width
+                width: "120px", // Sufficient width for Value
+                textAlign: "center",
                 backgroundColor: "#F5F5F5",
               }}
             >
@@ -149,7 +151,8 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
               sx={{
                 fontWeight: "bold",
                 color: "#09337e",
-                width: "280px", // Reduced width
+                width: "50px", // Reduced width for Packages (two digits)
+                textAlign: "center",
                 backgroundColor: "#F5F5F5",
               }}
             >
@@ -159,48 +162,85 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
               sx={{
                 fontWeight: "bold",
                 color: "#09337e",
-                width: "280px",
+                width: "130px", // Adjusted width
+                textAlign: "center",
                 backgroundColor: "#F5F5F5",
               }}
             >
-              Gross Wt.(MT)
+              Gross Wt. ({shipmentData.uom})
             </TableCell>
             <TableCell
               sx={{
                 fontWeight: "bold",
                 color: "#09337e",
-                width: "280px",
+                width: "130px", // Adjusted width
+                textAlign: "center",
                 backgroundColor: "#F5F5F5",
               }}
             >
-              Net Wt. (MT)
+              Net Wt. ({shipmentData.uom})
             </TableCell>
-            <TableCell
-              sx={{
-                fontWeight: "bold",
-                color: "#09337e",
-                width: "280px",
-                backgroundColor: "#F5F5F5",
-              }}
-            >
-              Cons. Wt.(MT)
-            </TableCell>
-            <TableCell
-              sx={{
-                fontWeight: "bold",
-                color: "#09337e",
-                width: "280px",
-                backgroundColor: "#F5F5F5",
-              }}
-            >
-              Delivery No.
-            </TableCell>
+            
+            {isTechnova ? (
+              <>
+                <TableCell
+                  sx={{
+                    fontWeight: "bold",
+                    color: "#09337e",
+                    width: "130px", // Adjusted width
+                    textAlign: "center",
+                    backgroundColor: "#F5F5F5",
+                  }}
+                >
+                  Bill To
+                </TableCell>
+                <TableCell
+                  sx={{
+                    fontWeight: "bold",
+                    color: "#09337e",
+                    width: "150px",
+                    textAlign: "center",
+                    backgroundColor: "#F5F5F5",
+                  }}
+                >
+                  Bill To Name
+                </TableCell>
+              </>
+            ) : (
+              <>
+                <TableCell
+                  sx={{
+                    fontWeight: "bold",
+                    color: "#09337e",
+                    width: "130px", // Adjusted width
+                    textAlign: "center",
+                    backgroundColor: "#F5F5F5",
+                  }}
+                >
+                  Cons. Wt.({shipmentData.uom})
+                </TableCell>
+                <TableCell
+                  sx={{
+                    fontWeight: "bold",
+                    color: "#09337e",
+                    width: "130px", // Adjusted width
+                    textAlign: "center",
+                    backgroundColor: "#F5F5F5",
+                  }}
+                >
+                  Delivery No.
+                </TableCell>
+              </>
+            )}
+
             {isEditing && (
               <TableCell
                 sx={{
                   fontWeight: "bold",
                   color: "#09337e",
                   backgroundColor: "#F5F5F5",
+                  width: "80px", // Explicit width for Actions
+                  textAlign: "center",
                 }}
               >
                 Actions
@@ -211,6 +251,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
                 fontWeight: "bold",
                 color: "#09337e",
                 backgroundColor: "#F5F5F5",
+                textAlign: "center",
               }}
             />
           </TableRow>
@@ -218,7 +259,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
         <TableBody>
           {groupedInvoices.map((invGroup: any, groupIndex: number) => {
             const invoicesToRender =
-              (isEditing
+              (isEditing // Use the editable data if in edit mode
                 ? editableGoodsInfoForPickup[groupIndex]?.commercialInvoices
                 : invGroup.commercial_invoices) ?? [];
 
@@ -226,10 +267,9 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
               ? editableGoodsInfoForPickup[groupIndex] || {}
               : invGroup;
 
-            return (
-              <TableRow key={invGroup.delivery_id?._id || groupIndex}>
-                {/* 1. Delivery Location Cell (Renders ONCE per row) */}
-                <TableCell sx={{ verticalAlign: "top" }}>
+            return ( // Apply verticalAlign: 'top' to all cells in the row
+              <TableRow key={invGroup.delivery_id?._id || groupIndex} sx={{ '& > td': { verticalAlign: 'top' } }}>
+                <TableCell sx={{ padding: '10px 2px 0px 8px ' }}>
                   <Box sx={{ display: "flex", alignItems: "flex-start" }}>
                     <span className={styles.deliveryIcon}>
                       D{groupIndex + 1}
@@ -252,6 +292,53 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
                       </Typography>
                     </Box>
                   </Box>
+
+                  {(isTechnova || isEmami || isBMWIL) &&
+                    (() => {
+                      const TotalRow = ({ label, value }: { label: string; value: React.ReactNode }) => (
+                        <Box sx={{ display: "flex", alignItems: "center" }}>
+                          <Typography variant="body2" sx={{ width: "100px", flexShrink: 0 }}>{label}</Typography>
+                          <Typography variant="body2" sx={{ mx: 1 }}>:</Typography>
+                          <Typography variant="body2" sx={{ fontWeight: "bold" }}>{value}</Typography>
+                        </Box>
+                      );
+
+                      return (
+                        <Box
+                          sx={{
+                            mt: 2,
+                            p: 1.5,
+                            border: "1px solid #e0e0e0",
+                            borderRadius: "4px",
+                            backgroundColor: "#f9f9f9",
+                          }}
+                        >
+                          <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 'bold' }}>
+                            Totals
+                          </Typography>
+                          <TotalRow
+                            label="Gross Wt"
+                            value={`${(invGroup.total_gross_weight ?? 0).toFixed(2)} ${shipmentData.uom}`}
+                          />
+                          <TotalRow
+                            label="Net Wt"
+                            value={`${(invGroup.total_net_weight ?? 0).toFixed(2)} ${shipmentData.uom}`}
+                          />
+                          <TotalRow
+                            label="Cons. Wt"
+                            value={`${(invGroup.total_considered_weight ?? 0).toFixed(2)} ${shipmentData.uom}`}
+                          />
+                          <TotalRow
+                            label="Packages"
+                            value={invGroup.total_nop ?? 0}
+                          />
+                          <TotalRow
+                            label="Invoices"
+                            value={invoicesToRender.length}
+                          />
+                        </Box>
+                      );
+                    })()}
                   <TextField
                     multiline
                     rows={2}
@@ -259,14 +346,14 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
                     variant="outlined"
                     size="small"
                     label="Comments"
-                    sx={{ mt: 1, ...textFieldStyles }}
+                    sx={{ mt: 1, ...textFieldStyles, mb : 1 }}
                     disabled={!isEditing}
                     value={currentGoodsInfo.comments || ""}
                     onChange={(e) =>
                       onGoodsInfoChange(groupIndex, "comments", e.target.value)
                     }
                   />
-                  <Box sx={{ mt: 1 }}>
+                  <Box sx={{ mt: 1, marginBottom: '8px' }}>
                     {isEditing ? (
                       <CustomDateTimePicker
                         label="E-waybill Expiry"
@@ -284,216 +371,291 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
                         }
                       />
                     ) : (
-                      <Box sx={{ mt: 1, pl: 1 , border: '1px solid #e0e0e0', borderRadius: '4px' }}>
+                      <Box
+                        sx={{
+                          mt: 1,
+                          pl: 1,
+                          border: "1px solid #e0e0e0",
+                          borderRadius: "4px",
+                        }}
+                      >
                         <Typography variant="caption" color="text.secondary">
                           E-waybill Expiry
-                        </Typography> 
+                        </Typography>
                         <Typography variant="body2" color="text.secondary">
-                          {formatDateTime(currentGoodsInfo.ewaybillExpiryDateTime)}
+                          {formatDateTime(
+                            currentGoodsInfo.ewaybillExpiryDateTime
+                          )}
                         </Typography>
                       </Box>
                     )}
                   </Box>
                 </TableCell>
 
-                {/* --- Mapped Cells (Render vertically for each invoice) --- */}
-
-                {/* Invoice Number */}
-                <TableCell sx={{ verticalAlign: "top" }}>
+                <TableCell sx={{ padding: '6px 2px' }}> {/* Added verticalAlign: 'top' to all data cells */}
                   {invoicesToRender.map((ci: any, ciIndex: number) => (
-                    <InvoiceFieldWrapper
-                      key={ci._id || `num-${ciIndex}`}
-                      isLast={ciIndex === invoicesToRender.length - 1}
-                    >
-                      <TextField
-                        size="small"
-                        variant="outlined"
-                        sx={{ ...textFieldStyles, width: "100%"}}
-                        disabled={!isEditing}
-                        value={ci.num ?? ""}
-                        onChange={(e) =>
-                          onInvoiceChange(
-                            groupIndex,
-                            ciIndex,
-                            "num",
-                            e.target.value
-                          )
-                        }
-                      />
-                    </InvoiceFieldWrapper>
+                    <Box key={ci._id || `num-${ciIndex}`} sx={{minHeight: "40px", display: "flex", alignItems: "center", mb: ciIndex === invoicesToRender.length - 1 ? 0 : 2}}>
+                      {isEditing ? (
+                        <TextField
+                          size="small"
+                          variant="outlined"
+                          fullWidth
+                          sx={{ ...textFieldStyles, width: "100%" }}
+                          disabled={!isEditing}
+                          value={ci.num ?? ""}
+                          onChange={(e) =>
+                            onInvoiceChange(
+                              groupIndex,
+                              ciIndex,
+                              "num",
+                              e.target.value
+                            )
+                          }
+                          inputProps={{ style: { textAlign: 'center' } }}
+                        />
+                      ) : (
+                        <Typography variant="body2" sx={{ width: "100%", fontWeight: '590', textAlign: 'center' }}>{ci.num ?? "—"}</Typography>
+                      )}
+                    </Box>
+                  ))}
+                </TableCell>
+                <TableCell sx={{ padding: '6px 2px' }}>
+                  {invoicesToRender.map((ci: any, ciIndex: number) => (
+                    <Box key={ci._id || `val-${ciIndex}`} sx={{minHeight: "40px", display: "flex", alignItems: "center", mb: ciIndex === invoicesToRender.length - 1 ? 0 : 2}}>
+                      {isEditing ? (
+                        <TextField
+                          size="small"
+                          variant="outlined"
+                          fullWidth
+                          sx={{ ...textFieldStyles, width: "100%" }}
+                          disabled={!isEditing}
+                          type="number"
+                          inputProps={{ min: 0, style: { textAlign: 'center' } }}
+                          value={ci.value ?? ""}
+                          onChange={(e) => {
+                            const value = e.target.value.replace(/[^0-9]/g, "");
+                            onInvoiceChange(groupIndex, ciIndex, "value", value);
+                          }}
+                        />
+                      ) : (
+                        <Typography variant="body2" sx={{ width: "100%", fontWeight: '590', textAlign: 'center' }}>{ci.value ?? "0.00"}</Typography>
+                      )}
+                    </Box>
+                  ))}
+                </TableCell>
+                <TableCell sx={{ padding: '6px 2px' }}>
+                  {invoicesToRender.map((ci: any, ciIndex: number) => (
+                    <Box key={ci._id || `nop-${ciIndex}`} sx={{minHeight: "40px", display: "flex", alignItems: "center", mb: ciIndex === invoicesToRender.length - 1 ? 0 : 2}}>
+                      {isEditing ? (
+                        <TextField
+                          size="small"
+                          variant="outlined"
+                          fullWidth
+                          sx={{ ...textFieldStyles, width: "100%" }}
+                          disabled={!isEditing}
+                          type="number"
+                          inputProps={{ min: 0, style: { textAlign: 'center' } }}
+                          value={ci.nop ?? ""}
+                          onChange={(e) =>
+                            onInvoiceChange(
+                              groupIndex,
+                              ciIndex,
+                              "nop",
+                              e.target.value
+                            )
+                          }
+                        />
+                      ) : (
+                        <Typography variant="body2" sx={{ width: "100%", fontWeight: '590', textAlign: 'center' }}>{ci.nop ?? "0"}</Typography>
+                      )}
+                    </Box>
+                  ))}
+                </TableCell>
+                <TableCell sx={{ padding: '6px 2px' }}>
+                  {invoicesToRender.map((ci: any, ciIndex: number) => (
+                    <Box key={ci._id || `gross-${ciIndex}`} sx={{minHeight: "40px", display: "flex", alignItems: "center", mb: ciIndex === invoicesToRender.length - 1 ? 0 : 2}}>
+                      {isEditing ? (
+                        <TextField
+                          size="small"
+                          variant="outlined"
+                          fullWidth
+                          sx={{ ...textFieldStyles, width: "100%" }}
+                          disabled={!isEditing}
+                          type="number"
+                          inputProps={{ min: 0, style: { textAlign: 'center' } }}
+                          value={ci.gross_weight ?? ""}
+                          onChange={(e) =>
+                            onInvoiceChange(
+                              groupIndex,
+                              ciIndex,
+                              "gross_weight",
+                              e.target.value
+                            )
+                          }
+                        />
+                      ) : (
+                        <Typography variant="body2" sx={{ width: "100%", fontWeight: '590', textAlign: 'center' }}>{ci.gross_weight ?? "0.00"}</Typography>
+                      )}
+                    </Box>
+                  ))}
+                </TableCell>
+                <TableCell sx={{ padding: '6px 2px' }}>
+                  {invoicesToRender.map((ci: any, ciIndex: number) => (
+                    <Box key={ci._id || `net-${ciIndex}`} sx={{minHeight: "40px", display: "flex", alignItems: "center", mb: ciIndex === invoicesToRender.length - 1 ? 0 : 2}}>
+                      {isEditing ? (
+                        <TextField
+                          size="small"
+                          variant="outlined"
+                          fullWidth
+                          sx={{ ...textFieldStyles, width: "100%" }}
+                          disabled={!isEditing}
+                          type="number"
+                          inputProps={{ min: 0, style: { textAlign: 'center' } }}
+                          value={ci.net_weight ?? ""}
+                          onChange={(e) =>
+                            onInvoiceChange(
+                              groupIndex,
+                              ciIndex,
+                              "net_weight",
+                              e.target.value
+                            )
+                          }
+                        />
+                      ) : (
+                        <Typography variant="body2" sx={{ width: "100%", fontWeight: '590', textAlign: 'center' }}>{ci.net_weight ?? "0.00"}</Typography>
+                      )}
+                    </Box>
                   ))}
                 </TableCell>
 
-                {/* Value */}
-                <TableCell sx={{ verticalAlign: "top" }}>
-                  {invoicesToRender.map((ci: any, ciIndex: number) => (
-                    <InvoiceFieldWrapper
-                      key={ci._id || `val-${ciIndex}`}
-                      isLast={ciIndex === invoicesToRender.length - 1}
-                    >
-                      <TextField
-                        size="small"
-                        variant="outlined"
-                        sx={{ ...textFieldStyles, width: "100%" }}
-                        disabled={!isEditing}
-                        type="number"
-                        inputProps={{ min: 0 }}
-                        value={ci.value ?? ""}
-                        onChange={(e) => {
-                          const value = e.target.value.replace(/[^0-9]/g, "");
-                          onInvoiceChange(groupIndex, ciIndex, "value", value);
-                        }}
-                      />
-                    </InvoiceFieldWrapper>
-                  ))}
-                </TableCell>
+                {isTechnova ? (
+                  <>
+                    <TableCell sx={{ padding: '6px 2px' }}>
+                      {invoicesToRender.map((ci: any, ciIndex: number) => (
+                        <Box key={ci._id || `bill-to-${ciIndex}`} sx={{minHeight: "40px", display: "flex", alignItems: "center", mb: ciIndex === invoicesToRender.length - 1 ? 0 : 2}}>
+                          {isEditing ? (
+                            <TextField
+                              size="small"
+                              fullWidth
+                              variant="outlined"
+                              sx={{ ...textFieldStyles, width: "100%" }}
+                              disabled={!isEditing}
+                              value={ci.others?.bill_to || ""}
+                              onChange={(e) =>
+                                onInvoiceChange(
+                                  groupIndex,
+                                  ciIndex,
+                                  "bill_to",
+                                  e.target.value
+                                )
+                              }
+                              inputProps={{ style: { textAlign: 'center' } }}
+                            />
+                          ) : (
+                            <Typography variant="body2" sx={{ width: "100%", fontWeight: '590', textAlign: 'center' }}>{ci.others?.bill_to || "—"}</Typography>
+                          )}
+                        </Box>
+                      ))}
+                    </TableCell>
+                    <TableCell sx={{ padding: '6px 2px' }}>
+                      {invoicesToRender.map((ci: any, ciIndex: number) => (
+                        <Box key={ci._id || `bill-to-name-${ciIndex}`} sx={{minHeight: "40px", display: "flex", alignItems: "center", mb: ciIndex === invoicesToRender.length - 1 ? 0 : 2}}>
+                          {isEditing ? (
+                            <TextField
+                              size="small"
+                              fullWidth
+                              variant="outlined"
+                              sx={{ ...textFieldStyles, width: "100%" }}
+                              disabled={!isEditing}
+                              value={ci.others?.bill_to_name || ""}
+                              onChange={(e) =>
+                                onInvoiceChange(
+                                  groupIndex,
+                                  ciIndex,
+                                  "bill_to_name",
+                                  e.target.value
+                                )
+                              }
+                              inputProps={{ style: { textAlign: 'center' } }}
+                            />
+                          ) : (
+                            <Tooltip title={capitalizeFirstLetter(ci.others?.bill_to_name || '')} arrow>
+                              <Typography variant="body2" sx={{ width: "100%", fontWeight: '590',textAlign: 'center' }}>
+                                {ci.others?.bill_to_name
+                                  ? `${capitalizeFirstLetter(ci.others.bill_to_name.substring(0, 10))}${ci.others.bill_to_name.length > 10 ? '...' : ''}`
+                                  : "—"
+                                }
+                              </Typography>
+                            </Tooltip>
+                          )}
+                        </Box>
+                      ))}
+                    </TableCell>
+                  </>
+                ) : (
+                  <>
+                    <TableCell sx={{ padding: '6px 2px' }}>
+                      {invoicesToRender.map((ci: any, ciIndex: number) => (
+                        <Box key={ci._id || `cons-${ciIndex}`} sx={{minHeight: "40px", display: "flex", alignItems: "center", mb: ciIndex === invoicesToRender.length - 1 ? 0 : 2}}>
+                          {isEditing ? (
+                            <TextField
+                              size="small"
+                              fullWidth
+                              variant="outlined"
+                              sx={{ ...textFieldStyles, width: "100%" }}
+                              disabled={!isEditing}
+                              type="number"
+                              inputProps={{ min: 0, style: { textAlign: 'center' } }}
+                              value={ci.considered_weight ?? ""}
+                              onChange={(e) =>
+                                onInvoiceChange(
+                                  groupIndex,
+                                  ciIndex,
+                                  "considered_weight",
+                                  e.target.value
+                                )
+                              }
+                            />
+                          ) : (
+                            <Typography variant="body2" sx={{ width: "100%", fontWeight: '590', textAlign: 'center' }}>{ci.considered_weight ?? "0.00"}</Typography>
+                          )}
+                        </Box>
+                      ))}
+                    </TableCell>
+                    <TableCell sx={{ padding: '6px 2px' }}>
+                      {invoicesToRender.map((ci: any, ciIndex: number) => (
+                        <Box key={ci._id || `del-${ciIndex}`} sx={{minHeight: "40px", display: "flex", alignItems: "center", mb: ciIndex === invoicesToRender.length - 1 ? 0 : 2}}>
+                          {isEditing ? (
+                            <TextField
+                              size="small"
+                              fullWidth
+                              variant="outlined"
+                              sx={{ ...textFieldStyles, width: "100%" }}
+                              disabled={!isEditing}
+                              value={ci.others?.delivery_no || ""}
+                              onChange={(e) =>
+                                onInvoiceChange(
+                                  groupIndex,
+                                  ciIndex,
+                                  "delivery_no",
+                                  e.target.value
+                                )
+                              }
+                              inputProps={{ style: { textAlign: 'center' } }}
+                            />
+                          ) : (
+                            <Typography variant="body2" sx={{ width: "100%", fontWeight: '590', textAlign: 'center' }}>{ci.others?.delivery_no || "—"}</Typography>
+                          )}
+                        </Box>
+                      ))}
+                    </TableCell>
+                  </>
+                )}
 
-                {/* No. of Packages */}
-                <TableCell sx={{ verticalAlign: "top" }}>
-                  {invoicesToRender.map((ci: any, ciIndex: number) => (
-                    <InvoiceFieldWrapper
-                      key={ci._id || `nop-${ciIndex}`}
-                      isLast={ciIndex === invoicesToRender.length - 1}
-                    >
-                      <TextField
-                        size="small"
-                        variant="outlined"
-                        sx={{ ...textFieldStyles, width: "100%" }}
-                        disabled={!isEditing}
-                        type="number"
-                        inputProps={{ min: 0 }}
-                        value={ci.nop ?? ""}
-                        onChange={(e) =>
-                          onInvoiceChange(
-                            groupIndex,
-                            ciIndex,
-                            "nop",
-                            e.target.value
-                          )
-                        }
-                      />
-                    </InvoiceFieldWrapper>
-                  ))}
-                </TableCell>
-
-                {/* Gross Wt. */}
-                <TableCell sx={{ verticalAlign: "top" }}>
-                  {invoicesToRender.map((ci: any, ciIndex: number) => (
-                    <InvoiceFieldWrapper
-                      key={ci._id || `gross-${ciIndex}`}
-                      isLast={ciIndex === invoicesToRender.length - 1}
-                    >
-                      <TextField
-                        size="small"
-                        variant="outlined"
-                        sx={{ ...textFieldStyles, width: "100%" }}
-                        disabled={!isEditing}
-                        type="number"
-                        inputProps={{ min: 0 }}
-                        value={ci.gross_weight ?? ""}
-                        onChange={(e) =>
-                          onInvoiceChange(
-                            groupIndex,
-                            ciIndex,
-                            "gross_weight",
-                            e.target.value
-                          )
-                        }
-                      />
-                    </InvoiceFieldWrapper>
-                  ))}
-                </TableCell>
-
-                {/* Net Wt. */}
-                <TableCell sx={{ verticalAlign: "top" }}>
-                  {invoicesToRender.map((ci: any, ciIndex: number) => (
-                    <InvoiceFieldWrapper
-                      key={ci._id || `net-${ciIndex}`}
-                      isLast={ciIndex === invoicesToRender.length - 1}
-                    >
-                      <TextField
-                        size="small"
-                        variant="outlined"
-                        sx={{ ...textFieldStyles, width: "100%" }}
-                        disabled={!isEditing}
-                        type="number"
-                        inputProps={{ min: 0 }}
-                        value={ci.net_weight ?? ""}
-                        onChange={(e) =>
-                          onInvoiceChange(
-                            groupIndex,
-                            ciIndex,
-                            "net_weight",
-                            e.target.value
-                          )
-                        }
-                      />
-                    </InvoiceFieldWrapper>
-                  ))}
-                </TableCell>
-
-                {/* Cons. Wt. */}
-                <TableCell sx={{ verticalAlign: "top" }}>
-                  {invoicesToRender.map((ci: any, ciIndex: number) => (
-                    <InvoiceFieldWrapper
-                      key={ci._id || `cons-${ciIndex}`}
-                      isLast={ciIndex === invoicesToRender.length - 1}
-                    >
-                      <TextField
-                        size="small"
-                        variant="outlined"
-                        sx={{ ...textFieldStyles, width: "100%" }}
-                        disabled={!isEditing}
-                        type="number"
-                        inputProps={{ min: 0 }}
-                        value={ci.considered_weight ?? ""}
-                        onChange={(e) =>
-                          onInvoiceChange(
-                            groupIndex,
-                            ciIndex,
-                            "considered_weight",
-                            e.target.value
-                          )
-                        }
-                      />
-                    </InvoiceFieldWrapper>
-                  ))}
-                </TableCell>
-
-                {/* Delivery No. */}
-                <TableCell sx={{ verticalAlign: "top" }}>
-                  {invoicesToRender.map((ci: any, ciIndex: number) => (
-                    <InvoiceFieldWrapper
-                      key={ci._id || `del-${ciIndex}`}
-                      isLast={ciIndex === invoicesToRender.length - 1}
-                    >
-                      <TextField
-                        size="small"
-                        variant="outlined"
-                        sx={{ ...textFieldStyles, width: "100%" }}
-                        disabled={!isEditing}
-                        value={ci.others?.delivery_no || "-"}
-                        onChange={(e) =>
-                          onInvoiceChange(
-                            groupIndex,
-                            ciIndex,
-                            "delivery_no",
-                            e.target.value
-                          )
-                        }
-                      />
-                    </InvoiceFieldWrapper>
-                  ))}
-                </TableCell>
-
-                {/* Actions */}
                 {isEditing && (
-                  <TableCell sx={{ verticalAlign: "top" }}>
+                  <TableCell sx={{ padding: '6px 2px' }}>
                     {invoicesToRender.map((ci: any, ciIndex: number) => (
-                      <InvoiceFieldWrapper
-                        key={ci._id || `act-${ciIndex}`}
-                        isLast={ciIndex === invoicesToRender.length - 1}
-                      >
+                      <Box key={ci._id || `act-${ciIndex}`} sx={{minHeight: "40px", display: "flex", alignItems: "center", mb: ciIndex === invoicesToRender.length - 1 ? 0 : 2}}>
                         <Box sx={{ display: "flex", alignItems: "center" }}>
                           {invoicesToRender.length > 1 && (
                             <IconButton
@@ -508,31 +670,25 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
                               size="small"
                               onClick={() => onAddRow(groupIndex)}
                             >
-                              <AddCircleOutlineIcon
-                                sx={{ color: "#4f46e5" }}
-                              />
+                              <AddCircleOutlineIcon sx={{ color: "#4f46e5" }} />
                             </IconButton>
                           )}
                         </Box>
-                      </InvoiceFieldWrapper>
+                      </Box>
                     ))}
                   </TableCell>
                 )}
 
-                {/* More Info Menu */}
-                <TableCell sx={{ verticalAlign: "top" }} align="center">
+                <TableCell sx={{ padding: '6px 2px' }}>
                   {invoicesToRender.map((ci: any, ciIndex: number) => (
-                    <InvoiceFieldWrapper
-                      key={ci._id || `more-${ciIndex}`}
-                      isLast={ciIndex === invoicesToRender.length - 1}
-                    >
+                    <Box key={ci._id || `more-${ciIndex}`} sx={{minHeight: "40px", display: "flex", alignItems: "center", mb: ciIndex === invoicesToRender.length - 1 ? 0 : 2}}>
                       <IconButton
                         size="small"
                         onClick={(e) => handleMenuClick(e, ci)}
                       >
                         <MoreVertIcon />
                       </IconButton>
-                    </InvoiceFieldWrapper>
+                    </Box>
                   ))}
                 </TableCell>
               </TableRow>
