@@ -403,13 +403,16 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
                           sx={{ ...textFieldStyles, width: "100%" }}
                           disabled={!isEditing}
                           value={ci.num ?? ""}
-                          onChange={(e) =>
+                          onChange={(e) =>{
+                            const value = e.target.value.replace(/[^a-zA-Z0-9]/g, "");
                             onInvoiceChange(
                               groupIndex,
                               ciIndex,
                               "num",
-                              e.target.value
+                              value
                             )
+                          }
+                            
                           }
                           inputProps={{ style: { textAlign: 'center' } }}
                         />
@@ -433,12 +436,14 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
                           inputProps={{ min: 0, style: { textAlign: 'center' } }}
                           value={ci.value ?? ""}
                           onChange={(e) => {
-                            const value = e.target.value.replace(/[^0-9]/g, "");
+                            const value = e.target.value.replace(/^(?!\d*\.?\d*$).*/g, "");
                             onInvoiceChange(groupIndex, ciIndex, "value", value);
                           }}
                         />
                       ) : (
-                        <Typography variant="body2" sx={{ width: "100%", fontWeight: '590', textAlign: 'center' }}>{ci.value ?? "0.00"}</Typography>
+                        <Typography variant="body2" sx={{ width: "100%", fontWeight: '590', textAlign: 'center' }}>
+                          {Number(ci.value || 0).toFixed(2)}
+                        </Typography>
                       )}
                     </Box>
                   ))}
@@ -456,13 +461,17 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
                           type="number"
                           inputProps={{ min: 0, style: { textAlign: 'center' } }}
                           value={ci.nop ?? ""}
-                          onChange={(e) =>
+                          onChange={(e) =>{
+                            const value = e.target.value.replace(/^(?!\d*\.?\d*$).*/g, "");
                             onInvoiceChange(
+                              
                               groupIndex,
                               ciIndex,
                               "nop",
-                              e.target.value
+                              value
                             )
+                          }
+                            
                           }
                         />
                       ) : (
@@ -484,17 +493,22 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
                           type="number"
                           inputProps={{ min: 0, style: { textAlign: 'center' } }}
                           value={ci.gross_weight ?? ""}
-                          onChange={(e) =>
+                          onChange={(e) =>{
+                            const value = e.target.value.replace(/^(?!\d*\.?\d*$).*/g, "");
                             onInvoiceChange(
                               groupIndex,
                               ciIndex,
                               "gross_weight",
-                              e.target.value
+                              value 
                             )
                           }
+                          }
+                            
                         />
                       ) : (
-                        <Typography variant="body2" sx={{ width: "100%", fontWeight: '590', textAlign: 'center' }}>{ci.gross_weight ?? "0.00"}</Typography>
+                        <Typography variant="body2" sx={{ width: "100%", fontWeight: '590', textAlign: 'center' }}>
+                          {Number(ci.gross_weight || 0).toFixed(2)}
+                        </Typography>
                       )}
                     </Box>
                   ))}
@@ -512,17 +526,21 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
                           type="number"
                           inputProps={{ min: 0, style: { textAlign: 'center' } }}
                           value={ci.net_weight ?? ""}
-                          onChange={(e) =>
+                          onChange={(e) =>{
+                            const value = e.target.value.replace(/^(?!\d*\.?\d*$).*/g, "");
                             onInvoiceChange(
                               groupIndex,
                               ciIndex,
                               "net_weight",
-                              e.target.value
+                              value
                             )
+                          } 
                           }
                         />
                       ) : (
-                        <Typography variant="body2" sx={{ width: "100%", fontWeight: '590', textAlign: 'center' }}>{ci.net_weight ?? "0.00"}</Typography>
+                        <Typography variant="body2" sx={{ width: "100%", fontWeight: '590', textAlign: 'center' }}>
+                          {Number(ci.net_weight || 0).toFixed(2)}
+                        </Typography>
                       )}
                     </Box>
                   ))}
@@ -607,17 +625,21 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
                               type="number"
                               inputProps={{ min: 0, style: { textAlign: 'center' } }}
                               value={ci.considered_weight ?? ""}
-                              onChange={(e) =>
+                              onChange={(e) =>{
+                                const value = e.target.value.replace(/^(?!\d*\.?\d*$).*/g, "");
                                 onInvoiceChange(
                                   groupIndex,
                                   ciIndex,
                                   "considered_weight",
-                                  e.target.value
+                                  value
                                 )
+                              }
                               }
                             />
                           ) : (
-                            <Typography variant="body2" sx={{ width: "100%", fontWeight: '590', textAlign: 'center' }}>{ci.considered_weight ?? "0.00"}</Typography>
+                            <Typography variant="body2" sx={{ width: "100%", fontWeight: '590', textAlign: 'center' }}>
+                              {Number(ci.considered_weight || 0).toFixed(2)}
+                            </Typography>
                           )}
                         </Box>
                       ))}
@@ -633,13 +655,15 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
                               sx={{ ...textFieldStyles, width: "100%" }}
                               disabled={!isEditing}
                               value={ci.others?.delivery_no || ""}
-                              onChange={(e) =>
+                              onChange={(e) =>{
+                                const value = e.target.value.replace(/[^a-zA-Z0-9]/g, "");
                                 onInvoiceChange(
                                   groupIndex,
                                   ciIndex,
                                   "delivery_no",
-                                  e.target.value
+                                  value
                                 )
+                              } 
                               }
                               inputProps={{ style: { textAlign: 'center' } }}
                             />

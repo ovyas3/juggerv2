@@ -41,7 +41,7 @@ import styles from "./DeliveryTab.module.css";
 import pickupStyles from "./PickupTab.module.css";
 import CustomDatePicker from "@/components/UI/CustomDatePicker/CustomDatePicker";
 import { useSnackbar } from "@/hooks/snackBar";
-import { httpsPut, httpsPost } from "@/utils/Communication";
+import { httpsPut, httpsPost, httpsGet } from "@/utils/Communication"; // ⬅️ Add httpsGet here
 import { UserRoles } from "@/hooks/useUserRoles";
 import CustomDateTimePicker from "@/components/UI/CustomDateTimePicker/CustomDateTimePicker";
 import { format, sub } from "date-fns";
@@ -281,17 +281,22 @@ const PackageStatusTable = ({
         <Table size="small">
           <TableHead sx={{ backgroundColor: "#f9f9f9" }}>
             <TableRow>
-              {finalColumns.map((col) => (
+              {finalColumns.map((col, colIndex) => (
                 <TableCell
                   key={col.id}
                   align="center"
                   colSpan={col.subColumns ? col.subColumns.length : 1}
-                  sx={{ fontWeight: "bold", width: "100px", color: "#09337e" }}
+                  sx={{
+                    fontWeight: "bold",
+                    width: "100px",
+                    color: "#09337e",
+                    borderRight: "1px solid #e0e0e0",
+                  }}
                 >
                   {col.label}
                 </TableCell>
               ))}
-              <TableCell align="center" sx={{ fontWeight: "bold", width: "100px", color: "#09337e" }}>
+              <TableCell align="center" sx={{ fontWeight: "bold", width: "100px", color: "#09337e", borderRight: "1px solid #e0e0e0" }}>
                 Total ({currencySymbol})
               </TableCell>
               <TableCell align="center" sx={{ fontWeight: "bold", width: "80px", color: "#09337e" }}>
@@ -301,16 +306,16 @@ const PackageStatusTable = ({
             {getDynamicColumns.length > 0 && (
               <TableRow>
                 {baseColumns.map((col) => (
-                  <TableCell key={col.id} />
+                  <TableCell key={col.id} sx={{ borderRight: "1px solid #e0e0e0" }} />
                 ))}
                 {getDynamicColumns.map((col) =>
                   col.subColumns.map((subCol, index) => (
-                    <TableCell key={`${col.id}-${index}`} align="center" sx={{ color: "#09337e", fontWeight: "bold" }}>
+                    <TableCell key={`${col.id}-${index}`} align="center" sx={{ color: "#09337e", fontWeight: "bold", borderRight: "1px solid #e0e0e0" }}>
                       {subCol}
                     </TableCell>
                   ))
                 )}
-                <TableCell />
+                <TableCell sx={{ borderRight: "1px solid #e0e0e0" }} />
                 <TableCell />
               </TableRow>
             )}
@@ -318,7 +323,7 @@ const PackageStatusTable = ({
           <TableBody>
             {tableData.map((row: InvoiceProduct, index: number) => (
               <TableRow key={`row-${index}`}>
-                <TableCell align="center"sx={{ padding: '7px 2px 7px 7px' }}>
+                <TableCell align="center"sx={{ padding: '7px 7px 7px 7px', borderRight: "1px solid #e0e0e0" }}>
                   <Autocomplete
                     options={materials?.map((m: any) => m.sku) || []}
                     value={row.material_SKU || ""}
@@ -341,7 +346,7 @@ const PackageStatusTable = ({
                     }}
                   />
                 </TableCell>
-                <TableCell align="center" sx={{ padding: '7px 2px' }}>
+                <TableCell align="center" sx={{ padding: '7px 7px', borderRight: "1px solid #e0e0e0" }}>
                   <TextField
                     size="small"
                     value={row.batch || ""}
@@ -354,7 +359,7 @@ const PackageStatusTable = ({
                     }}
                   />
                 </TableCell>
-                <TableCell align="center">
+                <TableCell align="center" sx={{ padding: '7px 7px', borderRight: "1px solid #e0e0e0" }}>
                 <TextField
                   size="small"
                   value={row.MFG_date || ""}
@@ -367,7 +372,7 @@ const PackageStatusTable = ({
                   }}
                 />
               </TableCell>
-                <TableCell align="center" sx={{ padding: '7px 2px' }}>
+                <TableCell align="center" sx={{ padding: '7px 7px', borderRight: "1px solid #e0e0e0" }}>
                   <TextField
                     type="text"
                     size="small"
@@ -381,13 +386,13 @@ const PackageStatusTable = ({
                     }
                     disabled={!isEditable}
                     sx={{
-                      "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                        borderColor: "#4f46e5",
-                      },
-                    }}
+                          "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                            borderColor: "#4f46e5",
+                          },
+                        }}
                   />
                 </TableCell>
-                <TableCell align="center" sx={{ padding: '7px 2px' }}>
+                <TableCell align="center" sx={{ padding: '7px 7px', borderRight: "1px solid #e0e0e0" }}>
                   <TextField
                     type="text"
                     size="small"
@@ -410,7 +415,7 @@ const PackageStatusTable = ({
                 {/* Dynamic columns based on selected status checkboxes */}
                 {invoice.status.missing_checked && (
                   <>
-                    <TableCell align="center" sx={{ padding: '7px 2px' }}>
+                    <TableCell align="center" sx={{ padding: '7px 7px', borderRight: "1px solid #e0e0e0" }}>
                       <TextField
                         type="text"
                         size="small"
@@ -430,7 +435,7 @@ const PackageStatusTable = ({
                         }}
                       />
                     </TableCell>
-                    <TableCell align="center" sx={{ padding: '7px 2px' }}>
+                    <TableCell align="center" sx={{ padding: '7px 7px', borderRight: "1px solid #e0e0e0" }}>
                       <TextField
                         type="text"
                         size="small"
@@ -454,7 +459,7 @@ const PackageStatusTable = ({
                 )}
                 {invoice.status.damaged_checked && (
                   <>
-                    <TableCell align="center" sx={{ padding: '7px 2px' }}>
+                    <TableCell align="center" sx={{ padding: '7px 7px', borderRight: "1px solid #e0e0e0" }}>
                       <TextField
                         type="text"
                         size="small"
@@ -474,7 +479,7 @@ const PackageStatusTable = ({
                         }}
                       />
                     </TableCell>
-                    <TableCell align="center" sx={{ padding: '7px 2px' }}>
+                    <TableCell align="center" sx={{ padding: '7px 7px', borderRight: "1px solid #e0e0e0" }}>
                       <TextField
                         type="text"
                         size="small"
@@ -498,7 +503,7 @@ const PackageStatusTable = ({
                 )}
                 {invoice.status.clotted_checked && (
                   <>
-                    <TableCell align="center" sx={{ padding: '7px 2px' }}>
+                    <TableCell align="center" sx={{ padding: '7px 7px', borderRight: "1px solid #e0e0e0" }}>
                       <TextField
                         type="text"
                         size="small"
@@ -518,7 +523,7 @@ const PackageStatusTable = ({
                         }}
                       />
                     </TableCell>
-                    <TableCell align="center" sx={{ padding: '7px 2px' }}>
+                    <TableCell align="center" sx={{ padding: '7px 7px', borderRight: "1px solid #e0e0e0" }}>
                       <TextField
                         type="text"
                         size="small"
@@ -542,7 +547,7 @@ const PackageStatusTable = ({
                 )}
                 {invoice.status.rejected_checked && (
                   <>
-                    <TableCell align="center" sx={{ padding: '7px 2px' }}>
+                    <TableCell align="center" sx={{ padding: '7px 7px', borderRight: "1px solid #e_e_e" }}>
                       <TextField
                         type="text"
                         size="small"
@@ -562,7 +567,7 @@ const PackageStatusTable = ({
                         }}
                       />
                     </TableCell>
-                    <TableCell align="center" sx={{ padding: '7px 2px' }}>
+                    <TableCell align="center" sx={{ padding: '7px 7px', borderRight: "1px solid #e0e0e0" }}>
                       <TextField
                         type="text"
                         size="small"
@@ -586,7 +591,7 @@ const PackageStatusTable = ({
                 )}
                 {invoice.status.carton_damage_checked && (
                   <>
-                    <TableCell align="center" sx={{ padding: '7px 2px' }}>
+                    <TableCell align="center" sx={{ padding: '7px 7px', borderRight: "1px solid #e0e0e0" }}>
                       <TextField
                         type="text"
                         size="small"
@@ -606,7 +611,7 @@ const PackageStatusTable = ({
                         }}
                       />
                     </TableCell>
-                    <TableCell align="center" sx={{ padding: '7px 2px' }}>
+                    <TableCell align="center" sx={{ padding: '7px 7px', borderRight: "1px solid #e0e0e0" }}>
                       <TextField
                         type="text"
                         size="small"
@@ -628,8 +633,8 @@ const PackageStatusTable = ({
                     </TableCell>
                   </>
                 )}
-                <TableCell align="center" sx={{ padding: '7px 2px' }}>{row.total || ""}</TableCell>
-                <TableCell align="center" sx={{ padding: '7px 2px' }}>
+                <TableCell align="center" sx={{ padding: '7px 7px', borderRight: "1px solid #e0e0e0" }}>{row.total || ""}</TableCell>
+                <TableCell align="center" sx={{ padding: '7px 7px' }}>
                   <IconButton
                     onClick={() => handleRemoveRow(index)}
                     disabled={!isEditable || tableData.length <= 1}
@@ -650,6 +655,8 @@ const PackageStatusTable = ({
     </Box>
   );
 };
+
+
 
 const DeliveryTab = ({
   shipmentData,

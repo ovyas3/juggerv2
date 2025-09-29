@@ -714,12 +714,14 @@ useEffect(() => {
   // Read 'shippers' from localStorage and parse
   try {
     const shipperData = JSON.parse(localStorage.getItem("shippers") || "[]");
+    console.log("Shipper data from localStorage:", shipperData[0].parent_name);
     if (
       shipperData &&
       shipperData.length > 0 &&
       shipperData[0].parent_name === "Tata Power Ltd"
     ) {
       setIsTata(true);
+      console.log("isTata set to true");
     } else {
       setIsTata(false);
     }
@@ -3262,7 +3264,7 @@ const applyFilter = () => {
                 showLoader={showLoader}
                 actionSearch={actionSearch}
                 setActionSearch={setActionSearch}
-                actionMenuCategories={() => actionMenuCategories}
+                actionMenuCategories={actionMenuCategories}
                 renderStatusCell={renderStatusCell}
                 onViewDetails={handleViewDetails}
                 renderLocationCell={renderLocationCell}
