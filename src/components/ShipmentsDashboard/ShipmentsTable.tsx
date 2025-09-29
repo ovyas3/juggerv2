@@ -768,18 +768,24 @@ const  renderConsentAndSubscriptionIcons = (shipment: any, openSubscribeModal: (
                                    return (
                                      <DropdownMenuItem
                                        key={index}
-                                       className={`${styles.actionMenuItem} ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                       disabled={isDisabled}
+                                       className={`${styles.actionMenuItem} ${isDisabled ? styles.actionMenuItemDisabled : ''}`}
                                        onSelect={(e) => {
+                                         if (isDisabled) {
+                                           e.preventDefault();
+                                           return;
+                                         }
                                          e.preventDefault();
-                                         if (!isDisabled && item.onClick) {
+                                         if (item.onClick) {
                                            item.onClick(shipment);
                                          }
                                          closeActionMenu();
                                        }}
+                                       aria-disabled={isDisabled}
                                      >
-                                       <IconComponent className={`${styles.actionMenuIcon} ${item.color}`} />
-                                       <span className={styles.actionLabel}>{item.label}</span>
+                                       <IconComponent className={`${styles.actionMenuIcon} ${item.color} ${isDisabled ? styles.actionMenuIconDisabled : ''}`} />
+                                       <span className={`${styles.actionLabel} ${isDisabled ? styles.actionLabelDisabled : ''}`}>
+                                         {item.label}
+                                       </span>
                                      </DropdownMenuItem>
                                    );
                                  })}
