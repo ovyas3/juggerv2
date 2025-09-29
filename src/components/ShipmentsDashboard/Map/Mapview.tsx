@@ -29,6 +29,8 @@ import mail from "../../../assets/mailround.svg";
 import upload from "../../../assets/attachFiles.svg";
 import doc from "../../../assets/Doc-icon.svg";
 import { httpsGet } from "@/utils/Communication";
+import { useSearchParams } from "next/navigation";
+import { StopsPreview } from "./StopsPreview";
 
 import header from "../../UI/ModalHeader/ModalHeader";
 import { Col } from "antd";
@@ -77,7 +79,7 @@ import { MarkerClusterer, SuperClusterAlgorithm, type Renderer } from "@googlema
 
 interface Location {
   name?: string;
-  address?: string;
+  area?: string;
   lat?: number;
   lng?: number;
   state?: string;
@@ -205,6 +207,26 @@ export default function Mapview() {
   const [geoFences, setGeoFences] = useState<any[]>([]);
 const [infoFromMapClick, setInfoFromMapClick] = useState(false);
 type LegendItem = { key: LegendKey; label: string; icon: any };
+// at top of component body (client component)
+// const portalTarget = typeof window !== 'undefined' ? document.body : null;
+const [portalTarget, setPortalTarget] = useState<Element | null>(null);
+const searchParams = useSearchParams();
+
+const limitFromUrl = useMemo(() => {
+  const n = Number(searchParams.get("limit"));
+  return Number.isFinite(n) && n > 0 ? n : 100; // fallback to your old default
+}, [searchParams]);
+
+const skipFromUrl = useMemo(() => {
+  const n = Number(searchParams.get("skip"));
+  return Number.isFinite(n) && n >= 0 ? n : 0; // fallback to your old default
+}, [searchParams]);
+
+
+useEffect(() => {
+  // only run on client
+  setPortalTarget(document.body);
+}, []);
 
 const STATUS_ITEMS: LegendItem[] = [
   { key: "on",    label: "On Time",         icon: ontime },
@@ -278,6 +300,14 @@ const updateFormDraft = (field: keyof typeof formDrafts, value: string) => {
   setFormDrafts(prev => ({ ...prev, [field]: value }));
 };
   
+// add once in the component
+useEffect(() => {
+  if (isFilterOpen) {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = prev; };
+  }
+}, [isFilterOpen]);
 
 const onFormMaterialChange = (value: string) => updateFormDraft("materials", value);
 const onFormPickupChange = (value: string) => updateFormDraft("pickupLocation", value);
@@ -324,8 +354,10 @@ const [pdInfo, setPdInfo] = useState<{
   kind: "P" | "D";
   seq: number;
   name?: string;
-  address?: string;
+  area?: string;
   shipmentSIN?: string;
+  city?: string;
+
 } | null>(null);
 
 function clearPDMarkers() {
@@ -350,7 +382,7 @@ function addPDMarker(
   pos: google.maps.LatLngLiteral,
   kind: "P"|"D",
   seq: number,
-  meta?: { name?: string; address?: string; sin?: string },
+  meta?: { name?: string; address?: string; area?: string; sin?: string,city?:string },
 ) {
   console.debug(`[PD] add ${kind}${seq}`, { pos, meta });   
   const marker = new google.maps.Marker({
@@ -361,16 +393,16 @@ function addPDMarker(
       text: (kind + seq) as string,         
       color: "#ffffff",
       fontWeight: "700",
-      fontSize: "25px",
+      fontSize: "13px",
     },
     zIndex: 80,
   });
   marker.addListener("click", () => {
     console.debug(`[PD] click ${kind}${seq}`, meta); 
-    setPdInfo({ pos, kind, seq, name: meta?.name, address: meta?.address, shipmentSIN: meta?.sin });
+    setPdInfo({ pos, kind, seq, name: meta?.name, area: meta?.area, shipmentSIN: meta?.sin,city:meta?.city });
   });
   pdOverlaysRef.current.push(marker);
-  console.debug(`[PD] overlays now`, pdOverlaysRef.current.length); // 👈
+  console.debug(`[PD] overlays now`, pdOverlaysRef.current.length);
   return marker;
 }
 
@@ -432,6 +464,41 @@ async function ensureLatLngFromLocation(loc:any): Promise<google.maps.LatLngLite
   return null;
 }
 
+// async function drawPDForShipment(s: Shipment) {
+//   console.groupCollapsed("[PD] draw", s?.SIN ?? s?._id ?? "unknown");
+
+//   if (!(window as any).google || !google.maps) { console.warn("[PD] maps not ready"); console.groupEnd(); return; }
+//   const map = mapRef as unknown as google.maps.Map | null;
+//   if (!map) { console.warn("[PD] mapRef.current is null"); console.groupEnd(); return; }
+
+//   const pickupDoc = s?.pickups?.[0] ?? null;
+//   const deliveryDoc = s?.deliveries?.[s?.deliveries?.length - 1] ?? null;
+//   const pRaw = pickupDoc?.location ?? null;
+//   const dRaw = deliveryDoc?.location ?? null;
+
+//   const p = (resolveLoc(pRaw)) || (await ensureLatLngFromLocation(pRaw));
+//   const d = (resolveLoc(dRaw)) || (await ensureLatLngFromLocation(dRaw));
+
+//   console.table({ pickup_parsed: p || "❌", delivery_parsed: d || "❌" });
+
+//   clearPDMarkers();
+//   let added = 0; const b = new google.maps.LatLngBounds();
+
+//   if (p) { addPDMarker(map, p, "P", 1, { sin: s?.SIN }); b.extend(p); added++; }
+//   else   { console.warn("[PD] pickup invalid/missing lat/lng"); }
+
+//   if (d) { addPDMarker(map, d, "D", 1, { sin: s?.SIN }); b.extend(d); added++; }
+//   else   { console.warn("[PD] delivery invalid/missing lat/lng"); }
+
+//   if (added && !b.isEmpty()) map.fitBounds(b, 60);
+//   else {
+//     const ctr = map.getCenter();
+//     const test = new google.maps.Marker({ map, position: ctr, label: "TEST" });
+//     setTimeout(() => test.setMap(null), 1500);
+//   }
+//   console.groupEnd();
+// }
+
 async function drawPDForShipment(s: Shipment) {
   console.groupCollapsed("[PD] draw", s?.SIN ?? s?._id ?? "unknown");
 
@@ -439,35 +506,49 @@ async function drawPDForShipment(s: Shipment) {
   const map = mapRef as unknown as google.maps.Map | null;
   if (!map) { console.warn("[PD] mapRef.current is null"); console.groupEnd(); return; }
 
-  const pickupDoc = s?.pickups?.[0] ?? null;
-  const deliveryDoc = s?.deliveries?.[s?.deliveries?.length - 1] ?? null;
-  const pRaw = pickupDoc?.location ?? null;
-  const dRaw = deliveryDoc?.location ?? null;
-
-  const p = (resolveLoc(pRaw)) || (await ensureLatLngFromLocation(pRaw));
-  const d = (resolveLoc(dRaw)) || (await ensureLatLngFromLocation(dRaw));
-
-  console.table({ pickup_parsed: p || "❌", delivery_parsed: d || "❌" });
-
   clearPDMarkers();
   let added = 0; const b = new google.maps.LatLngBounds();
 
-  if (p) { addPDMarker(map, p, "P", 1, { sin: s?.SIN }); b.extend(p); added++; }
-  else   { console.warn("[PD] pickup invalid/missing lat/lng"); }
+  // Draw all pickup markers
+  for (let i = 0; i < (s?.pickups?.length ?? 0); i++) {
+    const pickupDoc = s.pickups[i];
+    const pRaw = pickupDoc?.location ?? null;
+    const p = resolveLoc(pRaw) || (await ensureLatLngFromLocation(pRaw));
+    
+    if (p) {
+      addPDMarker(map, p, "P", i + 1, { sin: s?.SIN, name: pRaw?.name, area: pRaw?.area,city: pRaw?.city });
+      b.extend(p);
+      added++;
+    } else {
+      console.warn(`[PD] pickup ${i + 1} invalid/missing lat/lng`);
+    }
+  }
 
-  if (d) { addPDMarker(map, d, "D", 1, { sin: s?.SIN }); b.extend(d); added++; }
-  else   { console.warn("[PD] delivery invalid/missing lat/lng"); }
+  // Draw all delivery markers
+  for (let i = 0; i < (s?.deliveries?.length ?? 0); i++) {
+    const deliveryDoc = s.deliveries[i];
+    const dRaw = deliveryDoc?.location ?? null;
+    const d = resolveLoc(dRaw) || (await ensureLatLngFromLocation(dRaw));
+    
+    if (d) {
+      addPDMarker(map, d, "D", i + 1, { sin: s?.SIN, name: dRaw?.name, area: dRaw?.area,city: dRaw?.city });
+      b.extend(d);
+      added++;
+    } else {
+      console.warn(`[PD] delivery ${i + 1} invalid/missing lat/lng`);
+    }
+  }
 
-  if (added && !b.isEmpty()) map.fitBounds(b, 60);
-  else {
+  if (added && !b.isEmpty()) {
+    map.fitBounds(b, 60);
+  } else {
+    // Fallback if no valid locations found
     const ctr = map.getCenter();
     const test = new google.maps.Marker({ map, position: ctr, label: "TEST" });
     setTimeout(() => test.setMap(null), 1500);
   }
   console.groupEnd();
 }
-
-
 function arrivalIsoFromDeliveries(s: Shipment): string | undefined {
   const lastArrived = Array.isArray(s?.deliveries)
     ? (s.deliveries as any[]).filter(d => d?.arrived === true).slice(-1)[0]
@@ -700,12 +781,12 @@ function detentionBucket(arrivedIso?: string): DetentionBucket {
 }
 
 const MAP_HEIGHTS: Record<StatusTab | "default", number> = {
-  in_transit: 570,
-  at_delivery: 570,
-  in_plant: 605,
-  towards_pickup: 605,
-  all: 605,
-  default: 605,
+  in_transit: 635,
+  at_delivery: 635,
+  in_plant: 635,
+  towards_pickup: 635,
+  all: 635,
+  default: 635,
 };
 const containerStyle = useMemo(() => {
   const h = MAP_HEIGHTS[(selectedStatus as StatusTab) ?? "default"] ?? MAP_HEIGHTS.default;
@@ -1442,7 +1523,12 @@ const handleSearchApply = () => {
   }, [mapRef, unitLocations]);
 
 const buildApiFilters = () => {
-  const f: any = { limit: 100, skip: 0 };
+  // const f: any = { limit: 100, skip: 0 };
+  const f: any = {
+    // ... your other filters
+    limit: limitFromUrl,
+    skip: skipFromUrl,
+  };
   const fromMs = toStartOfDayMs(dateFrom);
   const toMs = toEndOfDayMs(dateTo);
 
@@ -1772,11 +1858,11 @@ function fitToAllVehicles(list: Shipment[] = visibleShipments) {
 </div>
 
 <div style={{ display: "flex", justifyContent: "space-between" }}>
-  <div>
+  <div style={{ display: "flex", alignItems: "center" , justifyContent: "center"}}>
     <div className={styles.controlsRow}>
       <div className={styles.noTicks}>
         <Select value={shipmentGroup} onValueChange={setShipmentGroup}>
-          <SelectTrigger className={styles.select}>
+          <SelectTrigger className={`${styles.select} ${styles.selectTrigger}`}>
             <SelectValue placeholder="All Shipments" className={styles.selectValue} />
           </SelectTrigger>
           <SelectContent className={styles.selectContent}>
@@ -1789,7 +1875,7 @@ function fitToAllVehicles(list: Shipment[] = visibleShipments) {
       </div>
       
       <Select value={selectedStatus} onValueChange={setSelectedStatus}>
-        <SelectTrigger className={styles.select}>
+        <SelectTrigger className={`${styles.select} ${styles.selectTrigger}`}>
           <SelectValue placeholder="Towards Pickup" className={styles.selectValue} />
         </SelectTrigger>
         <SelectContent className={styles.selectContent}>
@@ -1803,7 +1889,7 @@ function fitToAllVehicles(list: Shipment[] = visibleShipments) {
       
       {selectedStatus === 'towards_pickup' && (
         <Select>
-          <SelectTrigger className={styles.select}>
+          <SelectTrigger className={`${styles.select} ${styles.selectTrigger}`}>
             <SelectValue placeholder="Estimated arrival in" className={styles.selectValue} />
           </SelectTrigger>
           <SelectContent className={styles.selectContent}>
@@ -1816,7 +1902,7 @@ function fitToAllVehicles(list: Shipment[] = visibleShipments) {
       
       {selectedStatus === 'in_plant' && (
         <Select value={inPlantStage} onValueChange={setInPlantStage}>
-          <SelectTrigger className={styles.select}>
+          <SelectTrigger className={`${styles.select} ${styles.selectTrigger}`}>
             <SelectValue placeholder="Event status" className={styles.selectValue}/>
           </SelectTrigger>
           <SelectContent className={styles.selectContent}>
@@ -1840,7 +1926,7 @@ function fitToAllVehicles(list: Shipment[] = visibleShipments) {
             // Let useEffect handle the API call
           }}
         >
-          <SelectTrigger className={styles.select}>
+          <SelectTrigger className={`${styles.select} ${styles.selectTrigger}`}>
             <SelectValue placeholder="Materials" className={styles.selectValue}/>
           </SelectTrigger>
           <SelectContent className={styles.selectContent}>
@@ -1868,7 +1954,7 @@ function fitToAllVehicles(list: Shipment[] = visibleShipments) {
               // Let useEffect handle the API call
             }}
           >
-            <SelectTrigger className={styles.select}>
+            <SelectTrigger className={`${styles.select} ${styles.selectTrigger}`}>
               <SelectValue placeholder="Customer Location" className={styles.selectValue}/>
             </SelectTrigger>
             <SelectContent className={styles.selectContent}>
@@ -1892,7 +1978,7 @@ function fitToAllVehicles(list: Shipment[] = visibleShipments) {
               setSelectedCarrier(value);
             }}
           >
-            <SelectTrigger className={styles.select}>
+            <SelectTrigger className={`${styles.select} ${styles.selectTrigger}`}>
               <SelectValue placeholder="Carrier" className={styles.selectValue}/>
             </SelectTrigger>
             <SelectContent className={styles.selectContent}>
@@ -1911,13 +1997,10 @@ function fitToAllVehicles(list: Shipment[] = visibleShipments) {
           </Select>
         </>
       )}
-    </div>
-    
-    {/* Right side controls */}
-    <div className={styles.controlsRowRight}>
+
       {selectedStatus === 'in_transit' && ( 
         <Select>
-          <SelectTrigger className={styles.select}>
+          <SelectTrigger className={`${styles.select} ${styles.selectTrigger}`}>
             <SelectValue placeholder="ETA" className={styles.selectValue}/>
           </SelectTrigger>
           <SelectContent className={styles.selectContent}>
@@ -1929,7 +2012,7 @@ function fitToAllVehicles(list: Shipment[] = visibleShipments) {
       
       {selectedStatus === 'at_delivery' && (
         <Select>
-          <SelectTrigger className={styles.select}>
+          <SelectTrigger className={`${styles.select} ${styles.selectTrigger}`}>
             <SelectValue placeholder="Detention" className={styles.selectValue}/>
           </SelectTrigger>
           <SelectContent className={styles.selectContent}>
@@ -1942,7 +2025,7 @@ function fitToAllVehicles(list: Shipment[] = visibleShipments) {
       
       {selectedStatus === 'in_transit' && ( 
         <Select>
-          <SelectTrigger className={styles.select}>
+          <SelectTrigger className={`${styles.select} ${styles.selectTrigger}`}>
             <SelectValue placeholder="Delay" className={styles.selectValue}/>
           </SelectTrigger>
           <SelectContent className={styles.selectContent}>
@@ -2133,19 +2216,22 @@ function fitToAllVehicles(list: Shipment[] = visibleShipments) {
     .filter((gf: any) => gf && (gf.type === "Polygon" || gf.type === "MultiPolygon"))}
 />
 
-{pdInfo && (
+{/* {pdInfo && (
   <InfoWindow
     position={pdInfo.pos}
     onCloseClick={() => setPdInfo(null)}
   >
-    <div className={styles.haltCard}>
+    <div 
+    // className={styles.haltCard }
+    >
       <div className={styles.haltCardHeader}>
         {pdInfo.kind}{pdInfo.seq} • {pdInfo.shipmentSIN}
       </div>
       <div className={styles.haltDivider} />
       <div className={styles.haltRow}>
         <span className={styles.haltKey}>Name:</span>
-        <span className={styles.haltVal}>{pdInfo.name || "-"}</span>
+        <strong>
+        <span className={styles.haltVal}>{pdInfo.name || "-"}</span></strong>
       </div>
       <div className={styles.haltRow}>
         <span className={styles.haltKey}>Address:</span>
@@ -2153,7 +2239,7 @@ function fitToAllVehicles(list: Shipment[] = visibleShipments) {
       </div>
     </div>
   </InfoWindow>
-)}
+)} */}
 
 {mapRef && activeHalt && haltInfoPos && (
   <InfoWindow
@@ -2185,27 +2271,34 @@ function fitToAllVehicles(list: Shipment[] = visibleShipments) {
     <div className={styles.haltCard}>
       <div className={styles.haltHeader}>
         <span className={
-          `${styles.haltTitle} ${pdInfo.kind === "P" ? styles.pdPickupTitle : styles.pdDeliveryTitle}`
+          ` ${pdInfo.kind === "P" ? styles.pdPickupTitle : styles.pdDeliveryTitle}`
         }>
           {pdInfo.kind === "P" ? "Pickup" : "Delivery"} {pdInfo.seq}
         </span>
-        <button className={styles.haltClose} onClick={() => setPdInfo(null)}>×</button>
+        {/* <button className={styles.haltClose} onClick={() => setPdInfo(null)}>×</button> */}
       </div>
 
       <div className={styles.haltDivider} />
 
       <div className={styles.haltRow}>
         <span className={styles.haltKey}>Name:</span>
-        <span className={styles.haltVal}>{pdInfo.name || "-"}</span>
+        <strong>
+        <span className={styles.haltVal}>{pdInfo.name || "-"}</span></strong>
       </div>
       <div className={styles.haltRow}>
         <span className={styles.haltKey}>Address:</span>
-        <span className={styles.haltVal}>{pdInfo.address || "-"}</span>
+        <strong>
+        <span className={styles.haltVal}>{pdInfo.area || "-"}</span></strong>
       </div>
       <div className={styles.haltRow}>
+        <span className={styles.haltKey}>City:</span>
+        <strong>
+        <span className={styles.haltVal}>{pdInfo.city || "-"}</span></strong>
+      </div>
+      {/* <div className={styles.haltRow}>
         <span className={styles.haltKey}>Shipment:</span>
         <span className={`${styles.haltVal} ${styles.haltStrong}`}>{pdInfo.shipmentSIN || "-"}</span>
-      </div>
+      </div> */}
     </div>
   </InfoWindow>
 )}
@@ -2274,7 +2367,7 @@ function fitToAllVehicles(list: Shipment[] = visibleShipments) {
     <InfoWindow position={pos} onCloseClick={() => setSelectedShipment(null)}>
       <div className={styles.infoCard}>
         <div className={styles.infoRow}>
-          SIN: {""}
+          <span className={styles.infoKey}>SIN:</span> {""}
           <a
             href={`/triptracker?uniqueCode=${selectedShipment.unique_code}`}
             target="_blank"
@@ -2282,16 +2375,16 @@ function fitToAllVehicles(list: Shipment[] = visibleShipments) {
           >  {selectedShipment.SIN}</a>
         </div>
 
-        <div className={styles.infoRow}>Vehicle Number:<strong> {vNo}</strong></div>
-        <div className={styles.infoRow}>Carrier:<strong> {carrier}</strong></div>
-        <div className={styles.infoRow}>Driver:<strong> {driverName}</strong></div>
-        <div className={styles.infoRow}>Driver Mobile:<strong> {driverMobile}</strong></div>
+        <div className={styles.infoRow}><span className={styles.infoKey}>Vehicle Number:</span><strong> {vNo}</strong></div>
+        <div className={styles.infoRow}><span className={styles.infoKey}>Carrier:</span><strong> {carrier}</strong></div>
+        <div className={styles.infoRow}><span className={styles.infoKey}>Driver:</span><strong> {driverName}</strong></div>
+        <div className={styles.infoRow}><span className={styles.infoKey}>Driver Mobile:</span><strong> {driverMobile}</strong></div>
 
         <hr className={styles.infoHr} />
 
-        <div className={styles.infoRow}>Customer:<strong> {customer}</strong></div>
-        <div className={styles.infoRow}>Destination:<strong> {destination}</strong></div>
-        <div className={styles.infoRow}>Material:<strong> {material}</strong></div>
+        <div className={styles.infoRow}><span className={styles.infoKey}>Customer:</span><strong> {customer}</strong></div>
+        <div className={styles.infoRow}><span className={styles.infoKey}>Destination:</span><strong> {destination}</strong></div>
+        <div className={styles.infoRow}><span className={styles.infoKey}>Material:</span><strong> {material}</strong></div>
       </div>
     </InfoWindow>
   );
@@ -2316,6 +2409,7 @@ function fitToAllVehicles(list: Shipment[] = visibleShipments) {
     <div className={styles.legendBar}>{/* your existing legend items */}</div>
     
     <div className={styles.pathChips}>
+
       {pathData.gps?.length ? (
         <button
           type="button"
@@ -2324,7 +2418,7 @@ function fitToAllVehicles(list: Shipment[] = visibleShipments) {
         >
           GPS
         </button>
-      ) : null}
+        ) : null}  
 
       {pathData.app?.length ? (
         <button
@@ -2334,9 +2428,9 @@ function fitToAllVehicles(list: Shipment[] = visibleShipments) {
         >
           APP
         </button>
-       ) : null} 
+       ) : null}  
 
-      {pathData.sim?.length ? (
+      {pathData.sim?.length ? ( 
         <button
           type="button"
           className={`${styles.chip} ${pathVisible.sim ? styles.chipSimOn : styles.chipSimOff}`}
@@ -2344,10 +2438,10 @@ function fitToAllVehicles(list: Shipment[] = visibleShipments) {
         >
           SIM
         </button>
-      ) : null}
+     ) : null} 
     </div>
   </div>
-) : null}
+ ) : null} 
 
 
 
@@ -2404,37 +2498,10 @@ function fitToAllVehicles(list: Shipment[] = visibleShipments) {
         </div>
         <div className={styles.shipmentID}>{shipment?.SIN ?? "—"}</div>
       </div>
+      <StopsPreview shipment={shipment} centered  anchorWithin={document.querySelector(`.${styles.sidebar}`) as HTMLElement} />
 
     
-      <div className={styles.routeSection}>
-
-  {stops.map((s, idx) => (
-  <React.Fragment key={s.key}>
-    <div className={styles.stopRow}>
-      <span
-        className={`${styles.stopBadge} ${
-          s.type === "pickup" ? styles.pickupBadge : styles.deliveryBadge
-        }`}
-      >
-        {s.label}
-      </span>
-      <div className={styles.stopPill}>
-        {s.name}{" - "}{s.city || "—"}
-      </div>
-    </div>
-
-    {/* connector only if not the last stop */}
-    {idx < stops.length - 1 && (
-      <div className={styles.routeDots} aria-hidden="true">
-        <span />
-        <span />
-        <span />
-      </div>
-    )}
-  </React.Fragment>
-))}
-
-      </div>
+     
 
       <hr className={styles.cardDivider} />
 
@@ -2512,7 +2579,9 @@ function fitToAllVehicles(list: Shipment[] = visibleShipments) {
 
         </div>
       
-      {isFilterOpen && (
+      {isFilterOpen ? (portalTarget
+      ? createPortal(
+
         <div
           className={styles.modalOverlay}
           onClick={(e) => e.target === e.currentTarget && setIsFilterOpen(false)} >
@@ -2542,7 +2611,7 @@ function fitToAllVehicles(list: Shipment[] = visibleShipments) {
   <div className={styles.field}>
     <label>Materials</label>
     <Select value={formDrafts.materials || undefined} onValueChange={onFormMaterialChange} key={`materials-${formDrafts.materials}`}>
-      <SelectTrigger className={styles.select}>
+      <SelectTrigger className={`${styles.select} ${styles.selectTrigger}`}>
         <SelectValue />
       </SelectTrigger>
       <SelectContent className={styles.selectContent}>
@@ -2569,7 +2638,7 @@ function fitToAllVehicles(list: Shipment[] = visibleShipments) {
   <div className={styles.field}>
     <label>Pickup Location</label>
     <Select value={formDrafts.pickupLocation || undefined} onValueChange={onFormPickupChange} key={`pickup-${formDrafts.pickupLocation}`} >
-      <SelectTrigger className={styles.select}>
+      <SelectTrigger className={`${styles.select} ${styles.selectTrigger}`}>
         <SelectValue />
       </SelectTrigger>
       <SelectContent className={styles.selectContent}>
@@ -2599,7 +2668,7 @@ function fitToAllVehicles(list: Shipment[] = visibleShipments) {
   <div className={styles.field}>
     <label>Delivery Location</label>
     <Select value={formDrafts.deliveryLocation || undefined} onValueChange={onFormDeliveryChange} key={`delivery-${formDrafts.deliveryLocation}`}>
-      <SelectTrigger className={styles.select}>
+      <SelectTrigger className={`${styles.select} ${styles.selectTrigger}`}>
         <SelectValue />
       </SelectTrigger>
       <SelectContent className={styles.selectContent}>
@@ -2629,7 +2698,7 @@ function fitToAllVehicles(list: Shipment[] = visibleShipments) {
   <div className={styles.field}>
     <label>Carrier</label>
     <Select value={formDrafts.carrier || undefined} onValueChange={onFormCarrierChange} key={`carrier-${formDrafts.carrier}`}>
-      <SelectTrigger className={styles.select}>
+      <SelectTrigger className={`${styles.select} ${styles.selectTrigger}`}>
         <SelectValue />
       </SelectTrigger>
       <SelectContent className={styles.selectContent}>
@@ -2659,7 +2728,7 @@ function fitToAllVehicles(list: Shipment[] = visibleShipments) {
   <div className={styles.field}>
     <label>Shipment Status</label>
     <Select value={formDrafts.status || undefined} onValueChange={onFormStatusChange} key={`status-${formDrafts.status}`}>
-      <SelectTrigger className={styles.select}>
+      <SelectTrigger className={`${styles.select} ${styles.selectTrigger}`}>
         <SelectValue />
       </SelectTrigger>
       <SelectContent className={styles.selectContent}>
@@ -2676,7 +2745,7 @@ function fitToAllVehicles(list: Shipment[] = visibleShipments) {
     <div className={styles.field}>
       <label>In Plant Stage</label>
       <Select value={formDrafts.inPlantStage || undefined} onValueChange={onFormInPlantChange} key={`inPlantStage-${formDrafts.inPlantStage}`}>
-        <SelectTrigger className={styles.select}>
+        <SelectTrigger className={`${styles.select} ${styles.selectTrigger}`}>
           <SelectValue />
         </SelectTrigger>
         <SelectContent className={styles.selectContent}>
@@ -2759,9 +2828,9 @@ function fitToAllVehicles(list: Shipment[] = visibleShipments) {
 </form>
 
           </div>
-        </div>
-      
-      )}
+        </div>,   portalTarget  ) : null)
+        : null}
+     
       
   
       {mounted && menu.open && createPortal(

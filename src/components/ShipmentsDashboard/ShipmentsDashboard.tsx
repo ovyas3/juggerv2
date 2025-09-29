@@ -90,6 +90,16 @@ import { HelpCircle } from "lucide-react";
 
 
 interface Shipment {
+  isVehicleId: any;
+  disableInvoiceEdit: any;
+  assigned_driver: any;
+  assigned: string;
+  firstPickupLocation: string;
+  lastDeliveryLocation: string;
+  inboundShippers: any;
+  isOwnFleet_shipment: any;
+  client_rate: any;
+  rate: any;
   drop: any;
   organization: any;
   unique_code: any;
@@ -201,7 +211,148 @@ interface ShipperPrefs {
   locations: Location[];
   deliveryLocations: Location[];
 }
+type ParentFlags = {
+  parentRaw: string | null;  // e.g., "TechNova Imaging Systems Pvt Ltd"
+  parent: string;            // normalized, e.g., "technova"
+  isTechnova: boolean;
+  isMykl: boolean;
+  isModenik: boolean;
+  isEmami: boolean;
+  isjspl: boolean;
+ isbmw: boolean;
+  istatapower: boolean;
+ };
+ 
+ 
+ // Try a few common keys and shapes you already use in LS
+//  function readParentFromLocalStorage(): string | null {
+//   const keys = ["parent", "shippers", "shipper", "selectedShipper"];
+//   for (const k of keys) {
+//     const raw = localStorage.getItem(k);
+//     if (!raw) continue;
+ 
+ 
+//     // If JSON, try known fields; else treat as plain string
+//     try {
+//       if (raw.trim().startsWith("{") || raw.trim().startsWith("[")) {
+//         const obj = JSON.parse(raw);
+//         const name =
+//           obj?.parent_name ||
+//           obj?.parent?.name ||
+//           obj?.parent ||
+//           obj?.name ||
+//           obj?.company ||
+//           null;
+//         if (typeof name === "string" && name.trim()) return name.trim();
+//       } else {
+//         if (raw.trim()) return raw.trim();
+//       }
+//     } catch {
+//       if (raw.trim()) return raw.trim();
+//     }
+//   }
+//   return null;
+//  }
+// Corrected readParentFromLocalStorage function
+function readParentFromLocalStorage(): string | null {
+  const keys = ["parent", "shippers", "shipper", "selectedShipper"];
+  for (const k of keys) {
+    const raw = localStorage.getItem(k);
+    if (!raw) continue;
 
+    try {
+      // Check if it's a JSON object or array
+      if (raw.trim().startsWith("{") || raw.trim().startsWith("[")) {
+        const obj = JSON.parse(raw);
+
+        let parentName = null;
+        if (Array.isArray(obj) && obj.length > 0) {
+          // If it's an array, get the parent_name from the first object
+          parentName = obj[0]?.parent_name || null;
+        } else if (typeof obj === "object") {
+          // If it's a single object, get the parent_name directly
+          parentName =
+            obj?.parent_name ||
+            obj?.parent?.name ||
+            obj?.parent ||
+            obj?.name ||
+            obj?.company ||
+            null;
+        }
+
+        if (typeof parentName === "string" && parentName.trim()) {
+          return parentName.trim();
+        }
+      } else {
+        // Handle a simple string value
+        if (raw.trim()) {
+          return raw.trim();
+        }
+      }
+    } catch {
+      // If parsing fails, fall back to the raw string
+      if (raw.trim()) {
+        return raw.trim();
+      }
+    }
+  }
+  return null;
+}
+ function normalizeName(n: string | null): string {
+  if (!n) return "";
+  return n
+  .toLowerCase()
+  .replace(/&/g, "and")
+  .replace(/[^a-z0-9]+/g, "") // keep only a-z0-9
+  .replace(/(privatelimited|private|limited|ltd|llp|plc|co|company|systems|imaging|india|pvt)/g, "");
+}
+
+
+// Map normalized name to flags; include common typos/variants
+// function getParentFlags(): ParentFlags {
+// const raw = readParentFromLocalStorage();
+// const norm = normalizeName(raw);
+
+// const isTechnova = raw === "TechNova Imaging Systems Pvt Ltd";
+//   const isMykl     = raw === "MYK Laticrete India Private Limited";
+  
+//   // Use the normalized name or raw name for partial matches.
+//   // The original code uses .includes() for JSPL, so let's replicate that.
+//   const isjspl = rawLower.includes('jsp') || rawLower.includes('jspl angul');
+// // // include typo “techonva” and spacing variants
+// // const isTechnova = /(TechNova|techonva)/.test(norm);
+// // const isMykl     = /mykl/.test(norm);
+// const isModenik  = /Modenik/.test(norm);
+// const isEmami    = /Emami/.test(norm);
+// // const isjspl=/JSPL/.test(norm);
+// const isbmw=/bmw/.test(norm);
+// const istatapower=/tatpower/.test(norm);
+
+
+// return { parentRaw: raw, parent: norm, isTechnova, isMykl, isModenik, isEmami,isjspl,isbmw,istatapower };
+// }
+function getParentFlags(): ParentFlags {
+  const raw = readParentFromLocalStorage();
+  const norm = normalizeName(raw);
+  console.log("Raw parent name from local storage:", raw);
+  console.log("Normalized parent name:", norm);
+
+  const isTechnova = raw === "TechNova Imaging Systems Pvt Ltd";
+  const isMykl     = raw === "MYK Laticrete India Private Limited";
+  
+  // Use a case-insensitive check and trim for robustness
+  const rawLower = raw?.toLowerCase().trim() ?? '';
+  const isjspl = rawLower.includes('jsp') || rawLower.includes('jspl angul');
+  console.log("isjspl check (rawLower):", rawLower);
+  console.log("isjspl result:", isjspl);
+  // You had these in the original function as well.
+  const isModenik  = /modenik/.test(norm);
+  const isEmami    = /emami/.test(norm);
+  const isbmw      = /bmw/.test(norm);
+  const istatapower= /tatpower/.test(norm);
+
+  return { parentRaw: raw, parent: norm, isTechnova, isMykl, isModenik, isEmami, isjspl, isbmw, istatapower };
+}
 const ShipmentsDashboard: React.FC = () => {
   const { showMessage } = useSnackbar();
   // State management
@@ -331,6 +482,7 @@ const [rawShipmentResponse, setRawShipmentResponse] = useState<any | null>(null)
     name: "",
     id: "",
   });
+  const [parentFlags, setParentFlags] = React.useState<ParentFlags>(() => getParentFlags());
 
   // Filter and dropdown data
   const [materialsArray, setMaterialsArray] = useState<any[]>([]);
@@ -448,6 +600,25 @@ const [combinedLocationData, setCombinedLocationData] = useState<{
   deliveryId: '',
   currentLocation: []
 });
+
+const [roles, setRoles] = useState({
+  owner: false,
+  fleet: false, 
+  shipment_admin: false,
+  unit_admin: false,
+  rate_card: false,
+  finance: false
+});
+
+const [functions, setFunctions] = useState({
+  shipment_management: false,
+  hide_mobile: true,
+  hide_freight: true
+});
+
+const [showTracking, setShowTracking] = useState(false);
+const [showFreight, setShowFreight] = useState(false);
+const [selectedShipperLocationID, setSelectedShipperLocationID] = useState("");
 
 const handleSaveDO = async (doNumber: string) => {
   try {
@@ -751,63 +922,331 @@ const handleAddDriverExpenses = (shipment: Shipment) => {
   };
 
 
-  
-const actionMenuCategories = {
-  "Quick Actions": [
-    { icon: Eye, label: "View", color: "text-blue-600" },
-    { icon: Share2, label: "Share", color: "text-blue-500", onClick: handleShareShipment },
-    { icon: Mail, label: "Mail", color: "text-orange-600", onClick: handleMailShipment },
-    { icon: XCircle, label: "Cancel", color: "text-red-600", onClick: handleCancelShipment },
-  ],
-  "Tracking & GPS": [
-    { icon: Download, label: "SIM Tracking", color: "text-amber-600", onClick: handleSimTracking },
-    { icon: WifiOff, label: "GPS Disconnection Reason", color: "text-teal-600", onClick: (shipment: Shipment) => handleOpenReasonDialog('gps', shipment._id, shipment.sin) },
-    { icon: Wifi, label: "Add GPS Connection", color: "text-amber-600", onClick: (shipment: Shipment) => handleOpenGpsModal(shipment) },
-    { icon: Clock, label: "Update Delay Reason", color: "text-teal-600", onClick: (shipment: Shipment) => { closeAllDialogs(); handleOpenReasonDialog('delay', shipment._id, shipment.sin); } },
-  ],
-  "Location & Routes": [
-    { icon: Edit, label: "Edit Pickup Location", color: "text-pink-600", onClick: (shipment: Shipment) => handleOpenEditLocation(shipment, 'pickup'), disabled: (shipment: Shipment) => ['Completed', 'Cancelled'].includes(shipment.status) },
-    { icon: Edit, label: "Edit Delivery Location", color: "text-pink-600", onClick: (shipment: Shipment) => handleOpenEditLocation(shipment, 'delivery'), disabled: (shipment: Shipment) => ['Completed', 'Cancelled'].includes(shipment.status) },
-    { icon: Route, label: "Pull Freight with Routes", color: "text-brown-600", onClick: handlePullFreightWithRoutes },
-    { icon: Calculator, label: "Recalculate Distance", color: "text-pink-600", onClick: handleRecalculateDistanceClick },
-  ],
-  "Freight & Payment": [
-    { icon: Truck, label: "Update Carrier Freight", color: "text-gray-600", onClick: (shipment: Shipment) => { closeAllDialogs(); handleOpenFreightModal(shipment._id, shipment.sin, 'rate'); } },
-    { icon: Truck, label: "Flush Freight", color: "text-gray-600", onClick: handleFlushFreight },
-    { icon: CreditCard, label: "Create Payment Advice", color: "text-indigo-600", onClick: handleCreateAdvancePayment },
-    { icon: FileText, label: "Change Invoice Type", color: "text-brown-600", onClick: handleChangeInvoiceType },
-  ],
-  "Documents & Status": [
-    { icon: FileText, label: "Upload Approval Documents", color: "text-purple-600", onClick: handleUploadApprovalDocuments },
-    { icon: Package, label: "View Epods", color: "text-brown-600", onClick: handleViewEpods },
-    { icon: CheckCircle, label: "Complete Shipment", color: "text-green-600", onClick: handleCompleteShipment },
-    { icon: DoorOpen, label: "Recalculate Customer Gate In/Out", color: "text-pink-600", onClick: (shipment: Shipment) => handleRecalculateGateInOut(shipment), disabled: (shipment: Shipment) => ["Completed", "Cancelled"].includes(shipment.status) },
-  ],
-  "Shipment Operations": [
-    { icon: RefreshCw, label: "Reassign", color: "text-blue-600" },
-    { icon: CheckCircle, label: "Submit Mark As Arrived", color: "text-green-600", onClick: handleMarkAsArrived },
-    { icon: CreditCard, label: "Create Payment Advance", color: "text-indigo-600", onClick: handleCreatePaymentAdvice },
-    { icon: Upload, label: "Bulk Upload - Commercial Invoices", color: "text-green-600", onClick: handleBulkUploadCommercialInvoices },
-  ],
-  "Shipment Management": [
-    { icon: PlusCircle, label: "Add DO Details", color: "text-blue-600", onClick: handleAddDODetails },
-    { icon: Edit, label: "Update Shipment Status", color: "text-yellow-600", onClick: handleUpdateShipmentStatus },
-    { icon: AlertCircle, label: "Mark Fault Device", color: "text-red-600", onClick: handleMarkFaultDevice },
-    { icon: AlertCircle, label: "Missed Event", color: "text-red-600", onClick: handleMissedEvent },
-  ],
-  "Advanced": [
-    { icon: UserPlus, label: "Add Managed By", color: "text-blue-600", onClick: handleAddManagedBy },
-    { icon: RefreshCw, label: "ReTrigger Missed Events", color: "text-blue-600", onClick: handleRetriggerMissedEvents },
-    { icon: Edit, label: "Update Client Freight", color: "text-yellow-600", onClick: (shipment: Shipment) => { closeAllDialogs(); handleOpenFreightModal(shipment._id, shipment.sin, 'client_rate'); } },
-    { icon: Plus, label: "Add Driver Expenses", color: "text-green-600", onClick: handleAddDriverExpenses },
-  ],
-  "Geofence & ePOD": [
-    { icon: Plus, label: "Add/Edit Geofence", color: "text-green-600", onClick: handleOpenGeofenceEditor, disabled: (shipment: Shipment) => ['Completed', 'Cancelled'].includes(shipment.status) },
-    { icon: Upload, label: "Upload ePOD", color: "text-green-600" },
-    { icon: Upload, label: "Request ePOD", color: "text-green-600" }, 
-  ]
+const actionMenuCategories = (shipment: Shipment) => {
+  return {
+    "Quick Actions": [
+      { 
+        icon: Eye, 
+        label: "View", 
+        color: "text-blue-600",
+        show: true
+      },
+      { 
+        icon: Share2, 
+        label: "Share", 
+        color: "text-blue-500", 
+        onClick: () => handleShareShipment(shipment),
+        show: true,
+        disabled: shipment.status != 'Assigned' && shipment.status != 'Completed' && shipment.status != 'Cancelled' && shipment.assigned != 'Pending'
+      },
+      { 
+        icon: Mail, 
+        label: "Mail", 
+        color: "text-orange-600", 
+        onClick: () => handleMailShipment(shipment),
+        show: true,
+        disabled: shipment.status != 'Assigned' && shipment.status != 'Completed' && shipment.status != 'Cancelled' && shipment.assigned != 'Pending'
+      },
+      { 
+        icon: XCircle, 
+        label: "Cancel", 
+        color: "text-red-600", 
+        onClick: () => handleCancelShipment(shipment),
+        show: shipment.status !== 'Completed' && shipment.status !== 'Cancelled'
+      },
+    ],
+    
+    "Tracking & GPS": [
+      { 
+        icon: Download, 
+        label: "SIM Tracking", 
+        color: "text-amber-600", 
+        onClick: () => handleSimTracking(shipment),
+        show: showTracking,
+        disabled: (shipment.status === 'Completed' || shipment.status === 'Assigned' || shipment.status === 'Cancelled')
+      },
+      { 
+        icon: WifiOff, 
+        label: "GPS Disconnection Reason", 
+        color: "text-teal-600", 
+        onClick: () => handleOpenReasonDialog('gps', shipment._id, shipment.sin),
+        show: true
+      },
+      { 
+        icon: Wifi, 
+        label: "Add GPS Connection", 
+        color: "text-amber-600", 
+        onClick: () => handleOpenGpsModal(shipment),
+        show: !!shipment.carrier
+      },
+      { 
+        icon: Clock, 
+        label: "Update Delay Reason", 
+        color: "text-teal-600", 
+        onClick: () => handleOpenReasonDialog('delay', shipment._id, shipment.sin),
+        show: true
+      },
+    ],
+    
+    "Freight & Payment": [
+      { 
+        icon: Truck, 
+        label: "Update Carrier Freight", 
+        color: "text-gray-600", 
+        onClick: () => handleOpenFreightModal(shipment._id, shipment.sin, 'rate'),
+        show: shipment.rate?.type === 'manual' && showFreight
+      },
+      { 
+        icon: Truck, 
+        label: "Update Client Freight", 
+        color: "text-yellow-600", 
+        onClick: () => handleOpenFreightModal(shipment._id, shipment.sin, 'client_rate'),
+        show: shipment.client_rate?.type === 'manual' && showFreight
+      },
+      { 
+        icon: CreditCard, 
+        label: "Create Payment Advice", 
+        color: "text-indigo-600", 
+        onClick: () => handleCreateAdvancePayment(shipment),
+        show: !shipment.isOwnFleet_shipment && shipment.status !== 'Cancelled'
+      },
+      { icon: FileText, label: "Change Invoice Type", color: "text-brown-600", onClick: handleChangeInvoiceType, show: true },
+    ],
+    
+    "Shipment Management": [
+      { 
+        icon: PlusCircle, 
+        label: "Add DO Details", 
+        color: "text-blue-600", 
+        onClick: () => handleAddDODetails(shipment),
+        show: shipment.status === 'Accepted'
+      },
+      { 
+        icon: Edit, 
+        label: "Update Shipment Status", 
+        color: "text-yellow-600", 
+        onClick: () => handleUpdateShipmentStatus(shipment),
+        show: (roles.shipment_admin || roles.owner) && shipment.status === 'In Transit'
+      },
+      { 
+        icon: CheckCircle, 
+        label: "Complete Shipment", 
+        color: "text-green-600", 
+        onClick: () => handleCompleteShipment(shipment),
+        show: (functions.shipment_management || (roles.owner || roles.fleet)) && 
+              (!shipment.inboundShippers || 
+               (selectedShipperLocationID === shipment.lastDeliveryLocation) || 
+               (selectedShipperLocationID === shipment.firstPickupLocation)),
+        disabled: (shipment.status === 'Completed' || shipment.status === 'Cancelled')
+      },
+      { 
+        icon: CheckCircle, 
+        label: "Submit Mark As Arrived", 
+        color: "text-green-600", 
+        onClick: () => handleMarkAsArrived(shipment),
+        show: functions.shipment_management || (roles.owner || roles.fleet),
+        disabled: (shipment.status === 'Completed' || shipment.status === 'Cancelled')
+      },
+      { 
+        icon: RefreshCw, 
+        label: "Reassign", 
+        color: "text-blue-600",
+        show: shipment.isOwnFleet_shipment && !shipment.carrier && (roles.owner || roles.fleet),
+        disabled: (shipment.status === 'Completed' || shipment.status === 'Cancelled')
+      },
+      ...(parentFlags.isjspl
+        ? [{ 
+            icon: AlertCircle, 
+            label: "Mark Fault Device", 
+            color: "text-red-600", 
+            onClick: () => handleMarkFaultDevice(shipment),
+            show: shipment.assigned_driver?.vehicle && !!shipment.assigned_driver.vehicle.gps
+          } as const]: []),
+      ...(parentFlags.isjspl
+        ? [{ 
+            icon: AlertCircle, 
+            label: "Missed Event", 
+            color: "text-red-600", 
+            onClick: () => handleMissedEvent(shipment),
+            show: true
+          } as const] : []),
+    ],
+    
+    "Documents & Status": [
+      { 
+        icon: FileText, 
+        label: "Upload Approval Documents", 
+        color: "text-purple-600", 
+        onClick: () => handleUploadApprovalDocuments(shipment),
+        show: shipment.rate?.type === 'manual'
+      },
+      { 
+        icon: Package, 
+        label: "View Epods", 
+        color: "text-brown-600", 
+        onClick: () => handleViewEpods(shipment),
+        show: !!shipment.carrier
+      },
+      { 
+        icon: Upload, 
+        label: "Upload ePOD", 
+        color: "text-green-600",
+        show: shipment.isOwnFleet_shipment && !shipment.carrier && (roles.owner || roles.fleet)
+      },
+      { 
+        icon: Upload, 
+        label: "Request ePOD", 
+        color: "text-green-600",
+        show: shipment.isOwnFleet_shipment && !shipment.carrier && (roles.owner || roles.fleet)
+      },
+      { 
+        icon: Upload, 
+        label: "Bulk Upload - Commercial Invoices", 
+        color: "text-green-600", 
+        onClick: () => handleBulkUploadCommercialInvoices(shipment),
+        show: !shipment.disableInvoiceEdit && (shipmentType === 'outbound' || shipmentType === 'all')
+      },
+    ],
+
+    "Advanced": [
+      { 
+        icon: UserPlus, 
+        label: "Add Managed By", 
+        color: "text-blue-600", 
+        onClick: () => handleAddManagedBy(shipment),
+        show: !!shipment.isOwnFleet_shipment
+      },
+      ...(parentFlags.isMykl
+        ? [{ 
+            icon: RefreshCw, 
+            label: "ReTrigger Missed Events", 
+            color: "text-blue-600", 
+            onClick: () => handleRetriggerMissedEvents(shipment),
+            show: true
+          } as const]: []),
+      { 
+        icon: Plus, 
+        label: "Add Driver Expenses", 
+        color: "text-green-600", 
+        onClick: () => handleAddDriverExpenses(shipment),
+        show: ((shipment.isOwnFleet_shipment && !shipment.carrier) || 
+               shipment.status === 'Completed') && !!shipment.isVehicleId
+      },
+      { icon: Plus, label: "Add/Edit Geofence", color: "text-green-600", onClick: () => handleOpenGeofenceEditor(shipment), show: true },
+      { icon: Truck, label: "Flush Freight", color: "text-gray-600", onClick: () => handleFlushFreight(shipment), show: true },
+    ],
+    
+    "Location & Routes": [
+      { 
+        icon: Edit, 
+        label: "Edit Pickup Location", 
+        color: "text-pink-600", 
+        onClick: () => handleOpenEditLocation(shipment, 'pickup'), 
+        show: true,
+        disabled: ['Completed', 'Cancelled'].includes(shipment.status) 
+      },
+      { 
+        icon: Edit, 
+        label: "Edit Delivery Location", 
+        color: "text-pink-600", 
+        onClick: () => handleOpenEditLocation(shipment, 'delivery'), 
+        show: true,
+        disabled: ['Completed', 'Cancelled'].includes(shipment.status) 
+      },
+      { 
+        icon: Calculator, 
+        label: "Recalculate Distance", 
+        color: "text-pink-600", 
+        onClick: () => handleRecalculateDistanceClick(shipment),
+        show: true
+      },
+      { 
+        icon: Route, 
+        label: "Pull Freight with Routes", 
+        color: "text-brown-600", 
+        onClick: () => handlePullFreightWithRoutes(shipment),
+        show: true
+      },
+      { icon: DoorOpen, label: "Recalculate Customer Gate In/Out", color: "text-pink-600", onClick: (shipment: Shipment) => handleRecalculateGateInOut(shipment), disabled: (shipment: Shipment) => ["Completed", "Cancelled"].includes(shipment.status), show: shipment.trip_tracker?.methods?.includes('GPS') },
+      // { 
+      //   icon: RefreshCw, 
+      //   label: "Rerun", 
+      //   color: "text-blue-600",
+      //   show: shipment.trip_tracker?.methods?.includes('GPS')
+      // },
+    ],
+
+    // "Loading/Unloading": [
+    //   { 
+    //     icon: Upload, 
+    //     label: shipmentsFilter.type_filter === 'outbound' ? "Add Loading Changes" : "Add Unloading Changes", 
+    //     color: "text-green-600",
+    //     onClick: () => handleBoundShippers(shipment, shipmentsFilter.type_filter),
+    //     show: shipmentsFilter.type_filter === 'inbound' || shipmentsFilter.type_filter === 'outbound'
+    //   }
+    // ]
+  };
 };
 
+// Add functions to initialize roles and functions
+const getRoles = () => {
+  try {
+    const rolesData = JSON.parse(localStorage.getItem('roles') || '[]');
+    const newRoles = {
+      owner: false,
+      fleet: false,
+      shipment_admin: false,
+      unit_admin: false,
+      rate_card: false,
+      finance: false
+    };
+
+    rolesData.forEach((element: any) => {
+      if (element.value === 'accountowner') newRoles.owner = true;
+      if (element.value === 'fleetshipmentexecutive' || element.value === 'fleetshipmentadministrator') newRoles.fleet = true;
+      if (element.value === 'unitadministrator') newRoles.unit_admin = true;
+      if (element.value === 'ratecardadministrator' || element.value === 'ratecardexecutive') newRoles.rate_card = true;
+      if (element.value === 'financeexecutive' || element.value === 'financeadministrator') newRoles.finance = true;
+      if (element.value === 'shipmentadministrator') newRoles.shipment_admin = true;
+    });
+
+    setRoles(newRoles);
+  } catch (error) {
+    console.error('Error parsing roles:', error);
+  }
+};
+
+const getFunctions = () => {
+  try {
+    const functionsData = JSON.parse(localStorage.getItem('functions') || '[]');
+    const newFunctions = {
+      shipment_management: false,
+      hide_mobile: true,
+      hide_freight: true
+    };
+
+    functionsData.forEach((element: any) => {
+      if (element.value === 'manageshipment') newFunctions.shipment_management = true;
+      if (element.value === 'hidemobilenumber') newFunctions.hide_mobile = false;
+      if (element.value === 'hideshipmentfreight') newFunctions.hide_freight = false;
+    });
+
+    setFunctions(newFunctions);
+    setShowFreight(!newFunctions.hide_freight || roles.owner || roles.rate_card || roles.finance || roles.unit_admin);
+  } catch (error) {
+    console.error('Error parsing functions:', error);
+  }
+};
+
+// Add this useEffect to initialize roles and functions
+useEffect(() => {
+  getRoles();
+  getFunctions();
+  
+  // Check if tracking should be shown
+  const environment = process.env.NODE_ENV;
+  setShowTracking(environment === 'development' || process.env.NEXT_PUBLIC_COUNTRY === 'IN');
+}, []);
 
 
 const closeActionMenu = () => {
@@ -820,13 +1259,14 @@ const closeActionMenu = () => {
   }, [showAttachDialog]);
 
   const subFilters = [
-    { key: "towards_pickup", label: "Towards Pickup", count: 0, color: "#16a085" },
-    { key: "at_pickup", label: "At Pickup", count: 0, color: "#3498db" },
-    { key: "in_transit", label: "In Transit", count: 0, color: "#f39c12" },
-    { key: "about_to_reach", label: "About to Reach", count: 0, color: "#34495e" },
-    { key: "at_delivery", label: "At Delivery", count: 0, color: "#667eea" },
-    { key: "completed", label: "Completed", count: 0, color: "#2ecc40" },
-    { key: "cancelled", label: "Cancelled", count: 0, color: "#e74c3c" },
+    { key: "SP", label: "Towards Pickup", count: 0, color: "#16a085" },
+    { key: "AP", label: "At Pickup", count: 0, color: "#3498db" },
+    { key: "INPLANT", label: "In Plant", count: 0, color: "#a502b0" },
+    { key: "ITNS", label: "In Transit", count: 0, color: "#f39c12" },
+    // { key: "ALD", label: "About to Reach", count: 0, color: "#34495e" },
+    { key: "ALD", label: "At Delivery", count: 0, color: "#667eea" },
+    { key: "CPTD", label: "Completed", count: 0, color: "#2ecc40" },
+    { key: "CNCL", label: "Cancelled", count: 0, color: "#e74c3c" },
     // { key: "delayed", label: "Delayed", count: 0, color: "#ed8936" },
   ];
 
@@ -1724,8 +2164,9 @@ const closeActionMenu = () => {
     Cancelled: "#e74c3c",
     "Towards Pickup": "#16a085",
     "At Pickup": "#3498db",
-    "At Delivery": "#f1948a",
+    "At Delivery": "#667eea",
     "About to Reach": "#34495e",
+    "In Plant": "#a502b0",
   };
 
   const statusLabels: Record<string, string> = {
@@ -2006,7 +2447,7 @@ const renderLastLocationCell = (shipment: any) => {
 
   const [showBulkUploadModal, setShowBulkUploadModal] = useState(false);
   const [selectedShipmentForBulkUpload, setSelectedShipmentForBulkUpload] = useState<any>(null);
-
+ 
   const handleBulkUploadClick = (shipment: any) => {
     setSelectedShipmentForBulkUpload(shipment);
     setShowBulkUploadModal(true);
@@ -2137,7 +2578,8 @@ const renderLastLocationCell = (shipment: any) => {
     locations: [],
     deliveryLocations: []
   });
-
+  const limit = pageSize;
+  const skip = currentPage * pageSize;
 const handleOpenEditLocation = (shipment: any, type: 'pickup' | 'delivery') => {
   setSelectedShipment(shipment);
   setSelectedLocationType(type);
@@ -2462,8 +2904,9 @@ const applyFilter = () => {
           onSendEPOD={updateEPODBackToJDE}
           onFetchInvoiceDetails={fetchInvoiceDetails}
           onBulkUpload={() => openBulkUpload("shipment")}
-          isTechnova={isTechnova}
+          isTechnova={parentFlags.isTechnova}
           isLoading={isLoading}
+          isjspl={parentFlags.isjspl}
           hasSelectedShipments={selectedShipmentsArray.length > 0}
           onMissedShipment={handleMissedShipmentHeader} 
         />
@@ -2519,7 +2962,7 @@ const applyFilter = () => {
     );
   })}
 </div>
-
+ { isTechnova &&(
         <div className={styles.filterGroup}>
           <label className={styles.checkboxLabel}>
             <input
@@ -2529,7 +2972,7 @@ const applyFilter = () => {
             />
             <span>ODC Shipment(s)</span>
           </label>
-        </div>
+        </div>)}
 
 
       </div>
@@ -2592,8 +3035,8 @@ const applyFilter = () => {
           >
             Advanced Search
           </div>
-          <Link href="/Mapview" style={{textDecoration: "none"}}>
-
+          {/* <Link href="/Mapview" style={{textDecoration: "none"}}> */}
+         <Link href={{ pathname: "/Mapview", query: { limit: String(limit), skip: String(skip) } }} style={{textDecoration: "none"}}>
           <button className={styles.button}>Map View</button>
           </Link>
 
@@ -2767,6 +3210,9 @@ const applyFilter = () => {
                 isAnalyticsView={isAnalyticsView}
                 isCompactView={isCompactView}
                 tableRef={tableRef}
+                isjspl={parentFlags.isjspl}
+                isTechnova={parentFlags.isTechnova}
+                isMykl={parentFlags.isMykl}
                 selectedShipmentsArray={selectedShipmentsArray}
                 handleSelectAllShipments={handleSelectAllShipments}
                 shipmentsArray={shipmentsArray}
@@ -2788,10 +3234,10 @@ const applyFilter = () => {
                 openLocationsPopup={openLocationsPopup}
                 formatCurrency={formatCurrency}
                 renderLastLocationCell={renderLastLocationCell}
-                  actionMenuOpenId={actionMenuOpenId}
-  setActionMenuOpenId={setActionMenuOpenId}
-  closeActionMenu={closeActionMenu}
-    openSubscribeModal={openSubscribeModal}
+                actionMenuOpenId={actionMenuOpenId}
+                setActionMenuOpenId={setActionMenuOpenId}
+                closeActionMenu={closeActionMenu}
+                openSubscribeModal={openSubscribeModal}
               />
             )}
           </div>

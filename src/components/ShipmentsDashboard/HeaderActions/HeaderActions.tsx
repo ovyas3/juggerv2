@@ -11,6 +11,7 @@ interface HeaderActionsProps {
   onFetchInvoiceDetails: () => void;
   onBulkUpload: () => void;
   isTechnova?: boolean;
+  isjspl?:boolean;
   isLoading?: boolean;
   hasSelectedShipments?: boolean;
   onMissedShipment?: () => void; 
@@ -23,6 +24,7 @@ const HeaderActions: React.FC<HeaderActionsProps> = ({
   onFetchInvoiceDetails,
   onBulkUpload,
   isTechnova = false,
+  isjspl=false,
   isLoading = false,
   hasSelectedShipments = false,
   onMissedShipment,
@@ -69,6 +71,8 @@ const HeaderActions: React.FC<HeaderActionsProps> = ({
 
         {open && (
           <div className={styles.menu} role="menu">
+             {isTechnova && (
+              <>
             <button
               className={styles.menuItem}
               role="menuitem"
@@ -120,6 +124,7 @@ const HeaderActions: React.FC<HeaderActionsProps> = ({
               <FileText className={styles.lucideIcon} />
               Fetch Invoice Details
             </button>
+            </>)}
             <button
               className={styles.menuItem}
               role="menuitem"
@@ -129,6 +134,7 @@ const HeaderActions: React.FC<HeaderActionsProps> = ({
               <Upload className={styles.lucideIcon} />
               Bulk Upload
             </button>
+            {isjspl && (
             <button
               className={styles.menuItem}
               role="menuitem"
@@ -140,7 +146,8 @@ const HeaderActions: React.FC<HeaderActionsProps> = ({
             >
               <AlertCircle className={styles.lucideIcon} />
               Missed Shipment
-            </button>
+            </button>)}
+
           </div>
         )}
       </div>
