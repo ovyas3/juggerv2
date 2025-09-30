@@ -6,7 +6,7 @@ import dynamic from "next/dynamic";
 import * as L from "leaflet";
 import { MapPin } from "lucide-react";
 import { Play, Pause, RotateCcw, X } from "lucide-react";
-import styles from "./kepler-map.module.css";
+import styles from "./Kepler-map.module.css";
 import type { Icon as LeafletIcon, DivIcon as LeafletDivIcon, Map as LeafletMap } from "leaflet";
 import tollPendingUrl from "../../../assets/toll_gate.svg";
 import Image from "next/image";
@@ -33,8 +33,9 @@ interface KeplerMapProps {
   showDeviations?: boolean;
   showGeofence?: boolean;
   showStoppages?: boolean;
-  showHaltPoints?: boolean; 
+  showHaltPoints?: boolean;
   isFullscreen?: boolean;
+  setShowDeviations: (show: boolean) => void;
   onZoomIn?: () => void;
   onZoomOut?: () => void;
   onToggleSatellite?: () => void;
@@ -43,6 +44,19 @@ interface KeplerMapProps {
   onToggleDeviations?: () => void;
   isSatelliteView?: boolean;
   unique_code?:string;
+  showFencePath?: boolean;
+  fencePathData?: any[];
+  geoFenceData?: {
+    path?: string;
+    app_fence?: string;
+    sim_fence?: string;
+    s3_locations?: {
+      path?: string;
+      app_fence?: string;
+      sim_fence?: string;
+    };
+  };
+  tripTrackerMethods?: string[];
 
 }
 
@@ -140,18 +154,22 @@ function MagnifierMapController({ setMap }: { setMap: (map: LeafletMap) => void 
 export default function KeplerMap({
   showGPSRoute = true,
   showDeviations = true,
-  showStoppages = false, 
+  setShowDeviations,
+  showStoppages = false,
   showGeofence = true,
   showHaltPoints,
   isFullscreen = false,
   isSatelliteView = false,
   unique_code,
+  showFencePath = false,
+  fencePathData = [],
+  geoFenceData,
+  tripTrackerMethods = [],
   onToggleSatellite,
   onToggleFullscreen,
   onToggleGPSRoute,
   onToggleDeviations,
 }: KeplerMapProps) {
-  console.log("KeplerMap received showHaltPoints prop:", showHaltPoints);
   const [isClient, setIsClient] = useState(false);
   const [leafletLoaded, setLeafletLoaded] = useState(false);
   const [simPath, setSimPath] = useState<[number, number][]>([]);
@@ -185,6 +203,7 @@ const [progressPercentage, setProgressPercentage] = useState(0);
 const [dayRunPolylines, setDayRunPolylines] = useState<[number, number][][]>([]);
 const [showDayRun, setShowDayRun] = useState(false);
 const [dayRunDetails, setDayRunDetails] = useState<any[]>([]);
+const [deviationData, setDeviationData] = useState<any[]>([]);
  // 0 to 100
 const [currentReplayPositions, setCurrentReplayPositions] = useState<number>(0);
 
@@ -206,7 +225,16 @@ const replayIndexRef = useRef(0);
 const [isPausedAtHalt, setIsPausedAtHalt] = useState(false);
 const [replayTimeoutId, setReplayTimeoutId] = useState<NodeJS.Timeout | null>(null);
 const [currentReplayHaltIndex, setCurrentReplayHaltIndex] = useState(-1);
+const [isPausedAtDeviation, setIsPausedAtDeviation] = useState(false);
+const [currentReplayDeviationIndex, setCurrentReplayDeviationIndex] = useState(-1);
+const deviationPopupRef = useRef<L.Popup | null>(null);
+const deviationPopupTimerRef = useRef<NodeJS.Timeout | null>(null);
   const [showMagnifierSettings, setShowMagnifierSettings] = useState(false);
+const [internalFencePathData, setInternalFencePathData] = useState<any[]>([]);
+const [showFence, setShowFence] = useState(false);
+const [isLoadingFence, setIsLoadingFence] = useState(false);
+// Cache for fence data to prevent re-downloading
+const [fenceCache, setFenceCache] = useState<Record<string, any>>({});
   const [isMagnifierEnabled, setIsMagnifierEnabled] = useState(false);
   const [magnifierPosition, setMagnifierPosition] = useState({ x: 0, y: 0 });
   const [magnifierCenter, setMagnifierCenter] = useState<[number, number]>([28.6139, 77.209]);
@@ -264,6 +292,12 @@ const [isMobile, setIsMobile] = useState(false);
       window.removeEventListener('resize', checkIsMobile);
     };
   }, []); // Empty dependency array ensures this runs only once on mount
+  // Close day run table when exiting fullscreen
+  useEffect(() => {
+    if (!isFullscreen && showDayRun) {
+      setShowDayRun(false);
+    }
+  }, [isFullscreen, showDayRun]);
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !activeMode) return;
@@ -413,6 +447,28 @@ useEffect(() => {
       // do not schedule the next timer here — the pause useEffect handles resume
       return;
     }
+    // Look for deviation start/end points that have not been handled yet and are within tolerance
+    const foundDeviationIndex = deviationData.findIndex((deviation, idx) => {
+      if (idx <= currentReplayDeviationIndex) return false; // only look for future deviations
+      // Check both start and end points of the deviation
+      const startCoords: [number, number] = deviation.path[0]; // First point of deviation path
+      const endCoords: [number, number] = deviation.path[deviation.path.length - 1]; // Last point of deviation path
+      const distanceToStart = L.latLng(nextPosition).distanceTo(L.latLng(startCoords));
+      const distanceToEnd = L.latLng(nextPosition).distanceTo(L.latLng(endCoords));
+      return distanceToStart <= toleranceMeters || distanceToEnd <= toleranceMeters;
+    });
+    if (foundDeviationIndex !== -1) {
+      // Stop at the deviation point
+      replayIndexRef.current = candidateIndex;
+      setCurrentReplayPosition(nextPosition);
+      setReplayProgress(
+        (candidateIndex / (activeRoute.length - 1)) * 100
+      );
+      setCurrentReplayDeviationIndex(foundDeviationIndex);
+      setIsPausedAtDeviation(true);
+      // do not schedule the next timer here — the pause useEffect handles resume
+      return;
+    }
   
     // Normal frame advance if no halt
     replayIndexRef.current = candidateIndex;
@@ -423,7 +479,7 @@ useEffect(() => {
     timerId = setTimeout(animateReplay, animationDelay);
   };
 // Start the animation loop if not paused
-if (!isPausedAtHalt) {
+if (!isPausedAtHalt && !isPausedAtDeviation) {
   timerId = setTimeout(animateReplay, animationDelay);
 }
 
@@ -434,7 +490,7 @@ return () => {
   
 
  
-}, [isReplaying, activeRoute, isPausedAtHalt, haltPoints, currentReplayHaltIndex, replaySpeed]);
+}, [isReplaying, activeRoute, isPausedAtHalt, isPausedAtDeviation, haltPoints, currentReplayHaltIndex, currentReplayDeviationIndex, deviationData, replaySpeed]);
 
 // This new useEffect handles the pause duration and resume. It's cleaner and separates concerns.
 useEffect(() => {
@@ -452,6 +508,22 @@ useEffect(() => {
         }
     };
 }, [isPausedAtHalt]);
+// useEffect to handle deviation pause duration and resume
+useEffect(() => {
+    let timerId: NodeJS.Timeout | null = null;
+    console.log("Deviation popup useEffect triggered. isPausedAtDeviation =", isPausedAtDeviation);
+    if (isPausedAtDeviation) {
+        // If we're paused at deviation, set a timer to un-pause after 5 seconds.
+        timerId = setTimeout(() => {
+            setIsPausedAtDeviation(false);
+        }, 5000);
+    }
+    return () => {
+        if (timerId) {
+            clearTimeout(timerId);
+        }
+    };
+}, [isPausedAtDeviation]);
 
 // Add this NEW useEffect hook to manage the pause duration and resume.
 // This is cleaner and separates concerns.
@@ -593,6 +665,80 @@ useEffect(() => {
   };
 }, [isPausedAtHalt, currentReplayHaltIndex, currentReplayPosition, haltPoints]);
 
+// Deviation popup useEffect - similar to halt popup but for deviations
+useEffect(() => {
+  if (!mapRef.current) return;
+  // Clear any previous deviation popup / timer
+  const closeExistingDeviation = () => {
+    if (deviationPopupTimerRef.current) {
+      clearTimeout(deviationPopupTimerRef.current);
+      deviationPopupTimerRef.current = null;
+    }
+    if (deviationPopupRef.current && mapRef.current) {
+      try {
+        mapRef.current.closePopup(deviationPopupRef.current);
+      } catch {}
+      deviationPopupRef.current = null;
+    }
+  };
+  if (isPausedAtDeviation && currentReplayDeviationIndex > -1 && currentReplayPosition && deviationData[currentReplayDeviationIndex]) {
+    // Build a simple HTML string for the deviation popup content
+    const deviation = deviationData[currentReplayDeviationIndex];
+    const content = `
+      <div class="${styles.popup}">
+        <div class="${styles.popupTitle} ${styles.titleRed}">Deviation Info</div>
+        <hr class="${styles.divider}" />
+        <div class="${styles.popupBody}">Reason: <strong>${deviation.reason}</strong></div>
+        <div class="${styles.popupBody}">Distance: <strong>${deviation.distance}</strong></div>
+        <div class="${styles.popupBody}">Duration: <strong>${deviation.duration}</strong></div>
+        <div class="${styles.popupBody}">Start: <strong>${deviation.startTime}</strong></div>
+        <div class="${styles.popupBody}">End: <strong>${deviation.endTime}</strong></div>
+      </div>
+    `;
+    // ensure previous popup closed
+    closeExistingDeviation();
+    // create/open popup at vehicle position
+    try {
+      const popup = L.popup({
+        closeOnClick: false,
+        autoClose: false,
+        className: '' // optional: add custom class
+      })
+        .setLatLng(currentReplayPosition)
+        .setContent(content)
+        .openOn(mapRef.current as any); // openOn attaches it to the map
+      deviationPopupRef.current = popup;
+      // Pan map slightly to show the popup
+      try {
+        mapRef.current.panTo(currentReplayPosition, { animate: true, duration: 0.4 });
+      } catch {}
+      // set timer to close popup and resume replay
+      deviationPopupTimerRef.current = setTimeout(() => {
+        if (deviationPopupRef.current && mapRef.current) {
+          try { mapRef.current.closePopup(deviationPopupRef.current); } catch {}
+          deviationPopupRef.current = null;
+        }
+        setIsPausedAtDeviation(false);
+      }, 5000); // Show popup for 5 seconds
+    } catch (err) {
+      console.error("Failed to show deviation popup", err);
+    }
+  } else {
+    // not paused or missing data -> close any existing popup
+    closeExistingDeviation();
+  }
+  // cleanup
+  return () => {
+    if (deviationPopupTimerRef.current) {
+      clearTimeout(deviationPopupTimerRef.current);
+      deviationPopupTimerRef.current = null;
+    }
+    if (deviationPopupRef.current && mapRef.current) {
+      try { mapRef.current.closePopup(deviationPopupRef.current); } catch {}
+      deviationPopupRef.current = null;
+    }
+  };
+}, [isPausedAtDeviation, currentReplayDeviationIndex, currentReplayPosition, deviationData]);
 
 type ShipPoint = {
   location: {
@@ -633,7 +779,15 @@ type ShipmentResponse = {
     dayrun?: {
       dayRuns?: dayRuns[];
     };
- 
+    deviation?: {
+      deviations?: {
+        start_time: string;
+        end_time?: string | null;
+        distance: number;
+        polyline: string;
+        duration: number;
+      }[];
+    };
   };
 };
 interface dayRuns {
@@ -705,12 +859,10 @@ function convertUtcToIst24hr(utcDateString: string | undefined): string {
   // Use Intl.DateTimeFormat to get date and time components in IST
   // This is the most reliable way to handle timezone conversions
   const options: Intl.DateTimeFormatOptions = {
-    year: 'numeric',
     month: '2-digit',
     day: '2-digit',
     hour: '2-digit',
     minute: '2-digit',
-    second: '2-digit',
     hour12: false, // Ensure 24-hour format
     timeZone: 'Asia/Kolkata' // Explicitly set the timezone to IST
   };
@@ -773,10 +925,26 @@ setProgressPercentage(newProgress);
         // Include any other details you want to display
       }));
       setDayRunDetails(extractedDetails);
+      // Process deviation data
+      const deviations = shipment?.deviation?.deviations || [];
+      const processedDeviations = deviations.map((deviation: any, index: number) => ({
+        id: index + 1,
+        path: decodePolyline(deviation.polyline),
+        reason: "Route deviation detected",
+        location: `Deviation ${index + 1}`,
+        startTime: convertUtcToIst24hr(deviation.start_time),
+        endTime: convertUtcToIst24hr(deviation.end_time),
+        distance: `${deviation.distance?.toFixed(2)} km`,
+        duration: `${Math.floor(deviation.duration / 60)} min`,
+        polyline: deviation.polyline
+      }));
+      setDeviationData(processedDeviations);
       // Assuming it's encoded
         console.log("Decoded Day Run Polylines:", decodedDayRuns);
         console.log("Day Run Details:", extractedDetails);
         console.log("Show Day Run State:", showDayRun);
+        console.log("Deviation Data:", processedDeviations);
+        console.log("Deviation Count:", processedDeviations.length);
       // Update the state with the day run polylines
       setDayRunPolylines(decodedDayRuns);
 
@@ -845,6 +1013,74 @@ setProgressPercentage(newProgress);
 }, [
   // decodePolyline
 ]); // This dependency is correct
+
+// Function to fetch fence path data using passed geo_fence data
+const fetchInternalFencePathData = async () => {
+
+  if (!geoFenceData || !tripTrackerMethods.length) {
+    return;
+  }
+
+  try {
+    setIsLoadingFence(true);
+
+    // Use the passed geo_fence data instead of making API call
+    let fenceUrl = '';
+
+    // Check if URLs are in s3_locations nested object or at root level
+    const fenceUrls = geoFenceData.s3_locations || geoFenceData;
+
+    if (tripTrackerMethods.includes("GPS")) {
+      fenceUrl = fenceUrls.app_fence || fenceUrls.path || '';
+    } else if (tripTrackerMethods.includes("SIM")) {
+      fenceUrl = fenceUrls.sim_fence || '';
+    } else if (tripTrackerMethods.includes("APP")) {
+      fenceUrl = fenceUrls.app_fence || '';
+    }
+
+    if (!fenceUrl) {
+      return;
+    }
+    setShowFence(false);
+    // Check cache first
+    if (fenceCache[fenceUrl]) {
+      const cachedData = fenceCache[fenceUrl];
+      setInternalFencePathData(cachedData);
+      return;
+    }
+
+    // Use our proxy API to fetch the fence path data and bypass CORS
+    const proxyUrl = `/api/proxy-fence?url=${encodeURIComponent(fenceUrl)}`;
+    const ac = new AbortController();
+    const fenceResponse = await fetch(proxyUrl, { signal: ac.signal, method: 'GET' });
+    if (!fenceResponse.ok) throw new Error(`Failed to fetch fence data: ${fenceResponse.status}`);
+    const fetchedFenceData = await fenceResponse.json();
+
+
+    // Assuming the response is a LineString GeoJSON
+    let coordinates = null;
+    const decodedPolylines: [number, number][] = decodePolyline(fetchedFenceData)
+    if (decodedPolylines) {
+      console.log("Using fetchedFenceData.coordinates");
+      coordinates = decodedPolylines;
+    } else {
+      console.warn("No coordinates found in fence data", fetchedFenceData);
+    }
+
+    if (coordinates) {
+      // Cache the coordinates for future use
+      setFenceCache(prev => ({
+        ...prev,
+        [fenceUrl]: coordinates.slice(0, coordinates.length - 1)
+      }));
+      setInternalFencePathData(coordinates);
+    }
+  } catch (error) {
+    console.error("Error fetching fence path data:", error);
+  } finally {
+    setIsLoadingFence(false);
+  }
+};
 
 useEffect(() => {
   // Wait until we have data before doing anything
@@ -919,10 +1155,9 @@ useEffect(() => {
     }
   };
 
-  // fetch immediately and then poll every 15s
   fetchCurrentLocation();
-  const interval = setInterval(fetchCurrentLocation, 15000);
-
+  const interval = setInterval(fetchCurrentLocation, 15 * 60 * 1000); // every 15 min
+  fetchInternalFencePathData();
   return () => {
     clearInterval(interval);
     ac.abort();
@@ -1307,38 +1542,8 @@ useEffect(() => {
   };
   const routeBuffer = createRouteBuffer(mainRoute);
 
-  const deviationRoutes = [
-    {
-      id: 1,
-      path: [
-        [28.6139, 77.209],
-        [28.62, 77.195],
-        [28.615, 77.18],
-        [28.6129, 77.2295],
-      ] as [number, number][],
-      reason: "Traffic congestion on main route",
-      location: "Karol Bagh Junction",
-      startTime: "10:25 AM",
-      endTime: "10:50 AM",
-      distance: "2.3 km",
-      duration: "25 min",
-    },
-    {
-      id: 2,
-      path: [
-        [28.5562, 77.241],
-        [28.54, 77.26],
-        [28.53, 77.255],
-        [28.5355, 77.25],
-      ] as [number, number][],
-      reason: "Road construction work",
-      location: "Kalkaji Extension",
-      startTime: "11:15 AM",
-      endTime: "11:25 AM",
-      distance: "1.8 km",
-      duration: "10 min",
-    },
-  ];
+  // Use dynamic deviation data from API, fallback to empty array if no data
+  const deviationRoutes = deviationData.length > 0 ? deviationData : [];
 
   const geofenceAreas = [
     { id: 1, center: [28.6139, 77.209] as [number, number], radius: 500, name: "Pickup Zone - Connaught Place", color: "#22c55e" },
@@ -1628,6 +1833,8 @@ const startReplay = () => {
       setCurrentReplayPosition(activeRoute[0]);
       setCurrentReplayHaltIndex(-1);  // reset halts
       setIsPausedAtHalt(false);
+      setCurrentReplayDeviationIndex(-1);  // reset deviations
+      setIsPausedAtDeviation(false);
       // Clean up any old timers
       // if (replayTimeoutId) {
       //     clearTimeout(replayTimeoutId);
@@ -1635,6 +1842,8 @@ const startReplay = () => {
       // }
       if (haltPopupTimerRef.current) { clearTimeout(haltPopupTimerRef.current); haltPopupTimerRef.current = null; }
     if (haltPopupRef.current && mapRef.current) { try { mapRef.current.closePopup(haltPopupRef.current); } catch {}; haltPopupRef.current = null; }
+    if (deviationPopupTimerRef.current) { clearTimeout(deviationPopupTimerRef.current); deviationPopupTimerRef.current = null; }
+    if (deviationPopupRef.current && mapRef.current) { try { mapRef.current.closePopup(deviationPopupRef.current); } catch {}; deviationPopupRef.current = null; }
   }
 };
 const pauseReplay = () => {
@@ -1656,8 +1865,12 @@ const stopReplay = () => {
   setReplayProgress(0);
   setIsPausedAtHalt(false);
 setCurrentReplayHaltIndex(-1);
+setIsPausedAtDeviation(false);
+setCurrentReplayDeviationIndex(-1);
 if (haltPopupTimerRef.current) { clearTimeout(haltPopupTimerRef.current); haltPopupTimerRef.current = null; }
+if (deviationPopupTimerRef.current) { clearTimeout(deviationPopupTimerRef.current); deviationPopupTimerRef.current = null; }
 if (haltPopupRef.current && mapRef.current) { try { mapRef.current.closePopup(haltPopupRef.current); } catch {}; haltPopupRef.current = null; }
+if (deviationPopupRef.current && mapRef.current) { try { mapRef.current.closePopup(deviationPopupRef.current); } catch {}; deviationPopupRef.current = null; }
 
 };
 const stopAndHideReplay = () => {
@@ -1977,7 +2190,102 @@ if (haltPopupRef.current && mapRef.current) { try { mapRef.current.closePopup(ha
   />
 ))}
 
-       
+{/* === Deviation Polylines (in red) === */}
+{showDeviations && deviationRoutes.map((route) => (
+  <Polyline
+    key={`deviation-polyline-${route.id}`}
+    positions={route.path}
+    pathOptions={{
+      color: selectedDeviationForReplay === route.id ? "#f59e0b" : "#ef4444",
+      weight: 4,
+      opacity: 0.9,
+      dashArray: "10, 5"
+    }}
+  >
+    <Popup>
+      <div className={styles.popup}>
+        <div className={`${styles.popupTitle} ${styles.titleRed}`}>Route Deviation</div>
+        <div className={styles.metricRow}>
+          <span className={styles.metricKey}>Location:</span>
+          <span className={styles.metricVal}>{route.location}</span>
+        </div>
+        <div className={styles.metricRow}>
+          <span className={styles.metricKey}>Distance:</span>
+          <span className={styles.metricVal}>{route.distance}</span>
+        </div>
+        <div className={styles.metricRow}>
+          <span className={styles.metricKey}>Duration:</span>
+          <span className={styles.metricVal}>{route.duration}</span>
+        </div>
+      </div>
+    </Popup>
+  </Polyline>
+))}
+
+{/* === FASTag Polyline (if available and enabled) === */}
+{showFastag && fastagPath.length > 0 && (
+  <Polyline
+    key="fastag-polyline"
+    positions={fastagPath}
+    pathOptions={{
+      color: "#ff6b35",
+      weight: 4,
+      opacity: 0.9,
+      dashArray: "5, 10"
+    }}
+  >
+    <Popup>
+      <div>
+        <h4>FASTag Route</h4>
+        <p>Route distance: {fastagPath.length} points</p>
+      </div>
+    </Popup>
+  </Polyline>
+)}
+
+{/* === Fence Path Polyline (if available and enabled) === */}
+{(() => {
+  const shouldShowFence = (
+    (showFencePath && fencePathData && fencePathData.length > 0) ||
+    (showFence && internalFencePathData && internalFencePathData.length > 0)
+  );
+
+  const pathToUse = fencePathData && fencePathData.length > 0 ? fencePathData : internalFencePathData;
+
+  console.log("Fence rendering check:", {
+    shouldShowFence,
+    showFencePath,
+    fencePathDataLength: fencePathData?.length || 0,
+    internalFencePathDataLength: internalFencePathData.length,
+    pathToUseLength: pathToUse?.length || 0
+  });
+  console.log("Fence Path Data:");
+  console.log(pathToUse.map(coord => [coord[1], coord[0]]));
+  return shouldShowFence && (
+    <Polyline
+      key="fence-path-polyline"
+      positions={pathToUse.map(coord => [coord[1], coord[0]])} // Convert lng,lat to lat,lng
+      pathOptions={{
+        color: "#000",
+        weight: 3,
+        opacity: 0.8,
+        fill: false,
+        // dashArray: "15, 10"
+      }}
+    >
+      <Popup>
+        <div className={styles.popup}>
+          <div className={`${styles.popupTitle} ${styles.titleGreen}`}>Fence Path</div>
+          <div className={styles.metricRow}>
+            <span className={styles.metricKey}>Type:</span>
+            <span className={styles.metricVal}>Recommended Route</span>
+          </div>
+        </div>
+      </Popup>
+    </Polyline>
+  );
+})()}
+
 {currentLocation &&  !isReplaying &&(
   <Marker 
     position={currentLocation} 
@@ -2086,9 +2394,11 @@ if (haltPopupRef.current && mapRef.current) { try { mapRef.current.closePopup(ha
                           <Play className={styles.iconXs} /> Resume
                         </button>
                       ) : (
-                        <button onClick={() => startReplay(
-                          // route.id
-                          )} className={`${styles.btn} ${styles.btnGreenSm}`}>
+                        <button onClick={() => {
+                          setSelectedDeviationForReplay(route.id);
+                          setIsReplaying(true);
+                          setReplayProgress(0);
+                          }} className={`${styles.btn} ${styles.btnGreenSm}`}>
                           <Play className={styles.iconXs} /> Play
                         </button>
 
@@ -2141,36 +2451,20 @@ if (haltPopupRef.current && mapRef.current) { try { mapRef.current.closePopup(ha
       </MapContainer>
       {/* Enhanced Magnifier Tool with Custom Settings */}
       {isMagnifierEnabled && (
-      
         <div
           // 1. The onMouseDown handler is placed directly on this outer div
           onMouseDown={handleMouseDown}
+          className={`${styles.magnifier} ${isDraggingMagnifier ? styles.dragging : ''}`}
           style={{
-            // --- CSS properties to make this div work ---
-            position: 'absolute',
-            pointerEvents: 'auto', // CRITICAL: Makes this div clickable
-            zIndex: 1001,
-            borderRadius: '50%',
-            overflow: 'hidden',
-            boxShadow: '0 25px 50px rgba(0, 0, 0, 0.25)',
-            backgroundColor: '#fff',
-            
-            // --- Your existing dynamic styles ---
+            // Only positioning and size - let CSS handle the glass effect
             left: magnifierPosition.x - magnifierSettings.size / 2,
             top: magnifierPosition.y - magnifierSettings.size / 2,
             width: magnifierSettings.size,
             height: magnifierSettings.size,
-            border: `${magnifierSettings.borderWidth}px solid #3b82f6`,
           }}
         >
           {/* 2. The inner div is made invisible to the mouse */}
-          <div style={{
-              width: '100%',
-              height: '100%',
-              position: 'relative',
-              pointerEvents: 'none', // CRITICAL: Clicks pass through to the parent
-            }}
-          >
+          <div className={styles.magnifierInner}>
             <MapContainer
               // ref={setMagnifierMap}
             
@@ -2200,6 +2494,77 @@ if (haltPopupRef.current && mapRef.current) { try { mapRef.current.closePopup(ha
 
               
 
+              {/* Show main route in magnifier */}
+              {mainRoute.length > 0 && (
+                <Polyline
+                  key="magnifier-main-route"
+                  positions={mainRoute}
+                  pathOptions={{
+                    color: "#3b82f6",
+                    weight: 4,
+                    opacity: 0.8,
+                  }}
+                />
+              )}
+
+              {/* Show GPS path in magnifier */}
+              {activeMode === 'gps' && gpsPath.length > 0 && (
+                <Polyline
+                  key="magnifier-gps-path"
+                  positions={gpsPath}
+                  pathOptions={{ color: "#1e40af", weight: 4, opacity: 0.8 }}
+                />
+              )}
+
+              {/* Show SIM path in magnifier */}
+              {activeMode === 'sim' && simPath.length > 0 && (
+                <Polyline
+                  key="magnifier-sim-path"
+                  positions={simPath}
+                  pathOptions={{ color: "#9333ea", weight: 4, opacity: 0.8 }}
+                />
+              )}
+
+              {/* Show APP path in magnifier */}
+              {activeMode === 'app' && appPath.length > 0 && (
+                <Polyline
+                  key="magnifier-app-path"
+                  positions={appPath}
+                  pathOptions={{ color: "#ec4899", weight: 4, opacity: 0.8 }}
+                />
+              )}
+
+              {/* Show fence path in magnifier if visible */}
+              {(() => {
+                const shouldShowFence = (
+                  (showFencePath && fencePathData && fencePathData.length > 0) ||
+                  (internalFencePathData && internalFencePathData.length > 0)
+                );
+                const pathToUse = fencePathData && fencePathData.length > 0 ? fencePathData : internalFencePathData;
+                return shouldShowFence && (
+                  <Polyline
+                    key="magnifier-fence-path"
+                    positions={pathToUse.map(coord => [coord[1], coord[0]])}
+                    pathOptions={{
+                      color: "#000",
+                      weight: 3,
+                      opacity: 0.8,
+                      fill: false,
+                      dashArray: "15, 10"
+                    }}
+                  />
+                );
+              })()}
+
+              {/* Show delivery polylines in magnifier */}
+              {deliveryPolylines.map((coords: any, i: number) => (
+                <Polyline
+                  key={`magnifier-delivery-poly-${i}`}
+                  positions={coords}
+                  pathOptions={{ color: "#ef4444", weight: 2, opacity: 0.9, dashArray: "2, 2", fill: true }}
+                />
+              ))}
+
               {/* Show deviation routes in magnifier */}
               {showDeviations &&
                 deviationRoutes.map((route) => (
@@ -2215,7 +2580,69 @@ if (haltPopupRef.current && mapRef.current) { try { mapRef.current.closePopup(ha
                   />
                 ))}
 
-              {/* Show all markers in magnifier with larger icons */}
+              {/* Show FASTag polyline in magnifier */}
+              {showFastag && fastagPath.length > 0 && (
+                <Polyline
+                  key="magnifier-fastag-polyline"
+                  positions={fastagPath}
+                  pathOptions={{
+                    color: "#ff6b35",
+                    weight: 4,
+                    opacity: 0.9,
+                    dashArray: "5, 10"
+                  }}
+                />
+              )}
+
+              {/* Show toll plaza markers in magnifier */}
+              {showFastag &&
+                fastagPoints.map((toll: any, idx: number) => {
+                  const lat = parseFloat(toll.geo_point.coordinates[1]);
+                  const lng = parseFloat(toll.geo_point.coordinates[0]);
+                  const icon = isTollPassed(toll) ? customIcons.tollPassed : customIcons.tollPending;
+                  return (
+                    <Marker
+                      key={`magnifier-toll-${idx}`}
+                      position={[lat, lng]}
+                      icon={icon}
+                    />
+                  );
+                })}
+
+              {/* Show halt markers in magnifier */}
+              {shouldShowHaltMarkers &&
+                customIcons.halt &&
+                haltPoints.map((halt, idx) => {
+                  const lat = halt.geo_point.coordinates[1];
+                  const lng = halt.geo_point.coordinates[0];
+                  return (
+                    <Marker
+                      key={`magnifier-halt-${idx}`}
+                      position={[lat, lng]}
+                      icon={customIcons.halt}
+                    />
+                  );
+                })}
+
+              {/* Show pickup markers in magnifier */}
+              {shipmentPickups.map(({ pos, label }: any, i: number) => (
+                <Marker
+                  key={`magnifier-pickup-${i}`}
+                  position={pos}
+                  icon={makeChipicon("#22c55e", label)}
+                />
+              ))}
+
+              {/* Show delivery markers in magnifier */}
+              {shipmentDeliveries.map(({ pos, label }: any, i: number) => (
+                <Marker
+                  key={`magnifier-delivery-${i}`}
+                  position={pos}
+                  icon={makeChipIcon("#f97316", label)}
+                />
+              ))}
+
+              {/* Show all waypoint markers in magnifier with larger icons */}
             
               {customIcons.waypoint &&
                 mainRoute
@@ -2241,67 +2668,22 @@ if (haltPopupRef.current && mapRef.current) { try { mapRef.current.closePopup(ha
              
             </MapContainer>
 
-            {/* Enhanced magnifier border and indicators */}
-            <div style={{
-                position: 'absolute',
-                inset: '0px',
-                border: '2px solid white',
-                borderRadius: '9999px',
-                pointerEvents: 'none'
-            }} />
-            <div style={{
-                position: 'absolute',
-                top: '8px',
-                right: '8px',
-                backgroundColor: '#3b82f6',
-                color: 'white',
-                fontSize: '12px',
-                padding: '2px 6px',
-                borderRadius: '6px',
-                fontWeight: 'bold',
-                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
-            }}>
+            {/* Glass border */}
+            <div className={styles.magnifierBorder} />
+
+            {/* Zoom badge */}
+            <div className={styles.magnifierBadge}>
               {Math.min(zoom + magnifierSettings.zoom, 18)}x
             </div>
 
-            {/* Center crosshair */}
-            <div style={{
-                position: 'absolute',
-                top: '50%',
-                left: '50%',
-                transform: 'translate(-50%, -50%)',
-                pointerEvents: 'none'
-            }}>
-              <div style={{
-                  width: '24px',
-                  height: '2px',
-                  backgroundColor: '#3b82f6',
-                  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
-              }}></div>
-              <div style={{
-                  position: 'absolute',
-                  top: '0px',
-                  left: '50%',
-                  transform: 'translate(-50%, -50%)',
-                  width: '2px',
-                  height: '24px',
-                  backgroundColor: '#3b82f6',
-                  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
-              }}></div>
+            {/* Enhanced crosshair */}
+            <div className={styles.crosshair}>
+              <div className={styles.crosshairH}></div>
+              <div className={styles.crosshairV}></div>
             </div>
 
-            {/* Coordinate display */}
-            <div style={{
-                position: 'absolute',
-                bottom: '8px',
-                left: '8px',
-                backgroundColor: 'rgba(0, 0, 0, 0.7)',
-                color: 'white',
-                fontSize: '12px',
-                padding: '2px 6px',
-                borderRadius: '4px',
-                fontFamily: 'monospace'
-            }}>
+            {/* Coordinates display */}
+            <div className={styles.coordBadge}>
               {magnifierCenter[0].toFixed(4)}, {magnifierCenter[1].toFixed(4)}
             </div>
           </div>
@@ -2463,6 +2845,22 @@ if (haltPopupRef.current && mapRef.current) { try { mapRef.current.closePopup(ha
               d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
           </svg>
         </button>
+
+        {/* <button
+          onClick={() => {
+            if (internalFencePathData.length === 0 && !isLoadingFence) {
+              fetchInternalFencePathData();
+            }
+          }}
+          className={`${styles.iconBtn} ${internalFencePathData.length > 0 ? styles.iconBtnActiveGreen : isLoadingFence ? styles.iconBtnActiveYellow : ""}`}
+          title={isLoadingFence ? "Loading Fence Path..." : internalFencePathData.length > 0 ? "Fence Path Loaded" : "Show Fence Path"}
+          disabled={isLoadingFence}
+        >
+          <svg className={styles.iconSm} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+              d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+          </svg>
+        </button> */}
       </div>
 
       {/* Map Style Selector */}
@@ -2488,9 +2886,6 @@ if (haltPopupRef.current && mapRef.current) { try { mapRef.current.closePopup(ha
           </div>
         </div>
       )}
-
-      
-
 
       {/* Right side controls */}
       {/* <div className={`${styles.sideControls} ${isFullscreen ? styles.sideControlsFullscreen : ""}`}> */}
@@ -2520,6 +2915,22 @@ if (haltPopupRef.current && mapRef.current) { try { mapRef.current.closePopup(ha
         </button>
   )
       }
+      {internalFencePathData.length > 0 && (
+      <button
+        onClick={() => {if (internalFencePathData.length) {
+          setShowFence(v => !v);
+        }}}
+        className={`${styles.sideBtn} ${showFence ? styles.iconBtnActiveGreen: styles.sideBtnGray}`}
+      >{/* Added a new color class for SIM */}
+          <div className={styles.sideDotBox}>
+            <svg className={styles.iconSm} fill="#fff" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+            </svg>
+          </div>
+          <span>Show Fence</span>
+        </button>
+      )}
     {fastagPath.length > 0 && (
         <button
         onClick={() => setShowFastag(v => !v)}
@@ -2565,37 +2976,42 @@ if (haltPopupRef.current && mapRef.current) { try { mapRef.current.closePopup(ha
 
 
         <button
-          onClick={() => onToggleDeviations && onToggleDeviations()}
+          onClick={() => setShowDeviations(!showDeviations)}
           className={`${styles.sideBtn} ${showDeviations ? styles.sideBtnOrange : styles.sideBtnGray}`}
         >
           {/* <div className={styles.sideDotBox}></div> */}
           <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-  <line x1="6" x2="6" y1="3" y2="15"></line>
-  <circle cx="18" cy="6" r="3"></circle>
-  <path d="M18 9a9 9 0 0 1-9 9"></path>
-  <circle cx="6" cy="18" r="3"></circle>
-</svg>
+            <line x1="6" x2="6" y1="3" y2="15"></line>
+            <circle cx="18" cy="6" r="3"></circle>
+            <path d="M18 9a9 9 0 0 1-9 9"></path>
+            <circle cx="6" cy="18" r="3"></circle>
+          </svg>
           <span>Deviation</span>
         </button>
 
 
         <button
-         onClick={() => setShowDayRun((prev) => !prev)}
-         className={`${styles.sideBtn} ${showDayRun ? styles.sideBtnPink : styles.sideBtnGray}`}
-
+         onClick={() => {
+           if (isFullscreen) {
+             setShowDayRun((prev) => !prev);
+           }
+         }}
+         className={`${styles.sideBtn} ${showDayRun ? styles.sideBtnPink : styles.sideBtnGray} ${!isFullscreen ? styles.disabled : ''}`}
+         disabled={!isFullscreen}
+         title={!isFullscreen ? "Day Run details available only in fullscreen mode" : "Toggle Day Run details"}
         >
           {/* <div className={styles.sideDotBox}></div> */}
           <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-  <path d="M12 2a10 10 0 1 0 0 20a10 10 0 0 0 0-20z"></path>
-  <path d="M12 6L12 12"></path>
-  <path d="M12 12H18"></path>
-  <path d="M5 12h-3"></path>
-  <path d="M22 12h-2"></path>
-  <path d="M12 2v2"></path>
-  <path d="M12 20v2"></path>
-  <path d="M4.22 4.22l1.42 1.42"></path>
-  <path d="M18.36 18.36l1.42 1.42"></path>
-</svg>
+            <path d="M12 2a10 10 0 1 0 0 20a10 10 0 0 0 0-20z"></path>
+            <path d="M12 6L12 12"></path>
+            <path d="M12 12H18"></path>
+            <path d="M5 12h-3"></path>
+            <path d="M22 12h-2"></path>
+            <path d="M12 2v2"></path>
+            <path d="M12 20v2"></path>
+            <path d="M4.22 4.22l1.42 1.42"></path>
+            <path d="M18.36 18.36l1.42 1.42"></path>
+          </svg>
           <span>Day run</span>
         </button>
       </div>

@@ -163,6 +163,59 @@ const httpsPut = async (path: string, data: any, router: any = null, type = 0, i
   return response?.data || response;
 };
 
+const httpsPut = async (path: string, data: any, router: any = null, type = 0, isFile = false) => {
+  const auth = getAuth();
+  const authorization = {
+    Authorization: auth,
+  };
+  const headers = {
+    Authorization: auth,
+    'Content-Type': 'multipart/form-data'
+  };
+  const url = prefix[type] + path;
+  let config;
+  if (isFile) {
+    config = {
+      method: "PUT",
+      url,
+      headers: headers,
+      data,
+    };
+  } else {
+    config = {
+      method: "PUT",
+      url,
+      headers: authorization,
+      data,
+    };
+  }
+  const response = await axios(config)
+    .then((res) => res)
+    .catch((err) => {
+      if (axios.isAxiosError(err) && err.response?.status === 401 && !redirectInProgress) {
+        redirectInProgress = true
+        if(url.includes('shipper_user/signin')) {
+          return err.response.data 
+        }
+        const fromRms = Boolean(localStorage.getItem('isSDLogin'))
+        if(fromRms) {
+          router.push('/signin')
+        } else {
+          if(prefix[0].includes('dev')){
+            router.push(`${parent[0]}/login`);
+          }else{
+            router.push(`${parent[1]}/login`);
+          }
+        }
+        deleteAllCache();
+      } else {
+        redirectInProgress = false
+      }
+      return err.response.data 
+    });
+  return response?.data || response;
+};
+
 const apiCall = async (config: any) => {
   const finalConf = {
     ...config,
@@ -180,4 +233,5 @@ const apiCall = async (config: any) => {
   await axios(finalConf);
 };
 
+export { httpsGet, httpsPost, httpsPut, apiCall };
 export { httpsGet, httpsPost, httpsPut, apiCall };

@@ -540,16 +540,7 @@ function SideDrawer() {
                     isActive={active === item.id}
                     isHovered={hoveredId === item.id}
                     isOpen={open}
-                    onClick={() => {
-                        if (item.id === 'controlRoom') {
-                            router.back();
-                            setActive('controlRoom');
-                        } else if (item.route) {
-                            handleShipperRouting(item.route);
-                        } else {
-                            handleRouting(item.id);
-                        }
-                    }}
+                    onClick={() => item.route ? handleShipperRouting(item.route) : handleRouting(item.id)}
                     onMouseEnter={() => setHoveredId(item.id)}
                     onMouseLeave={() => setHoveredId(null)}
                     active={active}
