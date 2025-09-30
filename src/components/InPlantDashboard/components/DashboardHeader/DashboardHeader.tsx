@@ -67,7 +67,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
       <div className="header-top">
         {/* Left Section - Title */}
         <div className="header-left">
-          <h1 className="dashboard-title">InPlant Dashboard</h1>
+          <h2 className="dashboard-title">InPlant Dashboard</h2>
           <span className="plant-name">Mumbai Distribution Center</span>
         </div>
 
@@ -201,11 +201,11 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
       )}
 
       {/* Auto-refresh indicator */}
-      <div className="refresh-indicator">
+      {/* <div className="refresh-indicator">
         <div className="refresh-dot"></div>
         <span>Auto-refresh: ON (30s)</span>
         <span className="last-updated">Last updated: {new Date().toLocaleTimeString()}</span>
-      </div>
+      </div> */}
     </div>
   );
 };

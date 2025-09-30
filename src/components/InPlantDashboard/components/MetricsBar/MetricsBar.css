@@ -6,6 +6,7 @@
   padding: var(--spacing-lg);
   position: relative;
   box-shadow: var(--shadow-sm);
+  margin-top: 20px;
 }
 
 .metrics-container {
@@ -25,12 +26,12 @@
   position: relative;
   overflow: hidden;
 }
-
+/* 
 .metric-card:hover {
   border-color: var(--primary-blue);
   box-shadow: var(--shadow-md);
   transform: translateY(-2px);
-}
+} */
 
 .metric-card::before {
   content: '';
@@ -81,7 +82,7 @@
   color: var(--text-secondary);
   margin: 0;
   line-height: 1.4;
-  text-transform: uppercase;
+  /* text-transform: uppercase; */
   letter-spacing: 0.5px;
 }
 
@@ -268,10 +269,10 @@
   .metric-card {
     border: 2px solid var(--border-dark);
   }
-
+  /* 
   .metric-card:hover {
     border-color: var(--primary-blue);
-  }
+  } */
 
   .metric-trend.trend-up {
     color: var(--success-green);
@@ -310,4 +311,28 @@
     animation: none;
     background: var(--bg-tertiary);
   }
+}
+
+.metric-card.normal:hover {
+  border-color: var(--primary-blue);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.metric-card.success:hover {
+  border-color: var(--success-green);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.metric-card.warning:hover {
+  border-color: var(--warning-amber);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.metric-card.critical:hover {
+  border-color: var(--danger-red);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
 }

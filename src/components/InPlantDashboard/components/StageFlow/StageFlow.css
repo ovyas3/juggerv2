@@ -11,14 +11,14 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: var(--spacing-lg);
+  margin-bottom: var(--spacing-sm);
   flex-wrap: wrap;
   gap: var(--spacing-md);
 }
 
 .flow-title h2 {
   font-size: var(--text-xl);
-  font-weight: var(--font-semibold);
+  font-weight: var(--font-bold);
   color: var(--text-primary);
   margin: 0 0 var(--spacing-xs) 0;
 }
@@ -27,6 +27,8 @@
   display: flex;
   gap: var(--spacing-lg);
   font-size: var(--text-sm);
+  align-items: center;
+  justify-content: center;
 }
 
 .total-vehicles {
@@ -37,6 +39,9 @@
 .delayed-stages {
   color: var(--danger-red);
   font-weight: var(--font-medium);
+  background-color: #ffc5c5;
+  padding: 6px 9px;
+  border-radius: 7px;
 }
 
 .flow-legend {
@@ -76,7 +81,7 @@
   gap: 0;
   overflow-x: auto;
   padding: var(--spacing-md) 0;
-  margin: 0 -var(--spacing-md);
+  margin: 0 15px;
   padding: var(--spacing-md);
 }
 
@@ -88,7 +93,8 @@
 
 /* Stage Card */
 .stage-card {
-  width: 180px;
+  width: 180px;  
+  min-height: 147px;
   background: var(--bg-primary);
   border: 1px solid var(--border-light);
   border-radius: 12px;
@@ -144,6 +150,7 @@
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: var(--spacing-md);
+  width: 140px;
 }
 
 .stage-info {
@@ -456,4 +463,28 @@
   .progress-fill {
     transition: none;
   }
+}
+
+.stage-card.normal:hover {
+  border-color: var(--success-green);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.stage-card.warning:hover {
+  border-color: var(--warning-amber);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.stage-card.critical:hover {
+  border-color: var(--danger-red);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.stage-card:hover {
+  border-color: var(--neutral-gray);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
 }

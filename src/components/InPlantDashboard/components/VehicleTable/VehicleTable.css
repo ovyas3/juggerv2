@@ -551,3 +551,7 @@
     background: var(--bg-tertiary);
   }
 }
+
+.stage-cell {
+  width: 120px;
+}

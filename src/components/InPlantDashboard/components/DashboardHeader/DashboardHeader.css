@@ -20,7 +20,7 @@
 }
 
 .dashboard-title {
-  font-size: var(--text-2xl);
+  font-size: var(--text-xl);
   font-weight: var(--font-bold);
   color: var(--text-primary);
   margin: 0;
@@ -71,6 +71,17 @@
   cursor: pointer;
   outline: none;
   min-width: 120px;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+.date-select:hover,
+.date-select:focus,
+.date-select:active {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
 }
 
 /* Right Section */
@@ -104,7 +115,7 @@
 }
 
 .search-input:focus {
-  border-color: var(--primary-blue);
+  /* border-color: var(--primary-blue); */
   box-shadow: 0 0 0 2px var(--primary-light);
 }
 
