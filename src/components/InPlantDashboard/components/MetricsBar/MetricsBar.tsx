@@ -16,9 +16,11 @@ interface MetricCardProps {
   unit?: string;
   trend?: number;
   trendLabel?: string;
-  status?: 'normal' | 'warning' | 'critical' | 'success';
+  status?: StatusType;
   loading?: boolean;
 }
+
+type StatusType = 'normal' | 'warning' | 'critical' | 'success';
 
 const MetricCard: React.FC<MetricCardProps> = ({
   title,
@@ -103,28 +105,28 @@ const MetricsBar: React.FC<MetricsBarProps> = ({ metrics, loading = false }) => 
       title: 'Active Vehicles',
       value: metrics.activeVehicles,
       trend: metrics.trends.activeVehiclesTrend,
-      status: metrics.activeVehicles > 30 ? 'warning' : 'normal' as const
+      status: (metrics.activeVehicles > 30 ? 'warning' : 'normal') as StatusType
     },
     {
       title: 'Average Time in Plant',
       value: metrics.averageProcessingTime,
       trend: metrics.trends.avgTimeTrend,
       trendLabel: 'm',
-      status: metrics.averageProcessingTime > 180 ? 'critical' :
-              metrics.averageProcessingTime > 120 ? 'warning' : 'success' as const
+      status: (metrics.averageProcessingTime > 180 ? 'critical' :
+              metrics.averageProcessingTime > 120 ? 'warning' : 'success') as StatusType
     },
     {
       title: 'Delayed Vehicles',
       value: metrics.delayedVehicles,
       trend: metrics.trends.delayedTrend,
-      status: metrics.delayedVehicles > 10 ? 'critical' :
-              metrics.delayedVehicles > 5 ? 'warning' : 'normal' as const
+      status: (metrics.delayedVehicles > 10 ? 'critical' :
+              metrics.delayedVehicles > 5 ? 'warning' : 'normal') as StatusType
     },
     {
       title: 'Completed Today',
       value: metrics.completedToday,
       trend: metrics.trends.completedTrend,
-      status: 'success' as const
+      status: 'success' as StatusType
     }
   ];
 

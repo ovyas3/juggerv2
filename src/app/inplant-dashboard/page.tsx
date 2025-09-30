@@ -1,12 +1,17 @@
 'use client'
 
-import React from "react";
-import SideDrawer from "@/components/Drawer/Drawer";
-import MobileDrawer from "@/components/Drawer/mobile_drawer";
-import MobileHeader from "@/components/Header/mobileHeader";
-import Header from "@/components/Header/header";
+import dynamic from 'next/dynamic';
+const SideDrawer = dynamic(() => import('@/components/Drawer/Drawer'));
+const MobileDrawer = dynamic(() => import('@/components/Drawer/mobile_drawer'));
+const MobileHeader = dynamic(() => import('@/components/Header/mobileHeader'));
+const Header = dynamic(() => import('@/components/Header/header'));
 import { useMediaQuery, useTheme } from '@mui/material';
-import InPlantDashboard from "@/components/InPlantDashboard/InPlantDashboard";
+import { useState, useEffect } from 'react';
+
+const InPlantDashboard = dynamic(
+  () => import('@/components/InPlantDashboard/InPlantDashboard'),
+  { ssr: false }
+);
 
 export default function InPlantDashboardPage() {
     const theme = useTheme();
