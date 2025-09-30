@@ -392,9 +392,7 @@ const CarrierInvoiceTab = ({
                         <Link
                           href={invoice.pdfLinks[0]}
                           target="_blank"
-                          rel="noopener"
-                          sx={{ display: "block", color: "#4f46E5", textDecoration: "underline" }}
-                        >
+                          rel="noopener" sx={{ display: "block", color: "#20104d", textDecoration: "underline" }}>
                           Document - {invoice.invoiceNumber}
                         </Link>
                       </Tooltip>

@@ -82,7 +82,8 @@
 }
 .uploading_epod_button {
   padding: 5px;
-  background-color: #4f46e5;
+  background-color: #20104d
+;
   color: rgb(255, 255, 255);
   border: none;
   border-radius: 3px;
@@ -93,7 +94,8 @@
 
 .done_button {
   padding: 5px;
-  background-color: #4f46e5;
+  background-color: #20104d
+;
   color: rgb(255, 255, 255);
   border: none;
   border-radius: 3px;
@@ -103,7 +105,8 @@
 }
 .uploading_picture_button {
   padding: 5px;
-  background-color: #4f46e5;
+  background-color: #20104d
+;
   color: rgb(255, 255, 255);
   border: none;
   border-radius: 3px;
@@ -159,7 +162,8 @@
 
 .uploadEpodButton,
 .requestEpodButton {
-  background-color: #4f46e5;
+  background-color: #20104d
+;
   color: white;
   box-shadow: none;
   text-transform: capitalize;

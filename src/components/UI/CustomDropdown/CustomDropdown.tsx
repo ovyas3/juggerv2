@@ -36,8 +36,8 @@ const dropdownButtonStyles: React.CSSProperties = {
 };
 
 const dropdownButtonFocusStyles: React.CSSProperties = {
-  boxShadow: "0 0 0 2px #20114d33",
-  borderColor: "#20114d",
+  boxShadow: "0 0 0 2px #20104d33",
+  borderColor: "#20104d",
 };
 
 const dropdownListStyles: React.CSSProperties = {

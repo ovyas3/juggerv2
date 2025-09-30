@@ -67,7 +67,7 @@
 
 .inputField:focus {
   outline: none;
-  border-color: #4F46E5;
+  border-color: #20104d;
 }
 
 .floatingLabel {
@@ -86,7 +86,7 @@
 .inputField:focus + .floatingLabel,
 .inputField:not(:placeholder-shown) + .floatingLabel {
   transform: translateY(-24px) scale(0.85);
-  color: #4F46E5;
+  color: #20104d;
 }
 
 .footer {
@@ -97,7 +97,7 @@
 }
 
 .submitButton {
-  background-color: #4F46E5;
+  background-color: #20104d;
   color: white;
   border: none;
   padding: 8px 24px;

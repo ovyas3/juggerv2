@@ -59,7 +59,7 @@ const textFieldStyles = {
   "& .MuiOutlinedInput-root": {
     "& fieldset": { borderColor: "#e0e0e0" },
     "&:hover fieldset": { borderColor: "#c0c0c0" },
-    "&.Mui-focused fieldset": { borderColor: "#4F46E5" },
+    "&.Mui-focused fieldset": { borderColor: "#20104d" },
   },
   "& .MuiInputBase-input": { padding: "8.5px 4px" },
 };
@@ -670,7 +670,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
                               size="small"
                               onClick={() => onAddRow(groupIndex)}
                             >
-                              <AddCircleOutlineIcon sx={{ color: "#4f46e5" }} />
+                              <AddCircleOutlineIcon sx={{ color: "#20104d"}}/>
                             </IconButton>
                           )}
                         </Box>
@@ -728,11 +728,10 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
             variant="contained"
             onClick={onSave}
             sx={{
-              backgroundColor: "#4F46E5",
+              backgroundColor: "#20104d",
               textTransform: "capitalize",
-              "&:hover": { backgroundColor: "#4338ca" },
-            }}
-          >
+              "&:hover": { backgroundColor: "#271950" },
+            }}>
             Submit
           </Button>
         </Box>

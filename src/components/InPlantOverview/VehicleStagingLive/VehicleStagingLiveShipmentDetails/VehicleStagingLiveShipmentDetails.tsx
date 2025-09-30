@@ -164,7 +164,7 @@ export default function VehicleStagingLiveShipmentDetails({ isOpen, onClose, tit
                             visible={true}
                             height="100"
                             width="100"
-                            color="#20114d"
+                            color="#20104d"
                             ariaLabel="three-circles-loading"
                             wrapperStyle={{}}
                             wrapperClass=""

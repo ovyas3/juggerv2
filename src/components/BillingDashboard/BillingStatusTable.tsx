@@ -936,7 +936,7 @@ export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatus
         }
 
         .gate-entry-number-style {
-          color: #20114d;
+          color: #20104d;
           // font-weight: bold;
         }
 
@@ -966,7 +966,7 @@ export function BillingStatusTable({ currentTheme = themes.navy }: BillingStatus
           border: 1px solid #ccc;
         }
         .gate-entry-legend-color {
-          background-color: #20114d;
+          background-color: #20104d;
         }
         .vehicle-number-legend-color {
           background-color: #007BFF;

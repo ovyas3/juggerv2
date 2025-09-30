@@ -19,7 +19,7 @@ import { CustomDropdown } from "@/components/UI/CustomDropdown/CustomDropdown";
 const theme = createTheme({
   palette: {
     primary: {
-      main: "#20114d",
+      main: "#20104d",
       light: "#4a3c7a",
       dark: "#150c35",
     },
@@ -83,7 +83,7 @@ const theme = createTheme({
           backgroundColor: "transparent",
           transition: "all 0.2s ease-in-out",
           "&.Mui-selected": {
-            backgroundColor: "#20114d !important",
+            backgroundColor: "#20104d !important",
             color: "#ffffff !important",
             fontWeight: 600,
           },

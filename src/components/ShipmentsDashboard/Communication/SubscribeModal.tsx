@@ -118,7 +118,7 @@ const SubscribeModal = ({ open, onClose, shipment }: { open: boolean, onClose: (
                   <div
                     className={styles.submitButton}
                     style={{
-                      backgroundColor: subStatus === "Yes" ? "#fff" : "#4f46e5"
+                      backgroundColor: subStatus === "Yes" ? "#fff" : "#20104d"
                     }}
                   >
                     <div

@@ -1298,7 +1298,9 @@ const actionMenuCategories = (shipment: Shipment) => {
       { icon: DoorOpen, label: "Recalculate Customer Gate In/Out", color: "text-pink-600", onClick: (shipment: Shipment, e?: React.MouseEvent) => {
         e?.stopPropagation();
         handleRecalculateGateInOut(shipment);
-      }, disabled: (shipment: Shipment) => ["Completed", "Cancelled"].includes(shipment.status), show: shipment.trip_tracker?.methods?.includes('GPS') },
+      }, 
+      disabled: (shipment: Shipment) => ["Completed", "Cancelled"].includes(shipment.status), show: shipment.trip_tracker?.methods?.includes('GPS') 
+      },
       // { 
       //   icon: RefreshCw, 
       //   label: "Rerun", 

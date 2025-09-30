@@ -397,7 +397,7 @@ function MobileDrawer() {
                     onClick={() => handleRouting("welcome")}
                 >
                     {active === "welcome" ? (
-                        <HomeIcon sx={{ color: "#20114d" }} />
+                        <HomeIcon sx={{ color: "#20104d" }} />
                     ) : (
                         <HomeIcon sx={{ color: "#fff" }} />
                     )}
