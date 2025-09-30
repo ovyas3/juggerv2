@@ -2719,14 +2719,14 @@ const handleOpenEditLocation = (shipment: any, type: 'pickup' | 'delivery') => {
   if (type === 'pickup' && shipment.from && shipment.from.length > 0) {
     const location = shipment.from[0].location;
     combinedLocation = `${location.name} - ${location.area}${location.city ? ` - ${location.city}` : ''}`;
-    pickupId = shipment.from[0].id;
+    pickupId = shipment.from[0]._id;
     pickupCity = location.city || '';
   }
   
   if (type === 'delivery' && shipment.to && shipment.to.length > 0) {
     const location = shipment.to[0].location;
     combinedLocation = `${location.name} - ${location.area}${location.city ? ` - ${location.city}` : ''}`;
-    deliveryId = shipment.to[0].id;
+    deliveryId = shipment.to[0]._id;
   }
   
   if (shipment.triptracker?.lastlocation) {
