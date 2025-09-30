@@ -1379,6 +1379,23 @@ useEffect(() => {
   setShowTracking(environment === 'development' || process.env.NEXT_PUBLIC_COUNTRY === 'IN');
 }, []);
 
+useEffect(() => {
+  setShipmentsFilter((prev: any) => ({
+    ...prev,
+    type_filter: shipmentType === 'all' ? undefined : shipmentType
+  }));
+}, [shipmentType]);
+
+useEffect(() => {
+  if (inputQuery === '') {
+    setShipmentsFilter((prev: any) => {
+      const newFilter = { ...prev };
+      delete newFilter[searchValue];
+      return newFilter;
+    });
+    fetchShipments();
+  }
+}, [inputQuery]);
 
 const closeActionMenu = () => {
   console.log("closeActionMenu executed, closing dropdown");
@@ -2792,6 +2809,15 @@ const changeSearchType = (typeName: string, typeValue: string) => {
 };
 
 const applyFilter = () => {
+  if (inputQuery.trim() === '') {
+    setShipmentsFilter((prev: any) => ({
+      ...prev,
+      type_filter: shipmentType === 'all' ? undefined : shipmentType
+    }));
+    fetchShipments();
+    return;
+  }
+
   if (inputQuery.length <= 3) {
     showMessage('Enter at least 4 characters to Search', 'error');
     return;
