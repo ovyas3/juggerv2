@@ -270,28 +270,43 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
             return ( // Apply verticalAlign: 'top' to all cells in the row
               <TableRow key={invGroup.delivery_id?._id || groupIndex} sx={{ '& > td': { verticalAlign: 'top' } }}>
                 <TableCell sx={{ padding: '10px 2px 0px 8px ' }}>
-                  <Box sx={{ display: "flex", alignItems: "flex-start" }}>
-                    <span className={styles.deliveryIcon}>
-                      D{groupIndex + 1}
-                    </span>
-                    <Box>
-                      <Typography
-                        variant="body1"
-                        className={styles.locationName}
-                        sx={{ fontWeight: 500, fontSize: "12px" }}
-                      >
-                        {invGroup.delivery_id?.location?.name}
-                      </Typography>
-                      <Typography
-                        variant="body2"
-                        className={styles.locationName}
-                        color="text.secondary"
-                        sx={{ fontSize: "12px" }}
-                      >
-                        {invGroup.delivery_id?.location?.area}
-                      </Typography>
-                    </Box>
+                <Box sx={{ display: "flex", alignItems: "flex-start", gap: '8px' }}>
+    
+                  {/* NEW ISOLATION WRAPPER: Ensures the icon maintains its height */}
+                  <Box 
+                      sx={{ 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          height: 24, // Enforce the required 24px height
+                          flexShrink: 0, // Prevent container from being vertically compressed
+                          // Align the icon container to the top edge of the overall flex block
+                          alignSelf: 'flex-start' 
+                      }}
+                  >
+                      <span className={styles.deliveryIcon}>
+                          D{groupIndex + 1}
+                      </span>
                   </Box>
+                  {/* END ISOLATION WRAPPER */}
+                  
+                  <Box>
+                      <Typography
+                          variant="body1"
+                          className={styles.locationName}
+                          sx={{ fontWeight: 500, fontSize: "12px" }}
+                      >
+                          {invGroup.delivery_id?.location?.name}
+                      </Typography>
+                      <Typography
+                          variant="body2"
+                          className={styles.locationName}
+                          color="text.secondary"
+                          sx={{ fontSize: "12px" }}
+                      >
+                          {invGroup.delivery_id?.location?.area}
+                      </Typography>
+                  </Box>
+              </Box>
 
                   {(isTechnova || isEmami || isBMWIL) &&
                     (() => {
@@ -353,6 +368,37 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
                       onGoodsInfoChange(groupIndex, "comments", e.target.value)
                     }
                   />
+                  <Box sx={{ mt: 1, marginBottom: '8px' }}>
+                    {isEditing ? (
+                      <TextField
+                        label="E-waybill Number"
+                        size="small"
+                        fullWidth
+                        variant="outlined"
+                        sx={{ ...textFieldStyles }}
+                        value={currentGoodsInfo.ewaybillNumber || ""}
+                        onChange={(e) =>
+                          onGoodsInfoChange(groupIndex, "ewaybillNumber", e.target.value)
+                        }
+                      />
+                    ) : (
+                      <Box
+                        sx={{
+                          mt: 1,
+                          pl: 1,
+                          border: "1px solid #e0e0e0",
+                          borderRadius: "4px",
+                        }}
+                      >
+                        <Typography variant="caption" color="text.secondary">
+                          E-waybill Number
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          {currentGoodsInfo.ewaybillNumber || "—"}
+                        </Typography>
+                      </Box>
+                    )}
+                  </Box>
                   <Box sx={{ mt: 1, marginBottom: '8px' }}>
                     {isEditing ? (
                       <CustomDateTimePicker

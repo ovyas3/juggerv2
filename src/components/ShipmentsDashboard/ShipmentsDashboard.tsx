@@ -586,6 +586,7 @@ const [selectedShipmentForManagedBy, setSelectedShipmentForManagedBy] = useState
 const [showRetriggerEventModal, setShowRetriggerEventModal] = useState(false);
 const [selectedShipmentForRetrigger, setSelectedShipmentForRetrigger] = useState<Shipment | null>(null);
 const [showDriverExpenses, setShowDriverExpenses] = useState(false);
+const [rawShipmentResponse, setRawShipmentResponse] = useState<any>(null);
 
 // Add this near other state declarations
 const [isGeofenceEditorOpen, setIsGeofenceEditorOpen] = useState(false);
@@ -1711,6 +1712,8 @@ const closeActionMenu = () => {
     });
   };
 
+  
+
   const timeConvert = (seconds: number) => {
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
@@ -1744,6 +1747,9 @@ const closeActionMenu = () => {
 
     filters.limit = pageSize;
     filters.skip = currentPage * pageSize;
+
+    setSelectedShipmentsArray([]);
+    setShowButtons(false);
 
     if (inputQuery !== "" && inputQuery.length > 0 && searchValue) {
       if (searchValue === "vehicle_no") {
@@ -2229,6 +2235,19 @@ const closeActionMenu = () => {
       console.error("Error fetching shipments:", error);
     }
   };
+
+  const debouncedSearch = useCallback(
+    debounce((query) => {
+      // Pass the query as 'searchIndex' in the filters object
+      const filters: any = { searchIndex: query };
+      // Add other existing filters
+      if (odcFilter !== null) {
+        filters.odc = odcFilter;
+      }
+      fetchShipments(filters);
+    }, 50), // 500ms delay
+    [odcFilter, fetchShipments]
+  );
 
   useEffect(() => {
     console.log("Triggered useEffect");
@@ -3129,22 +3148,25 @@ const applyFilter = () => {
     </Select>
     
     <div className={styles.searchInputContainer}>
-      <input
-        type="text"
-        placeholder="Search ..."
-        name="filter"
-        value={inputQuery}
-        onChange={(e) => setInputQuery(e.target.value)}
-        className={styles.inputSearch}
-        onKeyPress={(e) => {
-          if (e.key === 'Enter') {
-            applyFilter();
-          }
-        }}
-      />
+    <input
+      type="text"
+      placeholder="Search ..."
+      name="filter"
+      className={styles.inputSearch}
+      value={inputQuery}
+      onChange={(e) => {
+        const query = e.target.value;
+        setInputQuery(query);
+        // Call the debounced function with the new input value
+        if (query.length === 0 || query.length > 1) { // You can set a minimum length here
+          debouncedSearch(query);
+        }
+      }}
+      // Remove the onKeyPress handler completely
+    />
       <Search
         className={styles.searchIcon}
-        onClick={applyFilter}
+    
       />
     </div>
   </div>
@@ -3930,7 +3952,18 @@ const applyFilter = () => {
 )}
  </div>
   );
+
+  
 };
+
+function debounce<T extends (...args: any[]) => void>(func: T, delay: number): (...args: Parameters<T>) => void {
+  let timeout: ReturnType<typeof setTimeout>;
+  return function(this: any, ...args: Parameters<T>) {
+    const context = this;
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func.apply(context, args), delay);
+  };
+}
 
 
 

@@ -11,29 +11,36 @@
 .header {
   display: flex;
   gap: 12px;
-  align-items: flex-start;
+  /* Crucial: Aligns the icon and the adjacent text box perfectly vertically */
+  align-items: flex-start; 
   margin-bottom: 16px;
 }
 
 .deliveryIcon {
-  display: inline-flex;
+  /* CHANGE: Use flex on the icon itself to perfectly center 'D1' text */
+  display: flex; 
   align-items: center;
   justify-content: center;
-  width: 30px;
-  height: 28px;
+  
+  /* Enforce fixed dimensions */
+  width: 24px;
+  height: 24px; 
+  
   border-radius: 50%;
   background-color: #d8511f;
   color: white;
   font-weight: bold;
   font-size: 0.9rem;
+  
+  /* REMOVE vertical-align: middle; - it often conflicts with Flexbox parents */
 }
 
 .pickupIcon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   background-color: #0b7d2e;
   color: white;
@@ -185,12 +192,7 @@
   font-weight: bold;
 }
 
-.approveButton,
-.disapproveButton {
-  text-transform: capitalize;
-  color: white;
-  box-shadow: none;
-}
+
 
 .approveButton {
   background-color: #0c6628;
@@ -199,3 +201,4 @@
 .disapproveButton {
   background-color: #d85120;
 }
+

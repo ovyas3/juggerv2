@@ -8,7 +8,7 @@ const formatDuration = (seconds?: number): string => {
   const d = Math.floor(seconds / (3600 * 24));
   const h = Math.floor((seconds % (3600 * 24)) / 3600);
   const m = Math.floor((seconds % 3600) / 60);
-  return `${d > 0 ? `${d}d ` : ""}${h > 0 ? `${h}h ` : ""}${m}m`;
+  return `${d > 0 ? `${d}days ` : ""}${h > 0 ? `${h}hours ` : ""}${m}minutes`;
 };
 
 // --- Helper to format distance ---
@@ -68,8 +68,15 @@ const ShipmentDetailsTab = ({
   isTata: boolean;
 }) => {
 
+
   const { singleSaleOrder, deliveryOrders } = useMemo(() => {
-    const hasDeliveryOrders = shipmentData.order?.delivery_locations?.some(
+    if (!shipmentData || !shipmentData.order) {
+      return { 
+        singleSaleOrder: null, 
+        deliveryOrders: [] 
+      };
+    }
+    const hasDeliveryOrders = shipmentData.order.delivery_locations?.some(
       (d: any) => d.orders?.length > 0
     );
     const result: {
@@ -79,7 +86,6 @@ const ShipmentDetailsTab = ({
       singleSaleOrder: null,
       deliveryOrders: [],
     };
-
     if (isTata) {
       if (hasDeliveryOrders) {
         const orderDeliveryMap = new Map<string, any[]>();
@@ -128,7 +134,7 @@ const ShipmentDetailsTab = ({
       }
     }
     return result;
-  }, [isTata, shipmentData]);
+  }, [isTata, shipmentData]); // Ensure shipmentData is the dependency
 
   if (!shipmentData) {
     return <Typography>Loading details...</Typography>;

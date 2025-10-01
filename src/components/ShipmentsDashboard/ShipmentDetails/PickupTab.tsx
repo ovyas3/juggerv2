@@ -361,6 +361,7 @@ const PickupTab = ({
     }));
   };
 
+  const isCompletedOrCancelled = shipmentData.latest_status === "CPTD" || shipmentData.latest_status === "CNCL";
 
 
   const handleInvoiceChange = (
@@ -612,6 +613,8 @@ const PickupTab = ({
     }
   };
 
+
+  
   // --- File & Container Handlers ---
   const handleUploadClick = (refId: string) =>
     fileInputRefs.current[refId]?.click();
@@ -844,8 +847,8 @@ const PickupTab = ({
 
                           Date & Time
                         </Typography>
-                        {canEditTimestamps &&
-                          (isEditingTimes ? (
+                        {canEditTimestamps && !isCompletedOrCancelled && (
+                          isEditingTimes ? (
                             <>
                               <IconButton
                                 size="small"
@@ -862,9 +865,7 @@ const PickupTab = ({
                               <IconButton
                                 size="small"
                                 title="Cancel"
-                                onClick={() =>
-                                  handleEditTimestampsToggle(pickup._id)
-                                }
+                                onClick={() => handleEditTimestampsToggle(pickup._id)}
                                 disabled={isSavingTimestamps[pickup._id]}
                               >
                                 <CancelIcon fontSize="small" />
@@ -874,13 +875,13 @@ const PickupTab = ({
                             <IconButton
                               size="small"
                               title="Edit Timestamps"
-                              onClick={() =>
-                                handleEditTimestampsToggle(pickup._id)
-                              }
+                              onClick={() => handleEditTimestampsToggle(pickup._id)}
                             >
                               <EditIcon fontSize="small" />
                             </IconButton>
-                          ))}
+                          )
+                        )}
+
                       </Box>
                       <Box sx={{ p: 2 }}>
                         {isEditingTimes ? (
@@ -1042,27 +1043,16 @@ const PickupTab = ({
                       ?.map((m: any) => m.name)
                       .join(", ") || "N/A"}
                   </Typography>
-                  {canEditInvoices &&
-                    (isEditing ? (
-                      <Box>
-                        
-                        <IconButton
-                          size="small"
-                          title="Cancel"
-                          onClick={() => handleEditGoodsToggle(pickup._id)}
-                        >
-                          <CancelIcon fontSize="small" />
-                        </IconButton>
-                      </Box>
-                    ) : (
-                      <IconButton
-                        size="small"
-                        title="Edit Goods & Invoices"
-                        onClick={() => handleEditGoodsToggle(pickup._id)}
-                      >
-                        <EditIcon fontSize="small" />
-                      </IconButton>
-                    ))}
+                  {canEditInvoices && !isCompletedOrCancelled && (
+                    <IconButton
+                      size="small"
+                      title={isEditing ? "Cancel" : "Edit Goods & Invoices"}
+                      onClick={() => handleEditGoodsToggle(pickup._id)}
+                    >
+                      {isEditing ? <CancelIcon fontSize="small" /> : <EditIcon fontSize="small" />}
+                    </IconButton>
+                  )}
+
                 </Box>
                 <InvoiceTable
                   groupedInvoices={goodsInfo}
