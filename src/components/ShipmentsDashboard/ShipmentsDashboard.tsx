@@ -1381,6 +1381,23 @@ useEffect(() => {
   setShowTracking(environment === 'development' || process.env.NEXT_PUBLIC_COUNTRY === 'IN');
 }, []);
 
+useEffect(() => {
+  setShipmentsFilter((prev: any) => ({
+    ...prev,
+    type_filter: shipmentType === 'all' ? undefined : shipmentType
+  }));
+}, [shipmentType]);
+
+useEffect(() => {
+  if (inputQuery === '') {
+    setShipmentsFilter((prev: any) => {
+      const newFilter = { ...prev };
+      delete newFilter[searchValue];
+      return newFilter;
+    });
+    fetchShipments();
+  }
+}, [inputQuery]);
 
 const closeActionMenu = () => {
   console.log("closeActionMenu executed, closing dropdown");
@@ -2739,14 +2756,14 @@ const handleOpenEditLocation = (shipment: any, type: 'pickup' | 'delivery') => {
   if (type === 'pickup' && shipment.from && shipment.from.length > 0) {
     const location = shipment.from[0].location;
     combinedLocation = `${location.name} - ${location.area}${location.city ? ` - ${location.city}` : ''}`;
-    pickupId = shipment.from[0].id;
+    pickupId = shipment.from[0]._id;
     pickupCity = location.city || '';
   }
   
   if (type === 'delivery' && shipment.to && shipment.to.length > 0) {
     const location = shipment.to[0].location;
     combinedLocation = `${location.name} - ${location.area}${location.city ? ` - ${location.city}` : ''}`;
-    deliveryId = shipment.to[0].id;
+    deliveryId = shipment.to[0]._id;
   }
   
   if (shipment.triptracker?.lastlocation) {
@@ -2812,6 +2829,15 @@ const changeSearchType = (typeName: string, typeValue: string) => {
 };
 
 const applyFilter = () => {
+  if (inputQuery.trim() === '') {
+    setShipmentsFilter((prev: any) => ({
+      ...prev,
+      type_filter: shipmentType === 'all' ? undefined : shipmentType
+    }));
+    fetchShipments();
+    return;
+  }
+
   if (inputQuery.length <= 3) {
     showMessage('Enter at least 4 characters to Search', 'error');
     return;
