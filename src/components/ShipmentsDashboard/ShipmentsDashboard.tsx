@@ -1612,6 +1612,7 @@ const closeActionMenu = () => {
 
   const clearFilters = () => {
     setFromDate("");
+    setSearchType("");
     setToDate("");
     setInvoiceNo("");
     setLrNumber("");
@@ -1631,6 +1632,16 @@ const closeActionMenu = () => {
     setSelectedSegmentation([]);
     setOdcFilter(false);
     setSelectedSubFilters([]);
+    setInputQuery("");           // NEW: clear the text box
+    setSearchValue("");          // NEW: drop the active search key
+  
+    // NEW: ensure no stale search fields remain in request payload
+    setShipmentsFilter((prev: any) => {
+      const next = { ...prev };
+      SearchTypes.forEach(t => delete (next as any)[t.value]);
+      return next;
+    });
+  
 
     fetchShipments();
   };

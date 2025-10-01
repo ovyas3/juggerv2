@@ -419,6 +419,7 @@ const  renderConsentAndSubscriptionIcons = (shipment: any, openSubscribeModal: (
                 <td className={`${styles.matCell} ${styles.matColumnSelect}`}>
                   <input
                     type="checkbox"
+                    className={ styles.checkboxChecked }
                     checked={selectedShipmentsArray.includes(shipment._id)}
                     onChange={(e) => {
                       e.stopPropagation();

@@ -537,6 +537,7 @@
 .buttonContainer {
   display: flex;
   align-items: center;
+padding-right:40px !important;
   gap: 10px; /* Adds consistent spacing between all buttons */
 }
 
@@ -3673,17 +3674,17 @@ select.didFloatingSelect::-ms-expand {
   background: rgba(248, 250, 252, 0.8);
   border-radius: 8px;
   padding: 12px;
-  border: 1px solid rgba(139, 92, 246, 0.1);
+  border: 1px solid rgba(53, 30, 107, 0.1);
 }
 
 .actionCategoryHeader {
   font-size: 11px;
   font-weight: 600;
-  color: #8b5cf6;
+  color: #20104d;
   letter-spacing: 0.5px;
   margin-bottom: 8px;
   padding-bottom: 4px;
-  border-bottom: 1px solid rgba(139, 92, 246, 0.1);
+  border-bottom: 1px solid rgba(28, 13, 61, 0.1);
 }
 
 .actionCategoryItems {
@@ -3746,7 +3747,7 @@ select.didFloatingSelect::-ms-expand {
 .actionSearchInput {
   width: 100%;
   padding: 8px 12px 8px 36px;
-  border: 1px solid rgba(139, 92, 246, 0.2);
+  border: 1px solid rgba(23, 12, 49, 0.2);
   border-radius: 6px;
   font-size: 12px;
   background: rgba(248, 250, 252, 0.8);
@@ -3798,13 +3799,13 @@ select.didFloatingSelect::-ms-expand {
 .actionsMenuButton:hover,
 .actionsMenuButton:focus {
   background: #fafaff;
-  border-color: #7c3aed; /* purple border on hover/focus */
+  border-color: #20104d; /* purple border on hover/focus */
   box-shadow: 0 0 0 2px #e6e6fa;
 }
 
 .actionsMenuButton:active {
   background: #f5f3ff;
-  border-color: #7c3aed;
+  border-color: #20104d;
   box-shadow: 0 0 4px #c3bff4;
 }
 .actionIcon {
@@ -3814,11 +3815,13 @@ select.didFloatingSelect::-ms-expand {
   margin: 0 auto; /* horizontal centering if needed */
   color: #fff;
 }
+.actionsMenuButton:active .actionIcon:hover{
+  color: #271260;
+}
 
 .actionIcon:hover {
   /* background: #e3e4fe; */
-  color: #271260
-;
+  color: #271260;
 }
 
 .actionsMenuButton:hover .actionIcon,
@@ -3837,6 +3840,7 @@ select.didFloatingSelect::-ms-expand {
 /* Alternative: target when button has aria-expanded=true */
 .actionsMenuButton[aria-expanded="true"] .actionIcon {
   color: #fff;
+  /* color: #271260; */
 }
 
 @keyframes scaleIn {
@@ -4301,12 +4305,12 @@ select.didFloatingSelect::-ms-expand {
 }
 
 .checkboxLabel input[type="checkbox"]:hover {
-  border-color: #271260
+  border-color: #20104d
 ;
 }
 
 .checkboxLabel input[type="checkbox"]:checked {
-  background-color: #271260
+  background-color:#20104d
 ;
   border-color: 
 #20104d;
@@ -4325,7 +4329,7 @@ select.didFloatingSelect::-ms-expand {
 
 /* Focus state for accessibility */
 .checkboxLabel input[type="checkbox"]:focus {
-  outline: 2px solid #271260
+  outline: 2px solid #20104d
 ;
   outline-offset: 2px;
 }
@@ -4365,7 +4369,7 @@ select.didFloatingSelect::-ms-expand {
 .shipmentSin {
   font-family: monospace;
   font-weight: 600;
-  color: #5e35b1;
+  color: #20104d;
 }
 
 .actionMenuSearch {
@@ -4409,11 +4413,20 @@ select.didFloatingSelect::-ms-expand {
 /* .actionCategory:not(:last-child) {
   margin-bottom: 12px;
 } */
+ /* ShipmentsDashboard.module.css */
+
+/* This targets the input when it has the class 'checkboxChecked' */
+.checkboxChecked {
+  /* Note: browser support for custom styling native checkboxes is poor/inconsistent. */
+  /* This is mostly for basic changes like background or border, if the browser allows. */
+  accent-color: #20104d; /* Blue color for modern browsers */
+  border-color: #20104d;
+}
 
 .actionCategoryHeader {
   font-weight: 600;
   font-size: 12px;
-  color: #8b5cf6;
+  color: #20104d;
   padding: 4px 0;
 }
 
