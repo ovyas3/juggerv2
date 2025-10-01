@@ -362,7 +362,7 @@ const ShipmentsDashboard: React.FC = () => {
   const [shipmentType, setShipmentType] = useState<
     "all" | "outbound" | "inbound" | "others"
   >("all");
-  const [isLoading, setIsLoading] = useState(false);
+
 
   const [showButtons, setShowButtons] = useState(false);
   const [isAnalyticsView, setIsAnalyticsView] = useState(false);
@@ -2617,7 +2617,8 @@ const renderLastLocationCell = (shipment: any) => {
     }
 
     try {
-      setIsLoading(true);
+      setIsLoading(false);
+      setShowLoader(true); 
       const response = await httpsPost(
         "jde/vehicleArrival",
         selectedShipmentsArray
@@ -3012,7 +3013,7 @@ const applyFilter = () => {
     setShowMissedShipmentModal(true);
   }
 };
-
+const [isLoading, setIsLoading] = useState(false);
   return (
     <div className={styles.main}>
       <div className={styles.tabsContainer}>

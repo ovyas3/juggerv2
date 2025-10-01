@@ -31,6 +31,7 @@ import doc from "../../../assets/Doc-icon.svg";
 import { httpsGet } from "@/utils/Communication";
 import { useSearchParams } from "next/navigation";
 import { StopsPreview } from "./StopsPreview";
+import View from "../ShipmentDetails/ShipmentDetails";
 
 import header from "../../UI/ModalHeader/ModalHeader";
 import { Col } from "antd";
@@ -962,11 +963,23 @@ const [menu, setMenu] = useState<{
   placement: "above" | "below";
 }>({ open: false, x: 0, y: 0, shipmentId: undefined, placement: "below" });
 
-type ModalType = "cancel" | "mail" | "share" | "upload" | "advance" | null;
+type ModalType = "view" |"cancel" | "mail" | "share" | "upload" | "advance" | null;
 
+// type ModalState =
+//   | { type: "cancel" | "mail" | "share"; shipment: { _id: string; sin: string } }
+//   | { type: "upload" | "advance";        shipmentId: string }
+//   | { type: null };
+// type ModalState =
+//   | { type: "view" | "cancel" | "mail" | "share"; shipment: { _id: string; sin: string } }
+//   | { type: "upload" | "advance"; shipmentId: string }
+//   | { type: null };
+// Mapview.tsx (Line 1361)
+// type ModalState =
+//   | { type: "view" | "cancel" | "mail" | "share" | "upload" | "advance"; shipment: { _id: string; sin: string } }
+//   | { type: null };
 type ModalState =
-  | { type: "cancel" | "mail" | "share"; shipment: { _id: string; sin: string } }
-  | { type: "upload" | "advance";        shipmentId: string }
+  | { type: "cancel" | "mail" | "share" | "upload" | "advance"; shipment: { _id: string; sin: string } }
+  | { type: "view"; shipment: Shipment } // <-- MODIFIED to hold the full Shipment object
   | { type: null };
 
 const [modal, setModal] = useState<ModalState>({ type: null });
@@ -980,8 +993,8 @@ function openMailModal(s: { _id: string; SIN: string }) {
 function openShareModal(s: { _id: string; SIN: string }) {
   setModal({ type: "share",   shipment: { _id: s._id, sin: s.SIN } });
 }
-function openAttachModal(id: string)  { setModal({ type: "upload",  shipmentId: id }); }
-function openAdvanceModal(id: string) { setModal({ type: "advance", shipmentId: id }); }
+// function openAttachModal(id: string)  { setModal({ type: "upload",  shipmentId: id }); }
+// function openAdvanceModal(id: string) { setModal({ type: "advance", shipmentId: id }); }
 
 function driverPos(s: Shipment): { lat: number; lng: number } | null {
   const coords = s?.assigned_driver?.geo_point?.coordinates; 
@@ -1105,9 +1118,30 @@ useEffect(() => {
 
   function openModal(type: Exclude<ModalType, null>, shipmentId: string) {
     const id = String(shipmentId);
-  
-    if (type === "upload" || type === "advance") {
-      setModal({ type, shipmentId: id }); 
+    // if (type === "view") {
+    //   // Pass the full shipment object for the View modal
+    //   setModal({ type: "view", shipment });
+    // }
+ 
+    
+    // --- FIX: Find the full shipment object for the "view" action ---
+    const shipment = shipmentsData.find(s => s.SIN === id || s._id === id);
+
+    if (type === "view") {
+      if (!shipment) {
+        console.error(`Shipment with SIN/ID ${id} not found for View Modal.`);
+        return;
+      }
+      // Pass the full shipment object for the View modal
+      setModal({ type: "view", shipment });
+    }
+   else if (type === "upload" || type === "advance") {
+    if (!shipment) {
+      console.error(`Shipment with SIN/ID ${id} not found for Upload/Advance Modal.`);
+      return;
+    }
+    setModal({ type, shipment: { _id: shipment._id, sin: shipment.SIN } });
+      // setModal({ type, shipmentId: id }); 
     } else {
       setModal({ type, shipment: { _id: id, sin: id } }); 
     }
@@ -1359,10 +1393,10 @@ const [mounted, setMounted] = useState(false);
 useEffect(() => setMounted(true), []);
 const actionItems = useMemo(
   () => [
-    { key: "view", icon: eye, label: "View", onClick: (id: string) => console.log("view", id) },
+    { key: "view", icon: eye, label: "View", onClick: (id: string) =>  openModal("view", id) },
     { key: "cancel", icon: cancel, label: "Cancel", onClick: (id: string) => openModal("cancel", id)},
-    { key: "share", icon: share, label: "Share", onClick: (id: string) => openModal("mail", id) },
-    { key: "mail", icon: mail, label: "Mail", onClick: (id: string) =>  openModal("share", id)},
+    { key: "share", icon: share, label: "Share", onClick: (id: string) => openModal("share", id) },
+    { key: "mail", icon: mail, label: "Mail", onClick: (id: string) =>  openModal("mail", id)},
     { key: "upload", icon: upload, label: "Upload Approval Documents", onClick: (id: string) =>  openModal("upload", id) },
     { key: "advance", icon: doc, label: "Create Advance Payment", onClick: (id: string) => openModal("advance", id) },
  
@@ -1753,6 +1787,26 @@ function fitToAllVehicles(list: Shipment[] = visibleShipments) {
 // }, [geoFences, mapRef]);
   return (
     <div className={styles.wrapper}>
+
+{/* {modal.type === "view" && modal.shipment && (
+  <View
+    open={true}
+    shipmentId={modal.shipment._id}
+    onClose={closeModal}
+  />
+)} */}
+{modal.type === "view" && modal.shipment && (
+  <View
+    // The View component does not take an 'open' prop, it's rendered conditionally
+    // open={true}
+    isOpen={true} 
+    shipmentId={modal.shipment._id}  // Cast as any because the `Shipment` interface is partial
+    onClose={closeModal}
+    // Add other required props if needed: onEdit, onRefresh, showActions
+    // showActions={true}
+  />
+)}
+
       
       {/* Cancel */}
 {modal.type === "cancel" && (
@@ -1767,11 +1821,21 @@ function fitToAllVehicles(list: Shipment[] = visibleShipments) {
 
 
 
+{/* {modal.type === "share" && (
+  <ShareModal
+    open
+    onClose={closeModal}
+    trackingUrl={`${(typeof window !== "undefined" ? window.location.origin : "")}/tracking/${modal.shipment.sin}`}
+  />
+)} */}
+
 {modal.type === "share" && (
   <ShareModal
     open
     onClose={closeModal}
     trackingUrl={`${(typeof window !== "undefined" ? window.location.origin : "")}/tracking/${modal.shipment.sin}`}
+    // FIX: Add the sin prop here
+    sin={modal.shipment.sin} // <-- ADD THIS LINE
   />
 )}
 
@@ -1786,13 +1850,36 @@ function fitToAllVehicles(list: Shipment[] = visibleShipments) {
 )}
 
 
-{modal.type === "upload" && (
+{/* {modal.type === "upload" && (
   <AttachFilesModal
     show
     onClose={closeModal}
     onAttach={handleAttachDone}         // () => void
     shipmentId={modal.shipmentId}       // string
     isLoading={false}
+  />
+)} */}
+{/* {modal.type === "upload" && (
+  <AttachFilesModal
+    show
+    onClose={closeModal}
+    onAttach={handleAttachDone}
+    shipmentId={modal.shipmentId}
+    isLoading={false}
+    // FIX: Pass the specific title here
+    title="Upload Approval Documents" 
+  />
+)} */}
+{modal.type === "upload" && (
+  <AttachFilesModal
+    // ... other props
+    show
+    onClose={closeModal}
+    onAttach={handleAttachDone}
+    shipmentId={modal.shipment._id}
+    // FIX: Include SIN in the title
+    isLoading={false}
+    sin={modal.shipment.sin}
   />
 )}
 
@@ -1802,9 +1889,17 @@ function fitToAllVehicles(list: Shipment[] = visibleShipments) {
     show
     onClose={closeModal}
     onSubmit={handleCreateAdvance}
-    shipmentId={modal.shipmentId}       // string
+    shipmentId={modal.shipment._id} 
+    // shipmentId={modal.shipmentId}       // string
     // data={undefined}
-    data={{}} 
+    data={{
+      shipment: { 
+          _id: modal.shipment._id,
+          sin: modal.shipment.sin,
+          // Include other fields the modal might need, like estimated amounts, etc., 
+          // if they are available on the modal.shipment object from the Mapview state.
+      } 
+  }}
   />
 )}
 

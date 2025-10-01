@@ -41,8 +41,6 @@ export default function MapsProvider({ children }: { children: React.ReactNode }
             }}>
                 <Loader2 style={{ color: "#20104d", fontSize: "2rem", width: "40px", height: "40px" }} />
                 <p>Loading...</p>
-                <Loader2 style={{ color: "#20104d", fontSize: "2rem", width: "40px", height: "40px" }} />
-                <p>Loading...</p>
             </div>
         );
     }

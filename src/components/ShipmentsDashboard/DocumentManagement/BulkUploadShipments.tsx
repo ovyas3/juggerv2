@@ -10,6 +10,7 @@ import { httpsPost } from "@/utils/Communication";
 import { useSnackbar } from "@/hooks/snackBar";
 import CloseIcon from "@mui/icons-material/Close";
 import styles from "./BulkUploadShipments.module.css";
+import ModalHeader from "@/components/UI/ModalHeader/ModalHeader";
 
 interface BulkUploadShipmentsProps {
   open: boolean;
@@ -116,7 +117,7 @@ const BulkUploadShipments: React.FC<BulkUploadShipmentsProps> = ({
         return "Bulk Upload";
     }
   };
-
+  const modalTitle = sin ? `${getTitle()} - #${sin}` : getTitle();
   return (
     <Dialog
       open={open}
@@ -138,8 +139,8 @@ const BulkUploadShipments: React.FC<BulkUploadShipmentsProps> = ({
           </div>
         </div>
       )}
-
-      <Box className={styles.header}>
+ <ModalHeader title={modalTitle} onClose={handleClose} /> {/* <--- CHANGED/ADDED */}
+      {/* <Box className={styles.header}>
         <div className={styles.label}>
           {getTitle()} - #{sin}
           <IconButton
@@ -150,7 +151,7 @@ const BulkUploadShipments: React.FC<BulkUploadShipmentsProps> = ({
             <CloseIcon />
           </IconButton>
         </div>
-      </Box>
+      </Box> */}
 
       <DialogContent className={styles.section}>
         <div className={styles.uploadFile}>
