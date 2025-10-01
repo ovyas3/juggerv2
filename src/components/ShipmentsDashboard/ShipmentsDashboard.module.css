@@ -537,7 +537,8 @@
 .buttonContainer {
   display: flex;
   align-items: center;
-padding-right:40px !important;
+/* padding-right:100px ; */
+
   gap: 10px; /* Adds consistent spacing between all buttons */
 }
 
@@ -593,6 +594,12 @@ padding-right:40px !important;
   display: flex;
   flex-direction: row;
 }
+.advancedActive {
+  /* subtle outer ring to signal filters are active */
+  box-shadow: 0 0 0 3px rgba(124, 7, 208, 0.35); /* indigo-ish */
+  border-radius: 5px; /* match your button’s radius */
+}
+
 
 .customSelectButton {
   -webkit-appearance: none;
@@ -3830,7 +3837,9 @@ select.didFloatingSelect::-ms-expand {
   color: 
 #20104d;
 }
-
+.actionsMenuButton[aria-expanded="true"]:hover .actionIcon {
+  color: #20104d;
+}
 /* If your dropdown library adds data-state attribute when open */
 .actionsMenuButton[data-state="open"] .actionIcon {
   color: 

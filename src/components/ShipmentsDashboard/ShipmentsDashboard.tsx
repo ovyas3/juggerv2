@@ -362,7 +362,7 @@ const ShipmentsDashboard: React.FC = () => {
   const [shipmentType, setShipmentType] = useState<
     "all" | "outbound" | "inbound" | "others"
   >("all");
-
+  const [advancedFilterApplied, setAdvancedFilterApplied] = useState(false);
 
   const [showButtons, setShowButtons] = useState(false);
   const [isAnalyticsView, setIsAnalyticsView] = useState(false);
@@ -1621,6 +1621,7 @@ const closeActionMenu = () => {
     setSelectedDeliveries([]);
     setSelectedCarriers([]);
     setShipmentStatusName([]);
+    setAdvancedFilterApplied(false); 
     setMobile("");
     setVehicleNo("");
     setShipmentSIN("");
@@ -3192,7 +3193,7 @@ const [isLoading, setIsLoading] = useState(false);
 
         <div className={styles.buttonContainer}>
           <div
-            className={`${styles.button} ${styles.advancedSearchSubmitButton}`}
+            className={`${styles.button} ${styles.advancedSearch} ${advancedFilterApplied ? styles.advancedActive : ""}`}
             role="button"
             tabIndex={0}
             onClick={() => setShowAdvancedSearch((prev) => !prev)}
@@ -3262,10 +3263,15 @@ const [isLoading, setIsLoading] = useState(false);
           deliverLocations={deliveryLocations}
           shipStatus={shipmentStatus}
           onApply={(filters) => {
+            const hasAny = Object.values(filters || {}).some((v: any) =>
+              Array.isArray(v) ? v.length > 0 : (v ?? "") !== "" && String(v).trim() !== ""
+            );
+            setAdvancedFilterApplied(hasAny);
             console.log("Applied filters:", filters);
           }}
           onClear={() => {
             console.log("Filters cleared");
+            setAdvancedFilterApplied(false);
           }}
           onClose={() => {
             console.log("Close filter");
