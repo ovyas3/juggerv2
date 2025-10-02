@@ -1,7 +1,9 @@
 'use client';
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useMediaQuery, useTheme } from '@mui/material';
+import { useRouter } from 'next/navigation';
+import { httpsGet, httpsPost } from '@/utils/Communication';
 import DashboardHeader from './components/DashboardHeader/DashboardHeader';
 import { MetricCard } from '../UI/MetricCard/MetricCard';
 import { MetricCardSkeleton } from '../UI/MetricCard/MetricCardSkeleton';
@@ -12,6 +14,8 @@ import DetailPanel from './components/DetailPanel/DetailPanel';
 import KeplerMapView from './components/KeplerMapView/KeplerMapView';
 import './InPlantDashboard.css';
 import {AlertTriangle, CheckCircle2, ChevronDown, ChevronUp, Clock, Truck, DoorOpen, Scale, Package, LogOut  } from 'lucide-react';
+import { useSnackbar } from '@/hooks/snackBar';
+
 export interface Vehicle {
   id: string;
   vehicleNumber: string;
@@ -70,7 +74,9 @@ export interface StageInfo {
 
 const InPlantDashboard: React.FC = () => {
   const theme = useTheme();
+  const router = useRouter();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const { showMessage } = useSnackbar();
 
   // State management
   const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
@@ -83,9 +89,64 @@ const InPlantDashboard: React.FC = () => {
     stage: 'all',
     timeRange: 'all'
   });
+  const [isLoading, setIsLoading] = useState(true);
+  const [metrics, setMetrics] = useState(null);
+  const [stages, setStages] = useState<StageInfo[]>([]);
+  const [isStagesLoading, setIsStagesLoading] = useState(true);
 
-  // Mock data - this will be replaced with API calls
-  const [isLoading, setIsLoading] = useState(false); 
+  useEffect(() => {
+    const fetchMetrics = async () => {
+      try {
+        setIsLoading(true);
+        const response = await httpsPost('InplantDashbaord/KPIcards', {}, {}, 1,);
+        if (response?.statusCode === 200) {
+          setMetrics(response.data);
+        } else {
+          console.error('Failed to fetch metrics:', response?.message || 'Unknown error');
+          showMessage('Failed to fetch metrics', 'error');
+        }
+      } catch (error) {
+        console.error('Error fetching metrics:', error);
+        showMessage('Error fetching metrics', 'error');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchMetrics();
+  }, [router]);
+
+  useEffect(() => {
+    const fetchStages = async () => {
+      try {
+        setIsStagesLoading(true);
+        const response = await httpsPost('InplantDashbaord/vehicleflow', {}, {}, 1);
+        if (response?.statusCode === 200) {
+          const formattedStages = response.data.map((stage: any) => ({
+            stageId: stage.stageId || '',
+            stageName: stage.stageName || '',
+            vehicleCount: stage.vehicleCount || 0,
+            averageTime: stage.averageTime || 0,
+            healthStatus: stage.healthStatus?.toLowerCase() || 'normal',
+            slaThreshold: stage.slaThreshold || 0,
+            order: stage.order || 0
+          }));
+          setStages(formattedStages);
+        } else {
+          console.error('Failed to fetch stages:', response?.message || 'Unknown error');
+          showMessage('Failed to fetch stages data', 'error');
+        }
+      } catch (error) {
+        console.error('Error fetching stages:', error);
+        showMessage('Error fetching stages data', 'error');
+      } finally {
+        setIsStagesLoading(false);
+      }
+    };
+
+    fetchStages();
+  }, []);
+
   const formatTime = (minutes: number): string => {
     const hours = Math.floor(minutes / 60);
     const mins = minutes % 60;
@@ -130,7 +191,6 @@ const InPlantDashboard: React.FC = () => {
       borderColor: '#E5E7EB'
     }
   ];
-
 
   const mockStages = [
     {
@@ -297,6 +357,52 @@ const InPlantDashboard: React.FC = () => {
     }
   ];
 
+  const displayMetrics = metrics || mockMetrics;
+
+    const getStageIcon = (stageId: string) => {
+      switch(stageId) {
+        case 'EXT_PARKING':
+          return <Truck size={20} />;
+        case 'ENTRY_GATE':
+          return <DoorOpen size={20} />;
+        case 'WEIGHING':
+          return <Scale size={20} />;
+        case 'LOADING':
+          return <Package size={20} />;
+        case 'EXIT_GATE':
+          return <LogOut size={20} />;
+        default:
+          return <Truck size={20} />;
+      }
+    };
+
+    const getStageColor = (stageId: string) => {
+    const colors = {
+      'EXT_PARKING': '#3B82F6',
+      'ENTRY_GATE': '#8B5CF6',
+      'WEIGHING': '#F59E0B',
+      'LOADING': '#10B981',
+      'EXIT_GATE': '#EC4899',
+    };
+    return colors[stageId as keyof typeof colors] || '#6B7280';
+  };
+
+
+  const displayStages = stages.length > 0 ? stages.map(stage => ({
+    id: stage.stageId,
+    title: stage.stageName,
+    value: stage.vehicleCount.toString(),
+    icon: getStageIcon(stage.stageId),
+    iconColor: getStageColor(stage.stageId),
+    bgColor: 'white',
+    borderColor: '#E5E7EB',
+    stageId: stage.stageId,
+    averageTime: stage.averageTime,
+    healthStatus: stage.healthStatus,
+    slaThreshold: stage.slaThreshold,
+    order: stage.order
+  })) : [];
+
   // Event handlers
   const handleVehicleSelect = useCallback((vehicle: Vehicle) => {
     setSelectedVehicle(vehicle);
@@ -348,7 +454,7 @@ const InPlantDashboard: React.FC = () => {
                   <MetricCardSkeleton key={`skeleton-${index}`} />
                 ))
               ) : (
-                mockMetrics.map((metric) => (
+                displayMetrics.map((metric) => (
                   <MetricCard
                     key={metric.id}
                     title={metric.title}
