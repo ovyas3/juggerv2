@@ -23,9 +23,10 @@ interface VehicleRowProps {
   vehicle: Vehicle;
   isSelected: boolean;
   onSelect: () => void;
+  index: number;
 }
 
-const VehicleRow: React.FC<VehicleRowProps> = ({ vehicle, isSelected, onSelect }) => {
+const VehicleRow: React.FC<VehicleRowProps> = ({ vehicle, isSelected, onSelect, index }) => {
   const getStatusIcon = () => {
     switch (vehicle.overallStatus) {
       case 'on_track':
@@ -86,19 +87,26 @@ const VehicleRow: React.FC<VehicleRowProps> = ({ vehicle, isSelected, onSelect }
         }
       }}
     >
+      {/* S.No */}
+      <td className="sno-cell">{index}</td>
+
       {/* Status Indicator */}
       <td className="status-cell">
         {getStatusIcon()}
+      </td>
+
+      <td className="shipment-cell">
+        <div className="shipment-info">
+          <div className="shipment-meta">
+            <span>{vehicle.shipmentId}</span>
+          </div>
+        </div>
       </td>
 
       {/* Vehicle Number */}
       <td className="vehicle-cell">
         <div className="vehicle-info">
           <div className="vehicle-number">{vehicle.vehicleNumber}</div>
-          <div className="vehicle-meta">
-            <Truck size={12} />
-            <span>{vehicle.shipmentId}</span>
-          </div>
         </div>
       </td>
 
@@ -114,7 +122,6 @@ const VehicleRow: React.FC<VehicleRowProps> = ({ vehicle, isSelected, onSelect }
       <td className="time-cell">
         <div className="time-info">
           <div className="entry-time">{formatTime(vehicle.entryTime)}</div>
-          <div className="time-label">Entry</div>
         </div>
       </td>
 
@@ -283,24 +290,27 @@ const VehicleTable: React.FC<VehicleTableProps> = ({
         <table className="vehicle-table">
           <thead>
             <tr>
+              <th className="sno-header">S.No</th>
               <th className="status-header">Status</th>
+              <th className="shipment-header">SIN</th>
               <th className="vehicle-header">Vehicle</th>
               <th className="stage-header">Current Stage</th>
-              <th className="time-header">Entry Time</th>
+              <th className="time-header">Gate In</th>
               <th className="duration-header">Duration</th>
               <th className="progress-header">Progress</th>
-              <th className="company-header">Companies</th>
+              <th className="company-header">Customer</th>
               <th className="actions-header">Actions</th>
               <th className="expand-header"></th>
             </tr>
           </thead>
           <tbody>
-            {filteredVehicles.map((vehicle) => (
+            {filteredVehicles.map((vehicle, index) => (
               <VehicleRow
                 key={vehicle.id}
                 vehicle={vehicle}
                 isSelected={selectedVehicle?.id === vehicle.id}
                 onSelect={() => onVehicleSelect(vehicle)}
+                index={index + 1}
               />
             ))}
           </tbody>

@@ -181,6 +181,14 @@ const navigationItems: NavItem[] = [
         isImageIcon: true
     },
     {
+        id: 'inplant-dashboard',
+        label: 'In-Plant Dashboard',
+        icon: '',
+        activeIcon: InPlantOverviewActive,
+        inactiveIcon: InPlantOverviewInactive,
+        isImageIcon: true
+    },
+    {
         id: 'anomalydashboard',
         label: 'Anomaly Dashboard',
         icon: '',

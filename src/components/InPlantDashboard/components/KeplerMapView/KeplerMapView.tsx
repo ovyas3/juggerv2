@@ -335,26 +335,43 @@ const KeplerMapView: React.FC<KeplerMapViewProps> = ({
       )}
 
       {/* Map */}
-      <MapContainer
-        center={plantCenter}
-        zoom={mapZoom}
-        style={{ height: '100%', width: '100%' }}
-        ref={mapRef}
-        className={styles.leafletMap}
-        zoomControl={false}
-        attributionControl={false}
-        key={isFullscreen ? "fullscreen" : "normal"}
-      >
-        {selectedMapStyle !== "none" && (
-          <TileLayer
-            url={getCurrentMapUrl()}
-            attribution={
-              selectedMapStyle === "satellite" || isSatelliteView
-                ? '© Esri'
-                : '© OpenStreetMap contributors'
+      <div style={{ height: '100%', width: '100%', position: 'relative' }}>
+        <MapContainer
+          center={plantCenter}
+          zoom={mapZoom}
+          style={{ 
+            height: '100%', 
+            width: '100%',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0
+          }}
+          className={styles.leafletMap}
+          zoomControl={false}
+          attributionControl={false}
+          whenReady={() => {
+            const map = mapRef.current;
+            if (map) {
+              setTimeout(() => {
+                map.invalidateSize(true);
+              }, 0);
             }
-          />
-        )}
+          }}
+          key={`${isFullscreen}-${selectedMapStyle}`}
+        >
+      <TileLayer
+        url={getCurrentMapUrl()}
+        noWrap={true}
+        updateWhenZooming={false}
+        updateWhenIdle={true}
+        attribution={
+          isSatelliteView
+            ? 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+            : '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }
+      />
 
         {/* Stage Locations */}
         {showStageLabels && plantLocations
@@ -436,6 +453,7 @@ const KeplerMapView: React.FC<KeplerMapViewProps> = ({
           return null;
         })}
       </MapContainer>
+      </div>
 
       {/* Map Stats */}
       <div className={styles.mapStats}>
