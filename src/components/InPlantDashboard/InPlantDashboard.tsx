@@ -5,6 +5,7 @@ import { useMediaQuery, useTheme } from '@mui/material';
 import DashboardHeader from './components/DashboardHeader/DashboardHeader';
 import MetricsBar from './components/MetricsBar/MetricsBar';
 import StageFlow from './components/StageFlow/StageFlow';
+import VehicleStagingLive from '../InPlantOverview/VehicleStagingLive/VehicleStagingLive';
 import VehicleTable from './components/VehicleTable/VehicleTable';
 import DetailPanel from './components/DetailPanel/DetailPanel';
 import KeplerMapView from './components/KeplerMapView/KeplerMapView';
@@ -261,8 +262,26 @@ const InPlantDashboard: React.FC = () => {
           />
         )}
 
+        <div style={{
+          width: '100%',
+          boxSizing: 'border-box',
+          border: '1px solid var(--border-light)',
+          borderRadius: '12px',
+          padding: 'var(--spacing-lg)',
+          boxShadow: '0 0 0 1px rgb(118 16 255 / 20%)',
+          backgroundColor: '#f9f9ff',
+          minHeight: '200px',
+          position: 'relative'
+        }}>
+          <VehicleStagingLive 
+            noLeftMargin={true} 
+            isInDashboard={true} 
+            useLoader2={true} 
+          />
+        </div>
+
         {/* Main Content Area */}
-        <div className="dashboard-main-content">
+        <div className="dashboard-main-content1">
           {/* Header Section */}
           <DashboardHeader
             searchQuery={searchQuery}
@@ -290,7 +309,7 @@ const InPlantDashboard: React.FC = () => {
           </div>
 
           {/* Content Area */}
-          <div className="content-area">
+          <div className={`content-area ${viewMode === 'map' ? 'map-view-container' : ''}`}>
             {viewMode === 'table' ? (
               <VehicleTable
                 vehicles={mockVehicles}

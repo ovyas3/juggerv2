@@ -1,9 +1,11 @@
 /* Dashboard Header Styles */
 .dashboard-header {
-  background: var(--bg-primary);
+  /* background: var(--bg-primary); */
   border-bottom: 1px solid var(--border-light);
   padding: var(--spacing-md) var(--spacing-lg);
   flex-shrink: 0;
+  box-shadow: 0 0 0 1px rgb(118 16 255 / 20%);
+  background-color: #f9f9ff;
 }
 
 .header-top {
@@ -51,6 +53,8 @@
   background: var(--bg-primary);
   cursor: pointer;
   transition: var(--transition-smooth);
+  width: 200px;
+  position: relative;
 }
 
 .date-selector:hover {
@@ -61,27 +65,6 @@
 .date-icon {
   color: var(--text-secondary);
   flex-shrink: 0;
-}
-
-.date-select {
-  border: none;
-  background: none;
-  font-size: var(--text-base);
-  color: var(--text-primary);
-  cursor: pointer;
-  outline: none;
-  min-width: 120px;
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-}
-
-.date-select:hover,
-.date-select:focus,
-.date-select:active {
-  border: none !important;
-  outline: none !important;
-  box-shadow: none !important;
 }
 
 /* Right Section */
@@ -115,8 +98,9 @@
 }
 
 .search-input:focus {
-  /* border-color: var(--primary-blue); */
-  box-shadow: 0 0 0 2px var(--primary-light);
+  border-color: #4F46E5;
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+  outline: none;
 }
 
 .search-input::placeholder {
@@ -128,7 +112,7 @@
   border: 1px solid var(--border-medium);
   border-radius: 8px;
   background: var(--bg-primary);
-  color: var(--text-secondary);
+  color: #301c6c;
   cursor: pointer;
   transition: var(--transition-smooth);
   display: flex;
@@ -139,9 +123,9 @@
 }
 
 .action-btn:hover {
-  border-color: var(--primary-blue);
-  color: var(--primary-blue);
-  box-shadow: var(--shadow-sm);
+  border-color: #301c6c;
+  color: #301c6c;
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
 }
 
 .action-btn:disabled {
@@ -150,7 +134,7 @@
 }
 
 .action-btn.refreshing {
-  color: var(--primary-blue);
+  color: #301c6c;
 }
 
 .spin {
@@ -178,25 +162,26 @@
   align-items: center;
   gap: var(--spacing-xs);
   padding: var(--spacing-xs) var(--spacing-md);
-  border: 1px solid var(--border-medium);
+  border: 1px solid #301c6c;
   border-radius: 20px;
-  background: var(--bg-primary);
+  background: #301c6c;
   font-size: var(--text-sm);
-  color: var(--text-secondary);
+  color: #fff;
   cursor: pointer;
   transition: var(--transition-smooth);
   white-space: nowrap;
 }
 
 .filter-chip:hover {
-  border-color: var(--primary-blue);
-  color: var(--primary-blue);
+  background: #35198a;
+  border-color: #35198a;
 }
 
 .filter-chip.active {
-  background: var(--primary-blue);
-  border-color: var(--primary-blue);
+  background: #322c8e;
+  border-color: #322c8e;
   color: white;
+  box-shadow: 0 0 0 2px #09009f59;
 }
 
 .filter-count {
@@ -217,23 +202,30 @@
   align-items: center;
   gap: var(--spacing-xs);
   padding: var(--spacing-sm) var(--spacing-md);
-  border: 1px solid var(--border-medium);
+  border: 1px solid #301c6c;
   border-radius: 8px;
-  background: var(--bg-primary);
+  background: #301c6c;
   font-size: var(--text-sm);
-  color: var(--text-secondary);
+  color: #fff;
   cursor: pointer;
   transition: var(--transition-smooth);
   white-space: nowrap;
 }
 
 .advanced-filters-toggle:hover {
-  border-color: var(--primary-blue);
-  color: var(--primary-blue);
+  border-color: #35198a;
+  background-color: #35198a;
 }
 
 .advanced-filters-toggle .rotated {
   transform: rotate(180deg);
+}
+
+.advanced-filters-toggle.active {
+  background: #3932ae;
+  border-color: #3932ae;
+  color: white;
+  box-shadow: 0 0 0 2px #09009f59;
 }
 
 /* Advanced Filters Panel */
@@ -319,14 +311,14 @@
 }
 
 .apply-filters-btn {
-  border: 1px solid var(--primary-blue);
-  background: var(--primary-blue);
+  border: 1px solid #301c6c;
+  background: #301c6c;
   color: white;
 }
 
 .apply-filters-btn:hover {
-  background: var(--primary-dark);
-  border-color: var(--primary-dark);
+  background: #35198a;
+  border-color: #35198a;
 }
 
 /* Refresh Indicator */
@@ -430,3 +422,116 @@
     justify-content: center;
   }
 }
+
+.select {
+  width: 100%;
+  min-height: 36px;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  font-size: 14px;
+  background-color: white;
+  transition: all 0.3s;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+}
+
+.select:hover {
+  border-color: #4F46E5;
+}
+
+.select:focus-within {
+  border-color: #4F46E5;
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+  outline: none;
+}
+
+.select[data-state="open"] {
+  border-color: #4F46E5;
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+}
+
+.selectContent {
+  background: white;
+  border-radius: 6px;
+  box-shadow: 0 3px 6px -4px rgba(0, 0, 0, 0.12), 
+              0 6px 16px 0 rgba(0, 0, 0, 0.08), 
+              0 9px 28px 8px rgba(0, 0, 0, 0.05);
+  padding: 4px;
+  z-index: 1000;
+  max-height: 250px;
+  overflow-y: auto;
+  width: 397px !important;
+  margin-top: 7px;
+}
+
+.selectContent1 {
+  background: white;
+  border-radius: 6px;
+  box-shadow: 0 3px 6px -4px rgba(0, 0, 0, 0.12), 
+              0 6px 16px 0 rgba(0, 0, 0, 0.08), 
+              0 9px 28px 8px rgba(0, 0, 0, 0.05);
+  padding: 4px;
+  z-index: 1000;
+  max-height: 250px;
+  overflow-y: auto;
+  width: 300px !important;
+  margin-top: 7px;
+}
+
+.selectUnitContent {
+  background: white;
+  border-radius: 6px;
+  box-shadow: 0 3px 6px -4px rgba(0, 0, 0, 0.12), 
+              0 6px 16px 0 rgba(0, 0, 0, 0.08), 
+              0 9px 28px 8px rgba(0, 0, 0, 0.05);
+  padding: 4px;
+  z-index: 1000;
+  max-height: 250px;
+  overflow-y: auto;
+  width: 150px !important;
+  margin-top: 7px;
+}
+
+.selectItem {
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #333;
+  transition: all 0.2s;
+}
+
+.selectItem:hover {
+  background-color: #f5f5f5;
+}
+
+.selectItem[data-highlighted] {
+  background-color: #4F46E5;
+  color: white;
+  outline: none;
+}
+
+.selectValue {
+  color: #333;
+  width: 100%;
+  text-align: left;
+  flex: 1;
+}
+
+.selectItem:global([data-state='checked']) svg { 
+  display: none !important; 
+}
+
+.selectContent :global([data-radix-select-item-indicator]) { 
+  display: none !important; 
+}
+
+.selectContent1 :global([data-radix-select-item-indicator]) { 
+  display: none !important; 
+}
+
+.selectItem :global(.radix-select-item-indicator) { display: none !important; }
+.selectItem :global([data-state='checked']) svg { display: none !important; }

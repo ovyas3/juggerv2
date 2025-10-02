@@ -153,9 +153,29 @@ const MetricsBar: React.FC<MetricsBarProps> = ({ metrics, loading = false }) => 
             <div className="live-dot"></div>
             <span>Live</span>
           </div>
-          <span className="last-update">
-            Updated {new Date().toLocaleTimeString()}
-          </span>
+          <div className="legend-container">
+            <div className="status-legend">
+              <div className="legend-item">
+                <span className="legend-dot normal"></span>
+                <span>Normal</span>
+              </div>
+              <div className="legend-item">
+                <span className="legend-dot success"></span>
+                <span>On Track</span>
+              </div>
+              <div className="legend-item">
+                <span className="legend-dot warning"></span>
+                <span>At Risk</span>
+              </div>
+              <div className="legend-item">
+                <span className="legend-dot critical"></span>
+                <span>Critical</span>
+              </div>
+            </div>
+            <div className="last-update">
+              Updated {new Date().toLocaleTimeString()}
+            </div>
+          </div>
         </div>
       )}
     </div>

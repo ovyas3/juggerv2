@@ -10,6 +10,15 @@ import {
   Settings,
   ChevronDown
 } from 'lucide-react';
+
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/UI/select";
+
 import './DashboardHeader.css';
 
 interface DashboardHeaderProps {
@@ -52,7 +61,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
     { key: 'all', label: 'All', count: 23 },
     { key: 'active', label: 'Active', count: 18 },
     { key: 'delayed', label: 'Delayed', count: 5 },
-    { key: 'completed', label: 'Completed', count: 142 }
+    { key: 'gate-out', label: 'Gate Out', count: 142 }
   ];
 
   const dateRangeOptions = [
@@ -67,27 +76,37 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
       <div className="header-top">
         {/* Left Section - Title */}
         <div className="header-left">
-          <h2 className="dashboard-title">InPlant Dashboard</h2>
-          <span className="plant-name">Mumbai Distribution Center</span>
+          <h1 className="dashboard-title">
+            InPlant Dashboard
+            <span className="plant-name">Mumbai Distribution Center</span>
+          </h1>
         </div>
 
         {/* Center Section - Date Range */}
         <div className="header-center">
-          <div className="date-selector">
-            <Calendar className="date-icon" size={16} />
-            <select
-              value={dateRange}
-              onChange={(e) => onDateRangeChange(e.target.value as any)}
-              className="date-select"
+          {/* <div className="date-selector">
+            <Calendar className="date-icon" size={16} /> */}
+            <Select 
+              value={dateRange} 
+              onValueChange={(value) => onDateRangeChange(value as any)}
             >
-              {dateRangeOptions.map(option => (
-                <option key={option.key} value={option.key}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-            <ChevronDown size={14} />
-          </div>
+              <SelectTrigger className="select">
+                <SelectValue className="selectValue" />
+              </SelectTrigger>
+              <SelectContent 
+                className="selectContent1"
+                position="popper"
+                side="bottom"
+                align="start"
+              >
+                {dateRangeOptions.map(option => (
+                  <SelectItem key={option.key} value={option.key} className='selectItem'>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          {/* </div> */}
         </div>
 
         {/* Right Section - Actions */}
@@ -97,7 +116,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
             <Search className="search-icon" size={16} />
             <input
               type="text"
-              placeholder="Search vehicle, driver..."
+              placeholder="Search shipments..."
               value={searchQuery}
               onChange={(e) => onSearch(e.target.value)}
               className="search-input"
@@ -107,10 +126,10 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
           {/* Action Buttons */}
           <button
             onClick={handleRefresh}
-            className={`action-btn ${isRefreshing ? 'refreshing' : ''}`}
             disabled={isRefreshing}
+            className={`action-btn ${isRefreshing ? 'refreshing' : ''}`}
           >
-            <RefreshCw size={16} className={isRefreshing ? 'spin' : ''} />
+            <RefreshCw className={isRefreshing ? 'spin' : ''} size={16} />
           </button>
 
           <button onClick={handleExport} className="action-btn">
@@ -135,7 +154,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
               onClick={() => onFiltersChange({ ...filters, status: filter.key })}
               className={`filter-chip ${filters.status === filter.key ? 'active' : ''}`}
             >
-              {filter.label}
+              <span>{filter.label}</span>
               <span className="filter-count">{filter.count}</span>
             </button>
           ))}
@@ -146,8 +165,11 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
           className="advanced-filters-toggle"
         >
           <Filter size={14} />
-          Advanced Filters
-          <ChevronDown size={14} className={showAdvancedFilters ? 'rotated' : ''} />
+          <span>Advanced Filters</span>
+          <ChevronDown 
+            size={14} 
+            className={showAdvancedFilters ? 'rotated' : ''} 
+          />
         </button>
       </div>
 
@@ -157,32 +179,52 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
           <div className="filters-grid">
             <div className="filter-group">
               <label>Stage</label>
-              <select
-                value={filters.stage}
-                onChange={(e) => onFiltersChange({ ...filters, stage: e.target.value })}
+              <Select 
+                value={filters.stage} 
+                onValueChange={(value) => onFiltersChange({ ...filters, stage: value })}
               >
-                <option value="all">All Stages</option>
-                <option value="EXT_PARKING">External Parking</option>
-                <option value="ENTRY_GATE">Entry Gate</option>
-                <option value="WEIGHING">Weighing</option>
-                <option value="LOADING">Loading</option>
-                <option value="WEIGHT_OUT">Weight Out</option>
-                <option value="GATE_OUT">Gate Out</option>
-              </select>
+                <SelectTrigger className="select">
+                  <SelectValue placeholder="All Stages" />
+                </SelectTrigger>
+                <SelectContent 
+                  className="selectContent"
+                  position="popper"
+                  side="bottom"
+                  align="start"
+                >
+                  <SelectItem className="selectItem" value="all">All Stages</SelectItem>
+                  <SelectItem className="selectItem" value="external-parking">External Parking</SelectItem>
+                  <SelectItem className="selectItem" value="entry-gate">Entry Gate</SelectItem>
+                  <SelectItem className="selectItem" value="weighing">Weighing</SelectItem>
+                  <SelectItem className="selectItem" value="loading">Loading</SelectItem>
+                  <SelectItem className="selectItem" value="weight-out">Weight Out</SelectItem>
+                  <SelectItem value="gate-out">Gate Out</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="filter-group">
               <label>Duration</label>
-              <select
-                value={filters.timeRange}
-                onChange={(e) => onFiltersChange({ ...filters, timeRange: e.target.value })}
+              <Select 
+                value={filters.timeRange} 
+                onValueChange={(value) => onFiltersChange({ ...filters, timeRange: value })}
               >
-                <option value="all">All Durations</option>
-                <option value="under_1h">Under 1 hour</option>
-                <option value="1h_2h">1-2 hours</option>
-                <option value="2h_4h">2-4 hours</option>
-                <option value="over_4h">Over 4 hours</option>
-              </select>
+                <SelectTrigger className="select">
+                  <SelectValue placeholder="All Durations" className='selectValue' />
+                </SelectTrigger>
+                <SelectContent 
+                  className="selectContent"
+                  position="popper"
+                  side="bottom"
+                  align="start"
+                >
+                  <SelectItem className='selectItem' value="all">All Durations</SelectItem>
+                  <SelectItem className='selectItem' value="under-1h">Under 1 hour</SelectItem>
+                  <SelectItem className='selectItem' value="1-2h">1-2 hours</SelectItem>
+                  <SelectItem className='selectItem' value="2-4h">2-4 hours</SelectItem>
+                  <SelectItem className='selectItem' value="over-4h">Over 4 hours</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="filter-actions">
@@ -199,13 +241,6 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
           </div>
         </div>
       )}
-
-      {/* Auto-refresh indicator */}
-      {/* <div className="refresh-indicator">
-        <div className="refresh-dot"></div>
-        <span>Auto-refresh: ON (30s)</span>
-        <span className="last-updated">Last updated: {new Date().toLocaleTimeString()}</span>
-      </div> */}
     </div>
   );
 };

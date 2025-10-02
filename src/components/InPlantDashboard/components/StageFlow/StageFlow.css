@@ -1,10 +1,12 @@
 /* Stage Flow Styles */
 .stage-flow {
-  background: var(--bg-primary);
+  /* background: var(--bg-primary); */
   border: 1px solid var(--border-light);
   border-radius: 12px;
   padding: var(--spacing-lg);
   box-shadow: var(--shadow-sm);
+  box-shadow: 0 0 0 1px rgb(118 16 255 / 20%);
+  background-color: #f9f9ff;
 }
 
 .stage-flow-header {
@@ -145,7 +147,7 @@
 }
 
 /* Stage Header */
-.stage-header {
+.stage-header1 {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;

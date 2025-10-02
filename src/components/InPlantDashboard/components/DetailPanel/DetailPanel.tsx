@@ -169,10 +169,9 @@ const DetailPanel: React.FC<DetailPanelProps> = ({ vehicle, onClose, isOpen }) =
         {/* Panel Header */}
         <div className="detail-header">
           <div className="header-info">
-            <h2>Vehicle Details</h2>
-            <span className="vehicle-number">{vehicle.vehicleNumber}</span>
+            Vehicle Details
           </div>
-          <button onClick={onClose} className="close-btn" aria-label="Close details">
+          <button onClick={onClose} className="close" aria-label="Close details">
             <X size={20} />
           </button>
         </div>

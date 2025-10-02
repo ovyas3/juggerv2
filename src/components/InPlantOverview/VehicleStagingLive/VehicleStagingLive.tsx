@@ -4,14 +4,14 @@ import React, { useState, useEffect } from "react"
 import styles from './VehicleStagingLive.module.css'
 import CustomDatePicker from '@/components/UI/CustomDatePicker/CustomDatePicker';
 import Box from '@mui/material/Box';
-import { useMediaQuery, useTheme } from '@mui/material';
+import { Typography, useMediaQuery, useTheme } from '@mui/material';
 import { httpsGet, httpsPost } from "@/utils/Communication";
 import { useRouter } from "next/navigation";
 import { useSnackbar } from "@/hooks/snackBar";
+import { Download, Loader2 } from 'lucide-react';
 import { ThreeCircles } from "react-loader-spinner";
 import VehicleStagingLiveCard from "./VehicleStagingLiveCard/VehicleStagingLiveCard";
 import VehicleStagingLiveShipmentDetails from "./VehicleStagingLiveShipmentDetails/VehicleStagingLiveShipmentDetails";
-import { Download } from 'lucide-react';
 import * as XLSX from 'xlsx';
 
 // Define types for the data structure
@@ -23,6 +23,12 @@ interface MaterialEntry {
     [materialName: string]: {
         [stage: string]: Stage;
     };
+}
+
+interface VehicleStagingLiveProps {
+  noLeftMargin?: boolean;
+  isInDashboard?: boolean;
+  useLoader2?: boolean;
 }
 
 const stages: MaterialKey[] = ['DC', 'PO', 'GI', 'TW', 'GW', 'PG', 'TC', 'IV', 'EW', 'GO'];
@@ -42,7 +48,11 @@ const stageWithName: Record<MaterialKey, string> = {
     GO: 'GI - GO'
 }
 
-export default function VehicleStagingLive() {
+export default function VehicleStagingLive({ 
+  noLeftMargin = false, 
+  isInDashboard = false, 
+  useLoader2 = false 
+}: VehicleStagingLiveProps) {
     // Date States
     const today: any = new Date();
     const oneWeekAgo: any = new Date();
@@ -143,36 +153,67 @@ export default function VehicleStagingLive() {
 
     return (
         <>
-            {/* Loader */}
             {loading && (
                 <div style={{
                     display: 'flex',
                     justifyContent: 'center',
                     alignItems: 'center',
-                    height: '100vh',
-                    position: 'absolute',
-                    width: '100vw',
-                    background: 'white',
+                    height: isInDashboard ? '200px' : '100vh',
+                    position: isInDashboard ? 'relative' : 'absolute',
+                    width: isInDashboard ? '100%' : '100vw',
+                    background: isInDashboard ? 'transparent' : 'white',
                     zIndex: 1000,
-                    opacity: 1
+                    opacity: 1,
+                    borderRadius: isInDashboard ? '12px' : '0',
+                    margin: isInDashboard ? '16px 0' : '0'
                 }}>
-                    <ThreeCircles
-                        visible={true}
-                        height="100"
-                        width="100"
-                        color="#20114d"
-                        ariaLabel="three-circles-loading"
-                        wrapperStyle={{}}
-                        wrapperClass=""
-                    />
+                    {useLoader2 ? (
+                        <>
+                            <Loader2 className="animate-spin" style={{
+                                width: '40px',
+                                height: '40px',
+                                color: '#20114d',
+                                animation: 'spin 1s linear infinite',
+                                display: 'inline-block'
+                            }} />
+                            <style jsx global>{`
+                                @keyframes spin {
+                                    from { transform: rotate(0deg); }
+                                    to { transform: rotate(360deg); }
+                                }
+                            `}</style>
+                        </>
+                    ) : (
+                        <ThreeCircles
+                            visible={true}
+                            height="100"
+                            width="100"
+                            color="#20114d"
+                            ariaLabel="three-circles-loading"
+                            wrapperStyle={{}}
+                            wrapperClass=""
+                        />
+                    )}
                 </div>
             )}
-            <div className={styles.main} style={{ margin: !mobile ? '56px 0 0 70px' : '0px' }}>
-                <div className={styles.container}>
+           <div className={`${styles.main} ${isInDashboard ? styles.mainDashboard : ''}`} style={{ 
+            margin: !mobile 
+                ? isInDashboard 
+                ? `${styles.mainDashboard}` 
+                : '56px 0 0 70px' 
+                : '0px' 
+            }}>
+                <div className={`${styles.container} ${isInDashboard ? styles.dashboardContainer : ''}`}>
                     {mobile && (
                         <h1 className={styles.title}>Vehicle Staging Live</h1>
                     )}
                     <div className={styles.dateContainer}>
+                       <div style={{ display: 'flex', alignItems: 'center', gap: 8 , width: '100%'}}>
+                       {isInDashboard && (
+                            <h2 className={styles.title}>
+                                Mill Wise
+                            </h2>
+                        )}
                         <Box sx={{
                             display: 'flex',
                             justifyContent: 'flex-start',
@@ -197,7 +238,11 @@ export default function VehicleStagingLive() {
                                 minSelectableDate={startDate}
                             />
                         </Box>
-                        <button className={styles.exportButton} onClick={exportToExcel}>
+                       </div>
+                        <button 
+                            className={`${styles.exportButton} ${isInDashboard ? styles.dashboardExportButton : ''}`}
+                            onClick={exportToExcel}
+                        >
                             <Download className={styles.exportButtonIcon} />
                             Export
                         </button>
@@ -211,7 +256,7 @@ export default function VehicleStagingLive() {
                     )}
                     {!mobile && (
                         <div className={styles.tableContainer}>
-                            <table className={styles.table}>
+                            <table className={`${styles.table} ${isInDashboard ? styles.dashboardTable : ''}`}>
                                 <thead>
                                     <tr>
                                         <th onClick={() => handleSort("TW")}>Materials</th>
@@ -228,7 +273,7 @@ export default function VehicleStagingLive() {
                                 <tbody>
                                     {sortedMaterials && sortedMaterials.length > 0 && sortedMaterials.map(([material, data], index) => {
                                         return (
-                                            <tr key={material} className={index === sortedMaterials.length - 1 ? styles.totalRow : ''}>
+                                            <tr key={material} className={index === sortedMaterials.length - 1 ? styles.totalRow : isInDashboard ? styles.dashboardRow : ''}>
                                                 <td>{material}</td>
                                                 {stages.map((stage) => (
                                                     <td key={stage} onClick={() => handleDriverIDs(data[stage], stage, material)}>{data[stage]?.count || 0}</td>

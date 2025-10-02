@@ -74,7 +74,7 @@ const StageCard: React.FC<StageCardProps> = ({
         }}
       >
         {/* Stage Header */}
-        <div className="stage-header">
+        <div className="stage-header1">
           <div className="stage-info">
             <h3 className="stage-name">{stage.stageName}</h3>
             <div className="stage-health">
