@@ -32,6 +32,26 @@
   box-shadow: var(--shadow-md);
   transform: translateY(-2px);
 } */
+.collapse-toggle-btn {
+  /* Style to make it look like a clear toggle button */
+
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;    /* Add a small invisible padding */
+  border-radius: 50%; /* Make the background shape round */
+  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto; 
+  color: #6B7280;
+  transition: all 0.2s;/* Only take up necessary height */
+}
+
+.collapse-toggle-btn:hover {
+  background-color: #F3F4F6;
+}
 
 .metric-card::before {
   content: '';

@@ -1,10 +1,11 @@
 'use client';
 
-import React from 'react';
-import { ChevronRight, Clock, AlertTriangle, CheckCircle, Circle } from 'lucide-react';
+import React,{useState} from 'react';
+import { ChevronRight, Clock, AlertTriangle, CheckCircle, Circle , ChevronDown, ChevronUp} from 'lucide-react';
 import { StageInfo } from '../../InPlantDashboard';
 import './StageFlow.css';
-
+import MetricCard from '@/components/UI/MetricCard';
+import MetricCardSkeleton from '@/components/UI/MetricCardSkeleton';
 interface StageFlowProps {
   stages: StageInfo[];
   selectedStage: string | null;
@@ -57,9 +58,11 @@ const StageCard: React.FC<StageCardProps> = ({
       default: return 'var(--neutral-gray)';
     }
   };
-
+  const [isExpanded, setIsExpanded] = useState(true);
+  const toggleCollapse = () => setIsExpanded(!isExpanded);
   return (
     <div className="stage-flow-item">
+   
       <div
         className={`stage-card ${stage.healthStatus} ${isSelected ? 'selected' : ''} ${loading ? 'loading' : ''}`}
         onClick={onClick}
@@ -152,10 +155,23 @@ const StageFlow: React.FC<StageFlowProps> = ({
 
   const totalVehicles = stages.reduce((sum, stage) => sum + stage.vehicleCount, 0);
   const delayedStages = stages.filter(stage => stage.healthStatus === 'critical' || stage.healthStatus === 'warning').length;
-
+  const [isExpanded, setIsExpanded] = useState(true);
+  const toggleCollapse = () => setIsExpanded(!isExpanded);
   return (
     <div className="stage-flow">
+        <button 
+      className="collapse-toggle-btn" 
+      onClick={toggleCollapse} 
+      aria-expanded={isExpanded}
+      aria-controls="metrics-container" // Assuming the metrics-bar is what is collapsed
+    >
+      {isExpanded ? <ChevronUp size={24} /> : <ChevronDown size={24} />}
+    </button>
+    
+    {isExpanded && (
+      <>
       <div className="stage-flow-header">
+    
         <div className="flow-title">
           <h2>Vehicle Flow</h2>
           <div className="flow-summary">
@@ -217,6 +233,8 @@ const StageFlow: React.FC<StageFlowProps> = ({
           </button>
         </div>
       )}
+      </>
+    )}
     </div>
   );
 };
