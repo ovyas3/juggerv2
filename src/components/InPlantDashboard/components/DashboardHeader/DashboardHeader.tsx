@@ -8,7 +8,8 @@ import {
   RefreshCw,
   Download,
   Settings,
-  ChevronDown
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 
 import {
@@ -32,6 +33,8 @@ interface DashboardHeaderProps {
     timeRange: string;
   };
   onFiltersChange: (filters: any) => void;
+  isExpanded: boolean;
+  onToggleExpand: () => void;
 }
 
 const DashboardHeader: React.FC<DashboardHeaderProps> = ({
@@ -40,7 +43,9 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   dateRange,
   onDateRangeChange,
   filters,
-  onFiltersChange
+  onFiltersChange,
+  isExpanded,
+  onToggleExpand
 }) => {
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -72,174 +77,185 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   ];
 
   return (
-    <div className="dashboard-header">
+    <div className={`dashboard-header ${isExpanded ? 'expanded' : 'collapsed'}`}>
       <div className="header-top">
-        {/* Left Section - Title */}
         <div className="header-left">
-          <h1 className="dashboard-title">
-            InPlant Dashboard
-            <span className="plant-name">Mumbai Distribution Center</span>
-          </h1>
-        </div>
-
-        {/* Center Section - Date Range */}
-        <div className="header-center">
-          {/* <div className="date-selector">
-            <Calendar className="date-icon" size={16} /> */}
-            <Select 
-              value={dateRange} 
-              onValueChange={(value) => onDateRangeChange(value as any)}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <h1 className="dashboard-title">
+              InPlant Dashboard
+            </h1>
+            <div 
+              onClick={onToggleExpand}
+              style={{
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                marginLeft: '0.5rem',
+                color: '#4B5563'
+              }}
             >
-              <SelectTrigger className="select">
-                <SelectValue className="selectValue" />
-              </SelectTrigger>
-              <SelectContent 
-                className="selectContent1"
-                position="popper"
-                side="bottom"
-                align="start"
-              >
-                {dateRangeOptions.map(option => (
-                  <SelectItem key={option.key} value={option.key} className='selectItem'>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          {/* </div> */}
-        </div>
-
-        {/* Right Section - Actions */}
-        <div className="header-right">
-          {/* Search */}
-          <div className="search-container">
-            <Search className="search-icon" size={16} />
-            <input
-              type="text"
-              placeholder="Search shipments..."
-              value={searchQuery}
-              onChange={(e) => onSearch(e.target.value)}
-              className="search-input"
-            />
+              {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+            </div>
           </div>
-
-          {/* Action Buttons */}
-          <button
-            onClick={handleRefresh}
-            disabled={isRefreshing}
-            className={`action-btn ${isRefreshing ? 'refreshing' : ''}`}
-          >
-            <RefreshCw className={isRefreshing ? 'spin' : ''} size={16} />
-          </button>
-
-          <button onClick={handleExport} className="action-btn">
-            <Download size={16} />
-          </button>
-
-          <button
-            onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
-            className="action-btn"
-          >
-            <Settings size={16} />
-          </button>
-        </div>
-      </div>
-
-      {/* Quick Filters Row */}
-      <div className="header-filters">
-        <div className="quick-filters">
-          {quickFilters.map(filter => (
-            <button
-              key={filter.key}
-              onClick={() => onFiltersChange({ ...filters, status: filter.key })}
-              className={`filter-chip ${filters.status === filter.key ? 'active' : ''}`}
-            >
-              <span>{filter.label}</span>
-              <span className="filter-count">{filter.count}</span>
-            </button>
-          ))}
         </div>
 
-        <button
-          onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
-          className="advanced-filters-toggle"
-        >
-          <Filter size={14} />
-          <span>Advanced Filters</span>
-          <ChevronDown 
-            size={14} 
-            className={showAdvancedFilters ? 'rotated' : ''} 
-          />
-        </button>
-      </div>
-
-      {/* Advanced Filters Panel */}
-      {showAdvancedFilters && (
-        <div className="advanced-filters-panel">
-          <div className="filters-grid">
-            <div className="filter-group">
-              <label>Stage</label>
+        {isExpanded && (
+          <>
+            <div className="header-center">
               <Select 
-                value={filters.stage} 
-                onValueChange={(value) => onFiltersChange({ ...filters, stage: value })}
+                value={dateRange} 
+                onValueChange={onDateRangeChange}
               >
                 <SelectTrigger className="select">
-                  <SelectValue placeholder="All Stages" />
+                  <SelectValue className="selectValue" />
                 </SelectTrigger>
                 <SelectContent 
-                  className="selectContent"
+                  className="selectContent1"
                   position="popper"
                   side="bottom"
                   align="start"
                 >
-                  <SelectItem className="selectItem" value="all">All Stages</SelectItem>
-                  <SelectItem className="selectItem" value="external-parking">External Parking</SelectItem>
-                  <SelectItem className="selectItem" value="entry-gate">Entry Gate</SelectItem>
-                  <SelectItem className="selectItem" value="weighing">Weighing</SelectItem>
-                  <SelectItem className="selectItem" value="loading">Loading</SelectItem>
-                  <SelectItem className="selectItem" value="weight-out">Weight Out</SelectItem>
-                  <SelectItem value="gate-out">Gate Out</SelectItem>
+                  {dateRangeOptions.map(option => (
+                    <SelectItem key={option.key} value={option.key} className='selectItem'>
+                      {option.label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
 
-            <div className="filter-group">
-              <label>Duration</label>
-              <Select 
-                value={filters.timeRange} 
-                onValueChange={(value) => onFiltersChange({ ...filters, timeRange: value })}
-              >
-                <SelectTrigger className="select">
-                  <SelectValue placeholder="All Durations" className='selectValue' />
-                </SelectTrigger>
-                <SelectContent 
-                  className="selectContent"
-                  position="popper"
-                  side="bottom"
-                  align="start"
-                >
-                  <SelectItem className='selectItem' value="all">All Durations</SelectItem>
-                  <SelectItem className='selectItem' value="under-1h">Under 1 hour</SelectItem>
-                  <SelectItem className='selectItem' value="1-2h">1-2 hours</SelectItem>
-                  <SelectItem className='selectItem' value="2-4h">2-4 hours</SelectItem>
-                  <SelectItem className='selectItem' value="over-4h">Over 4 hours</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            <div className="header-right">
+              <div className="search-container">
+                <Search className="search-icon" size={16} />
+                <input
+                  type="text"
+                  placeholder="Search shipments..."
+                  value={searchQuery}
+                  onChange={(e) => onSearch(e.target.value)}
+                  className="search-input"
+                />
+              </div>
 
-            <div className="filter-actions">
               <button
-                onClick={() => onFiltersChange({ status: 'all', stage: 'all', timeRange: 'all' })}
-                className="reset-filters-btn"
+                onClick={handleRefresh}
+                disabled={isRefreshing}
+                className={`action-btn ${isRefreshing ? 'refreshing' : ''}`}
               >
-                Reset
+                <RefreshCw className={isRefreshing ? 'spin' : ''} size={16} />
               </button>
-              <button className="apply-filters-btn">
-                Apply Filters
+
+              <button onClick={handleExport} className="action-btn">
+                <Download size={16} />
+              </button>
+
+              <button
+                onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+                className="action-btn"
+              >
+                <Settings size={16} />
               </button>
             </div>
+          </>
+        )}
+      </div>
+
+      {isExpanded && (
+        <>
+          <div className="header-filters">
+            <div className="quick-filters">
+              {quickFilters.map(filter => (
+                <button
+                  key={filter.key}
+                  onClick={() => onFiltersChange({ ...filters, status: filter.key })}
+                  className={`filter-chip ${filters.status === filter.key ? 'active' : ''}`}
+                >
+                  <span>{filter.label}</span>
+                  <span className="filter-count">{filter.count}</span>
+                </button>
+              ))}
+            </div>
+
+            <button
+              onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+              className="advanced-filters-toggle"
+            >
+              <Filter size={14} />
+              <span>Advanced Filters</span>
+              <ChevronDown 
+                size={14} 
+                className={showAdvancedFilters ? 'rotated' : ''} 
+              />
+            </button>
           </div>
-        </div>
+
+          {showAdvancedFilters && (
+            <div className="advanced-filters-panel">
+              <div className="filters-grid">
+                <div className="filter-group">
+                  <label>Stage</label>
+                  <Select 
+                    value={filters.stage} 
+                    onValueChange={(value) => onFiltersChange({ ...filters, stage: value })}
+                  >
+                    <SelectTrigger className="select">
+                      <SelectValue placeholder="All Stages" />
+                    </SelectTrigger>
+                    <SelectContent 
+                      className="selectContent"
+                      position="popper"
+                      side="bottom"
+                      align="start"
+                    >
+                      <SelectItem className="selectItem" value="all">All Stages</SelectItem>
+                      <SelectItem className="selectItem" value="external-parking">External Parking</SelectItem>
+                      <SelectItem className="selectItem" value="entry-gate">Entry Gate</SelectItem>
+                      <SelectItem className="selectItem" value="weighing">Weighing</SelectItem>
+                      <SelectItem className="selectItem" value="loading">Loading</SelectItem>
+                      <SelectItem className="selectItem" value="weight-out">Weight Out</SelectItem>
+                      <SelectItem value="gate-out">Gate Out</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="filter-group">
+                  <label>Duration</label>
+                  <Select 
+                    value={filters.timeRange} 
+                    onValueChange={(value) => onFiltersChange({ ...filters, timeRange: value })}
+                  >
+                    <SelectTrigger className="select">
+                      <SelectValue placeholder="All Durations" className='selectValue' />
+                    </SelectTrigger>
+                    <SelectContent 
+                      className="selectContent"
+                      position="popper"
+                      side="bottom"
+                      align="start"
+                    >
+                      <SelectItem className='selectItem' value="all">All Durations</SelectItem>
+                      <SelectItem className='selectItem' value="under-1h">Under 1 hour</SelectItem>
+                      <SelectItem className='selectItem' value="1-2h">1-2 hours</SelectItem>
+                      <SelectItem className='selectItem' value="2-4h">2-4 hours</SelectItem>
+                      <SelectItem className='selectItem' value="over-4h">Over 4 hours</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="filter-actions">
+                  <button
+                    onClick={() => onFiltersChange({ status: 'all', stage: 'all', timeRange: 'all' })}
+                    className="reset-filters-btn"
+                  >
+                    Reset
+                  </button>
+                  <button className="apply-filters-btn">
+                    Apply Filters
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </>
       )}
     </div>
   );

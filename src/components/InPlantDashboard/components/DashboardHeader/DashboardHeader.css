@@ -1,19 +1,52 @@
 /* Dashboard Header Styles */
 .dashboard-header {
-  /* background: var(--bg-primary); */
-  border-bottom: 1px solid var(--border-light);
-  padding: var(--spacing-md) var(--spacing-lg);
-  flex-shrink: 0;
-  box-shadow: 0 0 0 1px rgb(118 16 255 / 20%);
-  background-color: #f9f9ff;
+  background: rgb(249, 249, 255);
+  padding: 0.75rem 1.5rem;
+  transition: all 0.2s ease;
+  overflow: hidden;
+}
+
+/* When collapsed, only show the header-top with minimal height */
+.dashboard-header.collapsed {
+  padding: 0.5rem 1.5rem;
 }
 
 .header-top {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: var(--spacing-md);
-  gap: var(--spacing-lg);
+  min-height: 48px;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.header-center,
+.header-right,
+.header-filters {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.dashboard-header:not(.expanded) .header-center,
+.dashboard-header:not(.expanded) .header-right,
+.dashboard-header:not(.expanded) .header-filters {
+  opacity: 0;
+  height: 0;
+  overflow: hidden;
+  transform: translateY(-10px);
+  pointer-events: none;
+}
+
+.dashboard-header.expanded .header-center,
+.dashboard-header.expanded .header-right,
+.dashboard-header.expanded .header-filters {
+  opacity: 1;
+  height: auto;
+  transform: translateY(0);
+  pointer-events: auto;
 }
 
 /* Left Section */
@@ -149,6 +182,7 @@
   gap: var(--spacing-lg);
   padding-top: var(--spacing-md);
   border-top: 1px solid var(--border-light);
+  margin-top: 10px;
 }
 
 .quick-filters {

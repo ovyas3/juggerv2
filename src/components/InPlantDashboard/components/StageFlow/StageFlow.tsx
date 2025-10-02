@@ -2,19 +2,20 @@
 
 import React,{useState} from 'react';
 import { ChevronRight, Clock, AlertTriangle, CheckCircle, Circle , ChevronDown, ChevronUp} from 'lucide-react';
-import { StageInfo } from '../../InPlantDashboard';
-import './StageFlow.css';
 import MetricCard from '@/components/UI/MetricCard';
 import MetricCardSkeleton from '@/components/UI/MetricCardSkeleton';
+import { StageInfo } from '../../InPlantDashboard';
+import './StageFlow.css';
+
 interface StageFlowProps {
-  stages: StageInfo[];
+  stages: any[];
   selectedStage: string | null;
   onStageSelect: (stageId: string) => void;
   loading?: boolean;
 }
 
 interface StageCardProps {
-  stage: StageInfo;
+  stage: any;
   isSelected: boolean;
   isLast: boolean;
   onClick: () => void;
@@ -152,89 +153,114 @@ const StageFlow: React.FC<StageFlowProps> = ({
   loading = false
 }) => {
   const sortedStages = [...stages].sort((a, b) => a.order - b.order);
-
-  const totalVehicles = stages.reduce((sum, stage) => sum + stage.vehicleCount, 0);
-  const delayedStages = stages.filter(stage => stage.healthStatus === 'critical' || stage.healthStatus === 'warning').length;
   const [isExpanded, setIsExpanded] = useState(true);
-  const toggleCollapse = () => setIsExpanded(!isExpanded);
-  return (
-    <div className="stage-flow">
-        <button 
-      className="collapse-toggle-btn" 
-      onClick={toggleCollapse} 
-      aria-expanded={isExpanded}
-      aria-controls="metrics-container" // Assuming the metrics-bar is what is collapsed
-    >
-      {isExpanded ? <ChevronUp size={24} /> : <ChevronDown size={24} />}
-    </button>
-    
-    {isExpanded && (
-      <>
-      <div className="stage-flow-header">
-    
-        <div className="flow-title">
-          <h2>Vehicle Flow</h2>
-          <div className="flow-summary">
-            <span className="total-vehicles">{totalVehicles} vehicles in plant</span>
-            {delayedStages > 0 && (
-              <span className="delayed-stages">
-                {delayedStages} stage{delayedStages > 1 ? 's' : ''} delayed
-              </span>
-            )}
-          </div>
-        </div>
 
-        {!loading && (
-          <div className="flow-legend">
-            <div className="legend-item">
-              <CheckCircle size={14} className="legend-icon normal" />
-              <span>Normal</span>
-            </div>
-            <div className="legend-item">
-              <AlertTriangle size={14} className="legend-icon warning" />
-              <span>At Risk</span>
-            </div>
-            <div className="legend-item">
-              <AlertTriangle size={14} className="legend-icon critical" />
-              <span>Delayed</span>
-            </div>
-            <div className="legend-item">
-              <Circle size={14} className="legend-icon empty" />
-              <span>Empty</span>
-            </div>
-          </div>
-        )}
-      </div>
-
+  if (loading) {
+    return (
       <div className="stage-flow-container">
-        {sortedStages.map((stage, index) => (
-          <StageCard
-            key={stage.stageId}
-            stage={stage}
-            isSelected={selectedStage === stage.stageId}
-            isLast={index === sortedStages.length - 1}
-            onClick={() => onStageSelect(stage.stageId)}
-            loading={loading}
-          />
+        {Array(6).fill(0).map((_, index) => (
+          <div key={`skeleton-${index}`} className="stage-metric-card">
+            <MetricCardSkeleton />
+          </div>
         ))}
       </div>
+    );
+  }
 
-      {/* Stage selection info */}
-      {selectedStage && !loading && (
-        <div className="stage-selection-info">
-          <span>
-            Showing vehicles in: <strong>{stages.find(s => s.stageId === selectedStage)?.stageName}</strong>
-          </span>
-          <button
-            onClick={() => onStageSelect('')}
-            className="clear-selection"
-          >
-            Show All
-          </button>
+  return (
+    <div className="stage-flow">
+      <div className="stage-flow-header">
+        <div 
+          className="flow-title"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            cursor: 'pointer',
+            userSelect: 'none',
+            padding: '0.5rem 0',
+            width: '100%',
+            justifyContent: 'space-between'
+          }}
+          onClick={() => setIsExpanded(!isExpanded)}
+        >
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <h2 style={{ margin: 0, marginRight: '0.5rem' }}>Vehicle Flow</h2>
+            {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+          </div>
+          {isExpanded && (
+            <div className="flow-summary">
+              <span className="total-vehicles">{sortedStages.reduce((sum, stage) => sum + stage.vehicleCount, 0)} vehicles in plant</span>
+              {sortedStages.filter(stage => stage.healthStatus === 'critical' || stage.healthStatus === 'warning').length > 0 && (
+                <span className="delayed-stages">
+                  {sortedStages.filter(stage => stage.healthStatus === 'critical' || stage.healthStatus === 'warning').length} stage{sortedStages.filter(stage => stage.healthStatus === 'critical' || stage.healthStatus === 'warning').length > 1 ? 's' : ''} delayed
+                </span>
+              )}
+            </div>
+          )}
         </div>
+      </div>
+      
+      {isExpanded && (
+        <>
+          {!loading && (
+            <div className="flow-legend">
+              <div className="legend-item">
+                <CheckCircle size={14} className="legend-icon normal" />
+                <span>Normal</span>
+              </div>
+              <div className="legend-item">
+                <AlertTriangle size={14} className="legend-icon warning" />
+                <span>At Risk</span>
+              </div>
+              <div className="legend-item">
+                <AlertTriangle size={14} className="legend-icon critical" />
+                <span>Delayed</span>
+              </div>
+              <div className="legend-item">
+                <Circle size={14} className="legend-icon empty" />
+                <span>Empty</span>
+              </div>
+            </div>
+          )}
+          <div className="stage-flow-container">
+            {sortedStages.map((stage, index) => (
+              <div 
+                key={stage.id} 
+                // className={`stage-metric-card ${selectedStage === stage.stageId ? 'selected' : ''}`}
+                onClick={() => onStageSelect(stage.stageId)}
+              >
+                <MetricCard
+                  title={stage.title}
+                  value={stage.value}
+                  subText={stage.subtitle}
+                  icon={stage.icon}
+                  iconColor={stage.iconColor}
+                  bgColor={stage.bgColor}
+                  borderColor={stage.borderColor}
+                  averageTime={stage.averageTime}
+                  slaThreshold={stage.slaThreshold}
+                  healthStatus={stage.healthStatus}
+                />
+              </div>
+            ))}
+          </div>
+
+          {/* Stage selection info */}
+          {selectedStage && !loading && (
+            <div className="stage-selection-info">
+              <span>
+                Showing vehicles in: <strong>{stages.find(s => s.stageId === selectedStage)?.stageName}</strong>
+              </span>
+              <button
+                onClick={() => onStageSelect('')}
+                className="clear-selection"
+              >
+                Show All
+              </button>
+            </div>
+          )}
+        </>
       )}
-      </>
-    )}
     </div>
   );
 };
