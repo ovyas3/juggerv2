@@ -62,7 +62,8 @@
   margin-bottom: 24px; /* Added more space below the MultiSelect */
   position: relative; /* Ensures z-index context is clean */
   z-index: 10;
-  border: 1px solid #4f46e5;
+  border: 1px solid #20104d
+;
   box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
   outline: none !important;
   border-radius: 6px;
@@ -99,7 +100,8 @@
 }
 
 .submitButton {
-  background-color: #4F46E5;
+  background-color: #20104d
+;
   color: white;
 }
 

@@ -63,12 +63,13 @@
   margin: 15px;
   cursor: pointer;
   border: none;
-  background-color: #4F46E5;
+  background-color: #20104d
+;
   color: white;
 }
 
 .submitButton:hover {
-  background-color: #4338ca;
+  background-color: #271950;
 }
 
 .bookShipmentButton {
@@ -82,12 +83,13 @@
   margin: 15px;
   cursor: pointer;
   border: none;
-  background-color: #4F46E5;
+  background-color: #20104d
+;
   color: white;
 }
 
 .bookShipmentButton:hover {
-  background-color: #4338ca;
+  background-color: #271950;
 }
 
 .serialInvoicesContainer {
@@ -155,12 +157,13 @@
   margin: 15px;
   cursor: pointer;
   border: none;
-  background-color: #4F46E5;
+  background-color: #20104d
+;
   color: white;
 }
 
 .searchButton:hover {
-  background-color: #4338ca;
+  background-color: #271950;
 }
 
 .datePickerContainer :global(.ant-picker-dropdown) {

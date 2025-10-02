@@ -187,7 +187,7 @@ const SecurityAppStagesTab = ({ shipmentData }: { shipmentData: any }) => {
                             onClick={() => handleDownloadSingleImage(selectedImage)} 
                             startIcon={<DownloadIcon />}
                             variant="contained"
-                            sx={{ mr: 2, textTransform: 'Capitalize', backgroundColor: '#4f46e5', color: 'white' }}
+                            sx={{ mr: 2, textTransform: 'Capitalize', backgroundColor: '#20104d', color: 'white' }}
                         >
                             Download
                         </Button>

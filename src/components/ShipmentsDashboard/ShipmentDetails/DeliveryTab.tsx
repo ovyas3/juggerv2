@@ -93,7 +93,7 @@ const SimpleDocViewer = ({
             justifyContent: "center",
             overflow: "hidden",
             cursor: "pointer",
-            "&:hover": { borderColor: "#4f46e5" },
+            "&:hover": { borderColor: "#20104d" },
           }}
         >
           {isImage ? (
@@ -336,7 +336,7 @@ const PackageStatusTable = ({
                     readOnly={!isEditable}
                     sx={{
                       "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                        borderColor: "#4f46e5",
+                        borderColor: "#20104d",
                       },
                     }}
                   />
@@ -349,7 +349,7 @@ const PackageStatusTable = ({
                     disabled={!isEditable}
                     sx={{
                       "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                        borderColor: "#4f46e5",
+                        borderColor: "#20104",
                       },
                     }}
                   />
@@ -362,7 +362,7 @@ const PackageStatusTable = ({
                   disabled={!isEditable}
                   sx={{
                     "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "#4f46e5",
+                      borderColor: "#20104d",
                     },
                   }}
                 />
@@ -382,7 +382,7 @@ const PackageStatusTable = ({
                     disabled={!isEditable}
                     sx={{
                       "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                        borderColor: "#4f46e5",
+                        borderColor: "#20104d",
                       },
                     }}
                   />
@@ -402,7 +402,7 @@ const PackageStatusTable = ({
                     disabled={!isEditable}
                     sx={{
                       "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                        borderColor: "#4f46e5",
+                        borderColor: "#20104",
                       },
                     }}
                   />
@@ -425,7 +425,7 @@ const PackageStatusTable = ({
                         disabled={!isEditable}
                         sx={{
                           "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                            borderColor: "#4f46e5",
+                            borderColor: "#20104d",
                           },
                         }}
                       />
@@ -445,7 +445,7 @@ const PackageStatusTable = ({
                         disabled={!isEditable}
                         sx={{
                           "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                            borderColor: "#4f46e5",
+                            borderColor: "#20104d",
                           },
                         }}
                       />
@@ -469,7 +469,7 @@ const PackageStatusTable = ({
                         disabled={!isEditable}
                         sx={{
                           "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                            borderColor: "#4f46e5",
+                            borderColor: "#20104d",
                           },
                         }}
                       />
@@ -489,7 +489,7 @@ const PackageStatusTable = ({
                         disabled={!isEditable}
                         sx={{
                           "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                            borderColor: "#4f46e5",
+                            borderColor: "#20104",
                           },
                         }}
                       />
@@ -513,7 +513,7 @@ const PackageStatusTable = ({
                         disabled={!isEditable}
                         sx={{
                           "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                            borderColor: "#4f46e5",
+                            borderColor: "#20104d",
                           },
                         }}
                       />
@@ -533,7 +533,7 @@ const PackageStatusTable = ({
                         disabled={!isEditable}
                         sx={{
                           "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                            borderColor: "#4f46e5",
+                            borderColor: "#20104d",
                           },
                         }}
                       />
@@ -557,7 +557,7 @@ const PackageStatusTable = ({
                         disabled={!isEditable}
                         sx={{
                           "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                            borderColor: "#4f46e5",
+                            borderColor: "#20104d",
                           },
                         }}
                       />
@@ -577,7 +577,7 @@ const PackageStatusTable = ({
                         disabled={!isEditable}
                         sx={{
                           "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                            borderColor: "#4f46e5",
+                            borderColor: "#20104d",
                           },
                         }}
                       />
@@ -601,7 +601,7 @@ const PackageStatusTable = ({
                         disabled={!isEditable}
                         sx={{
                           "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                            borderColor: "#4f46e5",
+                            borderColor: "#20104d",
                           },
                         }}
                       />
@@ -621,7 +621,7 @@ const PackageStatusTable = ({
                         disabled={!isEditable}
                         sx={{
                           "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                            borderColor: "#4f46e5",
+                            borderColor: "#20104d",
                           },
                         }}
                       />
@@ -1353,7 +1353,7 @@ const DeliveryTab = ({
                                       <CircularProgress size={16} />
                                     ) : (
                                       <SaveIcon
-                                        sx={{ color: "#4F46E5" }}
+                                        sx={{ color: "#20104d" }}
                                         fontSize="small"
                                       />
                                     )}
@@ -1560,13 +1560,12 @@ const DeliveryTab = ({
                     variant="contained"
                     size="small"
                     sx={{
-                      backgroundColor: "#4f46e5",
-                      "&:hover": { backgroundColor: "#4338ca" },
+                      backgroundColor: "#20104d",
+                      "&:hover": { backgroundColor: "#271950" },
                       textTransform: "capitalize",
                       boxShadow: "none",
                     }}
-                    onClick={() => handleUploadClick(delivery._id, "epod")}
-                  >
+                    onClick={() => handleUploadClick(delivery._id, "epod")}>
                     Upload EPOD
                   </Button>
                   <Button
@@ -1747,9 +1746,9 @@ const DeliveryTab = ({
                                             }
                                             disabled={!canEditDelivery}
                                             sx={{
-                                              color: '#4f46e5',
+                                              color: '#20104d',
                                               '&.Mui-checked': {
-                                                color: '#4f46e5',
+                                                color: '#20104d',
                                               },
                                             }}
                                           />
@@ -1810,10 +1809,10 @@ const DeliveryTab = ({
                                         )
                                       }
                                       sx={{
-                                        color: '#4f46e5',
-                                        borderColor: '#4f46e5',
+                                        color: '#20104d',
+                                        borderColor: '#20104d',
                                         '&:hover': {
-                                          borderColor: '#4338ca',
+                                          borderColor: '#271950',
                                         },
                                         textTransform: "capitalize",
                                       }}
@@ -1912,13 +1911,12 @@ const DeliveryTab = ({
                           color="primary"
                           size="small"
                           sx={{
-                            backgroundColor: "#4f46e5",
-                            "&:hover": { backgroundColor: "#4338ca" },
+                            backgroundColor: "#20104d",
+                            "&:hover": { backgroundColor: "#271950" },
                             textTransform: "capitalize",
                           }}
                           onClick={() => handleSaveAll(delivery._id, invoiceGroup)}
-                          disabled={isSaving[invoiceGroup._id]}
-                        >
+                          disabled={isSaving[invoiceGroup._id]}>
                           {isSaving[invoiceGroup._id] ? (
                             <CircularProgress size={20} />
                           ) : (
@@ -2182,8 +2180,9 @@ const DeliveryTab = ({
                     onClick={() => handleUploadClick(delivery._id, "goods")}
                     sx={{
                       mt: 2,
-                      backgroundColor: "#4f46e5",
-                      "&:hover": { backgroundColor: "#4338ca" },
+                      backgroundColor: "#20104d
+",
+                      "&:hover": { backgroundColor: "#271950" },
                       textTransform: "capitalize",
                     }}
                   >

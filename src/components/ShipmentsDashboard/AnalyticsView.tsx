@@ -402,7 +402,8 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
             title="Total Shipments"
             value={analyticsData.totalShipments}
             icon={<Truck />}
-            iconColor="#4f46e5"
+            iconColor="#20104d
+"
             bgColor="#e4e2f8"
             borderColor="#544ecc"
           />

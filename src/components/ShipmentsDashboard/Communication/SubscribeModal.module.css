@@ -97,7 +97,7 @@
   }
   
   .button {
-    background: #4f46e5;
+    background: #20104d;
     color: #fff;
     font-size: 12px;
     padding: 5px 12px;
@@ -106,7 +106,7 @@
     min-width: 72px;
     border: none;
     text-align: center;
-    border-color: #4f46e5;
+    border-color: #20104d;
     font-weight: 600;
   }
   
@@ -129,7 +129,7 @@
   }
 
   .button:hover {
-    background-color: #4338ca;
+    background-color: #271950;
   }
   
   .submitButtonYes .button {

@@ -112,7 +112,7 @@
 .browseButton:hover,
 .browseButton:focus {
   background-color: #ececec;
-  border-color: #4F46E5;
+  border-color: #20104d;
   color: #222;
   box-shadow: 0 0 0 2px #ede9fe;
 }
@@ -156,7 +156,7 @@
 }
 
 .button {
-  background-color: #4F46E5;
+  background-color: #20104d;
   color: white;
   padding: 8px 24px;
   border-radius: 4px;

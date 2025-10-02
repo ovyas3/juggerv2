@@ -55,7 +55,7 @@ const IndentWiseDashboard = () => {
       dataIndex: "location",
       key: "location",
       onHeaderCell: () => ({
-        style: { background: "#20114d", color: "white" },
+        style: { background: "#20104d", color: "white" },
       }),
     },
     {
@@ -86,7 +86,7 @@ const IndentWiseDashboard = () => {
       dataIndex: "indented",
       key: "indented",
       onHeaderCell: () => ({
-        style: { background: "#20114d", color: "white" },
+        style: { background: "#20104d", color: "white" },
       }),
     },
     // {
@@ -117,7 +117,7 @@ const IndentWiseDashboard = () => {
     //   dataIndex: "allocated",
     //   key: "allocated",
     //   onHeaderCell: () => ({
-    //     style: { background: "#20114d", color: "white" },
+    //     style: { background: "#20104d", color: "white" },
     //   }),
     // },
     {
@@ -148,7 +148,7 @@ const IndentWiseDashboard = () => {
       dataIndex: "accepted",
       key: "accepted",
       onHeaderCell: () => ({
-        style: { background: "#20114d", color: "white" },
+        style: { background: "#20104d", color: "white" },
       }),
     },
     {
@@ -179,7 +179,7 @@ const IndentWiseDashboard = () => {
       dataIndex: "assigned",
       key: "assigned",
       onHeaderCell: () => ({
-        style: { background: "#20114d", color: "white" },
+        style: { background: "#20104d", color: "white" },
       }),
     },
     {
@@ -210,7 +210,7 @@ const IndentWiseDashboard = () => {
       dataIndex: "reported",
       key: "reported",
       onHeaderCell: () => ({
-        style: { background: "#20114d", color: "white" },
+        style: { background: "#20104d", color: "white" },
       }),
     },
     {
@@ -241,7 +241,7 @@ const IndentWiseDashboard = () => {
       dataIndex: "gateIn",
       key: "gateIn",
       onHeaderCell: () => ({
-        style: { background: "#20114d", color: "white" },
+        style: { background: "#20104d", color: "white" },
       }),
     },
     {
@@ -272,7 +272,7 @@ const IndentWiseDashboard = () => {
       dataIndex: "reported",
       key: "reported",
       onHeaderCell: () => ({
-        style: { background: "#20114d", color: "white" },
+        style: { background: "#20104d", color: "white" },
       }),
     },
     {
@@ -303,7 +303,7 @@ const IndentWiseDashboard = () => {
       dataIndex: "invoiced",
       key: "invoiced",
       onHeaderCell: () => ({
-        style: { background: "#20114d", color: "white" },
+        style: { background: "#20104d", color: "white" },
       }),
     },
     {
@@ -334,7 +334,7 @@ const IndentWiseDashboard = () => {
       dataIndex: "dispatched",
       key: "dispatched",
       onHeaderCell: () => ({
-        style: { background: "#20114d", color: "white" },
+        style: { background: "#20104d", color: "white" },
       }),
     },
   ];

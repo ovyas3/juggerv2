@@ -27,6 +27,7 @@
 }
 .smallCheckbox {
   padding: 4px !important; /* Reduce padding to make the clickable area smaller */
+  color: #20104d !important;
 }
 
 .smallCheckbox svg {
@@ -45,8 +46,8 @@
     padding: 18px 30px;
     font-size: 20px;
     font-weight: 600;
-    border-bottom: 1px solid #4F46E5;
-    background-color: #4F46E5;
+    border-bottom: 1px solid #20104d;
+    background-color: #20104d;
     color: #FFFFFF;
   }
   
@@ -78,7 +79,83 @@
     margin-bottom: 4px;
     padding-left: 10px;
   }
-  
+  /* AdvancedFilter.module.css */
+
+/* 1. Focus/Open State of the input wrapper */
+.inputField:focus-within {
+  border-color: #20104d !important;
+  box-shadow: 0 0 0 2px rgba(32, 16, 77, 0.2);
+}
+.inputField.ant-picker:hover {
+  border-color: #20104d !important;
+}
+/* Ant Design might append the "focused" class to the input itself */
+.inputField.ant-picker-focused {
+  border-color: #20104d !important;
+  box-shadow: 0 0 0 2px rgba(32, 16, 77, 0.2);
+}
+.ant-picker-cell-in-view.ant-picker-cell-selected .ant-picker-cell-inner,
+.ant-picker-cell-in-view.ant-picker-cell-range-start .ant-picker-cell-inner,
+.ant-picker-cell-in-view.ant-picker-cell-range-end .ant-picker-cell-inner,
+.ant-picker-today .ant-picker-cell-inner::before /* Today's border marker */
+{
+    background: #20104d !important; /* Set the background color */
+    color: #ffffff !important;      /* Ensure text is white on the background */
+    border-color: #20104d !important; /* Ensure border color matches */
+}
+
+/* 2. Header and Navigation Elements */
+/* This targets the Month/Year text (e.g., 'Oct 2025') and the navigation arrows */
+.ant-picker-header-view button,
+.ant-picker-header-super-prev-btn,
+.ant-picker-header-super-next-btn,
+.ant-picker-header-prev-btn,
+.ant-picker-header-next-btn {
+    color: #20104d !important; /* Changes the icon/text color */
+}
+
+/* 3. "Today" Button Color */
+/* This changes the color of the text/link at the bottom */
+.ant-picker-footer-extra a,
+.ant-picker-today-btn {
+    color: #20104d !important;
+}
+
+/* 4. Hover State (Unselected Days) */
+/* This targets the background color when hovering over an unselected day */
+.ant-picker-cell-in-view:hover:not(.ant-picker-cell-selected):not(.ant-picker-cell-range-start):not(.ant-picker-cell-range-end) .ant-picker-cell-inner {
+    background: rgba(32, 16, 77, 0.1) !important; /* A light, transparent shade of your color */
+    color: #000000 !important; /* Keeps the text black/dark gray on hover */
+}
+.filterSection :hover > .inputField.ant-picker,
+.filterSection :hover > .ant-picker,
+.inputField.ant-picker:hover {
+    border-color: #20104d !important; /* Set to your desired color */
+}
+/* FIX END */
+
+/* 1. Focus/Open State of the input wrapper (keeping your existing functional styles) */
+.inputField:focus-within {
+    border-color: #20104d !important;
+    box-shadow: 0 0 0 2px rgba(32, 16, 77, 0.2);
+}
+.ant-picker-cell-in-view:hover:not(.ant-picker-cell-selected):not(.ant-picker-cell-range-start):not(.ant-picker-cell-range-end) .ant-picker-cell-inner {
+  /* FIX: Set the text color to black/dark gray on hover */
+  color: #000000 !important; 
+  /* Also, ensure the background is subtle (if you haven't set it already) */
+  background: #f5f5f5; /* Light gray background on hover */
+}
+
+/* Ensure selected cells have white text on your primary color */
+.ant-picker-cell-in-view.ant-picker-cell-selected .ant-picker-cell-inner {
+  color: #ffffff !important;
+  background: #20104d !important;
+}
+/* Ant Design might append the "focused" class to the input itself */
+.inputField.ant-picker-focused {
+    border-color: #20104d !important;
+    box-shadow: 0 0 0 2px rgba(32, 16, 77, 0.2);
+}
   .input,
   .inputField {
     height: 28px;
@@ -86,6 +163,7 @@
     border: solid 1px #e3e3e3;
     border-radius: 4px;
     outline: none;
+    color: #20104d;
     padding: 0 8px;
     box-sizing: border-box;
     background-color: #fff;

@@ -79,8 +79,8 @@
 }
 
 .rerunBtn:hover {
-  background-color: #4338ca !important;
-  border: 1px solid #4338ca !important;
+  background-color: #271950 !important;
+  border: 1px solid #271950 !important;
 }
 
 .rerunBtn:disabled {
@@ -112,12 +112,12 @@
 }
 
 .selectField:hover > div {
-  border-color: #4f46e5 !important;
+  border-color: #20104d !important;
   box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2) !important;
 }
 
 .selectField > div.Mui-focused {
-  border-color: #4f46e5 !important;
+  border-color: #20104d !important;
   box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2) !important;
 }
 
@@ -139,12 +139,12 @@
 .datePicker:focus,
 .datePicker:focus-within {
   outline: none;
-  border-color: #4f46e5 !important;
+  border-color: #20104d !important;
   box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2) !important;
 }
 
 .datePicker:hover {
-  border-color: #4f46e5 !important;
+  border-color: #20104d !important;
   box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2) !important;
 }
 

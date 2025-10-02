@@ -96,7 +96,8 @@
 }
 
 .uploadIcon {
-  color: #4F46E5;
+  color: #20104d
+;
 }
 
 .fileTypeInfo {
@@ -114,7 +115,8 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  color: #4F46E5;
+  color: #20104d
+;
   text-decoration: none;
   font-size: 14px;
   font-weight: 500;
@@ -122,7 +124,7 @@
 }
 
 .downloadLink:hover {
-  color: #4338CA;
+  color: #271950;
   text-decoration: underline;
 }
 
@@ -162,7 +164,8 @@
   padding: 8px 24px;
   border: none;
   border-radius: 4px;
-  background-color: #4F46E5;
+  background-color: #20104d
+;
   color: white;
   font-size: 14px;
   font-weight: 500;
@@ -175,7 +178,7 @@
 }
 
 .submitButton:hover {
-  background-color: #4338CA;
+  background-color: #271950;
 }
 
 .submitButton:disabled {
@@ -185,7 +188,8 @@
 
 .fileInputLabel {
   cursor: pointer;
-  color: #4F46E5;
+  color: #20104d
+;
 }
 
 /* Loading state */
@@ -237,7 +241,8 @@
 }
 
 .dragDropBox.dragOver {
-  border-color: #4F46E5; 
+  border-color: #20104d
+; 
   background-color: #e0e7ff; 
 }
 
@@ -247,13 +252,15 @@
 }
 
 .dragDropBox .uploadIcon {
-  color: #4F46E5; 
+  color: #20104d
+; 
   margin-bottom: 8px;
 }
 
 .chooseFileButton {
 
-  background-color: #4F46E5 !important; /* Ensure primary background */
+  background-color: #20104d
+ !important; /* Ensure primary background */
   color: white !important;
   border-radius: 4px !important;
   padding: 8px 16px !important;
@@ -264,7 +271,7 @@
 }
 
 .chooseFileButton:hover {
-  background-color: #4338CA !important; 
+  background-color: #271950 !important; 
 }
 
 
@@ -275,7 +282,8 @@
   padding: 10px 16px;
   background-color: #EDE7F6; /* Light purple */
   color: #5E35B1; /* Darker purple text */
-  border: 1px solid #4f46e5;
+  border: 1px solid #20104d
+;
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s;
@@ -286,7 +294,9 @@
 }
 
 .fileInputLabel:hover {
-  background-color: #4f46e5;
+  background-color: #20104d
+;
   color: white;
-  border-color: #4f46e5;
+  border-color: #20104d
+;
 }

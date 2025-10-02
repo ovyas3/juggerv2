@@ -160,15 +160,18 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background-color: #4f46e5;
+  background-color: 
+#20104d;
   color: #ffffff;
-  border-color: #4f46e5;
+  border-color: 
+#20104d;
   border: none;
   cursor: pointer;
 }
 
 .matStrokedButton:hover {
-  background-color: #4338ca;
+  background-color: #271260
+;
 }
 
 .matStrokedButton .matIcon {
@@ -534,6 +537,8 @@
 .buttonContainer {
   display: flex;
   align-items: center;
+/* padding-right:100px ; */
+
   gap: 10px; /* Adds consistent spacing between all buttons */
 }
 
@@ -547,7 +552,12 @@
   font-size: 14px;
   cursor: pointer;
   font-weight: bold;
-  background-color: #4f46e5;
+  /* background-color: 
+#20104d; */
+  background-color: 
+#20104d; 
+  /* background-color: #5B3799;  */
+
   color: #ffffff;
   border: none;
   white-space: nowrap; /* Prevents text from wrapping */
@@ -555,7 +565,8 @@
 }
 
 .button:hover {
-  background-color: #4338ca;
+  background-color: #271260
+;
 }
 
 .matSelect {
@@ -583,6 +594,12 @@
   display: flex;
   flex-direction: row;
 }
+.advancedActive {
+  /* subtle outer ring to signal filters are active */
+  box-shadow: 0 0 0 3px rgba(124, 7, 208, 0.35); /* indigo-ish */
+  border-radius: 5px; /* match your button’s radius */
+}
+
 
 .customSelectButton {
   -webkit-appearance: none;
@@ -594,7 +611,8 @@
   font-size: 14px;
   cursor: pointer;
   font-weight: bold;
-  background-color: #4f46e5;
+  background-color: 
+#20104d;
   color: #ffffff;
   border: none;
   height: 38px; /* Match input height */
@@ -602,7 +620,8 @@
 }
 
 .customSelectButton:hover {
-  background-color: #4338ca;
+  background-color:  #271260
+;
 }
 
 .submitButton .button {
@@ -616,14 +635,17 @@
   margin-bottom: 1px;
   margin-right: 10px;
   font-weight: bold;
-  background-color: #4f46e5;
+  background-color: 
+#20104d;
   color: #ffffff;
-  border-color: #4f46e5;
+  border-color: 
+#20104d;
   border: none;
 }
 
 .submitButton .button:hover {
-  background-color: #4338ca;
+  background-color: #271260
+;
 }
 
 .commercialInvoiceBtn {
@@ -643,14 +665,17 @@
   margin-bottom: 1px;
   margin-right: 10px;
   font-weight: bold;
-  background-color: #4f46e5;
+  background-color: 
+#20104d;
   color: #ffffff;
-  border-color: #4f46e5;
+  border-color: 
+#20104d;
   border: none;
 }
 
 .commercialInvoiceSubmit:hover {
-  background-color: #4338ca;
+  background-color: #271260
+;
 }
 
 .commercialInvoiceSubmit .matSelectPlaceholder {
@@ -693,7 +718,8 @@
   font-size: 20px;
   font-weight: 600;
   border-bottom: 1px solid #e5e5e5;
-  background-color: #4f46e5;
+  background-color: 
+#20104d;
   color: #ffffff;
 }
 /* Close button */
@@ -3217,7 +3243,8 @@ select.didFloatingSelect::-ms-expand {
 .paginationButton {
   width: 32px !important; /* Smaller button */
   height: 32px !important;
-  background: #4f46e5 !important;
+  background: 
+#20104d !important;
   border: none !important;
   border-radius: 8px !important;
   color: #fff !important;
@@ -3508,6 +3535,14 @@ select.didFloatingSelect::-ms-expand {
   border-color: #3b82f6;
   box-shadow: 0 0 0 1px #3b82f6;
 }
+.spinner {
+  border: 4px solid #f3f3f3; /* Light grey */
+  border-top: 4px solid #3498db; /* Blue color */
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
 
 .actionSection {
   padding: 4px 0;
@@ -3646,17 +3681,17 @@ select.didFloatingSelect::-ms-expand {
   background: rgba(248, 250, 252, 0.8);
   border-radius: 8px;
   padding: 12px;
-  border: 1px solid rgba(139, 92, 246, 0.1);
+  border: 1px solid rgba(53, 30, 107, 0.1);
 }
 
 .actionCategoryHeader {
   font-size: 11px;
   font-weight: 600;
-  color: #8b5cf6;
+  color: #20104d;
   letter-spacing: 0.5px;
   margin-bottom: 8px;
   padding-bottom: 4px;
-  border-bottom: 1px solid rgba(139, 92, 246, 0.1);
+  border-bottom: 1px solid rgba(28, 13, 61, 0.1);
 }
 
 .actionCategoryItems {
@@ -3678,19 +3713,22 @@ select.didFloatingSelect::-ms-expand {
 }
 
 .actionMenuItem:hover {
-    border: 1px solid #4F46E5;
+    border: 1px solid #20104d
+;
     box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
     outline: none;
 }
 
 .actionMenuItem:focus {
-  border: 1px solid #4F46E5;
+  border: 1px solid #20104d
+;
   box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
   outline: none;
 }
 
 .actionMenuItem:active {
-  border: 1px solid #4F46E5;
+  border: 1px solid #20104d
+;
   box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
   outline: none;
 }
@@ -3716,7 +3754,7 @@ select.didFloatingSelect::-ms-expand {
 .actionSearchInput {
   width: 100%;
   padding: 8px 12px 8px 36px;
-  border: 1px solid rgba(139, 92, 246, 0.2);
+  border: 1px solid rgba(23, 12, 49, 0.2);
   border-radius: 6px;
   font-size: 12px;
   background: rgba(248, 250, 252, 0.8);
@@ -3736,7 +3774,8 @@ select.didFloatingSelect::-ms-expand {
   transform: translateY(-50%);
   width: 14px;
   height: 14px;
-  color: #4f46e5;
+  color: 
+#20104d;
 }
 .actionsMenuButton {
   display: flex;
@@ -3746,11 +3785,13 @@ select.didFloatingSelect::-ms-expand {
   width: 36px;
   border: 2px solid #e3e4fe;
   border-radius: 8px;
-  background: #4f46e5;
+  background: 
+#20104d;
   transition: all 0.2s ease;
   cursor: pointer;
   box-sizing: border-box;
   outline: none;
+
   padding: 0; /* no additional padding needed */
   margin: 0 auto; /* ensures horizontal centering if cell is not center-aligned */
 }
@@ -3765,13 +3806,13 @@ select.didFloatingSelect::-ms-expand {
 .actionsMenuButton:hover,
 .actionsMenuButton:focus {
   background: #fafaff;
-  border-color: #7c3aed; /* purple border on hover/focus */
+  border-color: #20104d; /* purple border on hover/focus */
   box-shadow: 0 0 0 2px #e6e6fa;
 }
 
 .actionsMenuButton:active {
   background: #f5f3ff;
-  border-color: #7c3aed;
+  border-color: #20104d;
   box-shadow: 0 0 4px #c3bff4;
 }
 .actionIcon {
@@ -3781,26 +3822,34 @@ select.didFloatingSelect::-ms-expand {
   margin: 0 auto; /* horizontal centering if needed */
   color: #fff;
 }
+.actionsMenuButton:active .actionIcon:hover{
+  color: #271260;
+}
 
 .actionIcon:hover {
   /* background: #e3e4fe; */
-  color: #4f46e5;
+  color: #271260;
 }
 
 .actionsMenuButton:hover .actionIcon,
 .actionsMenuButton:focus .actionIcon,
 .actionsMenuButton:active .actionIcon {
-  color: #4f46e5;
+  color: 
+#20104d;
 }
-
+.actionsMenuButton[aria-expanded="true"]:hover .actionIcon {
+  color: #20104d;
+}
 /* If your dropdown library adds data-state attribute when open */
 .actionsMenuButton[data-state="open"] .actionIcon {
-  color: #4f46e5;
+  color: 
+#20104d;
 }
 
 /* Alternative: target when button has aria-expanded=true */
 .actionsMenuButton[aria-expanded="true"] .actionIcon {
   color: #fff;
+  /* color: #271260; */
 }
 
 @keyframes scaleIn {
@@ -3908,7 +3957,8 @@ select.didFloatingSelect::-ms-expand {
     /* padding: 8px 12px; */
     cursor: pointer;
     font-weight: bold;
-    background-color: #4f46e5;
+    background-color: 
+#20104d;
     color: #ffffff;
     border: none;
     white-space: nowrap;
@@ -3935,7 +3985,8 @@ select.didFloatingSelect::-ms-expand {
   display: none;
 }
 .perPageSelect:focus {
-  border-color: #2563eb; /* blue on focus */
+  border-color: #271260
+; /* blue on focus */
 }
 .perPageContent {
   background: #fff;
@@ -4169,7 +4220,8 @@ select.didFloatingSelect::-ms-expand {
 }
 
 .searchIcon:hover {
-  color: #4f46e5;
+  color: #271260
+;
 }
 
 .inputSearch {
@@ -4185,7 +4237,8 @@ select.didFloatingSelect::-ms-expand {
   /* border-left: none; */
   width: 100%;
   flex: 1;
-  border: 1.4px solid #4f46e5;
+  border: 1.4px solid 
+#20104d;
 }
 
 .perSinSelect {
@@ -4202,25 +4255,33 @@ select.didFloatingSelect::-ms-expand {
   font-weight: 500;
   box-shadow: none;
   transition: border 0.2s;
-  background-color: #4f46e5;
+  background-color: 
+#20104d;
   color: #fff;
-  border: 2px solid #4f46e5;
+  border: 2px solid 
+#20104d;
   padding: 0px 10px;
 }
 
 .perSinSelect:hover {
-  border-color: #4f46e5;
-  background-color: #4f46e5;
+  border-color: 
+#20104d;
+  background-color: #271260
+;
 }
 
 .perSinSelect:active {
-  border-color: #4f46e5 !important;
-  background-color: #4f46e5 !important;
+  border-color: 
+#20104d !important;
+  background-color: 
+#20104d !important;
 }
 
 .perSinSelect:focus {
-  border-color: #4f46e5 !important;
-  background-color: #4f46e5 !important;
+  border-color: 
+#20104d !important;
+  background-color: 
+#20104d !important;
 }
 
 .filterGroup {
@@ -4253,12 +4314,15 @@ select.didFloatingSelect::-ms-expand {
 }
 
 .checkboxLabel input[type="checkbox"]:hover {
-  border-color: #4f46e5;
+  border-color: #20104d
+;
 }
 
 .checkboxLabel input[type="checkbox"]:checked {
-  background-color: #4f46e5;
-  border-color: #4f46e5;
+  background-color:#20104d
+;
+  border-color: 
+#20104d;
 }
 
 .checkboxLabel input[type="checkbox"]:checked::after {
@@ -4274,7 +4338,8 @@ select.didFloatingSelect::-ms-expand {
 
 /* Focus state for accessibility */
 .checkboxLabel input[type="checkbox"]:focus {
-  outline: 2px solid #4f46e5;
+  outline: 2px solid #20104d
+;
   outline-offset: 2px;
 }
 
@@ -4283,12 +4348,14 @@ select.didFloatingSelect::-ms-expand {
 }
 
 .helpIcon {
-  color: #4f46e5; /* or any color that matches your design */
+  color: 
+#20104d; /* or any color that matches your design */
   cursor: pointer;
 }
 
 .helpIcon:hover {
-  color: #4338ca; /* slightly darker on hover */
+  color: #271260
+; /* slightly darker on hover */
 }
 
 .shipmentInfo {
@@ -4311,7 +4378,7 @@ select.didFloatingSelect::-ms-expand {
 .shipmentSin {
   font-family: monospace;
   font-weight: 600;
-  color: #5e35b1;
+  color: #20104d;
 }
 
 .actionMenuSearch {
@@ -4355,11 +4422,20 @@ select.didFloatingSelect::-ms-expand {
 /* .actionCategory:not(:last-child) {
   margin-bottom: 12px;
 } */
+ /* ShipmentsDashboard.module.css */
+
+/* This targets the input when it has the class 'checkboxChecked' */
+.checkboxChecked {
+  /* Note: browser support for custom styling native checkboxes is poor/inconsistent. */
+  /* This is mostly for basic changes like background or border, if the browser allows. */
+  accent-color: #20104d; /* Blue color for modern browsers */
+  border-color: #20104d;
+}
 
 .actionCategoryHeader {
   font-weight: 600;
   font-size: 12px;
-  color: #8b5cf6;
+  color: #20104d;
   padding: 4px 0;
 }
 
@@ -4389,7 +4465,8 @@ select.didFloatingSelect::-ms-expand {
 }
 
 .TableSearchIcon:hover {
-  color: #4f46e5;
+  color: 
+#20104d;
 }
 
 .actionSearchContainer {

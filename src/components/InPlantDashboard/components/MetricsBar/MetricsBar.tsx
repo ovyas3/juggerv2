@@ -1,7 +1,7 @@
 'use client';
 
-import React from 'react';
-import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import React,{useState} from 'react';
+import { TrendingUp, TrendingDown, Minus , ChevronDown, ChevronUp} from 'lucide-react';
 import { DashboardMetrics } from '../../InPlantDashboard';
 import './MetricsBar.css';
 
@@ -129,9 +129,21 @@ const MetricsBar: React.FC<MetricsBarProps> = ({ metrics, loading = false }) => 
       status: 'success' as StatusType
     }
   ];
-
+  const [isExpanded, setIsExpanded] = useState(true);
+  const toggleCollapse = () => setIsExpanded(!isExpanded);
   return (
     <div className="metrics-bar">
+   <button 
+      className="collapse-toggle-btn" 
+      onClick={toggleCollapse} 
+      aria-expanded={isExpanded}
+      aria-controls="metrics-container" // Assuming the metrics-bar is what is collapsed
+    >
+      {isExpanded ? <ChevronUp size={24} /> : <ChevronDown size={24} />}
+     
+    </button>
+    {isExpanded && (
+      <>
       <div className="metrics-container">
         {metricConfigs.map((config, index) => (
           <MetricCard
@@ -178,6 +190,7 @@ const MetricsBar: React.FC<MetricsBarProps> = ({ metrics, loading = false }) => 
           </div>
         </div>
       )}
+      </>)}
     </div>
   );
 };

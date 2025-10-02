@@ -10,7 +10,7 @@ import VehicleTable from './components/VehicleTable/VehicleTable';
 import DetailPanel from './components/DetailPanel/DetailPanel';
 import KeplerMapView from './components/KeplerMapView/KeplerMapView';
 import './InPlantDashboard.css';
-
+import {ChevronDown, ChevronUp  } from 'lucide-react';
 export interface Vehicle {
   id: string;
   vehicleNumber: string;
@@ -246,7 +246,8 @@ const InPlantDashboard: React.FC = () => {
   const handleClosePanelDetail = useCallback(() => {
     setSelectedVehicle(null);
   }, []);
-
+  const [isExpanded, setIsExpanded] = useState(true);
+  const toggleCollapse = () => setIsExpanded(!isExpanded);
   return (
     <div className="inplant-dashboard">
       <div className="dashboard-container">
@@ -283,6 +284,19 @@ const InPlantDashboard: React.FC = () => {
         {/* Main Content Area */}
         <div className="dashboard-main-content1">
           {/* Header Section */}
+          <button 
+      className="collapse-toggle-btn" 
+      onClick={toggleCollapse} 
+      aria-expanded={isExpanded}
+      aria-controls="metrics-container" // Assuming the metrics-bar is what is collapsed
+    >
+      {isExpanded ? <ChevronUp size={24} /> : <ChevronDown size={24} />}
+     
+    </button>
+    <div className={`collapsible-section ${!isExpanded ? 'collapsed' : ''}`}>
+    {isExpanded && (
+        <>
+        <div>
           <DashboardHeader
             searchQuery={searchQuery}
             onSearch={handleSearch}
@@ -292,6 +306,8 @@ const InPlantDashboard: React.FC = () => {
             onFiltersChange={handleFilterChange}
           />
 
+
+          
           {/* Content Tabs */}
           <div className="content-tabs">
             <button
@@ -328,6 +344,9 @@ const InPlantDashboard: React.FC = () => {
               />
             )}
           </div>
+          </div>
+      </>)}
+   </div>
         </div>
 
         {/* Detail Panel */}

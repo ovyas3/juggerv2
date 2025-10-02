@@ -180,7 +180,7 @@
 }
 
 .submitButton {
-  background-color: #4F46E5;
+  background-color: #20104d;
   color: white;
   border: none;
 }
@@ -237,13 +237,13 @@
 }
 
 .selectTrigger:hover {
-  border: 1px solid #4F46E5;
+  border: 1px solid #20104d;
   box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
   outline: none;
 }
 
 .selectTrigger:focus {
-  border-color: #4f46e5;
+  border-color: #20104d;
   box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
   outline: none;
 }
@@ -313,7 +313,7 @@
 .selectField:focus,
 .reasonTextarea:focus {
   outline: none !important;
-  border: 1px solid #4f46e5 !important;
+  border: 1px solid #20104d !important;
   box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2) !important;
 }
 
@@ -328,12 +328,12 @@
 }
 
 .datePicker:hover {
-  border-color: #4F46E5;
+  border-color: #20104d;
 }
 
 .datePicker:focus,
 .datePicker-focused {
-  border-color: #4f46e5;
+  border-color: #20104d;
   box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
   outline: none;
 }
@@ -343,26 +343,26 @@
   width: 200px;
   padding: 8px 12px;
   outline: none;
-  border: 1px solid #4f46e5;
+  border: 1px solid #20104d;
   border-radius: 4px;
   font-size: 14px;
   font-family: "Muli", sans-serif;
 }
 
 .dateInput:hover {
-  border: 1px solid #4f46e5;
+  border: 1px solid #20104d;
   box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
 }
 
 .dateInput:focus {
   outline: none;
-  border: 1px solid #4f46e5;
+  border: 1px solid #20104d;
   box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
 }
 
 .dateInput:focus-visible {
   outline: none;
-  border: 1px solid #4f46e5;
+  border: 1px solid #20104d;
   box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
 }
 

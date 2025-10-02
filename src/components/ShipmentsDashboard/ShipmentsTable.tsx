@@ -157,6 +157,8 @@ export const ShipmentsTable: React.FC<ShipmentsTableProps> = ({
   const [showOrdersPopup, setShowOrdersPopup] = useState(false);
   const [selectedOrders, setSelectedOrders] = useState<string[]>([]);
 
+
+
   const handleBubbleClick = (orders: string[], e: React.MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
@@ -344,6 +346,11 @@ const  renderConsentAndSubscriptionIcons = (shipment: any, openSubscribeModal: (
             >
               Destination Code
             </th>}
+            {isMykl && <th
+              className={`${styles.matHeaderCell} ${styles.matColumnDestinationCode}`}
+            >
+             Invoice No
+            </th>}
             <th
               className={`${styles.matHeaderCell} ${styles.matColumnSpotDriver}`}
             >
@@ -419,6 +426,7 @@ const  renderConsentAndSubscriptionIcons = (shipment: any, openSubscribeModal: (
                 <td className={`${styles.matCell} ${styles.matColumnSelect}`}>
                   <input
                     type="checkbox"
+                    className={ styles.checkboxChecked }
                     checked={selectedShipmentsArray.includes(shipment._id)}
                     onChange={(e) => {
                       e.stopPropagation();
@@ -593,6 +601,47 @@ const  renderConsentAndSubscriptionIcons = (shipment: any, openSubscribeModal: (
                 {isMykl && <td className={`${styles.matCell} ${styles.matColumnDestinationCode}`}>
                   {shipment.destination_code || "-"}
                 </td>}
+                {/* {isMykl && <td className={`${styles.matCell} ${styles.matColumnDestinationCode}`}>
+                  {
+                  // shipment.others||
+                   "-"}
+                </td>} */}
+                {isMykl && <td className={styles.matCell}>
+                  {/* {shipment.others
+                    ? (() => {
+                        const orders = shipment.others.split(",");
+                        return (
+                          <span style={{ display: "flex", alignItems: "center",justifyContent: "center", gap: 8 }}>
+                            <span>{orders[0]}</span>
+                            {orders.length > 1 && (
+                              <span
+                                className={`${styles.buble_round} no-row-click`}
+                                onClick={(e) => handleBubbleClick(orders.slice(1), e)}
+                                style={{
+                                  background: "#EDE7F6",
+                                  borderRadius: "50%",
+                                  padding: "0px 3px",
+                                  fontSize: "12px",
+                                  width: "22px",
+                                  height: "22px",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  cursor: "pointer",
+                                  color: "#5e35b1"
+                                }}
+                              >
+                                +{orders.length - 1}
+                              </span>
+                            )}
+                          </span>
+                        );
+                      })()
+                    :  */}
+                    -
+                    {/* } */}
+                </td>
+                }
 
                 <td
                   className={`${styles.matCell} ${styles.matColumnSpotDriver}`}

@@ -116,7 +116,7 @@
 .actionButton {
   background: none;
   border: none;
-  color: #4f46e5;
+  color: #20104d;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -230,13 +230,13 @@
 
 .approveButton,
 .submitButton {
-  background-color: #4f46e5 !important;
+  background-color: #20104d !important;
   color: white !important;
   text-transform: none !important;
   font-weight: 500 !important;
   padding: 6px 20px !important;
   border-radius: 4px !important;
-  border-color: #4f46e5 !important;
+  border-color: #20104d !important;
 }
 
 .approveButton:hover:not(:disabled),
@@ -367,17 +367,17 @@
 }
 
 .select:hover {
-  border-color: #4F46E5;
+  border-color: #20104d;
 }
 
 .select:focus-within {
-  border-color: #4F46E5;
+  border-color: #20104d;
   box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
   outline: none;
 }
 
 .select[data-state="open"] {
-  border-color: #4F46E5;
+  border-color: #20104d;
   box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
 }
 
@@ -409,7 +409,7 @@
 }
 
 .selectItem[data-highlighted] {
-  background-color: #4F46E5;
+  background-color: #20104d;
   color: white;
   outline: none;
 }
