@@ -8,7 +8,7 @@ import { Typography, useMediaQuery, useTheme } from '@mui/material';
 import { httpsGet, httpsPost } from "@/utils/Communication";
 import { useRouter } from "next/navigation";
 import { useSnackbar } from "@/hooks/snackBar";
-import { Download, Loader2 } from 'lucide-react';
+import { Download, Loader2, ChevronUp, ChevronDown } from 'lucide-react';
 import { ThreeCircles } from "react-loader-spinner";
 import VehicleStagingLiveCard from "./VehicleStagingLiveCard/VehicleStagingLiveCard";
 import VehicleStagingLiveShipmentDetails from "./VehicleStagingLiveShipmentDetails/VehicleStagingLiveShipmentDetails";
@@ -74,6 +74,8 @@ export default function VehicleStagingLive({
     const [driverIds, setDriverIds] = useState<string[]>([]);
     const [title, setTitle] = useState<string>('');
     const [isPopupOpen, setIsPopupOpen] = useState<boolean>(false)
+    const [isExpanded, setIsExpanded] = useState(true);
+    const toggleExpand = () => setIsExpanded(!isExpanded);
 
     const handleStartDateChange = (date: Date | null) => {
         setStartDate(date);
@@ -208,88 +210,112 @@ export default function VehicleStagingLive({
                         <h1 className={styles.title}>Vehicle Staging Live</h1>
                     )}
                     <div className={styles.dateContainer}>
-                       <div style={{ display: 'flex', alignItems: 'center', gap: 8 , width: '100%'}}>
-                       {isInDashboard && (
-                            <h2 className={styles.title}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                          {isInDashboard && (
+                            <div 
+                              style={{ 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                gap: 8,
+                                cursor: 'pointer'
+                              }}
+                              onClick={toggleExpand}
+                            >
+                              <h2 className={styles.title}>
                                 Mill Wise
-                            </h2>
-                        )}
-                        <Box sx={{
-                            display: 'flex',
-                            justifyContent: 'flex-start',
-                            alignItems: 'center',
-                            gap: 2,
-                            width: !mobile ? '20%' : '100%',
-                        }}>
-                            <CustomDatePicker
+                              </h2>
+                              <div style={{ display: 'flex', alignItems: 'center' }}>
+                                {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                        
+                        {isExpanded && (
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                            <Box sx={{
+                              display: 'flex',
+                              justifyContent: 'flex-start',
+                              alignItems: 'center',
+                              gap: 2,
+                              width: !mobile ? 'auto' : '100%',
+                            }}>
+                              <CustomDatePicker
                                 label="From"
                                 value={startDate}
                                 onChange={handleStartDateChange}
                                 maxDate={endDate}
                                 defaultDate={oneWeekAgo}
                                 maxSelectableDate={today}
-                            />
-                            <CustomDatePicker
+                              />
+                              <CustomDatePicker
                                 label="To"
                                 value={endDate}
                                 onChange={handleEndDateChange}
                                 minDate={startDate}
                                 defaultDate={today}
                                 minSelectableDate={startDate}
-                            />
-                        </Box>
-                       </div>
-                        <button 
-                            className={`${styles.exportButton} ${isInDashboard ? styles.dashboardExportButton : ''}`}
-                            onClick={exportToExcel}
-                        >
-                            <Download className={styles.exportButtonIcon} />
-                            Export
-                        </button>
+                              />
+                            </Box>
+                            <button 
+                              className={`${styles.exportButton} ${isInDashboard ? styles.dashboardExportButton : ''}`}
+                              onClick={exportToExcel}
+                            >
+                              <Download className={styles.exportButtonIcon} />
+                              Export
+                            </button>
+                          </div>
+                        )}
+                      </div>
                     </div>
-                    {mobile && (
-                        <div className={styles.cardContainer}>
+
+                    {isExpanded && (
+                      <>
+                        {mobile ? (
+                          <div className={styles.cardContainer}>
                             {sortedMaterials && sortedMaterials.length > 0 && sortedMaterials.map(([material, data]) => (
-                                <VehicleStagingLiveCard key={material} material={material} data={data} />
+                              <VehicleStagingLiveCard key={material} material={material} data={data} />
                             ))}
-                        </div>
-                    )}
-                    {!mobile && (
-                        <div className={styles.tableContainer}>
+                          </div>
+                        ) : (
+                          <div className={styles.tableContainer}>
                             <table className={`${styles.table} ${isInDashboard ? styles.dashboardTable : ''}`}>
-                                <thead>
-                                    <tr>
-                                        <th onClick={() => handleSort("TW")}>Materials</th>
-                                        {stages.map((stage) => {
-                                            const stageName = stageWithName[stage]
-                                            return (
-                                                <th key={stage} onClick={() => handleSort(stage)}>
-                                                    {stageName}
-                                                </th>
-                                            )
-                                        })}
+                              <thead>
+                                <tr>
+                                  <th onClick={() => handleSort("TW")}>Materials</th>
+                                  {stages.map((stage) => {
+                                    const stageName = stageWithName[stage]
+                                    return (
+                                      <th key={stage} onClick={() => handleSort(stage)}>
+                                        {stageName}
+                                      </th>
+                                    )
+                                  })}
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {sortedMaterials && sortedMaterials.length > 0 && sortedMaterials.map(([material, data], index) => {
+                                  return (
+                                    <tr key={material} className={index === sortedMaterials.length - 1 ? styles.totalRow : isInDashboard ? styles.dashboardRow : ''}>
+                                      <td>{material}</td>
+                                      {stages.map((stage) => (
+                                        <td key={stage} onClick={() => handleDriverIDs(data[stage], stage, material)}>{data[stage]?.count || 0}</td>
+                                      ))}
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    {sortedMaterials && sortedMaterials.length > 0 && sortedMaterials.map(([material, data], index) => {
-                                        return (
-                                            <tr key={material} className={index === sortedMaterials.length - 1 ? styles.totalRow : isInDashboard ? styles.dashboardRow : ''}>
-                                                <td>{material}</td>
-                                                {stages.map((stage) => (
-                                                    <td key={stage} onClick={() => handleDriverIDs(data[stage], stage, material)}>{data[stage]?.count || 0}</td>
-                                                ))}
-                                            </tr>
-                                        )
-                                    })}
-                                </tbody>
+                                  )
+                                })}
+                              </tbody>
                             </table>
-                        </div>
+                          </div>
+                        )}
+                      </>
                     )}
                     <VehicleStagingLiveShipmentDetails
-                        isOpen={isPopupOpen}
-                        onClose={() => setIsPopupOpen(false)}
-                        title={title}
-                        data={driverIds}
+                      isOpen={isPopupOpen}
+                      onClose={() => setIsPopupOpen(false)}
+                      title={title}
+                      data={driverIds}
                     />
                 </div>
             </div>
