@@ -1,0 +1,46 @@
+import {
+    User,
+    IndianRupee,
+    CheckCircle,
+    Clock,
+    FileSearch,
+    AlertTriangle,
+    FileWarning,
+    CheckCircle2,
+    CalendarX2,
+    PackageX,
+    Sigma,
+    Truck,
+    MapPin,
+    GitPullRequestClosed,
+    XCircle,
+    PackageCheck,
+    Loader2,
+    AlertCircle,
+    FileCheck
+  } from "lucide-react";
+  
+  export const iconMap: { [key: string]: React.ElementType } = {
+    User,
+    IndianRupee,
+    CheckCircle,
+    Clock,
+    FileSearch,
+    AlertTriangle,
+    FileWarning,
+    CalendarX2,
+    PackageX,
+    Sigma,
+    Truck,
+    MapPin,
+    CheckCircle2,
+    GitPullRequestClosed,
+    XCircle,
+    PackageCheck,
+    Loader2,
+    AlertCircle,
+    FileCheck,
+  
+    default: User,
+  };
+  
