@@ -216,6 +216,8 @@
   background: #f3f4f6;
   border-radius: 8px;
   overflow: hidden;
+  display: flex;            /* <-- make it a flex parent */
+ flex-direction: column;
 }
 
 

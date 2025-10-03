@@ -9,7 +9,9 @@ import styles from "./KeplerMapView.module.css";
 import type { Icon as LeafletIcon, DivIcon as LeafletDivIcon, Map as LeafletMap } from "leaflet";
 import type { LatLngExpression } from "leaflet";
 import { Vehicle, StageInfo } from '../../InPlantDashboard';
+import 'leaflet/dist/leaflet.css';
 
+import { useMap } from "react-leaflet";
 // Dynamically import Leaflet components
 const MapContainer = dynamic(() => import("react-leaflet").then((mod) => mod.MapContainer), { ssr: false });
 const TileLayer = dynamic(() => import("react-leaflet").then((mod) => mod.TileLayer), { ssr: false });
@@ -32,12 +34,29 @@ interface PlantLocation {
   type: 'stage' | 'building' | 'parking';
 }
 
+const KeplerMap: React.FC = () => {
+  const map = useMap(); // Get the map instance
+
+  useEffect(() => {
+      // This runs after the component mounts/renders, ensuring the container is available
+      // A small delay often helps, especially in complex UI transitions
+      const timer = setTimeout(() => {
+          map.invalidateSize();
+      }, 100); // 100ms delay
+
+      return () => clearTimeout(timer); // Clean up the timeout
+  }, [map]); // Dependency array: run once after mount
+
+  return null; // This component doesn't render anything itself
+}
 const KeplerMapView: React.FC<KeplerMapViewProps> = ({
   vehicles,
   selectedVehicle,
   onVehicleSelect,
   stages
 }) => {
+  const [mapReady, setMapReady] = useState(false);
+
   const [isSatelliteView, setIsSatelliteView] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [mapZoom, setMapZoom] = useState(16);
@@ -46,26 +65,132 @@ const KeplerMapView: React.FC<KeplerMapViewProps> = ({
   const [selectedMapStyle, setSelectedMapStyle] = useState("light");
   const [showMapStyleSelector, setShowMapStyleSelector] = useState(false);
   const mapRef = useRef<LeafletMap | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
+  
+// Flip ready as soon as a real map instance exists (via MapController)
+useEffect(() => {
+  if (mapRef.current && !mapReady) {
+    setMapReady(true);
+    // nudge size once when we declare ready
+    requestAnimationFrame(() => mapRef.current?.invalidateSize(true));
+  }
+}, [mapRef.current, mapReady]);
+
+  useEffect(() => {
+  if (!mapReady) return;
+    const map = mapRef.current;
+    const el = containerRef.current;
+    if (!map || !el) return;
+  
+    // Reflow on size changes (tab switches, sidebar toggles, etc.)
+    const ro = new ResizeObserver(() => {
+      map.invalidateSize();
+    });
+    ro.observe(el);
+  
+    // Reflow when it becomes visible again
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) {
+          // small delay lets CSS/layout settle
+          setTimeout(() => map.invalidateSize(), 100);
+        }
+      },
+      { threshold: 0.2 }
+    );
+    io.observe(el);
+  
+    return () => {
+      ro.disconnect();
+      io.disconnect();
+    };
+  }, [mapReady]);
+  // useEffect(() => {
+  //   if (mapRef.current) {
+  //     setTimeout(() => mapRef.current!.invalidateSize(), 0);
+  //   }
+  // }, [isFullscreen, selectedMapStyle]);
+  useEffect(() => {
+      if (!mapReady) return;
+       mapRef.current && setTimeout(() => mapRef.current!.invalidateSize(), 0);
+     }, [mapReady, isFullscreen, selectedMapStyle]);
+     // after map is created
+
+// Add this function inside KeplerMapView, before the return statement
+
+
+
+// KeplerMapView.tsx
+
+
+
+// Make sure you have this ref
+
+  // Hook to handle map resizing when it becomes visible
+  // useEffect(() => {
+  //   if (mapRef.current) {
+  //     // Use a timeout to ensure all parent DOM elements have rendered and sized correctly
+  //     const timer = setTimeout(() => {
+  //       mapRef.current!.invalidateSize();
+  //     }, 100); // 100ms is a safe delay for tab transitions
+
+  //     return () => clearTimeout(timer);
+  //   }
+  // }, [mapRef.current]);
   // Plant center coordinates (example: Mumbai location)
   const plantCenter: [number, number] = [19.0760, 72.8777];
+  // put near other handlers
+const setZoomDelta = (delta: number) => {
+  const map = mapRef.current;
+  if (!map) return;
+  const next = map.getZoom() + delta;
+  map.setZoom(next);
+  setMapZoom(next);            // <-- keep React state in sync
+};
+
 
   // Map styles configuration similar to triptracker
+  // const mapStyles = [
+  //   { id: "none", name: "No Basemap", url: "", color: "#000000" },
+  //   { id: "dark", name: "DarkMatter", url: "https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png", color: "#2c3e50" },
+  //   { id: "light", name: "Positron", url: "https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png", color: "#f8f9fa" },
+  //   { id: "voyager", name: "Voyager", url: "https://cartodb-basemaps-{s}.global.ssl.fastly.net/rastertiles/voyager/{z}/{x}/{y}.png", color: "#e8f4f8" },
+  //   { id: "satellite", name: "Satellite", url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", color: "#4a5568" },
+  //   { id: "osm-light", name: "OpenStreetMap", url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", color: "#ffffff" }
+  // ];
   const mapStyles = [
-    { id: "none", name: "No Basemap", url: "", color: "#000000" },
-    { id: "dark", name: "DarkMatter", url: "https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png", color: "#2c3e50" },
-    { id: "light", name: "Positron", url: "https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png", color: "#f8f9fa" },
-    { id: "voyager", name: "Voyager", url: "https://cartodb-basemaps-{s}.global.ssl.fastly.net/rastertiles/voyager/{z}/{x}/{y}.png", color: "#e8f4f8" },
-    { id: "satellite", name: "Satellite", url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", color: "#4a5568" },
-    { id: "osm-light", name: "OpenStreetMap", url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", color: "#ffffff" }
+    { id: "none",     name: "No Basemap",  url: "",  color: "#000000"  },
+  
+    // CARTO (single host to avoid blocked b/c/d)
+    { id: "light",    name: "Positron",    url: "https://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png" },
+    { id: "dark",     name: "DarkMatter",  url: "https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png" },
+    { id: "voyager",  name: "Voyager",     url: "https://a.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png" },
+  
+    // OSM (single host, no subdomains)
+    { id: "osm",      name: "OSM",         url: "https://tile.openstreetmap.org/{z}/{x}/{y}.png" },
+  
+    // Esri satellite (single host already)
+    { id: "satellite",name: "Satellite",   url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}" },
   ];
-
+  
   const getCurrentMapUrl = () => {
     if (selectedMapStyle === "none") return "";
     if (isSatelliteView) return mapStyles.find((s) => s.id === "satellite")?.url || "";
     return mapStyles.find((s) => s.id === selectedMapStyle)?.url || mapStyles.find((s) => s.id === "light")?.url || "";
   };
 
+  function MapController({ mapRef }: { mapRef: React.MutableRefObject<LeafletMap | null> }) {
+    const map = useMap();
+  
+    useEffect(() => {
+      if (map) {
+        mapRef.current = map;
+      }
+    }, [map, mapRef]);
+  
+    return null; // It doesn't render anything.
+  }
   // Mock plant locations relative to center
   const plantLocations: PlantLocation[] = [
     {
@@ -137,7 +262,28 @@ const KeplerMapView: React.FC<KeplerMapViewProps> = ({
       type: 'building'
     }
   ];
+  const ensureMapSized = useCallback(() => {
+    const map = mapRef.current;
+    const el = containerRef.current?.querySelector('.leaflet-container') as HTMLElement | null;
+    if (!map || !el) return;
+  
+    const targetW = Math.round(el.clientWidth);
+    const targetH = Math.round(el.clientHeight);
+    const { x, y } = map.getSize();
+  
+    if (x !== targetW || y !== targetH) {
+      map.invalidateSize(true);
+      requestAnimationFrame(ensureMapSized);
+    }
+  }, []);
+  useEffect(() => {
+    if (!mapReady) return;
+    ensureMapSized();
+  }, [ensureMapSized,mapReady]);
+  
+  // If you have toggles like fullscreen / basemap / tab switches, include them here:
 
+  
   // Get vehicle position based on current stage
   const getVehiclePosition = useCallback((vehicle: Vehicle): [number, number] => {
     const location = plantLocations.find(loc => loc.stageId === vehicle.currentStage.stageId);
@@ -235,21 +381,59 @@ const KeplerMapView: React.FC<KeplerMapViewProps> = ({
     }
   };
 
-  const handleMapZoom = useCallback((zoomIn: boolean) => {
-    if (mapRef.current) {
-      const newZoom = zoomIn ? mapZoom + 1 : mapZoom - 1;
-      mapRef.current.setZoom(newZoom);
-      setMapZoom(newZoom);
-    }
-  }, [mapZoom]);
+
 
   const toggleFullscreen = useCallback(() => {
     setIsFullscreen(!isFullscreen);
   }, [isFullscreen]);
+  const calculateBounds = useCallback(() => {
+    // Collect all coordinates (plant locations and vehicle positions)
+    const allCoordinates: LatLngExpression[] = plantLocations.map(loc => loc.coordinates);
+    vehicles.forEach(vehicle => {
+        allCoordinates.push(getVehiclePosition(vehicle));
+    });
+  
+    if (allCoordinates.length === 0) {
+        // Fallback to a single point if no data is available
+        return L.latLngBounds(plantCenter, plantCenter);
+    }
+    
+    // Create a LatLngBounds object from the array of coordinates
+    return L.latLngBounds(allCoordinates);
+  }, [plantLocations, vehicles, getVehiclePosition, plantCenter]);
+  const changeZoom = (delta: number) => {
+    const map = mapRef.current;
+    if (!map) {
+      console.warn('[changeZoom] no mapRef yet');return;}
+    const max = map.getMaxZoom() ?? 20;
+    const min = map.getMinZoom() ?? 0;
+    const current = map.getZoom();
+    const next = Math.max(min, Math.min(max, map.getZoom() + delta));
+    console.log('[changeZoom] delta', {
+      current, delta, next, min, max
+    });
+    if (next !== map.getZoom()) {
+      map.setZoom(next, { animate: true });   // state syncs via 'zoomend'
+    }
+  };
+  useEffect(() => {
+    if (!mapReady || !mapRef.current) return;
+    const map = mapRef.current;
+  
+    const syncZoom = () => setMapZoom(map.getZoom());
+    map.on('zoomend', syncZoom);
+  
+  
+    return () => {
+      map.off('zoomend', syncZoom); // ✅ returns void
+    };
+  }, [mapReady]);
 
   return (
-    <div className={`${styles.mapContainer} ${isFullscreen ? styles.fullscreen : ''}`}>
+    // <div className={`${styles.mapContainer} ${isFullscreen ? styles.fullscreen : ''}`}>
+     <div ref={containerRef} className={`${styles.mapContainer} ${isFullscreen ? styles.fullscreen : ''}`}>
       {/* Map Controls */}
+    
       <div className={styles.mapControls}>
         <div className={styles.controlGroup}>
           <button
@@ -285,14 +469,26 @@ const KeplerMapView: React.FC<KeplerMapViewProps> = ({
         <div className={styles.controlGroup}>
           <button
             className={styles.controlBtn}
-            onClick={() => handleMapZoom(true)}
+            onClick={() => {
+              if (!mapRef.current) { console.warn('[zoomIn] map not ready'); return; }
+              const z = mapRef.current.getZoom();
+              const max = mapRef.current.getMaxZoom();
+              console.log('[zoomIn]', { before: z, max });
+              mapRef.current.zoomIn(1);
+              setTimeout(() => console.log('[zoomIn] after', mapRef.current?.getZoom()), 0);
+            }}
             title="Zoom In"
+            
           >
             <ZoomIn size={16} />
           </button>
           <button
             className={styles.controlBtn}
-            onClick={() => handleMapZoom(false)}
+            onClick={() => {
+              if (!mapRef.current) return;
+              mapRef.current.zoomOut(1);
+            }}
+            
             title="Zoom Out"
           >
             <ZoomOut size={16} />
@@ -334,44 +530,130 @@ const KeplerMapView: React.FC<KeplerMapViewProps> = ({
         </div>
       )}
 
+
+
       {/* Map */}
-      <div style={{ height: '100%', width: '100%', position: 'relative' }}>
-        <MapContainer
+      {/* <div ref={containerRef} className={styles.mapCanvas}> */}
+      {/* <MapContainer
+         center={plantCenter}
+        ref={mapRef} 
+        // center={center}
+        zoom={mapZoom}
+        style={{ height: "100%", width: "100%" }}
+        zoomControl={false}
+        attributionControl={false}
+        key={isFullscreen ? "fullscreen" : "normal"}
+      >
+         <MapController mapRef={mapRef} />  */}
+          <div className={styles.mapCanvas}>
+         <MapContainer
+       
+      
+           
+           zoom={mapZoom}  
+           touchZoom={true}
+   center={plantCenter}
+ 
+  style={{ height: "100%", width: "100%" }}
+   zoomControl={false}
+   attributionControl={false}
+   ref={mapRef} 
+
+  //  whenCreated={(map) => {
+  //   mapRef.current = map;
+  //   (window as any)._map = map;   // optional but great for console poking
+  //   map.whenReady(() => {
+  //     setMapReady(true);                  // <-- flip ready only now
+  //     setTimeout(() => map.invalidateSize(true), 0);
+  //   });
+//   }
+// }
+ 
+ >
+    <MapController mapRef={mapRef} />
+
+
+          {/* <Pane name="shipmentMarkers" style={{ zIndex: 650 }} /> */} 
+      
+          <TileLayer
+            url={getCurrentMapUrl()}
+            attribution={
+              isSatelliteView
+                ? 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+                : '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }
+    
+            crossOrigin="anonymous"
+ eventHandlers={{
+   load:     () => mapRef.current?.invalidateSize(true),
+   tileload: () => mapRef.current?.invalidateSize(),
+   tileerror: (e) => console.warn('tileerror:', e?.tile?.src),
+ }}
+//  attribution={
+//   isSatelliteView
+  
+// }
+          />
+      
+      {/* <div  style={{ height: '100%', width: '100%', position: 'relative' }}> */}
+        {/* <MapContainer
           center={plantCenter}
           zoom={mapZoom}
           style={{ 
             height: '100%', 
             width: '100%',
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0
+            // position: 'absolute',
+            // top: 0,
+            // left: 0,
+            // right: 0,
+            // bottom: 0
           }}
           className={styles.leafletMap}
           zoomControl={false}
           attributionControl={false}
-          whenReady={() => {
-            const map = mapRef.current;
-            if (map) {
-              setTimeout(() => {
-                map.invalidateSize(true);
-              }, 0);
-            }
-          }}
-          key={`${isFullscreen}-${selectedMapStyle}`}
+          ref={mapRef as any}
+          whenCreated={(map) => {
+               mapRef.current = map;
+              // debug handle so you can poke it from DevTools
+               (window as any)._map = map;
+               // first nudge
+               setTimeout(() => map.invalidateSize(true), 0);
+             }} 
+          // whenReady={() => {
+          //   const map = mapRef.current;
+          //   if (map) {
+          //     setTimeout(() => {
+          //       map.invalidateSize(true);
+          //     }, 0);
+          //   }
+          // }}
+          // key={`${isFullscreen}-${selectedMapStyle}`}
         >
-      <TileLayer
+      
+       {/* <TileLayer
         url={getCurrentMapUrl()}
         noWrap={true}
         updateWhenZooming={false}
         updateWhenIdle={true}
+        eventHandlers={{ load: () => mapRef.current?.invalidateSize() }}
         attribution={
           isSatelliteView
             ? 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
             : '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }
-      />
+      /> */}
+      {/* <TileLayer
+  url={getCurrentMapUrl()}
+  crossOrigin="anonymous"
+  // only needed if you keep {s} in URLs; otherwise omit:
+  // subdomains={['a']}     // ← start with 'a' only to kill column gaps
+  eventHandlers={{
+    load: () => mapRef.current?.invalidateSize(true),
+    tileload: () => mapRef.current?.invalidateSize(),
+    tileerror: (e) => console.warn('tileerror', e?.tile?.src)
+  }}
+/>
+     */}
 
         {/* Stage Locations */}
         {showStageLabels && plantLocations
@@ -453,8 +735,9 @@ const KeplerMapView: React.FC<KeplerMapViewProps> = ({
           return null;
         })}
       </MapContainer>
-      </div>
+      {/* </div> */}
 
+</div>
       {/* Map Stats */}
       <div className={styles.mapStats}>
         <div className={styles.statItem}>
