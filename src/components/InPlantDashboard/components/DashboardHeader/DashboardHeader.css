@@ -28,7 +28,19 @@
   margin: 0;
   line-height: 1.2;
 }
+.selectItem[data-state='checked'] > :global([data-radix-select-item-indicator]) {
+  display: none !important;
+}
 
+/* Also ensure any SVG inside a checked SelectItem is hidden, in case the indicator is an SVG */
+.selectItem[data-state='checked'] svg { 
+  display: none !important; 
+}
+
+/* Your existing attempt (keep it, but make sure the above is added/corrected) */
+.selectContent1 :global([data-radix-select-item-indicator]) { 
+  display: none !important; 
+}
 .plant-name {
   font-size: var(--text-sm);
   color: var(--text-secondary);
@@ -98,7 +110,7 @@
 }
 
 .search-input:focus {
-  border-color: #4F46E5;
+  border-color: #2f2b74;
   box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
   outline: none;
 }
@@ -449,7 +461,7 @@
 }
 
 .select[data-state="open"] {
-  border-color: #4F46E5;
+  border-color: #302b82;
   box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
 }
 
@@ -509,7 +521,7 @@
 }
 
 .selectItem[data-highlighted] {
-  background-color: #4F46E5;
+  background-color: #191647;
   color: white;
   outline: none;
 }
