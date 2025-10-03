@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { useMediaQuery, useTheme } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { httpsGet, httpsPost } from '@/utils/Communication';
@@ -15,6 +15,7 @@ import KeplerMapView from './components/KeplerMapView/KeplerMapView';
 import './InPlantDashboard.css';
 import {AlertTriangle, CheckCircle2, ChevronDown, ChevronUp, Clock, Truck, DoorOpen, Scale, Package, LogOut  } from 'lucide-react';
 import { useSnackbar } from '@/hooks/snackBar';
+import dayjs from "dayjs";
 
 export interface Vehicle {
   id: string;
@@ -83,16 +84,43 @@ const InPlantDashboard: React.FC = () => {
   const [selectedStage, setSelectedStage] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [dateRange, setDateRange] = useState<'today' | 'yesterday' | 'week' | 'custom'>('today');
+  const [customDateRange, setCustomDateRange] = useState<{
+    startDate: string;
+    endDate: string;
+  }>({
+    startDate: dayjs().subtract(7, 'day').startOf('day').toISOString(),
+    endDate: dayjs().endOf('day').toISOString()
+  });
   const [viewMode, setViewMode] = useState<'table' | 'map'>('table');
   const [filters, setFilters] = useState({
     status: 'all',
     stage: 'all',
+    duration: 'all',
+    quickFilter: 'all',
     timeRange: 'all'
   });
   const [isLoading, setIsLoading] = useState(true);
   const [metrics, setMetrics] = useState(null);
   const [stages, setStages] = useState<StageInfo[]>([]);
   const [isStagesLoading, setIsStagesLoading] = useState(true);
+  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  const [isVehiclesLoading, setIsVehiclesLoading] = useState(true);
+  const [pageSize, setPageSize] = useState<number>(10);
+  const [currentPage, setCurrentPage] = useState<number>(0);
+
+  const paginatedVehicles = useMemo(() => {
+    const startIndex = currentPage * pageSize;
+    return vehicles.slice(startIndex, startIndex + pageSize);
+  }, [vehicles, currentPage, pageSize]);
+
+  const handlePageSizeChange = (size: number) => {
+    setPageSize(size);
+    setCurrentPage(0);
+  };
+
+  useEffect(() => {
+    setCurrentPage(0);
+  }, [searchQuery, selectedStage, filters]);
 
   useEffect(() => {
     const fetchMetrics = async () => {
@@ -147,6 +175,111 @@ const InPlantDashboard: React.FC = () => {
     fetchStages();
   }, []);
 
+  useEffect(() => {
+    const fetchVehicles = async () => {
+      try {
+        setIsVehiclesLoading(true);
+        
+        const getDateRange = () => {
+          const now = new Date();
+          const start = new Date(now);
+          
+          if (dateRange === 'custom') {
+            return {
+              startDate: customDateRange.startDate,
+              endDate: customDateRange.endDate
+            };
+          }
+          
+          switch (dateRange) {
+            case 'yesterday':
+              start.setDate(now.getDate() - 1);
+              start.setHours(0, 0, 0, 0);
+              return {
+                startDate: start.toISOString(),
+                endDate: new Date(start.setHours(23, 59, 59, 999)).toISOString()
+              };
+            case 'week':
+              start.setDate(now.getDate() - 7);
+              start.setHours(0, 0, 0, 0);
+              return {
+                startDate: start.toISOString(),
+                endDate: new Date().toISOString()
+              };
+            case 'today':
+            default:
+              start.setHours(0, 0, 0, 0);
+              return {
+                startDate: start.toISOString(),
+                endDate: new Date(start.setHours(23, 59, 59, 999)).toISOString()
+              };
+          }
+        };
+
+        const dateRangeObj = getDateRange();
+        
+        const payload = {
+          stage: filters.stage,
+          duration: filters.duration,
+          dateRange: {
+            key: dateRange,
+            startDate: dateRangeObj.startDate,
+            endDate: dateRangeObj.endDate
+          },
+          quickFilter: filters.quickFilter,
+          // skip: currentPage * pageSize,
+          // limit: pageSize
+        };
+
+        const response = await httpsPost('InplantDashbaord/Table', payload, {}, 1);
+        if (response?.statusCode === 200) {
+          const formattedVehicles = response.data.map((vehicle: any) => ({
+            id: vehicle.id || '',
+            vehicleNumber: vehicle.vehicleNumber || '',
+            currentStage: {
+              stageId: vehicle.currentStage?.stageId || '',
+              stageName: vehicle.currentStage?.stageName || '',
+              location: vehicle.currentStage?.location || '',
+              arrivedAt: vehicle.currentStage?.arrivedAt || new Date().toISOString(),
+              duration: vehicle.currentStage?.duration || 0,
+              expectedDuration: vehicle.currentStage?.expectedDuration || 0,
+              status: vehicle.currentStage?.status || 'on_time'
+            },
+            entryTime: vehicle.entryTime || new Date().toISOString(),
+            totalDuration: vehicle.totalDuration || 0,
+            overallStatus: vehicle.overallStatus || 'on_track',
+            progress: vehicle.progress || 0,
+            completedStages: vehicle.completedStages || [],
+            shipper: {
+              id: vehicle.shipper?.id || '',
+              name: vehicle.shipper?.name || 'Unknown'
+            },
+            carrier: {
+              id: vehicle.carrier?.id || '',
+              name: vehicle.carrier?.name || 'Unknown'
+            },
+            driver: {
+              name: vehicle.driver?.name || 'Unknown',
+              phone: vehicle.driver?.phone || ''
+            },
+            shipmentId: vehicle.shipmentId || '',
+            orderReference: vehicle.orderReference || ''
+          }));
+          setVehicles(formattedVehicles);
+        } else {
+          console.error('Failed to fetch vehicles:', response?.message || 'Unknown error');
+          showMessage('Failed to fetch vehicles data', 'error');
+        }
+      } catch (error) {
+        console.error('Error fetching vehicles:', error);
+        showMessage('Error fetching vehicles data', 'error');
+      } finally {
+        setIsVehiclesLoading(false);
+      }
+    };
+
+    fetchVehicles();
+  }, [dateRange, filters, customDateRange, currentPage, pageSize]); 
   const formatTime = (minutes: number): string => {
     const hours = Math.floor(minutes / 60);
     const mins = minutes % 60;
@@ -359,34 +492,33 @@ const InPlantDashboard: React.FC = () => {
 
   const displayMetrics = metrics || mockMetrics;
 
-    const getStageIcon = (stageId: string) => {
-      switch(stageId) {
-        case 'EXT_PARKING':
-          return <Truck size={20} />;
-        case 'ENTRY_GATE':
-          return <DoorOpen size={20} />;
-        case 'WEIGHING':
-          return <Scale size={20} />;
-        case 'LOADING':
-          return <Package size={20} />;
-        case 'EXIT_GATE':
-          return <LogOut size={20} />;
-        default:
-          return <Truck size={20} />;
-      }
-    };
-
-    const getStageColor = (stageId: string) => {
-    const colors = {
-      'EXT_PARKING': '#3B82F6',
-      'ENTRY_GATE': '#8B5CF6',
-      'WEIGHING': '#F59E0B',
-      'LOADING': '#10B981',
-      'EXIT_GATE': '#EC4899',
-    };
-    return colors[stageId as keyof typeof colors] || '#6B7280';
+  const getStageIcon = (stageId: string) => {
+    switch(stageId) {
+      case 'EXT_PARKING':
+        return <Truck size={20} />;
+      case 'ENTRY_GATE':
+        return <DoorOpen size={20} />;
+      case 'WEIGHING':
+        return <Scale size={20} />;
+      case 'LOADING':
+        return <Package size={20} />;
+      case 'EXIT_GATE':
+        return <LogOut size={20} />;
+      default:
+        return <Truck size={20} />;
+    }
   };
 
+  const getStageColor = (stageId: string) => {
+  const colors = {
+    'EXT_PARKING': '#3B82F6',
+    'ENTRY_GATE': '#8B5CF6',
+    'WEIGHING': '#F59E0B',
+    'LOADING': '#10B981',
+    'EXIT_GATE': '#EC4899',
+  };
+  return colors[stageId as keyof typeof colors] || '#6B7280';
+};
 
   const displayStages = stages.length > 0 ? stages.map(stage => ({
     id: stage.stageId,
@@ -402,6 +534,8 @@ const InPlantDashboard: React.FC = () => {
     slaThreshold: stage.slaThreshold,
     order: stage.order
   })) : [];
+
+  const displayVehicles = vehicles.length > 0 ? vehicles : [];
 
   // Event handlers
   const handleVehicleSelect = useCallback((vehicle: Vehicle) => {
@@ -425,6 +559,10 @@ const InPlantDashboard: React.FC = () => {
   }, []);
   const [isExpanded, setIsExpanded] = useState(true);
   const toggleExpand = useCallback(() => setIsExpanded(prev => !prev), []);
+
+  const handleCustomDateRangeChange = (range: { startDate: string; endDate: string }) => {
+    setCustomDateRange(range);
+  };
 
   return (
     <div className="inplant-dashboard">
@@ -473,7 +611,7 @@ const InPlantDashboard: React.FC = () => {
         {/* Stage Flow Visualization */}
         {!isMobile && (
           <StageFlow
-            stages={mockStages}
+            stages={stages}
             selectedStage={selectedStage}
             onStageSelect={handleStageSelect}
           />
@@ -505,6 +643,7 @@ const InPlantDashboard: React.FC = () => {
             onSearch={handleSearch}
             dateRange={dateRange}
             onDateRangeChange={setDateRange}
+            onCustomDateRangeChange={handleCustomDateRangeChange}
             filters={filters}
             onFiltersChange={handleFilterChange}
             isExpanded={isExpanded}
@@ -534,19 +673,29 @@ const InPlantDashboard: React.FC = () => {
               <div className={`content-area ${viewMode === 'map' ? 'map-view-container' : ''}`}>
                 {viewMode === 'table' ? (
                   <VehicleTable
-                    vehicles={mockVehicles}
+                    vehicles={paginatedVehicles}
                     selectedVehicle={selectedVehicle}
                     onVehicleSelect={handleVehicleSelect}
                     searchQuery={searchQuery}
                     selectedStage={selectedStage}
-                    filters={filters}
+                    filters={{
+                      status: filters.status,
+                      stage: filters.stage,
+                      timeRange: filters.timeRange
+                    }}
+                    loading={isVehiclesLoading}
+                    pageSize={pageSize}
+                    currentPage={currentPage}
+                    totalItems={vehicles.length}
+                    onPageChange={setCurrentPage}
+                    onPageSizeChange={handlePageSizeChange}
                   />
                 ) : (
                   <KeplerMapView
-                    vehicles={mockVehicles}
+                    vehicles={displayVehicles}
                     selectedVehicle={selectedVehicle}
                     onVehicleSelect={handleVehicleSelect}
-                    stages={mockStages}
+                    stages={displayStages}
                   />
                 )}
               </div>

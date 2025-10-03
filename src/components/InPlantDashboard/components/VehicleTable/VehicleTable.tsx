@@ -1,8 +1,15 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import { ChevronRight, Clock, AlertCircle, CheckCircle, Truck, User, Building } from 'lucide-react';
+import { ChevronRight, Clock, AlertCircle, CheckCircle, Truck, User, Building, ChevronLeft, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import { Vehicle } from '../../InPlantDashboard';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../../UI/select';
 import './VehicleTable.css';
 
 interface VehicleTableProps {
@@ -17,6 +24,11 @@ interface VehicleTableProps {
     timeRange: string;
   };
   loading?: boolean;
+  pageSize: number;
+  currentPage: number;
+  totalItems: number;
+  onPageChange: (page: number) => void;
+  onPageSizeChange: (size: number) => void;
 }
 
 interface VehicleRowProps {
@@ -201,17 +213,23 @@ const VehicleTable: React.FC<VehicleTableProps> = ({
   searchQuery,
   selectedStage,
   filters,
-  loading = false
+  loading = false,
+  pageSize,
+  currentPage,
+  totalItems,
+  onPageChange,
+  onPageSizeChange
 }) => {
   const filteredVehicles = useMemo(() => {
     let filtered = [...vehicles];
 
     // Search filter
     if (searchQuery) {
-      filtered = filtered.filter(vehicle =>
-        vehicle.vehicleNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        vehicle.driver.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        vehicle.shipmentId.toLowerCase().includes(searchQuery.toLowerCase())
+      filtered = filtered.filter(
+        vehicle =>
+          vehicle.vehicleNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          (vehicle.driver?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false) ||
+          vehicle.shipmentId.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
 
@@ -238,6 +256,16 @@ const VehicleTable: React.FC<VehicleTableProps> = ({
 
     return filtered;
   }, [vehicles, searchQuery, selectedStage, filters]);
+
+  const totalPages = Math.ceil(totalItems / pageSize);
+  const startItem = totalItems > 0 ? currentPage * pageSize + 1 : 0;
+  const endItem = Math.min((currentPage + 1) * pageSize, totalItems);
+
+  const handlePageSizeChange = (size: number) => {
+    // Reset to first page when changing page size
+    onPageSizeChange(size);
+    onPageChange(0);
+  };
 
   if (loading) {
     return (
@@ -279,10 +307,69 @@ const VehicleTable: React.FC<VehicleTableProps> = ({
 
   return (
     <div className="vehicle-table-container">
-      <div className="table-header">
-        <h3>Vehicles</h3>
-        <div className="table-count">
-          {filteredVehicles.length} of {vehicles.length} vehicles
+      <div className="pagination-controls">
+        <div className="pagination-left">
+          <span className="results-count">
+            Showing {startItem}-{endItem} of {totalItems} vehicles
+          </span>
+        </div>
+        
+        <div className="pagination-right">
+          <div className="pagination-rows-per-page">
+            <span className="rows-label">Rows per page:</span>
+            <Select
+              value={pageSize.toString()}
+              onValueChange={(value) => handlePageSizeChange(Number(value))}
+            >
+              <SelectTrigger className="page-size-select">
+                <SelectValue placeholder={pageSize.toString()} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="10">10</SelectItem>
+                <SelectItem value="25">25</SelectItem>
+                <SelectItem value="50">50</SelectItem>
+                <SelectItem value="100">100</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="pagination-buttons">
+            <button
+              className={`pagination-button ${currentPage === 0 ? 'disabled' : ''}`}
+              onClick={() => onPageChange(0)}
+              disabled={currentPage === 0}
+              title="First page"
+            >
+              <ChevronsLeft size={16} />
+            </button>
+            <button
+              className={`pagination-button ${currentPage === 0 ? 'disabled' : ''}`}
+              onClick={() => onPageChange(currentPage - 1)}
+              disabled={currentPage === 0}
+              title="Previous page"
+            >
+              <ChevronLeft size={16} />
+            </button>
+            <span className="page-info">
+              Page {currentPage + 1} of {Math.max(1, totalPages)}
+            </span>
+            <button
+              className={`pagination-button ${currentPage >= totalPages - 1 ? 'disabled' : ''}`}
+              onClick={() => onPageChange(currentPage + 1)}
+              disabled={currentPage >= totalPages - 1}
+              title="Next page"
+            >
+              <ChevronRight size={16} />
+            </button>
+            <button
+              className={`pagination-button ${currentPage >= totalPages - 1 ? 'disabled' : ''}`}
+              onClick={() => onPageChange(totalPages - 1)}
+              disabled={currentPage >= totalPages - 1}
+              title="Last page"
+            >
+              <ChevronsRight size={16} />
+            </button>
+          </div>
         </div>
       </div>
 
@@ -310,20 +397,11 @@ const VehicleTable: React.FC<VehicleTableProps> = ({
                 vehicle={vehicle}
                 isSelected={selectedVehicle?.id === vehicle.id}
                 onSelect={() => onVehicleSelect(vehicle)}
-                index={index + 1}
+                index={startItem + index - 1}
               />
             ))}
           </tbody>
         </table>
-      </div>
-
-      <div className="table-footer">
-        <div className="pagination-info">
-          Showing {filteredVehicles.length} vehicles
-        </div>
-        <div className="auto-refresh-info">
-          Auto-refresh: ON • Last updated: {new Date().toLocaleTimeString()}
-        </div>
       </div>
     </div>
   );
