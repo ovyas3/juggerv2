@@ -861,3 +861,9 @@
   border-right: 1px solid var(--border-light);
   background: var(--bg-primary);
 }
+.pagination-rows-per-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}

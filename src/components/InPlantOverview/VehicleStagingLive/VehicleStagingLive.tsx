@@ -234,11 +234,12 @@ export default function VehicleStagingLive({
                         
                         {isExpanded && (
                           <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                            <Box sx={{
-                              display: 'flex',
-                              justifyContent: 'flex-start',
-                              alignItems: 'center',
-                              gap: 2,
+                            {!isInDashboard && (
+                              <Box sx={{
+                                display: 'flex',
+                                justifyContent: 'flex-start',
+                                alignItems: 'center',
+                                gap: 2,
                               width: !mobile ? 'auto' : '100%',
                             }}>
                               <CustomDatePicker
@@ -257,7 +258,8 @@ export default function VehicleStagingLive({
                                 defaultDate={today}
                                 minSelectableDate={startDate}
                               />
-                            </Box>
+                            </Box>  
+                            )}
                             <button 
                               className={`${styles.exportButton} ${isInDashboard ? styles.dashboardExportButton : ''}`}
                               onClick={exportToExcel}

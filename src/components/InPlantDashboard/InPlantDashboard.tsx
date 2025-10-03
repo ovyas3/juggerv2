@@ -16,6 +16,7 @@ import './InPlantDashboard.css';
 import {AlertTriangle, CheckCircle2, ChevronDown, ChevronUp, Clock, Truck, DoorOpen, Scale, Package, LogOut  } from 'lucide-react';
 import { useSnackbar } from '@/hooks/snackBar';
 import dayjs from "dayjs";
+import { iconMap } from '@/components/UI/iconMap';
 
 export interface Vehicle {
   id: string;
@@ -150,15 +151,28 @@ const InPlantDashboard: React.FC = () => {
         setIsStagesLoading(true);
         const response = await httpsPost('InplantDashbaord/vehicleflow', {}, {}, 1);
         if (response?.statusCode === 200) {
-          const formattedStages = response.data.map((stage: any) => ({
-            stageId: stage.stageId || '',
-            stageName: stage.stageName || '',
-            vehicleCount: stage.vehicleCount || 0,
-            averageTime: stage.averageTime || 0,
-            healthStatus: stage.healthStatus?.toLowerCase() || 'normal',
-            slaThreshold: stage.slaThreshold || 0,
-            order: stage.order || 0
-          }));
+          const formattedStages = response.data.map((stage: any) => {
+            const IconComponent = stage.icon ? iconMap[stage.icon] : iconMap.default;
+            return {
+              stageId: stage.id || '',
+              stageName: stage.title || '',
+              title: stage.title || '',
+              value: stage.value || '0',
+              subtitle: stage.subtitle || '',
+              icon: IconComponent ? <IconComponent size={20} /> : null,
+              iconColor: stage.iconColor || '#333333',
+              bgColor: stage.bgColor || 'white',
+              borderColor: stage.borderColor || '#E5E7EB',
+              vehicleCount: parseInt(stage.value) || 0,
+              averageTime: stage.averageTime || 0,
+              healthStatus: stage.healthStatus?.toLowerCase() || 'normal',
+              slaThreshold: stage.slaThreshold || 0,
+              order: stage.order || 0,
+              trend: stage.trend || 'neutral',
+              trendValue: stage.trendValue || 0,
+              trendLabel: stage.trendLabel || ''
+            };
+          });
           setStages(formattedStages);
         } else {
           console.error('Failed to fetch stages:', response?.message || 'Unknown error');
@@ -250,18 +264,9 @@ const InPlantDashboard: React.FC = () => {
             overallStatus: vehicle.overallStatus || 'on_track',
             progress: vehicle.progress || 0,
             completedStages: vehicle.completedStages || [],
-            shipper: {
-              id: vehicle.shipper?.id || '',
-              name: vehicle.shipper?.name || 'Unknown'
-            },
-            carrier: {
-              id: vehicle.carrier?.id || '',
-              name: vehicle.carrier?.name || 'Unknown'
-            },
-            driver: {
-              name: vehicle.driver?.name || 'Unknown',
-              phone: vehicle.driver?.phone || ''
-            },
+            shipper: { id: vehicle.shipper?.id || '', name: vehicle.shipper?.name || 'Unknown' },
+            carrier: { id: vehicle.carrier?.id || '', name: vehicle.carrier?.name || 'Unknown' },
+            driver: { name: vehicle.driver?.name || 'Unknown', phone: vehicle.driver?.phone || '' },
             shipmentId: vehicle.shipmentId || '',
             orderReference: vehicle.orderReference || ''
           }));
@@ -291,37 +296,37 @@ const InPlantDashboard: React.FC = () => {
       id: 'activeVehicles',
       title: 'Active Vehicles',
       value: '23',
-      icon: <Truck size={20} />,
+      icon: 'Truck',
       iconColor: '#3B82F6', 
-      bgColor: 'white',
-      borderColor: '#E5E7EB' 
+      bgColor: 'rgba(59, 130, 246, 0.1)',
+      borderColor: 'rgba(59, 130, 246, 0.2)' 
     },
     {
       id: 'averageProcessingTime',
       title: 'Avg. Processing Time',
       value: formatTime(135),
-      icon: <Clock size={20} />,
+      icon: 'Clock',
       iconColor: '#06B6D4', 
-      bgColor: 'white',
-      borderColor: '#E5E7EB'
+      bgColor: 'rgba(6, 182, 212, 0.1)',
+      borderColor: 'rgba(6, 182, 212, 0.2)'
     },
     {
       id: 'delayedVehicles',
       title: 'Delayed Vehicles',
       value: '5',
-      icon: <AlertTriangle size={20} />,
+      icon: 'AlertTriangle',
       iconColor: '#EF4444', 
-      bgColor: 'white',
-      borderColor: '#E5E7EB'
+      bgColor: 'rgba(239, 68, 68, 0.1)',
+      borderColor: 'rgba(239, 68, 68, 0.2)'
     },
     {
       id: 'completedToday',
-      title: 'Completed Today',
+      title: 'Gate Out Today',
       value: '142',
-      icon: <CheckCircle2 size={20} />,
+      icon: 'CheckCircle2',
       iconColor: '#10B981',   
-      bgColor: 'white',
-      borderColor: '#E5E7EB'
+      bgColor: 'rgba(16, 185, 129, 0.1)',
+      borderColor: 'rgba(16, 185, 129, 0.2)'
     }
   ];
 
@@ -331,10 +336,10 @@ const InPlantDashboard: React.FC = () => {
       title: 'External Parking',
       value: '8',
       subtitle: 'Vehicles',
-      icon: <Truck size={20} />,
+      icon: 'Truck',
       iconColor: '#3B82F6',
-      bgColor: 'white',
-      borderColor: '#E5E7EB',
+      bgColor: 'rgba(59, 130, 246, 0.1)',
+      borderColor: 'rgba(59, 130, 246, 0.2)',
       stageId: 'EXT_PARKING',
       averageTime: 80,
       healthStatus: 'normal',
@@ -346,10 +351,10 @@ const InPlantDashboard: React.FC = () => {
       title: 'Entry Gate',
       value: '4',
       subtitle: 'Vehicles',
-      icon: <DoorOpen size={20} />,
+      icon: 'DoorOpen',
       iconColor: '#8B5CF6',
-      bgColor: 'white',
-      borderColor: '#E5E7EB',
+      bgColor: 'rgba(139, 92, 246, 0.1)',
+      borderColor: 'rgba(139, 92, 246, 0.2)',
       stageId: 'ENTRY_GATE',
       averageTime: 15,
       healthStatus: 'normal',
@@ -361,10 +366,10 @@ const InPlantDashboard: React.FC = () => {
       title: 'Weighing',
       value: '3',
       subtitle: 'Vehicles',
-      icon: <Scale size={20} />,
+      icon: 'Scale',
       iconColor: '#F59E0B',
-      bgColor: 'white',
-      borderColor: '#E5E7EB',
+      bgColor: 'rgba(245, 158, 11, 0.1)',
+      borderColor: 'rgba(245, 158, 11, 0.2)',
       stageId: 'WEIGHING',
       averageTime: 45,
       healthStatus: 'warning',
@@ -376,10 +381,10 @@ const InPlantDashboard: React.FC = () => {
       title: 'Loading',
       value: '5',
       subtitle: 'Vehicles',
-      icon: <Package size={20} />,
+      icon: 'Package',
       iconColor: '#10B981',
-      bgColor: 'white',
-      borderColor: '#E5E7EB',
+      bgColor: 'rgba(16, 185, 129, 0.1)',
+      borderColor: 'rgba(16, 185, 129, 0.2)',
       stageId: 'LOADING',
       averageTime: 90,
       healthStatus: 'normal',
@@ -391,10 +396,10 @@ const InPlantDashboard: React.FC = () => {
       title: 'Weight Out',
       value: '3',
       subtitle: 'Vehicles',
-      icon: <Scale size={20} className="rotate-180" />,
+      icon: 'Scale',
       iconColor: '#8B5CF6',
-      bgColor: 'white',
-      borderColor: '#E5E7EB',
+      bgColor: 'rgba(139, 92, 246, 0.1)',
+      borderColor: 'rgba(139, 92, 246, 0.2)',
       stageId: 'WEIGHT_OUT',
       averageTime: 20,
       healthStatus: 'normal',
@@ -406,10 +411,10 @@ const InPlantDashboard: React.FC = () => {
       title: 'Gate Out',
       value: '0',
       subtitle: 'Vehicles',
-      icon: <LogOut size={20} />,
+      icon: 'LogOut',
       iconColor: '#6B7280',
-      bgColor: 'white',
-      borderColor: '#E5E7EB',
+      bgColor: 'rgba(107, 114, 128, 0.1)',
+      borderColor: 'rgba(107, 114, 128, 0.2)',
       stageId: 'GATE_OUT',
       averageTime: 10,
       healthStatus: 'normal',
@@ -592,17 +597,20 @@ const InPlantDashboard: React.FC = () => {
                   <MetricCardSkeleton key={`skeleton-${index}`} />
                 ))
               ) : (
-                displayMetrics.map((metric) => (
-                  <MetricCard
-                    key={metric.id}
-                    title={metric.title}
-                    value={metric.value}
-                    icon={metric.icon}
-                    iconColor={metric.iconColor}
-                    bgColor={metric.bgColor}
-                    borderColor={metric.borderColor}
-                  />
-                ))
+                displayMetrics.map((metric) => {
+                  const IconComponent = iconMap[metric.icon] || iconMap.default;
+                  return (
+                    <MetricCard
+                      key={metric.id}
+                      title={metric.title}
+                      value={metric.value}
+                      icon={<IconComponent size={20} />}
+                      iconColor={metric.iconColor}
+                      bgColor={metric.bgColor}
+                      borderColor={metric.borderColor}
+                    />
+                  );
+                })
               )}
             </div>
           )}
