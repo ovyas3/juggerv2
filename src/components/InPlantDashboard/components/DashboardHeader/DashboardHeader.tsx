@@ -1,25 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
-import {
-  Search,
-  Calendar,
-  Filter,
-  RefreshCw,
-  Download,
-  Settings,
-  ChevronDown,
-  ChevronUp
-} from 'lucide-react';
-
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/UI/select";
-
+import React, { useState, useEffect } from 'react';
+import { Search, Calendar, Filter, RefreshCw, Download, Settings, ChevronDown, ChevronUp } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/UI/select";
+import { DatePicker } from "antd";
+import dayjs from "dayjs";
 import './DashboardHeader.css';
 
 interface DashboardHeaderProps {
@@ -27,10 +12,12 @@ interface DashboardHeaderProps {
   onSearch: (query: string) => void;
   dateRange: 'today' | 'yesterday' | 'week' | 'custom';
   onDateRangeChange: (range: 'today' | 'yesterday' | 'week' | 'custom') => void;
+  onCustomDateRangeChange?: (range: { startDate: string; endDate: string }) => void;
   filters: {
     status: string;
     stage: string;
-    timeRange: string;
+    duration: string;
+    quickFilter: string;
   };
   onFiltersChange: (filters: any) => void;
   isExpanded: boolean;
@@ -42,16 +29,60 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   onSearch,
   dateRange,
   onDateRangeChange,
+  onCustomDateRangeChange,
   filters,
   onFiltersChange,
   isExpanded,
   onToggleExpand
 }) => {
+  const [showDateRangePickers, setShowDateRangePickers] = useState(false);
+  const [startDate, setStartDate] = useState<dayjs.Dayjs>(dayjs().subtract(7, 'day').startOf('day'));
+  const [endDate, setEndDate] = useState<dayjs.Dayjs>(dayjs().endOf('day'));
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
+  useEffect(() => {
+    if (dateRange === 'custom') {
+      setStartDate(dayjs().subtract(7, 'day').startOf('day'));
+      setEndDate(dayjs().endOf('day'));
+      setShowDateRangePickers(true);
+    } else {
+      setShowDateRangePickers(false);
+    }
+  }, [dateRange]);
+
+  const handleStartDateChange = (date: any) => {
+    if (date) {
+      setStartDate(date.startOf('day'));
+      if (onCustomDateRangeChange) {
+        onCustomDateRangeChange({
+          startDate: date.startOf('day').toISOString(),
+          endDate: endDate.toISOString()
+        });
+      }
+    }
+  };
+
+  const handleEndDateChange = (date: any) => {
+    if (date) {
+      setEndDate(date.endOf('day'));
+      if (onCustomDateRangeChange) {
+        onCustomDateRangeChange({
+          startDate: startDate.toISOString(),
+          endDate: date.endOf('day').toISOString()
+        });
+      }
+    }
+  };
+
   const handleRefresh = async () => {
     setIsRefreshing(true);
+    onFiltersChange({ 
+      status: 'all',
+      stage: 'all',
+      duration: 'all',
+      quickFilter: 'all'
+    });
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1000));
     setIsRefreshing(false);
@@ -102,26 +133,60 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
         {isExpanded && (
           <>
             <div className="header-center">
-              <Select 
-                value={dateRange} 
-                onValueChange={onDateRangeChange}
-              >
-                <SelectTrigger className="select">
-                  <SelectValue className="selectValue" />
-                </SelectTrigger>
-                <SelectContent 
-                  className="selectContent1"
-                  position="popper"
-                  side="bottom"
-                  align="start"
+              <div className="date-range-container">
+                <Select 
+                  value={dateRange} 
+                  onValueChange={(value: 'today' | 'yesterday' | 'week' | 'custom') => {
+                    onDateRangeChange(value);
+                  }}
                 >
-                  {dateRangeOptions.map(option => (
-                    <SelectItem key={option.key} value={option.key} className='selectItem'>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                  <SelectTrigger className="select">
+                    <SelectValue className="selectValue" />
+                  </SelectTrigger>
+                  <SelectContent 
+                    className="selectContent1"
+                    position="popper"
+                    side="bottom"
+                    align="start"
+                  >
+                    {dateRangeOptions.map(option => (
+                      <SelectItem key={option.key} value={option.key} className='selectItem'>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                
+                {showDateRangePickers && (
+                  <div className="date-pickers-container">
+                    <div className="date-picker-group">
+                      <span className="date-picker-label">From</span>
+                      <DatePicker
+                        value={startDate}
+                        onChange={handleStartDateChange}
+                        format="DD/MM/YYYY"
+                        className="date-picker"
+                        popupClassName="ant-picker-dropdown"
+                        allowClear={false}
+                      />
+                    </div>
+                    <div className="date-picker-group">
+                      <span className="date-picker-label">To</span>
+                      <DatePicker
+                        value={endDate}
+                        onChange={handleEndDateChange}
+                        format="DD/MM/YYYY"
+                        className="date-picker"
+                        popupClassName="ant-picker-dropdown"
+                        allowClear={false}
+                        disabledDate={(current) => {
+                          return current && current < startDate.startOf('day');
+                        }}
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
 
             <div className="header-right">
@@ -148,12 +213,12 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                 <Download size={16} />
               </button>
 
-              <button
+              {/* <button
                 onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
                 className="action-btn"
               >
                 <Settings size={16} />
-              </button>
+              </button> */}
             </div>
           </>
         )}
@@ -166,8 +231,8 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
               {quickFilters.map(filter => (
                 <button
                   key={filter.key}
-                  onClick={() => onFiltersChange({ ...filters, status: filter.key })}
-                  className={`filter-chip ${filters.status === filter.key ? 'active' : ''}`}
+                  onClick={() => onFiltersChange({ ...filters, quickFilter: filter.key })}
+                  className={`filter-chip ${filters.quickFilter === filter.key ? 'active' : ''}`}
                 >
                   <span>{filter.label}</span>
                   <span className="filter-count">{filter.count}</span>
@@ -220,8 +285,8 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                 <div className="filter-group">
                   <label>Duration</label>
                   <Select 
-                    value={filters.timeRange} 
-                    onValueChange={(value) => onFiltersChange({ ...filters, timeRange: value })}
+                    value={filters.duration} 
+                    onValueChange={(value) => onFiltersChange({ ...filters, duration: value })}
                   >
                     <SelectTrigger className="select">
                       <SelectValue placeholder="All Durations" className='selectValue' />
@@ -243,14 +308,14 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
 
                 <div className="filter-actions">
                   <button
-                    onClick={() => onFiltersChange({ status: 'all', stage: 'all', timeRange: 'all' })}
+                    onClick={() => onFiltersChange({ stage: 'all', duration: 'all' })}
                     className="reset-filters-btn"
                   >
                     Reset
                   </button>
-                  <button className="apply-filters-btn">
+                  {/* <button className="apply-filters-btn">
                     Apply Filters
-                  </button>
+                  </button> */}
                 </div>
               </div>
             </div>
