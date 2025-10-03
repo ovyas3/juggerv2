@@ -1,4 +1,8 @@
 /* Vehicle Table Styles */
+:root {
+  --select-accent: #20104d;          /* ← your dark purple */
+  --select-accent-contrast: #ffffff; /* text/icon on top */
+}
 .vehicle-table-container {
   background: var(--bg-primary);
   border-radius: 8px;
@@ -55,7 +59,7 @@
   border-bottom: 1px solid var(--border-light);
   position: sticky;
   top: 0;
-  z-index: 10;
+  /* z-index: 5; */
 }
 
 .sno-header {
@@ -400,61 +404,94 @@
 
 /* Custom Select Styling */
 .page-size-select {
-  width: 140px;
+  width: 90px;
   height: 32px;
   padding: 0 12px;
-  border-radius: 4px;
+  /* border-radius: 4px;
   border: 1px solid #d1d5db;
-  background-color: #fff;
+  background-color: #fff; */
+  border-radius: 10px !important;          /* rounded corners */
+  background:white;             /* solid white */
+  border: 1px solid rgba(0,0,0,0.18);   /* crisper edge so white pops */
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
   font-size: 14px;
   color: #111827;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: space-between;
+
 }
 
 .page-size-select:hover {
   border-color: #9ca3af;
 }
+.select[data-state="open"] {
+  border-color: #302b82;
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+}
 
 .page-size-select:focus {
   outline: none;
-  border-color: #3b82f6;
+  border-color: #302b82;
   box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
 }
 
 .page-size-content {
-  min-width: 140px;
+  min-width: 70px !important;
+
   padding: 4px;
   background-color: #fff;
   border-radius: 6px;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  z-index: 50;
+  z-index: 9999;
+
 }
 
 .page-size-item {
   position: relative;
   display: flex;
   align-items: center;
+  /* min-width: 70px; */
+  width: auto !important; 
   padding: 8px 12px;
   border-radius: 4px;
   font-size: 14px;
   line-height: 1.25rem;
   color: #111827;
-  cursor: pointer;
+  cursor: pointer !important;
   outline: none;
   user-select: none;
+  z-index: 100;
 }
 
 .page-size-item[data-highlighted] {
   background-color: #f3f4f6;
   color: #111827;
 }
+/* --- NEW RULE TO HIDE THE TICK MARK --- */
+
+/* 1. Target the indicator element inside the selected item */
+.page-size-item[data-state='checked'] [data-radix-select-item-indicator], 
+.page-size-item[data-state='checked'] .SelectItemIndicator,
+.page-size-item[data-state='checked'] svg {
+    /* Use !important to override any inline or library styles */
+    display: none !important;
+}
+
+/* 2. Remove space for the tick mark from the selected item's padding
+   (The library often adds extra right padding to checked items) */
+.page-size-item[data-state='checked'] {
+  background-color:  #111827;
+  font-weight: 500;
+  /* Adjust padding back to non-checked state's padding to align content */
+  padding: 8px 12px; /* Resetting to padding without indicator space */
+}
 
 .page-size-item[data-state='checked'] {
-  background-color: #f3f4f6;
+  background-color:  #111827;
   font-weight: 500;
+  cursor: pointer !important;
 }
 
 /* Pagination Buttons */
@@ -861,3 +898,119 @@
   border-right: 1px solid var(--border-light);
   background: var(--bg-primary);
 }
+/* --- Wider trigger (the closed select box) --- */
+.page-size-select {
+  width: 90px;               /* was 140px — pick your number */
+}
+
+/* --- Wider dropdown panel (Radix portal) --- */
+/* Radix adds data attributes to the content + viewport; target those */
+[data-radix-select-content] {
+  min-width: 90px !important;  /* ensure panel is at least this wide */
+}
+
+[data-radix-select-viewport] {
+  min-width: 90px !important;  /* keep the items area in sync */
+}
+
+/* Optional: make each item fill the panel width neatly */
+.page-size-item {
+ 
+  box-sizing: border-box;
+}
+[data-radix-select-content] [role="option"] {
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin: 4px 8px;      /* adds the “pill in menu” spacing */
+  outline: none;
+}
+
+/* Hover / keyboard highlight */
+[role="option"][data-highlighted] {
+  background: var(--select-accent);
+  color: var(--select-accent-contrast);
+}
+
+/* Selected item (with the checkmark) */
+[role="option"][data-state="checked"] {
+  background: var(--select-accent);
+  color: var(--select-accent-contrast);
+}
+
+/* Ensure the checkmark/indicator also flips to white */
+[role="option"][data-highlighted] [data-radix-select-item-indicator],
+[role="option"][data-state="checked"] [data-radix-select-item-indicator] {
+  color: var(--select-accent-contrast);
+}
+
+/* Optional: sharpen the dropdown surface (panel) */
+[data-radix-select-content] {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow:
+    0 10px 24px rgba(0,0,0,0.14),
+    0 4px 10px rgba(0,0,0,0.10);
+}
+/* Hide the checkmark indicator everywhere */
+[data-radix-select-item-indicator],
+.SelectItemIndicator {
+  display: none !important;
+}
+/* Styling for the 'Rows per page' dropdown menu content */
+.selectcontent {
+  min-width: 70px; 
+  background-color: white; 
+  /* 🛑 ADDED: Border radius for rounded corners */
+  border-radius: 6px; 
+  /* Optional: Keep z-index high, although page-size-content usually handles this */
+  z-index: 9999;
+  /* Optional: Inherit padding/shadow from previous styling if necessary, but this sets the basics */
+  padding: 4px;
+  /* box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); */
+}
+
+/* Remove the extra right-side space Radix leaves for the indicator */
+.page-size-item,
+[role="option"][data-radix-collection-item] {
+  padding-right: 12px !important; /* match your normal item padding */
+}
+/* 🛑 CRITICAL FIX: Ensure the tick mark is hidden inside the custom dropdown */
+.selectcontent [data-radix-select-item-indicator],
+.selectcontent .SelectItemIndicator,
+.selectcontent svg {
+  display: none !important;
+}
+
+/* 🛑 Layout Fix: Remove the space reserved for the tick on ALL items */
+.page-size-item,
+[data-radix-select-content] [role="option"] {
+  padding-right: 12px !important; /* Forces uniform padding, removing the tick space */
+  /* Re-aligns text to the left */
+  justify-content: flex-start !important; 
+}
+/* Styling for focused/highlighted state (the blue line appears here) */
+[role="option"][data-highlighted] {
+  background: var(--select-accent);
+  color: var(--select-accent-contrast);
+  /* 🛑 FIX: Explicitly remove the browser/Radix outline */
+  outline: none !important; 
+}
+
+/* Also ensure the checked state doesn't have an outline */
+[role="option"][data-state="checked"] {
+  background: var(--select-accent);
+  color: var(--select-accent-contrast);
+  /* 🛑 FIX: Explicitly remove the browser/Radix outline */
+  outline: none !important; 
+}
+/* Panel width can be slim; we only need enough for the numbers */
+.page-size-content[data-radix-select-content] {
+  min-width: 70px !important;     /* was 200px in your file */
+  padding: 8px;
+  border-radius: 10px;
+}
+
+/* ⛔️ REMOVE any rule that makes items full-width.
+   You currently have:
+   .page-size-item { width: 100%; box-sizing: border-box; }
+   Delete it or override it like this: */
