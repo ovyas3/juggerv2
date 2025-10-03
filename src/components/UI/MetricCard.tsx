@@ -53,6 +53,10 @@ const MetricCard: React.FC<MetricCardProps> = ({
   slaThreshold,
   healthStatus = 'normal'
 }) => {
+  console.log(`MetricCard for: ${title}`);
+  console.log(`  averageTime: ${averageTime}, Type: ${typeof averageTime}`);
+  console.log(`  slaThreshold: ${slaThreshold}, Type: ${typeof slaThreshold}`);
+  console.log(`  Should Render SLA: ${averageTime !== undefined && slaThreshold !== undefined}`);
   const getTrendIcon = () => {
     switch (trend) {
       case "up":

@@ -163,8 +163,18 @@
   color: var(--danger-red);
 }
 
-.metric-skeleton {
+/* .metric-skeleton {
   height: 40px;
+  background: linear-gradient(90deg, var(--bg-tertiary) 25%, var(--bg-secondary) 50%, var(--bg-tertiary) 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+  border-radius: 8px;
+} */
+.metric-skeleton {
+  /* ORIGINAL: height: 40px; */
+  height: 48px; /* Increased height to match the large text size better */
+  width: 75%; /* ADDED: Constrain skeleton width to look like a text line */
+  
   background: linear-gradient(90deg, var(--bg-tertiary) 25%, var(--bg-secondary) 50%, var(--bg-tertiary) 75%);
   background-size: 200% 100%;
   animation: loading 1.5s infinite;
@@ -408,4 +418,86 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+/* Custom background and border for the metric cards to match the screenshot */
+
+/* Metric 1: Avg TAT (Based on Delivery) - Blue/Purple */
+.metric-card.normal {
+  background-color: #f9f9ff; /* Very light blue/purple from the metrics-bar background, or slightly lighter */
+  border-color: #b0c4de; /* A slightly darker blue/purple for the border */
+  border-width: 1.5px; /* Thicker border for better visibility */
+  border-style: solid;
+}
+
+/* Override the default background when not hovering for the primary metric card */
+.metric-card:not(.warning):not(.critical) {
+  background: #fff; /* Resetting to white/primary background */
+}
+
+/* Metric 2: Avg TAT (Based on Reached Destination) - Green */
+.metric-card.success {
+  background-color: #f0fff4; /* Very light green */
+  border-color: #a4c4a8; /* Light green border */
+  border-width: 1.5px;
+  border-style: solid;
+}
+
+/* Metric 3: On-Time Delivery (% Within TAT) - Amber/Orange */
+.metric-card.warning {
+  background-color: #fffaf0; /* Very light amber/orange */
+  border-color: #f0c987; /* Light amber/orange border */
+  border-width: 1.5px;
+  border-style: solid;
+}
+
+/* Metric 4: Average TAT Deviation - Red/Orange */
+.metric-card.critical {
+  background-color: #fff0f0; /* Very light red/orange */
+  border-color: #f0a4a4; /* Light red/orange border */
+  border-width: 1.5px;
+  border-style: solid;
+}
+
+/* Adjusting the hover effect to maintain the colored border */
+.metric-card.normal:hover {
+  border-color: #7610ff; /* A more vibrant blue/purple on hover */
+}
+
+.metric-card.success:hover {
+  border-color: #10b981; /* A more vibrant green on hover */
+}
+
+.metric-card.warning:hover {
+  border-color: #f59e0b; /* A more vibrant amber on hover */
+}
+
+.metric-card.critical:hover {
+  border-color: #dc2626; /* A more vibrant red on hover */
+}
+
+/* Override the colored top-bar for a clean look, if needed. The screenshot does not show the top bar active. */
+.metric-card::before {
+  opacity: 0 !important;
+}
+
+/* If you want the 'Avg TAT (Based on Delivery)' card to specifically have the blue background shown in the image,
+you might need a custom class or check what default background is applied.
+Assuming the first card in the screenshot uses the `.metric-card` default styling or an overridden `.normal` style.
+The screenshot's first card has a blue/purple background, while your `.metric-card` default is white.
+The most specific change is to the `.metric-card.normal` style above. */
+.metric-header { gap: 8px; }
+
+.metric-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.05); /* subtle pill so the SVG pops */
+  color: var(--text-secondary);  /* lucide uses currentColor for stroke */
+}
+
+.metric-icon svg {
+  display: block;
 }

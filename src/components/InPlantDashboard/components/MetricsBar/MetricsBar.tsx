@@ -4,6 +4,7 @@ import React,{useState} from 'react';
 import { TrendingUp, TrendingDown, Minus , ChevronDown, ChevronUp} from 'lucide-react';
 import { DashboardMetrics } from '../../InPlantDashboard';
 import './MetricsBar.css';
+import {iconMap} from './iconMap';
 
 interface MetricsBarProps {
   metrics: DashboardMetrics;
@@ -18,6 +19,7 @@ interface MetricCardProps {
   trendLabel?: string;
   status?: StatusType;
   loading?: boolean;
+  iconName?: string; 
 }
 
 type StatusType = 'normal' | 'warning' | 'critical' | 'success';
@@ -29,8 +31,10 @@ const MetricCard: React.FC<MetricCardProps> = ({
   trend = 0,
   trendLabel = '',
   status = 'normal',
-  loading = false
+  loading = false,
+  iconName
 }) => {
+  const IconComponent = iconName ? iconMap[iconName] : null; 
   const getTrendIcon = () => {
     if (trend > 0) return <TrendingUp size={14} />;
     if (trend < 0) return <TrendingDown size={14} />;
@@ -66,7 +70,15 @@ const MetricCard: React.FC<MetricCardProps> = ({
   return (
     <div className={`metric-card ${status} ${loading ? 'loading' : ''}`}>
       <div className="metric-header">
-        <h3 className="metric-title">{title}</h3>
+      
+      <div className="icon-label-wrapper">
+  {IconComponent && (
+    <span className="metric-icon" aria-hidden="true">
+      <IconComponent size={20} strokeWidth={2} />
+    </span>
+  )}
+</div>
+       
         {!loading && trend !== 0 && (
           <div className={`metric-trend ${getTrendClass()}`}>
             {getTrendIcon()}
@@ -105,7 +117,8 @@ const MetricsBar: React.FC<MetricsBarProps> = ({ metrics, loading = false }) => 
       title: 'Active Vehicles',
       value: metrics.activeVehicles,
       trend: metrics.trends.activeVehiclesTrend,
-      status: (metrics.activeVehicles > 30 ? 'warning' : 'normal') as StatusType
+      status: (metrics.activeVehicles > 30 ? 'warning' : 'normal') as StatusType,
+        iconName: 'Truck'
     },
     {
       title: 'Average Time in Plant',
@@ -113,20 +126,23 @@ const MetricsBar: React.FC<MetricsBarProps> = ({ metrics, loading = false }) => 
       trend: metrics.trends.avgTimeTrend,
       trendLabel: 'm',
       status: (metrics.averageProcessingTime > 180 ? 'critical' :
-              metrics.averageProcessingTime > 120 ? 'warning' : 'success') as StatusType
+              metrics.averageProcessingTime > 120 ? 'warning' : 'success') as StatusType,
+               iconName: 'Clock'
     },
     {
       title: 'Delayed Vehicles',
       value: metrics.delayedVehicles,
       trend: metrics.trends.delayedTrend,
       status: (metrics.delayedVehicles > 10 ? 'critical' :
-              metrics.delayedVehicles > 5 ? 'warning' : 'normal') as StatusType
+              metrics.delayedVehicles > 5 ? 'warning' : 'normal') as StatusType,
+               iconName: 'AlertTriangle'
     },
     {
       title: 'Completed Today',
       value: metrics.completedToday,
       trend: metrics.trends.completedTrend,
-      status: 'success' as StatusType
+      status: 'success' as StatusType,
+       iconName: 'CheckCircle'
     }
   ];
   const [isExpanded, setIsExpanded] = useState(true);
@@ -154,6 +170,7 @@ const MetricsBar: React.FC<MetricsBarProps> = ({ metrics, loading = false }) => 
             trendLabel={config.trendLabel}
             status={config.status}
             loading={loading}
+            iconName={config.iconName}
           />
         ))}
       </div>
