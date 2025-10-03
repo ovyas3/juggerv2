@@ -571,9 +571,11 @@ const InPlantDashboard: React.FC = () => {
 
   return (
     <div className="inplant-dashboard">
-      <div className="dashboard-container">
+      {/* <div className="dashboard-container"> */}
+      <div className={`dashboard-container ${isExpanded ? '' : 'collapsed'}`}>
         {/* Metrics Bar */}
-        <div className="dashboard-content">
+        {/* <div className="dashboard-content"> */}
+        <div className={`dashboard-content ${isExpanded ? 'expanded' : 'collapsed'}`}>
           <div 
             className="metrics-header" 
             onClick={toggleExpand}
@@ -645,6 +647,7 @@ const InPlantDashboard: React.FC = () => {
 
         {/* Main Content Area */}
         <div className="dashboard-main-content1">
+        <section className={`inplant-section ${isExpanded ? 'expanded' : 'collapsed'}`}>
           {/* Header Section */}
           <DashboardHeader 
             searchQuery={searchQuery}
@@ -709,6 +712,7 @@ const InPlantDashboard: React.FC = () => {
               </div>
             </div>
           </>)}
+          </section>
         </div>
 
         {/* Detail Panel */}

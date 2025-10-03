@@ -309,3 +309,54 @@
     box-shadow: 0 0 0 1px rgb(118 16 255 / 20%);
     background-color: #f9f9ff;
 }
+
+
+
+/* The page column had min-height: 100vh; shrink it when collapsed so the white
+   block doesn’t look as tall when the content is hidden. */
+   .dashboard-container.collapsed {
+    min-height: auto;
+  }
+  
+  /* The “Key Metrics” card-like wrapper keeps padding even when empty.
+     Make it tight in collapsed state. */
+  .dashboard-content.collapsed {
+    padding: 6px 12px;          /* was var(--spacing-lg) */
+  }
+  
+  /* Make the header bar itself a bit tighter when collapsed */
+  .dashboard-content.collapsed .metrics-header {
+    padding: 0;                  /* you already control margin inline */
+  }
+  
+  /* If any extra space still shows under the header, remove bottom margin */
+  .dashboard-content.collapsed .metrics-grid {
+    margin-bottom: 0;            /* safety: if you ever render it conditionally */
+  }
+  /* Default look of the big card */
+.inplant-section {
+  /* whatever you already have */
+  /* Example: padding, border, background, radius, etc. */
+  transition: padding 0.2s ease, min-height 0.2s ease, height 0.2s ease;
+}
+
+/* When collapsed, don't hold vertical space */
+.inplant-section.collapsed {
+  min-height: 0 !important;
+  height: auto !important;
+  padding-bottom: 8px;         /* keep a small gutter under the title bar */
+}
+
+/* Safety: if your content wrappers themselves have min-heights, zero them */
+.inplant-section.collapsed .content-tabs,
+.inplant-section.collapsed .content-area,
+.inplant-section.collapsed .map-view-container,
+.inplant-section.collapsed .table-view-container {
+  min-height: 0 !important;
+  height: 0 !important;        /* <- only safe because you stop rendering them (isExpanded && …) */
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden;
+}
+
+  

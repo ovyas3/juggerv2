@@ -324,11 +324,11 @@ const VehicleTable: React.FC<VehicleTableProps> = ({
               <SelectTrigger className="page-size-select">
                 <SelectValue placeholder={pageSize.toString()} />
               </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="10">10</SelectItem>
-                <SelectItem value="25">25</SelectItem>
-                <SelectItem value="50">50</SelectItem>
-                <SelectItem value="100">100</SelectItem>
+              <SelectContent className="page-size-content">
+                <SelectItem value="10" className="page-size-item">10</SelectItem>
+                <SelectItem value="25" className="page-size-item">25</SelectItem>
+                <SelectItem value="50" className="page-size-item">50</SelectItem>
+                <SelectItem value="100" className="page-size-item">100</SelectItem>
               </SelectContent>
             </Select>
           </div>
