@@ -712,13 +712,15 @@ const InPlantDashboard: React.FC = () => {
         </div>
 
         {/* Detail Panel */}
-        {selectedVehicle && (
-          <DetailPanel
-            vehicle={selectedVehicle}
-            onClose={handleClosePanelDetail}
-            isOpen={!!selectedVehicle}
-          />
-        )}
+        <div className={`detail-panel-container ${selectedVehicle ? 'open' : ''}`}>
+          {selectedVehicle && (
+            <DetailPanel
+              vehicle={selectedVehicle}
+              onClose={handleClosePanelDetail}
+              isOpen={!!selectedVehicle}
+            />
+          )}
+        </div>
       </div>
     </div>
   );
