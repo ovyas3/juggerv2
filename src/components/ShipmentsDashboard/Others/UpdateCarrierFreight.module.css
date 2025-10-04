@@ -45,7 +45,8 @@
 .selectField:focus,
 .reasonTextarea:focus {
   outline: none;
-  border-color: #4f46e5;
+  border-color: #20104d
+;
   box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
 }
 
@@ -149,12 +150,13 @@
 }
 
 .submitButton {
-  background-color: #4f46e5;
+  background-color: #20104d
+;
   color: white;
 }
 
 .submitButton:hover {
-  background-color: #4338ca;
+  background-color: #271950;
 }
 
 .submitButton:disabled {
@@ -173,7 +175,8 @@
 
 .spinner {
     border: 4px solid #f3f3f3;
-    border-top: 4px solid #4f46e5;
+    border-top: 4px solid #20104d
+;
     border-radius: 50%;
     width: 40px;
     height: 40px;

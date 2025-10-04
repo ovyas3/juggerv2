@@ -49,7 +49,7 @@
     display: flex;
     align-items: center;
     padding: 8px 16px;
-    background: #20114d;
+    background: #20104d;
     border: none;
     border-radius: 28px;
     color: white;
@@ -84,7 +84,7 @@
     right: 0;
     height: 54px;
     /* padding: 8px 0px; */
-    background: #20114d;
+    background: #20104d;
     display: flex;
     justify-content: space-around;
     align-items: center;
@@ -134,7 +134,7 @@
     bottom: 48px;
     left: 0;
     right: 0;
-    background: #20114d;
+    background: #20104d;
     border-radius: 24px 24px 0 0;
     padding: 20px 16px;
     transform: translateY(120%);
@@ -177,7 +177,7 @@
 .close-button-mobile-header {
     background: white;
     border: none;
-    color: #20114d;
+    color: #20104d;
     cursor: pointer;
     padding: 4px;
     width: 28px;
@@ -226,7 +226,7 @@
 
 .drawer-item.active {
     background: white;
-    color: #20114d;
+    color: #20104d;
     justify-content: flex-start;
 }
 

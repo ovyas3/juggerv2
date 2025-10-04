@@ -291,7 +291,7 @@ const MissedEventModal: React.FC<MissedEventModalProps> = ({
                 // style={{
                 //   width: "450px",
                 //   height: "108px",
-                //   border: "1px solid #4f46e5",
+                //   border: "1px solid #20104d",
                 //   textAlign: "left" as const,
                 //   background: "#FFFFFF",
                 //   opacity: 1,

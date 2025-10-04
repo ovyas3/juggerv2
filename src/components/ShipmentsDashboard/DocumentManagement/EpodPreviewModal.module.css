@@ -116,7 +116,7 @@
 .actionButton {
   background: none;
   border: none;
-  color: #4f46e5;
+  color: #20104d;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -230,13 +230,13 @@
 
 .approveButton,
 .submitButton {
-  background-color: #4f46e5 !important;
+  background-color: #20104d !important;
   color: white !important;
   text-transform: none !important;
   font-weight: 500 !important;
   padding: 6px 20px !important;
   border-radius: 4px !important;
-  border-color: #4f46e5 !important;
+  border-color: #20104d !important;
 }
 
 .approveButton:hover:not(:disabled),

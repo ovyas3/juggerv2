@@ -880,7 +880,8 @@ const DeliveryTab = ({
                           <Button 
                             variant="contained" 
                             size="small" 
-                            sx={{ backgroundColor: '#4f46e5', '&:hover': { backgroundColor: '#4338ca' }, textTransform: 'capitalize' , boxShadow: 'none'}}
+                            sx={{ backgroundColor: '#20104d
+', '&:hover': { backgroundColor: '#271950' }, textTransform: 'capitalize' , boxShadow: 'none'}}
                             onClick={() => handleUploadClick(delivery._id, "epod")}
                           >
                             Upload EPOD

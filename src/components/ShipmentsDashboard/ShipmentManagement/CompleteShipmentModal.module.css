@@ -149,8 +149,8 @@
 }
 
 .checkboxContainer input[type="checkbox"]:checked {
-  background-color: #4f46e5;
-  border-color: #4f46e5;
+  background-color: #20104d;
+  border-color: #20104d;
 }
 
 .checkboxContainer input[type="checkbox"]:checked::after {
@@ -311,25 +311,25 @@
   width: 200px;
   padding: 8px 12px;
   outline: none;
-  border: 1px solid #4f46e5;
+  border: 1px solid #20104d;
   border-radius: 4px;
   font-size: 14px;
   font-family: "Muli", sans-serif;
 }
 
 .dateInput:hover {
-  border: 1px solid #4f46e5;
+  border: 1px solid #20104d;
   box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
 }
 
 .dateInput:focus {
   outline: none;
-  border: 1px solid #4f46e5;
+  border: 1px solid #20104d;
   box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
 }
 
 .dateInput:focus-visible {
   outline: none;
-  border: 1px solid #4f46e5;
+  border: 1px solid #20104d;
   box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
 }

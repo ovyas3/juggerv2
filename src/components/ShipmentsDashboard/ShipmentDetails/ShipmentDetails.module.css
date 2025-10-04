@@ -6,7 +6,7 @@
     height: 650px;
     border: 8px solid #20104d; /* Updated theme color */
     box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
-    background-color: white;
+    background-color: rgb(18, 14, 42);
     display: flex;
     flex-direction: column;
     border-radius: 16px; 

@@ -366,6 +366,10 @@ const handleApply = async () => {
 
   try {
     const response = await httpsPost("shipment/many", cleanPayload, {}, 5);
+    if (response.statusCode === 200) { // Assuming a successful response structure
+      console.log("API response received successfully. Calling onApply with payload.");
+      onApply(cleanPayload); // <--- THIS IS THE CRITICAL FIX
+    }
 
       if (!response.ok) {
           // Handle HTTP errors
@@ -382,6 +386,7 @@ const handleApply = async () => {
       console.error("Error applying filters:", error);
       // You could also set a state to show an error message to the user
   }
+  onClose();
 };
 
 // ... (rest of your component code)

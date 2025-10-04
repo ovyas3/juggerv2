@@ -94,7 +94,7 @@ const SimpleDocViewer = ({
             justifyContent: "center",
             overflow: "hidden",
             cursor: "pointer",
-            "&:hover": { borderColor: "#4f46e5" },
+            "&:hover": { borderColor: "#20104d" },
           }}
         >
           {isImage ? (
@@ -402,10 +402,9 @@ const PackageStatusTable = ({
                     getOptionLabel={(option) => option}
                     readOnly={!isEditable}
                     sx={{
-                      "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
-                        {
-                          borderColor: "#4f46e5",
-                        },
+                      "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                        borderColor: "#20104d",
+                      },
                     }}
                   />
                 </TableCell>
@@ -425,10 +424,9 @@ const PackageStatusTable = ({
                     }
                     disabled={!isEditable}
                     sx={{
-                      "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
-                        {
-                          borderColor: "#4f46e5",
-                        },
+                      "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                        borderColor: "#20104",
+                      },
                     }}
                   />
                 </TableCell>
@@ -446,7 +444,7 @@ const PackageStatusTable = ({
                     sx={{
                       "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
                         {
-                          borderColor: "#4f46e5",
+                          borderColor: "#20104d",
                         },
                     }}
                   />
@@ -468,10 +466,9 @@ const PackageStatusTable = ({
                     }
                     disabled={!isEditable}
                     sx={{
-                      "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
-                        {
-                          borderColor: "#4f46e5",
-                        },
+                      "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                        borderColor: "#20104d",
+                      },
                     }}
                   />
                 </TableCell>
@@ -492,10 +489,9 @@ const PackageStatusTable = ({
                     }
                     disabled={!isEditable}
                     sx={{
-                      "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
-                        {
-                          borderColor: "#4f46e5",
-                        },
+                      "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                        borderColor: "#20104d",
+                      },
                     }}
                   />
                 </TableCell>
@@ -522,10 +518,9 @@ const PackageStatusTable = ({
                         }
                         disabled={!isEditable}
                         sx={{
-                          "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
-                            {
-                              borderColor: "#4f46e5",
-                            },
+                          "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                            borderColor: "#20104d",
+                          },
                         }}
                       />
                     </TableCell>
@@ -549,10 +544,9 @@ const PackageStatusTable = ({
                         }
                         disabled={!isEditable}
                         sx={{
-                          "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
-                            {
-                              borderColor: "#4f46e5",
-                            },
+                          "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                            borderColor: "#20104d",
+                          },
                         }}
                       />
                     </TableCell>
@@ -580,10 +574,9 @@ const PackageStatusTable = ({
                         }
                         disabled={!isEditable}
                         sx={{
-                          "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
-                            {
-                              borderColor: "#4f46e5",
-                            },
+                          "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                            borderColor: "#20104d",
+                          },
                         }}
                       />
                     </TableCell>
@@ -607,10 +600,9 @@ const PackageStatusTable = ({
                         }
                         disabled={!isEditable}
                         sx={{
-                          "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
-                            {
-                              borderColor: "#4f46e5",
-                            },
+                          "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                            borderColor: "#20104d",
+                          },
                         }}
                       />
                     </TableCell>
@@ -638,10 +630,9 @@ const PackageStatusTable = ({
                         }
                         disabled={!isEditable}
                         sx={{
-                          "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
-                            {
-                              borderColor: "#4f46e5",
-                            },
+                          "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                            borderColor: "#20104d",
+                          },
                         }}
                       />
                     </TableCell>
@@ -665,10 +656,9 @@ const PackageStatusTable = ({
                         }
                         disabled={!isEditable}
                         sx={{
-                          "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
-                            {
-                              borderColor: "#4f46e5",
-                            },
+                          "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                            borderColor: "#20104d",
+                          },
                         }}
                       />
                     </TableCell>
@@ -696,10 +686,9 @@ const PackageStatusTable = ({
                         }
                         disabled={!isEditable}
                         sx={{
-                          "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
-                            {
-                              borderColor: "#4f46e5",
-                            },
+                          "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                            borderColor: "#20104d",
+                          },
                         }}
                       />
                     </TableCell>
@@ -723,10 +712,9 @@ const PackageStatusTable = ({
                         }
                         disabled={!isEditable}
                         sx={{
-                          "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
-                            {
-                              borderColor: "#4f46e5",
-                            },
+                          "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                            borderColor: "#20104d",
+                          },
                         }}
                       />
                     </TableCell>
@@ -754,10 +742,9 @@ const PackageStatusTable = ({
                         }
                         disabled={!isEditable}
                         sx={{
-                          "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
-                            {
-                              borderColor: "#4f46e5",
-                            },
+                          "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                            borderColor: "#20104d",
+                          },
                         }}
                       />
                     </TableCell>
@@ -781,10 +768,9 @@ const PackageStatusTable = ({
                         }
                         disabled={!isEditable}
                         sx={{
-                          "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
-                            {
-                              borderColor: "#4f46e5",
-                            },
+                          "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                            borderColor: "#20104d",
+                          },
                         }}
                       />
                     </TableCell>
@@ -1817,13 +1803,12 @@ const DeliveryTab = ({
                     variant="contained"
                     size="small"
                     sx={{
-                      backgroundColor: "#4f46e5",
-                      "&:hover": { backgroundColor: "#4338ca" },
+                      backgroundColor: "#20104d",
+                      "&:hover": { backgroundColor: "#271950" },
                       textTransform: "capitalize",
                       boxShadow: "none",
                     }}
-                    onClick={() => handleUploadClick(delivery._id, "epod")}
-                  >
+                    onClick={() => handleUploadClick(delivery._id, "epod")}>
                     Upload EPOD
                   </Button>
                   <Button
@@ -2004,9 +1989,9 @@ const DeliveryTab = ({
                                             }
                                             disabled={!canEditDelivery}
                                             sx={{
-                                              color: "#4f46e5",
-                                              "&.Mui-checked": {
-                                                color: "#4f46e5",
+                                              color: '#20104d',
+                                              '&.Mui-checked': {
+                                                color: '#20104d',
                                               },
                                             }}
                                           />
@@ -2068,10 +2053,10 @@ const DeliveryTab = ({
                                         )
                                       }
                                       sx={{
-                                        color: "#4f46e5",
-                                        borderColor: "#4f46e5",
-                                        "&:hover": {
-                                          borderColor: "#4338ca",
+                                        color: '#20104d',
+                                        borderColor: '#20104d',
+                                        '&:hover': {
+                                          borderColor: '#271950',
                                         },
                                         textTransform: "capitalize",
                                       }}
@@ -2175,8 +2160,8 @@ const DeliveryTab = ({
                             color="primary"
                             size="small"
                             sx={{
-                              backgroundColor: "#4f46e5",
-                              "&:hover": { backgroundColor: "#4338ca" },
+                              backgroundColor: "#20104d",
+                              "&:hover": { backgroundColor: "#271950" },
                               textTransform: "capitalize",
                             }}
                             onClick={() =>
@@ -2627,8 +2612,9 @@ const DeliveryTab = ({
                     onClick={() => handleUploadClick(delivery._id, "goods")}
                     sx={{
                       mt: 2,
-                      backgroundColor: "#4f46e5",
-                      "&:hover": { backgroundColor: "#4338ca" },
+                      backgroundColor: "#20104d
+",
+                      "&:hover": { backgroundColor: "#271950" },
                       textTransform: "capitalize",
                     }}
                   >

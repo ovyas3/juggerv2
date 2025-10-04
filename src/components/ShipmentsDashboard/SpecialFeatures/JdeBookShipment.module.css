@@ -68,7 +68,7 @@
 }
 
 .submitButton:hover {
-  background-color: #4338ca;
+  background-color: #271950;
 }
 
 .bookShipmentButton {
@@ -87,7 +87,7 @@
 }
 
 .bookShipmentButton:hover {
-  background-color: #4338ca;
+  background-color: #271950;
 }
 
 .serialInvoicesContainer {
@@ -160,7 +160,7 @@
 }
 
 .searchButton:hover {
-  background-color: #4338ca;
+  background-color: #271950;
 }
 
 .datePickerContainer :global(.ant-picker-dropdown) {

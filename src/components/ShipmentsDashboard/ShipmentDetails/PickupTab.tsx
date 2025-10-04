@@ -1022,7 +1022,7 @@ const PickupTab = ({
                       sx={{
                         backgroundColor: '#20104d',
                         '&:hover': {
-                          backgroundColor: '#4338ca',
+                          backgroundColor: '#271950',
                         },
                         textTransform: 'capitalize',
                         height: '30px',

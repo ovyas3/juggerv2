@@ -362,7 +362,7 @@ const ShipmentsDashboard: React.FC = () => {
   const [shipmentType, setShipmentType] = useState<
     "all" | "outbound" | "inbound" | "others"
   >("all");
-  const [isLoading, setIsLoading] = useState(false);
+  const [advancedFilterApplied, setAdvancedFilterApplied] = useState(false);
 
   const [showButtons, setShowButtons] = useState(false);
   const [isAnalyticsView, setIsAnalyticsView] = useState(false);
@@ -1300,7 +1300,9 @@ const actionMenuCategories = (shipment: Shipment) => {
       { icon: DoorOpen, label: "Recalculate Customer Gate In/Out", color: "text-pink-600", onClick: (shipment: Shipment, e?: React.MouseEvent) => {
         e?.stopPropagation();
         handleRecalculateGateInOut(shipment);
-      }, disabled: (shipment: Shipment) => ["Completed", "Cancelled"].includes(shipment.status), show: shipment.trip_tracker?.methods?.includes('GPS') },
+      }, 
+      disabled: (shipment: Shipment) => ["Completed", "Cancelled"].includes(shipment.status), show: shipment.trip_tracker?.methods?.includes('GPS') 
+      },
       // { 
       //   icon: RefreshCw, 
       //   label: "Rerun", 
@@ -1612,6 +1614,7 @@ const closeActionMenu = () => {
 
   const clearFilters = () => {
     setFromDate("");
+    setSearchType("");
     setToDate("");
     setInvoiceNo("");
     setLrNumber("");
@@ -1620,6 +1623,7 @@ const closeActionMenu = () => {
     setSelectedDeliveries([]);
     setSelectedCarriers([]);
     setShipmentStatusName([]);
+    setAdvancedFilterApplied(false); 
     setMobile("");
     setVehicleNo("");
     setShipmentSIN("");
@@ -1631,6 +1635,16 @@ const closeActionMenu = () => {
     setSelectedSegmentation([]);
     setOdcFilter(false);
     setSelectedSubFilters([]);
+    setInputQuery("");           // NEW: clear the text box
+    setSearchValue("");          // NEW: drop the active search key
+  
+    // NEW: ensure no stale search fields remain in request payload
+    setShipmentsFilter((prev: any) => {
+      const next = { ...prev };
+      SearchTypes.forEach(t => delete (next as any)[t.value]);
+      return next;
+    });
+  
 
     fetchShipments();
   };
@@ -2635,7 +2649,8 @@ const renderLastLocationCell = (shipment: any) => {
     }
 
     try {
-      setIsLoading(true);
+      setIsLoading(false);
+      setShowLoader(true); 
       const response = await httpsPost(
         "jde/vehicleArrival",
         selectedShipmentsArray
@@ -3030,7 +3045,7 @@ const applyFilter = () => {
     setShowMissedShipmentModal(true);
   }
 };
-
+const [isLoading, setIsLoading] = useState(false);
   return (
     <div className={styles.main}>
       <div className={styles.tabsContainer}>
@@ -3201,7 +3216,7 @@ const applyFilter = () => {
 
         <div className={styles.buttonContainer}>
           <div
-            className={`${styles.button} ${styles.advancedSearchSubmitButton}`}
+            className={`${styles.button} ${styles.advancedSearch} ${advancedFilterApplied ? styles.advancedActive : ""}`}
             role="button"
             tabIndex={0}
             onClick={() => setShowAdvancedSearch((prev) => !prev)}
@@ -3271,10 +3286,15 @@ const applyFilter = () => {
           deliverLocations={deliveryLocations}
           shipStatus={shipmentStatus}
           onApply={(filters) => {
+            const hasAny = Object.values(filters || {}).some((v: any) =>
+              Array.isArray(v) ? v.length > 0 : (v ?? "") !== "" && String(v).trim() !== ""
+            );
+            setAdvancedFilterApplied(hasAny);
             console.log("Applied filters:", filters);
           }}
           onClear={() => {
             console.log("Filters cleared");
+            setAdvancedFilterApplied(false);
           }}
           onClose={() => {
             console.log("Close filter");

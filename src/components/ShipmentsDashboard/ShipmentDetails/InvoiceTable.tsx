@@ -854,9 +854,8 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
             sx={{
               backgroundColor: "#20104d",
               textTransform: "capitalize",
-              "&:hover": { backgroundColor: "#4338ca" },
-            }}
-          >
+              "&:hover": { backgroundColor: "#271950" },
+            }}>
             Submit
           </Button>
         </Box>

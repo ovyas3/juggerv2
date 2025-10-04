@@ -6,7 +6,7 @@
   width: 100%;
   border: 2px solid #20104d;
   align-items: center;
-  background-color: #20104d;
+  background-color: #271950;
   margin: 0 auto;
   border-radius: 1px;
   height: 48px;
@@ -20,7 +20,8 @@
 }
 
 .close {
-  background-color: #908be6;
+  background-color: #271260
+;
   color: white;
   border: none;
   border-radius: 4px;

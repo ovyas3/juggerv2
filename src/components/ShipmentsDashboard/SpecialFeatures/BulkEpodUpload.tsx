@@ -168,7 +168,7 @@ const BulkEpodUpload: React.FC<BulkEpodUploadProps> = ({
                 boxShadow: 'none !important',
                 marginTop: '8px',
                 '&:hover': {
-                  backgroundColor: '#4338CA !important',
+                  backgroundColor: '#271950 !important',
                 }
               }}
             >

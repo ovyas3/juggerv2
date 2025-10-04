@@ -230,7 +230,8 @@
   margin: 15px;
   cursor: pointer;
   border: none;
-  background-color: #4f46e5;
+  background-color: #20104d
+;
   color: white;
 }
 
@@ -395,7 +396,8 @@
 
 /* Custom styles for DatePicker focus */
 .datepickerFilled .ant-picker.ant-picker-focused {
-  border-color: #4f46e5 !important;
+  border-color: #20104d
+ !important;
   box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2) !important;
 }
 
