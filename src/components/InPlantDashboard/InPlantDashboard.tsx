@@ -267,7 +267,7 @@ const InPlantDashboard: React.FC = () => {
             shipper: { id: vehicle.shipper?.id || '', name: vehicle.shipper?.name || 'Unknown' },
             carrier: { id: vehicle.carrier?.id || '', name: vehicle.carrier?.name || 'Unknown' },
             driver: { name: vehicle.driver?.name || 'Unknown', phone: vehicle.driver?.phone || '' },
-            shipmentId: vehicle.shipmentId || '',
+            shipmentId: vehicle.sin || '',
             orderReference: vehicle.orderReference || ''
           }));
           setVehicles(formattedVehicles);

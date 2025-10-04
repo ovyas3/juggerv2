@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useMemo,useState,useRef,useEffect } from 'react';
 import { ChevronRight, Clock, AlertCircle, CheckCircle, Truck, User, Building, ChevronLeft, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import { Vehicle } from '../../InPlantDashboard';
 import {
@@ -11,7 +11,8 @@ import {
   SelectValue,
 } from '../../../UI/select';
 import './VehicleTable.css';
-
+import AddRemarkModal from './AddRemarkModal';
+import ModalHeader from '@/components/UI/ModalHeader/ModalHeader';
 interface VehicleTableProps {
   vehicles: Vehicle[];
   selectedVehicle: Vehicle | null;
@@ -36,9 +37,10 @@ interface VehicleRowProps {
   isSelected: boolean;
   onSelect: () => void;
   index: number;
+  onRemarkAdd: (vehicle: Vehicle) => void;
 }
 
-const VehicleRow: React.FC<VehicleRowProps> = ({ vehicle, isSelected, onSelect, index }) => {
+const VehicleRow: React.FC<VehicleRowProps> = ({ vehicle, isSelected, onSelect, index,onRemarkAdd  }) => {
   const getStatusIcon = () => {
     switch (vehicle.overallStatus) {
       case 'on_track':
@@ -55,7 +57,32 @@ const VehicleRow: React.FC<VehicleRowProps> = ({ vehicle, isSelected, onSelect, 
         return <Clock size={16} className="status-icon default" />;
     }
   };
+  const [showPopup, setShowPopup] = useState(false); 
+ ;
+  const actionButtonRef = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    const handleOutsideClick = (event: MouseEvent) => {
+      // Check if the click occurred outside the popup and outside the action button
+      if (
+        actionButtonRef.current && 
+        !actionButtonRef.current.contains(event.target as Node) &&
+        !(event.target as HTMLElement).closest('.action-popup') // Check if click is on the popup itself
+      ) {
+        setShowPopup(false);
+      }
+    };
 
+    // Attach listener when the popup is open
+    if (showPopup) {
+      document.addEventListener('mousedown', handleOutsideClick);
+    } else {
+      document.removeEventListener('mousedown', handleOutsideClick);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleOutsideClick);
+    };
+  }, [showPopup]);
   const formatDuration = (minutes: number): string => {
     if (minutes < 60) return `${minutes}m`;
     const hours = Math.floor(minutes / 60);
@@ -193,9 +220,25 @@ const VehicleRow: React.FC<VehicleRowProps> = ({ vehicle, isSelected, onSelect, 
 
       {/* Actions */}
       <td className="actions-cell">
-        <button className="action-btn" onClick={(e) => { e.stopPropagation(); /* Add action logic */ }}>
+        <button className="action-btn" onClick={(e) => { e.stopPropagation();
+             setShowPopup(!showPopup);  /* Add action logic */ }}>
           ⋮
         </button>
+        {showPopup && (
+            <div className="action-popup">
+              <div 
+                className="popup-item"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  // Logic for "Add Remark" goes here
+                  onRemarkAdd(vehicle); 
+                  setShowPopup(false); // Close after action
+                }}
+              >
+                Add Remark
+              </div>
+            </div>
+          )}
       </td>
 
       {/* Expand */}
@@ -220,9 +263,17 @@ const VehicleTable: React.FC<VehicleTableProps> = ({
   onPageChange,
   onPageSizeChange
 }) => {
+  const [remarkVehicle, setRemarkVehicle] = useState<Vehicle | null>(null);
+  const handleOpenRemarkModal = (vehicle: Vehicle) => {
+    setRemarkVehicle(vehicle);
+  };
+
+  const handleCloseRemarkModal = () => {
+    setRemarkVehicle(null);
+  }
   const filteredVehicles = useMemo(() => {
     let filtered = [...vehicles];
-
+   
     // Search filter
     if (searchQuery) {
       filtered = filtered.filter(
@@ -398,9 +449,18 @@ const VehicleTable: React.FC<VehicleTableProps> = ({
                 isSelected={selectedVehicle?.id === vehicle.id}
                 onSelect={() => onVehicleSelect(vehicle)}
                 index={startItem + index - 1}
+                onRemarkAdd={handleOpenRemarkModal} 
               />
             ))}
+         
           </tbody>
+          {remarkVehicle && (
+        <AddRemarkModal
+          title="Add Remark"
+          shipmentId={remarkVehicle.shipmentId}
+          onClose={handleCloseRemarkModal}
+        />
+      )}
         </table>
       </div>
     </div>
