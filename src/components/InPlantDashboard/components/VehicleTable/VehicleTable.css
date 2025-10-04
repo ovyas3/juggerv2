@@ -59,7 +59,7 @@
   border-bottom: 1px solid var(--border-light);
   position: sticky;
   top: 0;
-  /* z-index: 5; */
+  z-index: 5;
 }
 
 .sno-header {
@@ -79,12 +79,12 @@
 .duration-header { width: 90px; border-right: 1px solid var(--border-light); }
 .progress-header { width: 180px; border-right: 1px solid var(--border-light); }
 .company-header { width: 180px; border-right: 1px solid var(--border-light); }
-.actions-header { width: 80px; border-right: 1px solid var(--border-light); }
+.actions-header { width: 80px; border-right: 1px solid var(--border-light); position: relative; }
 .expand-header { width: 40px }
 
 /* Table Rows */
 .vehicle-row {
-  border-bottom: 1px solid var(--border-light);
+  /* border-bottom: 1px solid var(--border-light); */
   cursor: pointer;
   transition: var(--transition-smooth);
 }
@@ -337,7 +337,7 @@
 }
 
 .action-btn:hover {
-  border-color: var(--primary-blue);
+  /* border-color: var(--primary-blue); */
   color: var(--primary-blue);
 }
 
@@ -745,9 +745,13 @@
 
 /* Accessibility */
 .vehicle-row:focus {
-  outline: 2px solid var(--primary-blue);
-  outline-offset: -2px;
+  /* outline: 2px solid var(--primary-blue);
+  outline-offset: -2px; */
+  outline: none !important;
+  outline-offset: 0 !important;
 }
+.vehicle-row:focus { outline: none !important; }
+
 
 .vehicle-row:focus:not(:focus-visible) {
   outline: none;
@@ -878,7 +882,7 @@
   background: var(--bg-primary);
 }
 
-.actions-cell {
+/* .actions-cell {
   text-align: center;
   padding: var(--spacing-md) var(--spacing-sm);
   color: var(--text-secondary);
@@ -887,6 +891,25 @@
   /* background: var(--bg-primary); */
   display: flex;
   align-items: center;
+  justify-content: center;
+} */
+ /* VehicleTable.css */
+
+.actions-cell {
+  text-align: center;
+  padding: var(--spacing-md) var(--spacing-sm);
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  background: var(--bg-primary);
+  
+  /* CRITICAL FIXES: Set position: relative and center button manually */
+  position: relative; /* <-- ADD THIS: Makes the cell the positioning context */
+  vertical-align: middle; /* Ensures content is vertically aligned */
+}
+
+/* Ensure the button is centered without using flex on the cell */
+.actions-cell > div { 
+  display: flex;
   justify-content: center;
 }
 
@@ -1021,7 +1044,53 @@
     justify-content: center;
     gap: 8px;
 }
+/* VehicleTable.css */
 
+/* --- ADD NEW POPUP STYLES AT THE END OF THE FILE --- */
+
+.action-popup {
+  position: absolute;
+  top: 50%; /* Position below the button */
+  right: 0;  /* Align to the right of the button */
+  z-index: 20; /* Ensure it floats above the table */
+  min-height:20px;
+  min-width: 90px;
+  background-color: white;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  margin-top: 8px; /* Spacing below the button */
+  
+  /* Styling for the content */
+  padding: 4px;
+  border: 1px solid #e5e7eb;
+}
+
+.popup-item {
+  padding: 8px 12px;
+  font-size: 12px;
+  /* color: var(--text-primary); */
+  cursor: pointer;
+  border-radius: 4px;
+  /* transition: background-color 0.15s; */
+}
+
+
+
+/* Dark Mode support for popup */
+[data-theme='dark'] .action-popup {
+  background-color: #374151;
+  border-color: #4b5563;
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
+}
+
+[data-theme='dark'] .popup-item {
+  color: #e5e7eb;
+}
+
+[data-theme='dark'] .popup-item:hover {
+  background-color: #4b5563;
+  color: #fff;
+}
 .pagination-buttons {
   display: flex;
   align-items: center;

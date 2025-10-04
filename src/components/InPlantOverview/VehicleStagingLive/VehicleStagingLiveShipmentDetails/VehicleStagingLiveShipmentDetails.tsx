@@ -14,10 +14,12 @@ interface ShipmentPopupProps {
     isOpen: boolean
     onClose: () => void
     title: string
+    isInDashboard?: boolean
+  
     data: string[]
 }
 
-export default function VehicleStagingLiveShipmentDetails({ isOpen, onClose, title, data }: ShipmentPopupProps) {
+export default function VehicleStagingLiveShipmentDetails({ isOpen, onClose, title, data,isInDashboard}: ShipmentPopupProps) {
     console.log(isOpen, onClose, title, data, "ShipmentPopupProps")
     const [isVisible, setIsVisible] = useState(false)
     const popupRef = useRef<HTMLDivElement>(null)
@@ -184,14 +186,17 @@ export default function VehicleStagingLiveShipmentDetails({ isOpen, onClose, tit
                             <table className={styles.table}>
                                 <thead>
                                     <tr>
-                                        <th className={styles.th}>S.No</th>
-                                        <th className={styles.th}>SIN</th>
-                                        <th className={styles.th}>Vehicle No.</th>
-                                        <th className={styles.th}>Customer & Destination</th>
-                                        <th className={styles.th}>Driver Details</th>
-                                        <th className={styles.th}>OBD No.</th>
-                                        <th className={styles.th}>OBD Created Date</th>
-                                        <th className={styles.th}>Carrier</th>
+                                        <th 
+                                         className={`${isInDashboard ? styles['th-inplant'] : styles.th}`}
+                                        // className=     className={`${isInDashboard ? styles['th-inplant'] : styles.th}`}
+                                        >S.No</th>
+                                        <th      className={`${isInDashboard ? styles['th-inplant'] : styles.th}`}>SIN</th>
+                                        <th   className={`${isInDashboard ? styles['th-inplant'] : styles.th}`}>Vehicle No.</th>
+                                        <th    className={`${isInDashboard ? styles['th-inplant'] : styles.th}`}>Customer & Destination</th>
+                                        <th   className={`${isInDashboard ? styles['th-inplant'] : styles.th}`}>Driver Details</th>
+                                        <th    className={`${isInDashboard ? styles['th-inplant'] : styles.th}`}>OBD No.</th>
+                                        <th   className={`${isInDashboard ? styles['th-inplant'] : styles.th}`}>OBD Created Date</th>
+                                        <th    className={`${isInDashboard ? styles['th-inplant'] : styles.th}`}>Carrier</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -199,7 +204,9 @@ export default function VehicleStagingLiveShipmentDetails({ isOpen, onClose, tit
                                         <tr key={item.id} className={styles.tr}>
                                             <td className={styles.td}>{item.id}</td>
                                             <td className={styles.td}>
-                                                <a href={`${item.trackerLink}`} target="_blank" rel="noopener noreferrer" className={styles.link}>
+                                                <a href={`${item.trackerLink}`} target="_blank" rel="noopener noreferrer" 
+                                                // className={styles.link}
+                                                className={`${isInDashboard ? styles['link-inplant'] : styles.link}`}>
                                                     {item.sin}
                                                 </a>
                                             </td>

@@ -263,10 +263,10 @@
   border-color: #35198a;
   background-color: #35198a;
 }
-
+/* 
 .advanced-filters-toggle .rotated {
   transform: rotate(180deg);
-}
+} */
 
 .advanced-filters-toggle.active {
   background: #3932ae;
@@ -527,6 +527,7 @@
   min-height:120px;
   overflow-y: auto;
   width: 130px !important;
+  scroll-behavior: auto !important; 
   margin-top: 7px;
 }
 
@@ -666,4 +667,59 @@
 .ant-picker-range,
 .ant-picker-dropdown-range {
   display: none;
+}
+/* To ensure the select dropdown arrow is always pointing down and never rotates */
+.select[data-state='open'] :global([data-radix-select-icon]) {
+  transform: none !important; /* Prevents the arrow from rotating when open */
+}
+.select :global([data-radix-select-icon]) {
+  /* This ensures the base state is a down arrow (0 degrees) if needed */
+  transform: rotate(0deg) !important; 
+}
+/* keep what you have, but change the sizing like this */
+.selectContent,
+.selectContent1 {
+  background: white;
+  border-radius: 6px;
+  box-shadow: 0 3px 6px -4px rgba(0,0,0,.12),
+              0 6px 16px 0 rgba(0,0,0,.08),
+              0 9px 28px 8px rgba(0,0,0,.05);
+  padding: 4px 0;                /* tidy vertical padding */
+  z-index: 1000;
+  min-height: 150px;             /* 👈 cap height so it scrolls when long */
+  overflow-y: auto;              /* 👈 native scroll */
+  margin-top: 7px;
+  /* optional niceties */
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+.selectContent2 {
+  background: white;
+  border-radius: 6px;
+  box-shadow: 0 3px 6px -4px rgba(0,0,0,.12),
+              0 6px 16px 0 rgba(0,0,0,.08),
+              0 9px 28px 8px rgba(0,0,0,.05);
+  padding: 4px 0;                /* tidy vertical padding */
+  z-index: 1000;
+  min-height: 150px;             /* 👈 cap height so it scrolls when long */
+  overflow-y: auto;              /* 👈 native scroll */
+  margin-top: 7px;
+  /* optional niceties */
+  overscroll-behavior: contain;
+  min-width:400px;
+  scrollbar-gutter: stable;
+}
+
+/* remove any forced min-height on the small menu */
+.selectContent1 { min-height: auto; /* was 120px */ }
+/* Radix scroll buttons show the chevrons; just hide them */
+.selectContent  [data-radix-select-scroll-up-button],
+.selectContent  [data-radix-select-scroll-down-button],
+.selectContent1 [data-radix-select-scroll-up-button],
+.selectContent1 [data-radix-select-scroll-down-button],
+.selectContent  button[aria-label="Scroll up"],
+.selectContent  button[aria-label="Scroll down"],
+.selectContent1 button[aria-label="Scroll up"],
+.selectContent1 button[aria-label="Scroll down"] {
+  display: none !important;
 }

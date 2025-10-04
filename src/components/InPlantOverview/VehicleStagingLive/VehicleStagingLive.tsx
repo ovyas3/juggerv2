@@ -259,7 +259,7 @@ export default function VehicleStagingLive({
                                 minSelectableDate={startDate}
                               />
                             </Box>  
-                            )}
+                           )} 
                             <button 
                               className={`${styles.exportButton} ${isInDashboard ? styles.dashboardExportButton : ''}`}
                               onClick={exportToExcel}
@@ -315,6 +315,7 @@ export default function VehicleStagingLive({
                     )}
                     <VehicleStagingLiveShipmentDetails
                       isOpen={isPopupOpen}
+                      isInDashboard={isInDashboard} 
                       onClose={() => setIsPopupOpen(false)}
                       title={title}
                       data={driverIds}
