@@ -792,9 +792,18 @@ const PickupTab = ({
             return (
               <Box key={pickup._id} className={styles.pickupPointCard}>
                 <Grid container spacing={2} sx={{mt : '0', ml: '0', width : '100%', border: '1px solid #e0e0e0'}}>
-                  <Grid item xs={12} md={7}>
+                  <Grid item xs={12} md={7} pl={7}>
                     <Box className={styles.header}>
-                      <span className={styles.pickupIcon}>P{index + 1}</span>
+                      <Box 
+                        sx={{ 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          height: 24, // Enforce height here too
+                          flexShrink: 0 // Prevent the icon container from shrinking
+                        }}
+                      >
+                        <span className={styles.pickupIcon}>P{index + 1}</span>
+                      </Box>
                       <Box className={styles.locationInfo}>
                         <Typography variant="body1" sx={{ fontWeight: "bold" }}>
                           {pickup.location?.name}
@@ -859,7 +868,7 @@ const PickupTab = ({
                                 {isSavingTimestamps[pickup._id] ? (
                                   <CircularProgress size={16} />
                                 ) : (
-                                  <SaveIcon sx={{ color: '#4F46E5' }} fontSize="small" />
+                                  <SaveIcon sx={{ color: '#20104d' }} fontSize="small" />
                                 )}
                               </IconButton>
                               <IconButton
@@ -1011,7 +1020,7 @@ const PickupTab = ({
                       size="small"
                       onClick={() => handleUploadClick(pickup._id + "_doc")}
                       sx={{
-                        backgroundColor: '#4F46E5',
+                        backgroundColor: '#20104d',
                         '&:hover': {
                           backgroundColor: '#4338ca',
                         },

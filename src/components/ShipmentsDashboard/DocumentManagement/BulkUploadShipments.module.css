@@ -30,7 +30,7 @@
 /* Header */
 .header {
   padding: 16px;
-  background: #4F46E5;
+  background: #20104d;
   color: white;
   display: flex;
   justify-content: space-between;
@@ -82,7 +82,7 @@
 }
 
 .download a {
-  color: #4F46E5;
+  color: #20104d;
   text-decoration: none;
   font-weight: 500;
   display: inline-flex;
@@ -101,7 +101,7 @@
 }
 
 .submitButton .button {
-  background-color: #4F46E5;
+  background-color: #20104d;
   color: white;
   border: none;
   border-radius: 4px;

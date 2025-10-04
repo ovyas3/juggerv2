@@ -148,17 +148,17 @@
 }
 
 .select:hover {
-  border-color: #4F46E5;
+  border-color: #20104d;
 }
 
 .select:focus-within {
-  border-color: #4F46E5;
+  border-color: #20104d;
   box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
   outline: none;
 }
 
 .select[data-state="open"] {
-  border-color: #4F46E5;
+  border-color: #20104d;
   box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
 }
 
@@ -190,7 +190,7 @@
 }
 
 .selectItem[data-highlighted] {
-  background-color: #4F46E5;
+  background-color: #20104d;
   color: white;
   outline: none;
 }
@@ -244,7 +244,7 @@
 }
 
 .submitButton {
-  background-color: #4F46E5;
+  background-color: #20104d;
   color: white;
 }
 

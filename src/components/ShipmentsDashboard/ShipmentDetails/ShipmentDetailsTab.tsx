@@ -1,6 +1,7 @@
 import React, { useMemo } from "react";
 import { Grid, Box, Typography, Link, Tooltip } from "@mui/material";
 import Image from "next/image";
+import styles from "./PickupTab.module.css";
 
 // --- Helper to format duration ---
 const formatDuration = (seconds?: number): string => {
@@ -242,8 +243,16 @@ const ShipmentDetailsTab = ({
                   variant="body2"
                   sx={{ display: "flex", alignItems: "center", mb: 0.5 }}
                 >
-                  <Box component="span" sx={getCircleStyles(`P${index + 1}`)}>
-                    P{index + 1}
+                 <Box 
+                  sx={{ 
+                    display: 'flex', 
+                    paddingRight: '10px',
+                    alignItems: 'flex-start', 
+                    height: 24, // Enforce height here too
+                    flexShrink: 0 // Prevent the icon container from shrinking
+                  }}
+                >
+                  <span className={styles.pickupIcon}>P{index + 1}</span>
                   </Box>
                   <strong>{p.location?.name || "N/A"}</strong>
                 </Typography>
@@ -279,8 +288,15 @@ const ShipmentDetailsTab = ({
                   variant="body2"
                   sx={{ display: "flex", alignItems: "center", mb: 0.5 }}
                 >
-                  <Box component="span" sx={getCircleStyles(`D${index + 1}`)}>
-                    D{index + 1}
+                  <Box 
+                    sx={{ 
+                      display: 'flex', 
+                      alignItems: 'flex-start', 
+                      height: 24, // Enforce height here too
+                      flexShrink: 0 // Prevent the icon container from shrinking
+                    }}
+                  >
+                    <span className={styles.deliveryIcon}>D{index + 1}</span>
                   </Box>
                   <strong>{d.location?.name || "N/A"}</strong>
                 </Typography>

@@ -31,9 +31,9 @@
     padding: 10px;
     color: #fff;
     width: 100%;
-    border: 2px solid #4F46E5;
+    border: 2px solid #20104d;
     align-items: center;
-    background-color: #4F46E5;
+    background-color: #20104d;
     margin: 0 auto;
     border-radius: 1px;
     height: 48px;
@@ -103,7 +103,7 @@
   
   .selectInput:focus {
     outline: none;
-    border-color: #4F46E5;
+    border-color: #20104d;
     box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
   }
   
@@ -129,7 +129,7 @@
     width: 120px;
     padding: 8px 16px;
     color: #fff;
-    background-color: #4F46E5;
+    background-color: #20104d;
     font-size: 14px;
     font-weight: 500;
     cursor: pointer;

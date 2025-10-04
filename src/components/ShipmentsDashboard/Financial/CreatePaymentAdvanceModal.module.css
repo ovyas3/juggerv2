@@ -180,7 +180,7 @@
 }
 
 .submitButton {
-  background-color: #4F46E5;
+  background-color: #20104d;
   color: white;
   border: none;
 }
@@ -237,7 +237,7 @@
 }
 
 .selectTrigger:hover {
-  border: 1px solid #4F46E5;
+  border: 1px solid #20104d;
   box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
   outline: none;
 }
@@ -328,7 +328,7 @@
 }
 
 .datePicker:hover {
-  border-color: #4F46E5;
+  border-color: #20104d;
 }
 
 .datePicker:focus,

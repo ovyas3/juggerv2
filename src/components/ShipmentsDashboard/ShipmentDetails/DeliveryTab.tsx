@@ -1519,8 +1519,8 @@ const DeliveryTab = ({
 
         return (
           <Box key={delivery._id} className={styles.deliveryPointCard}>
-            <Grid container spacing={2} className={styles.infoGridContainer}>
-              <Grid item xs={12} md={7} className={styles.infoGridItem}>
+            <Grid container spacing={2} className={styles.infoGridContainer} sx= {{mt : '0px', width: '100%', ml : '0px', border: '1px solid #e0e0e0'}}>
+              <Grid item xs={12} md={7} className={styles.infoGridItem} sx ={{width: '50%'}} >
                 
 
                 <Box className={styles.header}>
@@ -1608,7 +1608,7 @@ const DeliveryTab = ({
                                       <CircularProgress size={16} />
                                     ) : (
                                       <SaveIcon
-                                        sx={{ color: "#4F46E5" }}
+                                        sx={{ color: "#20104d" }}
                                         fontSize="small"
                                       />
                                     )}
@@ -2693,7 +2693,7 @@ const DeliveryTab = ({
       >
         <DialogTitle
           sx={{
-            backgroundColor: "#4F46E5",
+            backgroundColor: "#20104d",
             color: "white",
             fontSize: "16px",
             fontWeight: 500,

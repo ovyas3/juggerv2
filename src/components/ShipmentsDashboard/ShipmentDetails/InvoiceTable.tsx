@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import dayjs from "dayjs";
 import {
   Box,
-  
   Table,
   TableBody,
   TableCell,
@@ -24,7 +23,8 @@ import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import styles from "./PickupTab.module.css";
-import CustomDateTimePicker from "@/components/UI/CustomDateTimePicker/CustomDateTimePicker";
+// Assuming CustomDateTimePicker is a defined component
+import CustomDateTimePicker from "@/components/UI/CustomDateTimePicker/CustomDateTimePicker"; 
 
 interface InvoiceTableProps {
   groupedInvoices: any[];
@@ -49,7 +49,8 @@ interface InvoiceTableProps {
 const formatDateTime = (dateString?: string | null): string => {
   if (!dateString) return "DD MMM YYYY, hh:mm";
   try {
-    return dayjs(dateString).format("DD MMM YYYY, hh:mm");
+    // dayjs will handle various date formats, including ISO strings (which is what your API returns)
+    return dayjs(dateString).format("DD MMM YYYY, hh:mm"); 
   } catch (e) {
     return "N/A";
   }
@@ -59,7 +60,7 @@ const textFieldStyles = {
   "& .MuiOutlinedInput-root": {
     "& fieldset": { borderColor: "#e0e0e0" },
     "&:hover fieldset": { borderColor: "#c0c0c0" },
-    "&.Mui-focused fieldset": { borderColor: "#4F46E5" },
+    "&.Mui-focused fieldset": { borderColor: "#20104d" },
   },
   "& .MuiInputBase-input": { padding: "8.5px 4px" },
 };
@@ -129,7 +130,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
               sx={{
                 fontWeight: "bold",
                 color: "#09337e",
-                width: "180px", // Sufficient width for Invoice Number
+                width: "180px", 
                 textAlign: "center",
                 backgroundColor: "#F5F5F5",
               }}
@@ -140,7 +141,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
               sx={{
                 fontWeight: "bold",
                 color: "#09337e",
-                width: "120px", // Sufficient width for Value
+                width: "120px", 
                 textAlign: "center",
                 backgroundColor: "#F5F5F5",
               }}
@@ -151,7 +152,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
               sx={{
                 fontWeight: "bold",
                 color: "#09337e",
-                width: "50px", // Reduced width for Packages (two digits)
+                width: "50px", 
                 textAlign: "center",
                 backgroundColor: "#F5F5F5",
               }}
@@ -162,7 +163,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
               sx={{
                 fontWeight: "bold",
                 color: "#09337e",
-                width: "130px", // Adjusted width
+                width: "130px", 
                 textAlign: "center",
                 backgroundColor: "#F5F5F5",
               }}
@@ -173,7 +174,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
               sx={{
                 fontWeight: "bold",
                 color: "#09337e",
-                width: "130px", // Adjusted width
+                width: "130px", 
                 textAlign: "center",
                 backgroundColor: "#F5F5F5",
               }}
@@ -187,7 +188,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
                   sx={{
                     fontWeight: "bold",
                     color: "#09337e",
-                    width: "130px", // Adjusted width
+                    width: "130px", 
                     textAlign: "center",
                     backgroundColor: "#F5F5F5",
                   }}
@@ -212,7 +213,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
                   sx={{
                     fontWeight: "bold",
                     color: "#09337e",
-                    width: "130px", // Adjusted width
+                    width: "130px", 
                     textAlign: "center",
                     backgroundColor: "#F5F5F5",
                   }}
@@ -223,7 +224,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
                   sx={{
                     fontWeight: "bold",
                     color: "#09337e",
-                    width: "130px", // Adjusted width
+                    width: "130px", 
                     textAlign: "center",
                     backgroundColor: "#F5F5F5",
                   }}
@@ -239,7 +240,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
                   fontWeight: "bold",
                   color: "#09337e",
                   backgroundColor: "#F5F5F5",
-                  width: "80px", // Explicit width for Actions
+                  width: "80px", 
                   textAlign: "center",
                 }}
               >
@@ -259,27 +260,39 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
         <TableBody>
           {groupedInvoices.map((invGroup: any, groupIndex: number) => {
             const invoicesToRender =
-              (isEditing // Use the editable data if in edit mode
+              (isEditing 
                 ? editableGoodsInfoForPickup[groupIndex]?.commercialInvoices
                 : invGroup.commercial_invoices) ?? [];
 
+            // Determine the source of the invoice info object
             const currentGoodsInfo = isEditing
               ? editableGoodsInfoForPickup[groupIndex] || {}
               : invGroup;
+            
+            // Define the data to be used for display (outside of edit mode)
+            // It prioritizes the editable state if editing is true, otherwise uses the original API object structure.
+            const displayEwaybillNumber = isEditing 
+                ? currentGoodsInfo.ewaybillNumber 
+                : invGroup.ewaybill?.number;
+                
+            const displayEwaybillExpiry = isEditing 
+                ? currentGoodsInfo.ewaybillExpiryDateTime 
+                : invGroup.ewaybill?.expire_date;
+                
+            const displayInvoiceTime = isEditing 
+                ? currentGoodsInfo.invoiceDateTime 
+                : shipmentData.pickup_date; // Angular defaults to shipment pickup date
 
-            return ( // Apply verticalAlign: 'top' to all cells in the row
+            return ( 
               <TableRow key={invGroup.delivery_id?._id || groupIndex} sx={{ '& > td': { verticalAlign: 'top' } }}>
                 <TableCell sx={{ padding: '10px 2px 0px 8px ' }}>
                 <Box sx={{ display: "flex", alignItems: "flex-start", gap: '8px' }}>
-    
-                  {/* NEW ISOLATION WRAPPER: Ensures the icon maintains its height */}
                   <Box 
                       sx={{ 
                           display: 'flex', 
                           alignItems: 'center', 
-                          height: 24, // Enforce the required 24px height
-                          flexShrink: 0, // Prevent container from being vertically compressed
-                          // Align the icon container to the top edge of the overall flex block
+                          height: 24, 
+                          flexShrink: 0, 
                           alignSelf: 'flex-start' 
                       }}
                   >
@@ -287,7 +300,6 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
                           D{groupIndex + 1}
                       </span>
                   </Box>
-                  {/* END ISOLATION WRAPPER */}
                   
                   <Box>
                       <Typography
@@ -368,6 +380,48 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
                       onGoodsInfoChange(groupIndex, "comments", e.target.value)
                     }
                   />
+                   {/* START: Invoice Time Field */}
+                   {isBMWIL && (
+                    <Box sx={{ mt: 1, marginBottom: '8px' }}>
+                        {isEditing ? (
+                            <CustomDateTimePicker
+                                label="Invoice Time"
+                                value={
+                                currentGoodsInfo.invoiceDateTime
+                                    ? new Date(currentGoodsInfo.invoiceDateTime)
+                                    : null
+                                }
+                                onChange={(newDate: Date | null) =>
+                                    onGoodsInfoChange(
+                                        groupIndex,
+                                        "invoiceDateTime", 
+                                        newDate
+                                    )
+                                }
+                            />
+                        ) : (
+                            <Box>
+                                <Box
+                                    sx={{
+                                        mt: 1,
+                                        pl: 1,
+                                        border: "1px solid #e0e0e0",
+                                        borderRadius: "4px",
+                                    }}
+                                >
+                                    <Typography variant="caption" color="text.secondary">
+                                      Invoice Time
+                                    </Typography>
+                                    <Typography variant="body2" color="text.secondary">
+                                        {formatDateTime(displayInvoiceTime)}
+                                    </Typography>
+                                </Box>
+                            </Box>
+                        )}
+                    </Box>
+                   )}
+                  {/* END: Invoice Time Field */}
+
                   <Box sx={{ mt: 1, marginBottom: '8px' }}>
                     {isEditing ? (
                       <TextField
@@ -394,7 +448,8 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
                           E-waybill Number
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
-                          {currentGoodsInfo.ewaybillNumber || "—"}
+                          {/* FIX: Use displayEwaybillNumber which checks both editable and original API object */}
+                          {displayEwaybillNumber || "—"}
                         </Typography>
                       </Box>
                     )}
@@ -429,16 +484,15 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
                           E-waybill Expiry
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
-                          {formatDateTime(
-                            currentGoodsInfo.ewaybillExpiryDateTime
-                          )}
+                          {/* FIX: Use displayEwaybillExpiry which checks both editable and original API object */}
+                          {formatDateTime(displayEwaybillExpiry)}
                         </Typography>
                       </Box>
                     )}
                   </Box>
                 </TableCell>
 
-                <TableCell sx={{ padding: '6px 2px' }}> {/* Added verticalAlign: 'top' to all data cells */}
+                <TableCell sx={{ padding: '6px 2px' }}> 
                   {invoicesToRender.map((ci: any, ciIndex: number) => (
                     <Box key={ci._id || `num-${ciIndex}`} sx={{minHeight: "40px", display: "flex", alignItems: "center", mb: ciIndex === invoicesToRender.length - 1 ? 0 : 2}}>
                       {isEditing ? (
@@ -740,7 +794,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
                               size="small"
                               onClick={() => onAddRow(groupIndex)}
                             >
-                              <AddCircleOutlineIcon sx={{ color: "#4f46e5" }} />
+                              <AddCircleOutlineIcon sx={{ color: "#20104d" }} />
                             </IconButton>
                           )}
                         </Box>
@@ -798,7 +852,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
             variant="contained"
             onClick={onSave}
             sx={{
-              backgroundColor: "#4F46E5",
+              backgroundColor: "#20104d",
               textTransform: "capitalize",
               "&:hover": { backgroundColor: "#4338ca" },
             }}

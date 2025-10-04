@@ -44,7 +44,7 @@ const textFieldStyles = {
   "& .MuiOutlinedInput-root": {
     "& fieldset": { borderColor: "#e0e0e0" },
     "&:hover fieldset": { borderColor: "#c0c0c0" },
-    "&.Mui-focused fieldset": { borderColor: "#4F46E5" },
+    "&.Mui-focused fieldset": { borderColor: "#20104d" },
   },
   "& .MuiInputBase-input": { padding: "8.5px 10px" },
 };
@@ -581,7 +581,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
             variant="contained"
             onClick={onSave}
             sx={{
-              backgroundColor: "#4F46E5",
+              backgroundColor: "#20104d",
               textTransform: "capitalize",
               "&:hover": { backgroundColor: "#4338ca" },
             }}

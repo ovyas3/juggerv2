@@ -133,7 +133,7 @@ const BulkEpodUpload: React.FC<BulkEpodUploadProps> = ({
         <Box sx={{ mt: 2 }}>
           <div
             style={{
-              border: `2px dashed ${isDragOver ? '#4F46E5' : '#D1D5DB'}`,
+              border: `2px dashed ${isDragOver ? '#20104d' : '#D1D5DB'}`,
               borderRadius: '6px',
               padding: '10px',
               textAlign: 'center',
@@ -148,7 +148,7 @@ const BulkEpodUpload: React.FC<BulkEpodUploadProps> = ({
             onDrop={onDrop}
             onClick={() => fileInputRef.current?.click()}
           >
-            {/* <Upload size={24} style={{ color: '#4F46E5', marginBottom: '8px' }} /> */}
+            {/* <Upload size={24} style={{ color: '#20104d', marginBottom: '8px' }} /> */}
             <Typography variant="body1" sx={{ mt: 1 }}>
               Drag & drop your CSV file here
             </Typography>
@@ -159,7 +159,7 @@ const BulkEpodUpload: React.FC<BulkEpodUploadProps> = ({
               variant="contained"
               component="span"
               sx={{
-                backgroundColor: '#4F46E5 !important',
+                backgroundColor: '#20104d !important',
                 color: 'white !important',
                 borderRadius: '4px !important',
                 padding: '8px 16px !important',
@@ -202,7 +202,7 @@ const BulkEpodUpload: React.FC<BulkEpodUploadProps> = ({
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: '6px',
-                  color: '#4F46E5',
+                  color: '#20104d',
                   textDecoration: 'none',
                   fontSize: '14px',
                   fontWeight: '500',
@@ -250,7 +250,7 @@ const BulkEpodUpload: React.FC<BulkEpodUploadProps> = ({
             padding: '8px 24px',
             border: 'none',
             borderRadius: '4px',
-            backgroundColor: '#4F46E5',
+            backgroundColor: '#20104d',
             color: 'white',
             fontSize: '14px',
             fontWeight: '500',
