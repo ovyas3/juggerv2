@@ -10,15 +10,61 @@ import type { Icon as LeafletIcon, DivIcon as LeafletDivIcon, Map as LeafletMap 
 import type { LatLngExpression } from "leaflet";
 import { Vehicle, StageInfo } from '../../InPlantDashboard';
 import 'leaflet/dist/leaflet.css';
+import { httpsGet, httpsPost } from '../../../../utils/Communication';
+import { useRouter } from "next/navigation";
 
+import GateIn from '../../../../assets/GateIn.svg';
+import GateOut from "../../../../assets/GateOut.svg";
+import polyline from 'polyline-encoded'; 
 import { useMap } from "react-leaflet";
+import { blue } from "@mui/material/colors";
 // Dynamically import Leaflet components
 const MapContainer = dynamic(() => import("react-leaflet").then((mod) => mod.MapContainer), { ssr: false });
 const TileLayer = dynamic(() => import("react-leaflet").then((mod) => mod.TileLayer), { ssr: false });
 const Marker = dynamic(() => import("react-leaflet").then((mod) => mod.Marker), { ssr: false });
 const Popup = dynamic(() => import("react-leaflet").then((mod) => mod.Popup), { ssr: false });
 const Polyline = dynamic(() => import("react-leaflet").then((mod) => mod.Polyline), { ssr: false });
+const GATE_ICON_SIZE: [number, number] = [32, 32]; // Adjust size as needed
+const CENTER_ICON_SIZE: [number, number] = [25, 25];
 
+const PlantCenterIcon = L.divIcon({
+  html: `
+    <div style="
+      width: ${CENTER_ICON_SIZE[0]}px;
+      height: ${CENTER_ICON_SIZE[1]}px;
+      background:  #10b981 ;
+      border: 1px solid white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+    ">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
+        <circle cx="12" cy="10" r="3"/>
+      </svg>
+    </div>
+  `,
+  className: 'plant-center-marker', // Custom class for styling
+  iconSize: CENTER_ICON_SIZE,
+  iconAnchor: [CENTER_ICON_SIZE[0] / 2, CENTER_ICON_SIZE[1]], // Anchor at the bottom center
+  popupAnchor: [0, -CENTER_ICON_SIZE[1] / 2],
+});
+
+const GateInIcon = L.icon({
+  iconUrl: GateIn.src, // Use .src for Next.js static imports
+  iconSize: GATE_ICON_SIZE,
+  iconAnchor: [GATE_ICON_SIZE[0] / 2, GATE_ICON_SIZE[1]], // Center bottom point
+  popupAnchor: [0, -GATE_ICON_SIZE[1] / 2],
+});
+
+const GateOutIcon = L.icon({
+  iconUrl: GateOut.src, // Use .src for Next.js static imports
+  iconSize: GATE_ICON_SIZE,
+  iconAnchor: [GATE_ICON_SIZE[0] / 2, GATE_ICON_SIZE[1]],
+  popupAnchor: [0, -GATE_ICON_SIZE[1] / 2],
+});
 interface KeplerMapViewProps {
   vehicles: Vehicle[];
   selectedVehicle: Vehicle | null;
@@ -33,10 +79,29 @@ interface PlantLocation {
   stageId?: string;
   type: 'stage' | 'building' | 'parking';
 }
+interface MapLocationData {
+  name: string;
+  area: string;
+  geo_point: {
+    type: 'Point';
+    coordinates: [number, number]; // [longitude, latitude]
+  };
+  gatesV2: {
+    entry: {
+      type: 'Point';
+      coordinates: [number, number]; // [longitude, latitude]
+    };
+    exit: {
+      type: 'Point';
+      coordinates: [number, number]; // [longitude, latitude]
+    };
+  };
+  polylines: string[];
 
+}
 const KeplerMap: React.FC = () => {
   const map = useMap(); // Get the map instance
-
+ 
   useEffect(() => {
       // This runs after the component mounts/renders, ensuring the container is available
       // A small delay often helps, especially in complex UI transitions
@@ -56,7 +121,7 @@ const KeplerMapView: React.FC<KeplerMapViewProps> = ({
   stages
 }) => {
   const [mapReady, setMapReady] = useState(false);
-
+  const [mapLocationData, setMapLocationData] = useState<MapLocationData | null>(null);
   const [isSatelliteView, setIsSatelliteView] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [mapZoom, setMapZoom] = useState(16);
@@ -66,7 +131,101 @@ const KeplerMapView: React.FC<KeplerMapViewProps> = ({
   const [showMapStyleSelector, setShowMapStyleSelector] = useState(false);
   const mapRef = useRef<LeafletMap | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const [loading, setLoading] = useState(false);
 
+  const router = useRouter(); 
+  const fetchMapLocation = async () => {
+    // The URL from your cURL example
+    const url = 'InplantDashbaord/maplocation';
+    
+   
+    const payload = {
+        // Example:
+        // plant_id: 'XYZ_123', 
+        // date_range: 'today',
+    };
+
+    try {
+        setLoading(true);
+        
+        const response = await httpsPost(
+            url, 
+            payload, 
+            router,
+            1, 
+            false 
+          
+        );
+
+        if (response?.statusCode === 200 && response.data) {
+          
+            setMapLocationData(response.data as MapLocationData);
+           
+        } else {
+            console.error("Failed to fetch map data:", response?.message);
+            // Optionally use useSnackbar here: showMessage("Failed to fetch map data", "error");
+        }
+    } catch (error) {
+        console.error("API call error:", error);
+        // Optionally use useSnackbar here: showMessage("An error occurred", "error");
+    } finally {
+        setLoading(false);
+    }
+};
+const DEFAULT_CENTER: [number, number] = [19.0760, 72.8777];
+const INDIA_BOUNDS: [number, number][] = [
+  [6.5, 68.0],   // SW corner (Lower tip/Gujarat) - [lat, lng]
+  [37.0, 98.0]   // NE corner (Kashmir/Arunachal Pradesh) - [lat, lng]
+];
+const plantCenter: [number, number] = mapLocationData
+? [mapLocationData.geo_point.coordinates[1], mapLocationData.geo_point.coordinates[0]] 
+: DEFAULT_CENTER;
+const fetchMapdata = async () => {
+  // The URL from your cURL example
+  const url = 'InplantDashbaord/mapview';
+  console.log("Hitting the api");
+  // **PAYLOAD ASSUMPTION:** // A POST request usually requires a body. 
+  // Define your actual payload/filters here.
+  const payload = {
+      // Example:
+      // plant_id: 'XYZ_123', 
+      // date_range: 'today',
+  };
+
+  try {
+      setLoading(true);
+      
+      const response = await httpsPost(
+          url, 
+          payload, 
+          router,
+          1, 
+          false 
+        
+      );
+
+      if (response?.statusCode === 200 && response.data) {
+          console.log("Map location data fetched:", response.data);
+         
+      } else {
+          console.error("Failed to fetch map data:", response?.message);
+          // Optionally use useSnackbar here: showMessage("Failed to fetch map data", "error");
+      }
+  } catch (error) {
+      console.error("API call error:", error);
+      // Optionally use useSnackbar here: showMessage("An error occurred", "error");
+  } finally {
+      setLoading(false);
+  }
+};
+
+// Load data on initial component mount using useEffect
+useEffect(() => {
+    fetchMapLocation();
+    fetchMapdata ();
+  
+    // The empty dependency array [] ensures this runs only once on mount
+}, []); 
   
 // Flip ready as soon as a real map instance exists (via MapController)
 useEffect(() => {
@@ -139,7 +298,7 @@ useEffect(() => {
   //   }
   // }, [mapRef.current]);
   // Plant center coordinates (example: Mumbai location)
-  const plantCenter: [number, number] = [19.0760, 72.8777];
+  // const plantCenter: [number, number] = [19.0760, 72.8777];
   // put near other handlers
 const setZoomDelta = (delta: number) => {
   const map = mapRef.current;
@@ -532,19 +691,7 @@ const setZoomDelta = (delta: number) => {
 
 
 
-      {/* Map */}
-      {/* <div ref={containerRef} className={styles.mapCanvas}> */}
-      {/* <MapContainer
-         center={plantCenter}
-        ref={mapRef} 
-        // center={center}
-        zoom={mapZoom}
-        style={{ height: "100%", width: "100%" }}
-        zoomControl={false}
-        attributionControl={false}
-        key={isFullscreen ? "fullscreen" : "normal"}
-      >
-         <MapController mapRef={mapRef} />  */}
+     
           <div className={styles.mapCanvas}>
          <MapContainer
        
@@ -552,22 +699,15 @@ const setZoomDelta = (delta: number) => {
            
            zoom={mapZoom}  
            touchZoom={true}
-   center={plantCenter}
+  //  center={plantCenter}
+  bounds={INDIA_BOUNDS} 
  
   style={{ height: "100%", width: "100%" }}
    zoomControl={false}
    attributionControl={false}
    ref={mapRef} 
 
-  //  whenCreated={(map) => {
-  //   mapRef.current = map;
-  //   (window as any)._map = map;   // optional but great for console poking
-  //   map.whenReady(() => {
-  //     setMapReady(true);                  // <-- flip ready only now
-  //     setTimeout(() => map.invalidateSize(true), 0);
-  //   });
-//   }
-// }
+
  
  >
     <MapController mapRef={mapRef} />
@@ -595,68 +735,10 @@ const setZoomDelta = (delta: number) => {
 // }
           />
       
-      {/* <div  style={{ height: '100%', width: '100%', position: 'relative' }}> */}
-        {/* <MapContainer
-          center={plantCenter}
-          zoom={mapZoom}
-          style={{ 
-            height: '100%', 
-            width: '100%',
-            // position: 'absolute',
-            // top: 0,
-            // left: 0,
-            // right: 0,
-            // bottom: 0
-          }}
-          className={styles.leafletMap}
-          zoomControl={false}
-          attributionControl={false}
-          ref={mapRef as any}
-          whenCreated={(map) => {
-               mapRef.current = map;
-              // debug handle so you can poke it from DevTools
-               (window as any)._map = map;
-               // first nudge
-               setTimeout(() => map.invalidateSize(true), 0);
-             }} 
-          // whenReady={() => {
-          //   const map = mapRef.current;
-          //   if (map) {
-          //     setTimeout(() => {
-          //       map.invalidateSize(true);
-          //     }, 0);
-          //   }
-          // }}
-          // key={`${isFullscreen}-${selectedMapStyle}`}
-        >
-      
-       {/* <TileLayer
-        url={getCurrentMapUrl()}
-        noWrap={true}
-        updateWhenZooming={false}
-        updateWhenIdle={true}
-        eventHandlers={{ load: () => mapRef.current?.invalidateSize() }}
-        attribution={
-          isSatelliteView
-            ? 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
-            : '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        }
-      /> */}
-      {/* <TileLayer
-  url={getCurrentMapUrl()}
-  crossOrigin="anonymous"
-  // only needed if you keep {s} in URLs; otherwise omit:
-  // subdomains={['a']}     // ← start with 'a' only to kill column gaps
-  eventHandlers={{
-    load: () => mapRef.current?.invalidateSize(true),
-    tileload: () => mapRef.current?.invalidateSize(),
-    tileerror: (e) => console.warn('tileerror', e?.tile?.src)
-  }}
-/>
-     */}
+    
 
         {/* Stage Locations */}
-        {showStageLabels && plantLocations
+        {/* {showStageLabels && plantLocations
           .filter(location => location.stageId)
           .map(location => {
             const vehicleCount = vehicles.filter(v => v.currentStage.stageId === location.stageId).length;
@@ -678,7 +760,23 @@ const setZoomDelta = (delta: number) => {
               </Marker>
             );
           })
-        }
+        } */}
+
+        {/* --- Plant Center Marker (from geo_point) --- */}
+        {mapLocationData && (
+          <Marker
+            key="plant-center-main"
+            position={plantCenter} // Uses the API-derived center [lat, lng]
+            icon={PlantCenterIcon} // Use the custom icon
+            zIndexOffset={100} // Ensure it sits on top of other markers
+          >
+            <Popup>
+              <h4>{mapLocationData.name || "Plant Center"}</h4>
+              <p>Area: {mapLocationData.area}</p>
+           
+            </Popup>
+          </Marker>
+        )}
 
         {/* Vehicles */}
         {vehicles.map(vehicle => {
@@ -708,8 +806,49 @@ const setZoomDelta = (delta: number) => {
           );
         })}
 
+
+
+        {/* --- Gate Markers (Entry) --- */}
+        {mapLocationData?.gatesV2?.entry?.coordinates && (
+          // Check if mapLocationData and the entry gate object exist
+          <Marker
+            key="gate-entry-single"
+            // Access coordinates directly from mapLocationData.gatesV2.entry
+            position={[
+              mapLocationData.gatesV2.entry.coordinates[1], // [lat, lng]
+              mapLocationData.gatesV2.entry.coordinates[0],
+            ]}
+            icon={GateInIcon}
+          >
+            {/* <Popup>
+              <h4>{mapLocationData.gatesV2.entry.name || `Entry Gate`}</h4>
+              <p>Type: Entry</p>
+            </Popup> */}
+          </Marker>
+        )}
+
+        {/* --- Gate Markers (Exit) --- */}
+        {mapLocationData?.gatesV2?.exit?.coordinates && (
+          // Check if mapLocationData and the exit gate object exist
+          <Marker
+            key="gate-exit-single"
+            // Access coordinates directly from mapLocationData.gatesV2.exit
+            position={[
+              mapLocationData.gatesV2.exit.coordinates[1], // [lat, lng]
+              mapLocationData.gatesV2.exit.coordinates[0],
+            ]}
+            icon={GateOutIcon}
+          >
+            {/* <Popup>
+              <h4>{mapLocationData.gatesV2.exit.name || `Exit Gate`}</h4>
+              <p>Type: Exit</p>
+            </Popup> */}
+          </Marker>
+        )}
+        
+
         {/* Vehicle Paths */}
-        {showVehiclePaths && vehicles.map(vehicle => {
+        {/* {showVehiclePaths && vehicles.map(vehicle => {
           const currentPos = getVehiclePosition(vehicle);
           const currentStageIndex = stages.findIndex(s => s.stageId === vehicle.currentStage.stageId);
 
@@ -733,7 +872,57 @@ const setZoomDelta = (delta: number) => {
             }
           }
           return null;
-        })}
+        })} */}
+          {/* API Polylines (Roads/Boundaries) */}
+          {(() => {
+          // Define a set of distinct colors to cycle through
+          const polylineColors = [
+            '#ef4444', // Red
+            '#f97316', // Orange
+            '#eab308', // Yellow
+            '#22c55e', // Green
+            '#06b6d4', // Cyan
+            '#3b82f6', // Blue
+            '#8b5cf6', // Violet
+            '#ec4899', // Pink
+            '#64748b', // Slate
+            '#111827', // Dark Gray/Black (as a fallback)
+            '#166534', // Forest Green
+    '#7e22ce', // Dark Purple
+    '#475569', // Medium Slate Gray
+    '#9f1239', // Dark Crimson
+          ];
+          
+          if (!mapLocationData?.polylines || mapLocationData.polylines.length === 0) return null;
+
+          return mapLocationData.polylines.map((encodedPolyline, index) => {
+            try {
+              // Select color based on the polyline's index, cycling back to the start if needed
+              const color = polylineColors[index % polylineColors.length]; 
+              
+              // Decode the polyline string into an array of [lat, lng] coordinates
+              const decodedCoordinates: LatLngExpression[] = polyline.decode(encodedPolyline);
+              
+              // if (decodedCoordinates.length < 2) return null;
+
+              return (
+                <Polyline
+                  key={`api-path-${index}`}
+                  positions={decodedCoordinates}
+                  pathOptions={{
+                    color: color, // Dynamically assigned color
+                    weight: 4,
+                    opacity: 0.7,
+                    lineCap: 'round',
+                  }}
+                />
+              );
+            } catch (error) {
+              console.error(`Error decoding polyline at index ${index}:`, error);
+              return null;
+            }
+          });
+        })()}
       </MapContainer>
       {/* </div> */}
 

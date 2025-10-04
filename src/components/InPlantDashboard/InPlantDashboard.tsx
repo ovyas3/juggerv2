@@ -247,7 +247,7 @@ const InPlantDashboard: React.FC = () => {
 
         const response = await httpsPost('InplantDashbaord/Table', payload, {}, 1);
         if (response?.statusCode === 200) {
-          const formattedVehicles = response.data.map((vehicle: any) => ({
+          const formattedVehicles = response.data.data.map((vehicle: any) => ({
             id: vehicle.id || '',
             vehicleNumber: vehicle.vehicleNumber || '',
             currentStage: {

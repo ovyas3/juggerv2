@@ -263,21 +263,20 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                     onValueChange={(value) => onFiltersChange({ ...filters, stage: value })}
                   >
                     <SelectTrigger className="select">
-                      <SelectValue placeholder="All Stages" />
+                      <SelectValue placeholder="All Stages" className="selectValue" />
                     </SelectTrigger>
                     <SelectContent 
-                      className="selectContent"
-                      position="popper"
-                      side="bottom"
-                      align="start"
-                    >
+                       className="selectContent2"
+                       position="popper"
+                       side="bottom"
+                       align="start">
                       <SelectItem className="selectItem" value="all">All Stages</SelectItem>
                       <SelectItem className="selectItem" value="external-parking">External Parking</SelectItem>
                       <SelectItem className="selectItem" value="entry-gate">Entry Gate</SelectItem>
                       <SelectItem className="selectItem" value="weighing">Weighing</SelectItem>
                       <SelectItem className="selectItem" value="loading">Loading</SelectItem>
                       <SelectItem className="selectItem" value="weight-out">Weight Out</SelectItem>
-                      <SelectItem value="gate-out">Gate Out</SelectItem>
+                      <SelectItem className="selectItem" value="gate-out">Gate Out</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -292,7 +291,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                       <SelectValue placeholder="All Durations" className='selectValue' />
                     </SelectTrigger>
                     <SelectContent 
-                      className="selectContent"
+                        className="selectContent2"
                       position="popper"
                       side="bottom"
                       align="start"
