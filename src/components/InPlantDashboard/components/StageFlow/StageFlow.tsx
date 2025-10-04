@@ -222,8 +222,11 @@ const StageFlow: React.FC<StageFlowProps> = ({
               </div>
             </div>
           )}
-          <div className="stage-flow-container">
-            {sortedStages.map((stage, index) => (
+         <div className="stage-flow-container">
+          {loading ? (
+            <MetricCardSkeleton count={sortedStages.length || 6} />
+          ) : (
+            sortedStages.map((stage, index) => (
               <div 
                 key={stage.id} 
                 // className={`stage-metric-card ${selectedStage === stage.stageId ? 'selected' : ''}`}
@@ -242,8 +245,9 @@ const StageFlow: React.FC<StageFlowProps> = ({
                   healthStatus={stage.healthStatus}
                 />
               </div>
-            ))}
-          </div>
+            ))
+          )}
+        </div>
 
           {/* Stage selection info */}
           {selectedStage && !loading && (

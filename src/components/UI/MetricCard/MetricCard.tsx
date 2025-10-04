@@ -27,8 +27,6 @@ export const MetricCard: React.FC<MetricCardProps> = ({
   onClick,
 }) => {
   const handleClick = () => {
-    console.log(`MetricCard clicked - Title: ${title}`);
-    console.log("onClick prop type:", typeof onClick);
     if (onClick) {
       console.log("Calling onClick handler");
       onClick();

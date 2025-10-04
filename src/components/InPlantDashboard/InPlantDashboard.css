@@ -300,7 +300,7 @@
 }
 
 .dashboard-content {
-    margin: 1rem 0;
+    margin-top: 1.5rem;
     width: 100%;
     border: 1px solid var(--border-light);
     border-radius: 12px;
@@ -326,7 +326,7 @@
   
   /* Make the header bar itself a bit tighter when collapsed */
   .dashboard-content.collapsed .metrics-header {
-    padding: 0;                  /* you already control margin inline */
+    padding: 1.5rem 0px;       
   }
   
   /* If any extra space still shows under the header, remove bottom margin */
@@ -359,4 +359,8 @@
   overflow: hidden;
 }
 
-  
+.statsGrid {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(206px, 1fr));
+}

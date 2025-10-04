@@ -199,9 +199,9 @@ const VehicleRow: React.FC<VehicleRowProps> = ({ vehicle, isSelected, onSelect, 
       </td>
 
       {/* Expand */}
-      <td className="expand-cell">
+      {/* <td className="expand-cell">
         <ChevronRight size={16} className={`expand-icon ${isSelected ? 'expanded' : ''}`} />
-      </td>
+      </td> */}
     </tr>
   );
 };
@@ -377,7 +377,7 @@ const VehicleTable: React.FC<VehicleTableProps> = ({
         <table className="vehicle-table">
           <thead>
             <tr>
-              <th className="sno-header">S.No</th>
+              <th className="sno-header">S.No.</th>
               <th className="status-header">Status</th>
               <th className="shipment-header">SIN</th>
               <th className="vehicle-header">Vehicle</th>
@@ -387,7 +387,7 @@ const VehicleTable: React.FC<VehicleTableProps> = ({
               <th className="progress-header">Progress</th>
               <th className="company-header">Customer</th>
               <th className="actions-header">Actions</th>
-              <th className="expand-header"></th>
+              {/* <th className="expand-header"></th> */}
             </tr>
           </thead>
           <tbody>
@@ -397,7 +397,7 @@ const VehicleTable: React.FC<VehicleTableProps> = ({
                 vehicle={vehicle}
                 isSelected={selectedVehicle?.id === vehicle.id}
                 onSelect={() => onVehicleSelect(vehicle)}
-                index={startItem + index - 1}
+                index={startItem + index}
               />
             ))}
           </tbody>

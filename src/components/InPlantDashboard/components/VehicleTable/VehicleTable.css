@@ -95,7 +95,7 @@
 
 .vehicle-row.selected {
   background: var(--primary-light);
-  border-left: 4px solid var(--primary-blue);
+  border-left: 4px solid #301c6c;
 }
 
 .vehicle-row:nth-child(even) {
@@ -111,7 +111,7 @@
 }
 
 .vehicle-row td {
-  padding: var(--spacing-md);
+  /* padding: var(--spacing-md); */
   /* vertical-align: top; */
 }
 
@@ -884,7 +884,7 @@
   color: var(--text-secondary);
   font-size: var(--text-sm);
   border-right: 1px solid var(--border-light);
-  background: var(--bg-primary);
+  /* background: var(--bg-primary); */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1020,4 +1020,11 @@
     align-items: center;
     justify-content: center;
     gap: 8px;
+}
+
+.pagination-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }

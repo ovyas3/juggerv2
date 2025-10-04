@@ -53,10 +53,6 @@ const MetricCard: React.FC<MetricCardProps> = ({
   slaThreshold,
   healthStatus = 'normal'
 }) => {
-  console.log(`MetricCard for: ${title}`);
-  console.log(`  averageTime: ${averageTime}, Type: ${typeof averageTime}`);
-  console.log(`  slaThreshold: ${slaThreshold}, Type: ${typeof slaThreshold}`);
-  console.log(`  Should Render SLA: ${averageTime !== undefined && slaThreshold !== undefined}`);
   const getTrendIcon = () => {
     switch (trend) {
       case "up":
@@ -112,10 +108,17 @@ const MetricCard: React.FC<MetricCardProps> = ({
           {averageTime !== undefined && slaThreshold !== undefined && (
             <div className={styles.timeInfo}>
               <div className={styles.timeRow}>
+                <div className={styles.timeIconContainer}>
                 <Clock size={14} className={styles.timeIcon} />
+                <span>Avg Time:</span>
+                </div>
                 <span className={styles.timeText}>
                   {formatTime(averageTime)} / {formatTime(slaThreshold)}
                 </span>
+              </div>
+              <div className={styles.slaContainer}>
+                <span>SLA:</span>
+                <span className={styles.slaValue} style={{ backgroundColor: bgColor, color: iconColor }}>{formatTime(slaThreshold)}</span>
               </div>
               <div className={styles.progressBar}>
                 <div 
@@ -128,11 +131,11 @@ const MetricCard: React.FC<MetricCardProps> = ({
             </div>
           )}
           
-          {subText && (
+          {/* {subText && (
             <div style={{ color: iconColor }} className={styles.subText}>
               {subText}
             </div>
-          )}
+          )} */}
         </div>
     </div>
   

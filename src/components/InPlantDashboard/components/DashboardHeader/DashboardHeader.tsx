@@ -83,7 +83,9 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
       duration: 'all',
       quickFilter: 'all'
     });
-    // Simulate API call
+    if (onDateRangeChange) {
+      onDateRangeChange('today');
+    }
     await new Promise(resolve => setTimeout(resolve, 1000));
     setIsRefreshing(false);
   };
@@ -308,7 +310,11 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
 
                 <div className="filter-actions">
                   <button
-                    onClick={() => onFiltersChange({ stage: 'all', duration: 'all' })}
+                    onClick={() => onFiltersChange({ 
+                      ...filters, 
+                      stage: 'all',
+                      duration: 'all'
+                    })}
                     className="reset-filters-btn"
                   >
                     Reset

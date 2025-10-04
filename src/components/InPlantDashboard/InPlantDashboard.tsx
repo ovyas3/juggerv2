@@ -247,7 +247,7 @@ const InPlantDashboard: React.FC = () => {
 
         const response = await httpsPost('InplantDashbaord/Table', payload, {}, 1);
         if (response?.statusCode === 200) {
-          const formattedVehicles = response.data.map((vehicle: any) => ({
+          const formattedVehicles = response.data.data.map((vehicle: any) => ({
             id: vehicle.id || '',
             vehicleNumber: vehicle.vehicleNumber || '',
             currentStage: {
@@ -267,7 +267,7 @@ const InPlantDashboard: React.FC = () => {
             shipper: { id: vehicle.shipper?.id || '', name: vehicle.shipper?.name || 'Unknown' },
             carrier: { id: vehicle.carrier?.id || '', name: vehicle.carrier?.name || 'Unknown' },
             driver: { name: vehicle.driver?.name || 'Unknown', phone: vehicle.driver?.phone || '' },
-            shipmentId: vehicle.shipmentId || '',
+            shipmentId: vehicle.sin || '',
             orderReference: vehicle.orderReference || ''
           }));
           setVehicles(formattedVehicles);
@@ -595,9 +595,7 @@ const InPlantDashboard: React.FC = () => {
           {isExpanded && (
             <div className="metrics-grid">
               {isLoading ? (
-                Array(4).fill(0).map((_, index) => (
-                  <MetricCardSkeleton key={`skeleton-${index}`} />
-                ))
+               <MetricCardSkeleton count={4} />
               ) : (
                 displayMetrics.map((metric) => {
                   const IconComponent = iconMap[metric.icon] || iconMap.default;

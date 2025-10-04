@@ -481,7 +481,7 @@
   padding: var(--spacing-md);
   background: var(--bg-secondary);
   border-radius: 8px;
-  border-left: 4px solid var(--primary-blue);
+  border-left: 4px solid #301c6c;
 }
 
 .note-header {

@@ -5,7 +5,7 @@ import { X, Download, AlertTriangle, FileText, User, Phone, Building, Clock, Che
 import { Vehicle } from '../../InPlantDashboard';
 import './DetailPanel.css';
 import { useRouter } from 'next/navigation';
-import { httpsGet } from '@/utils/Communication';
+import { httpsGet, httpsPost } from '@/utils/Communication';
 
 interface DetailPanelProps {
   vehicle: Vehicle | null;
@@ -56,7 +56,7 @@ const DetailPanel: React.FC<DetailPanelProps> = ({ vehicle, onClose, isOpen }) =
       setError(null);
       
       try {
-        const response = await httpsGet(`InplantDashboard/timeline/${vehicle.vehicleNumber}`, 1);
+        const response = await httpsGet(`InplantDashboard/timeline/${vehicle.id}`, 1);
         if (response && response.data) {
           setTimelineData(response.data);
         } else {
@@ -260,15 +260,21 @@ const DetailPanel: React.FC<DetailPanelProps> = ({ vehicle, onClose, isOpen }) =
 
                   {item.weighingData && (
                     <div className="weighing-details">
-                      <div className="weight-info">
-                        Tare Weight: <strong>{item.weighingData.tareWeight.toLocaleString()} kg</strong>
-                      </div>
-                      <div className="slip-info">
-                        Weight Slip: <strong>{item.weighingData.weightSlipNumber}</strong>
-                      </div>
-                      <div className="operator-info">
-                        Operator: <strong>{item.weighingData.operatorId}</strong>
-                      </div>
+                      {item.weighingData.tareWeight !== undefined && (
+                        <div className="weight-info">
+                          Tare Weight: <strong>{item.weighingData.tareWeight?.toLocaleString()} kg</strong>
+                        </div>
+                      )}
+                      {item.weighingData.weightSlipNumber && (
+                        <div className="slip-info">
+                          Weight Slip: <strong>{item.weighingData.weightSlipNumber}</strong>
+                        </div>
+                      )}
+                      {item.weighingData.operatorId && (
+                        <div className="operator-info">
+                          Operator: <strong>{item.weighingData.operatorId}</strong>
+                        </div>
+                      )}
                     </div>
                   )}
 
@@ -305,7 +311,7 @@ const DetailPanel: React.FC<DetailPanelProps> = ({ vehicle, onClose, isOpen }) =
 
         {activeTab === 'documents' && (
           <div className="documents-content">
-            <div className="documents-list">
+            {/* <div className="documents-list">
               <div className="document-category">
                 <h4>Entry Documents</h4>
                 <div className="document-item">
@@ -329,13 +335,13 @@ const DetailPanel: React.FC<DetailPanelProps> = ({ vehicle, onClose, isOpen }) =
                   <button className="doc-action">Download</button>
                 </div>
               </div>
-            </div>
+            </div> */}
           </div>
         )}
 
         {activeTab === 'notes' && (
           <div className="notes-content">
-            <div className="notes-list">
+            {/* <div className="notes-list">
               <div className="note-item">
                 <div className="note-header">
                   <span className="note-author">System</span>
@@ -360,13 +366,13 @@ const DetailPanel: React.FC<DetailPanelProps> = ({ vehicle, onClose, isOpen }) =
             <div className="add-note">
               <textarea placeholder="Add a note..." className="note-input" rows={3}></textarea>
               <button className="add-note-btn">Add Note</button>
-            </div>
+            </div> */}
           </div>
         )}
       </div>
 
       {/* Panel Footer */}
-      <div className="detail-footer">
+      {/* <div className="detail-footer">
         <button onClick={handleExportPDF} className="footer-btn secondary">
           <Download size={16} />
           Export PDF
@@ -375,7 +381,7 @@ const DetailPanel: React.FC<DetailPanelProps> = ({ vehicle, onClose, isOpen }) =
           <AlertTriangle size={16} />
           Send Alert
         </button>
-      </div>
+      </div> */}
     </div>
   );
 };
