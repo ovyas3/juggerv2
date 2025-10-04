@@ -547,10 +547,6 @@ const InPlantDashboard: React.FC = () => {
     setSelectedVehicle(vehicle);
   }, []);
 
-  const handleStageSelect = useCallback((stageId: string) => {
-    setSelectedStage(selectedStage === stageId ? null : stageId);
-  }, [selectedStage]);
-
   const handleSearch = useCallback((query: string) => {
     setSearchQuery(query);
   }, []);
@@ -621,7 +617,6 @@ const InPlantDashboard: React.FC = () => {
           <StageFlow
             stages={stages}
             selectedStage={selectedStage}
-            onStageSelect={handleStageSelect}
           />
         )}
 
@@ -630,10 +625,10 @@ const InPlantDashboard: React.FC = () => {
           boxSizing: 'border-box',
           border: '1px solid var(--border-light)',
           borderRadius: '12px',
-          padding: 'var(--spacing-lg)',
+          padding: '0px 24px',
           boxShadow: '0 0 0 1px rgb(118 16 255 / 20%)',
           backgroundColor: '#f9f9ff',
-          minHeight: '200px',
+          minHeight: '100px',
           position: 'relative'
         }}>
           <VehicleStagingLive 

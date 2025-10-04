@@ -11,6 +11,18 @@
   background-color: #f9f9ff;
 }
 
+.stage-flow-collapsed {
+  /* margin: 1rem 0; */
+  width: 100%;
+  /* background: var(--bg-primary); */
+  border: 1px solid var(--border-light);
+  border-radius: 12px;
+  padding: 27px 20px;
+  box-shadow: var(--shadow-sm);
+  box-shadow: 0 0 0 1px rgb(118 16 255 / 20%);
+  background-color: #f9f9ff;
+}
+
 .stage-flow-header {
   display: flex;
   justify-content: space-between;

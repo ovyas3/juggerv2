@@ -106,7 +106,7 @@
   }
 
   .dashboard-main-content1 {
-    min-height: 400px;
+    /* min-height: 400px; */
   }
 }
 
@@ -202,7 +202,7 @@
   border-radius: 12px;
   box-shadow: var(--shadow-sm);
   border: 1px solid var(--border-light);
-  min-height: 500px;
+  /* min-height: 500px; */
   box-shadow: 0 0 0 1px rgb(118 16 255 / 20%);
   background-color: #f9f9ff;
 }
@@ -321,7 +321,7 @@
   /* The “Key Metrics” card-like wrapper keeps padding even when empty.
      Make it tight in collapsed state. */
   .dashboard-content.collapsed {
-    padding: 6px 12px;          /* was var(--spacing-lg) */
+    padding: 25px 22px;
   }
   
   /* Make the header bar itself a bit tighter when collapsed */
@@ -344,7 +344,7 @@
 .inplant-section.collapsed {
   min-height: 0 !important;
   height: auto !important;
-  padding-bottom: 8px;         /* keep a small gutter under the title bar */
+  padding: 17px 0px;
 }
 
 /* Safety: if your content wrappers themselves have min-heights, zero them */

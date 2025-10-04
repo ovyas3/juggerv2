@@ -10,7 +10,6 @@ import './StageFlow.css';
 interface StageFlowProps {
   stages: any[];
   selectedStage: string | null;
-  onStageSelect: (stageId: string) => void;
   loading?: boolean;
 }
 
@@ -149,7 +148,6 @@ const StageCard: React.FC<StageCardProps> = ({
 const StageFlow: React.FC<StageFlowProps> = ({
   stages,
   selectedStage,
-  onStageSelect,
   loading = false
 }) => {
   const sortedStages = [...stages].sort((a, b) => a.order - b.order);
@@ -168,7 +166,7 @@ const StageFlow: React.FC<StageFlowProps> = ({
   }
 
   return (
-    <div className="stage-flow">
+    <div className={isExpanded ? "stage-flow" : "stage-flow-collapsed"}>
       <div className="stage-flow-header">
         <div 
           className="flow-title"
@@ -230,7 +228,6 @@ const StageFlow: React.FC<StageFlowProps> = ({
               <div 
                 key={stage.id} 
                 // className={`stage-metric-card ${selectedStage === stage.stageId ? 'selected' : ''}`}
-                onClick={() => onStageSelect(stage.stageId)}
               >
                 <MetricCard
                   title={stage.title}
@@ -248,21 +245,6 @@ const StageFlow: React.FC<StageFlowProps> = ({
             ))
           )}
         </div>
-
-          {/* Stage selection info */}
-          {selectedStage && !loading && (
-            <div className="stage-selection-info">
-              <span>
-                Showing vehicles in: <strong>{stages.find(s => s.stageId === selectedStage)?.stageName}</strong>
-              </span>
-              <button
-                onClick={() => onStageSelect('')}
-                className="clear-selection"
-              >
-                Show All
-              </button>
-            </div>
-          )}
         </>
       )}
     </div>
