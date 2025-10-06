@@ -1,15 +1,63 @@
 // AddRemarkModal.tsx
 
-import React from 'react';
+import React,{useState} from 'react';
 import ModalHeader from '@/components/UI/ModalHeader/ModalHeader';
-
+import { httpsPost } from '../../../../utils/Communication'; // Adjust the import path for httpsPost
+import { useRouter } from 'next/navigation';
 interface AddRemarkModalProps {
   title: string;
   shipmentId: string;
+  driverId: string; 
   onClose: () => void;
 }
 
-const AddRemarkModal: React.FC<AddRemarkModalProps> = ({ title, shipmentId, onClose }) => {
+const AddRemarkModal: React.FC<AddRemarkModalProps> = ({ title, shipmentId, onClose, driverId}) => {
+  const [remark, setRemark] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const router = useRouter();
+  console.log("AddRemarkModal received driverId:", driverId);
+  const handleSubmit = async () => {
+    if (!remark.trim()) {
+      alert("Please enter a remark before submitting.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    const url = 'inPlantVehicles/updateRemarks'; // API endpoint
+
+    // Payload structure for the API call
+    const payload = {
+      // Assuming the API expects the shipment ID and the remark content
+      attached_driver: driverId, 
+      shipper_remark: remark.trim(),
+    };
+
+    try {
+      // Use httpsPost for the API call
+      const response = await httpsPost(
+        url, 
+        payload, 
+        router, 
+        1, // Retries
+        false // Is external
+      );
+
+      if (response?.statusCode === 200) {
+        // Success feedback (e.g., toast/snackbar)
+        console.log("Remark submitted successfully:", response);
+        onClose(); // Close modal on success
+      } else {
+        // Failure feedback
+        console.error("Failed to submit remark:", response?.message || "Unknown error");
+        alert(`Failed to submit remark. ${response?.message || ''}`);
+      }
+    } catch (error) {
+      console.error("API call error during remark submission:", error);
+      alert("An error occurred during submission.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
   return (
     // Simple modal background and centered content wrapper
     <div style={{
@@ -45,6 +93,12 @@ const AddRemarkModal: React.FC<AddRemarkModalProps> = ({ title, shipmentId, onCl
      
           {/* Example form field */}
           <textarea 
+           value={remark} 
+          //  onChange={(e) => setRemark(e.target.value)} 
+          onChange={(e) => {
+            const inputValue = e.target.value;
+            const filteredValue = inputValue.replace(/[^a-zA-Z\s0-9]/g, '');
+           setRemark(filteredValue);}}
             placeholder="Enter your remark here..." 
             rows={4}
             style={{ width: '100%', padding: '8px', border: '1px solid #ccc', borderRadius: '4px' }}
@@ -68,7 +122,7 @@ const AddRemarkModal: React.FC<AddRemarkModalProps> = ({ title, shipmentId, onCl
               Cancel
             </button>
             <button 
-              onClick={onClose} 
+                  onClick={handleSubmit} 
               className="submit-btn-modal" 
             //   style={{ padding: '8px 15px', background: '#20104d', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
              >

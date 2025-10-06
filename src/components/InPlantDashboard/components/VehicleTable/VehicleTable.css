@@ -1154,3 +1154,6 @@
 .submit-btn-modal:hover {
   background: #302b82; /* Lighter shade of dark purple */
 }
+.vehicle-row.selected td {
+  background: var(--primary-light); /* Maintain the selected color */
+}

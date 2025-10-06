@@ -45,6 +45,7 @@ export interface Vehicle {
     name: string;
   };
   driver: {
+    id:string;
     name: string;
     phone: string;
   };
@@ -268,7 +269,7 @@ const InPlantDashboard: React.FC = () => {
             completedStages: vehicle.completedStages || [],
             shipper: { id: vehicle.shipper?.id || '', name: vehicle.shipper?.name || 'Unknown' },
             carrier: { id: vehicle.carrier?.id || '', name: vehicle.carrier?.name || 'Unknown' },
-            driver: { name: vehicle.driver?.name || 'Unknown', phone: vehicle.driver?.phone || '' },
+            driver: { name: vehicle.driver?.name || 'Unknown', phone: vehicle.driver?.phone || '',id: vehicle.driver?.id },
             shipmentId: vehicle.sin || '',
             orderReference: vehicle.orderReference || ''
           }));
