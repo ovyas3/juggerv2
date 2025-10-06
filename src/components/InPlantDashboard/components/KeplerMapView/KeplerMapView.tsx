@@ -24,7 +24,8 @@ const TileLayer = dynamic(() => import("react-leaflet").then((mod) => mod.TileLa
 const Marker = dynamic(() => import("react-leaflet").then((mod) => mod.Marker), { ssr: false });
 const Popup = dynamic(() => import("react-leaflet").then((mod) => mod.Popup), { ssr: false });
 const Polyline = dynamic(() => import("react-leaflet").then((mod) => mod.Polyline), { ssr: false });
-const GATE_ICON_SIZE: [number, number] = [32, 32]; // Adjust size as needed
+const Polygon = dynamic(() => import("react-leaflet").then((mod) => mod.Polygon), { ssr: false });
+const GATE_ICON_SIZE: [number, number] = [20, 20]; // Adjust size as needed
 const CENTER_ICON_SIZE: [number, number] = [25, 25];
 
 const PlantCenterIcon = L.divIcon({
@@ -65,11 +66,16 @@ const GateOutIcon = L.icon({
   iconAnchor: [GATE_ICON_SIZE[0] / 2, GATE_ICON_SIZE[1]],
   popupAnchor: [0, -GATE_ICON_SIZE[1] / 2],
 });
+interface LocationData {
+  latitude: number;
+  longitude: number;
+  locationName:string;
+}
 interface KeplerMapViewProps {
-  vehicles: Vehicle[];
-  selectedVehicle: Vehicle | null;
-  onVehicleSelect: (vehicle: Vehicle) => void;
-  stages: StageInfo[];
+  // vehicles: AugmentedVehicle[];
+  // selectedVehicle: Vehicle | null;
+  // onVehicleSelect: (vehicle: Vehicle) => void;
+  // stages: StageInfo[];
 }
 
 interface PlantLocation {
@@ -79,6 +85,33 @@ interface PlantLocation {
   stageId?: string;
   type: 'stage' | 'building' | 'parking';
 }
+interface Destination {
+  name: string;
+  city: string;
+}
+interface GatePoint {
+  type: 'Point';
+  coordinates: [number, number]; // [longitude, latitude]
+  name?: string; // Add name if it exists in the API response
+}
+interface Driver {
+  name: string;
+  phone: string; // Assuming 'phone' is a string
+}
+
+interface Carrier {
+  name: string;
+}
+type AugmentedVehicle = Vehicle & {
+  sin?: string;
+  status?: string; // Assuming a string status
+  entryTime: string; // Assuming a date string
+  totalDuration: number; // Assuming a number of minutes
+  driver: Driver;
+  carrier: Carrier;
+  destination?: Destination; // The specific property that caused the error
+  location?: LocationData; 
+};
 interface MapLocationData {
   name: string;
   area: string;
@@ -87,39 +120,36 @@ interface MapLocationData {
     coordinates: [number, number]; // [longitude, latitude]
   };
   gatesV2: {
-    entry: {
-      type: 'Point';
-      coordinates: [number, number]; // [longitude, latitude]
-    };
-    exit: {
-      type: 'Point';
-      coordinates: [number, number]; // [longitude, latitude]
-    };
+    entry: GatePoint[]; 
+    exit: GatePoint[];
   };
   polylines: string[];
 
 }
-const KeplerMap: React.FC = () => {
-  const map = useMap(); // Get the map instance
+// const KeplerMap: React.FC = () => {
+//   const map = useMap(); // Get the map instance
  
-  useEffect(() => {
-      // This runs after the component mounts/renders, ensuring the container is available
-      // A small delay often helps, especially in complex UI transitions
-      const timer = setTimeout(() => {
-          map.invalidateSize();
-      }, 100); // 100ms delay
+//   useEffect(() => {
+//       // This runs after the component mounts/renders, ensuring the container is available
+//       // A small delay often helps, especially in complex UI transitions
+//       const timer = setTimeout(() => {
+//           map.invalidateSize();
+//       }, 100); // 100ms delay
 
-      return () => clearTimeout(timer); // Clean up the timeout
-  }, [map]); // Dependency array: run once after mount
+//       return () => clearTimeout(timer); // Clean up the timeout
+//   }, [map]); // Dependency array: run once after mount
 
-  return null; // This component doesn't render anything itself
-}
+//   return null; // This component doesn't render anything itself
+// }
 const KeplerMapView: React.FC<KeplerMapViewProps> = ({
-  vehicles,
-  selectedVehicle,
-  onVehicleSelect,
-  stages
+  // vehicles:vehiclesProp,
+  // selectedVehicle,
+
+  // onVehicleSelect,
+  // stages
 }) => {
+  const [fetchedVehicles, setFetchedVehicles] = useState<AugmentedVehicle[]>();
+  const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
   const [mapReady, setMapReady] = useState(false);
   const [mapLocationData, setMapLocationData] = useState<MapLocationData | null>(null);
   const [isSatelliteView, setIsSatelliteView] = useState(false);
@@ -132,13 +162,20 @@ const KeplerMapView: React.FC<KeplerMapViewProps> = ({
   const mapRef = useRef<LeafletMap | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [loading, setLoading] = useState(false);
-
+  const handleVehicleSelect = useCallback((vehicle: Vehicle) => {
+    // Toggles selection: if the same vehicle is clicked, deselect it.
+    if (selectedVehicle?.id === vehicle.id) {
+      setSelectedVehicle(null);
+    } else {
+      setSelectedVehicle(vehicle);
+    }
+  }, [selectedVehicle]);
   const router = useRouter(); 
   const fetchMapLocation = async () => {
     // The URL from your cURL example
     const url = 'InplantDashbaord/maplocation';
     
-   
+  
     const payload = {
         // Example:
         // plant_id: 'XYZ_123', 
@@ -206,6 +243,9 @@ const fetchMapdata = async () => {
 
       if (response?.statusCode === 200 && response.data) {
           console.log("Map location data fetched:", response.data);
+          if (Array.isArray(response.data)) {
+            setFetchedVehicles(response.data as AugmentedVehicle[]);
+          }
          
       } else {
           console.error("Failed to fetch map data:", response?.message);
@@ -444,18 +484,24 @@ const setZoomDelta = (delta: number) => {
 
   
   // Get vehicle position based on current stage
-  const getVehiclePosition = useCallback((vehicle: Vehicle): [number, number] => {
-    const location = plantLocations.find(loc => loc.stageId === vehicle.currentStage.stageId);
-    if (location) {
-      // Add small random offset for vehicles at same stage
-      const offset = parseInt(vehicle.id.slice(-1)) * 0.0001;
-      return [
-        location.coordinates[0] + (offset % 3) * 0.0001,
-        location.coordinates[1] + (offset % 2) * 0.0001
-      ];
-    }
-    return plantCenter;
-  }, [plantLocations]);
+  // const getVehiclePosition = useCallback((vehicle: Vehicle): [number, number] => {
+  //   const location = plantLocations.find(loc => loc.stageId === vehicle.currentStage.stageId);
+  //   if (location) {
+  //     // Add small random offset for vehicles at same stage
+  //     const offset = parseInt(vehicle.id.slice(-1)) * 0.0001;
+  //     return [
+  //       location.coordinates[0] + (offset % 3) * 0.0001,
+  //       location.coordinates[1] + (offset % 2) * 0.0001
+  //     ];
+  //   }
+  //   return plantCenter;
+  // }, [plantLocations]);
+  const getVehiclePosition = useCallback((vehicle:AugmentedVehicle): [number, number] => {
+        if (vehicle.location?.latitude && vehicle.location?.longitude) {
+          return [vehicle.location.latitude, vehicle.location.longitude];
+        }
+       return plantCenter; // fallback
+      }, [plantCenter]);
 
   // Create custom icons
   const createVehicleIcon = useCallback((vehicle: Vehicle, isSelected: boolean) => {
@@ -527,7 +573,7 @@ const setZoomDelta = (delta: number) => {
       iconSize: [80, 50],
       iconAnchor: [40, 25]
     });
-  }, [stages]);
+  }, []);
 
   const getVehicleStatusColor = (status: Vehicle['overallStatus']): string => {
     switch (status) {
@@ -548,7 +594,9 @@ const setZoomDelta = (delta: number) => {
   const calculateBounds = useCallback(() => {
     // Collect all coordinates (plant locations and vehicle positions)
     const allCoordinates: LatLngExpression[] = plantLocations.map(loc => loc.coordinates);
-    vehicles.forEach(vehicle => {
+
+
+  fetchedVehicles?.forEach(vehicle => {
         allCoordinates.push(getVehiclePosition(vehicle));
     });
   
@@ -559,7 +607,7 @@ const setZoomDelta = (delta: number) => {
     
     // Create a LatLngBounds object from the array of coordinates
     return L.latLngBounds(allCoordinates);
-  }, [plantLocations, vehicles, getVehiclePosition, plantCenter]);
+  }, [plantLocations, getVehiclePosition, plantCenter]);
   const changeZoom = (delta: number) => {
     const map = mapRef.current;
     if (!map) {
@@ -763,7 +811,7 @@ const setZoomDelta = (delta: number) => {
         } */}
 
         {/* --- Plant Center Marker (from geo_point) --- */}
-        {mapLocationData && (
+        {/* {mapLocationData && (
           <Marker
             key="plant-center-main"
             position={plantCenter} // Uses the API-derived center [lat, lng]
@@ -776,47 +824,74 @@ const setZoomDelta = (delta: number) => {
            
             </Popup>
           </Marker>
-        )}
+        )} */}
 
         {/* Vehicles */}
-        {vehicles.map(vehicle => {
-          const position = getVehiclePosition(vehicle);
-          const isSelected = selectedVehicle?.id === vehicle.id;
+        {fetchedVehicles?.map(vehicle => {
+          // const position = getVehiclePosition(vehicle);
+          // const isSelected = selectedVehicle?.id === vehicle.id;
 
+          // return (
+          //   <Marker
+          //     key={vehicle.id}
+          //     position={position}
+          //     icon={createVehicleIcon(vehicle, isSelected)}
+          //     eventHandlers={{
+          //       click: () => onVehicleSelect(vehicle)
+          //     }}
+          //   >
+          //     <Popup>
+          //       <div className={styles.vehiclePopup}>
+          //         <h4>{vehicle.vehicleNumber}</h4>
+          //         <p><strong>Status:</strong> {vehicle.overallStatus.replace('_', ' ')}</p>
+          //         <p><strong>Location:</strong> {vehicle.currentStage.stageName}</p>
+          //         <p><strong>Duration:</strong> {Math.floor(vehicle.currentStage.duration / 60)}h {vehicle.currentStage.duration % 60}m</p>
+          //         <p><strong>Driver:</strong> {vehicle.driver.name}</p>
+          //         <p><strong>Carrier:</strong> {vehicle.carrier.name}</p>
+          //       </div>
+          //     </Popup>
+          //   </Marker>
+          const position = getVehiclePosition(vehicle);
+         const isSelected = selectedVehicle !== null &&  selectedVehicle?.id === vehicle?.id;
           return (
             <Marker
               key={vehicle.id}
-              position={position}
-              icon={createVehicleIcon(vehicle, isSelected)}
-              eventHandlers={{
-                click: () => onVehicleSelect(vehicle)
-              }}
+             position={position}
+             icon={createVehicleIcon(vehicle, isSelected)}
+              eventHandlers={{ click: () =>  handleVehicleSelect(vehicle) }}
             >
               <Popup>
-                <div className={styles.vehiclePopup}>
-                  <h4>{vehicle.vehicleNumber}</h4>
-                  <p><strong>Status:</strong> {vehicle.overallStatus.replace('_', ' ')}</p>
-                  <p><strong>Location:</strong> {vehicle.currentStage.stageName}</p>
-                  <p><strong>Duration:</strong> {Math.floor(vehicle.currentStage.duration / 60)}h {vehicle.currentStage.duration % 60}m</p>
-                  <p><strong>Driver:</strong> {vehicle.driver.name}</p>
-                  <p><strong>Carrier:</strong> {vehicle.carrier.name}</p>
+               <div className={styles.vehiclePopup}>
+               
+                  <p>Vehicle No:<strong> {vehicle.vehicleNumber}</strong></p>
+                  <p>SIN:<strong> {vehicle.sin}</strong></p>
+                 <p>Stage:<strong> {vehicle.currentStage?.stageName}</strong></p>
+                 <p>Status:<strong> {vehicle.status}</strong></p>
+                     <p>Location Name:<strong> {vehicle?.location?.locationName}</strong></p>
+                  <p>Entry Time:<strong> {new Date(vehicle.entryTime).toLocaleString()}</strong></p>
+                  <p>Total Duration:<strong> {vehicle.totalDuration} mins</strong></p>
+                  <p>Driver:<strong> {vehicle.driver?.name} </strong></p>
+                  {/* <p>Carrier:<strong> {vehicle.carrier?.name}</strong></p> */}
+                  <p>Destination:<strong> {vehicle.destination?.name}, {vehicle.destination?.city}</strong></p>
+                  <p>Order Ref:<strong> {vehicle.orderReference}</strong></p>
                 </div>
               </Popup>
             </Marker>
+        
           );
         })}
 
 
 
         {/* --- Gate Markers (Entry) --- */}
-        {mapLocationData?.gatesV2?.entry?.coordinates && (
+        {mapLocationData?.gatesV2?.entry?.[0]?.coordinates && (
           // Check if mapLocationData and the entry gate object exist
           <Marker
             key="gate-entry-single"
             // Access coordinates directly from mapLocationData.gatesV2.entry
             position={[
-              mapLocationData.gatesV2.entry.coordinates[1], // [lat, lng]
-              mapLocationData.gatesV2.entry.coordinates[0],
+              mapLocationData?.gatesV2?.entry[0].coordinates[1], // [lat, lng]
+              mapLocationData?.gatesV2?.entry[0].coordinates[0],
             ]}
             icon={GateInIcon}
           >
@@ -828,14 +903,14 @@ const setZoomDelta = (delta: number) => {
         )}
 
         {/* --- Gate Markers (Exit) --- */}
-        {mapLocationData?.gatesV2?.exit?.coordinates && (
+        {mapLocationData?.gatesV2?.exit?.[0]?.coordinates && (
           // Check if mapLocationData and the exit gate object exist
           <Marker
             key="gate-exit-single"
             // Access coordinates directly from mapLocationData.gatesV2.exit
             position={[
-              mapLocationData.gatesV2.exit.coordinates[1], // [lat, lng]
-              mapLocationData.gatesV2.exit.coordinates[0],
+              mapLocationData.gatesV2.exit?.[0].coordinates[1], // [lat, lng]
+              mapLocationData.gatesV2.exit?.[0].coordinates[0],
             ]}
             icon={GateOutIcon}
           >
@@ -906,7 +981,7 @@ const setZoomDelta = (delta: number) => {
               // if (decodedCoordinates.length < 2) return null;
 
               return (
-                <Polyline
+                <Polygon
                   key={`api-path-${index}`}
                   positions={decodedCoordinates}
                   pathOptions={{
@@ -930,13 +1005,13 @@ const setZoomDelta = (delta: number) => {
       {/* Map Stats */}
       <div className={styles.mapStats}>
         <div className={styles.statItem}>
-          <span>Total Vehicles: {vehicles.length}</span>
+          <span>Total Vehicles: {fetchedVehicles?.length}</span>
         </div>
         <div className={styles.statItem}>
-          <span>Delayed: {vehicles.filter(v => v.overallStatus === 'delayed').length}</span>
+          <span>Delayed: {fetchedVehicles?.filter(v => v.status === 'delayed').length}</span>
         </div>
         <div className={styles.statItem}>
-          <span>On Track: {vehicles.filter(v => v.overallStatus === 'on_track').length}</span>
+          <span>On Track: {fetchedVehicles?.filter(v => v.status === 'on_track').length}</span>
         </div>
       </div>
     </div>

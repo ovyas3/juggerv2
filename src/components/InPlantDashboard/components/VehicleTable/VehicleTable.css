@@ -111,8 +111,10 @@
 }
 
 .vehicle-row td {
-  /* padding: var(--spacing-md); */
-  /* vertical-align: top; */
+  padding: var(--spacing-md);
+  vertical-align: middle;
+  border-bottom: 1px solid var(--border-light); 
+  text-align: center; 
 }
 
 /* Status Cell */
@@ -320,6 +322,10 @@
 /* Actions Cell */
 .actions-cell {
   text-align: center;
+  position: relative;          /* keeps the popup anchored to this cell */
+  display: flex;               /* center the kebab button */
+  align-items: center;         /* vertical center inside the cell */
+  justify-content: center;
 }
 
 .action-btn {
@@ -808,6 +814,7 @@
   font-size: var(--text-sm);
   border-right: 1px solid var(--border-light);
   background: var(--bg-primary);
+  vertical-align: middle;
 }
 
 .status-cell {
@@ -881,19 +888,6 @@
   border-right: 1px solid var(--border-light);
   background: var(--bg-primary);
 }
-
-/* .actions-cell {
-  text-align: center;
-  padding: var(--spacing-md) var(--spacing-sm);
-  color: var(--text-secondary);
-  font-size: var(--text-sm);
-  border-right: 1px solid var(--border-light);
-  /* background: var(--bg-primary); */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-} */
- /* VehicleTable.css */
 
 .actions-cell {
   text-align: center;
@@ -1054,7 +1048,7 @@
   right: 0;  /* Align to the right of the button */
   z-index: 20; /* Ensure it floats above the table */
   min-height:20px;
-  min-width: 90px;
+  min-width: 120px;
   background-color: white;
   border-radius: 6px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -1096,4 +1090,42 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
+}
+/* VehicleTable.css */
+
+/* --- Add these styles for the modal buttons --- */
+
+/* Base styles for the Cancel button */
+.cancel-btn-modal {
+  padding: 8px 15px;
+  background: #d8511f; /* Current background color (Orange/Red) */
+  color: #fff; 
+  border: 1px solid #d1d5db; 
+  border-radius: 4px; 
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s ease-in-out; /* Add transition for smoothness */
+}
+
+/* Hover background color for Cancel button: slightly darker red */
+.cancel-btn-modal:hover {
+  background: #b94218; /* Darker shade of red/orange */
+  border-color: #b94218;
+}
+
+/* Base styles for the Submit button */
+.submit-btn-modal {
+  padding: 8px 15px;
+  background: #20104d; /* Current background color (Dark Purple) */
+  color: white; 
+  border: none; 
+  border-radius: 4px; 
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s ease-in-out; /* Add transition for smoothness */
+}
+
+/* Hover background color for Submit button: slightly lighter purple */
+.submit-btn-modal:hover {
+  background: #302b82; /* Lighter shade of dark purple */
 }

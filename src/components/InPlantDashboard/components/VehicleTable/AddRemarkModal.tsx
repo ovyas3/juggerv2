@@ -53,23 +53,25 @@ const AddRemarkModal: React.FC<AddRemarkModalProps> = ({ title, shipmentId, onCl
               }}>
           <button 
               onClick={onClose} // Simply close the modal on cancel
-              style={{ 
-                padding: '8px 15px', 
+            //   style={{ 
+            //     padding: '8px 15px', 
                
-                background: '#991b1b', // Light gray background
-                color: '#fff', 
-                border: '1px solid #d1d5db', 
-                borderRadius: '4px', 
-                cursor: 'pointer',
-                fontWeight: '500' 
-              }}
+            //     background: '#d8511f', // Light gray background
+            //     color: '#fff', 
+            //     border: '1px solid #d1d5db', 
+            //     borderRadius: '4px', 
+            //     cursor: 'pointer',
+            //     fontWeight: '500' 
+            //   }}
+            className="cancel-btn-modal"
             >
               Cancel
             </button>
             <button 
               onClick={onClose} 
-              style={{ padding: '8px 15px', background: '#3b82f6', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
-            >
+              className="submit-btn-modal" 
+            //   style={{ padding: '8px 15px', background: '#20104d', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+             >
               Submit
             </button>
           </div>
