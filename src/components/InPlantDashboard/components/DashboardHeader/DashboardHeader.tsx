@@ -5,11 +5,13 @@ import { Search, Calendar, Filter, RefreshCw, Download, Settings, ChevronDown, C
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/UI/select";
 import { DatePicker } from "antd";
 import dayjs from "dayjs";
+import { httpsPost } from '@/utils/Communication';
 import './DashboardHeader.css';
 
 interface DashboardHeaderProps {
   searchQuery: string;
   onSearch: (query: string) => void;
+  onSearchResults?: (results: any[]) => void;
   dateRange: 'today' | 'yesterday' | 'week' | 'custom';
   onDateRangeChange: (range: 'today' | 'yesterday' | 'week' | 'custom') => void;
   onCustomDateRangeChange?: (range: { startDate: string; endDate: string }) => void;
@@ -22,34 +24,33 @@ interface DashboardHeaderProps {
   onFiltersChange: (filters: any) => void;
   isExpanded: boolean;
   onToggleExpand: () => void;
+  onExport: () => Promise<void>;
 }
 
 const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   searchQuery,
   onSearch,
+  onSearchResults,
   dateRange,
   onDateRangeChange,
   onCustomDateRangeChange,
   filters,
   onFiltersChange,
   isExpanded,
-  onToggleExpand
+  onToggleExpand,
+  onExport
 }) => {
   const [showDateRangePickers, setShowDateRangePickers] = useState(false);
   const [startDate, setStartDate] = useState<dayjs.Dayjs>(dayjs().subtract(7, 'day').startOf('day'));
   const [endDate, setEndDate] = useState<dayjs.Dayjs>(dayjs().endOf('day'));
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
-
-  useEffect(() => {
-    if (dateRange === 'custom') {
-      setStartDate(dayjs().subtract(7, 'day').startOf('day'));
-      setEndDate(dayjs().endOf('day'));
-      setShowDateRangePickers(true);
-    } else {
-      setShowDateRangePickers(false);
-    }
-  }, [dateRange]);
+  const [isExporting, setIsExporting] = useState(false);
+  const [searchType, setSearchType] = useState('SIN');
+  const [searchValue, setSearchValue] = useState('');
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchSuggestions, setSearchSuggestions] = useState<string[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
 
   const handleStartDateChange = (date: any) => {
     if (date) {
@@ -75,25 +76,349 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
     }
   };
 
+  const getSearchField = (type: string): string => {
+    const fieldMap: { [key: string]: string } = {
+      'SIN': 'sin',
+      'Vehicle': 'vehicle_no',
+      'Shipper': 'shipper_name',
+      'Carrier': 'carrier_name'
+    };
+    return fieldMap[type] || 'sin';
+  };
+  const handleSearch = async () => {
+    if (!searchValue.trim()) {
+      onSearch('');
+      if (onSearchResults) {
+        onSearchResults([]);
+      }
+      setSearchSuggestions([]);
+      setShowSuggestions(false);
+      return;
+    }
+  
+    try {
+      setIsSearching(true);
+      
+      const getDateRange = () => {
+        const now = new Date();
+        const start = new Date(now);
+        
+        switch (dateRange) {
+          case 'yesterday':
+            start.setDate(now.getDate() - 1);
+            start.setHours(0, 0, 0, 0);
+            return {
+              startDate: start.toISOString(),
+              endDate: new Date(start.setHours(23, 59, 59, 999)).toISOString()
+            };
+          case 'week':
+            start.setDate(now.getDate() - 7);
+            start.setHours(0, 0, 0, 0);
+            return {
+              startDate: start.toISOString(),
+              endDate: new Date().toISOString()
+            };
+          case 'custom':
+            return {
+              startDate: startDate.toISOString(),
+              endDate: endDate.toISOString()
+            };
+          case 'today':
+          default:
+            start.setHours(0, 0, 0, 0);
+            return {
+              startDate: start.toISOString(),
+              endDate: new Date(start.setHours(23, 59, 59, 999)).toISOString()
+            };
+        }
+      };
+  
+      const dateRangeObj = getDateRange();
+      
+      const searchFieldMap: { [key: string]: string } = {
+        'SIN': 'SIN',
+        'Vehicle': 'vehicle_no',
+        'Shipper': 'shipper',
+        'Carrier': 'carrier'
+      };
+      
+      const searchField = searchFieldMap[searchType];
+      
+      const payload: any = {
+        dateRange: {
+          key: dateRange,
+          startDate: dateRangeObj.startDate,
+          endDate: dateRangeObj.endDate
+        },
+        limit: 20,
+        skip: 0,
+        report: false
+      };
+  
+      if (filters.stage && filters.stage !== 'all') {
+        payload.stage = filters.stage;
+      }
+      
+      if (filters.duration && filters.duration !== 'all') {
+        payload.duration = filters.duration;
+      }
+      
+      if (filters.quickFilter && filters.quickFilter !== 'all') {
+        payload.quickFilter = filters.quickFilter;
+      }
+      
+      if (searchField && searchValue.trim()) {
+        payload[searchField] = searchValue.trim();
+      }
+  
+      console.log('Search Payload:', JSON.stringify(payload, null, 2));
+      console.log('Search Payload:', JSON.stringify(payload, null, 2));
+  
+      const response = await httpsPost('InplantDashboard/Table', payload, {}, 1);
+      
+      console.log('Search Response:', response);
+      
+      if (response?.statusCode === 200) {
+        onSearch(`${searchType}:${searchValue.trim()}`);
+        if (onSearchResults) {
+          onSearchResults(response.data.data || []);
+        }
+        setShowSuggestions(false);
+      } else {
+        console.error('Search failed:', response?.message || 'Unknown error');
+        if (onSearchResults) {
+          onSearchResults([]);
+        }
+      }
+      
+    } catch (error) {
+      console.error('Error during search:', error);
+      if (onSearchResults) {
+        onSearchResults([]);
+      }
+    } finally {
+      setIsSearching(false);
+    }
+  };
+  
+  const handleSuggestionClick = async (suggestion: string) => {
+    setSearchValue(suggestion);
+    setShowSuggestions(false);
+    
+    try {
+      setIsSearching(true);
+      
+      const getDateRange = () => {
+        const now = new Date();
+        const start = new Date(now);
+        
+        switch (dateRange) {
+          case 'yesterday':
+            start.setDate(now.getDate() - 1);
+            start.setHours(0, 0, 0, 0);
+            return {
+              startDate: start.toISOString(),
+              endDate: new Date(start.setHours(23, 59, 59, 999)).toISOString()
+            };
+          case 'week':
+            start.setDate(now.getDate() - 7);
+            start.setHours(0, 0, 0, 0);
+            return {
+              startDate: start.toISOString(),
+              endDate: new Date().toISOString()
+            };
+          case 'custom':
+            return {
+              startDate: startDate.toISOString(),
+              endDate: endDate.toISOString()
+            };
+          case 'today':
+          default:
+            start.setHours(0, 0, 0, 0);
+            return {
+              startDate: start.toISOString(),
+              endDate: new Date(start.setHours(23, 59, 59, 999)).toISOString()
+            };
+        }
+      };
+  
+      const dateRangeObj = getDateRange();
+      
+      const searchFieldMap: { [key: string]: string } = {
+        'SIN': 'SIN',
+        'Vehicle': 'vehicle_no',
+        'Shipper': 'shipper',
+        'Carrier': 'carrier'
+      };
+      
+      const searchField = searchFieldMap[searchType];
+      
+      const payload: any = {
+        dateRange: {
+          key: dateRange,
+          startDate: dateRangeObj.startDate,
+          endDate: dateRangeObj.endDate
+        },
+        limit: 20,
+        skip: 0,
+        report: false
+      };
+  
+      if (filters.stage && filters.stage !== 'all') {
+        payload.stage = filters.stage;
+      }
+      
+      if (filters.duration && filters.duration !== 'all') {
+        payload.duration = filters.duration;
+      }
+      
+      if (filters.quickFilter && filters.quickFilter !== 'all') {
+        payload.quickFilter = filters.quickFilter;
+      }
+      
+      if (searchField && suggestion.trim()) {
+        payload[searchField] = suggestion.trim();
+      }
+  
+      console.log('Suggestion Click - Search Payload:', JSON.stringify(payload, null, 2));
+  
+      const response = await httpsPost('InplantDashboard/Table', payload, {}, 1);
+      
+      console.log('Suggestion Click - Search Response:', response);
+      
+      if (response?.statusCode === 200) {
+        onSearch(`${searchType}:${suggestion.trim()}`);
+        if (onSearchResults) {
+          onSearchResults(response.data.data || []);
+        }
+      } else {
+        console.error('Search failed:', response?.message || 'Unknown error');
+        if (onSearchResults) {
+          onSearchResults([]);
+        }
+      }
+      
+    } catch (error) {
+      console.error('Error during suggestion search:', error);
+      if (onSearchResults) {
+        onSearchResults([]);
+      }
+    } finally {
+      setIsSearching(false);
+    }
+  };
+  
+  
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchValue(value);
+    
+    if (value.trim() === '') {
+      onSearch('');
+      if (onSearchResults) {
+        onSearchResults([]);
+      }
+      setSearchSuggestions([]);
+      setShowSuggestions(false);
+      return;
+    }
+    
+    // Trigger autocomplete when user types (debounce can be added here)
+    if (value.trim().length >= 3) {
+      fetchSuggestions(value.trim());
+    } else {
+      setSearchSuggestions([]);
+      setShowSuggestions(false);
+    }
+  };
+
+  const fetchSuggestions = async (searchTerm: string) => {
+    try {
+      const field = getSearchField(searchType);
+      
+      const payload = {
+        search_term: searchTerm,
+        field: field,
+        limit: 50
+      };
+
+      const response = await httpsPost(
+        'InplantDashboard/searchIndex',
+        payload,
+        {},
+        1
+      );
+
+      if (response?.statusCode === 200) {
+        if (response.data && Array.isArray(response.data)) {
+          setSearchSuggestions(response.data);
+          setShowSuggestions(response.data.length > 0);
+        }
+      } else {
+        console.error('Search failed:', response?.message || 'Unknown error');
+        setSearchSuggestions([]);
+        setShowSuggestions(false);
+      }
+    } catch (error) {
+      console.error('Error fetching suggestions:', error);
+      setSearchSuggestions([]);
+      setShowSuggestions(false);
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
+
   const handleRefresh = async () => {
     setIsRefreshing(true);
-    onFiltersChange({ 
+    
+    setSearchValue('');
+    setSearchSuggestions([]);
+    setShowSuggestions(false);
+    onSearch('');
+    if (onSearchResults) {
+      onSearchResults([]);
+    }
+    
+    onFiltersChange({
       status: 'all',
       stage: 'all',
       duration: 'all',
       quickFilter: 'all'
     });
+    
     if (onDateRangeChange) {
       onDateRangeChange('today');
     }
+    
     await new Promise(resolve => setTimeout(resolve, 1000));
     setIsRefreshing(false);
   };
+  
 
-  const handleExport = () => {
-    // Export functionality would be implemented here
-    console.log('Exporting data...');
+  const handleExportClick = async () => {
+    try {
+      setIsExporting(true);
+      await onExport();
+    } catch (error) {
+      console.error('Error in export handler:', error);
+    } finally {
+      setIsExporting(false);
+    }
   };
+
+  useEffect(() => {
+    if (dateRange === 'custom') {
+      setStartDate(dayjs().subtract(7, 'day').startOf('day'));
+      setEndDate(dayjs().endOf('day'));
+      setShowDateRangePickers(true);
+    } else {
+      setShowDateRangePickers(false);
+    }
+  }, [dateRange]);
 
   const quickFilters = [
     { key: 'all', label: 'All', count: 23 },
@@ -192,15 +517,48 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
             </div>
 
             <div className="header-right">
-              <div className="search-container">
-                <Search className="search-icon" size={16} />
+              <div className="searchInputContainer" style={{ position: 'relative' }}>
+                <Select 
+                  value={searchType}
+                  onValueChange={setSearchType}
+                >
+                  <SelectTrigger className='perPageSelect'>
+                    <SelectValue placeholder="SIN" />
+                  </SelectTrigger>
+                  <SelectContent className='perPageContent'>
+                    <SelectItem className='perPageItem' value="SIN">SIN</SelectItem>
+                    <SelectItem className='perPageItem' value="Vehicle">Vehicle</SelectItem>
+                    <SelectItem className='perPageItem' value="Shipper">Shipper</SelectItem>
+                    <SelectItem className='perPageItem' value="Carrier">Carrier</SelectItem>
+                  </SelectContent>
+                </Select>
                 <input
                   type="text"
-                  placeholder="Search shipments..."
-                  value={searchQuery}
-                  onChange={(e) => onSearch(e.target.value)}
-                  className="search-input"
+                  placeholder={`Search by ${searchType}...`}
+                  value={searchValue}
+                  onChange={handleInputChange}
+                  onKeyPress={handleKeyPress}
+                  className="inputSearch"
+                  onFocus={() => searchSuggestions.length > 0 && setShowSuggestions(true)}
                 />
+                <Search 
+                  className="searchIcon" 
+                  onClick={handleSearch}
+                />
+                
+                {showSuggestions && searchSuggestions.length > 0 && (
+                  <div className="search-suggestions">
+                    {searchSuggestions.map((suggestion, index) => (
+                      <div
+                        key={index}
+                        className="suggestion-item"
+                        onClick={() => handleSuggestionClick(suggestion)}
+                      >
+                        {suggestion}
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <button
@@ -211,16 +569,13 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                 <RefreshCw className={isRefreshing ? 'spin' : ''} size={16} />
               </button>
 
-              <button onClick={handleExport} className="action-btn">
+              <button 
+                onClick={handleExportClick} 
+                className={`action-btn ${isExporting ? 'exporting' : ''}`}
+                disabled={isExporting}
+              >
                 <Download size={16} />
               </button>
-
-              {/* <button
-                onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
-                className="action-btn"
-              >
-                <Settings size={16} />
-              </button> */}
             </div>
           </>
         )}

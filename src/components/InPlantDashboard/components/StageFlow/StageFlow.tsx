@@ -153,17 +153,15 @@ const StageFlow: React.FC<StageFlowProps> = ({
   const sortedStages = [...stages].sort((a, b) => a.order - b.order);
   const [isExpanded, setIsExpanded] = useState(true);
 
-  if (loading) {
-    return (
-      <div className="stage-flow-container">
-        {Array(6).fill(0).map((_, index) => (
-          <div key={`skeleton-${index}`} className="stage-metric-card">
-            <MetricCardSkeleton />
-          </div>
-        ))}
-      </div>
-    );
-  }
+  // if (loading === false || loading === true) {
+  //   return (
+  //     <div className="stage-flow-container">
+       
+  //           <MetricCardSkeleton count={6} />
+          
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className={isExpanded ? "stage-flow" : "stage-flow-collapsed"}>
