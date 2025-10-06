@@ -186,6 +186,7 @@ const PickupTab = ({
   isTechnova,
   isEmami,
   isBMWIL,
+  isJSPL,
   isTata
 }: {
   shipmentData: any;
@@ -197,6 +198,7 @@ const PickupTab = ({
   isTechnova: boolean;
   isEmami: boolean;
   isBMWIL: boolean;
+  isJSPL: boolean;
   isTata: boolean;
 }) => {
   const [activeSubTab, setActiveSubTab] = useState(0);
@@ -1089,6 +1091,7 @@ const PickupTab = ({
                   isTechnova = {isTechnova}
                   isEmami = {isEmami}
                   isBMWIL = {isBMWIL}
+                  isJSPL = {isJSPL}
                   shipmentData={shipmentData}
                 />
                 <Grid

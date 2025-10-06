@@ -42,6 +42,7 @@ interface InvoiceTableProps {
   onRemoveRow: (groupIndex: number, ciIndex: number) => void;
   isTechnova: boolean;
   isBMWIL: boolean;
+  isJSPL: boolean;
   isEmami: boolean; 
   shipmentData: any; 
 }
@@ -82,6 +83,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
   isTechnova,
   isEmami,
   isBMWIL,
+  isJSPL,
   shipmentData = {},
 }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -168,7 +170,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
                 backgroundColor: "#F5F5F5",
               }}
             >
-              Gross Wt. ({shipmentData.uom})
+              Gross Wt. ({shipmentData.uom || 'MT'})
             </TableCell>
             <TableCell
               sx={{
@@ -179,7 +181,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
                 backgroundColor: "#F5F5F5",
               }}
             >
-              Net Wt. ({shipmentData.uom})
+              Net Wt. ({shipmentData.uom || 'MT'})
             </TableCell>
             
             {isTechnova ? (
@@ -218,7 +220,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
                     backgroundColor: "#F5F5F5",
                   }}
                 >
-                  Cons. Wt.({shipmentData.uom})
+                  Cons. Wt.({shipmentData.uom || 'MT'})
                 </TableCell>
                 <TableCell
                   sx={{
@@ -320,7 +322,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
                   </Box>
               </Box>
 
-                  {(isTechnova || isEmami || isBMWIL) &&
+                  {(isTechnova || isEmami || isBMWIL || isJSPL) &&
                     (() => {
                       const TotalRow = ({ label, value }: { label: string; value: React.ReactNode }) => (
                         <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -344,16 +346,16 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
                             Totals
                           </Typography>
                           <TotalRow
-                            label="Gross Wt"
-                            value={`${(invGroup.total_gross_weight ?? 0).toFixed(2)} ${shipmentData.uom}`}
+                            label="Gross Wt."
+                            value={`${(invGroup.total_gross_weight ?? 0).toFixed(2)} ${shipmentData.uom || 'MT'}`}
                           />
                           <TotalRow
-                            label="Net Wt"
-                            value={`${(invGroup.total_net_weight ?? 0).toFixed(2)} ${shipmentData.uom}`}
+                            label="Net Wt."
+                            value={`${(invGroup.total_net_weight ?? 0).toFixed(2)} ${shipmentData.uom || 'MT'}`}
                           />
                           <TotalRow
-                            label="Cons. Wt"
-                            value={`${(invGroup.total_considered_weight ?? 0).toFixed(2)} ${shipmentData.uom}`}
+                            label="Cons. Wt."
+                            value={`${(invGroup.total_considered_weight ?? 0).toFixed(2)} ${shipmentData.uom || 'MT'}`}
                           />
                           <TotalRow
                             label="Packages"
