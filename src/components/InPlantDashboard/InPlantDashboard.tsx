@@ -13,10 +13,11 @@ import VehicleTable from './components/VehicleTable/VehicleTable';
 import DetailPanel from './components/DetailPanel/DetailPanel';
 import KeplerMapView from './components/KeplerMapView/KeplerMapView';
 import './InPlantDashboard.css';
-import {AlertTriangle, CheckCircle2, ChevronDown, ChevronUp, Clock, Truck, DoorOpen, Scale, Package, LogOut  } from 'lucide-react';
+import {AlertTriangle, CheckCircle2, ChevronDown, ChevronUp, Clock, Truck, DoorOpen, Scale, Package, LogOut, CheckCircle, ArrowDownToLine, ArrowUpFromLine, Weight, PackageCheck, FileCheck, FileText  } from 'lucide-react';
 import { useSnackbar } from '@/hooks/snackBar';
 import dayjs from "dayjs";
 import { iconMap } from '@/components/UI/iconMap';
+import * as XLSX from 'xlsx';
 
 export interface Vehicle {
   id: string;
@@ -639,7 +640,6 @@ const InPlantDashboard: React.FC = () => {
       const getDateRange = () => {
         const now = new Date();
         const start = new Date(now);
-        
         if (dateRange === 'custom') {
           return {
             startDate: customDateRange.startDate,
@@ -671,9 +671,8 @@ const InPlantDashboard: React.FC = () => {
             };
         }
       };
-
+  
       const dateRangeObj = getDateRange();
-      
       const payload = {
         stage: filters.stage,
         duration: filters.duration,
@@ -683,22 +682,53 @@ const InPlantDashboard: React.FC = () => {
           endDate: dateRangeObj.endDate
         },
         quickFilter: filters.quickFilter,
-        skip: currentPage * pageSize,
-        limit: pageSize,
-        report: true 
+        skip: 0,
+        limit: 100,
+        report: true
       };
-
+  
       const response = await httpsPost(
         'InplantDashboard/Table',
         payload,
         {},
         1
       );
-
-      if (response?.statusCode === 200) {
-        showMessage('Export started successfully', 'success');
+  
+      if (response?.statusCode === 200 && response.data?.link) {
+        const csvResponse = await fetch(response.data.link);
+        const csvText = await csvResponse.text();
+        
+        const workbook = XLSX.read(csvText, { type: 'string' });
+        
+        const worksheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[worksheetName];
+        
+        worksheet['!cols'] = [
+          { wch: 15 },
+          { wch: 15 },
+          { wch: 20 },
+          { wch: 12 },
+          { wch: 10 },
+          { wch: 20 },
+          { wch: 12 },
+          { wch: 12 },
+          { wch: 10 },
+          { wch: 30 },
+          { wch: 25 },
+          { wch: 20 },
+          { wch: 15 },
+          { wch: 30 },
+          { wch: 15 }
+        ];
+        
+        const timestamp = dayjs().format('YYYY-MM-DD_HHmm');
+        const filename = `inplant_dashboard_${timestamp}.xlsx`;
+        
+        XLSX.writeFile(workbook, filename);
+        
+        showMessage('Export completed successfully', 'success');
       } else {
-        console.error('Failed to export data:', response?.message || 'Unknown error');
+        console.error('Failed to export data:', response?.message || 'No data available');
         showMessage('Failed to export data', 'error');
       }
     } catch (error) {
@@ -706,6 +736,7 @@ const InPlantDashboard: React.FC = () => {
       showMessage('Error exporting data', 'error');
     }
   };
+  
 
   return (
     <div className="inplant-dashboard">
@@ -802,21 +833,64 @@ const InPlantDashboard: React.FC = () => {
           {isSectionExpanded && (
             <>
             <div>
-              {/* Content Tabs */}
-              <div className="content-tabs">
-                <button
-                  className={`tab-button ${viewMode === 'table' ? 'active' : ''}`}
-                  onClick={() => setViewMode('table')}
-                >
-                  Table View
-                </button>
-                <button
-                  className={`tab-button ${viewMode === 'map' ? 'active' : ''}`}
-                  onClick={() => setViewMode('map')}
-                >
-                  Map View
-                </button>
+          <div className="content-tabs">
+            <div>
+            <button
+              className={`tab-button ${viewMode === 'table' ? 'active' : ''}`}
+              onClick={() => setViewMode('table')}
+            >
+              Table View
+            </button>
+            <button
+              className={`tab-button ${viewMode === 'map' ? 'active' : ''}`}
+              onClick={() => setViewMode('map')}
+            >
+              Map View
+            </button>
+            </div>
+          <div className="stage-legends">
+            <div className="legend-items stages-list">
+              <div className="legend-item">
+                <DoorOpen size={14} className="stage-icon" />
+                <span className="legend-label">Entry Gate</span>
               </div>
+              <div className="legend-item">
+                <Scale size={14} className="stage-icon" />
+                <span className="legend-label">Weighing In</span>
+              </div>
+              <div className="legend-item">
+                <ArrowDownToLine size={14} className="stage-icon" />
+                <span className="legend-label">Loading In</span>
+              </div>
+              <div className="legend-item">
+                <ArrowUpFromLine size={14} className="stage-icon" />
+                <span className="legend-label">Loading Out</span>
+              </div>
+              <div className="legend-item">
+                <Weight size={14} className="stage-icon" />
+                <span className="legend-label">Weighing Out</span>
+              </div>
+              <div className="legend-item">
+                <PackageCheck size={14} className="stage-icon" />
+                <span className="legend-label">Post Goods</span>
+              </div>
+              <div className="legend-item">
+                <FileCheck size={14} className="stage-icon" />
+                <span className="legend-label">Test Cert</span>
+              </div>
+              <div className="legend-item">
+                <FileText size={14} className="stage-icon" />
+                <span className="legend-label">Invoice</span>
+              </div>
+              <div className="legend-item">
+                <LogOut size={14} className="stage-icon" />
+                <span className="legend-label">Gate Out</span>
+              </div>
+            </div>
+          </div>
+          </div>
+
+
 
               {/* Content Area */}
               <div className={`content-area ${viewMode === 'map' ? 'map-view-container' : ''}`}>

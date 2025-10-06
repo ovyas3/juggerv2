@@ -260,7 +260,7 @@ export default function VehicleStagingLive({
                       </div>
                     </div>
 
-                    {useLoader2 ? (
+                    {loading ? (
                       <div className="flex justify-center items-center py-8 height: 200px width: 100%">
                         <Loader2 className="animate-spin" style={{
                           width: '40px',

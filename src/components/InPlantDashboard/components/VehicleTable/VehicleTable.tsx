@@ -1,7 +1,17 @@
 'use client';
 
 import React, { useMemo,useState,useRef,useEffect } from 'react';
-import { ChevronRight, Clock, AlertCircle, CheckCircle, Truck, User, Building, ChevronLeft, ChevronsLeft, ChevronsRight } from 'lucide-react';
+import { ChevronRight, Clock, AlertCircle, CheckCircle, Truck, User, Building, ChevronLeft, ChevronsLeft, ChevronsRight,
+  DoorOpen,       
+  Scale,           
+  ArrowDownToLine, 
+  ArrowUpFromLine, 
+  Weight,          
+  PackageCheck,    
+  FileCheck,       
+  FileText,        
+  LogOut           
+ } from 'lucide-react';
 import { Vehicle } from '../../InPlantDashboard';
 import {
   Select,
@@ -99,14 +109,26 @@ const VehicleRow: React.FC<VehicleRowProps> = ({ vehicle, isSelected, onSelect, 
   };
 
   const getProgressStages = () => {
-    const allStages = ['EXT_PARKING', 'ENTRY_GATE', 'WEIGHING', 'LOADING', 'WEIGHT_OUT', 'GATE_OUT'];
-    const currentIndex = allStages.indexOf(vehicle.currentStage.stageId);
-
+    const allStages = [
+      { id: 'GI', name: 'Entry Gate', icon: DoorOpen },
+      { id: 'TW', name: 'Weighing In', icon: Scale },
+      { id: 'LI', name: 'Loading In', icon: ArrowDownToLine },
+      { id: 'LO', name: 'Loading Out', icon: ArrowUpFromLine },
+      { id: 'GW', name: 'Weighing Out', icon: Weight },
+      { id: 'PG', name: 'Post Goods Issue', icon: PackageCheck },
+      { id: 'TC', name: 'Test Certificate', icon: FileCheck },
+      { id: 'IV', name: 'Invoice', icon: FileText },
+      { id: 'GO', name: 'Gate Out', icon: LogOut }
+    ];
+  
+    const currentIndex = allStages.findIndex(stage => stage.id === vehicle.currentStage.stageId);
+  
     return allStages.map((stage, index) => ({
-      id: stage,
-      name: stage.replace('_', ' '),
-      completed: vehicle.completedStages.includes(stage),
-      current: stage === vehicle.currentStage.stageId,
+      id: stage.id,
+      name: stage.name,
+      icon: stage.icon,
+      completed: index < currentIndex || vehicle.completedStages.includes(stage.id),
+      current: stage.id === vehicle.currentStage.stageId,
       pending: index > currentIndex
     }));
   };
@@ -192,15 +214,18 @@ const VehicleRow: React.FC<VehicleRowProps> = ({ vehicle, isSelected, onSelect, 
             />
           </div>
           <div className="progress-stages">
-            {progressStages.map((stage, index) => (
+          {progressStages.map((stage, index) => {
+            const IconComponent = stage.icon;
+            return (
               <div
                 key={stage.id}
                 className={`progress-stage ${stage.completed ? 'completed' : ''} ${stage.current ? 'current' : ''}`}
                 title={stage.name}
               >
-                {stage.completed ? '✓' : stage.current ? '→' : '○'}
+                <IconComponent size={14} />
               </div>
-            ))}
+            );
+          })}
           </div>
         </div>
       </td>
