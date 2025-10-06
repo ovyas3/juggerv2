@@ -108,6 +108,8 @@ const InPlantDashboard: React.FC = () => {
   const [isVehiclesLoading, setIsVehiclesLoading] = useState(true);
   const [pageSize, setPageSize] = useState<number>(10);
   const [currentPage, setCurrentPage] = useState<number>(0);
+  const [isSearchActive, setIsSearchActive] = useState(false);
+  const [totalCount, setTotalCount] = useState(0);
 
   const paginatedVehicles = useMemo(() => {
     const startIndex = currentPage * pageSize;
@@ -190,21 +192,20 @@ const InPlantDashboard: React.FC = () => {
   }, []);
 
   useEffect(() => {
+    if (isSearchActive) return;
+    
     const fetchVehicles = async () => {
       try {
         setIsVehiclesLoading(true);
-        
         const getDateRange = () => {
           const now = new Date();
           const start = new Date(now);
-          
           if (dateRange === 'custom') {
             return {
               startDate: customDateRange.startDate,
               endDate: customDateRange.endDate
             };
           }
-          
           switch (dateRange) {
             case 'yesterday':
               start.setDate(now.getDate() - 1);
@@ -229,9 +230,8 @@ const InPlantDashboard: React.FC = () => {
               };
           }
         };
-
-        const dateRangeObj = getDateRange();
         
+        const dateRangeObj = getDateRange();
         const payload = {
           stage: filters.stage,
           duration: filters.duration,
@@ -244,8 +244,9 @@ const InPlantDashboard: React.FC = () => {
           skip: currentPage * pageSize,
           limit: pageSize
         };
-
+        
         const response = await httpsPost('InplantDashboard/Table', payload, {}, 1);
+        
         if (response?.statusCode === 200) {
           const formattedVehicles = response.data.data.map((vehicle: any) => ({
             id: vehicle.id || '',
@@ -270,10 +271,12 @@ const InPlantDashboard: React.FC = () => {
             shipmentId: vehicle.sin || '',
             orderReference: vehicle.orderReference || ''
           }));
+          
           setVehicles(formattedVehicles);
-        } else {
-          console.error('Failed to fetch vehicles:', response?.message || 'Unknown error');
-          showMessage('Failed to fetch vehicles data', 'error');
+          
+          if (response.data.pagination) {
+            setTotalCount(response.data.pagination.total || 0);
+          }
         }
       } catch (error) {
         console.error('Error fetching vehicles:', error);
@@ -282,121 +285,62 @@ const InPlantDashboard: React.FC = () => {
         setIsVehiclesLoading(false);
       }
     };
-
+    
     fetchVehicles();
-  }, [dateRange, filters, customDateRange, currentPage, pageSize]); 
+  }, [dateRange, filters, customDateRange, currentPage, pageSize, isSearchActive]);
 
-  const handleSearchResults = useCallback(async (results: string[]) => {
+  const handleSearchResults = useCallback(async (results: any[], paginationData?: any) => {
     if (!results || results.length === 0) {
       setSearchQuery('');
+      setIsSearchActive(false);
       return;
     }
 
     try {
       setIsVehiclesLoading(true);
+      setIsSearchActive(true);
       
-      const getDateRange = () => {
-        const now = new Date();
-        const start = new Date(now);
-        
-        if (dateRange === 'custom') {
-          return {
-            startDate: customDateRange.startDate,
-            endDate: customDateRange.endDate
-          };
-        }
-        
-        switch (dateRange) {
-          case 'yesterday':
-            start.setDate(now.getDate() - 1);
-            start.setHours(0, 0, 0, 0);
-            return {
-              startDate: start.toISOString(),
-              endDate: new Date(start.setHours(23, 59, 59, 999)).toISOString()
-            };
-          case 'week':
-            start.setDate(now.getDate() - 7);
-            start.setHours(0, 0, 0, 0);
-            return {
-              startDate: start.toISOString(),
-              endDate: new Date().toISOString()
-            };
-          case 'today':
-          default:
-            start.setHours(0, 0, 0, 0);
-            return {
-              startDate: start.toISOString(),
-              endDate: new Date(start.setHours(23, 59, 59, 999)).toISOString()
-            };
-        }
-      };
-
-      const dateRangeObj = getDateRange();
-      const searchParts = searchQuery.split(':');
-      const searchType = searchParts[0] || 'SIN';
-      const searchValue = results[0]; 
-      
-      const searchFieldMap: { [key: string]: string } = {
-        'SIN': 'SIN',
-        'Vehicle': 'vehicle_no',
-        'Shipper': 'shipper',
-        'Carrier': 'carrier'
-      };
-      
-      const searchField = searchFieldMap[searchType] || 'SIN';
-      
-      const payload: any = {
-        stage: filters.stage,
-        duration: filters.duration,
-        dateRange: {
-          key: dateRange,
-          startDate: dateRangeObj.startDate,
-          endDate: dateRangeObj.endDate
+      const formattedVehicles = results.map((vehicle: any) => ({
+        id: vehicle.id || '',
+        vehicleNumber: vehicle.vehicleNumber || '',
+        currentStage: {
+          stageId: vehicle.currentStage?.stageId || '',
+          stageName: vehicle.currentStage?.stageName || '',
+          location: vehicle.currentStage?.location || '',
+          arrivedAt: vehicle.currentStage?.arrivedAt || new Date().toISOString(),
+          duration: vehicle.currentStage?.duration || 0,
+          expectedDuration: vehicle.currentStage?.expectedDuration || 0,
+          status: vehicle.currentStage?.status || 'on_time'
         },
-        quickFilter: filters.quickFilter,
-        skip: 0,
-        limit: 100
-      };
-
-      payload[searchField] = searchValue;
-
-      const response = await httpsPost('InplantDashboard/Table', payload, {}, 1);
-      if (response?.statusCode === 200) {
-        const formattedVehicles = response.data.data.map((vehicle: any) => ({
-          id: vehicle.id || '',
-          vehicleNumber: vehicle.vehicleNumber || '',
-          currentStage: {
-            stageId: vehicle.currentStage?.stageId || '',
-            stageName: vehicle.currentStage?.stageName || '',
-            location: vehicle.currentStage?.location || '',
-            arrivedAt: vehicle.currentStage?.arrivedAt || new Date().toISOString(),
-            duration: vehicle.currentStage?.duration || 0,
-            expectedDuration: vehicle.currentStage?.expectedDuration || 0,
-            status: vehicle.currentStage?.status || 'on_time'
-          },
-          entryTime: vehicle.entryTime || new Date().toISOString(),
-          totalDuration: vehicle.totalDuration || 0,
-          overallStatus: vehicle.overallStatus || 'on_track',
-          progress: vehicle.progress || 0,
-          completedStages: vehicle.completedStages || [],
-          shipper: { id: vehicle.shipper?.id || '', name: vehicle.shipper?.name || 'Unknown' },
-          carrier: { id: vehicle.carrier?.id || '', name: vehicle.carrier?.name || 'Unknown' },
-          driver: { name: vehicle.driver?.name || 'Unknown', phone: vehicle.driver?.phone || '' },
-          shipmentId: vehicle.sin || '',
-          orderReference: vehicle.orderReference || ''
-        }));
-        setVehicles(formattedVehicles);
-      } else {
-        console.error('Failed to fetch vehicles:', response?.message || 'Unknown error');
-        showMessage('Failed to fetch vehicles data', 'error');
+        entryTime: vehicle.entryTime || new Date().toISOString(),
+        totalDuration: vehicle.totalDuration || 0,
+        overallStatus: vehicle.overallStatus || 'on_track',
+        progress: vehicle.progress || 0,
+        completedStages: vehicle.completedStages || [],
+        shipper: { id: vehicle.shipper?.id || '', name: vehicle.shipper?.name || 'Unknown' },
+        carrier: { id: vehicle.carrier?.id || '', name: vehicle.carrier?.name || 'Unknown' },
+        driver: { name: vehicle.driver?.name || 'Unknown', phone: vehicle.driver?.phone || '' },
+        shipmentId: vehicle.sin || '',
+        orderReference: vehicle.orderReference || ''
+      }));
+      
+      setVehicles(formattedVehicles);
+      setCurrentPage(0);
+      
+      // **NEW: Update total count from search pagination**
+      if (paginationData) {
+        setTotalCount(paginationData.total || 0);
       }
+      
     } catch (error) {
-      console.error('Error fetching vehicles:', error);
-      showMessage('Error fetching vehicles data', 'error');
+      console.error('Error formatting search results:', error);
+      showMessage('Error processing search results', 'error');
     } finally {
       setIsVehiclesLoading(false);
     }
-  }, [dateRange, filters, customDateRange, searchQuery, showMessage]);
+  }, [showMessage]);
+  
+  
 
   const formatTime = (minutes: number): string => {
     const hours = Math.floor(minutes / 60);
@@ -662,8 +606,7 @@ const InPlantDashboard: React.FC = () => {
 
   const handleSearch = useCallback((query: string) => {
     setSearchQuery(query);
-    handleSearchResults([]);
-  }, [handleSearchResults]);
+  }, []);
 
   const handleFilterChange = useCallback((newFilters: any) => {
     setFilters(newFilters);
@@ -878,7 +821,7 @@ const InPlantDashboard: React.FC = () => {
               <div className={`content-area ${viewMode === 'map' ? 'map-view-container' : ''}`}>
                 {viewMode === 'table' ? (
                   <VehicleTable
-                    vehicles={paginatedVehicles}
+                    vehicles={vehicles}
                     selectedVehicle={selectedVehicle}
                     onVehicleSelect={handleVehicleSelect}
                     searchQuery={searchQuery}
@@ -891,7 +834,7 @@ const InPlantDashboard: React.FC = () => {
                     loading={isVehiclesLoading}
                     pageSize={pageSize}
                     currentPage={currentPage}
-                    totalItems={vehicles.length}
+                    totalItems={totalCount}
                     onPageChange={setCurrentPage}
                     onPageSizeChange={handlePageSizeChange}
                   />
