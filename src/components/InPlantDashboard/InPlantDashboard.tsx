@@ -897,10 +897,10 @@ const InPlantDashboard: React.FC = () => {
                   />
                 ) : (
                   <KeplerMapView
-                    vehicles={displayVehicles}
-                    selectedVehicle={selectedVehicle}
-                    onVehicleSelect={handleVehicleSelect}
-                    stages={displayStages}
+                    // vehicles={displayVehicles}
+                    // selectedVehicle={selectedVehicle}
+                    // onVehicleSelect={handleVehicleSelect}
+                    // stages={displayStages}
                   />
                 )}
               </div>
