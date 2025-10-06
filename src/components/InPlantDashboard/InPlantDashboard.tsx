@@ -127,7 +127,7 @@ const InPlantDashboard: React.FC = () => {
     const fetchMetrics = async () => {
       try {
         setIsLoading(true);
-        const response = await httpsPost('InplantDashbaord/KPIcards', {}, {}, 1,);
+        const response = await httpsPost('InplantDashboard/KPIcards', {}, {}, 1,);
         if (response?.statusCode === 200) {
           setMetrics(response.data);
         } else {
@@ -149,7 +149,7 @@ const InPlantDashboard: React.FC = () => {
     const fetchStages = async () => {
       try {
         setIsStagesLoading(true);
-        const response = await httpsPost('InplantDashbaord/vehicleflow', {}, {}, 1);
+        const response = await httpsPost('InplantDashboard/vehicleflow', {}, {}, 1);
         if (response?.statusCode === 200) {
           const formattedStages = response.data.map((stage: any) => {
             const IconComponent = stage.icon ? iconMap[stage.icon] : iconMap.default;
@@ -241,11 +241,11 @@ const InPlantDashboard: React.FC = () => {
             endDate: dateRangeObj.endDate
           },
           quickFilter: filters.quickFilter,
-          // skip: currentPage * pageSize,
-          // limit: pageSize
+          skip: currentPage * pageSize,
+          limit: pageSize
         };
 
-        const response = await httpsPost('InplantDashbaord/Table', payload, {}, 1);
+        const response = await httpsPost('InplantDashboard/Table', payload, {}, 1);
         if (response?.statusCode === 200) {
           const formattedVehicles = response.data.data.map((vehicle: any) => ({
             id: vehicle.id || '',
@@ -285,6 +285,119 @@ const InPlantDashboard: React.FC = () => {
 
     fetchVehicles();
   }, [dateRange, filters, customDateRange, currentPage, pageSize]); 
+
+  const handleSearchResults = useCallback(async (results: string[]) => {
+    if (!results || results.length === 0) {
+      setSearchQuery('');
+      return;
+    }
+
+    try {
+      setIsVehiclesLoading(true);
+      
+      const getDateRange = () => {
+        const now = new Date();
+        const start = new Date(now);
+        
+        if (dateRange === 'custom') {
+          return {
+            startDate: customDateRange.startDate,
+            endDate: customDateRange.endDate
+          };
+        }
+        
+        switch (dateRange) {
+          case 'yesterday':
+            start.setDate(now.getDate() - 1);
+            start.setHours(0, 0, 0, 0);
+            return {
+              startDate: start.toISOString(),
+              endDate: new Date(start.setHours(23, 59, 59, 999)).toISOString()
+            };
+          case 'week':
+            start.setDate(now.getDate() - 7);
+            start.setHours(0, 0, 0, 0);
+            return {
+              startDate: start.toISOString(),
+              endDate: new Date().toISOString()
+            };
+          case 'today':
+          default:
+            start.setHours(0, 0, 0, 0);
+            return {
+              startDate: start.toISOString(),
+              endDate: new Date(start.setHours(23, 59, 59, 999)).toISOString()
+            };
+        }
+      };
+
+      const dateRangeObj = getDateRange();
+      const searchParts = searchQuery.split(':');
+      const searchType = searchParts[0] || 'SIN';
+      const searchValue = results[0]; 
+      
+      const searchFieldMap: { [key: string]: string } = {
+        'SIN': 'SIN',
+        'Vehicle': 'vehicle_no',
+        'Shipper': 'shipper',
+        'Carrier': 'carrier'
+      };
+      
+      const searchField = searchFieldMap[searchType] || 'SIN';
+      
+      const payload: any = {
+        stage: filters.stage,
+        duration: filters.duration,
+        dateRange: {
+          key: dateRange,
+          startDate: dateRangeObj.startDate,
+          endDate: dateRangeObj.endDate
+        },
+        quickFilter: filters.quickFilter,
+        skip: 0,
+        limit: 100
+      };
+
+      payload[searchField] = searchValue;
+
+      const response = await httpsPost('InplantDashboard/Table', payload, {}, 1);
+      if (response?.statusCode === 200) {
+        const formattedVehicles = response.data.data.map((vehicle: any) => ({
+          id: vehicle.id || '',
+          vehicleNumber: vehicle.vehicleNumber || '',
+          currentStage: {
+            stageId: vehicle.currentStage?.stageId || '',
+            stageName: vehicle.currentStage?.stageName || '',
+            location: vehicle.currentStage?.location || '',
+            arrivedAt: vehicle.currentStage?.arrivedAt || new Date().toISOString(),
+            duration: vehicle.currentStage?.duration || 0,
+            expectedDuration: vehicle.currentStage?.expectedDuration || 0,
+            status: vehicle.currentStage?.status || 'on_time'
+          },
+          entryTime: vehicle.entryTime || new Date().toISOString(),
+          totalDuration: vehicle.totalDuration || 0,
+          overallStatus: vehicle.overallStatus || 'on_track',
+          progress: vehicle.progress || 0,
+          completedStages: vehicle.completedStages || [],
+          shipper: { id: vehicle.shipper?.id || '', name: vehicle.shipper?.name || 'Unknown' },
+          carrier: { id: vehicle.carrier?.id || '', name: vehicle.carrier?.name || 'Unknown' },
+          driver: { name: vehicle.driver?.name || 'Unknown', phone: vehicle.driver?.phone || '' },
+          shipmentId: vehicle.sin || '',
+          orderReference: vehicle.orderReference || ''
+        }));
+        setVehicles(formattedVehicles);
+      } else {
+        console.error('Failed to fetch vehicles:', response?.message || 'Unknown error');
+        showMessage('Failed to fetch vehicles data', 'error');
+      }
+    } catch (error) {
+      console.error('Error fetching vehicles:', error);
+      showMessage('Error fetching vehicles data', 'error');
+    } finally {
+      setIsVehiclesLoading(false);
+    }
+  }, [dateRange, filters, customDateRange, searchQuery, showMessage]);
+
   const formatTime = (minutes: number): string => {
     const hours = Math.floor(minutes / 60);
     const mins = minutes % 60;
@@ -549,7 +662,8 @@ const InPlantDashboard: React.FC = () => {
 
   const handleSearch = useCallback((query: string) => {
     setSearchQuery(query);
-  }, []);
+    handleSearchResults([]);
+  }, [handleSearchResults]);
 
   const handleFilterChange = useCallback((newFilters: any) => {
     setFilters(newFilters);
@@ -560,9 +674,93 @@ const InPlantDashboard: React.FC = () => {
   }, []);
   const [isExpanded, setIsExpanded] = useState(true);
   const toggleExpand = useCallback(() => setIsExpanded(prev => !prev), []);
+  const [isMetricsExpanded, setIsMetricsExpanded] = useState(true);
+  const [isSectionExpanded, setIsSectionExpanded] = useState(true);
+  const toggleMetricsExpand = useCallback(
+    () => setIsMetricsExpanded(prev => !prev),
+    []
+  );
+  
+  const toggleSectionExpand = useCallback(
+    () => setIsSectionExpanded(prev => !prev),
+    []
+  );
 
   const handleCustomDateRangeChange = (range: { startDate: string; endDate: string }) => {
     setCustomDateRange(range);
+  };
+
+  const handleExport = async () => {
+    try {
+      const getDateRange = () => {
+        const now = new Date();
+        const start = new Date(now);
+        
+        if (dateRange === 'custom') {
+          return {
+            startDate: customDateRange.startDate,
+            endDate: customDateRange.endDate
+          };
+        }
+        
+        switch (dateRange) {
+          case 'yesterday':
+            start.setDate(now.getDate() - 1);
+            start.setHours(0, 0, 0, 0);
+            return {
+              startDate: start.toISOString(),
+              endDate: new Date(start.setHours(23, 59, 59, 999)).toISOString()
+            };
+          case 'week':
+            start.setDate(now.getDate() - 7);
+            start.setHours(0, 0, 0, 0);
+            return {
+              startDate: start.toISOString(),
+              endDate: new Date().toISOString()
+            };
+          case 'today':
+          default:
+            start.setHours(0, 0, 0, 0);
+            return {
+              startDate: start.toISOString(),
+              endDate: new Date(start.setHours(23, 59, 59, 999)).toISOString()
+            };
+        }
+      };
+
+      const dateRangeObj = getDateRange();
+      
+      const payload = {
+        stage: filters.stage,
+        duration: filters.duration,
+        dateRange: {
+          key: dateRange,
+          startDate: dateRangeObj.startDate,
+          endDate: dateRangeObj.endDate
+        },
+        quickFilter: filters.quickFilter,
+        skip: currentPage * pageSize,
+        limit: pageSize,
+        report: true 
+      };
+
+      const response = await httpsPost(
+        'InplantDashboard/Table',
+        payload,
+        {},
+        1
+      );
+
+      if (response?.statusCode === 200) {
+        showMessage('Export started successfully', 'success');
+      } else {
+        console.error('Failed to export data:', response?.message || 'Unknown error');
+        showMessage('Failed to export data', 'error');
+      }
+    } catch (error) {
+      console.error('Error exporting data:', error);
+      showMessage('Error exporting data', 'error');
+    }
   };
 
   return (
@@ -571,24 +769,25 @@ const InPlantDashboard: React.FC = () => {
       <div className={`dashboard-container ${isExpanded ? '' : 'collapsed'}`}>
         {/* Metrics Bar */}
         {/* <div className="dashboard-content"> */}
-        <div className={`dashboard-content ${isExpanded ? 'expanded' : 'collapsed'}`}>
+        <div className={`dashboard-content ${isMetricsExpanded ? 'expanded' : 'collapsed'}`}>
           <div 
             className="metrics-header" 
-            onClick={toggleExpand}
+            onClick={toggleMetricsExpand}
             style={{
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
-              marginBottom: isExpanded ? '1rem' : 0,
+              marginBottom: isMetricsExpanded ? '1rem' : 0,
               padding: '0.5rem 0',
               userSelect: 'none'
             }}
           >
             <h3 style={{ margin: 0, marginRight: '0.5rem' }}>Key Metrics</h3>
-            {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+            {isMetricsExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
           </div>
-          
-          {isExpanded && (
+           
+           
+          {isMetricsExpanded && (
             <div className="metrics-grid">
               {isLoading ? (
                <MetricCardSkeleton count={4} />
@@ -617,6 +816,7 @@ const InPlantDashboard: React.FC = () => {
           <StageFlow
             stages={stages}
             selectedStage={selectedStage}
+            loading={isStagesLoading}
           />
         )}
 
@@ -640,7 +840,7 @@ const InPlantDashboard: React.FC = () => {
 
         {/* Main Content Area */}
         <div className="dashboard-main-content1">
-        <section className={`inplant-section ${isExpanded ? 'expanded' : 'collapsed'}`}>
+        <section className={`inplant-section ${isSectionExpanded ? 'expanded' : 'collapsed'}`}>
           {/* Header Section */}
           <DashboardHeader 
             searchQuery={searchQuery}
@@ -650,11 +850,12 @@ const InPlantDashboard: React.FC = () => {
             onCustomDateRangeChange={handleCustomDateRangeChange}
             filters={filters}
             onFiltersChange={handleFilterChange}
-            isExpanded={isExpanded}
-            onToggleExpand={toggleExpand}
+            isExpanded={isSectionExpanded}
+            onToggleExpand={toggleSectionExpand}
+            onExport={handleExport}
           />
 
-          {isExpanded && (
+          {isSectionExpanded && (
             <>
             <div>
               {/* Content Tabs */}

@@ -202,12 +202,12 @@ const DetailPanel: React.FC<DetailPanelProps> = ({ vehicle, onClose, isOpen }) =
         >
           Journey Timeline
         </button>
-        <button
+        {/* <button
           className={`tab-btn ${activeTab === 'documents' ? 'active' : ''}`}
           onClick={() => setActiveTab('documents')}
         >
           Documents
-        </button>
+        </button> */}
         <button
           className={`tab-btn ${activeTab === 'notes' ? 'active' : ''}`}
           onClick={() => setActiveTab('notes')}

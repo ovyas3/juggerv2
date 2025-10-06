@@ -5,11 +5,13 @@ import { Search, Calendar, Filter, RefreshCw, Download, Settings, ChevronDown, C
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/UI/select";
 import { DatePicker } from "antd";
 import dayjs from "dayjs";
+import { httpsPost } from '@/utils/Communication';
 import './DashboardHeader.css';
 
 interface DashboardHeaderProps {
   searchQuery: string;
   onSearch: (query: string) => void;
+  onSearchResults?: (results: any[]) => void;
   dateRange: 'today' | 'yesterday' | 'week' | 'custom';
   onDateRangeChange: (range: 'today' | 'yesterday' | 'week' | 'custom') => void;
   onCustomDateRangeChange?: (range: { startDate: string; endDate: string }) => void;
@@ -22,34 +24,33 @@ interface DashboardHeaderProps {
   onFiltersChange: (filters: any) => void;
   isExpanded: boolean;
   onToggleExpand: () => void;
+  onExport: () => Promise<void>;
 }
 
 const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   searchQuery,
   onSearch,
+  onSearchResults,
   dateRange,
   onDateRangeChange,
   onCustomDateRangeChange,
   filters,
   onFiltersChange,
   isExpanded,
-  onToggleExpand
+  onToggleExpand,
+  onExport
 }) => {
   const [showDateRangePickers, setShowDateRangePickers] = useState(false);
   const [startDate, setStartDate] = useState<dayjs.Dayjs>(dayjs().subtract(7, 'day').startOf('day'));
   const [endDate, setEndDate] = useState<dayjs.Dayjs>(dayjs().endOf('day'));
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
-
-  useEffect(() => {
-    if (dateRange === 'custom') {
-      setStartDate(dayjs().subtract(7, 'day').startOf('day'));
-      setEndDate(dayjs().endOf('day'));
-      setShowDateRangePickers(true);
-    } else {
-      setShowDateRangePickers(false);
-    }
-  }, [dateRange]);
+  const [isExporting, setIsExporting] = useState(false);
+  const [searchType, setSearchType] = useState('SIN');
+  const [searchValue, setSearchValue] = useState('');
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchSuggestions, setSearchSuggestions] = useState<string[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
 
   const handleStartDateChange = (date: any) => {
     if (date) {
@@ -75,6 +76,106 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
     }
   };
 
+  const getSearchField = (type: string): string => {
+    const fieldMap: { [key: string]: string } = {
+      'SIN': 'sin',
+      'Vehicle': 'vehicle_no',
+      'Shipper': 'shipper_name',
+      'Carrier': 'carrier_name'
+    };
+    return fieldMap[type] || 'sin';
+  };
+
+  const handleSearch = async () => {
+    if (!searchValue.trim()) {
+      onSearch('');
+      if (onSearchResults) {
+        onSearchResults([]);
+      }
+      setSearchSuggestions([]);
+      setShowSuggestions(false);
+      return;
+    }
+
+    try {
+      setIsSearching(true);
+      
+      onSearch(`${searchType}:${searchValue.trim()}`);
+      
+      if (onSearchResults) {
+        onSearchResults([searchValue.trim()]);
+      }
+      
+      setShowSuggestions(false);
+    } catch (error) {
+      console.error('Error during search:', error);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchValue(value);
+    
+    // Trigger autocomplete when user types (debounce can be added here)
+    if (value.trim().length >= 2) {
+      fetchSuggestions(value.trim());
+    } else {
+      setSearchSuggestions([]);
+      setShowSuggestions(false);
+    }
+  };
+
+  const fetchSuggestions = async (searchTerm: string) => {
+    try {
+      const field = getSearchField(searchType);
+      
+      const payload = {
+        search_term: searchTerm,
+        field: field,
+        limit: 50
+      };
+
+      const response = await httpsPost(
+        'InplantDashboard/searchIndex',
+        payload,
+        {},
+        1
+      );
+
+      if (response?.statusCode === 200) {
+        if (response.data && Array.isArray(response.data)) {
+          setSearchSuggestions(response.data);
+          setShowSuggestions(response.data.length > 0);
+        }
+      } else {
+        console.error('Search failed:', response?.message || 'Unknown error');
+        setSearchSuggestions([]);
+        setShowSuggestions(false);
+      }
+    } catch (error) {
+      console.error('Error fetching suggestions:', error);
+      setSearchSuggestions([]);
+      setShowSuggestions(false);
+    }
+  };
+
+  const handleSuggestionClick = (suggestion: string) => {
+    setSearchValue(suggestion);
+    setShowSuggestions(false);
+    onSearch(`${searchType}:${suggestion}`);
+    if (onSearchResults) {
+      onSearchResults([suggestion]);
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
+
   const handleRefresh = async () => {
     setIsRefreshing(true);
     onFiltersChange({ 
@@ -90,10 +191,26 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
     setIsRefreshing(false);
   };
 
-  const handleExport = () => {
-    // Export functionality would be implemented here
-    console.log('Exporting data...');
+  const handleExportClick = async () => {
+    try {
+      setIsExporting(true);
+      await onExport();
+    } catch (error) {
+      console.error('Error in export handler:', error);
+    } finally {
+      setIsExporting(false);
+    }
   };
+
+  useEffect(() => {
+    if (dateRange === 'custom') {
+      setStartDate(dayjs().subtract(7, 'day').startOf('day'));
+      setEndDate(dayjs().endOf('day'));
+      setShowDateRangePickers(true);
+    } else {
+      setShowDateRangePickers(false);
+    }
+  }, [dateRange]);
 
   const quickFilters = [
     { key: 'all', label: 'All', count: 23 },
@@ -192,15 +309,48 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
             </div>
 
             <div className="header-right">
-              <div className="search-container">
-                <Search className="search-icon" size={16} />
+              <div className="searchInputContainer" style={{ position: 'relative' }}>
+                <Select 
+                  value={searchType}
+                  onValueChange={setSearchType}
+                >
+                  <SelectTrigger className='perPageSelect'>
+                    <SelectValue placeholder="SIN" />
+                  </SelectTrigger>
+                  <SelectContent className='perPageContent'>
+                    <SelectItem className='perPageItem' value="SIN">SIN</SelectItem>
+                    <SelectItem className='perPageItem' value="Vehicle">Vehicle</SelectItem>
+                    <SelectItem className='perPageItem' value="Shipper">Shipper</SelectItem>
+                    <SelectItem className='perPageItem' value="Carrier">Carrier</SelectItem>
+                  </SelectContent>
+                </Select>
                 <input
                   type="text"
-                  placeholder="Search shipments..."
-                  value={searchQuery}
-                  onChange={(e) => onSearch(e.target.value)}
-                  className="search-input"
+                  placeholder={`Search by ${searchType}...`}
+                  value={searchValue}
+                  onChange={handleInputChange}
+                  onKeyPress={handleKeyPress}
+                  className="inputSearch"
+                  onFocus={() => searchSuggestions.length > 0 && setShowSuggestions(true)}
                 />
+                <Search 
+                  className="searchIcon" 
+                  onClick={handleSearch}
+                />
+                
+                {showSuggestions && searchSuggestions.length > 0 && (
+                  <div className="search-suggestions">
+                    {searchSuggestions.map((suggestion, index) => (
+                      <div
+                        key={index}
+                        className="suggestion-item"
+                        onClick={() => handleSuggestionClick(suggestion)}
+                      >
+                        {suggestion}
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <button
@@ -211,16 +361,13 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                 <RefreshCw className={isRefreshing ? 'spin' : ''} size={16} />
               </button>
 
-              <button onClick={handleExport} className="action-btn">
+              <button 
+                onClick={handleExportClick} 
+                className={`action-btn ${isExporting ? 'exporting' : ''}`}
+                disabled={isExporting}
+              >
                 <Download size={16} />
               </button>
-
-              {/* <button
-                onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
-                className="action-btn"
-              >
-                <Settings size={16} />
-              </button> */}
             </div>
           </>
         )}

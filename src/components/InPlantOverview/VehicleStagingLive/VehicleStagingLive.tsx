@@ -160,30 +160,18 @@ export default function VehicleStagingLive({
                     display: 'flex',
                     justifyContent: 'center',
                     alignItems: 'center',
-                    height: isInDashboard ? '200px' : '100vh',
+                    height: isInDashboard ? '0px' : '100vh',
                     position: isInDashboard ? 'relative' : 'absolute',
                     width: isInDashboard ? '100%' : '100vw',
                     background: isInDashboard ? 'transparent' : 'white',
                     zIndex: 1000,
                     opacity: 1,
-                    borderRadius: isInDashboard ? '12px' : '0',
-                    margin: isInDashboard ? '16px 0' : '0'
+                    borderRadius: '0',
+                    margin: '0'
                 }}>
                     {useLoader2 ? (
                         <>
-                            <Loader2 className="animate-spin" style={{
-                                width: '40px',
-                                height: '40px',
-                                color: '#20114d',
-                                animation: 'spin 1s linear infinite',
-                                display: 'inline-block'
-                            }} />
-                            <style jsx global>{`
-                                @keyframes spin {
-                                    from { transform: rotate(0deg); }
-                                    to { transform: rotate(360deg); }
-                                }
-                            `}</style>
+                           
                         </>
                     ) : (
                         <ThreeCircles
@@ -272,7 +260,23 @@ export default function VehicleStagingLive({
                       </div>
                     </div>
 
-                    {isExpanded && (
+                    {useLoader2 ? (
+                      <div className="flex justify-center items-center py-8 height: 200px width: 100%">
+                        <Loader2 className="animate-spin" style={{
+                          width: '40px',
+                          height: '40px',
+                          color: '#20114d',
+                          animation: 'spin 1s linear infinite',
+                          display: 'inline-block'
+                        }} />
+                        <style jsx global>{`
+                          @keyframes spin {
+                            from { transform: rotate(0deg); }
+                            to { transform: rotate(360deg); }
+                          }
+                        `}</style>
+                      </div>
+                    ) : isExpanded && (
                       <>
                         {mobile ? (
                           <div className={styles.cardContainer}>
