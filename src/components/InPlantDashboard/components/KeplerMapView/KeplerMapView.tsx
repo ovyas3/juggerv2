@@ -162,6 +162,46 @@ const KeplerMapView: React.FC<KeplerMapViewProps> = ({
   const mapRef = useRef<LeafletMap | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [loading, setLoading] = useState(false);
+  const [originalView, setOriginalView] = useState<{ center: [number, number]; zoom: number } | null>(null); // <<< NEW STATE
+  const [isGateInZoomed, setIsGateInZoomed] = useState(false);
+  const [stages, setStages] = useState<StageInfo[]>([]);
+  // Add this useEffect to the component body (e.g., around line 560)
+
+  const zoomToGateIn = useCallback(() => {
+    const map = mapRef.current;
+    if (!map) return;
+
+    if (isGateInZoomed && originalView) {
+        // --- SECOND CLICK: Revert to Original View ---
+        map.setView(originalView.center, originalView.zoom, { animate: true, duration: 0.8 });
+        setIsGateInZoomed(false);
+        setOriginalView(null); // Clear stored view
+        return;
+    }
+
+    // --- FIRST CLICK: Zoom to Gate In ---
+    const gateInCoords = mapLocationData?.gatesV2?.entry?.[0]?.coordinates;
+
+    if (gateInCoords) {
+        // Get the current center L.LatLng object
+        const currentCenter = map.getCenter();
+        
+        // FIX: Use .lat and .lng properties to create the array
+        setOriginalView({
+            center: [currentCenter.lat, currentCenter.lng], // <-- FIXED LINE
+            zoom: map.getZoom(),
+        });
+        
+        // API coordinates are [longitude, latitude], Leaflet/React-Leaflet uses [latitude, longitude]
+        const latLng: [number, number] = [gateInCoords[1], gateInCoords[0]];
+
+        // Set the map view to the Gate In coordinates at a close zoom level (e.g., 18)
+        map.setView(latLng, 18, { animate: true, duration: 0.8 });
+        setIsGateInZoomed(true);
+    } else {
+        console.warn("Gate In coordinates not available to zoom.");
+    }
+}, [mapLocationData, isGateInZoomed, originalView]); // Add new states to dependencies
   const handleVehicleSelect = useCallback((vehicle: Vehicle) => {
     // Toggles selection: if the same vehicle is clicked, deselect it.
     if (selectedVehicle?.id === vehicle.id) {
@@ -173,7 +213,7 @@ const KeplerMapView: React.FC<KeplerMapViewProps> = ({
   const router = useRouter(); 
   const fetchMapLocation = async () => {
     // The URL from your cURL example
-    const url = 'InplantDashbaord/maplocation';
+    const url = 'InplantDashboard/maplocation';
     
   
     const payload = {
@@ -219,7 +259,7 @@ const plantCenter: [number, number] = mapLocationData
 : DEFAULT_CENTER;
 const fetchMapdata = async () => {
   // The URL from your cURL example
-  const url = 'InplantDashbaord/mapview';
+  const url = 'InplantDashboard/mapview';
   console.log("Hitting the api");
   // **PAYLOAD ASSUMPTION:** // A POST request usually requires a body. 
   // Define your actual payload/filters here.
@@ -498,7 +538,10 @@ const setZoomDelta = (delta: number) => {
   // }, [plantLocations]);
   const getVehiclePosition = useCallback((vehicle:AugmentedVehicle): [number, number] => {
         if (vehicle.location?.latitude && vehicle.location?.longitude) {
-          return [vehicle.location.latitude, vehicle.location.longitude];
+          // return [vehicle.location.latitude, vehicle.location.longitude];
+          const pos: [number, number] = [vehicle.location.latitude, vehicle.location.longitude];
+          console.log(`Vehicle ${vehicle.vehicleNumber} position:`, pos);
+          return pos;
         }
        return plantCenter; // fallback
       }, [plantCenter]);
@@ -527,9 +570,10 @@ const setZoomDelta = (delta: number) => {
           </svg>
         </div>
       `,
-      className: 'vehicle-marker',
+      className: 'leaflet-div-icon  vehicle-marker',
       iconSize: [size, size],
-      iconAnchor: [size/2, size/2]
+      // iconAnchor: [size/2, size],
+      // popupAnchor: [0, -size] 
     });
   }, []);
 
@@ -635,6 +679,42 @@ const setZoomDelta = (delta: number) => {
       map.off('zoomend', syncZoom); // ✅ returns void
     };
   }, [mapReady]);
+  useEffect(() => {
+    if (mapRef.current && fetchedVehicles && fetchedVehicles.length > 0) {
+      const bounds = calculateBounds();
+      // Wait for tiles to load, then fit bounds
+      setTimeout(() => {
+        mapRef.current?.fitBounds(bounds, { 
+          padding: [50, 50],
+          maxZoom: 16 
+        });
+      }, 500);
+    }
+  }, [fetchedVehicles]);
+  // Force map to recalculate size after initial render and data load
+useEffect(() => {
+  if (!mapRef.current || !fetchedVehicles) return;
+  
+  // Multiple invalidations to catch different render phases
+  const timers = [
+    setTimeout(() => mapRef.current?.invalidateSize(true), 0),
+    setTimeout(() => mapRef.current?.invalidateSize(true), 100),
+    setTimeout(() => mapRef.current?.invalidateSize(true), 300),
+    setTimeout(() => {
+      if (mapRef.current && fetchedVehicles.length > 0) {
+        const bounds = calculateBounds();
+        mapRef.current.fitBounds(bounds, { 
+          padding: [50, 50],
+          maxZoom: 16,
+          animate: false // Don't animate on first load
+        });
+      }
+    }, 500)
+  ];
+
+  return () => timers.forEach(t => clearTimeout(t));
+}, [fetchedVehicles, calculateBounds]);
+ 
 
   return (
     // <div className={`${styles.mapContainer} ${isFullscreen ? styles.fullscreen : ''}`}>
@@ -659,18 +739,19 @@ const setZoomDelta = (delta: number) => {
           </button>
           <button
             className={styles.controlBtn}
-            onClick={() => setShowStageLabels(!showStageLabels)}
+            // onClick={() => setShowStageLabels(!showStageLabels)}
+            onClick={zoomToGateIn} 
             title="Toggle Stage Labels"
           >
             <MapPin size={16} />
           </button>
-          <button
+          {/* <button
             className={styles.controlBtn}
             onClick={() => setShowVehiclePaths(!showVehiclePaths)}
             title="Toggle Vehicle Paths"
           >
             <Truck size={16} />
-          </button>
+          </button> */}
         </div>
 
         <div className={styles.controlGroup}>
@@ -748,7 +829,7 @@ const setZoomDelta = (delta: number) => {
            zoom={mapZoom}  
            touchZoom={true}
   //  center={plantCenter}
-  bounds={INDIA_BOUNDS} 
+  // bounds={INDIA_BOUNDS} 
  
   style={{ height: "100%", width: "100%" }}
    zoomControl={false}
@@ -851,12 +932,14 @@ const setZoomDelta = (delta: number) => {
           //       </div>
           //     </Popup>
           //   </Marker>
+          console.log("This is the vehicle",vehicle);
           const position = getVehiclePosition(vehicle);
          const isSelected = selectedVehicle !== null &&  selectedVehicle?.id === vehicle?.id;
           return (
             <Marker
               key={vehicle.id}
              position={position}
+        
              icon={createVehicleIcon(vehicle, isSelected)}
               eventHandlers={{ click: () =>  handleVehicleSelect(vehicle) }}
             >
@@ -1012,6 +1095,22 @@ const setZoomDelta = (delta: number) => {
         </div>
         <div className={styles.statItem}>
           <span>On Track: {fetchedVehicles?.filter(v => v.status === 'on_track').length}</span>
+        </div>
+        <div className={styles.statItem} style={{ color: '#22c55e' }}> {/* Optional: Green color */}
+        <img 
+            src={GateIn.src} // Use the imported SVG source
+            alt="Gate In Icon" 
+            style={{ width: 18, height: 18 }} // Styling to match the green color
+          />
+          <span>Gate In</span>
+        </div>
+        <div className={styles.statItem} style={{ color: '#ef4444' }}> {/* Optional: Red color */}
+        <img 
+            src={GateOut.src} // Use the imported SVG source
+            alt="Gate Out Icon" 
+            style={{ width: 18, height: 18 }} // Styling to match the red color
+          /> 
+          <span>Gate Out</span>
         </div>
       </div>
     </div>

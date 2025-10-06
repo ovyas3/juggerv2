@@ -127,7 +127,7 @@ const InPlantDashboard: React.FC = () => {
     const fetchMetrics = async () => {
       try {
         setIsLoading(true);
-        const response = await httpsPost('InplantDashbaord/KPIcards', {}, {}, 1,);
+        const response = await httpsPost('InplantDashboard/KPIcards', {}, {}, 1,);
         if (response?.statusCode === 200) {
           setMetrics(response.data);
         } else {
@@ -149,7 +149,7 @@ const InPlantDashboard: React.FC = () => {
     const fetchStages = async () => {
       try {
         setIsStagesLoading(true);
-        const response = await httpsPost('InplantDashbaord/vehicleflow', {}, {}, 1);
+        const response = await httpsPost('InplantDashboard/vehicleflow', {}, {}, 1);
         if (response?.statusCode === 200) {
           const formattedStages = response.data.map((stage: any) => {
             const IconComponent = stage.icon ? iconMap[stage.icon] : iconMap.default;
@@ -245,7 +245,7 @@ const InPlantDashboard: React.FC = () => {
           // limit: pageSize
         };
 
-        const response = await httpsPost('InplantDashbaord/Table', payload, {}, 1);
+        const response = await httpsPost('InplantDashboard/Table', payload, {}, 1);
         if (response?.statusCode === 200) {
           const formattedVehicles = response.data.data.map((vehicle: any) => ({
             id: vehicle.id || '',
