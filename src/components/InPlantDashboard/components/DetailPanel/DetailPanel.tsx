@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState,useCallback } from 'react';
 import { X, Download, AlertTriangle, FileText, User, Phone, Building, Clock, CheckCircle, Circle } from 'lucide-react';
 import { Vehicle } from '../../InPlantDashboard';
 import './DetailPanel.css';
@@ -45,9 +45,14 @@ const DetailPanel: React.FC<DetailPanelProps> = ({ vehicle, onClose, isOpen }) =
   const [timelineData, setTimelineData] = useState<TimelineEvent[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [remark, setRemark] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+ 
 
-  useEffect(() => {
-    const fetchTimelineData = async () => {
+ 
+
+  // useEffect(() => {
+    const fetchTimelineData = useCallback(async (vehicleId: string) => {
       if (!vehicle) {
         return;
       }
@@ -69,10 +74,65 @@ const DetailPanel: React.FC<DetailPanelProps> = ({ vehicle, onClose, isOpen }) =
       } finally {
         setIsLoading(false);
       }
+    }, [setIsLoading, setError, setTimelineData]); 
+
+  //   fetchTimelineData();
+  // }, [vehicle]);
+  useEffect(() => {
+    if (!vehicle || !vehicle.id) {
+        return;
+    }
+    // Call the callable function with the current vehicle's ID
+    fetchTimelineData(vehicle.id); 
+}, [vehicle, fetchTimelineData]); 
+  const handleSubmit = async () => {
+    if (!vehicle) {
+      // Log a warning if this happens, though it shouldn't based on component usage
+      console.warn("Attempted to submit remark with no vehicle selected.");
+      return; 
+  }
+    if (!remark.trim()) {
+      alert("Please enter a remark before submitting.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    const url = 'inPlantVehicles/updateRemarks'; // API endpoint
+
+    // Payload structure for the API call
+    const payload = {
+      // Assuming the API expects the shipment ID and the remark content
+      attached_driver: vehicle?.driver?.id, 
+      shipper_remark: remark.trim(),
     };
 
-    fetchTimelineData();
-  }, [vehicle]);
+    try {
+      // Use httpsPost for the API call
+      const response = await httpsPost(
+        url, 
+        payload, 
+        router, 
+        1, // Retries
+        false // Is external
+      );
+
+      if (response?.statusCode === 200) {
+        // Success feedback (e.g., toast/snackbar)
+        console.log("Remark submitted successfully:", response);
+        onClose(); // Close modal on success
+        await fetchTimelineData(vehicle.id);
+      } else {
+        // Failure feedback
+        console.error("Failed to submit remark:", response?.message || "Unknown error");
+        alert(`Failed to submit remark. ${response?.message || ''}`);
+      }
+    } catch (error) {
+      console.error("API call error during remark submission:", error);
+      alert("An error occurred during submission.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   useEffect(() => {
     document.body.style.overflow = isOpen ? 'hidden' : 'unset';
@@ -342,12 +402,28 @@ const DetailPanel: React.FC<DetailPanelProps> = ({ vehicle, onClose, isOpen }) =
         {activeTab === 'notes' && (
           <div className="notes-content">
             <div className="notes-list">
-              // display notes
+              {/* // display notes */}
+              {timelineData.flatMap((stage) => 
+                  stage.events.map((event, index) => (
+                    <div key={`${stage.stageId}-${index}`} className="note-item">
+                      <div className="note-header">
+                        <span className="note-stage">{stage.stageName}</span>
+                        <span className="note-time">{formatTime(event.eventTime)}</span>
+                      </div>
+                      <p className="note-text">{event.notes}</p>
+                      <span className="note-performer">By: {event.performedBy}</span>
+                    </div>
+                  ))
+                ).reverse()}
             </div>
 
             <div className="add-note">
-              <textarea placeholder="Add a note..." className="note-input" rows={3}></textarea>
-              <button className="add-note-btn">Add Note</button>
+              <textarea    value={remark} 
+           onChange={(e) => {
+            const inputValue = e.target.value;
+            const filteredValue = inputValue.replace(/[^a-zA-Z\s0-9]/g, '');
+           setRemark(filteredValue);}} placeholder="Add a note..." className="note-input" rows={3}></textarea>
+              <button onClick={handleSubmit}  className="add-note-btn" >Add Note</button>
             </div>
           </div>
         )}

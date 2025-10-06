@@ -181,7 +181,7 @@
   border: none;
   font-size: var(--text-sm);
   font-weight: var(--font-medium);
-  color: var(--text-secondary);
+  color: #301c6c;
   cursor: pointer;
   border-bottom: 2px solid transparent;
   transition: var(--transition-smooth);
@@ -193,7 +193,7 @@
 }
 
 .tab-btn.active {
-  color: var(--primary-blue);
+  color: #301c6c;
   border-bottom-color: var(--primary-blue);
   background: var(--bg-primary);
 }
@@ -531,7 +531,7 @@
 
 .add-note-btn {
   align-self: flex-end;
-  background: var(--primary-blue);
+  background:#301c6c;
   border: none;
   border-radius: 6px;
   padding: var(--spacing-sm) var(--spacing-md);
@@ -542,7 +542,7 @@
 }
 
 .add-note-btn:hover {
-  background: var(--primary-dark);
+  background: #4a387e;
 }
 
 /* Panel Footer */
