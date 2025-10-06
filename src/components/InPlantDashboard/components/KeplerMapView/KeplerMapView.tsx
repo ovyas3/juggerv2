@@ -173,7 +173,7 @@ const KeplerMapView: React.FC<KeplerMapViewProps> = ({
   const router = useRouter(); 
   const fetchMapLocation = async () => {
     // The URL from your cURL example
-    const url = 'InplantDashbaord/maplocation';
+    const url = 'InplantDashboard/maplocation';
     
   
     const payload = {
@@ -219,7 +219,7 @@ const plantCenter: [number, number] = mapLocationData
 : DEFAULT_CENTER;
 const fetchMapdata = async () => {
   // The URL from your cURL example
-  const url = 'InplantDashbaord/mapview';
+  const url = 'InplantDashboard/mapview';
   console.log("Hitting the api");
   // **PAYLOAD ASSUMPTION:** // A POST request usually requires a body. 
   // Define your actual payload/filters here.
