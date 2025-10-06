@@ -105,15 +105,15 @@
 }
 
 .progressNormal {
-  background-color: #10B981; /* Green for normal */
+  background-color: #10B981 !important;
 }
 
 .progressWarning {
-  background-color: #F59E0B; /* Yellow for warning */
+  background-color: #F59E0B !important; 
 }
 
 .progressCritical {
-  background-color: #EF4444;
+  background-color: #EF4444 !important;
 }
 
 .subText {

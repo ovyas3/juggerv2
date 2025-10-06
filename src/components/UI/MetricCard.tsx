@@ -64,15 +64,28 @@ const MetricCard: React.FC<MetricCardProps> = ({
     }
   };
 
+  const slaProgress = averageTime && slaThreshold 
+  ? Math.min((averageTime / slaThreshold) * 100, 100) 
+  : 0;
+
+  const getProgressColorClass = () => {
+    switch (healthStatus) {
+      case 'normal':
+        return styles.progressNormal;
+      case 'warning':
+        return styles.progressWarning;
+      case 'critical':
+        return styles.progressCritical;
+      default:
+        return styles.progressNormal;
+    }
+  };
+
   return (
     <div
         className={styles.metricCard}
         style={{
         backgroundColor: bgColor,
-        // borderLeft: `4px solid ${borderColor}`,
-        // borderRight: `1px solid ${borderColor}`,
-        // borderTop: `1px solid ${borderColor}`,
-        // borderBottom: `1px solid ${borderColor}`,
         border: `1px solid ${borderColor}`,
         }}
     >
@@ -121,11 +134,9 @@ const MetricCard: React.FC<MetricCardProps> = ({
                 <span className={styles.slaValue} style={{ backgroundColor: bgColor, color: iconColor }}>{formatTime(slaThreshold)}</span>
               </div>
               <div className={styles.progressBar}>
-                <div 
-                  className={`${styles.progressFill} ${styles[`progress${healthStatus.charAt(0).toUpperCase() + healthStatus.slice(1)}`]}`}
-                  style={{
-                    width: `${Math.min(100, (averageTime / slaThreshold) * 100)}%`
-                  }}
+                <div
+                  className={`${styles.progressFill} ${getProgressColorClass()}`}
+                  style={{ width: `${slaProgress}%` }}
                 />
               </div>
             </div>

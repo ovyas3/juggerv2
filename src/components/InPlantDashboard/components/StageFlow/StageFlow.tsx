@@ -152,6 +152,9 @@ const StageFlow: React.FC<StageFlowProps> = ({
 }) => {
   const sortedStages = [...stages].sort((a, b) => a.order - b.order);
   const [isExpanded, setIsExpanded] = useState(true);
+  const delayedStagesCount = sortedStages.filter(
+    stage => stage.healthStatus === 'critical'
+  ).length;
 
   // if (loading === false || loading === true) {
   //   return (
@@ -187,9 +190,9 @@ const StageFlow: React.FC<StageFlowProps> = ({
             <div className="flow-summary">
               <span className="total-vehicles">{sortedStages.reduce((sum, stage) => sum + stage.vehicleCount, 0)} vehicles in plant</span>
               {sortedStages.filter(stage => stage.healthStatus === 'critical' || stage.healthStatus === 'warning').length > 0 && (
-                <span className="delayed-stages">
-                  {sortedStages.filter(stage => stage.healthStatus === 'critical' || stage.healthStatus === 'warning').length} stage{sortedStages.filter(stage => stage.healthStatus === 'critical' || stage.healthStatus === 'warning').length > 1 ? 's' : ''} delayed
-                </span>
+                 <span className="delayed-stages">
+                 {delayedStagesCount} stage{delayedStagesCount > 1 ? 's' : ''} delayed
+               </span>
               )}
             </div>
           )}
