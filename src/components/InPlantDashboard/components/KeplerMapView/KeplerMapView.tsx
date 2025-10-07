@@ -104,7 +104,7 @@ interface Carrier {
 }
 type AugmentedVehicle = Vehicle & {
   sin?: string;
-  status?: string; // Assuming a string status
+  status: string; // Assuming a string status
   entryTime: string; // Assuming a date string
   totalDuration: number; // Assuming a number of minutes
   driver: Driver;
@@ -755,7 +755,145 @@ useEffect(() => {
 }, [fetchedVehicles, calculateBounds, initialLoadDone]); // Add initialLoadDone to dependencies
 // KeplerMapView.tsx (Add this block after the previous useEffect fixes)
 
- // Run whenever the critical location data is fetched
+
+  useEffect(() => {
+    
+    if (!mapRef.current || !fetchedVehicles) {
+      return;
+    }
+    
+    const map = mapRef.current;
+    const markers: L.Marker[] = [];
+    
+    fetchedVehicles.forEach((vehicle, index) => {
+      
+      const position: [number, number] = vehicle.location?.latitude && vehicle.location?.longitude
+        ? [vehicle.location.latitude, vehicle.location.longitude]
+        : plantCenter;
+      
+      const color = '#3B82F6';
+      const size = 32;
+      const anchor = size / 2;
+      
+      const icon = L.divIcon({
+        html: `
+          <div style="
+            width: ${size}px;
+            height: ${size}px;
+            background: ${color};
+            border: 3px solid white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            cursor: pointer;
+          ">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="white">
+              <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9L18 10V6c0-2-2-4-4-4H4c-2 0-4 2-4 4v10c0 1.1.9 2 2 2h2c0 1.7 1.3 3 3 3s3-1.3 3-3h6c0 1.7 1.3 3 3 3s3-1.3 3-3zM7 19c-.6 0-1-.4-1-1s.4-1 1-1 1 .4 1 1-.4 1-1 1zm0-3c-1.1 0-2-.9-2-2H3V6c0-.6.4-1 1-1h10c.6 0 1 .4 1 1v8h-2c0 1.1-.9 2-2 2H7zm10 3c-.6 0-1-.4-1-1s.4-1 1-1 1 .4 1 1-.4 1-1 1z"/>
+            </svg>
+          </div>
+        `,
+        className: 'vehicle-marker',
+        iconSize: [size, size],
+        iconAnchor: [anchor, anchor],
+        popupAnchor: [0, -anchor]
+      });
+      
+      const marker = L.marker(position, { icon });
+
+      const formatStatus = (status: string) => {
+        const statusMap: { [key: string]: string } = {
+          'on_track': 'On Track',
+          'at_risk': 'At Risk',
+          'delayed': 'Delayed',
+          'completed': 'Completed',
+          'on_hold': 'On Hold'
+        };
+        return statusMap[status] || status;
+      };
+
+      const formatDate = (dateString: string) => {
+        const date = new Date(dateString);
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        return `${day}/${month}/${year} ${hours}:${minutes}`;
+      };
+
+      const popupContent = `
+        <div style="padding: 12px; min-width: 280px;">
+          <h4 style="margin: 0 0 12px 0; font-size: 16px; font-weight: 600; color: #111827; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px;">
+            Vehicle Details
+          </h4>
+          <div style="display: grid; gap: 8px;">
+            <p style="margin: 0; font-size: 13px; color: #374151; display: flex;">
+              <span style="display: inline-block; width: 110px; color: #6b7280; flex-shrink: 0;">Vehicle No:</span> 
+              <strong style="color: #111827; font-weight: 600; word-break: break-word;">${vehicle.vehicleNumber}</strong>
+            </p>
+            <p style="margin: 0; font-size: 13px; color: #374151; display: flex;">
+              <span style="display: inline-block; width: 110px; color: #6b7280; flex-shrink: 0;">SIN:</span> 
+              <strong style="color: #111827; font-weight: 600; word-break: break-word;">${vehicle.sin}</strong>
+            </p>
+            <p style="margin: 0; font-size: 13px; color: #374151; display: flex;">
+              <span style="display: inline-block; width: 110px; color: #6b7280; flex-shrink: 0;">Stage:</span> 
+              <strong style="color: #111827; font-weight: 600; word-break: break-word;">${vehicle.currentStage?.stageName || 'N/A'}</strong>
+            </p>
+            <p style="margin: 0; font-size: 13px; color: #374151; display: flex;">
+              <span style="display: inline-block; width: 110px; color: #6b7280; flex-shrink: 0;">Status:</span> 
+              <strong style="color: #111827; font-weight: 600; word-break: break-word;">${formatStatus(vehicle.status)}</strong>
+            </p>
+            <p style="margin: 0; font-size: 13px; color: #374151; display: flex;">
+              <span style="display: inline-block; width: 110px; color: #6b7280; flex-shrink: 0;">Location:</span> 
+              <strong style="color: #111827; font-weight: 600; word-break: break-word;">${vehicle?.location?.locationName || 'N/A'}</strong>
+            </p>
+            <p style="margin: 0; font-size: 13px; color: #374151; display: flex;">
+              <span style="display: inline-block; width: 110px; color: #6b7280; flex-shrink: 0;">Entry Time:</span> 
+              <strong style="color: #111827; font-weight: 600; word-break: break-word;">${formatDate(vehicle.entryTime)}</strong>
+            </p>
+            <p style="margin: 0; font-size: 13px; color: #374151; display: flex;">
+              <span style="display: inline-block; width: 110px; color: #6b7280; flex-shrink: 0;">Duration:</span> 
+              <strong style="color: #111827; font-weight: 600; word-break: break-word;">${vehicle.totalDuration} mins</strong>
+            </p>
+            <p style="margin: 0; font-size: 13px; color: #374151; display: flex;">
+              <span style="display: inline-block; width: 110px; color: #6b7280; flex-shrink: 0;">Driver:</span> 
+              <strong style="color: #111827; font-weight: 600; word-break: break-word;">${vehicle.driver?.name || 'N/A'}</strong>
+            </p>
+            <p style="margin: 0; font-size: 13px; color: #374151; display: flex;">
+              <span style="display: inline-block; width: 110px; color: #6b7280; flex-shrink: 0;">Carrier:</span> 
+              <strong style="color: #111827; font-weight: 600; word-break: break-word;">${vehicle.carrier?.name || 'N/A'}</strong>
+            </p>
+            <p style="margin: 0; font-size: 13px; color: #374151; display: flex;">
+              <span style="display: inline-block; width: 110px; color: #6b7280; flex-shrink: 0;">Destination:</span> 
+              <strong style="color: #111827; font-weight: 600; word-break: break-word;">${vehicle.destination?.name || 'N/A'}, ${vehicle.destination?.city || ''}</strong>
+            </p>
+            <p style="margin: 0; font-size: 13px; color: #374151; display: flex;">
+              <span style="display: inline-block; width: 110px; color: #6b7280; flex-shrink: 0;">Order Ref:</span> 
+              <strong style="color: #111827; font-weight: 600; word-break: break-word;">${vehicle.orderReference || 'N/A'}</strong>
+            </p>
+          </div>
+        </div>
+      `;
+
+      marker.bindPopup(popupContent, {
+        maxWidth: 300,
+        className: 'custom-vehicle-popup',
+        closeButton: true,
+        autoClose: false
+      });
+      
+      marker.addTo(map);
+      
+      markers.push(marker);
+    });
+    
+    
+    return () => {
+      markers.forEach(marker => marker.remove());
+    };
+  }, [fetchedVehicles, plantCenter]); 
 
   return (
     // <div className={`${styles.mapContainer} ${isFullscreen ? styles.fullscreen : ''}`}>
@@ -947,64 +1085,6 @@ useEffect(() => {
             </Popup>
           </Marker>
         )} */}
-
-        {/* Vehicles */}
-        {fetchedVehicles?.map(vehicle => {
-          // const position = getVehiclePosition(vehicle);
-          // const isSelected = selectedVehicle?.id === vehicle.id;
-
-          // return (
-          //   <Marker
-          //     key={vehicle.id}
-          //     position={position}
-          //     icon={createVehicleIcon(vehicle, isSelected)}
-          //     eventHandlers={{
-          //       click: () => onVehicleSelect(vehicle)
-          //     }}
-          //   >
-          //     <Popup>
-          //       <div className={styles.vehiclePopup}>
-          //         <h4>{vehicle.vehicleNumber}</h4>
-          //         <p><strong>Status:</strong> {vehicle.overallStatus.replace('_', ' ')}</p>
-          //         <p><strong>Location:</strong> {vehicle.currentStage.stageName}</p>
-          //         <p><strong>Duration:</strong> {Math.floor(vehicle.currentStage.duration / 60)}h {vehicle.currentStage.duration % 60}m</p>
-          //         <p><strong>Driver:</strong> {vehicle.driver.name}</p>
-          //         <p><strong>Carrier:</strong> {vehicle.carrier.name}</p>
-          //       </div>
-          //     </Popup>
-          //   </Marker>
-          console.log("This is the vehicle",vehicle);
-          const position = getVehiclePosition(vehicle);
-         const isSelected = selectedVehicle !== null &&  selectedVehicle?.id === vehicle?.id;
-          return (
-            <Marker
-              key={vehicle.id}
-             position={position}
-        
-             icon={createVehicleIcon(vehicle, isSelected)}
-              eventHandlers={{ click: () =>  handleVehicleSelect(vehicle) }}
-            >
-              <Popup>
-               <div className={styles.vehiclePopup}>
-               
-                  <p>Vehicle No:<strong> {vehicle.vehicleNumber}</strong></p>
-                  <p>SIN:<strong> {vehicle.sin}</strong></p>
-                 <p>Stage:<strong> {vehicle.currentStage?.stageName}</strong></p>
-                 <p>Status:<strong> {vehicle.status}</strong></p>
-                     <p>Location Name:<strong> {vehicle?.location?.locationName}</strong></p>
-                  <p>Entry Time:<strong> {new Date(vehicle.entryTime).toLocaleString()}</strong></p>
-                  <p>Total Duration:<strong> {vehicle.totalDuration} mins</strong></p>
-                  <p>Driver:<strong> {vehicle.driver?.name} </strong></p>
-                  {/* <p>Carrier:<strong> {vehicle.carrier?.name}</strong></p> */}
-                  <p>Destination:<strong> {vehicle.destination?.name}, {vehicle.destination?.city}</strong></p>
-                  <p>Order Ref:<strong> {vehicle.orderReference}</strong></p>
-                </div>
-              </Popup>
-            </Marker>
-        
-          );
-        })}
-
 
 
         {/* --- Gate Markers (Entry) --- */}
