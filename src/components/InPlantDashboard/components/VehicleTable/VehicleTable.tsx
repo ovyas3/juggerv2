@@ -314,15 +314,16 @@ const VehicleTable: React.FC<VehicleTableProps> = ({
 }, [remarkVehicle]);
   const filteredVehicles = useMemo(() => {
     let filtered = [...vehicles];
-   
+    const isApiSearch = searchQuery.includes(':'); 
     // Search filter
     if (searchQuery) {
+      if (!isApiSearch) { 
       filtered = filtered.filter(
         vehicle =>
           vehicle.vehicleNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
           (vehicle.driver?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false) ||
           vehicle.shipmentId.toLowerCase().includes(searchQuery.toLowerCase())
-      );
+      );}
     }
 
     // Stage filter

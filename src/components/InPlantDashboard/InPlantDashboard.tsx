@@ -292,6 +292,7 @@ const InPlantDashboard: React.FC = () => {
   }, [dateRange, filters, customDateRange, currentPage, pageSize, isSearchActive]);
 
   const handleSearchResults = useCallback(async (results: any[], paginationData?: any) => {
+    console.log("DEBUG-Parent: handleSearchResults received", results);
     if (!results || results.length === 0) {
       setSearchQuery('');
       setIsSearchActive(false);
@@ -329,7 +330,7 @@ const InPlantDashboard: React.FC = () => {
         shipmentId: vehicle.sin || '',
         orderReference: vehicle.orderReference || ''
       }));
-  
+      console.log(`DEBUG-Parent: Setting state with ${formattedVehicles.length} formatted vehicles.`);
       setVehicles(formattedVehicles);
       setCurrentPage(0);
       if (paginationData) {
@@ -566,6 +567,7 @@ const InPlantDashboard: React.FC = () => {
   };
 
   const handleExport = async () => {
+    console.log('DEBUG-EXPORT: --- STARTING handleExport ---'); 
     try {
       const getDateRange = () => {
         const now = new Date();
@@ -616,18 +618,24 @@ const InPlantDashboard: React.FC = () => {
         limit: 100,
         report: true
       };
-  
+      console.log('DEBUG-EXPORT: Sending Export Payload:', payload); 
       const response = await httpsPost(
         'InplantDashboard/Table',
         payload,
         {},
         1
       );
-  
+      console.log('DEBUG-EXPORT: Initial API Response Status:', response?.statusCode); // This should now print
       if (response?.statusCode === 200 && response.data?.link) {
         const csvResponse = await fetch(response.data.link);
         const csvText = await csvResponse.text();
+           // 👇 DEBUG: Check the raw text content from S3
+           console.log('DEBUG-EXPORT-S3: Downloaded CSV Text:', csvText);
         
+           // Check if content is just headers (often only one line break)
+           const rowCount = csvText.trim().split('\n').length;
+           console.log(`DEBUG-EXPORT-S3: Row Count (including header): ${rowCount}`);
+           
         const workbook = XLSX.read(csvText, { type: 'string' });
         
         const worksheetName = workbook.SheetNames[0];
@@ -665,6 +673,7 @@ const InPlantDashboard: React.FC = () => {
       console.error('Error exporting data:', error);
       showMessage('Error exporting data', 'error');
     }
+    console.log('DEBUG-EXPORT: --- FINISHED handleExport ---'); 
   };
   
 
