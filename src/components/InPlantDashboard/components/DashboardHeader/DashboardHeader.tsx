@@ -150,6 +150,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
       };
       
       const searchField = searchFieldMap[searchType];
+
       
       const payload: any = {
         dateRange: {
@@ -188,6 +189,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
       if (response?.statusCode === 200) {
         onSearch(`${searchType}:${searchValue.trim()}`);
         if (onSearchResults) {
+          console.log(`DEBUG: Search Success for ${searchType}. Passing ${response.data.data?.length || 0} results to parent.`);
           onSearchResults(response.data.data || []);
         }
         setShowSuggestions(false);
@@ -259,6 +261,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
       };
       
       const searchField = searchFieldMap[searchType];
+     
       
       const payload: any = {
         dateRange: {
@@ -296,6 +299,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
       if (response?.statusCode === 200) {
         onSearch(`${searchType}:${suggestion.trim()}`);
         if (onSearchResults) {
+          console.log(`DEBUG: Suggestion Success for ${searchType}. Passing ${response.data.data?.length || 0} results to parent.`);
           onSearchResults(response.data.data || []);
         }
       } else {
@@ -410,6 +414,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   
 
   const handleExportClick = async () => {
+    console.log('DEBUG-HEADER: Export CLICK EVENT RECEIVED.'); 
     try {
       setIsExporting(true);
       await onExport();
@@ -431,10 +436,10 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   }, [dateRange]);
 
   const quickFilters = [
-    { key: 'all', label: 'All', count: 23 },
-    { key: 'active', label: 'Active', count: 18 },
-    { key: 'delayed', label: 'Delayed', count: 5 },
-    { key: 'gate-out', label: 'Gate Out', count: 142 }
+    { key: 'all', label: 'All'},
+    { key: 'active', label: 'Active'},
+    { key: 'delayed', label: 'Delayed' },
+    { key: 'gate-out', label: 'Gate Out' }
   ];
 
   const dateRangeOptions = [
@@ -556,6 +561,21 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                   value={searchValue}
                   onChange={handleInputChange}
                   onKeyPress={handleKeyPress}
+                  onKeyDown={(e) => {
+                    // Allow all control keys (e.g., Backspace, Delete, Arrows, Tab, F-keys)
+                    // Also explicitly allow Enter key
+                    if (e.key.length > 1 && e.key.toLowerCase() !== 'enter') {
+                      return;
+                    }
+                    
+                    // Define allowed keys: letters, numbers, space, and hyphen
+                    const isAllowed = /^[a-zA-Z0-9\s-]$/.test(e.key);
+                
+                    // If the key is a single character and it is NOT allowed, prevent default action.
+                    if (e.key.length === 1 && !isAllowed) {
+                      e.preventDefault();
+                    }
+                  }}
                   // className="inputSearch"
                   className={`inputSearch ${UPPERCASE_SEARCH_TYPES.includes(searchType) ? 'uppercase-input' : ''}`}
                   onFocus={() => searchSuggestions.length > 0 && setShowSuggestions(true)}
@@ -589,7 +609,12 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
               </button>
 
               <button 
-                onClick={handleExportClick} 
+                // onClick={handleExportClick} 
+                onClick={(e) => { 
+                  console.log("DIAGNOSTIC: Button click inline test.");
+                  // Call the original function immediately after the log
+                  handleExportClick(); // You may need to adjust the signature for this to work perfectly.
+                }}
                 className={`action-btn ${isExporting ? 'exporting' : ''}`}
                 disabled={isExporting}
               >
@@ -611,7 +636,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                   className={`filter-chip ${filters.quickFilter === filter.key ? 'active' : ''}`}
                 >
                   <span>{filter.label}</span>
-                  <span className="filter-count">{filter.count}</span>
+                  {/* <span className="filter-count">{filter.count}</span> */}
                 </button>
               ))}
             </div>
