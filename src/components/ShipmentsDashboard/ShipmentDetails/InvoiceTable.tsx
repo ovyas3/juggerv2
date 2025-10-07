@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import dayjs from "dayjs";
 import {
   Box,
-  
   Table,
   TableBody,
   TableCell,
@@ -24,7 +23,8 @@ import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import styles from "./PickupTab.module.css";
-import CustomDateTimePicker from "@/components/UI/CustomDateTimePicker/CustomDateTimePicker";
+// Assuming CustomDateTimePicker is a defined component
+import CustomDateTimePicker from "@/components/UI/CustomDateTimePicker/CustomDateTimePicker"; 
 
 interface InvoiceTableProps {
   groupedInvoices: any[];
@@ -42,6 +42,7 @@ interface InvoiceTableProps {
   onRemoveRow: (groupIndex: number, ciIndex: number) => void;
   isTechnova: boolean;
   isBMWIL: boolean;
+  isJSPL: boolean;
   isEmami: boolean; 
   shipmentData: any; 
 }
@@ -49,7 +50,8 @@ interface InvoiceTableProps {
 const formatDateTime = (dateString?: string | null): string => {
   if (!dateString) return "DD MMM YYYY, hh:mm";
   try {
-    return dayjs(dateString).format("DD MMM YYYY, hh:mm");
+    // dayjs will handle various date formats, including ISO strings (which is what your API returns)
+    return dayjs(dateString).format("DD MMM YYYY, hh:mm"); 
   } catch (e) {
     return "N/A";
   }
@@ -81,6 +83,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
   isTechnova,
   isEmami,
   isBMWIL,
+  isJSPL,
   shipmentData = {},
 }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -129,7 +132,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
               sx={{
                 fontWeight: "bold",
                 color: "#09337e",
-                width: "180px", // Sufficient width for Invoice Number
+                width: "180px", 
                 textAlign: "center",
                 backgroundColor: "#F5F5F5",
               }}
@@ -140,7 +143,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
               sx={{
                 fontWeight: "bold",
                 color: "#09337e",
-                width: "120px", // Sufficient width for Value
+                width: "120px", 
                 textAlign: "center",
                 backgroundColor: "#F5F5F5",
               }}
@@ -151,7 +154,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
               sx={{
                 fontWeight: "bold",
                 color: "#09337e",
-                width: "50px", // Reduced width for Packages (two digits)
+                width: "50px", 
                 textAlign: "center",
                 backgroundColor: "#F5F5F5",
               }}
@@ -162,23 +165,23 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
               sx={{
                 fontWeight: "bold",
                 color: "#09337e",
-                width: "130px", // Adjusted width
+                width: "130px", 
                 textAlign: "center",
                 backgroundColor: "#F5F5F5",
               }}
             >
-              Gross Wt. ({shipmentData.uom})
+              Gross Wt. ({shipmentData.uom || 'MT'})
             </TableCell>
             <TableCell
               sx={{
                 fontWeight: "bold",
                 color: "#09337e",
-                width: "130px", // Adjusted width
+                width: "130px", 
                 textAlign: "center",
                 backgroundColor: "#F5F5F5",
               }}
             >
-              Net Wt. ({shipmentData.uom})
+              Net Wt. ({shipmentData.uom || 'MT'})
             </TableCell>
             
             {isTechnova ? (
@@ -187,7 +190,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
                   sx={{
                     fontWeight: "bold",
                     color: "#09337e",
-                    width: "130px", // Adjusted width
+                    width: "130px", 
                     textAlign: "center",
                     backgroundColor: "#F5F5F5",
                   }}
@@ -212,18 +215,18 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
                   sx={{
                     fontWeight: "bold",
                     color: "#09337e",
-                    width: "130px", // Adjusted width
+                    width: "130px", 
                     textAlign: "center",
                     backgroundColor: "#F5F5F5",
                   }}
                 >
-                  Cons. Wt.({shipmentData.uom})
+                  Cons. Wt.({shipmentData.uom || 'MT'})
                 </TableCell>
                 <TableCell
                   sx={{
                     fontWeight: "bold",
                     color: "#09337e",
-                    width: "130px", // Adjusted width
+                    width: "130px", 
                     textAlign: "center",
                     backgroundColor: "#F5F5F5",
                   }}
@@ -239,7 +242,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
                   fontWeight: "bold",
                   color: "#09337e",
                   backgroundColor: "#F5F5F5",
-                  width: "80px", // Explicit width for Actions
+                  width: "80px", 
                   textAlign: "center",
                 }}
               >
@@ -259,41 +262,67 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
         <TableBody>
           {groupedInvoices.map((invGroup: any, groupIndex: number) => {
             const invoicesToRender =
-              (isEditing // Use the editable data if in edit mode
+              (isEditing 
                 ? editableGoodsInfoForPickup[groupIndex]?.commercialInvoices
                 : invGroup.commercial_invoices) ?? [];
 
+            // Determine the source of the invoice info object
             const currentGoodsInfo = isEditing
               ? editableGoodsInfoForPickup[groupIndex] || {}
               : invGroup;
+            
+            // Define the data to be used for display (outside of edit mode)
+            // It prioritizes the editable state if editing is true, otherwise uses the original API object structure.
+            const displayEwaybillNumber = isEditing 
+                ? currentGoodsInfo.ewaybillNumber 
+                : invGroup.ewaybill?.number;
+                
+            const displayEwaybillExpiry = isEditing 
+                ? currentGoodsInfo.ewaybillExpiryDateTime 
+                : invGroup.ewaybill?.expire_date;
+                
+            const displayInvoiceTime = isEditing 
+                ? currentGoodsInfo.invoiceDateTime 
+                : shipmentData.pickup_date; // Angular defaults to shipment pickup date
 
-            return ( // Apply verticalAlign: 'top' to all cells in the row
+            return ( 
               <TableRow key={invGroup.delivery_id?._id || groupIndex} sx={{ '& > td': { verticalAlign: 'top' } }}>
                 <TableCell sx={{ padding: '10px 2px 0px 8px ' }}>
-                  <Box sx={{ display: "flex", alignItems: "flex-start" }}>
-                    <span className={styles.deliveryIcon}>
-                      D{groupIndex + 1}
-                    </span>
-                    <Box>
-                      <Typography
-                        variant="body1"
-                        className={styles.locationName}
-                        sx={{ fontWeight: 500, fontSize: "12px" }}
-                      >
-                        {invGroup.delivery_id?.location?.name}
-                      </Typography>
-                      <Typography
-                        variant="body2"
-                        className={styles.locationName}
-                        color="text.secondary"
-                        sx={{ fontSize: "12px" }}
-                      >
-                        {invGroup.delivery_id?.location?.area}
-                      </Typography>
-                    </Box>
+                <Box sx={{ display: "flex", alignItems: "flex-start", gap: '8px' }}>
+                  <Box 
+                      sx={{ 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          height: 24, 
+                          flexShrink: 0, 
+                          alignSelf: 'flex-start' 
+                      }}
+                  >
+                      <span className={styles.deliveryIcon}>
+                          D{groupIndex + 1}
+                      </span>
                   </Box>
+                  
+                  <Box>
+                      <Typography
+                          variant="body1"
+                          className={styles.locationName}
+                          sx={{ fontWeight: 500, fontSize: "12px" }}
+                      >
+                          {invGroup.delivery_id?.location?.name}
+                      </Typography>
+                      <Typography
+                          variant="body2"
+                          className={styles.locationName}
+                          color="text.secondary"
+                          sx={{ fontSize: "12px" }}
+                      >
+                          {invGroup.delivery_id?.location?.area}
+                      </Typography>
+                  </Box>
+              </Box>
 
-                  {(isTechnova || isEmami || isBMWIL) &&
+                  {(isTechnova || isEmami || isBMWIL || isJSPL) &&
                     (() => {
                       const TotalRow = ({ label, value }: { label: string; value: React.ReactNode }) => (
                         <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -317,16 +346,16 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
                             Totals
                           </Typography>
                           <TotalRow
-                            label="Gross Wt"
-                            value={`${(invGroup.total_gross_weight ?? 0).toFixed(2)} ${shipmentData.uom}`}
+                            label="Gross Wt."
+                            value={`${(invGroup.total_gross_weight ?? 0).toFixed(2)} ${shipmentData.uom || 'MT'}`}
                           />
                           <TotalRow
-                            label="Net Wt"
-                            value={`${(invGroup.total_net_weight ?? 0).toFixed(2)} ${shipmentData.uom}`}
+                            label="Net Wt."
+                            value={`${(invGroup.total_net_weight ?? 0).toFixed(2)} ${shipmentData.uom || 'MT'}`}
                           />
                           <TotalRow
-                            label="Cons. Wt"
-                            value={`${(invGroup.total_considered_weight ?? 0).toFixed(2)} ${shipmentData.uom}`}
+                            label="Cons. Wt."
+                            value={`${(invGroup.total_considered_weight ?? 0).toFixed(2)} ${shipmentData.uom || 'MT'}`}
                           />
                           <TotalRow
                             label="Packages"
@@ -353,6 +382,80 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
                       onGoodsInfoChange(groupIndex, "comments", e.target.value)
                     }
                   />
+                   {/* START: Invoice Time Field */}
+                   {isBMWIL && (
+                    <Box sx={{ mt: 1, marginBottom: '8px' }}>
+                        {isEditing ? (
+                            <CustomDateTimePicker
+                                label="Invoice Time"
+                                value={
+                                currentGoodsInfo.invoiceDateTime
+                                    ? new Date(currentGoodsInfo.invoiceDateTime)
+                                    : null
+                                }
+                                onChange={(newDate: Date | null) =>
+                                    onGoodsInfoChange(
+                                        groupIndex,
+                                        "invoiceDateTime", 
+                                        newDate
+                                    )
+                                }
+                            />
+                        ) : (
+                            <Box>
+                                <Box
+                                    sx={{
+                                        mt: 1,
+                                        pl: 1,
+                                        border: "1px solid #e0e0e0",
+                                        borderRadius: "4px",
+                                    }}
+                                >
+                                    <Typography variant="caption" color="text.secondary">
+                                      Invoice Time
+                                    </Typography>
+                                    <Typography variant="body2" color="text.secondary">
+                                        {formatDateTime(displayInvoiceTime)}
+                                    </Typography>
+                                </Box>
+                            </Box>
+                        )}
+                    </Box>
+                   )}
+                  {/* END: Invoice Time Field */}
+
+                  <Box sx={{ mt: 1, marginBottom: '8px' }}>
+                    {isEditing ? (
+                      <TextField
+                        label="E-waybill Number"
+                        size="small"
+                        fullWidth
+                        variant="outlined"
+                        sx={{ ...textFieldStyles }}
+                        value={currentGoodsInfo.ewaybillNumber || ""}
+                        onChange={(e) =>
+                          onGoodsInfoChange(groupIndex, "ewaybillNumber", e.target.value)
+                        }
+                      />
+                    ) : (
+                      <Box
+                        sx={{
+                          mt: 1,
+                          pl: 1,
+                          border: "1px solid #e0e0e0",
+                          borderRadius: "4px",
+                        }}
+                      >
+                        <Typography variant="caption" color="text.secondary">
+                          E-waybill Number
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          {/* FIX: Use displayEwaybillNumber which checks both editable and original API object */}
+                          {displayEwaybillNumber || "—"}
+                        </Typography>
+                      </Box>
+                    )}
+                  </Box>
                   <Box sx={{ mt: 1, marginBottom: '8px' }}>
                     {isEditing ? (
                       <CustomDateTimePicker
@@ -383,16 +486,15 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
                           E-waybill Expiry
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
-                          {formatDateTime(
-                            currentGoodsInfo.ewaybillExpiryDateTime
-                          )}
+                          {/* FIX: Use displayEwaybillExpiry which checks both editable and original API object */}
+                          {formatDateTime(displayEwaybillExpiry)}
                         </Typography>
                       </Box>
                     )}
                   </Box>
                 </TableCell>
 
-                <TableCell sx={{ padding: '6px 2px' }}> {/* Added verticalAlign: 'top' to all data cells */}
+                <TableCell sx={{ padding: '6px 2px' }}> 
                   {invoicesToRender.map((ci: any, ciIndex: number) => (
                     <Box key={ci._id || `num-${ciIndex}`} sx={{minHeight: "40px", display: "flex", alignItems: "center", mb: ciIndex === invoicesToRender.length - 1 ? 0 : 2}}>
                       {isEditing ? (
@@ -403,13 +505,16 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
                           sx={{ ...textFieldStyles, width: "100%" }}
                           disabled={!isEditing}
                           value={ci.num ?? ""}
-                          onChange={(e) =>
+                          onChange={(e) =>{
+                            const value = e.target.value.replace(/[^a-zA-Z0-9]/g, "");
                             onInvoiceChange(
                               groupIndex,
                               ciIndex,
                               "num",
-                              e.target.value
+                              value
                             )
+                          }
+                            
                           }
                           inputProps={{ style: { textAlign: 'center' } }}
                         />
@@ -433,12 +538,14 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
                           inputProps={{ min: 0, style: { textAlign: 'center' } }}
                           value={ci.value ?? ""}
                           onChange={(e) => {
-                            const value = e.target.value.replace(/[^0-9]/g, "");
+                            const value = e.target.value.replace(/^(?!\d*\.?\d*$).*/g, "");
                             onInvoiceChange(groupIndex, ciIndex, "value", value);
                           }}
                         />
                       ) : (
-                        <Typography variant="body2" sx={{ width: "100%", fontWeight: '590', textAlign: 'center' }}>{ci.value ?? "0.00"}</Typography>
+                        <Typography variant="body2" sx={{ width: "100%", fontWeight: '590', textAlign: 'center' }}>
+                          {Number(ci.value || 0).toFixed(2)}
+                        </Typography>
                       )}
                     </Box>
                   ))}
@@ -456,13 +563,17 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
                           type="number"
                           inputProps={{ min: 0, style: { textAlign: 'center' } }}
                           value={ci.nop ?? ""}
-                          onChange={(e) =>
+                          onChange={(e) =>{
+                            const value = e.target.value.replace(/^(?!\d*\.?\d*$).*/g, "");
                             onInvoiceChange(
+                              
                               groupIndex,
                               ciIndex,
                               "nop",
-                              e.target.value
+                              value
                             )
+                          }
+                            
                           }
                         />
                       ) : (
@@ -484,17 +595,22 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
                           type="number"
                           inputProps={{ min: 0, style: { textAlign: 'center' } }}
                           value={ci.gross_weight ?? ""}
-                          onChange={(e) =>
+                          onChange={(e) =>{
+                            const value = e.target.value.replace(/^(?!\d*\.?\d*$).*/g, "");
                             onInvoiceChange(
                               groupIndex,
                               ciIndex,
                               "gross_weight",
-                              e.target.value
+                              value 
                             )
                           }
+                          }
+                            
                         />
                       ) : (
-                        <Typography variant="body2" sx={{ width: "100%", fontWeight: '590', textAlign: 'center' }}>{ci.gross_weight ?? "0.00"}</Typography>
+                        <Typography variant="body2" sx={{ width: "100%", fontWeight: '590', textAlign: 'center' }}>
+                          {Number(ci.gross_weight || 0).toFixed(2)}
+                        </Typography>
                       )}
                     </Box>
                   ))}
@@ -512,17 +628,21 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
                           type="number"
                           inputProps={{ min: 0, style: { textAlign: 'center' } }}
                           value={ci.net_weight ?? ""}
-                          onChange={(e) =>
+                          onChange={(e) =>{
+                            const value = e.target.value.replace(/^(?!\d*\.?\d*$).*/g, "");
                             onInvoiceChange(
                               groupIndex,
                               ciIndex,
                               "net_weight",
-                              e.target.value
+                              value
                             )
+                          } 
                           }
                         />
                       ) : (
-                        <Typography variant="body2" sx={{ width: "100%", fontWeight: '590', textAlign: 'center' }}>{ci.net_weight ?? "0.00"}</Typography>
+                        <Typography variant="body2" sx={{ width: "100%", fontWeight: '590', textAlign: 'center' }}>
+                          {Number(ci.net_weight || 0).toFixed(2)}
+                        </Typography>
                       )}
                     </Box>
                   ))}
@@ -607,17 +727,21 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
                               type="number"
                               inputProps={{ min: 0, style: { textAlign: 'center' } }}
                               value={ci.considered_weight ?? ""}
-                              onChange={(e) =>
+                              onChange={(e) =>{
+                                const value = e.target.value.replace(/^(?!\d*\.?\d*$).*/g, "");
                                 onInvoiceChange(
                                   groupIndex,
                                   ciIndex,
                                   "considered_weight",
-                                  e.target.value
+                                  value
                                 )
+                              }
                               }
                             />
                           ) : (
-                            <Typography variant="body2" sx={{ width: "100%", fontWeight: '590', textAlign: 'center' }}>{ci.considered_weight ?? "0.00"}</Typography>
+                            <Typography variant="body2" sx={{ width: "100%", fontWeight: '590', textAlign: 'center' }}>
+                              {Number(ci.considered_weight || 0).toFixed(2)}
+                            </Typography>
                           )}
                         </Box>
                       ))}
@@ -633,13 +757,15 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
                               sx={{ ...textFieldStyles, width: "100%" }}
                               disabled={!isEditing}
                               value={ci.others?.delivery_no || ""}
-                              onChange={(e) =>
+                              onChange={(e) =>{
+                                const value = e.target.value.replace(/[^a-zA-Z0-9]/g, "");
                                 onInvoiceChange(
                                   groupIndex,
                                   ciIndex,
                                   "delivery_no",
-                                  e.target.value
+                                  value
                                 )
+                              } 
                               }
                               inputProps={{ style: { textAlign: 'center' } }}
                             />
@@ -670,7 +796,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
                               size="small"
                               onClick={() => onAddRow(groupIndex)}
                             >
-                              <AddCircleOutlineIcon sx={{ color: "#20104d"}}/>
+                              <AddCircleOutlineIcon sx={{ color: "#20104d" }} />
                             </IconButton>
                           )}
                         </Box>

@@ -18,8 +18,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   background-color: #0b7d2e;
   color: white;
@@ -48,7 +48,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 48px;
+  width: 24px;
   height: 24px;
   border-radius: 50%;
   background-color: #d8511f; /* Orange color from Delivery Tab */
@@ -137,8 +137,7 @@
 .subTab.Mui-selected {
   background-color: #e0e0e0 !important; /* White active background */
   font-weight: bold !important;
-  color: #20104d
- !important;
+  color: #20104d !important;
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 

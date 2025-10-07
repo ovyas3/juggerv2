@@ -1,6 +1,7 @@
 import React, { useMemo } from "react";
 import { Grid, Box, Typography, Link, Tooltip } from "@mui/material";
 import Image from "next/image";
+import styles from "./PickupTab.module.css";
 
 // --- Helper to format duration ---
 const formatDuration = (seconds?: number): string => {
@@ -8,7 +9,7 @@ const formatDuration = (seconds?: number): string => {
   const d = Math.floor(seconds / (3600 * 24));
   const h = Math.floor((seconds % (3600 * 24)) / 3600);
   const m = Math.floor((seconds % 3600) / 60);
-  return `${d > 0 ? `${d}d ` : ""}${h > 0 ? `${h}h ` : ""}${m}m`;
+  return `${d > 0 ? `${d}days ` : ""}${h > 0 ? `${h}hours ` : ""}${m}minutes`;
 };
 
 // --- Helper to format distance ---
@@ -68,8 +69,15 @@ const ShipmentDetailsTab = ({
   isTata: boolean;
 }) => {
 
+
   const { singleSaleOrder, deliveryOrders } = useMemo(() => {
-    const hasDeliveryOrders = shipmentData.order?.delivery_locations?.some(
+    if (!shipmentData || !shipmentData.order) {
+      return { 
+        singleSaleOrder: null, 
+        deliveryOrders: [] 
+      };
+    }
+    const hasDeliveryOrders = shipmentData.order.delivery_locations?.some(
       (d: any) => d.orders?.length > 0
     );
     const result: {
@@ -79,7 +87,6 @@ const ShipmentDetailsTab = ({
       singleSaleOrder: null,
       deliveryOrders: [],
     };
-
     if (isTata) {
       if (hasDeliveryOrders) {
         const orderDeliveryMap = new Map<string, any[]>();
@@ -128,7 +135,7 @@ const ShipmentDetailsTab = ({
       }
     }
     return result;
-  }, [isTata, shipmentData]);
+  }, [isTata, shipmentData]); // Ensure shipmentData is the dependency
 
   if (!shipmentData) {
     return <Typography>Loading details...</Typography>;
@@ -236,8 +243,16 @@ const ShipmentDetailsTab = ({
                   variant="body2"
                   sx={{ display: "flex", alignItems: "center", mb: 0.5 }}
                 >
-                  <Box component="span" sx={getCircleStyles(`P${index + 1}`)}>
-                    P{index + 1}
+                 <Box 
+                  sx={{ 
+                    display: 'flex', 
+                    paddingRight: '10px',
+                    alignItems: 'flex-start', 
+                    height: 24, // Enforce height here too
+                    flexShrink: 0 // Prevent the icon container from shrinking
+                  }}
+                >
+                  <span className={styles.pickupIcon}>P{index + 1}</span>
                   </Box>
                   <strong>{p.location?.name || "N/A"}</strong>
                 </Typography>
@@ -273,8 +288,15 @@ const ShipmentDetailsTab = ({
                   variant="body2"
                   sx={{ display: "flex", alignItems: "center", mb: 0.5 }}
                 >
-                  <Box component="span" sx={getCircleStyles(`D${index + 1}`)}>
-                    D{index + 1}
+                  <Box 
+                    sx={{ 
+                      display: 'flex', 
+                      alignItems: 'flex-start', 
+                      height: 24, // Enforce height here too
+                      flexShrink: 0 // Prevent the icon container from shrinking
+                    }}
+                  >
+                    <span className={styles.deliveryIcon}>D{index + 1}</span>
                   </Box>
                   <strong>{d.location?.name || "N/A"}</strong>
                 </Typography>

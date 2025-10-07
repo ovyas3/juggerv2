@@ -148,8 +148,7 @@ const BulkEpodUpload: React.FC<BulkEpodUploadProps> = ({
             onDrop={onDrop}
             onClick={() => fileInputRef.current?.click()}
           >
-            {/* <Upload size={24} style={{ color: '#20104d
-', marginBottom: '8px' }} /> */}
+            {/* <Upload size={24} style={{ color: '#20104d', marginBottom: '8px' }} /> */}
             <Typography variant="body1" sx={{ mt: 1 }}>
               Drag & drop your CSV file here
             </Typography>

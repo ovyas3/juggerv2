@@ -160,11 +160,9 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background-color: 
-#20104d;
+  background-color: #20104d;
   color: #ffffff;
-  border-color: 
-#20104d;
+  border-color: #20104d;
   border: none;
   cursor: pointer;
 }
@@ -552,12 +550,7 @@
   font-size: 14px;
   cursor: pointer;
   font-weight: bold;
-  /* background-color: 
-#20104d; */
-  background-color: 
-#20104d; 
-  /* background-color: #5B3799;  */
-
+  background-color: #20104d;
   color: #ffffff;
   border: none;
   white-space: nowrap; /* Prevents text from wrapping */
@@ -611,8 +604,7 @@
   font-size: 14px;
   cursor: pointer;
   font-weight: bold;
-  background-color: 
-#20104d;
+  background-color: #20104d;
   color: #ffffff;
   border: none;
   height: 38px; /* Match input height */
@@ -635,11 +627,9 @@
   margin-bottom: 1px;
   margin-right: 10px;
   font-weight: bold;
-  background-color: 
-#20104d;
+  background-color: #20104d;
   color: #ffffff;
-  border-color: 
-#20104d;
+  border-color: #20104d;
   border: none;
 }
 
@@ -665,11 +655,9 @@
   margin-bottom: 1px;
   margin-right: 10px;
   font-weight: bold;
-  background-color: 
-#20104d;
+  background-color: #20104d;
   color: #ffffff;
-  border-color: 
-#20104d;
+  border-color: #20104d;
   border: none;
 }
 
@@ -718,8 +706,7 @@
   font-size: 20px;
   font-weight: 600;
   border-bottom: 1px solid #e5e5e5;
-  background-color: 
-#20104d;
+  background-color: #20104d;
   color: #ffffff;
 }
 /* Close button */
@@ -3243,8 +3230,7 @@ select.didFloatingSelect::-ms-expand {
 .paginationButton {
   width: 32px !important; /* Smaller button */
   height: 32px !important;
-  background: 
-#20104d !important;
+  background: #20104d !important;
   border: none !important;
   border-radius: 8px !important;
   color: #fff !important;
@@ -3713,22 +3699,19 @@ select.didFloatingSelect::-ms-expand {
 }
 
 .actionMenuItem:hover {
-    border: 1px solid #20104d
-;
+    border: 1px solid #20104d;
     box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
     outline: none;
 }
 
 .actionMenuItem:focus {
-  border: 1px solid #20104d
-;
+  border: 1px solid #20104d;
   box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
   outline: none;
 }
 
 .actionMenuItem:active {
-  border: 1px solid #20104d
-;
+  border: 1px solid #20104d;
   box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
   outline: none;
 }
@@ -3774,8 +3757,7 @@ select.didFloatingSelect::-ms-expand {
   transform: translateY(-50%);
   width: 14px;
   height: 14px;
-  color: 
-#20104d;
+  color: #20104d;
 }
 .actionsMenuButton {
   display: flex;
@@ -3785,8 +3767,7 @@ select.didFloatingSelect::-ms-expand {
   width: 36px;
   border: 2px solid #e3e4fe;
   border-radius: 8px;
-  background: 
-#20104d;
+  background: #20104d;
   transition: all 0.2s ease;
   cursor: pointer;
   box-sizing: border-box;
@@ -3828,22 +3809,20 @@ select.didFloatingSelect::-ms-expand {
 
 .actionIcon:hover {
   /* background: #e3e4fe; */
-  color: #271260;
+  color: #20104d;
 }
 
 .actionsMenuButton:hover .actionIcon,
 .actionsMenuButton:focus .actionIcon,
 .actionsMenuButton:active .actionIcon {
-  color: 
-#20104d;
+  color: #20104d;
 }
 .actionsMenuButton[aria-expanded="true"]:hover .actionIcon {
   color: #20104d;
 }
 /* If your dropdown library adds data-state attribute when open */
 .actionsMenuButton[data-state="open"] .actionIcon {
-  color: 
-#20104d;
+  color: #20104d;
 }
 
 /* Alternative: target when button has aria-expanded=true */
@@ -3957,8 +3936,7 @@ select.didFloatingSelect::-ms-expand {
     /* padding: 8px 12px; */
     cursor: pointer;
     font-weight: bold;
-    background-color: 
-#20104d;
+    background-color: #20104d;
     color: #ffffff;
     border: none;
     white-space: nowrap;
@@ -4220,8 +4198,7 @@ select.didFloatingSelect::-ms-expand {
 }
 
 .searchIcon:hover {
-  color: #271260
-;
+  color: #20104d;
 }
 
 .inputSearch {
@@ -4237,8 +4214,7 @@ select.didFloatingSelect::-ms-expand {
   /* border-left: none; */
   width: 100%;
   flex: 1;
-  border: 1.4px solid 
-#20104d;
+  border: 1.4px solid #20104d;
 }
 
 .perSinSelect {
@@ -4255,33 +4231,25 @@ select.didFloatingSelect::-ms-expand {
   font-weight: 500;
   box-shadow: none;
   transition: border 0.2s;
-  background-color: 
-#20104d;
+  background-color: #20104d;
   color: #fff;
-  border: 2px solid 
-#20104d;
+  border: 2px solid #20104d;
   padding: 0px 10px;
 }
 
 .perSinSelect:hover {
-  border-color: 
-#20104d;
-  background-color: #271260
-;
+  border-color: #20104d;
+  background-color: #20104d;
 }
 
 .perSinSelect:active {
-  border-color: 
-#20104d !important;
-  background-color: 
-#20104d !important;
+  border-color: #20104d !important;
+  background-color: #20104d !important;
 }
 
 .perSinSelect:focus {
-  border-color: 
-#20104d !important;
-  background-color: 
-#20104d !important;
+  border-color: #20104d !important;
+  background-color: #20104d !important;
 }
 
 .filterGroup {
@@ -4314,15 +4282,12 @@ select.didFloatingSelect::-ms-expand {
 }
 
 .checkboxLabel input[type="checkbox"]:hover {
-  border-color: #20104d
-;
+  border-color: #20104d;
 }
 
 .checkboxLabel input[type="checkbox"]:checked {
-  background-color:#20104d
-;
-  border-color: 
-#20104d;
+  background-color: #20104d;
+  border-color: #20104d;
 }
 
 .checkboxLabel input[type="checkbox"]:checked::after {
@@ -4338,8 +4303,7 @@ select.didFloatingSelect::-ms-expand {
 
 /* Focus state for accessibility */
 .checkboxLabel input[type="checkbox"]:focus {
-  outline: 2px solid #20104d
-;
+  outline: 2px solid #20104d;
   outline-offset: 2px;
 }
 
@@ -4348,8 +4312,7 @@ select.didFloatingSelect::-ms-expand {
 }
 
 .helpIcon {
-  color: 
-#20104d; /* or any color that matches your design */
+  color: #20104d; /* or any color that matches your design */
   cursor: pointer;
 }
 
@@ -4465,8 +4428,7 @@ select.didFloatingSelect::-ms-expand {
 }
 
 .TableSearchIcon:hover {
-  color: 
-#20104d;
+  color: #20104d;
 }
 
 .actionSearchContainer {

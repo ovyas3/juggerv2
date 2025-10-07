@@ -25,14 +25,12 @@
 
 .header {
   width: 100%;
-  border: 2px solid #20104d
-;
+  border: 2px solid #20104d;
   padding: 0 10px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #20104d
-;
+  background-color: #20104d;
   margin: 0 auto;
   border-radius: 1px;
   color: #fff;

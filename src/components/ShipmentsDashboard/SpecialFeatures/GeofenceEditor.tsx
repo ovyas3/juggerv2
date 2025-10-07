@@ -4,7 +4,7 @@ import {
   Dialog, 
   DialogTitle, 
   DialogContent, 
-  DialogActions, 
+  DialogActions, // Imported but unused for a cleaner layout
   Button, 
   TextField, 
   MenuItem, 
@@ -286,7 +286,7 @@ const GeofenceEditor: React.FC<GeofenceEditorProps> = ({
           position: { lat, lng },
           map: mapInstance.current,
           icon: {
-            url: '/assets/Drop.svg',
+            url: '/assets/drop_icon.svg',
             scaledSize: new window.google.maps.Size(30, 30)
           },
           label: {
@@ -724,213 +724,250 @@ const GeofenceEditor: React.FC<GeofenceEditorProps> = ({
   };
   
   return (
-    <div className={styles.dialogMain}>
-      <div className={styles.header}>
-        <div className={styles.label}>Update Delivery Location</div>
-        <button className={styles.deleteIconBtn} onClick={onClose}>
-          ×
-        </button>
-      </div>
-      <div className={styles.section}>
-        {/* Left side - Map */}
-        <div className={styles.left} ref={mapRef}>
-          {loading && (
-            <div style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: 'rgba(255, 255, 255, 0.7)',
-              zIndex: 1000
-            }}>
-              <CircularProgress />
+    // 🛑 START: Wrap in MUI Dialog to ensure modal functionality (Z-index/backdrop)
+    <Dialog 
+        open={open} 
+        onClose={onClose} 
+        maxWidth="lg" 
+        fullWidth
+        // 1. Apply sizing to the Paper component to override MUI defaults
+        PaperProps={{
+            style: { 
+                width: '80%', 
+                maxWidth: '950px', 
+                height: '70vh', 
+                maxHeight: '600px', 
+                padding: 0 
+            }
+        }}
+    >
+        {/* 2. TITLE: Use DialogTitle and apply custom header styles */}
+        <DialogTitle sx={{ padding: 0 , height: '60px', }}>
+            <div className={styles.header}>
+                <div className={styles.label}>Update Delivery Location for {shipment.sin}</div>
+                <IconButton 
+                    aria-label="close" 
+                    onClick={onClose} 
+                    className={styles.deleteIconBtn}
+                    sx={{ position: 'absolute', right: 8, top: 8 }}
+                >
+                    <CloseIcon />
+                </IconButton>
             </div>
-          )}
-        </div>
-        {/* Right side - Controls */}
-        <div className={styles.right}>
-          {/* Delivery Location Dropdown */}
-          <div className={styles.formGroup}>
-            <FormControl fullWidth size="small">
-              <InputLabel id="delivery-location-label">Select Delivery Location</InputLabel>
-              <Select
-                labelId="delivery-location-label"
-                value={selectedDelivery?._id || ''}
-                onChange={(e) => {
-                  const delivery = shipment.to.find(d => d._id === e.target.value);
-                  if (delivery) {
-                    handleDeliverySelect(delivery);
-                  }
-                }}
-                label="Select Delivery Location"
-              >
-                {shipment.to.map((delivery, index) => (
-                  <MenuItem key={delivery._id} value={delivery._id}>
-                    {delivery.location.reference 
-                      ? `${delivery.location.reference} - ${delivery.location.name}`
-                      : delivery.location.name}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </div>
-          {/* Date Selection and Get Path Button */}
-          <div className={styles.formGroup} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <FormControl size="small" sx={{ minWidth: 150 }}>
-              <InputLabel id="date-select-label">Select a Date</InputLabel>
-              <Select
-                labelId="date-select-label"
-                value={selectedDate}
-                onChange={(e) => setSelectedDate(e.target.value)}
-                label="Select a Date"
-              >
-                {dateOptions.map((date) => (
-                  <MenuItem key={date} value={date}>
-                    {date}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-            <Button
-              variant="outlined"
-              onClick={handleGetPath}
-              sx={{
-                border: '1px solid #DFE3EB',
-                backgroundColor: '#FFFFFF',
-                color: '#42454E',
-                textTransform: 'none',
-                fontSize: '14px',
-                padding: '8px 12px',
-                '&:hover': {
-                  backgroundColor: '#F5F7FA',
-                  borderColor: '#DFE3EB'
-                }
-              }}
-              startIcon={
-                <Image
-                  src={GetPath}
-                  alt="Get Path" 
-                  style={{ width: '16px', height: '16px' }} 
-                />  
-              }
-            >
-              Get Path
-            </Button>
-          </div>
-          {/* Arrived and Finished Times */}
-          <div style={{
-            backgroundColor: '#F0F3F9',
-            padding: '16px',
-            borderRadius: '4px',
-            marginBottom: '20px',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '16px'
-          }}>
-            {/* Arrived At */}
-            <div style={{
-              display: 'flex',
-              alignItems: 'center'
-            }}>
-              <span style={{
-                width: '80px',
-                fontSize: '14px',
-                color: '#42454E'
-              }}>
-                Arrived at
-              </span>
-              <LocalizationProvider dateAdapter={AdapterDateFns}>
-                <DatePicker
-                  value={arrivedAt}
-                  onChange={(date) => setArrivedAt(date)}
-                />
-                <TimePicker
-                  value={arrivedTime ? new Date(`1970-01-01T${arrivedTime}`) : null}
-                  onChange={(time) => {
-                    if (time) {
-                      const hours = time.getHours();
-                      const minutes = time.getMinutes();
-                      const period = hours >= 12 ? 'PM' : 'AM';
-                      const displayHours = hours % 12 || 12;
-                      setArrivedTime(`${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`);
-                    } else {
-                      setArrivedTime('');
-                    }
-                  }}
-                />
-              </LocalizationProvider>
-            </div>
-            {/* Finished At */}
-            <div style={{
-              display: 'flex',
-              alignItems: 'center'
-            }}>
-              <span style={{
-                width: '80px',
-                fontSize: '14px',
-                color: '#42454E'
-              }}>
-                Finished at
-              </span>
-              <LocalizationProvider dateAdapter={AdapterDateFns}>
-                <DatePicker
-                  value={finishedAt}
-                  onChange={(date) => setFinishedAt(date)}
-                />
-                <TimePicker
-                  value={finishedTime ? new Date(`1970-01-01T${finishedTime}`) : null}
-                  onChange={(time) => {
-                    if (time) {
-                      const hours = time.getHours();
-                      const minutes = time.getMinutes();
-                      const period = hours >= 12 ? 'PM' : 'AM';
-                      const displayHours = hours % 12 || 12;
-                      setFinishedTime(`${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`);
-                    } else {
-                      setFinishedTime('');
-                    }
-                  }}
-                />
-              </LocalizationProvider>
-            </div>
-          </div>
-          {/* Location Details */}
-          <div className={styles.locationDetails}>
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-              <LocationOnIcon sx={{ color: '#2962FF', marginRight: '12px' }} />
-              <div>
-                <div className={styles.locationName}>
-                  {locality || 'Location not specified'}
+        </DialogTitle>
+
+        {/* 3. CONTENT: Use DialogContent to wrap the main section (map + controls) */}
+        {/* We use flexGrow and hidden overflow to manage the vertical space */}
+        <DialogContent sx={{ padding: 0, overflow: 'hidden', height: '100%' }}>
+            
+            <div className={styles.section} style={{ display: 'flex', height: '100%' }}>
+              
+              {/* Left side - Map */}
+              <div className={styles.left} ref={mapRef}>
+                {loading && (
+                  <div style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundColor: 'rgba(255, 255, 255, 0.7)',
+                    zIndex: 1000
+                  }}>
+                    <CircularProgress />
+                  </div>
+                )}
+              </div>
+              
+              {/* Right side - Controls */}
+              <div className={styles.right}>
+                {/* Delivery Location Dropdown */}
+                <div className={styles.formGroup}>
+                  <FormControl fullWidth size="small">
+                    <InputLabel id="delivery-location-label">Select Delivery Location</InputLabel>
+                    <Select
+                      labelId="delivery-location-label"
+                      value={selectedDelivery?._id || ''}
+                      onChange={(e) => {
+                        const delivery = shipment.to.find(d => d._id === e.target.value);
+                        if (delivery) {
+                          handleDeliverySelect(delivery);
+                        }
+                      }}
+                      label="Select Delivery Location"
+                    >
+                      {shipment.to.map((delivery, index) => (
+                        <MenuItem key={delivery._id} value={delivery._id}>
+                          {delivery.location.reference 
+                            ? `${delivery.location.reference} - ${delivery.location.name}`
+                            : delivery.location.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
                 </div>
-                <div className={styles.locationArea}>
-                  {areaDetails.area || 'Area not specified'}
+                {/* Date Selection and Get Path Button */}
+                <div className={styles.formGroup} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <FormControl size="small" sx={{ minWidth: 150 }}>
+                    <InputLabel id="date-select-label">Select a Date</InputLabel>
+                    <Select
+                      labelId="date-select-label"
+                      value={selectedDate}
+                      onChange={(e) => setSelectedDate(e.target.value)}
+                      label="Select a Date"
+                    >
+                      {dateOptions.map((date) => (
+                        <MenuItem key={date} value={date}>
+                          {date}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                  <Button
+                    variant="outlined"
+                    onClick={handleGetPath}
+                    sx={{
+                      border: '1px solid #DFE3EB',
+                      backgroundColor: '#FFFFFF',
+                      color: '#42454E',
+                      textTransform: 'none',
+                      fontSize: '14px',
+                      padding: '8px 12px',
+                      '&:hover': {
+                        backgroundColor: '#F5F7FA',
+                        borderColor: '#DFE3EB'
+                      }
+                    }}
+                    startIcon={
+                      <Image
+                        src={GetPath}
+                        alt="Get Path" 
+                        style={{ width: '16px', height: '16px' }} 
+                      />  
+                    }
+                  >
+                    Get Path
+                  </Button>
                 </div>
+                {/* Arrived and Finished Times */}
+                <div style={{
+                  backgroundColor: '#F0F3F9',
+                  padding: '16px',
+                  borderRadius: '4px',
+                  marginBottom: '20px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '16px'
+                }}>
+                  {/* Arrived At */}
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center'
+                  }}>
+                    <span style={{
+                      width: '80px',
+                      fontSize: '14px',
+                      color: '#42454E'
+                    }}>
+                      Arrived at
+                    </span>
+                    <LocalizationProvider dateAdapter={AdapterDateFns}>
+                      <DatePicker
+                        value={arrivedAt}
+                        onChange={(date) => setArrivedAt(date)}
+                        slotProps={{ textField: { size: 'small' } }}
+                      />
+                      <TimePicker
+                        value={arrivedTime ? new Date(`1970-01-01T${arrivedTime}`) : null}
+                        onChange={(time) => {
+                          if (time) {
+                            const hours = time.getHours();
+                            const minutes = time.getMinutes();
+                            const period = hours >= 12 ? 'PM' : 'AM';
+                            const displayHours = hours % 12 || 12;
+                            setArrivedTime(`${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`);
+                          } else {
+                            setArrivedTime('');
+                          }
+                        }}
+                        slotProps={{ textField: { size: 'small' } }}
+                      />
+                    </LocalizationProvider>
+                  </div>
+                  {/* Finished At */}
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center'
+                  }}>
+                    <span style={{
+                      width: '80px',
+                      fontSize: '14px',
+                      color: '#42454E'
+                    }}>
+                      Finished at
+                    </span>
+                    <LocalizationProvider dateAdapter={AdapterDateFns}>
+                      <DatePicker
+                        value={finishedAt}
+                        onChange={(date) => setFinishedAt(date)}
+                        slotProps={{ textField: { size: 'small' } }}
+                      />
+                      <TimePicker
+                        value={finishedTime ? new Date(`1970-01-01T${finishedTime}`) : null}
+                        onChange={(time) => {
+                          if (time) {
+                            const hours = time.getHours();
+                            const minutes = time.getMinutes();
+                            const period = hours >= 12 ? 'PM' : 'AM';
+                            const displayHours = hours % 12 || 12;
+                            setFinishedTime(`${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`);
+                          } else {
+                            setFinishedTime('');
+                          }
+                        }}
+                        slotProps={{ textField: { size: 'small' } }}
+                      />
+                    </LocalizationProvider>
+                  </div>
+                </div>
+                {/* Location Details */}
+                <div className={styles.locationDetails}>
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <LocationOnIcon sx={{ color: '#2962FF', marginRight: '12px' }} />
+                    <div>
+                      <div className={styles.locationName}>
+                        {locality || 'Location not specified'}
+                      </div>
+                      <div className={styles.locationArea}>
+                        {areaDetails.area || 'Area not specified'}
+                      </div>
+                    </div>
+                  </div>
+                  <button 
+                    className={styles.deleteIconBtn}
+                    onClick={handleRemoveGeofence}
+                    type="button"
+                  >
+                    <DeleteIcon />
+                  </button>
+                </div>
+                {/* Update Location Button */}
+                <button
+                  className={styles.dialogFooterBtn}
+                  onClick={handleUpdateLocation}
+                  disabled={loading}
+                  type="button"
+                >
+                  {loading ? 'Updating...' : 'UPDATE LOCATION'}
+                </button>
               </div>
             </div>
-            <button 
-              className={styles.deleteIconBtn}
-              onClick={handleRemoveGeofence}
-              type="button"
-            >
-              <DeleteIcon />
-            </button>
-          </div>
-          {/* Update Location Button */}
-          <button
-            className={styles.dialogFooterBtn}
-            onClick={handleUpdateLocation}
-            disabled={loading}
-            type="button"
-          >
-            {loading ? 'Updating...' : 'UPDATE LOCATION'}
-          </button>
-        </div>
-      </div>
-    </div>
+        </DialogContent>
+        {/* 🛑 END: MUI Dialog */}
+    </Dialog>
   );
 };
 
