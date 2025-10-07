@@ -143,11 +143,11 @@
   transition: var(--transition-smooth);
 }
 
-.search-input:focus {
+/* .search-input:focus {
   border-color: #2f2b74;
   box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
   outline: none;
-}
+} */
 
 .search-input::placeholder {
   color: var(--text-tertiary);
@@ -748,7 +748,13 @@
 }
 
 .inputSearch:focus {
-  border-color: #301c6c;
+  /* border-color: #301c6c; */
+}
+.inputSearch:focus {
+  /* Set border to default and remove all glow/outline */
+  border-color: #e0e0e0 !important; /* Keep the non-focused border color */
+  box-shadow: none !important;      /* Remove any box shadow/glow */
+  outline: none !important;         /* Remove default browser outline */
 }
 
 .searchIcon {
@@ -904,4 +910,11 @@
 /* Styles for the hovered option */
 .perPageItem:hover {
   background-color: #f0f4ff;
+}
+.date-picker:hover,
+.date-picker:focus,
+.date-picker-focused {
+  /* CHANGE THESE LINES */
+  border-color: #694bc4; /* Changed from #3b82f6 (blue) to purple */
+  box-shadow: 0 0 0 2px rgba(104, 69, 210, 0.4); /* Changed from blue rgba to purple rgba */
 }
