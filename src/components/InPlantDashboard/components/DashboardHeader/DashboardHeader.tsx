@@ -51,6 +51,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   const [isSearching, setIsSearching] = useState(false);
   const [searchSuggestions, setSearchSuggestions] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const UPPERCASE_SEARCH_TYPES = ['SIN', 'Vehicle'];
 
   const handleStartDateChange = (date: any) => {
     if (date) {
@@ -310,7 +311,10 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   
   
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
+    let value = e.target.value;
+    if (UPPERCASE_SEARCH_TYPES.includes(searchType)) {
+      value = value.toUpperCase();
+    }
     setSearchValue(value);
     
     if (value.trim() === '') {
@@ -538,7 +542,8 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                   value={searchValue}
                   onChange={handleInputChange}
                   onKeyPress={handleKeyPress}
-                  className="inputSearch"
+                  // className="inputSearch"
+                  className={`inputSearch ${UPPERCASE_SEARCH_TYPES.includes(searchType) ? 'uppercase-input' : ''}`}
                   onFocus={() => searchSuggestions.length > 0 && setShowSuggestions(true)}
                 />
                 <Search 

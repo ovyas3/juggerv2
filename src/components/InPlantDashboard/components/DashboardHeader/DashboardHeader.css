@@ -10,7 +10,9 @@
 .dashboard-header.collapsed {
   padding: 0.5rem 1.5rem;
 }
-
+.uppercase-input {
+  text-transform: uppercase;
+}
 .header-top {
   display: flex;
   align-items: center;
@@ -578,8 +580,15 @@
 .selectContent :global([data-radix-select-item-indicator]) { 
   display: none !important; 
 }
+.selectItem:global([data-state='checked']) svg { 
+  display: none !important; 
+}
 
-.selectContent1 :global([data-radix-select-item-indicator]) { 
+.perPageContent:global([data-radix-select-item-indicator]) { 
+  display: none !important; 
+}
+
+.perPageItem :global([data-radix-select-item-indicator]) { 
   display: none !important; 
 }
 
@@ -917,4 +926,19 @@
   /* CHANGE THESE LINES */
   border-color: #694bc4; /* Changed from #3b82f6 (blue) to purple */
   box-shadow: 0 0 0 2px rgba(104, 69, 210, 0.4); /* Changed from blue rgba to purple rgba */
+}
+.perPageItem > .lucide-check, 
+.perPageItem > svg,
+.perPageItem > span[role="status"] {
+  /* Common selectors for the icon/tick element */
+  display: none !important; /* Hide the element entirely */
+  width: 0 !important;
+  height: 0 !important;
+  visibility: hidden;
+}
+
+/* If the library uses a special class on the SelectItem to pad for the tick, 
+   you may need to remove that padding too */
+.perPageItem {
+  padding-right: var(--your-default-padding) !important; /* Adjust padding if necessary */
 }
