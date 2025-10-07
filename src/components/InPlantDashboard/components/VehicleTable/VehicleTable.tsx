@@ -10,7 +10,8 @@ import { ChevronRight, Clock, AlertCircle, CheckCircle, Truck, User, Building, C
   PackageCheck,    
   FileCheck,       
   FileText,        
-  LogOut           
+  LogOut,           
+  Pencil
  } from 'lucide-react';
 import { Vehicle } from '../../InPlantDashboard';
 import {
@@ -261,6 +262,7 @@ const VehicleRow: React.FC<VehicleRowProps> = ({ vehicle, isSelected, onSelect, 
                   setShowPopup(false); // Close after action
                 }}
               >
+                <Pencil size={13} style={{color: "red", marginRight: "1px"}} />
                 Add Remark
               </div>
             </div>
