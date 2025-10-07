@@ -24,6 +24,8 @@ import {
 import './VehicleTable.css';
 import AddRemarkModal from './AddRemarkModal';
 import ModalHeader from '@/components/UI/ModalHeader/ModalHeader';
+import { toTitleCase } from "@/utils/stringUtils"
+
 interface VehicleTableProps {
   vehicles: Vehicle[];
   selectedVehicle: Vehicle | null;
@@ -111,6 +113,7 @@ const VehicleRow: React.FC<VehicleRowProps> = ({ vehicle, isSelected, onSelect, 
 
   const getProgressStages = () => {
     const allStages = [
+      { id: 'PO', name: 'External Parking', icon: Truck },  
       { id: 'GI', name: 'Entry Gate', icon: DoorOpen },
       { id: 'TW', name: 'Weighing In', icon: Scale },
       { id: 'LI', name: 'Loading In', icon: ArrowDownToLine },
@@ -122,15 +125,14 @@ const VehicleRow: React.FC<VehicleRowProps> = ({ vehicle, isSelected, onSelect, 
       { id: 'GO', name: 'Gate Out', icon: LogOut }
     ];
   
-    const currentIndex = allStages.findIndex(stage => stage.id === vehicle.currentStage.stageId);
-  
-    return allStages.map((stage, index) => ({
+    return allStages.map((stage) => ({
       id: stage.id,
       name: stage.name,
       icon: stage.icon,
-      completed: index < currentIndex || vehicle.completedStages.includes(stage.id),
-      current: stage.id === vehicle.currentStage.stageId,
-      pending: index > currentIndex
+      completed: vehicle.completedStages.includes(stage.id),
+      current: stage.id === vehicle.currentStage.stageId,   
+      pending: !vehicle.completedStages.includes(stage.id) && 
+               stage.id !== vehicle.currentStage.stageId    
     }));
   };
 
@@ -215,18 +217,22 @@ const VehicleRow: React.FC<VehicleRowProps> = ({ vehicle, isSelected, onSelect, 
             />
           </div>
           <div className="progress-stages">
-          {progressStages.map((stage, index) => {
-            const IconComponent = stage.icon;
-            return (
-              <div
-                key={stage.id}
-                className={`progress-stage ${stage.completed ? 'completed' : ''} ${stage.current ? 'current' : ''}`}
-                title={stage.name}
-              >
-                <IconComponent size={14} />
-              </div>
-            );
-          })}
+            {progressStages.map((stage, index) => {
+              const IconComponent = stage.icon;
+              return (
+                <div
+                  key={stage.id}
+                  className={`progress-stage ${
+                    stage.completed ? 'completed' : 
+                    stage.current ? 'current' : 
+                    'pending'
+                  }`}
+                  title={stage.name}
+                >
+                  <IconComponent size={12} />
+                </div>
+              );
+            })}
           </div>
         </div>
       </td>
@@ -234,13 +240,13 @@ const VehicleRow: React.FC<VehicleRowProps> = ({ vehicle, isSelected, onSelect, 
       {/* Shipper/Carrier */}
       <td className="company-cell">
         <div className="company-info">
-          <div className="shipper">
+          {/* <div className="shipper">
             <Building size={12} />
             <span>{vehicle.shipper.name}</span>
-          </div>
+          </div> */}
           <div className="carrier">
-            <User size={12} />
-            <span>{vehicle.carrier.name}</span>
+            {/* <User size={12} /> */}
+            <span>{toTitleCase(vehicle.carrier.name)}</span>
           </div>
         </div>
       </td>
@@ -262,7 +268,7 @@ const VehicleRow: React.FC<VehicleRowProps> = ({ vehicle, isSelected, onSelect, 
                   setShowPopup(false); // Close after action
                 }}
               >
-                <Pencil size={13} style={{color: "red", marginRight: "1px"}} />
+                <Pencil size={13} style={{color: "#5c63ef", marginRight: "1px"}} />
                 Add Remark
               </div>
             </div>
