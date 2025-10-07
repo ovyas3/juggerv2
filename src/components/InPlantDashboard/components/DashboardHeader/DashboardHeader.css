@@ -918,3 +918,25 @@
   border-color: #694bc4; /* Changed from #3b82f6 (blue) to purple */
   box-shadow: 0 0 0 2px rgba(104, 69, 210, 0.4); /* Changed from blue rgba to purple rgba */
 }
+
+
+.filter-active-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10b981; 
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+  animation: pulse-dot 2s ease-in-out infinite;
+  margin-left: 4px;
+}
+
+@keyframes pulse-dot {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.1);
+  }
+}

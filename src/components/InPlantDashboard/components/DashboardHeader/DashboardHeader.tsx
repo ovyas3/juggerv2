@@ -434,6 +434,13 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
     { key: 'custom', label: 'Custom Range' }
   ];
 
+  const hasActiveAdvancedFilters = () => {
+    return (
+      (filters.stage && filters.stage !== 'all') ||
+      (filters.duration && filters.duration !== 'all')
+    );
+  };
+
   return (
     <div className={`dashboard-header ${isExpanded ? 'expanded' : 'collapsed'}`}>
       <div className="header-top">
@@ -603,6 +610,9 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
             >
               <Filter size={14} />
               <span>Advanced Filters</span>
+              {hasActiveAdvancedFilters() && (
+                <span className="filter-active-indicator" />
+              )}
               <ChevronDown 
                 size={14} 
                 className={showAdvancedFilters ? 'rotated' : ''} 

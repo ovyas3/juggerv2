@@ -321,19 +321,20 @@ const InPlantDashboard: React.FC = () => {
         completedStages: vehicle.completedStages || [],
         shipper: { id: vehicle.shipper?.id || '', name: vehicle.shipper?.name || 'Unknown' },
         carrier: { id: vehicle.carrier?.id || '', name: vehicle.carrier?.name || 'Unknown' },
-        driver: { name: vehicle.driver?.name || 'Unknown', phone: vehicle.driver?.phone || '' },
+        driver: { 
+          id: vehicle.driver?.id || '', 
+          name: vehicle.driver?.name || 'Unknown', 
+          phone: vehicle.driver?.phone || '' 
+        },
         shipmentId: vehicle.sin || '',
         orderReference: vehicle.orderReference || ''
       }));
-      
+  
       setVehicles(formattedVehicles);
       setCurrentPage(0);
-      
-      // **NEW: Update total count from search pagination**
       if (paginationData) {
         setTotalCount(paginationData.total || 0);
       }
-      
     } catch (error) {
       console.error('Error formatting search results:', error);
       showMessage('Error processing search results', 'error');
@@ -341,6 +342,7 @@ const InPlantDashboard: React.FC = () => {
       setIsVehiclesLoading(false);
     }
   }, [showMessage]);
+  
   
   
 
@@ -479,78 +481,6 @@ const InPlantDashboard: React.FC = () => {
       healthStatus: 'normal',
       slaThreshold: 15,
       order: 6
-    }
-  ];
-
-  const mockVehicles: Vehicle[] = [
-    {
-      id: 'VEH-001',
-      vehicleNumber: 'MH12AB1234',
-      currentStage: {
-        stageId: 'LOADING',
-        stageName: 'Loading Bay 3',
-        location: 'Bay 3',
-        arrivedAt: new Date(Date.now() - 90 * 60 * 1000).toISOString(),
-        duration: 90,
-        expectedDuration: 45,
-        status: 'delayed'
-      },
-      entryTime: new Date(Date.now() - 150 * 60 * 1000).toISOString(),
-      totalDuration: 150,
-      overallStatus: 'delayed',
-      progress: 60,
-      completedStages: ['EXT_PARKING', 'ENTRY_GATE', 'WEIGHING'],
-      shipper: { id: 'SHP-001', name: 'XYZ Industries' },
-      carrier: { id: 'CAR-001', name: 'ABC Logistics' },
-      driver: { name: 'John Doe', phone: '+919876543210' },
-      shipmentId: 'SHP-2024-001',
-      orderReference: 'ORD-12345'
-    },
-    {
-      id: 'VEH-002',
-      vehicleNumber: 'KA05CD5678',
-      currentStage: {
-        stageId: 'WEIGHING',
-        stageName: 'Weight In',
-        location: 'Weighbridge 1',
-        arrivedAt: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
-        duration: 30,
-        expectedDuration: 20,
-        status: 'at_risk'
-      },
-      entryTime: new Date(Date.now() - 60 * 60 * 1000).toISOString(),
-      totalDuration: 60,
-      overallStatus: 'at_risk',
-      progress: 40,
-      completedStages: ['EXT_PARKING', 'ENTRY_GATE'],
-      shipper: { id: 'SHP-002', name: 'ABC Manufacturing' },
-      carrier: { id: 'CAR-002', name: 'Express Transport' },
-      driver: { name: 'Rahul Kumar', phone: '+919876543211' },
-      shipmentId: 'SHP-2024-002',
-      orderReference: 'ORD-12346'
-    },
-    {
-      id: 'VEH-003',
-      vehicleNumber: 'TN43EF9012',
-      currentStage: {
-        stageId: 'ENTRY_GATE',
-        stageName: 'Entry Gate',
-        location: 'Gate 1',
-        arrivedAt: new Date(Date.now() - 10 * 60 * 1000).toISOString(),
-        duration: 10,
-        expectedDuration: 15,
-        status: 'on_time'
-      },
-      entryTime: new Date(Date.now() - 10 * 60 * 1000).toISOString(),
-      totalDuration: 10,
-      overallStatus: 'on_track',
-      progress: 20,
-      completedStages: ['EXT_PARKING'],
-      shipper: { id: 'SHP-003', name: 'Steel Corp' },
-      carrier: { id: 'CAR-003', name: 'Rapid Logistics' },
-      driver: { name: 'Suresh Patil', phone: '+919876543212' },
-      shipmentId: 'SHP-2024-003',
-      orderReference: 'ORD-12347'
     }
   ];
 
@@ -820,6 +750,7 @@ const InPlantDashboard: React.FC = () => {
           <DashboardHeader 
             searchQuery={searchQuery}
             onSearch={handleSearch}
+            onSearchResults={handleSearchResults}
             dateRange={dateRange}
             onDateRangeChange={setDateRange}
             onCustomDateRangeChange={handleCustomDateRangeChange}
@@ -848,46 +779,60 @@ const InPlantDashboard: React.FC = () => {
               Map View
             </button>
             </div>
-          <div className="stage-legends">
-            <div className="legend-items stages-list">
-              <div className="legend-item">
-                <DoorOpen size={14} className="stage-icon" />
-                <span className="legend-label">Entry Gate</span>
-              </div>
-              <div className="legend-item">
-                <Scale size={14} className="stage-icon" />
-                <span className="legend-label">Weighing In</span>
-              </div>
-              <div className="legend-item">
-                <ArrowDownToLine size={14} className="stage-icon" />
-                <span className="legend-label">Loading In</span>
-              </div>
-              <div className="legend-item">
-                <ArrowUpFromLine size={14} className="stage-icon" />
-                <span className="legend-label">Loading Out</span>
-              </div>
-              <div className="legend-item">
-                <Weight size={14} className="stage-icon" />
-                <span className="legend-label">Weighing Out</span>
-              </div>
-              <div className="legend-item">
-                <PackageCheck size={14} className="stage-icon" />
-                <span className="legend-label">Post Goods</span>
-              </div>
-              <div className="legend-item">
-                <FileCheck size={14} className="stage-icon" />
-                <span className="legend-label">Test Cert</span>
-              </div>
-              <div className="legend-item">
-                <FileText size={14} className="stage-icon" />
-                <span className="legend-label">Invoice</span>
-              </div>
-              <div className="legend-item">
-                <LogOut size={14} className="stage-icon" />
-                <span className="legend-label">Gate Out</span>
+            <div className="stage-legends">
+              <div className="legend-items stages-list">
+                <div className="legend-item">
+                  <Truck size={14} className="stage-icon" />
+                  <span className="legend-label">External Parking</span>
+                </div>
+                
+                <div className="legend-item">
+                  <DoorOpen size={14} className="stage-icon" />
+                  <span className="legend-label">Entry Gate</span>
+                </div>
+                
+                <div className="legend-item">
+                  <Scale size={14} className="stage-icon" />
+                  <span className="legend-label">Weighing In</span>
+                </div>
+                
+                <div className="legend-item">
+                  <ArrowDownToLine size={14} className="stage-icon" />
+                  <span className="legend-label">Loading In</span>
+                </div>
+                
+                <div className="legend-item">
+                  <ArrowUpFromLine size={14} className="stage-icon" />
+                  <span className="legend-label">Loading Out</span>
+                </div>
+                
+                <div className="legend-item">
+                  <Weight size={14} className="stage-icon" />
+                  <span className="legend-label">Weighing Out</span>
+                </div>
+                
+                <div className="legend-item">
+                  <PackageCheck size={14} className="stage-icon" />
+                  <span className="legend-label">Post Goods</span>
+                </div>
+                
+                <div className="legend-item">
+                  <FileCheck size={14} className="stage-icon" />
+                  <span className="legend-label">Test Cert</span>
+                </div>
+                
+                <div className="legend-item">
+                  <FileText size={14} className="stage-icon" />
+                  <span className="legend-label">Invoice</span>
+                </div>
+                
+                <div className="legend-item">
+                  <LogOut size={14} className="stage-icon" />
+                  <span className="legend-label">Gate Out</span>
+                </div>
               </div>
             </div>
-          </div>
+
           </div>
 
 
