@@ -165,6 +165,8 @@ const KeplerMapView: React.FC<KeplerMapViewProps> = ({
   const [originalView, setOriginalView] = useState<{ center: [number, number]; zoom: number } | null>(null); // <<< NEW STATE
   const [isGateInZoomed, setIsGateInZoomed] = useState(false);
   const [stages, setStages] = useState<StageInfo[]>([]);
+  const [initialLoadDone, setInitialLoadDone] = useState(false);
+
   // Add this useEffect to the component body (e.g., around line 560)
 
   const zoomToGateIn = useCallback(() => {
@@ -540,7 +542,8 @@ const setZoomDelta = (delta: number) => {
         if (vehicle.location?.latitude && vehicle.location?.longitude) {
           // return [vehicle.location.latitude, vehicle.location.longitude];
           const pos: [number, number] = [vehicle.location.latitude, vehicle.location.longitude];
-          console.log(`Vehicle ${vehicle.vehicleNumber} position:`, pos);
+          console.log(`[DEBUG POS] Vehicle ${vehicle.vehicleNumber} (ID:${vehicle.id}) Pos: [${pos[0]}, ${pos[1]}]`);
+          // console.log(`Vehicle ${vehicle.vehicleNumber} position:`, pos);
           return pos;
         }
        return plantCenter; // fallback
@@ -548,8 +551,10 @@ const setZoomDelta = (delta: number) => {
 
   // Create custom icons
   const createVehicleIcon = useCallback((vehicle: Vehicle, isSelected: boolean) => {
-    const color = getVehicleStatusColor(vehicle.overallStatus);
+    const color = '#3B82F6';
     const size = isSelected ? 40 : 32;
+    const anchor = size / 2;
+    console.log(`[DEBUG ICON] Vehicle ${vehicle.vehicleNumber} Size: ${size}x${size}, Anchor: [${anchor}, ${anchor}]`);
 
     return L.divIcon({
       html: `
@@ -574,6 +579,8 @@ const setZoomDelta = (delta: number) => {
       iconSize: [size, size],
       // iconAnchor: [size/2, size],
       // popupAnchor: [0, -size] 
+      iconAnchor: [size / 2, size / 2], // Anchor point is the center of the icon
+      popupAnchor: [0, -size / 2],
     });
   }, []);
 
@@ -692,29 +699,63 @@ const setZoomDelta = (delta: number) => {
     }
   }, [fetchedVehicles]);
   // Force map to recalculate size after initial render and data load
-useEffect(() => {
-  if (!mapRef.current || !fetchedVehicles) return;
+// useEffect(() => {
+//   if (!mapRef.current || !fetchedVehicles) return;
   
-  // Multiple invalidations to catch different render phases
-  const timers = [
-    setTimeout(() => mapRef.current?.invalidateSize(true), 0),
-    setTimeout(() => mapRef.current?.invalidateSize(true), 100),
-    setTimeout(() => mapRef.current?.invalidateSize(true), 300),
-    setTimeout(() => {
-      if (mapRef.current && fetchedVehicles.length > 0) {
-        const bounds = calculateBounds();
-        mapRef.current.fitBounds(bounds, { 
-          padding: [50, 50],
-          maxZoom: 16,
-          animate: false // Don't animate on first load
-        });
-      }
-    }, 500)
+//   // Multiple invalidations to catch different render phases
+//   const timers = [
+//     setTimeout(() => mapRef.current?.invalidateSize(true), 0),
+//     setTimeout(() => mapRef.current?.invalidateSize(true), 100),
+//     setTimeout(() => mapRef.current?.invalidateSize(true), 300),
+//     setTimeout(() => {
+//       if (mapRef.current && fetchedVehicles.length > 0) {
+//         const bounds = calculateBounds();
+//         mapRef.current.fitBounds(bounds, { 
+//           padding: [50, 50],
+//           maxZoom: 16,
+//           animate: false // Don't animate on first load
+//         });
+//       }
+//     }, 500)
+//   ];
+
+//   return () => timers.forEach(t => clearTimeout(t));
+// }, [fetchedVehicles, calculateBounds]);
+ // KeplerMapView.tsx (Replace the useEffect block around lines 525-545)
+useEffect(() => {
+  if (!mapRef.current || !fetchedVehicles || initialLoadDone) return;
+
+  const map = mapRef.current;
+  
+  // Invalidate size repeatedly to ensure the map container is fully sized
+  // before attempting to fit bounds.
+  const sizeTimers = [
+      setTimeout(() => map.invalidateSize(true), 0),
+      setTimeout(() => map.invalidateSize(true), 100),
+      setTimeout(() => map.invalidateSize(true), 300),
   ];
 
-  return () => timers.forEach(t => clearTimeout(t));
-}, [fetchedVehicles, calculateBounds]);
- 
+  // Logic to fit bounds, only runs on the first data load
+  const fitTimer = setTimeout(() => {
+      if (map && fetchedVehicles.length > 0) {
+          const bounds = calculateBounds();
+          map.fitBounds(bounds, {
+              padding: [50, 50],
+              maxZoom: 16,
+              animate: false, // Don't animate on first load
+          });
+          // CRITICAL: Mark the initial load as done
+          setInitialLoadDone(true); 
+      }
+  }, 500);
+
+  const allTimers = [...sizeTimers, fitTimer];
+  return () => allTimers.forEach(t => clearTimeout(t));
+
+}, [fetchedVehicles, calculateBounds, initialLoadDone]); // Add initialLoadDone to dependencies
+// KeplerMapView.tsx (Add this block after the previous useEffect fixes)
+
+ // Run whenever the critical location data is fetched
 
   return (
     // <div className={`${styles.mapContainer} ${isFullscreen ? styles.fullscreen : ''}`}>
