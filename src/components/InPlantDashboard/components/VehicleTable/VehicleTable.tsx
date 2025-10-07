@@ -305,13 +305,6 @@ const VehicleTable: React.FC<VehicleTableProps> = ({
   const handleCloseRemarkModal = () => {
     setRemarkVehicle(null);
   }
-  useEffect(() => {
-    if (remarkVehicle) {
-        console.log("DEBUG: remarkVehicle object is:", remarkVehicle);
-        // This will confirm if remarkVehicle.driver.id exists at runtime.
-        console.log("DEBUG: Attempted driver ID is:", (remarkVehicle as any)?.driver?.id); 
-    }
-}, [remarkVehicle]);
   const filteredVehicles = useMemo(() => {
     let filtered = [...vehicles];
    
@@ -498,8 +491,9 @@ const VehicleTable: React.FC<VehicleTableProps> = ({
           {remarkVehicle && (
         <AddRemarkModal
           title="Add Remark"
-          shipmentId={remarkVehicle.shipmentId}
+          shipmentId={remarkVehicle.id}
           driverId={remarkVehicle.driver.id} 
+          sin={remarkVehicle.shipmentId}
           onClose={handleCloseRemarkModal}
         />
       )}

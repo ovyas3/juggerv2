@@ -1,65 +1,64 @@
 // AddRemarkModal.tsx
 
-import React,{useState} from 'react';
+import React, { useState } from 'react';
 import ModalHeader from '@/components/UI/ModalHeader/ModalHeader';
-import { httpsPost } from '../../../../utils/Communication'; // Adjust the import path for httpsPost
+import { httpsPost } from '../../../../utils/Communication';
 import { useRouter } from 'next/navigation';
+import { useSnackbar } from "@/hooks/snackBar";
 interface AddRemarkModalProps {
   title: string;
   shipmentId: string;
   driverId: string; 
   onClose: () => void;
+  sin: string;
 }
 
-const AddRemarkModal: React.FC<AddRemarkModalProps> = ({ title, shipmentId, onClose, driverId}) => {
+const AddRemarkModal: React.FC<AddRemarkModalProps> = ({ title, shipmentId, onClose, driverId, sin }) => {
   const [remark, setRemark] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
-  console.log("AddRemarkModal received driverId:", driverId);
+  const { showMessage } = useSnackbar();
+  
   const handleSubmit = async () => {
     if (!remark.trim()) {
-      alert("Please enter a remark before submitting.");
+      showMessage("Please enter a remark before submitting.", "error");
       return;
     }
 
     setIsSubmitting(true);
-    const url = 'inPlantVehicles/updateRemarks'; // API endpoint
+    
+    const url = `InplantDashboard/notes/${shipmentId}`;
 
-    // Payload structure for the API call
     const payload = {
-      // Assuming the API expects the shipment ID and the remark content
-      attached_driver: driverId, 
-      shipper_remark: remark.trim(),
+      stageId: 'GI',
+      notes: remark.trim(),
     };
 
     try {
-      // Use httpsPost for the API call
       const response = await httpsPost(
         url, 
         payload, 
         router, 
-        1, // Retries
-        false // Is external
+        1,
+        false
       );
 
       if (response?.statusCode === 200) {
-        // Success feedback (e.g., toast/snackbar)
-        console.log("Remark submitted successfully:", response);
-        onClose(); // Close modal on success
+        showMessage("Note added successfully!", "success")
+        onClose();
       } else {
-        // Failure feedback
         console.error("Failed to submit remark:", response?.message || "Unknown error");
-        alert(`Failed to submit remark. ${response?.message || ''}`);
+        showMessage(`Failed to submit remark. ${response?.message || ''}`, "error");
       }
     } catch (error) {
       console.error("API call error during remark submission:", error);
-      alert("An error occurred during submission.");
+      showMessage("An error occurred during submission.", "error");
     } finally {
       setIsSubmitting(false);
     }
   };
+
   return (
-    // Simple modal background and centered content wrapper
     <div style={{
       position: 'fixed',
       top: 0,
@@ -70,7 +69,7 @@ const AddRemarkModal: React.FC<AddRemarkModalProps> = ({ title, shipmentId, onCl
       display: 'flex',
       justifyContent: 'center',
       alignItems: 'center',
-      zIndex: 1000 // High z-index to overlay everything
+      zIndex: 1000
     }}>
       <div style={{
         background: 'white',
@@ -81,52 +80,42 @@ const AddRemarkModal: React.FC<AddRemarkModalProps> = ({ title, shipmentId, onCl
         flexDirection: 'column'
       }}>
         
-        {/* Modal Header */}
         <ModalHeader 
-          title={`${title} - ${shipmentId}`} // Title combined with shipment ID
+          title={`${title} - #${sin}`}
           onClose={onClose}
-          // The title prop for ModalHeader is assumed to handle the full string
         />
 
-        {/* Modal Body */}
         <div style={{ padding: '20px' }}>
-     
-          {/* Example form field */}
           <textarea 
-           value={remark} 
-          //  onChange={(e) => setRemark(e.target.value)} 
-          onChange={(e) => {
-            const inputValue = e.target.value;
-            const filteredValue = inputValue.replace(/[^a-zA-Z\s0-9]/g, '');
-           setRemark(filteredValue);}}
+            value={remark} 
+            onChange={(e) => {
+              const inputValue = e.target.value;
+              const filteredValue = inputValue.replace(/[^a-zA-Z\s0-9]/g, '');
+              setRemark(filteredValue);
+            }}
             placeholder="Enter your remark here..." 
             rows={4}
             style={{ width: '100%', padding: '8px', border: '1px solid #ccc', borderRadius: '4px' }}
           />
-          <div style={{ marginTop: '10px', textAlign: 'right' , gap: '10px', display: 'flex',    justifyContent: 'flex-end', 
-              }}>
-          <button 
-              onClick={onClose} // Simply close the modal on cancel
-            //   style={{ 
-            //     padding: '8px 15px', 
-               
-            //     background: '#d8511f', // Light gray background
-            //     color: '#fff', 
-            //     border: '1px solid #d1d5db', 
-            //     borderRadius: '4px', 
-            //     cursor: 'pointer',
-            //     fontWeight: '500' 
-            //   }}
-            className="cancel-btn-modal"
+          <div style={{ 
+            marginTop: '10px', 
+            textAlign: 'right', 
+            gap: '10px', 
+            display: 'flex',    
+            justifyContent: 'flex-end',
+          }}>
+            <button 
+              onClick={onClose}
+              className="cancel-btn-modal"
             >
               Cancel
             </button>
             <button 
-                  onClick={handleSubmit} 
-              className="submit-btn-modal" 
-            //   style={{ padding: '8px 15px', background: '#20104d', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
-             >
-              Submit
+              onClick={handleSubmit} 
+              className="submit-btn-modal"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? 'Submitting...' : 'Submit'}
             </button>
           </div>
         </div>

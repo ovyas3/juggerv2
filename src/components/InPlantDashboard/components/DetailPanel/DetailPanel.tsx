@@ -6,6 +6,7 @@ import { Vehicle } from '../../InPlantDashboard';
 import './DetailPanel.css';
 import { useRouter } from 'next/navigation';
 import { httpsGet, httpsPost } from '@/utils/Communication';
+import { useSnackbar } from "@/hooks/snackBar";
 
 interface DetailPanelProps {
   vehicle: Vehicle | null;
@@ -14,6 +15,11 @@ interface DetailPanelProps {
 }
 
 interface TimelineEvent {
+  notes: Array<{
+    text: string;
+    addedBy: string;
+    addedAt: string;
+  }>;
   stageId: string;
   stageName: string;
   entryTime: string;
@@ -47,8 +53,7 @@ const DetailPanel: React.FC<DetailPanelProps> = ({ vehicle, onClose, isOpen }) =
   const [error, setError] = useState<string | null>(null);
   const [remark, setRemark] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
- 
-
+  const { showMessage } = useSnackbar();
  
 
   // useEffect(() => {
@@ -87,48 +92,43 @@ const DetailPanel: React.FC<DetailPanelProps> = ({ vehicle, onClose, isOpen }) =
 }, [vehicle, fetchTimelineData]); 
   const handleSubmit = async () => {
     if (!vehicle) {
-      // Log a warning if this happens, though it shouldn't based on component usage
       console.warn("Attempted to submit remark with no vehicle selected.");
-      return; 
-  }
+      return;
+    }
+
     if (!remark.trim()) {
-      alert("Please enter a remark before submitting.");
+      showMessage("Please enter a remark before submitting.", "error");
       return;
     }
 
     setIsSubmitting(true);
-    const url = 'inPlantVehicles/updateRemarks'; // API endpoint
-
-    // Payload structure for the API call
+    
+    const url = `InplantDashboard/notes/${vehicle.id}`;
+    
     const payload = {
-      // Assuming the API expects the shipment ID and the remark content
-      attached_driver: vehicle?.driver?.id, 
-      shipper_remark: remark.trim(),
+      stageId: vehicle.currentStage.stageId, 
+      notes: remark.trim(),
     };
 
     try {
-      // Use httpsPost for the API call
       const response = await httpsPost(
-        url, 
-        payload, 
-        router, 
-        1, // Retries
-        false // Is external
+        url,
+        payload,
+        {},
+        1 
       );
 
       if (response?.statusCode === 200) {
-        // Success feedback (e.g., toast/snackbar)
-        console.log("Remark submitted successfully:", response);
-        onClose(); // Close modal on success
+        setRemark(''); 
+        showMessage("Note added successfully!", "success");
         await fetchTimelineData(vehicle.id);
       } else {
-        // Failure feedback
-        console.error("Failed to submit remark:", response?.message || "Unknown error");
-        alert(`Failed to submit remark. ${response?.message || ''}`);
+        console.error("Failed to save note:", response?.message || "Unknown error");
+        showMessage(`Failed to save note. ${response?.message || ''}`, "error");
       }
     } catch (error) {
-      console.error("API call error during remark submission:", error);
-      alert("An error occurred during submission.");
+      console.error("API call error during note submission:", error);
+      showMessage("An error occurred during submission.", "error");
     } finally {
       setIsSubmitting(false);
     }
@@ -176,14 +176,6 @@ const DetailPanel: React.FC<DetailPanelProps> = ({ vehicle, onClose, isOpen }) =
       case 'pending':
         return <Circle size={20} className="timeline-icon pending" />;
     }
-  };
-
-  const handleExportPDF = () => {
-    console.log('Exporting PDF for vehicle:', vehicle.vehicleNumber);
-  };
-
-  const handleSendAlert = () => {
-    console.log('Sending alert for vehicle:', vehicle.vehicleNumber);
   };
 
   return (
@@ -403,18 +395,31 @@ const DetailPanel: React.FC<DetailPanelProps> = ({ vehicle, onClose, isOpen }) =
           <div className="notes-content">
             <div className="notes-list">
               {/* // display notes */}
-              {timelineData.flatMap((stage) => 
-                  stage.events.map((event, index) => (
-                    <div key={`${stage.stageId}-${index}`} className="note-item">
-                      <div className="note-header">
-                        <span className="note-stage">{stage.stageName}</span>
-                        <span className="note-time">{formatTime(event.eventTime)}</span>
-                      </div>
-                      <p className="note-text">{event.notes}</p>
-                      <span className="note-performer">By: {event.performedBy}</span>
+              {timelineData
+              .filter((stage) => stage.notes && stage.notes.length > 0) // ✅ Filter stages with notes
+              .flatMap((stage) =>
+                stage.notes.map((note: any, index: any) => (
+                  <div key={`${stage.stageId}-${index}`} className="note-item">
+                    <div className="note-header">
+                      <span className="note-stage">{stage.stageName}</span>
+                      <span className="note-time">
+                        {new Date(note.addedAt).toLocaleString('en-US', {
+                          month: 'short',
+                          day: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                          hour12: false
+                        })}
+                      </span>
                     </div>
-                  ))
-                ).reverse()}
+                    <p className="note-text">{note.text}</p>
+                    <div className="note-footer">
+                      <span className="note-author">By: {note.addedBy}</span>
+                    </div>
+                  </div>
+                ))
+              )
+            }
             </div>
 
             <div className="add-note">

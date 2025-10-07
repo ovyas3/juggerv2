@@ -18,6 +18,7 @@ import styles from "./ShipmentDetails.module.css";
 import { format } from "date-fns";
 import { httpsGet } from "@/utils/Communication";
 import { useUserRoles } from "@/hooks/useUserRoles";
+import { useSnackbar } from "@/hooks/snackBar";
 
 // Import all tab components
 import ShipmentDetailsTab from "./ShipmentDetailsTab";
@@ -90,6 +91,7 @@ const ShipmentDetails: React.FC<ShipmentDetailsProps> = ({
   const [shipmentData, setShipmentData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const userRoles = useUserRoles();
+  const { showMessage } = useSnackbar();
 
   const [isMYKL, setIsMYKL] = useState(false);
   const [isTata, setIsTata] = useState(false);
@@ -208,9 +210,7 @@ const ShipmentDetails: React.FC<ShipmentDetailsProps> = ({
 
   const handleOpenMapModal = (eventData: any) => {
     console.log("Opening map for event:", eventData);
-    alert(
-      `Showing map for location: [${eventData.latitude}, ${eventData.longitude}]`
-    );
+    showMessage(`Showing map for location: [${eventData.latitude}, ${eventData.longitude}]`, "success");
   };
 
   const tabsConfig = [

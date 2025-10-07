@@ -1139,6 +1139,7 @@
   cursor: pointer;
   font-weight: 500;
   transition: background-color 0.2s ease-in-out; /* Add transition for smoothness */
+  border: none;
 }
 
 /* Hover background color for Cancel button: slightly darker red */
@@ -1157,6 +1158,7 @@
   cursor: pointer;
   font-weight: 500;
   transition: background-color 0.2s ease-in-out; /* Add transition for smoothness */
+  border: none;
 }
 
 /* Hover background color for Submit button: slightly lighter purple */
