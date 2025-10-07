@@ -28,6 +28,7 @@ import {
   TextareaAutosize,
   Autocomplete,
 } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
 import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
 import ArticleIcon from "@mui/icons-material/Article";
@@ -41,7 +42,7 @@ import styles from "./DeliveryTab.module.css";
 import pickupStyles from "./PickupTab.module.css";
 import CustomDatePicker from "@/components/UI/CustomDatePicker/CustomDatePicker";
 import { useSnackbar } from "@/hooks/snackBar";
-import { httpsPut, httpsPost } from "@/utils/Communication";
+import { httpsPut, httpsPost, httpsGet } from "@/utils/Communication";
 import { UserRoles } from "@/hooks/useUserRoles";
 import CustomDateTimePicker from "@/components/UI/CustomDateTimePicker/CustomDateTimePicker";
 import { format, sub } from "date-fns";
@@ -189,13 +190,17 @@ const PackageStatusTable = ({
     }
   }, [isEditable, invoice.invoice_products]);
 
-  const handleFieldChange = (index: number, field: keyof InvoiceProduct, value: any) => {
+  const handleFieldChange = (
+    index: number,
+    field: keyof InvoiceProduct,
+    value: any
+  ) => {
     const updatedData = [...tableData];
     // This is the core fix to allow input
     (updatedData[index][field] as any) = value;
     setTableData(updatedData);
   };
-  
+
   const handleAddRow = () => {
     setTableData([
       ...tableData,
@@ -219,7 +224,7 @@ const PackageStatusTable = ({
       },
     ]);
   };
-  
+
   const handleRemoveRow = (index: number) => {
     if (tableData.length <= 1) {
       showMessage("At least one row must be present.", "warning");
@@ -233,31 +238,60 @@ const PackageStatusTable = ({
   const getDynamicColumns = useMemo(() => {
     const dynamicColumns = [];
     if (invoice.status.missing_checked) {
-      dynamicColumns.push({ id: "missing", label: "Short", subColumns: ["Cases/Packages", "Pcs."] });
+      dynamicColumns.push({
+        id: "missing",
+        label: "Short",
+        subColumns: ["Cases/Packages", "Pcs."],
+      });
     }
     if (invoice.status.damaged_checked) {
-      dynamicColumns.push({ id: "damaged", label: "Damaged", subColumns: ["Cases/Packages", "Pcs."] });
+      dynamicColumns.push({
+        id: "damaged",
+        label: "Damaged",
+        subColumns: ["Cases/Packages", "Pcs."],
+      });
     }
     if (invoice.status.clotted_checked) {
-      dynamicColumns.push({ id: "clotted", label: "Clotted", subColumns: ["Cases/Packages", "Pcs."] });
+      dynamicColumns.push({
+        id: "clotted",
+        label: "Clotted",
+        subColumns: ["Cases/Packages", "Pcs."],
+      });
     }
     if (invoice.status.rejected_checked) {
-      dynamicColumns.push({ id: "rejected", label: "Rejected", subColumns: ["Cases/Packages", "Pcs."] });
+      dynamicColumns.push({
+        id: "rejected",
+        label: "Rejected",
+        subColumns: ["Cases/Packages", "Pcs."],
+      });
     }
     if (invoice.status.carton_damage_checked) {
-      dynamicColumns.push({ id: "carton_damage", label: "Carton Damage", subColumns: ["No. of damaged Cartons", "Carton Damage Penalty"] });
+      dynamicColumns.push({
+        id: "carton_damage",
+        label: "Carton Damage",
+        subColumns: ["No. of damaged Cartons", "Carton Damage Penalty"],
+      });
     }
     return dynamicColumns;
   }, [invoice.status]);
 
   const baseColumns = [
-    { id: "material_SKU", label: "Material (SKU)", subColumns : [], width: "150px" },
+    {
+      id: "material_SKU",
+      label: "Material (SKU)",
+      subColumns: [],
+      width: "150px",
+    },
     { id: "batch", label: "Batch", width: "100px" },
     { id: "MFG_date", label: "Manufactured Date", width: "120px" },
     { id: "cost_per_pcs", label: `MRP (${currencySymbol})`, width: "100px" },
-    { id: "pcs_in_case", label: `No. of Pcs.(per case/package)`, width: "100px" },
+    {
+      id: "pcs_in_case",
+      label: `No. of Pcs.(per case/package)`,
+      width: "100px",
+    },
   ];
-  
+
   const finalColumns = [...baseColumns, ...getDynamicColumns];
 
   // Check if any dynamic columns are selected and if there is data
@@ -266,7 +300,7 @@ const PackageStatusTable = ({
       return false;
     }
     return invoice.invoice_products.some((product: InvoiceProduct) =>
-      Object.values(product).some(val => val !== "" && val !== 0)
+      Object.values(product).some((val) => val !== "" && val !== 0)
     );
   }, [invoice.invoice_products]);
 
@@ -281,36 +315,63 @@ const PackageStatusTable = ({
         <Table size="small">
           <TableHead sx={{ backgroundColor: "#f9f9f9" }}>
             <TableRow>
-              {finalColumns.map((col) => (
+              {finalColumns.map((col, colIndex) => (
                 <TableCell
                   key={col.id}
                   align="center"
                   colSpan={col.subColumns ? col.subColumns.length : 1}
-                  sx={{ fontWeight: "bold", width: "100px", color: "#09337e" }}
+                  sx={{
+                    fontWeight: "bold",
+                    width: "100px",
+                    color: "#09337e",
+                    borderRight: "1px solid #e0e0e0",
+                  }}
                 >
                   {col.label}
                 </TableCell>
               ))}
-              <TableCell align="center" sx={{ fontWeight: "bold", width: "100px", color: "#09337e" }}>
+              <TableCell
+                align="center"
+                sx={{
+                  fontWeight: "bold",
+                  width: "100px",
+                  color: "#09337e",
+                  borderRight: "1px solid #e0e0e0",
+                }}
+              >
                 Total ({currencySymbol})
               </TableCell>
-              <TableCell align="center" sx={{ fontWeight: "bold", width: "80px", color: "#09337e" }}>
+              <TableCell
+                align="center"
+                sx={{ fontWeight: "bold", width: "80px", color: "#09337e" }}
+              >
                 Actions
               </TableCell>
             </TableRow>
             {getDynamicColumns.length > 0 && (
               <TableRow>
                 {baseColumns.map((col) => (
-                  <TableCell key={col.id} />
+                  <TableCell
+                    key={col.id}
+                    sx={{ borderRight: "1px solid #e0e0e0" }}
+                  />
                 ))}
                 {getDynamicColumns.map((col) =>
                   col.subColumns.map((subCol, index) => (
-                    <TableCell key={`${col.id}-${index}`} align="center" sx={{ color: "#09337e", fontWeight: "bold" }}>
+                    <TableCell
+                      key={`${col.id}-${index}`}
+                      align="center"
+                      sx={{
+                        color: "#09337e",
+                        fontWeight: "bold",
+                        borderRight: "1px solid #e0e0e0",
+                      }}
+                    >
                       {subCol}
                     </TableCell>
                   ))
                 )}
-                <TableCell />
+                <TableCell sx={{ borderRight: "1px solid #e0e0e0" }} />
                 <TableCell />
               </TableRow>
             )}
@@ -318,7 +379,13 @@ const PackageStatusTable = ({
           <TableBody>
             {tableData.map((row: InvoiceProduct, index: number) => (
               <TableRow key={`row-${index}`}>
-                <TableCell align="center"sx={{ padding: '7px 2px 7px 7px' }}>
+                <TableCell
+                  align="center"
+                  sx={{
+                    padding: "7px 7px 7px 7px",
+                    borderRight: "1px solid #e0e0e0",
+                  }}
+                >
                   <Autocomplete
                     options={materials?.map((m: any) => m.sku) || []}
                     value={row.material_SKU || ""}
@@ -341,11 +408,20 @@ const PackageStatusTable = ({
                     }}
                   />
                 </TableCell>
-                <TableCell align="center" sx={{ padding: '7px 2px' }}>
+                <TableCell
+                  align="center"
+                  sx={{ padding: "7px 7px", borderRight: "1px solid #e0e0e0" }}
+                >
                   <TextField
                     size="small"
                     value={row.batch || ""}
-                    onChange={(e) => handleFieldChange(index, "batch", e.target.value.replace(/[^a-zA-Z0-9\-]/g, ""))}
+                    onChange={(e) =>
+                      handleFieldChange(
+                        index,
+                        "batch",
+                        e.target.value.replace(/[^a-zA-Z0-9\-]/g, "")
+                      )
+                    }
                     disabled={!isEditable}
                     sx={{
                       "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
@@ -354,20 +430,29 @@ const PackageStatusTable = ({
                     }}
                   />
                 </TableCell>
-                <TableCell align="center">
-                <TextField
-                  size="small"
-                  value={row.MFG_date || ""}
-                  onChange={(e) => handleFieldChange(index, "MFG_date", e.target.value)}
-                  disabled={!isEditable}
-                  sx={{
-                    "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "#20104d",
-                    },
-                  }}
-                />
-              </TableCell>
-                <TableCell align="center" sx={{ padding: '7px 2px' }}>
+                <TableCell
+                  align="center"
+                  sx={{ padding: "7px 7px", borderRight: "1px solid #e0e0e0" }}
+                >
+                  <TextField
+                    size="small"
+                    value={row.MFG_date || ""}
+                    onChange={(e) =>
+                      handleFieldChange(index, "MFG_date", e.target.value)
+                    }
+                    disabled={!isEditable}
+                    sx={{
+                      "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
+                        {
+                          borderColor: "#20104d",
+                        },
+                    }}
+                  />
+                </TableCell>
+                <TableCell
+                  align="center"
+                  sx={{ padding: "7px 7px", borderRight: "1px solid #e0e0e0" }}
+                >
                   <TextField
                     type="text"
                     size="small"
@@ -387,7 +472,10 @@ const PackageStatusTable = ({
                     }}
                   />
                 </TableCell>
-                <TableCell align="center" sx={{ padding: '7px 2px' }}>
+                <TableCell
+                  align="center"
+                  sx={{ padding: "7px 7px", borderRight: "1px solid #e0e0e0" }}
+                >
                   <TextField
                     type="text"
                     size="small"
@@ -402,7 +490,7 @@ const PackageStatusTable = ({
                     disabled={!isEditable}
                     sx={{
                       "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                        borderColor: "#20104",
+                        borderColor: "#20104d",
                       },
                     }}
                   />
@@ -410,7 +498,13 @@ const PackageStatusTable = ({
                 {/* Dynamic columns based on selected status checkboxes */}
                 {invoice.status.missing_checked && (
                   <>
-                    <TableCell align="center" sx={{ padding: '7px 2px' }}>
+                    <TableCell
+                      align="center"
+                      sx={{
+                        padding: "7px 7px",
+                        borderRight: "1px solid #e0e0e0",
+                      }}
+                    >
                       <TextField
                         type="text"
                         size="small"
@@ -430,7 +524,13 @@ const PackageStatusTable = ({
                         }}
                       />
                     </TableCell>
-                    <TableCell align="center" sx={{ padding: '7px 2px' }}>
+                    <TableCell
+                      align="center"
+                      sx={{
+                        padding: "7px 7px",
+                        borderRight: "1px solid #e0e0e0",
+                      }}
+                    >
                       <TextField
                         type="text"
                         size="small"
@@ -454,7 +554,13 @@ const PackageStatusTable = ({
                 )}
                 {invoice.status.damaged_checked && (
                   <>
-                    <TableCell align="center" sx={{ padding: '7px 2px' }}>
+                    <TableCell
+                      align="center"
+                      sx={{
+                        padding: "7px 7px",
+                        borderRight: "1px solid #e0e0e0",
+                      }}
+                    >
                       <TextField
                         type="text"
                         size="small"
@@ -474,7 +580,13 @@ const PackageStatusTable = ({
                         }}
                       />
                     </TableCell>
-                    <TableCell align="center" sx={{ padding: '7px 2px' }}>
+                    <TableCell
+                      align="center"
+                      sx={{
+                        padding: "7px 7px",
+                        borderRight: "1px solid #e0e0e0",
+                      }}
+                    >
                       <TextField
                         type="text"
                         size="small"
@@ -489,7 +601,7 @@ const PackageStatusTable = ({
                         disabled={!isEditable}
                         sx={{
                           "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                            borderColor: "#20104",
+                            borderColor: "#20104d",
                           },
                         }}
                       />
@@ -498,7 +610,13 @@ const PackageStatusTable = ({
                 )}
                 {invoice.status.clotted_checked && (
                   <>
-                    <TableCell align="center" sx={{ padding: '7px 2px' }}>
+                    <TableCell
+                      align="center"
+                      sx={{
+                        padding: "7px 7px",
+                        borderRight: "1px solid #e0e0e0",
+                      }}
+                    >
                       <TextField
                         type="text"
                         size="small"
@@ -518,7 +636,13 @@ const PackageStatusTable = ({
                         }}
                       />
                     </TableCell>
-                    <TableCell align="center" sx={{ padding: '7px 2px' }}>
+                    <TableCell
+                      align="center"
+                      sx={{
+                        padding: "7px 7px",
+                        borderRight: "1px solid #e0e0e0",
+                      }}
+                    >
                       <TextField
                         type="text"
                         size="small"
@@ -542,7 +666,13 @@ const PackageStatusTable = ({
                 )}
                 {invoice.status.rejected_checked && (
                   <>
-                    <TableCell align="center" sx={{ padding: '7px 2px' }}>
+                    <TableCell
+                      align="center"
+                      sx={{
+                        padding: "7px 7px",
+                        borderRight: "1px solid #e_e_e",
+                      }}
+                    >
                       <TextField
                         type="text"
                         size="small"
@@ -562,7 +692,13 @@ const PackageStatusTable = ({
                         }}
                       />
                     </TableCell>
-                    <TableCell align="center" sx={{ padding: '7px 2px' }}>
+                    <TableCell
+                      align="center"
+                      sx={{
+                        padding: "7px 7px",
+                        borderRight: "1px solid #e0e0e0",
+                      }}
+                    >
                       <TextField
                         type="text"
                         size="small"
@@ -586,7 +722,13 @@ const PackageStatusTable = ({
                 )}
                 {invoice.status.carton_damage_checked && (
                   <>
-                    <TableCell align="center" sx={{ padding: '7px 2px' }}>
+                    <TableCell
+                      align="center"
+                      sx={{
+                        padding: "7px 7px",
+                        borderRight: "1px solid #e0e0e0",
+                      }}
+                    >
                       <TextField
                         type="text"
                         size="small"
@@ -606,7 +748,13 @@ const PackageStatusTable = ({
                         }}
                       />
                     </TableCell>
-                    <TableCell align="center" sx={{ padding: '7px 2px' }}>
+                    <TableCell
+                      align="center"
+                      sx={{
+                        padding: "7px 7px",
+                        borderRight: "1px solid #e0e0e0",
+                      }}
+                    >
                       <TextField
                         type="text"
                         size="small"
@@ -628,8 +776,13 @@ const PackageStatusTable = ({
                     </TableCell>
                   </>
                 )}
-                <TableCell align="center" sx={{ padding: '7px 2px' }}>{row.total || ""}</TableCell>
-                <TableCell align="center" sx={{ padding: '7px 2px' }}>
+                <TableCell
+                  align="center"
+                  sx={{ padding: "7px 7px", borderRight: "1px solid #e0e0e0" }}
+                >
+                  {row.total || ""}
+                </TableCell>
+                <TableCell align="center" sx={{ padding: "7px 7px" }}>
                   <IconButton
                     onClick={() => handleRemoveRow(index)}
                     disabled={!isEditable || tableData.length <= 1}
@@ -637,7 +790,11 @@ const PackageStatusTable = ({
                     <RemoveCircleOutlineIcon color="error" />
                   </IconButton>
                   {isEditable && index === tableData.length - 1 && (
-                    <IconButton onClick={handleAddRow} color="primary" sx={{ color: "#09337e" }}>
+                    <IconButton
+                      onClick={handleAddRow}
+                      color="primary"
+                      sx={{ color: "#09337e" }}
+                    >
                       <AddCircleIcon />
                     </IconButton>
                   )}
@@ -676,11 +833,15 @@ const DeliveryTab = ({
   const [isEditingTimestamps, setIsEditingTimestamps] = useState<
     Record<string, boolean>
   >({});
-    const [isEditingDcs, setIsEditingDcs] = useState<Record<string, boolean>>({});
-  // This state will now handle editing for the entire invoice section of a delivery
+  const [isEditingDcs, setIsEditingDcs] = useState<Record<string, boolean>>({});
   const [isEditingInvoices, setIsEditingInvoices] = useState<
     Record<string, string | null>
   >({});
+  // ... inside DeliveryTab component function (where other state variables are declared)
+  const [isEpodEditing, setIsEpodEditing] = useState<Record<string, boolean>>(
+    {}
+  );
+
   const [editableTimestamps, setEditableTimestamps] = useState<
     Record<string, any>
   >({});
@@ -694,6 +855,12 @@ const DeliveryTab = ({
     reason: "",
   });
 
+  const [epodDeleteState, setEpodDeleteState] = useState({
+    open: false,
+    deliveryId: "",
+    epodLink: "",
+  });
+
   const [packageStatusState, setPackageStatusState] = useState<any>({});
   const [invoiceComments, setInvoiceComments] = useState<any>({});
   const [invoiceSubTableData, setInvoiceSubTableData] = useState<any>({});
@@ -705,6 +872,7 @@ const DeliveryTab = ({
     shipmentData?.shippers?.[0]?.country?.currency?.symbol || "₹";
   const uom = shipmentData?.uom || "MT";
   const isCompleted = shipmentData.latest_status === "CPTD";
+  const isCancelled = shipmentData.latest_status === "Cancelled";
   const isTransit = shipmentData.latest_status === "ITNS";
   // const canEditDelivery = isShipmentManagement && !isCompleted;
 
@@ -799,10 +967,6 @@ const DeliveryTab = ({
     }
   }, [shipmentData]);
 
-
-  
-
-
   const handleEditToggle = (
     deliveryId: string,
     section: "timestamps" | "docs"
@@ -822,10 +986,12 @@ const DeliveryTab = ({
     const invNum = invoiceGroup.invoice[0].num;
     const invId = invoiceGroup._id;
     const isCurrentlyEditing = isEditingDeliveryInvoice[deliveryId];
-    
+
     // Check if the current invoice has any data entered
-    const hasData = packageStatusState[deliveryId]?.[invId]?.[invNum]?.invoice_products?.some((p: any) =>
-      Object.values(p).some(v => v !== "" && v !== 0)
+    const hasData = packageStatusState[deliveryId]?.[invId]?.[
+      invNum
+    ]?.invoice_products?.some((p: any) =>
+      Object.values(p).some((v) => v !== "" && v !== 0)
     );
 
     setIsEditingDeliveryInvoice((prev) => {
@@ -843,7 +1009,9 @@ const DeliveryTab = ({
           updatedPackageStatusState[deliveryId][invId][invNum]
             ?.invoice_products || [];
         if (currentProducts.length === 0) {
-          updatedPackageStatusState[deliveryId][invId][invNum].invoice_products = [
+          updatedPackageStatusState[deliveryId][invId][
+            invNum
+          ].invoice_products = [
             {
               material_SKU: "",
               batch: "",
@@ -963,25 +1131,30 @@ const DeliveryTab = ({
         // If any other status is checked, uncheck FULL
         invoiceStatus.full_checked = false;
         // If there are no products, add one empty row
-        if (newState[deliveryId][invoiceGroupId][invNum].invoice_products.length === 0) {
-          newState[deliveryId][invoiceGroupId][invNum].invoice_products = [{
-            material_SKU: "",
-            batch: "",
-            MFG_date: "",
-            cost_per_pcs: "",
-            pcs_in_case: "",
-            total: 0,
-            missing_cases: "",
-            missing_pcs: "",
-            damaged_cases: "",
-            damaged_pcs: "",
-            clotted_cases: "",
-            clotted_pcs: "",
-            rejected_cases: "",
-            rejected_pcs: "",
-            carton_damage_cases: "",
-            carton_damage_penalty: "",
-          }];
+        if (
+          newState[deliveryId][invoiceGroupId][invNum].invoice_products
+            .length === 0
+        ) {
+          newState[deliveryId][invoiceGroupId][invNum].invoice_products = [
+            {
+              material_SKU: "",
+              batch: "",
+              MFG_date: "",
+              cost_per_pcs: "",
+              pcs_in_case: "",
+              total: 0,
+              missing_cases: "",
+              missing_pcs: "",
+              damaged_cases: "",
+              damaged_pcs: "",
+              clotted_cases: "",
+              clotted_pcs: "",
+              rejected_cases: "",
+              rejected_pcs: "",
+              carton_damage_cases: "",
+              carton_damage_penalty: "",
+            },
+          ];
         }
       }
 
@@ -1122,6 +1295,40 @@ const DeliveryTab = ({
     }
   };
 
+  const isCompletedOrCancelled =
+    shipmentData.latest_status === "CPTD" ||
+    shipmentData.latest_status === "CNCL";
+  const isEditingEpodsLocal =
+    mappedDeliveries.length > 0
+      ? isEpodEditing[mappedDeliveries[0]._id] || false
+      : false;
+
+  const handleDeleteEPOD = async (
+    deliveryId: string,
+    invoiceNum: string,
+    epodUrl: string
+  ) => {
+    if (!epodDeleteState.deliveryId || !epodDeleteState.epodLink) return;
+
+    const payload = {
+      delivery: epodDeleteState.deliveryId,
+      epodLink: epodDeleteState.epodLink,
+      reason: "Deleted by user",
+    };
+    try {
+      await httpsPost(`v1/carrier_invoice/epod/delete`, payload);
+      showMessage("EPOD deleted successfully!", "success");
+      onDataChange();
+      setEpodDeleteState({ open: false, deliveryId: "", epodLink: "" });
+    } catch (error: any) {
+      showMessage(error.message || "Failed to delete EPOD.", "error");
+    }
+  };
+
+  const handleEpodDeleteClick = (deliveryId: string, epodLink: string) => {
+    setEpodDeleteState({ open: true, deliveryId, epodLink });
+  };
+
   const handleSubTableAddRow = (
     deliveryId: string,
     invoiceId: string,
@@ -1234,25 +1441,33 @@ const DeliveryTab = ({
     }
   };
 
-  const handleDeleteEPOD = async (deliveryId: string, epodUrl: string) => {
-    const payload = {
-      delivery: deliveryId,
-      epodLink: epodUrl,
-      reason: "Deleted by user",
-    };
-    try {
-      await httpsPost(`v1/carrier_invoice/epod/delete`, payload);
-      showMessage("EPOD deleted successfully!", "success");
-      onDataChange();
-    } catch (error: any) {
-      showMessage(error.message || "Failed to delete EPOD.", "error");
-    }
-  };
-
   const isEpodApproved = (delivery: any) => delivery.epod_approved === true;
   const isEpodDisapproved = (delivery: any) => delivery.epod_approved === false;
+  const isEpodPending = (delivery: any) =>
+    delivery.epod_approved === null && !delivery.reject_reason?.length; // Corrected logic
   const hasRejectionReasons = (delivery: any) =>
     delivery.reject_reason && delivery.reject_reason.length > 0;
+
+  const isSalesPerson = userRoles.sales_person;
+  const isAccountOwner = userRoles.owner;
+
+  const canToggleEpodEdit = isAccountOwner && !isCompletedOrCancelled;
+  const canUploadEpod = useMemo(() => {
+    // Check if the user role is not 'sales_person' and the shipment is not completed/cancelled
+
+    const isCompletedOrCancelled =
+      shipmentData.latest_status === "CPTD" ||
+      shipmentData.latest_status === "CNCL";
+    return !isSalesPerson && !isCompletedOrCancelled;
+  }, [userRoles, shipmentData]);
+
+  if (!mappedDeliveries.length) {
+    return (
+      <Typography sx={{ p: 3, textAlign: "center" }}>
+        No delivery information available.
+      </Typography>
+    );
+  }
 
   if (!mappedDeliveries.length) {
     return (
@@ -1272,8 +1487,17 @@ const DeliveryTab = ({
         const isEditingInvoicesLocal = isEditingDeliveryInvoice[delivery._id];
         const currentTimestampData = editableTimestamps[delivery._id] || {};
         const isApproved = isEpodApproved(delivery);
+        const isCompletedOrCancelled =
+          shipmentData.latest_status === "CPTD" ||
+          shipmentData.latest_status === "CNCL";
+
+        const isAccountOwner = userRoles.owner;
+
+        // Define the condition for editing Timestamps (Date & Time)
+        const canEditTimestamps = isAccountOwner && !isCompletedOrCancelled;
         const isCurrentlyEditingDocs = isEditingDcs[delivery._id];
-        const isEpodPending = (delivery: any) => delivery.epod_approved === null;
+        // Corrected logic for epod states
+        const isPending = isEpodPending(delivery);
         const isDisapproved = isEpodDisapproved(delivery);
         const hasEpods = delivery.epods && delivery.epods.length > 0;
         const showUploadRequestButtons =
@@ -1281,10 +1505,24 @@ const DeliveryTab = ({
 
         return (
           <Box key={delivery._id} className={styles.deliveryPointCard}>
-            <Grid container spacing={2} className={styles.infoGridContainer}>
-              <Grid item xs={12} md={7} className={styles.infoGridItem}>
+            <Grid container spacing={2} className={styles.infoGridContainer} sx= {{mt : '0px', width: '100%', ml : '0px', border: '1px solid #e0e0e0'}}>
+              <Grid item xs={12} md={7} className={styles.infoGridItem} sx ={{width: '50%'}} >
+                
+
                 <Box className={styles.header}>
-                  <span className={styles.deliveryIcon}>D{index + 1}</span>
+                  {/* NEW ISOLATION WRAPPER */}
+                  <Box 
+                    sx={{ 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      height: 24, // Enforce height here too
+                      flexShrink: 0 // Prevent the icon container from shrinking
+                    }}
+                  >
+                    <span className={styles.deliveryIcon}>D{index + 1}</span>
+                  </Box>
+                  {/* END NEW ISOLATION WRAPPER */}
+                  
                   <Box>
                     <Typography variant="body1" className={styles.boldText}>
                       {delivery.location?.name}
@@ -1294,6 +1532,7 @@ const DeliveryTab = ({
                     </Typography>
                   </Box>
                 </Box>
+
                 <Typography variant="body2" className={styles.infoRow}>
                   Delivery Date and Time:{" "}
                   <strong className={styles.boldText}>
@@ -1330,7 +1569,9 @@ const DeliveryTab = ({
                           >
                             Date & Time
                           </Typography>
-                          {canEditDelivery && (
+
+                          {/* REVISED LOGIC: Use canEditTimestamps */}
+                          {canEditTimestamps && (
                             <Box
                               sx={{
                                 position: "absolute",
@@ -1379,6 +1620,8 @@ const DeliveryTab = ({
                                   onClick={() =>
                                     handleEditToggle(delivery._id, "timestamps")
                                   }
+                                  // Custom style to match the new grey icon requirement
+                                  sx={{ color: "text.secondary" }}
                                 >
                                   <EditIcon fontSize="small" />
                                 </IconButton>
@@ -1583,7 +1826,6 @@ const DeliveryTab = ({
                   </Button>
                 </>
               )}
-            
             </div>
 
             {/* Commercial Invoices Section */}
@@ -1620,9 +1862,18 @@ const DeliveryTab = ({
                         {!isCompleted && canEditDelivery && (
                           <IconButton
                             size="small"
-                            onClick={() => handleInvoiceEditToggle(delivery._id, invoiceGroup)}
+                            onClick={() =>
+                              handleInvoiceEditToggle(
+                                delivery._id,
+                                invoiceGroup
+                              )
+                            }
                             title={isEditing ? "Close Edit" : "Edit Invoices"}
-                            sx={{ color: isEditing ? 'inherit' : '#grey', width :   isEditing ? '20px' : '20px', height:  isEditing ? '20px': '20px' }}
+                            sx={{
+                              color: isEditing ? "inherit" : "#grey",
+                              width: isEditing ? "20px" : "20px",
+                              height: isEditing ? "20px" : "20px",
+                            }}
                           >
                             {isEditing ? <CancelIcon /> : <EditIcon />}
                           </IconButton>
@@ -1652,36 +1903,28 @@ const DeliveryTab = ({
                                 className={styles.tableHeaderCell}
                                 sx={{ color: "#09337e", fontWeight: "bold" }}
                               >
-                                <strong>
-                                  Value ({currencySymbol})
-                                </strong>
+                                <strong>Value ({currencySymbol})</strong>
                               </TableCell>
                               <TableCell
                                 align="center"
                                 className={styles.tableHeaderCell}
                                 sx={{ color: "#09337e", fontWeight: "bold" }}
                               >
-                                <strong>
-                                  Gross Wt. ({uom})
-                                </strong>
+                                <strong>Gross Wt. ({uom})</strong>
                               </TableCell>
                               <TableCell
                                 align="center"
                                 className={styles.tableHeaderCell}
                                 sx={{ color: "#09337e", fontWeight: "bold" }}
                               >
-                                <strong>
-                                  Net Wt. ({uom})
-                                </strong>
+                                <strong>Net Wt. ({uom})</strong>
                               </TableCell>
                               <TableCell
                                 align="center"
                                 className={styles.tableHeaderCell}
                                 sx={{ color: "#09337e", fontWeight: "bold" }}
                               >
-                                <strong>
-                                  Considered Wt. ({uom})
-                                </strong>
+                                <strong>Considered Wt. ({uom})</strong>
                               </TableCell>
                               <TableCell
                                 align="center"
@@ -1783,7 +2026,8 @@ const DeliveryTab = ({
                                         onDelete={() =>
                                           handleDeleteEPOD(
                                             delivery._id,
-                                            epodUrl
+                                            epodUrl,
+                                            inv.num
                                           )
                                         }
                                       />
@@ -1841,7 +2085,6 @@ const DeliveryTab = ({
                               </TableCell>
                               {/* <TableCell align="center">
                                 {/* No save icon here anymore */}
-                              
                             </TableRow>
                           </TableBody>
                         </Table>
@@ -1905,26 +2148,35 @@ const DeliveryTab = ({
                       </Box>
                       {/* New: Submit button */}
                       {isEditing && (
-                      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
-                        <Button
-                          variant="contained"
-                          color="primary"
-                          size="small"
+                        <Box
                           sx={{
-                            backgroundColor: "#20104d",
-                            "&:hover": { backgroundColor: "#271950" },
-                            textTransform: "capitalize",
+                            display: "flex",
+                            justifyContent: "flex-end",
+                            mt: 2,
                           }}
-                          onClick={() => handleSaveAll(delivery._id, invoiceGroup)}
-                          disabled={isSaving[invoiceGroup._id]}>
-                          {isSaving[invoiceGroup._id] ? (
-                            <CircularProgress size={20} />
-                          ) : (
-                            "Submit"
-                          )}
-                        </Button>
-                      </Box>
-                    )}
+                        >
+                          <Button
+                            variant="contained"
+                            color="primary"
+                            size="small"
+                            sx={{
+                              backgroundColor: "#20104d",
+                              "&:hover": { backgroundColor: "#271950" },
+                              textTransform: "capitalize",
+                            }}
+                            onClick={() =>
+                              handleSaveAll(delivery._id, invoiceGroup)
+                            }
+                            disabled={isSaving[invoiceGroup._id]}
+                          >
+                            {isSaving[invoiceGroup._id] ? (
+                              <CircularProgress size={20} />
+                            ) : (
+                              "Submit"
+                            )}
+                          </Button>
+                        </Box>
+                      )}
                     </Box>
                   );
                 })
@@ -1948,22 +2200,20 @@ const DeliveryTab = ({
                 width: "100%",
               }}
             >
+              {/* Damaged/Rejected/Missing Pictures Section (LEFT SIDE) */}
               <Grid
                 item
                 xs={12}
                 md={6}
-                sx={{ padding: "16px", borderRight: "1px solid  #E0E0E0" }}
+                sx={{
+                  padding: "16px",
+                  borderRight: { md: "1px solid #E0E0E0" },
+                }}
               >
                 <Box className={styles.sectionHeader}>
                   <Typography variant="subtitle2">
                     Damaged/Rejected/Missing Pictures
                   </Typography>
-                  {canEditAny && !isCurrentlyEditingDocs && (
-                    <IconButton
-                      size="small"
-                      onClick={() => handleEditToggle(delivery._id, "docs")}
-                    ></IconButton>
-                  )}
                 </Box>
                 <Box className={styles.galleryBox}>
                   {delivery.goods_pics?.length > 0 ? (
@@ -1976,44 +2226,294 @@ const DeliveryTab = ({
                     </Typography>
                   )}
                 </Box>
-                {isCurrentlyEditingDocs && (
+
+                {/* Upload Picture Button - SIMPLIFIED LOGIC */}
+                {isEditingEpodsLocal && !isCompletedOrCancelled && (
                   <button
                     className={styles.uploading_picture_button}
                     onClick={() => handleUploadClick(delivery._id, "goods")}
+                    style={{ marginTop: "8px" }}
                   >
                     Upload Picture
                   </button>
                 )}
               </Grid>
-              <Grid item xs={12} md={6} style={{ padding: "16px" }}>
-                <Box>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                      minHeight: "36.5px", // Matches the height of the other section header
-                      mb: "8px",
-                    }}
-                  >
-                    <Typography variant="subtitle2">ePODs</Typography>
-                    <Box
-                      sx={{
-                        display: "flex",
-                        gap: 1,
-                        alignItems: "center",
-                      }}
-                    >
-                      {hasEpods && (
-                        <>
-                          {isEpodApproved(delivery) && (
-                            <>
-                              <Typography
-                                variant="caption"
-                                sx={{ color: "green", fontWeight: "bold" }}
+
+              {/* ePODs Section (RIGHT SIDE) */}
+              <Grid item xs={12} md={6} sx={{ padding: "16px" }}>
+                <Box className={styles.sectionHeader}>
+                  <Typography variant="subtitle2">ePODs</Typography>
+                  <Box className={styles.epodApprovalStatus}>
+                    {/* Logic for Completed/Cancelled Shipments (Original logic) */}
+                    {isCompletedOrCancelled ? (
+                      <>
+                        {/* EPOD Approval/Disapproval for CPTD/CNCL - This is the block that must be visible */}
+                        {hasEpods && (
+                          <>
+                            {/* 1. EPOD explicitly approved: Show Approved label and Disapprove button */}
+                            {delivery.epod_approved === true && (
+                              <>
+                                <Typography
+                                  variant="caption"
+                                  className={styles.approvedText}
+                                  sx={{ mr: 1 , fontWeight: 'bold'}}
+                                >
+                                  ePOD are already Approved
+                                </Typography>
+                                <Button
+                                  onClick={() => handleApproveDisapproveEPOD(delivery._id, false)}
+                                  size="small"
+                                  sx={{ 
+                                      backgroundColor: "red", 
+                                      color: "white", 
+                                      textTransform: 'capitalize', 
+                                      padding: '3px 10px',
+                                      // ADD THIS TO REMOVE HOVER EFFECT
+                                      '&:hover': {
+                                          backgroundColor: 'red', // Keep the solid color
+                                          boxShadow: 'none',
+                                          filter: 'brightness(90%)' // Optional: slightly darken on hover
+                                      }
+                                  }}
                               >
-                                ePODs are already Approved
-                              </Typography>
+                                  Disapprove
+                              </Button>
+                              </>
+                            )}
+
+                            {/* 2. EPOD explicitly disapproved: Show Disapproved label (must have reason) and Approve button */}
+                            {delivery.epod_approved === false &&
+                              hasRejectionReasons(delivery) && (
+                                <>
+                                  <Tooltip
+                                    title={
+                                      delivery.reject_reason.join(", ") ||
+                                      "No reason provided"
+                                    }
+                                  >
+                                    <Typography
+                                      variant="caption"
+                                      className={styles.disapprovedText}
+                                      sx={{ mr: 1 }}
+                                    >
+                                      ePOD Disapproved
+                                    </Typography>
+                                  </Tooltip>
+                                  <Button
+                                    onClick={() => handleApproveDisapproveEPOD(delivery._id, true)}
+                                    size="small"
+                                    sx={{
+                                      backgroundColor: "green",
+                                      color: "white",
+                                      textTransform: "capitalize",
+                                      padding: "3px 10px",
+                                     '&:hover': {
+                                          backgroundColor: 'green', // Keep the solid color
+                                          boxShadow: 'none',
+                                          filter: 'brightness(90%)' // Optional: slightly darken on hover
+                                      }
+                                    }}
+                                  >
+                                    Approve
+                                  </Button>
+                                </>
+                              )}
+                          </>
+                        )}
+                        {hasEpods &&
+                          (delivery.epod_approved === null ||
+                            (delivery.epod_approved === false &&
+                              !hasRejectionReasons(delivery))) && (
+                            <>
+                              <Button
+                                onClick={() =>
+                                  handleApproveDisapproveEPOD(
+                                    delivery._id,
+                                    true
+                                  )
+                                }
+                                size="small"
+                                sx={{
+                                  backgroundColor: "green",
+                                  color: "white",
+                                  textTransform: "capitalize",
+                                  padding: "3px 10px",
+                                  '&:hover': {
+                                      backgroundColor: 'green', // Keep the solid color
+                                      boxShadow: 'none',
+                                      filter: 'brightness(90%)' // Optional: slightly darken on hover
+                                  }
+                                }}
+                              >
+                                Approve
+                              </Button>
+                              <Button
+                                  onClick={() => handleApproveDisapproveEPOD(delivery._id, false)}
+                                  size="small"
+                                  sx={{ 
+                                      backgroundColor: "red", 
+                                      color: "white", 
+                                      textTransform: 'capitalize', 
+                                      padding: '3px 10px',
+                                      // ADD THIS TO REMOVE HOVER EFFECT
+                                      '&:hover': {
+                                          backgroundColor: 'red', // Keep the solid color
+                                          boxShadow: 'none',
+                                          filter: 'brightness(90%)' // Optional: slightly darken on hover
+                                      }
+                                  }}
+                              >
+                                  Disapprove
+                              </Button>
+                            </>
+                          )}
+                      </>
+                    ) : (
+                      <>
+                        {/* Edit Button controlled by isAccountOwner and shipment status */}
+                        {/* The "only sales person" restriction should be added here to control the button visibility itself. */}
+                        {canToggleEpodEdit && (
+                          <IconButton
+                            onClick={() =>
+                              setIsEpodEditing((prev) => ({
+                                ...prev,
+                                [delivery._id]: !prev[delivery._id],
+                              }))
+                            }
+                            size="small"
+                            title={
+                              isEditingEpodsLocal
+                                ? "Close Editing"
+                                : "Edit ePODs"
+                            }
+                            sx={{
+                              // Style to make it a simple grey icon button
+                              padding: 0,
+                              minWidth: "unset",
+                              borderRadius: "4px",
+
+                              // Icon color: Red/Error when active (Close), Grey when inactive (Edit)
+                              color: isEditingEpodsLocal
+                                ? "error.main"
+                                : "text.secondary",
+
+                              backgroundColor: "transparent",
+                              border: "none",
+                              mr: 1,
+
+                              "&:hover": {
+                                backgroundColor: isEditingEpodsLocal
+                                  ? "rgba(244, 67, 54, 0.08)"
+                                  : "rgba(0, 0, 0, 0.04)", // Light hover effect
+                              },
+                            }}
+                          >
+                            {/* Toggle Icon: Close when editing, Edit when inactive */}
+                            {isEditingEpodsLocal ? (
+                              <CancelIcon fontSize="small" />
+                            ) : (
+                              <EditIcon fontSize="small" />
+                            )}
+                          </IconButton>
+                        )}
+
+                        {/* Show approval/disapproval buttons when NOT editing and EPODs exist */}
+                        {!isEditingEpodsLocal && hasEpods && (
+                          <>
+                            {/* 1. EPOD explicitly approved: Show Approved label and Disapprove button */}
+                            {delivery.epod_approved === true && (
+                              <>
+                                <Typography
+                                  variant="caption"
+                                  className={styles.approvedText}
+                                  sx={{ mr: 1 }}
+                                >
+                                  ePOD are already Approved
+                                </Typography>
+                                <Button
+                                  onClick={() =>
+                                    handleApproveDisapproveEPOD(
+                                      delivery._id,
+                                      false
+                                    )
+                                  }
+                                  size="small"
+                                  sx={{
+                                    backgroundColor: "red",
+                                    color: "white",
+                                    textTransform: "capitalize",
+                                    padding: "3px 10px",
+                                  }}
+                                >
+                                  Disapprove
+                                </Button>
+                              </>
+                            )}
+
+                            {/* 2. EPOD explicitly disapproved: Show Disapproved label (must have reason) and Approve button */}
+                            {delivery.epod_approved === false &&
+                              hasRejectionReasons(delivery) && (
+                                <>
+                                  <Tooltip
+                                    title={
+                                      delivery.reject_reason.join(", ") ||
+                                      "No reason provided"
+                                    }
+                                  >
+                                    <Typography
+                                      variant="caption"
+                                      className={styles.disapprovedText}
+                                      sx={{ mr: 1 }}
+                                    >
+                                      ePOD Disapproved
+                                    </Typography>
+                                  </Tooltip>
+                                  <Button
+                                    onClick={() =>
+                                      handleApproveDisapproveEPOD(
+                                        delivery._id,
+                                        true
+                                      )
+                                    }
+                                    size="small"
+                                    sx={{
+                                      backgroundColor: "green",
+                                      color: "white",
+                                      textTransform: "capitalize",
+                                      padding: "3px 10px",
+                                    }}
+                                  >
+                                    Approve
+                                  </Button>
+                                </>
+                              )}
+                          </>
+                        )}
+                        {/* Unresolved state approval buttons when NOT editing and EPODs exist */}
+                        {!isEditingEpodsLocal &&
+                          hasEpods &&
+                          (delivery.epod_approved === null ||
+                            (delivery.epod_approved === false &&
+                              !hasRejectionReasons(delivery))) && (
+                            <>
+                              <Button
+                                onClick={() =>
+                                  handleApproveDisapproveEPOD(
+                                    delivery._id,
+                                    true
+                                  )
+                                }
+                                size="small"
+                                sx={{
+                                  backgroundColor: "green",
+                                  color: "white",
+                                  textTransform: "capitalize",
+                                  padding: "3px 10px",
+                                  mr: 1,
+                                }}
+                              >
+                                Approve
+                              </Button>
                               <Button
                                 onClick={() =>
                                   handleApproveDisapproveEPOD(
@@ -2026,115 +2526,47 @@ const DeliveryTab = ({
                                   backgroundColor: "red",
                                   color: "white",
                                   textTransform: "capitalize",
-                                  padding: '3px 10px'
+                                  padding: "3px 10px",
                                 }}
                               >
                                 Disapprove
                               </Button>
                             </>
                           )}
-                          {isDisapproved && (
-                            <Tooltip
-                              title={
-                                hasRejectionReasons(delivery)
-                                  ? delivery.reject_reason.join(", ")
-                                  : "No reason provided"
-                              }
-                            >
-                              <Box sx={{ display: "flex", gap: 1, alignItems: 'center' }}>
-                                <Typography
-                                  variant="caption"
-                                  sx={{ color: "red", fontWeight: "bold" }}
-                                >
-                                  ePOD Disapproved
-                                </Typography>
-                                <Button
-                                  onClick={() =>
-                                    handleApproveDisapproveEPOD(
-                                      delivery._id,
-                                      true
-                                    )
-                                  }
-                                  size="small"
-                                  sx={{
-                                    backgroundColor: "green",
-                                    color: "white",
-                                    textTransform: "capitalize",
-                                  }}
-                                >
-                                  Approve
-                                </Button>
-                              </Box>
-                            </Tooltip>
-                          )}
-                          {isEpodPending(delivery) && (
-                            <>
-                              <Button
-                                onClick={() =>
-                                  handleApproveDisapproveEPOD(delivery._id, true)
-                                }
-                                size="small"
-                                sx={{ backgroundColor: "green", color: "white", textTransform: 'capitalize' }}
-                              >
-                                Approve
-                              </Button>
-                              <Button
-                                onClick={() =>
-                                  handleApproveDisapproveEPOD(delivery._id, false)
-                                }
-                                size="small"
-                                sx={{ backgroundColor: "red", color: "white", textTransform: 'capitalize' }}
-                              >
-                                Disapprove
-                              </Button>
-                            </>
-                          )}
-                        </>
-                      )}
-                    </Box>
+                      </>
+                    )}
                   </Box>
-
-                  <Box className={styles.galleryBox}>
-                    {delivery.epods?.length > 0 ? (
+                </Box>
+                <Box className={styles.galleryBox}>
+                  {delivery.epods?.length > 0 ? (
                     delivery.epods.map((epod: any, idx: number) => (
-                      <SimpleDocViewer key={idx} assetUrl={epod.link} />
+                      <SimpleDocViewer
+                        key={idx}
+                        assetUrl={epod.link}
+                        onDelete={() => handleEpodDeleteClick(delivery._id, epod.link)}
+                      />
                     ))
                   ) : (
                     <Typography color="text.secondary">
-                      No EPODs found
+                      No ePODs found
                     </Typography>
                   )}
                 </Box>
-                {isCurrentlyEditingDocs && (
+
+                {/* EPOD Upload/Replace Button Logic: SIMPLIFIED LOGIC */}
+                {isEditingEpodsLocal && !isCompletedOrCancelled && (
                   <button
-                    style={{
-                      backgroundColor: '#2962FF',
-                      color: '#fff',
-                      border: 'none',
-                      borderRadius: '4px',
-                      padding: '8px 15px',
-                      cursor: 'pointer',
-                      fontSize: '14px',
-                      marginTop: '10px'
-                    }}
+                    className={styles.uploading_epod_button}
                     onClick={() => handleUploadClick(delivery._id, "epod")}
+                    style={{ marginTop: "8px" }}
                   >
-                    Upload EPOD
+                    {delivery.epods?.length > 0
+                      ? "Replace EPOD"
+                      : "Upload EPOD"}
                   </button>
                 )}
-                </Box>
               </Grid>
             </Grid>
-            {isCurrentlyEditingDocs && (
-              <Box sx={{ textAlign: "right", mt: 2 }}>
-                <button
-                  className={styles.done_button}
-                  onClick={() => handleEditToggle(delivery._id, "docs")}
-                >
-                  Done
-                </button>
-              </Box>
-            )}
 
             <Grid
               container
@@ -2218,13 +2650,17 @@ const DeliveryTab = ({
             {/* Hidden file inputs */}
             <input
               type="file"
-              ref={(el) => {(fileInputRef.current[`${delivery._id}-epod`] = el)}}
+              ref={(el) => {
+                fileInputRef.current[`${delivery._id}-epod`] = el;
+              }}
               style={{ display: "none" }}
               onChange={(e) => handleFileChange(e, delivery._id, "epod")}
             />
             <input
               type="file"
-              ref={(el) => {(fileInputRef.current[`${delivery._id}-goods`] = el)}}
+              ref={(el) => {
+                fileInputRef.current[`${delivery._id}-goods`] = el;
+              }}
               style={{ display: "none" }}
               onChange={(e) => handleFileChange(e, delivery._id, "goods")}
             />
@@ -2235,14 +2671,43 @@ const DeliveryTab = ({
       <Dialog
         open={disapproveDialogState.open}
         onClose={() =>
-          setDisapproveDialogState({ ...disapproveDialogState, open: false })
+          setDisapproveDialogState({ open: false, deliveryId: "", reason: "" })
         }
+        PaperProps={{
+          sx: { width: "450px", height: "300px", borderRadius: "8px" },
+        }}
       >
-        <DialogTitle>Disapprove EPOD</DialogTitle>
-        <DialogContent>
+        <DialogTitle
+          sx={{
+            backgroundColor: "#20104d",
+            color: "white",
+            fontSize: "16px",
+            fontWeight: 500,
+            padding: "6px 20px",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          Disapprove EPOD
+          <IconButton
+            onClick={() =>
+              setDisapproveDialogState({
+                open: false,
+                deliveryId: "",
+                reason: "",
+              })
+            }
+            sx={{ color: "white" }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent
+          sx={{ p: 3, pt: "20px !important", pb: "0px !important" }}
+        >
           <TextareaAutosize
             minRows={3}
-            className={styles.textArea}
             value={disapproveDialogState.reason}
             onChange={(e) =>
               setDisapproveDialogState({
@@ -2250,26 +2715,29 @@ const DeliveryTab = ({
                 reason: e.target.value,
               })
             }
-            placeholder="Enter reason here..."
+            placeholder="Please give reason for disapproving the ePOD"
+            style={{
+              width: "100%",
+              padding: "10px",
+              fontSize: "14px",
+              height: "40px",
+              borderRadius: "4px",
+              borderColor: "#ccc",
+              fontFamily: "inherit",
+            }}
           />
         </DialogContent>
-        <DialogActions>
-          <Button
-            onClick={() =>
-              setDisapproveDialogState({
-                ...disapproveDialogState,
-                open: false,
-              })
-            }
-          >
-            Cancel
-          </Button>
+        <DialogActions sx={{ p: "0 8px 8px" }}>
           <Button
             onClick={handleDisapproveEPODWithReason}
             variant="contained"
-            color="error"
+            sx={{
+              textTransform: "capitalize",
+              backgroundColor: "#E54131",
+              "&:hover": { backgroundColor: "#c43426" },
+            }}
           >
-            Disapprove
+            Submit
           </Button>
         </DialogActions>
       </Dialog>

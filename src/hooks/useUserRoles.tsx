@@ -51,7 +51,8 @@ export const useUserRoles = (): UserRoles => {
             role.value === 'finance_administrator'
           ),
           shipment: storedRoles.some(role => role.value === 'shipment_administrator'),
-          sales_person: storedRoles.some(role => role.value === 'sales_person')
+          sales_person: storedRoles.some(role => role.value === 'sales_person'),
+
         };
         setRoles(newRoles);
       }

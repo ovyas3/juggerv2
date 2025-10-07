@@ -103,19 +103,7 @@ const HeaderActions: React.FC<HeaderActionsProps> = ({
               Update Vehicle Arrival
             </button>
 
-            {isTata && (
-              <button
-                className={styles.menuItem}
-                role="menuitem"
-                onClick={() => {
-                  setOpen(false);
-                  setShowBulkEpodUpload(true);
-                }}
-              >
-                <Upload className={styles.lucideIcon} />
-                Bulk ePOD Upload
-              </button>
-            )}
+            
 
             <button
               className={styles.menuItem}
@@ -143,6 +131,7 @@ const HeaderActions: React.FC<HeaderActionsProps> = ({
               Fetch Invoice Details
             </button>
             </>)}
+
             <button
               className={styles.menuItem}
               role="menuitem"
@@ -152,6 +141,20 @@ const HeaderActions: React.FC<HeaderActionsProps> = ({
               <Upload className={styles.lucideIcon} />
               Bulk Upload
             </button>
+
+            {isTata && (
+              <button
+                className={styles.menuItem}
+                role="menuitem"
+                onClick={() => {
+                  setOpen(false);
+                  setShowBulkEpodUpload(true);
+                }}
+              >
+                <Upload className={styles.lucideIcon} />
+                Bulk ePOD Upload
+              </button>
+            )}
             {isjspl && (
             <button
               className={styles.menuItem}
@@ -164,7 +167,8 @@ const HeaderActions: React.FC<HeaderActionsProps> = ({
             >
               <AlertCircle className={styles.lucideIcon} />
               Missed Shipment
-            </button>)}
+            </button>)
+            }
 
           </div>
         )}

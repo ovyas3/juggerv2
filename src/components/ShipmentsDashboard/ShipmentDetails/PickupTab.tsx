@@ -186,6 +186,7 @@ const PickupTab = ({
   isTechnova,
   isEmami,
   isBMWIL,
+  isJSPL,
   isTata
 }: {
   shipmentData: any;
@@ -197,6 +198,7 @@ const PickupTab = ({
   isTechnova: boolean;
   isEmami: boolean;
   isBMWIL: boolean;
+  isJSPL: boolean;
   isTata: boolean;
 }) => {
   const [activeSubTab, setActiveSubTab] = useState(0);
@@ -361,6 +363,7 @@ const PickupTab = ({
     }));
   };
 
+  const isCompletedOrCancelled = shipmentData.latest_status === "CPTD" || shipmentData.latest_status === "CNCL";
 
 
   const handleInvoiceChange = (
@@ -612,6 +615,8 @@ const PickupTab = ({
     }
   };
 
+
+  
   // --- File & Container Handlers ---
   const handleUploadClick = (refId: string) =>
     fileInputRefs.current[refId]?.click();
@@ -789,9 +794,18 @@ const PickupTab = ({
             return (
               <Box key={pickup._id} className={styles.pickupPointCard}>
                 <Grid container spacing={2} sx={{mt : '0', ml: '0', width : '100%', border: '1px solid #e0e0e0'}}>
-                  <Grid item xs={12} md={7}>
+                  <Grid item xs={12} md={7} pl={7}>
                     <Box className={styles.header}>
-                      <span className={styles.pickupIcon}>P{index + 1}</span>
+                      <Box 
+                        sx={{ 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          height: 24, // Enforce height here too
+                          flexShrink: 0 // Prevent the icon container from shrinking
+                        }}
+                      >
+                        <span className={styles.pickupIcon}>P{index + 1}</span>
+                      </Box>
                       <Box className={styles.locationInfo}>
                         <Typography variant="body1" sx={{ fontWeight: "bold" }}>
                           {pickup.location?.name}
@@ -844,8 +858,8 @@ const PickupTab = ({
 
                           Date & Time
                         </Typography>
-                        {canEditTimestamps &&
-                          (isEditingTimes ? (
+                        {canEditTimestamps && !isCompletedOrCancelled && (
+                          isEditingTimes ? (
                             <>
                               <IconButton
                                 size="small"
@@ -862,9 +876,7 @@ const PickupTab = ({
                               <IconButton
                                 size="small"
                                 title="Cancel"
-                                onClick={() =>
-                                  handleEditTimestampsToggle(pickup._id)
-                                }
+                                onClick={() => handleEditTimestampsToggle(pickup._id)}
                                 disabled={isSavingTimestamps[pickup._id]}
                               >
                                 <CancelIcon fontSize="small" />
@@ -874,13 +886,13 @@ const PickupTab = ({
                             <IconButton
                               size="small"
                               title="Edit Timestamps"
-                              onClick={() =>
-                                handleEditTimestampsToggle(pickup._id)
-                              }
+                              onClick={() => handleEditTimestampsToggle(pickup._id)}
                             >
                               <EditIcon fontSize="small" />
                             </IconButton>
-                          ))}
+                          )
+                        )}
+
                       </Box>
                       <Box sx={{ p: 2 }}>
                         {isEditingTimes ? (
@@ -1042,26 +1054,16 @@ const PickupTab = ({
                       ?.map((m: any) => m.name)
                       .join(", ") || "N/A"}
                   </Typography>
-                  {canEditInvoices &&
-                    (isEditing ? (
-                      <Box>
-                        
-                        <IconButton
-                          size="small"
-                          title="Cancel"
-                          onClick={() => handleEditGoodsToggle(pickup._id)}>
-                          <CancelIcon fontSize="small" />
-                        </IconButton>
-                      </Box>
-                    ) : (
-                      <IconButton
-                        size="small"
-                        title="Edit Goods & Invoices"
-                        onClick={() => handleEditGoodsToggle(pickup._id)}
-                      >
-                        <EditIcon fontSize="small" />
-                      </IconButton>
-                    ))}
+                  {canEditInvoices && !isCompletedOrCancelled && (
+                    <IconButton
+                      size="small"
+                      title={isEditing ? "Cancel" : "Edit Goods & Invoices"}
+                      onClick={() => handleEditGoodsToggle(pickup._id)}
+                    >
+                      {isEditing ? <CancelIcon fontSize="small" /> : <EditIcon fontSize="small" />}
+                    </IconButton>
+                  )}
+
                 </Box>
                 <InvoiceTable
                   groupedInvoices={goodsInfo}
@@ -1089,6 +1091,7 @@ const PickupTab = ({
                   isTechnova = {isTechnova}
                   isEmami = {isEmami}
                   isBMWIL = {isBMWIL}
+                  isJSPL = {isJSPL}
                   shipmentData={shipmentData}
                 />
                 <Grid

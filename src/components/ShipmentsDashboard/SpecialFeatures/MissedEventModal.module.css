@@ -134,10 +134,8 @@ select.inputField {
 /* Fetch Button */
 .fetchBtn {
   color: #fff;
-  background: #20104d
-;
-  border: 1px solid #20104d
-;
+  background: #20104d;
+  border: 1px solid #20104d;
   border-radius: 4px;
   padding: 10px 20px;
   cursor: pointer;
@@ -171,8 +169,7 @@ select.inputField {
 
 /* Footer Submit Button */
 .dialogFooterBtn {
-  background: #20104d
-;
+  background: #20104d;
   color: white;
   border: none;
   border-radius: 4px;
@@ -216,8 +213,7 @@ select.inputField {
 .dataTextarea {
   width: 100%;
   height: 108px;
-  border: 1px solid #20104d
-;
+  border: 1px solid #20104d;
   border-radius: 4px;
   padding: 8px;
   font-family: monospace;
@@ -230,8 +226,7 @@ select.inputField {
 
 .dataTextarea:focus {
   outline: none;
-  border-color: #20104d
-;
+  border-color: #20104d;
   box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
 }
 
@@ -252,20 +247,17 @@ select.inputField {
 }
 
 .select:hover {
-  border-color: #20104d
-;
+  border-color: #20104d;
 }
 
 .select:focus-within {
-  border-color: #20104d
-;
+  border-color: #20104d;
   box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
   outline: none;
 }
 
 .select[data-state="open"] {
-  border-color: #20104d
-;
+  border-color: #20104d;
   box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
 }
 
@@ -296,8 +288,7 @@ select.inputField {
 }
 
 .selectItem[data-highlighted] {
-  background-color: #20104d
-;
+  background-color: #20104d;
   color: white;
   outline: none;
 }
@@ -340,8 +331,7 @@ select.inputField {
   height: 16px;
   margin: -8px 0 0 -8px;
   border: 2px solid #f3f3f3;
-  border-top: 2px solid #20104d
-;
+  border-top: 2px solid #20104d;
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }

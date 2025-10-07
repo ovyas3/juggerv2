@@ -93,6 +93,7 @@ const ShipmentDetails: React.FC<ShipmentDetailsProps> = ({
 
   const [isMYKL, setIsMYKL] = useState(false);
   const [isTata, setIsTata] = useState(false);
+  const [isjSPL, setIsJSPL] = useState(false);
   const [isTechnova, setIsTechnova] = useState(false);
   const [isRSPL, setIsRSPL] = useState(false);
   const [isBMWIL, setIsBMWIL] = useState(false);
@@ -152,6 +153,7 @@ const ShipmentDetails: React.FC<ShipmentDetailsProps> = ({
           setIsMYKL(parentName === "MYK Laticrete India Private Limited");
           setIsEmami(parentName === "Emami Limited");
           setIsTata(parentName === "Tata Power Ltd");
+          setIsJSPL(parentName === "JSP" || parentName === "JSPL Angul");
           setIsTechnova(parentName === "TechNova Imaging Systems Pvt Ltd");
           setIsRSPL(parentName === "RSPL Limited");
           setIsBMWIL(parentName === "BMWISL");
@@ -251,6 +253,7 @@ const ShipmentDetails: React.FC<ShipmentDetailsProps> = ({
           isEmami = {isEmami}
           isTata = {isTata}
           isBMWIL = {isBMWIL}
+          isJSPL = {isjSPL}
         />
       ),
     },
@@ -309,26 +312,31 @@ const ShipmentDetails: React.FC<ShipmentDetailsProps> = ({
         />
       ),
     },
-    {
-      label: "Chart",
-      visible: isTechnova,
-      component: <ChartTab shipmentData={shipmentData} />,
-    },
-    {
-      label: "Materials",
-      visible: customerData.length > 0 || isRSPL || isMYKL,
-      component: <MaterialsTab shipmentData={shipmentData} />,
-    },
+    // {
+    //   label: "Chart",
+    //   visible: isTechnova,
+    //   component: <ChartTab shipmentData={shipmentData} />,
+    // },
+    // {
+    //   label: "Materials",
+    //   visible: customerData.length > 0 || isRSPL || isMYKL,
+    //   component: <MaterialsTab shipmentData={shipmentData} />,
+    // },
     {
       label: "Event Log",
       visible: isMYKL,
-      component: <EventLogTab shipmentData={shipmentData} />,
+      component: (
+        <EventLogTab 
+          shipmentData={shipmentData} 
+          isMYKL={isMYKL} 
+        />
+      ),
     },
-    {
-      label: "Bill To",
-      visible: isTechnova,
-      component: <BillToTab shipmentData={shipmentData} />,
-    },
+    // {
+    //   label: "Bill To",
+    //   visible: isTechnova,
+    //   component: <BillToTab shipmentData={shipmentData} />,
+    // },
   ];
 
   const visibleTabs = tabsConfig.filter((tab) => tab.visible);

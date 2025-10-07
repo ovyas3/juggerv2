@@ -308,8 +308,8 @@ const CarrierInvoiceTab = ({
 
   if (invoices.length === 0) {
     return (
-      <Typography sx={{ p: 3, textAlign: "center", color: "text.secondary" }}>
-        No Carrier Invoices found for this shipment.
+      <Typography sx={{ p: 3, textAlign: "center", color: "#E54131" }}>
+        Carrier Invoice is not generated yet.
       </Typography>
     );
   }

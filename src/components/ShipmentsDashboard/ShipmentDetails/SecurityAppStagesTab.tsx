@@ -85,6 +85,27 @@ const SecurityAppStagesTab = ({ shipmentData }: { shipmentData: any }) => {
 
     const handleCloseImage = () => setSelectedImage(null);
 
+    // Check if there are any stages or any images across all stages
+    const hasAnyImages = useMemo(() => {
+        if (!securityCheckStages || securityCheckStages.length === 0) {
+            return false;
+        }
+        return securityCheckStages.some((stage: any) => 
+            stage.checklist?.some((item: any) => 
+                item.images?.some((img: any) => img.imageURL)
+            )
+        );
+    }, [securityCheckStages]);
+
+    if (!hasAnyImages) {
+        return (
+            <Box className={styles.container} sx={{ alignItems: 'center', justifyContent: 'center', minHeight: '200px' }}>
+                <Typography color="text.secondary">
+                    No Images uploaded yet
+                </Typography>
+            </Box>
+        );
+    }
     return (
         <Box className={styles.container}>
             {(loadingBay || executiveName) && (
@@ -179,10 +200,20 @@ const SecurityAppStagesTab = ({ shipmentData }: { shipmentData: any }) => {
                             <CloseIcon />
                         </IconButton>
                     </DialogTitle>
-                    <DialogContent dividers>
-                        <img src={selectedImage} alt="Selected" style={{ width: '40%', height: 'auto' }} />
+                    <DialogContent
+                        dividers
+                        sx={{
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            backgroundColor: '#f5f5f5', // Match stage header background
+                        }}
+                    >
+                        <img src={selectedImage} alt="Selected" style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
                     </DialogContent>
-                    <DialogActions>
+                    <DialogActions sx={{
+                        backgroundColor: '#f5f5f5', // Match stage header background
+                    }}>
                         <Button 
                             onClick={() => handleDownloadSingleImage(selectedImage)} 
                             startIcon={<DownloadIcon />}
