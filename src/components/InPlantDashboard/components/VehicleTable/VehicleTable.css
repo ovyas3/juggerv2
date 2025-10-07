@@ -51,11 +51,11 @@
 
 /* Table Header */
 .vehicle-table thead th {
-  background: var(--bg-tertiary);
+  background: #301c6c;
   padding: var(--spacing-md) var(--spacing-md);
   text-align: center;
   font-weight: var(--font-semibold);
-  color: var(--text-secondary);
+  color: #fff;
   border-bottom: 1px solid var(--border-light);
   position: sticky;
   top: 0;
@@ -345,10 +345,19 @@
 /* Actions Cell */
 .actions-cell {
   text-align: center;
-  position: relative;          /* keeps the popup anchored to this cell */
-  display: flex;               /* center the kebab button */
-  align-items: center;         /* vertical center inside the cell */
+  padding: var(--spacing-md) var(--spacing-sm);
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  background: var(--bg-primary);
+  position: relative;
+  vertical-align: middle;
+  border-right: 1px solid var(--border-light);
+}
+
+.actions-cell > div {
+  display: flex;
   justify-content: center;
+  align-items: center;
 }
 
 .action-btn {
@@ -920,10 +929,10 @@
   color: var(--text-secondary);
   font-size: var(--text-sm);
   background: var(--bg-primary);
-  
   /* CRITICAL FIXES: Set position: relative and center button manually */
   position: relative; /* <-- ADD THIS: Makes the cell the positioning context */
   vertical-align: middle; /* Ensures content is vertically aligned */
+  border-right: 1px solid var(--border-light); /* ADD THIS LINE */
 }
 
 /* Ensure the button is centered without using flex on the cell */
@@ -1155,5 +1164,5 @@
   background: #302b82; /* Lighter shade of dark purple */
 }
 .vehicle-row.selected td {
-  background: var(--primary-light); /* Maintain the selected color */
+  background: #d8c9f91a
 }

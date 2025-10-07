@@ -265,13 +265,13 @@
 }
 
 .tab-button:hover {
-  color: var(--primary-blue);
-  background: var(--bg-hover);
+  color: #301c6c;
+  background: rgba(139, 92, 246, 0.1);
 }
 
 .tab-button.active {
-  color: var(--primary-blue);
-  border-bottom-color: var(--primary-blue);
+  color: #301c6c;
+  border-bottom-color: #301c6c;
   background: var(--bg-primary);
 }
 

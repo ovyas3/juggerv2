@@ -281,7 +281,7 @@
   padding: var(--spacing-lg);
   border: 1px solid var(--border-light);
   border-radius: 8px;
-  background: var(--bg-secondary);
+  background: rgb(249, 249, 255);
   animation: slideDown 0.2s ease-out;
 }
 
