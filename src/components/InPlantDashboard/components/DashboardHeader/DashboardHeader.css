@@ -587,6 +587,7 @@
 .perPageContent:global([data-radix-select-item-indicator]) { 
   display: none !important; 
 }
+.perPageItem[data-state='checked'] > svg { display: none !important; }
 
 .perPageItem :global([data-radix-select-item-indicator]) { 
   display: none !important; 
@@ -890,12 +891,40 @@
   align-items: center;
   justify-content: space-between;
 } */
-.perPageItem:global([data-state='checked']) svg {
-  display: none;
+.perPageItem[data-state='checked'] svg { 
+  display: none !important; 
 }
-.perPageSelect:focus {
+/* .perPageSelect:focus {
   border-color: #301c6c
-; /* blue on focus */
+
+} */
+.perPageSelect:focus,
+.perPageSelect:focus-within { /* Use :focus-within to cover the Radix component wrapper */
+  border-color: #c3c9e8 !important; /* Revert to the default subtle border color */
+  box-shadow: none !important;      /* Remove the glow effect */
+  outline: none !important;         /* Ensure no standard browser outline appears */
+}
+.perPageContent [data-radix-select-item-indicator],
+.selectContent  [data-radix-select-item-indicator],
+.selectContent1 [data-radix-select-item-indicator],
+.selectContent2 [data-radix-select-item-indicator] {
+  display: none !important;
+}
+/* If a theme draws the tick with pseudo-elements, nuke them */
+.perPageItem::before,
+.perPageItem::after,
+.selectItem::before,
+.selectItem::after {
+  content: none !important;
+  display: none !important;
+}
+.uppercase-input::placeholder {
+  text-transform: none; 
+}
+/* Ensure the Select itself does not add a box-shadow when open */
+.select[data-state="open"] {
+  border-color: #d9d9d9 !important; /* Revert to a neutral border color */
+  box-shadow: none !important;      /* Remove the glow when the dropdown is open */
 }
 .perPageContent {
   background: #fff;
@@ -941,4 +970,42 @@
    you may need to remove that padding too */
 .perPageItem {
   padding-right: var(--your-default-padding) !important; /* Adjust padding if necessary */
+}
+.selectContent [data-radix-select-item-indicator],
+.selectContent1 [data-radix-select-item-indicator],
+.selectContent2 [data-radix-select-item-indicator],
+.perPageContent [data-radix-select-item-indicator] {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  /* Add padding reset to prevent space from being left behind */
+  padding: 0 !important; 
+  margin: 0 !important;
+}
+
+/* FIX: Target the checkmark (SVG) directly inside a checked SelectItem */
+/* This handles cases where the indicator might be an SVG not wrapped in the Radix indicator element */
+.selectItem[data-state='checked'] > svg,
+.selectItem[data-state='checked'] > span > svg, /* covers nested SVG */
+.perPageItem[data-state='checked'] > svg,
+.perPageItem[data-state='checked'] > span > svg {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* Cleanup: Remove redundant or less specific selectors if they exist */
+/* You had a few attempts; ensure the working ones are kept, and others are removed/modified */
+
+/* Ensure the selectors near the end are updated as follows: */
+.perPageContent [data-radix-select-item-indicator],
+.selectContent  [data-radix-select-item-indicator],
+.selectContent1 [data-radix-select-item-indicator],
+.selectContent2 [data-radix-select-item-indicator] {
+  display: none !important;
+}
+
+.perPageItem:global([data-state='checked']) svg,
+.selectItem:global([data-state='checked']) svg {
+  display: none !important;
 }

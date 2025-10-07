@@ -52,6 +52,12 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   const [searchSuggestions, setSearchSuggestions] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const UPPERCASE_SEARCH_TYPES = ['SIN', 'Vehicle'];
+  const SEARCH_LABEL: Record<'sin'|'vehicle'|'shipper'|'carrier', string> = {
+       sin: 'Sin',
+      vehicle: 'Vehicle',
+       shipper: 'Shipper',
+       carrier: 'Carrier',
+     };
 
   const handleStartDateChange = (date: any) => {
     if (date) {
@@ -539,6 +545,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                 <input
                   type="text"
                   placeholder={`Search by ${searchType}...`}
+               
                   value={searchValue}
                   onChange={handleInputChange}
                   onKeyPress={handleKeyPress}

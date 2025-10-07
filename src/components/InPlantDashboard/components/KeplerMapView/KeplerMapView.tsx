@@ -899,7 +899,11 @@ useEffect(() => {
     // <div className={`${styles.mapContainer} ${isFullscreen ? styles.fullscreen : ''}`}>
      <div ref={containerRef} className={`${styles.mapContainer} ${isFullscreen ? styles.fullscreen : ''}`}>
       {/* Map Controls */}
-    
+      {loading && (
+        <div className={styles.loadingOverlay}>
+          <div className={styles.spinner} />
+        </div>
+      )}
       <div className={styles.mapControls}>
         <div className={styles.controlGroup}>
           <button
