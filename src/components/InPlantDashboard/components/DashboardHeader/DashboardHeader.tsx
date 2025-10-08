@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef} from 'react';
 import { Search, Calendar, Filter, RefreshCw, Download, Settings, ChevronDown, ChevronUp } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/UI/select";
 import { DatePicker } from "antd";
@@ -40,6 +40,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   onToggleExpand,
   onExport
 }) => {
+  const searchContainerRef = useRef<HTMLDivElement>(null);
   const [showDateRangePickers, setShowDateRangePickers] = useState(false);
   const [startDate, setStartDate] = useState<dayjs.Dayjs>(dayjs().subtract(7, 'day').startOf('day'));
   const [endDate, setEndDate] = useState<dayjs.Dayjs>(dayjs().endOf('day'));
@@ -319,7 +320,6 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
     }
   };
   
-  
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let value = e.target.value;
     if (UPPERCASE_SEARCH_TYPES.includes(searchType)) {
@@ -435,6 +435,26 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
     }
   }, [dateRange]);
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        searchContainerRef.current && 
+        !searchContainerRef.current.contains(event.target as Node)
+      ) {
+        setShowSuggestions(false);
+      }
+    };
+
+    if (showSuggestions) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showSuggestions]);
+
+
   const quickFilters = [
     { key: 'all', label: 'All'},
     { key: 'active', label: 'Active'},
@@ -541,6 +561,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
             <div className="header-right">
               <div className="searchInputContainer"
               //  style={{ position: 'relative' }}
+              ref={searchContainerRef}
                style={{ position: 'relative', zIndex: 10000 }}
                >
                 <Select 
