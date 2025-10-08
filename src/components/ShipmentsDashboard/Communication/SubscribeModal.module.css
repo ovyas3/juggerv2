@@ -2,7 +2,7 @@
 .modalOverlay {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.5);
+    background:rgba(0, 0, 0, 0.5) ;
     z-index: 2000;
     display: flex;
     align-items: center;
@@ -13,7 +13,7 @@
   .locationsPopupDialog {
     background: #fff;
     border-radius: 8px;
-    box-shadow: 0 4px 28px rgba(0,0,0,0.18);
+    box-shadow: 0 4px 28px #301c6c;
     width: 660px;
     max-width: 96vw;
     padding: 0;
@@ -97,7 +97,7 @@
   }
   
   .button {
-    background: #20104d;
+    background: #301c6c;
     color: #fff;
     font-size: 12px;
     padding: 5px 12px;
@@ -106,7 +106,7 @@
     min-width: 72px;
     border: none;
     text-align: center;
-    border-color: #20104d;
+    border-color: #301c6c;
     font-weight: 600;
   }
   

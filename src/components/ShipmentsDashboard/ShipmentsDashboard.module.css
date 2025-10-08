@@ -160,15 +160,15 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background-color: #20104d;
+  background-color: #3d2879;
   color: #ffffff;
-  border-color: #20104d;
+  border-color: #3d2879;
   border: none;
   cursor: pointer;
 }
 
 .matStrokedButton:hover {
-  background-color: #271260
+  background-color: #3d2879
 ;
 }
 
@@ -550,7 +550,7 @@
   font-size: 14px;
   cursor: pointer;
   font-weight: bold;
-  background-color: #20104d;
+  background-color: #3d2879;
   color: #ffffff;
   border: none;
   white-space: nowrap; /* Prevents text from wrapping */
@@ -558,7 +558,7 @@
 }
 
 .button:hover {
-  background-color: #271260
+  background-color: #3d2879
 ;
 }
 
@@ -604,7 +604,7 @@
   font-size: 14px;
   cursor: pointer;
   font-weight: bold;
-  background-color: #20104d;
+  background-color: #3d2879;
   color: #ffffff;
   border: none;
   height: 38px; /* Match input height */
@@ -612,7 +612,7 @@
 }
 
 .customSelectButton:hover {
-  background-color:  #271260
+  background-color:  #3d2879
 ;
 }
 
@@ -627,14 +627,14 @@
   margin-bottom: 1px;
   margin-right: 10px;
   font-weight: bold;
-  background-color: #20104d;
+  background-color: #3d2879;
   color: #ffffff;
-  border-color: #20104d;
+  border-color: #3d2879;
   border: none;
 }
 
 .submitButton .button:hover {
-  background-color: #271260
+  background-color: #3d2879
 ;
 }
 
@@ -655,14 +655,14 @@
   margin-bottom: 1px;
   margin-right: 10px;
   font-weight: bold;
-  background-color: #20104d;
+  background-color: #3d2879;
   color: #ffffff;
-  border-color: #20104d;
+  border-color: #3d2879;
   border: none;
 }
 
 .commercialInvoiceSubmit:hover {
-  background-color: #271260
+  background-color: #3d2879
 ;
 }
 
@@ -706,7 +706,7 @@
   font-size: 20px;
   font-weight: 600;
   border-bottom: 1px solid #e5e5e5;
-  background-color: #20104d;
+  background-color: #3d2879;
   color: #ffffff;
 }
 /* Close button */
@@ -3230,7 +3230,7 @@ select.didFloatingSelect::-ms-expand {
 .paginationButton {
   width: 32px !important; /* Smaller button */
   height: 32px !important;
-  background: #20104d !important;
+  background: #3d2879 !important;
   border: none !important;
   border-radius: 8px !important;
   color: #fff !important;
@@ -3673,7 +3673,7 @@ select.didFloatingSelect::-ms-expand {
 .actionCategoryHeader {
   font-size: 11px;
   font-weight: 600;
-  color: #20104d;
+  color: #3d2879;
   letter-spacing: 0.5px;
   margin-bottom: 8px;
   padding-bottom: 4px;
@@ -3699,19 +3699,19 @@ select.didFloatingSelect::-ms-expand {
 }
 
 .actionMenuItem:hover {
-    border: 1px solid #20104d;
+    border: 1px solid #3d2879;
     box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
     outline: none;
 }
 
 .actionMenuItem:focus {
-  border: 1px solid #20104d;
+  border: 1px solid #3d2879;
   box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
   outline: none;
 }
 
 .actionMenuItem:active {
-  border: 1px solid #20104d;
+  border: 1px solid #3d2879;
   box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
   outline: none;
 }
@@ -3757,7 +3757,7 @@ select.didFloatingSelect::-ms-expand {
   transform: translateY(-50%);
   width: 14px;
   height: 14px;
-  color: #20104d;
+  color: #3d2879;
 }
 .actionsMenuButton {
   display: flex;
@@ -3767,7 +3767,7 @@ select.didFloatingSelect::-ms-expand {
   width: 36px;
   border: 2px solid #e3e4fe;
   border-radius: 8px;
-  background: #20104d;
+  background: #3d2879;
   transition: all 0.2s ease;
   cursor: pointer;
   box-sizing: border-box;
@@ -3787,13 +3787,13 @@ select.didFloatingSelect::-ms-expand {
 .actionsMenuButton:hover,
 .actionsMenuButton:focus {
   background: #fafaff;
-  border-color: #20104d; /* purple border on hover/focus */
+  border-color: #3d2879; /* purple border on hover/focus */
   box-shadow: 0 0 0 2px #e6e6fa;
 }
 
 .actionsMenuButton:active {
   background: #f5f3ff;
-  border-color: #20104d;
+  border-color: #3d2879;
   box-shadow: 0 0 4px #c3bff4;
 }
 .actionIcon {
@@ -3804,31 +3804,31 @@ select.didFloatingSelect::-ms-expand {
   color: #fff;
 }
 .actionsMenuButton:active .actionIcon:hover{
-  color: #271260;
+  color: #3d2879;
 }
 
 .actionIcon:hover {
   /* background: #e3e4fe; */
-  color: #20104d;
+  color: #3d2879;
 }
 
 .actionsMenuButton:hover .actionIcon,
 .actionsMenuButton:focus .actionIcon,
 .actionsMenuButton:active .actionIcon {
-  color: #20104d;
+  color: #3d2879;
 }
 .actionsMenuButton[aria-expanded="true"]:hover .actionIcon {
-  color: #20104d;
+  color: #3d2879;
 }
 /* If your dropdown library adds data-state attribute when open */
 .actionsMenuButton[data-state="open"] .actionIcon {
-  color: #20104d;
+  color: #3d2879;
 }
 
 /* Alternative: target when button has aria-expanded=true */
 .actionsMenuButton[aria-expanded="true"] .actionIcon {
   color: #fff;
-  /* color: #271260; */
+  /* color: #3d2879; */
 }
 
 @keyframes scaleIn {
@@ -3936,7 +3936,7 @@ select.didFloatingSelect::-ms-expand {
     /* padding: 8px 12px; */
     cursor: pointer;
     font-weight: bold;
-    background-color: #20104d;
+    background-color: #3d2879;
     color: #ffffff;
     border: none;
     white-space: nowrap;
@@ -3963,7 +3963,7 @@ select.didFloatingSelect::-ms-expand {
   display: none;
 }
 .perPageSelect:focus {
-  border-color: #271260
+  border-color: #3d2879
 ; /* blue on focus */
 }
 .perPageContent {
@@ -4198,7 +4198,7 @@ select.didFloatingSelect::-ms-expand {
 }
 
 .searchIcon:hover {
-  color: #20104d;
+  color: #3d2879;
 }
 
 .inputSearch {
@@ -4214,7 +4214,7 @@ select.didFloatingSelect::-ms-expand {
   /* border-left: none; */
   width: 100%;
   flex: 1;
-  border: 1.4px solid #20104d;
+  border: 1.4px solid #3d2879;
 }
 
 .perSinSelect {
@@ -4231,25 +4231,25 @@ select.didFloatingSelect::-ms-expand {
   font-weight: 500;
   box-shadow: none;
   transition: border 0.2s;
-  background-color: #20104d;
+  background-color: #3d2879;
   color: #fff;
-  border: 2px solid #20104d;
+  border: 2px solid #3d2879;
   padding: 0px 10px;
 }
 
 .perSinSelect:hover {
-  border-color: #20104d;
-  background-color: #20104d;
+  border-color: #3d2879;
+  background-color: #3d2879;
 }
 
 .perSinSelect:active {
-  border-color: #20104d !important;
-  background-color: #20104d !important;
+  border-color: #3d2879 !important;
+  background-color: #3d2879 !important;
 }
 
 .perSinSelect:focus {
-  border-color: #20104d !important;
-  background-color: #20104d !important;
+  border-color: #3d2879 !important;
+  background-color: #3d2879 !important;
 }
 
 .filterGroup {
@@ -4282,12 +4282,12 @@ select.didFloatingSelect::-ms-expand {
 }
 
 .checkboxLabel input[type="checkbox"]:hover {
-  border-color: #20104d;
+  border-color: #3d2879;
 }
 
 .checkboxLabel input[type="checkbox"]:checked {
-  background-color: #20104d;
-  border-color: #20104d;
+  background-color: #3d2879;
+  border-color: #3d2879;
 }
 
 .checkboxLabel input[type="checkbox"]:checked::after {
@@ -4303,7 +4303,7 @@ select.didFloatingSelect::-ms-expand {
 
 /* Focus state for accessibility */
 .checkboxLabel input[type="checkbox"]:focus {
-  outline: 2px solid #20104d;
+  outline: 2px solid #3d2879;
   outline-offset: 2px;
 }
 
@@ -4312,12 +4312,12 @@ select.didFloatingSelect::-ms-expand {
 }
 
 .helpIcon {
-  color: #20104d; /* or any color that matches your design */
+  color: #3d2879; /* or any color that matches your design */
   cursor: pointer;
 }
 
 .helpIcon:hover {
-  color: #271260
+  color: #3d2879
 ; /* slightly darker on hover */
 }
 
@@ -4341,7 +4341,7 @@ select.didFloatingSelect::-ms-expand {
 .shipmentSin {
   font-family: monospace;
   font-weight: 600;
-  color: #20104d;
+  color: #3d2879;
 }
 
 .actionMenuSearch {
@@ -4391,14 +4391,14 @@ select.didFloatingSelect::-ms-expand {
 .checkboxChecked {
   /* Note: browser support for custom styling native checkboxes is poor/inconsistent. */
   /* This is mostly for basic changes like background or border, if the browser allows. */
-  accent-color: #20104d; /* Blue color for modern browsers */
-  border-color: #20104d;
+  accent-color: #3d2879; /* Blue color for modern browsers */
+  border-color: #3d2879;
 }
 
 .actionCategoryHeader {
   font-weight: 600;
   font-size: 12px;
-  color: #20104d;
+  color: #3d2879;
   padding: 4px 0;
 }
 
@@ -4428,7 +4428,7 @@ select.didFloatingSelect::-ms-expand {
 }
 
 .TableSearchIcon:hover {
-  color: #20104d;
+  color: #3d2879;
 }
 
 .actionSearchContainer {

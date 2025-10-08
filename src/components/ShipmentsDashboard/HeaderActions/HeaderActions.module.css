@@ -20,14 +20,14 @@
 
     text-align: center;
     border-radius: 4px;
-    background-color: #20104d;
+    background-color: #301c6c;
     color: #ffffff;
     white-space: nowrap;
     height: 38px;
 }
 
 .matStrokedButton:hover:not(:disabled) {
-  background-color: #271260
+  background-color: #3d2879
 ;
   border-color: #fff;
 }

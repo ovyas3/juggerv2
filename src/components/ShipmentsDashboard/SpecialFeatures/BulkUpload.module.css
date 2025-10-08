@@ -164,7 +164,7 @@
   padding: 8px 24px;
   border: none;
   border-radius: 4px;
-  background-color: #20104d
+  background-color: #301c6c
 ;
   color: white;
   font-size: 14px;
@@ -178,7 +178,7 @@
 }
 
 .submitButton:hover {
-  background-color: #271950;
+  background-color: #3d2879;
 }
 
 .submitButton:disabled {
@@ -271,7 +271,7 @@
 }
 
 .chooseFileButton:hover {
-  background-color: #271950 !important; 
+  background-color:#3d2879!important; 
 }
 
 

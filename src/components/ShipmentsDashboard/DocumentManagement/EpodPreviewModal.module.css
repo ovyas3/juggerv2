@@ -116,7 +116,7 @@
 .actionButton {
   background: none;
   border: none;
-  color: #20104d;
+  color: rgb(48, 28, 108);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -127,7 +127,7 @@
 }
 
 .actionButton:hover {
-  background-color: #433de8;
+  background-color:#3d2879;
 }
 
 /* Thumbnails */
@@ -230,18 +230,18 @@
 
 .approveButton,
 .submitButton {
-  background-color: #20104d !important;
+  background-color: rgb(48, 28, 108) !important;
   color: white !important;
   text-transform: none !important;
   font-weight: 500 !important;
   padding: 6px 20px !important;
   border-radius: 4px !important;
-  border-color: #20104d !important;
+  border-color: rgb(48, 28, 108) !important;
 }
 
 .approveButton:hover:not(:disabled),
 .submitButton:hover:not(:disabled) {
-  background-color: #433de8 !important;
+  background-color: #3d2879!important;
 }
 
 .rejectButton {
@@ -367,17 +367,17 @@
 }
 
 .select:hover {
-  border-color: #20104d;
+  border-color: rgb(48, 28, 108);
 }
 
 .select:focus-within {
-  border-color: #20104d;
+  border-color: rgb(48, 28, 108);
   box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
   outline: none;
 }
 
 .select[data-state="open"] {
-  border-color: #20104d;
+  border-color: rgb(48, 28, 108);
   box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
 }
 
@@ -409,7 +409,7 @@
 }
 
 .selectItem[data-highlighted] {
-  background-color: #20104d;
+  background-color: rgb(48, 28, 108);
   color: white;
   outline: none;
 }

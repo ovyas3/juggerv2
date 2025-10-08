@@ -4,7 +4,7 @@
     width: 1150px; /* Width from original Angular CSS */
     max-width: 95vw;
     height: 650px;
-    border: 8px solid #20104d; /* Updated theme color */
+    border: 8px solid #301c6c; /* Updated theme color */
     box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
     background-color: rgb(18, 14, 42);
     display: flex;
@@ -14,7 +14,7 @@
   }
   
   .modalHeader {
-    background-color: #20104d; /* Updated theme color */
+    background-color: #301c6c; /* Updated theme color */
     color: white;
     padding: 0px 12px;
     display: flex;

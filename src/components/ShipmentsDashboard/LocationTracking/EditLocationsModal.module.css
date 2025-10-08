@@ -37,7 +37,7 @@
   /* outline: none;
   border: 1px solid 
   
- #20104d; */
+   #301c6c; */
 }
 
 .dateInput {
@@ -46,7 +46,7 @@
   outline: none;
   border: 1px solid 
   
- #20104d;
+   #301c6c;
   border-radius: 4px;
   font-size: 14px;
   font-family: "Muli", sans-serif;
@@ -55,7 +55,7 @@
 .dateInput:hover {
   border: 1px solid 
   
- #20104d;
+   #301c6c;
   box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
 }
 
@@ -63,7 +63,7 @@
   outline: none;
   border: 1px solid 
   
- #20104d;
+   #301c6c;
   box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
 }
 
@@ -71,7 +71,7 @@
   outline: none;
   border: 1px solid 
   
- #20104d;
+   #301c6c;
   box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
 }
 
@@ -159,16 +159,16 @@
 .primary, .secondary {
   background-color: 
   
- #20104d;
+   #301c6c;
   color: white;
   border: 1px solid 
   
- #20104d;
+   #301c6c;
   cursor: pointer;
 }
 
 .primary:hover, .secondary:hover {
-  background-color: #271950;
+  background-color: #3d2879;
 }
 
 .primary:disabled, .secondary:disabled {
@@ -196,7 +196,7 @@
   width: 40px;
   height: 40px;
   border: 4px solid #f3f3f3;
-  border-top: 4px solid #2962FF;
+  border-top: 4px solid  #301c6c;
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -229,7 +229,7 @@
 .didFloatingInput:focus {
   border-color: 
   
- #20104d;
+   #301c6c;
   outline: none;
   box-shadow: 0 0 0 2px rgba(41, 98, 255, 0.1);
 }
@@ -259,7 +259,7 @@
   transform: translateY(-20px) scale(0.9);
   color: 
   
- #20104d;
+   #301c6c;
   font-size: 12px;
   font-weight: 500;
   background: white;

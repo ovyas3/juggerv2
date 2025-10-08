@@ -28,6 +28,8 @@ import { httpsGet, httpsPut, httpsPost } from '@/utils/Communication';
 import ModalHeader from '@/components/UI/ModalHeader/ModalHeader';
 import styles from "./GeofenceEditor.module.css";
 import GetPath from "../../../assets/get_path.svg";
+import CustomDateTimePicker from "@/components/UI/CustomDateTimePicker/CustomDateTimePicker";
+
 
 declare global {
   interface Window {
@@ -597,22 +599,22 @@ const GeofenceEditor: React.FC<GeofenceEditorProps> = ({
         id: selectedDelivery.location._id,
         area: areaDetails.area,
         locality: areaDetails.locality,
-        geo_point: {
-          type: 'Point',
-          coordinates: [areaDetails.longitude, areaDetails.latitude]
-        },
-        pincode: areaDetails.pincode
+        // geo_point: {
+        //   type: 'Point',
+        //   coordinates: [areaDetails.longitude, areaDetails.latitude]
+        // },
+        // pincode: areaDetails.pincode
       };
       
       // Add polygon data if available
-      if (pathRef.current?.length) {
-        locationData.polygon = {
-          type: 'Polygon',
-          coordinates: [pathRef.current.map(coord => [coord.lng, coord.lat])]
-        };
-      } else if (deleteFenceRef.current) {
-        locationData.deleteFence = true;
-      }
+      // if (pathRef.current?.length) {
+      //   locationData.polygon = {
+      //     type: 'Polygon',
+      //     coordinates: [pathRef.current.map(coord => [coord.lng, coord.lat])]
+      //   };
+      // } else if (deleteFenceRef.current) {
+      //   locationData.deleteFence = true;
+      // }
       
       // Update location
       const response = await httpsPost('v2/location/update', locationData);
@@ -743,17 +745,18 @@ const GeofenceEditor: React.FC<GeofenceEditorProps> = ({
     >
         {/* 2. TITLE: Use DialogTitle and apply custom header styles */}
         <DialogTitle sx={{ padding: 0 , height: '60px', }}>
-            <div className={styles.header}>
-                <div className={styles.label}>Update Delivery Location for {shipment.sin}</div>
-                <IconButton 
+          
+                {/* <div className={styles.label}>Update Delivery Location for {shipment.sin}</div> */}
+                <ModalHeader title={`Add Expenses - #${shipment.sin}`} onClose={onClose} />
+                {/* <IconButton 
                     aria-label="close" 
                     onClick={onClose} 
                     className={styles.deleteIconBtn}
                     sx={{ position: 'absolute', right: 8, top: 8 }}
                 >
                     <CloseIcon />
-                </IconButton>
-            </div>
+                </IconButton> */}
+            
         </DialogTitle>
 
         {/* 3. CONTENT: Use DialogContent to wrap the main section (map + controls) */}
@@ -798,6 +801,18 @@ const GeofenceEditor: React.FC<GeofenceEditorProps> = ({
                         }
                       }}
                       label="Select Delivery Location"
+                      sx={{
+                        '& .MuiOutlinedInput-notchedOutline': {
+                          borderColor: '#301c6c '
+                        },
+                        '&:hover .MuiOutlinedInput-notchedOutline': {
+                          borderColor: '#301c6c '
+                        },
+                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                          // Change 2: Blue focus border changed to Violet (#301c6c)
+                          borderColor: '#301c6c' 
+                        }
+                      }}
                     >
                       {shipment.to.map((delivery, index) => (
                         <MenuItem key={delivery._id} value={delivery._id}>
@@ -875,12 +890,18 @@ const GeofenceEditor: React.FC<GeofenceEditorProps> = ({
                       Arrived at
                     </span>
                     <LocalizationProvider dateAdapter={AdapterDateFns}>
-                      <DatePicker
+                      {/* <DatePicker
                         value={arrivedAt}
                         onChange={(date) => setArrivedAt(date)}
                         slotProps={{ textField: { size: 'small' } }}
-                      />
-                      <TimePicker
+                      /> */}
+                        <CustomDateTimePicker 
+                        label="Date"
+                        value={arrivedAt}
+                        onChange={setArrivedAt}
+                        // sx={{ flex: 1, height: '36px' }}
+                    />
+                      {/* <TimePicker
                         value={arrivedTime ? new Date(`1970-01-01T${arrivedTime}`) : null}
                         onChange={(time) => {
                           if (time) {
@@ -894,7 +915,7 @@ const GeofenceEditor: React.FC<GeofenceEditorProps> = ({
                           }
                         }}
                         slotProps={{ textField: { size: 'small' } }}
-                      />
+                      /> */}
                     </LocalizationProvider>
                   </div>
                   {/* Finished At */}
@@ -910,12 +931,18 @@ const GeofenceEditor: React.FC<GeofenceEditorProps> = ({
                       Finished at
                     </span>
                     <LocalizationProvider dateAdapter={AdapterDateFns}>
-                      <DatePicker
+                    <CustomDateTimePicker 
+                        label="Date"
+                        value={finishedAt}
+                        onChange={setFinishedAt}
+                        // sx={{ flex: 1, height: '30px' }}
+                    />
+                      {/* <DatePicker
                         value={finishedAt}
                         onChange={(date) => setFinishedAt(date)}
                         slotProps={{ textField: { size: 'small' } }}
-                      />
-                      <TimePicker
+                      /> */}
+                      {/* <TimePicker
                         value={finishedTime ? new Date(`1970-01-01T${finishedTime}`) : null}
                         onChange={(time) => {
                           if (time) {
@@ -929,14 +956,14 @@ const GeofenceEditor: React.FC<GeofenceEditorProps> = ({
                           }
                         }}
                         slotProps={{ textField: { size: 'small' } }}
-                      />
+                      /> */}
                     </LocalizationProvider>
                   </div>
                 </div>
                 {/* Location Details */}
                 <div className={styles.locationDetails}>
                   <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <LocationOnIcon sx={{ color: '#2962FF', marginRight: '12px' }} />
+                    <LocationOnIcon sx={{ color: '#301c6c', marginRight: '12px' }} />
                     <div>
                       <div className={styles.locationName}>
                         {locality || 'Location not specified'}
