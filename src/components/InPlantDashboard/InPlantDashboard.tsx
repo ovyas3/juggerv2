@@ -18,6 +18,7 @@ import { useSnackbar } from '@/hooks/snackBar';
 import dayjs from "dayjs";
 import { iconMap } from '@/components/UI/iconMap';
 import * as XLSX from 'xlsx';
+import { toTitleCase } from "@/utils/stringUtils"
 
 export interface Vehicle {
   id: string;
@@ -292,7 +293,6 @@ const InPlantDashboard: React.FC = () => {
   }, [dateRange, filters, customDateRange, currentPage, pageSize, isSearchActive]);
 
   const handleSearchResults = useCallback(async (results: any[], paginationData?: any) => {
-    console.log("DEBUG-Parent: handleSearchResults received", results);
     if (!results || results.length === 0) {
       setSearchQuery('');
       setIsSearchActive(false);
@@ -330,7 +330,6 @@ const InPlantDashboard: React.FC = () => {
         shipmentId: vehicle.sin || '',
         orderReference: vehicle.orderReference || ''
       }));
-      console.log(`DEBUG-Parent: Setting state with ${formattedVehicles.length} formatted vehicles.`);
       setVehicles(formattedVehicles);
       setCurrentPage(0);
       if (paginationData) {
@@ -566,8 +565,20 @@ const InPlantDashboard: React.FC = () => {
     setCustomDateRange(range);
   };
 
+  const formatDateTime = (isoString: string): string => {
+    if (!isoString) return '-';
+    const date = new Date(isoString);
+    
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    
+    return `${day}/${month}/${year} ${hours}:${minutes}`;
+  };
+
   const handleExport = async () => {
-    console.log('DEBUG-EXPORT: --- STARTING handleExport ---'); 
     try {
       const getDateRange = () => {
         const now = new Date();
@@ -604,6 +615,14 @@ const InPlantDashboard: React.FC = () => {
         }
       };
   
+      const formatDuration = (minutes: number): string => {
+        if (!minutes || minutes === 0) return '0m';
+        if (minutes < 60) return `${minutes}m`;
+        const hours = Math.floor(minutes / 60);
+        const remainingMinutes = minutes % 60;
+        return remainingMinutes > 0 ? `${hours}h ${remainingMinutes}m` : `${hours}h`;
+      };
+  
       const dateRangeObj = getDateRange();
       const payload = {
         stage: filters.stage,
@@ -618,51 +637,74 @@ const InPlantDashboard: React.FC = () => {
         limit: 100,
         report: true
       };
-      console.log('DEBUG-EXPORT: Sending Export Payload:', payload); 
       const response = await httpsPost(
         'InplantDashboard/Table',
         payload,
         {},
         1
       );
-      console.log('DEBUG-EXPORT: Initial API Response Status:', response?.statusCode); // This should now print
       if (response?.statusCode === 200 && response.data?.link) {
         const csvResponse = await fetch(response.data.link);
         const csvText = await csvResponse.text();
-           // 👇 DEBUG: Check the raw text content from S3
-           console.log('DEBUG-EXPORT-S3: Downloaded CSV Text:', csvText);
-        
-           // Check if content is just headers (often only one line break)
-           const rowCount = csvText.trim().split('\n').length;
-           console.log(`DEBUG-EXPORT-S3: Row Count (including header): ${rowCount}`);
-           
         const workbook = XLSX.read(csvText, { type: 'string' });
-        
         const worksheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[worksheetName];
         
-        worksheet['!cols'] = [
-          { wch: 15 },
-          { wch: 15 },
-          { wch: 20 },
-          { wch: 12 },
-          { wch: 10 },
-          { wch: 20 },
-          { wch: 12 },
-          { wch: 12 },
-          { wch: 10 },
-          { wch: 30 },
-          { wch: 25 },
-          { wch: 20 },
-          { wch: 15 },
-          { wch: 30 },
-          { wch: 15 }
+        const jsonData = XLSX.utils.sheet_to_json(worksheet);
+        
+        const formattedData = jsonData.map((row: any, index: number) => {
+          
+          let currentStageName = 'N/A';
+          const currentStageValue = row['Current Stage'] || row['currentStage'] || row['Current_Stage'];
+          
+          if (!currentStageValue || currentStageValue === '[object Object]') {
+            currentStageName = 'N/A (Backend Error)';
+          } else if (typeof currentStageValue === 'string' && !currentStageValue.includes('{')) {
+            currentStageName = currentStageValue;
+          } else if (typeof currentStageValue === 'object' && currentStageValue?.stageName) {
+            currentStageName = currentStageValue.stageName;
+          } else if (typeof currentStageValue === 'string' && currentStageValue.includes('{')) {
+            try {
+              const parsed = JSON.parse(currentStageValue);
+              currentStageName = parsed.stageName || parsed.name || 'N/A';
+            } catch (e) {
+              console.error('Failed to parse currentStage:', currentStageValue);
+              currentStageName = 'Parse Error';
+            }
+          }
+          
+          return {
+            'Vehicle Number': row['Vehicle Number'] || 'N/A',
+            'SIN': row['SIN'] || 'N/A',
+            'Current Stage': currentStageName,
+            'Progress (%)': row['Progress (%)'] || 0,
+            'Entry Time': row['Entry Time'] ? formatDateTime(row['Entry Time']) : '-',
+            'Total Duration (min)': formatDuration(row['Total Duration (min)'] || 0),
+            'Status': toTitleCase(row['Status'] || 'N/A'),
+            'Shipper': toTitleCase(row['Shipper'] || 'N/A'),
+            'Carrier': toTitleCase(row['Carrier'] || 'N/A'),
+            'Driver Name': toTitleCase(row['Driver Name'] || 'N/A'),
+            'Driver Phone': row['Driver Phone'] || 'N/A',
+            'Destination': toTitleCase(row['Destination'] || 'N/A'),
+            'Order Reference': row['Order Reference'] || 'N/A'
+          };
+        });
+        
+        const newWorksheet = XLSX.utils.json_to_sheet(formattedData);
+        
+        newWorksheet['!cols'] = [
+          { wch: 15 }, { wch: 15 }, { wch: 20 }, { wch: 12 },
+          { wch: 12 }, { wch: 20 }, { wch: 12 }, { wch: 25 },
+          { wch: 25 }, { wch: 20 }, { wch: 15 }, { wch: 30 }, { wch: 15 }
         ];
+        
+        const newWorkbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(newWorkbook, newWorksheet, 'InPlant Dashboard');
         
         const timestamp = dayjs().format('YYYY-MM-DD_HHmm');
         const filename = `inplant_dashboard_${timestamp}.xlsx`;
         
-        XLSX.writeFile(workbook, filename);
+        XLSX.writeFile(newWorkbook, filename);
         
         showMessage('Export completed successfully', 'success');
       } else {
@@ -673,8 +715,8 @@ const InPlantDashboard: React.FC = () => {
       console.error('Error exporting data:', error);
       showMessage('Error exporting data', 'error');
     }
-    console.log('DEBUG-EXPORT: --- FINISHED handleExport ---'); 
   };
+  
   
 
   return (

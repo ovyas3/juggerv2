@@ -53,19 +53,6 @@ export const MetricCard: React.FC<MetricCardProps> = ({
       </span>
     );
   };
-
-  console.log("MetricCard Props:", {
-    title,
-    value,
-    trend,
-    trendValue,
-    icon,
-    iconColor,
-    bgColor,
-    borderColor,
-    onClick,
-  });
-
   return (
     <div
       className={styles.card}

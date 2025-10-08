@@ -58,28 +58,24 @@ const DetailPanel: React.FC<DetailPanelProps> = ({ vehicle, onClose, isOpen }) =
 
   // useEffect(() => {
     const fetchTimelineData = useCallback(async (vehicleId: string) => {
-      if (!vehicle) {
-        return;
-      }
-      
+      if (!vehicle) return;
+    
       setIsLoading(true);
       setError(null);
-      
       try {
         const response = await httpsPost(`InplantDashboard/timeline/${vehicle.id}`, {}, {}, 1);
         if (response && response.data) {
           setTimelineData(response.data);
         } else {
-          throw new Error('Failed to load timeline data');
+          throw new Error("Failed to load timeline data");
         }
       } catch (err) {
-        console.error('Error fetching timeline data:', err);
-        setError('Failed to load timeline data. Please try again.');
+        setError("Failed to load timeline data. Please try again.");
         setTimelineData([]);
       } finally {
         setIsLoading(false);
       }
-    }, [setIsLoading, setError, setTimelineData]); 
+    }, [setIsLoading, setError, setTimelineData]);
 
   //   fetchTimelineData();
   // }, [vehicle]);
@@ -91,43 +87,30 @@ const DetailPanel: React.FC<DetailPanelProps> = ({ vehicle, onClose, isOpen }) =
     fetchTimelineData(vehicle.id); 
 }, [vehicle, fetchTimelineData]); 
   const handleSubmit = async () => {
-    if (!vehicle) {
-      console.warn("Attempted to submit remark with no vehicle selected.");
-      return;
-    }
-
+    if (!vehicle) return;
     if (!remark.trim()) {
       showMessage("Please enter a remark before submitting.", "error");
       return;
     }
 
     setIsSubmitting(true);
-    
     const url = `InplantDashboard/notes/${vehicle.id}`;
-    
     const payload = {
-      stageId: vehicle.currentStage.stageId, 
+      stageId: vehicle.currentStage.stageId,
       notes: remark.trim(),
     };
 
     try {
-      const response = await httpsPost(
-        url,
-        payload,
-        {},
-        1 
-      );
+      const response = await httpsPost(url, payload, {}, 1);
 
       if (response?.statusCode === 200) {
-        setRemark(''); 
+        setRemark("");
         showMessage("Note added successfully!", "success");
         await fetchTimelineData(vehicle.id);
       } else {
-        console.error("Failed to save note:", response?.message || "Unknown error");
-        showMessage(`Failed to save note. ${response?.message || ''}`, "error");
+        showMessage(`Failed to save note. ${response?.message || ""}`, "error");
       }
     } catch (error) {
-      console.error("API call error during note submission:", error);
       showMessage("An error occurred during submission.", "error");
     } finally {
       setIsSubmitting(false);
@@ -333,7 +316,7 @@ const DetailPanel: React.FC<DetailPanelProps> = ({ vehicle, onClose, isOpen }) =
                   {item.events.length > 0 && (
                     <div className="stage-events">
                       {item.events.map((event, eventIndex) => (
-                        <div key={eventIndex} className="event-item">
+                        <div key={eventIndex + "event"} className="event-item">
                           <div className="event-time">{formatTime(event.eventTime)}</div>
                           <div className="event-details">
                             <div className="event-performer">{event.performedBy}</div>

@@ -20,7 +20,6 @@ interface ShipmentPopupProps {
 }
 
 export default function VehicleStagingLiveShipmentDetails({ isOpen, onClose, title, data,isInDashboard}: ShipmentPopupProps) {
-    console.log(isOpen, onClose, title, data, "ShipmentPopupProps")
     const [isVisible, setIsVisible] = useState(false)
     const popupRef = useRef<HTMLDivElement>(null)
     const [loading, setLoading] = useState(false)
