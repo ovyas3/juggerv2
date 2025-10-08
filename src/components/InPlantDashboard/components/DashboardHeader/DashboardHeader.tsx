@@ -539,7 +539,10 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
             </div>
 
             <div className="header-right">
-              <div className="searchInputContainer" style={{ position: 'relative' }}>
+              <div className="searchInputContainer"
+              //  style={{ position: 'relative' }}
+               style={{ position: 'relative', zIndex: 10000 }}
+               >
                 <Select 
                   value={searchType}
                   onValueChange={setSearchType}
@@ -627,6 +630,8 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
 
       {isExpanded && (
         <>
+        <div className="divider"></div>
+       
           <div className="header-filters">
             <div className="quick-filters">
               {quickFilters.map(filter => (
