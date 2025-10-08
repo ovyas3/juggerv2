@@ -3012,10 +3012,18 @@ if (haltPopupRef.current && mapRef.current) { try { mapRef.current.closePopup(ha
           <div className={styles.statusItem}>
             <span className={`${styles.dot} ${styles.dotOrange}`}></span>
             <span>
-              {shipmentData?.latest_status?.toLowerCase().includes('delivered') || shipmentData?.deliveries?.[shipmentData.deliveries.length - 1]?.finished_at
-                ? `Delivered on: ${shipmentData.deliveries?.[shipmentData.deliveries.length - 1]?.finished_at ? new Date(shipmentData.deliveries[shipmentData.deliveries.length - 1].finished_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : 'N/A'}`
-                : `ETA: ${eta || "N/A"}`
-              }
+              {(() => {
+                const lastDelivery = shipmentData?.deliveries?.[shipmentData.deliveries.length - 1];
+                const finishedAt = lastDelivery?.finished_at;
+
+                if (shipmentData?.latest_status?.toLowerCase().includes('delivered') || finishedAt) {
+                  if (finishedAt) {
+                    return `Delivered on: ${new Date(finishedAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}`;
+                  }
+                  return 'Delivered on: N/A';
+                }
+                return `ETA: ${eta || "N/A"}`;
+              })()}
             </span>
           </div>
           {shipmentData?.trip_tracker?.last_location_address && (
