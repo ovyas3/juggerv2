@@ -5,7 +5,7 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import dynamic from "next/dynamic";
 import * as L from "leaflet";
 import { MapPin } from "lucide-react";
-import { Play, Pause, RotateCcw, X } from "lucide-react";
+import { Play, Pause, RotateCcw, X, SkipForward, SkipBack, FastForward, Rewind, Shield } from "lucide-react";
 import styles from "./Kepler-map.module.css";
 import type { Icon as LeafletIcon, DivIcon as LeafletDivIcon, Map as LeafletMap } from "leaflet";
 import tollPendingUrl from "../../../assets/toll_gate.svg";
@@ -627,6 +627,9 @@ useEffect(() => {
     const h = haltPoints[currentReplayHaltIndex];
     const durationHours = Math.floor(h.halt_duration / 60);
     const durationMins = Math.floor(h.halt_duration % 60);
+    const lat = h.geo_point.coordinates[1];
+    const lng = h.geo_point.coordinates[0];
+    const googleMapsUrl = `https://www.google.com/maps?q=${lat},${lng}`;
     const content = `
       <div class="${styles.popup}">
         <div class="${styles.popupTitle} ${styles.titleRed}">Halt Info</div>
@@ -634,6 +637,15 @@ useEffect(() => {
         <div class="${styles.popupBody}">Duration: <strong>${durationHours > 0 ? durationHours + ' hour(s), ' : ''}${durationMins} minute(s)</strong></div>
         <div class="${styles.popupBody}">Start: <strong>${new Date(h.start_time).toLocaleString()}</strong></div>
         <div class="${styles.popupBody}">End: <strong>${new Date(h.end_time).toLocaleString()}</strong></div>
+        <div class="${styles.popupBody}">
+          <a href="${googleMapsUrl}" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 4px; background: #4285F4; color: white; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-size: 12px; margin-top: 8px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+              <circle cx="12" cy="10" r="3"></circle>
+            </svg>
+            Open in Google Maps
+          </a>
+        </div>
       </div>
     `;
 
@@ -664,7 +676,7 @@ useEffect(() => {
           haltPopupRef.current = null;
         }
         setIsPausedAtHalt(false);
-      }, 5000);
+      }, 2500);
     } catch (err) {
       console.error("Failed to show halt popup", err);
     }
@@ -740,7 +752,7 @@ useEffect(() => {
           deviationPopupRef.current = null;
         }
         setIsPausedAtDeviation(false);
-      }, 5000); // Show popup for 5 seconds
+      }, 2500); // Show popup for 2.5 seconds
     } catch (err) {
       console.error("Failed to show deviation popup", err);
     }
@@ -1112,7 +1124,7 @@ useEffect(() => {
   // Now, check if the map instance is ready.
   // If mapRef.current exists, we can safely use it.
   // if (mapRef.current) {
-    if (map && map.getContainer()) { 
+    if (map && map.getContainer() && !isReplaying) {
 
     const all = [
       ...shipmentPickups.map(p => p.pos),
@@ -1126,7 +1138,7 @@ useEffect(() => {
       mapRef.current.fitBounds(L.latLngBounds(all), { padding: [40, 40] });
     }
   }
-}, [shipmentPickups, shipmentDeliveries]); // ✅ Only depend on the DATA// ✅ Add mapRef.current to the dependencies
+}, [shipmentPickups, shipmentDeliveries, isReplaying]); // ✅ Only depend on the DATA// ✅ Add mapRef.current to the dependencies
 useEffect(() => {
   console.log("--- DEBUGGING CURRENT LOCATION ---");
   // Check if the custom vehicle icon is loaded
@@ -1908,13 +1920,32 @@ const startReplay = () => {
   if (activeRoute.length > 0) {
       setIsReplaying(true);
       // Reset the index to 0
-      replayIndexRef.current = 0; 
+      replayIndexRef.current = 0;
       // Set the initial position on the map
       setCurrentReplayPosition(activeRoute[0]);
       setCurrentReplayHaltIndex(-1);  // reset halts
       setIsPausedAtHalt(false);
       setCurrentReplayDeviationIndex(-1);  // reset deviations
       setIsPausedAtDeviation(false);
+
+      // Show fence by default when replay starts
+      if (internalFencePathData.length > 0) {
+        setShowFence(true);
+      }
+
+      // Auto zoom to route bounds
+      if (mapRef.current && activeRoute.length > 1) {
+        try {
+          const bounds = L.latLngBounds(activeRoute);
+          mapRef.current.fitBounds(bounds, {
+            padding: [80, 80],
+            maxZoom: 15
+          });
+        } catch (err) {
+          console.error("Failed to fit bounds:", err);
+        }
+      }
+
       // Clean up any old timers
       // if (replayTimeoutId) {
       //     clearTimeout(replayTimeoutId);
@@ -1977,6 +2008,43 @@ if (haltPopupRef.current && mapRef.current) { try { mapRef.current.closePopup(ha
 
   const resetReplay  = () => { setReplayProgress(0); setCurrentReplayPosition(null); };
   const resumeReplay = () => setIsReplaying(true);
+
+  // Skip forward/backward functions
+  const skipForward = () => {
+    if (!activeRoute.length) return;
+    const skipAmount = Math.floor(activeRoute.length * 0.1); // Skip 10% of route
+    const newIndex = Math.min(replayIndexRef.current + skipAmount, activeRoute.length - 1);
+    replayIndexRef.current = newIndex;
+    setCurrentReplayPosition(activeRoute[newIndex]);
+    const newProgress = (newIndex / (activeRoute.length - 1)) * 100;
+    setReplayProgress(newProgress);
+  };
+
+  const skipBackward = () => {
+    if (!activeRoute.length) return;
+    const skipAmount = Math.floor(activeRoute.length * 0.1); // Skip 10% of route
+    const newIndex = Math.max(replayIndexRef.current - skipAmount, 0);
+    replayIndexRef.current = newIndex;
+    setCurrentReplayPosition(activeRoute[newIndex]);
+    const newProgress = (newIndex / (activeRoute.length - 1)) * 100;
+    setReplayProgress(newProgress);
+  };
+
+  const skipToEnd = () => {
+    if (!activeRoute.length) return;
+    const lastIndex = activeRoute.length - 1;
+    replayIndexRef.current = lastIndex;
+    setCurrentReplayPosition(activeRoute[lastIndex]);
+    setReplayProgress(100);
+    setIsReplaying(false);
+  };
+
+  const skipToStart = () => {
+    if (!activeRoute.length) return;
+    replayIndexRef.current = 0;
+    setCurrentReplayPosition(activeRoute[0]);
+    setReplayProgress(0);
+  };
 
   useEffect(() => {
     if (!isReplaying || selectedDeviationForReplay === null) return;
@@ -2061,59 +2129,90 @@ if (haltPopupRef.current && mapRef.current) { try { mapRef.current.closePopup(ha
       style={{ cursor: isDraggingMagnifier ? "grabbing" : isMagnifierEnabled ? "grab" : "default" }}
     >
   
-    {
-      //  activeRoute.length > 0 &&
-        showReplayPanel &&
-    <div className={styles.replayPanel}>
-        <div className={styles.replayHead}>
-            <div className={styles.replayHeadTitle}>Route Replay</div>
-            <button  onClick={() => stopAndHideReplay() } className={styles.iconBtnPlain}>
-                <X className={styles.iconSm} />
+    {showReplayPanel && (
+    <div className={styles.enhancedReplayPanel}>
+        {/* Progress Bar */}
+        {currentReplayPosition && (
+            <div className={styles.replayProgressContainer}>
+                <div className={styles.replayProgressBar}>
+                    <div className={styles.replayProgressFill} style={{ width: `${replayProgress}%` }} />
+                </div>
+                <span className={styles.replayProgressText}>{Math.round(replayProgress)}%</span>
+            </div>
+        )}
+
+        {/* Control Buttons */}
+        <div className={styles.replayControls}>
+            {/* Skip to Start */}
+            <button onClick={skipToStart} className={styles.replayControlBtn} title="Skip to Start">
+                <Rewind size={18} />
+            </button>
+
+            {/* Skip Backward */}
+            <button onClick={skipBackward} className={styles.replayControlBtn} title="Skip Backward 10%">
+                <SkipBack size={18} />
+            </button>
+
+            {/* Play/Pause */}
+            {isReplaying ? (
+                <button onClick={pauseReplay} className={`${styles.replayControlBtn} ${styles.primaryBtn}`} title="Pause">
+                    <Pause size={22} />
+                </button>
+            ) : (
+                <button onClick={startReplay} className={`${styles.replayControlBtn} ${styles.primaryBtn}`} title="Play">
+                    <Play size={22} />
+                </button>
+            )}
+
+            {/* Skip Forward */}
+            <button onClick={skipForward} className={styles.replayControlBtn} title="Skip Forward 10%">
+                <SkipForward size={18} />
+            </button>
+
+            {/* Skip to End */}
+            <button onClick={skipToEnd} className={styles.replayControlBtn} title="Skip to End">
+                <FastForward size={18} />
+            </button>
+
+            {/* Stop */}
+            <button onClick={stopReplay} className={`${styles.replayControlBtn} ${styles.stopBtn}`} title="Stop">
+                <RotateCcw size={18} />
+            </button>
+
+            {/* Show Fence Toggle */}
+            {internalFencePathData.length > 0 && (
+                <button
+                    onClick={() => setShowFence(prev => !prev)}
+                    className={`${styles.replayControlBtn} ${showFence ? styles.fenceActiveBtn : ''}`}
+                    title={showFence ? "Hide Fence" : "Show Fence"}
+                >
+                    <Shield size={18} />
+                </button>
+            )}
+
+            {/* Speed Control */}
+            <div className={styles.replaySpeedWrapper}>
+                <select
+                    className={styles.replaySpeedSelect}
+                    value={replaySpeed}
+                    onChange={(e) => setReplaySpeed(Number(e.target.value))}
+                    title="Playback Speed"
+                >
+                    <option value={0.5}>0.5x</option>
+                    <option value={1}>1x</option>
+                    <option value={2}>1.5x</option>
+                    <option value={4}>2x</option>
+                    <option value={8}>3x</option>
+                </select>
+            </div>
+
+            {/* Close */}
+            <button onClick={stopAndHideReplay} className={`${styles.replayControlBtn} ${styles.closeBtn}`} title="Close">
+                <X size={18} />
             </button>
         </div>
-        <div className={styles.replayBody}>
-            <div className={styles.replayRow}>
-                {isReplaying ? (
-                    <button onClick={pauseReplay} className={`${styles.btn} ${styles.btnRed}`}>
-                        <Pause className={styles.iconXs} /> Pause
-                    </button>
-                ) : (
-                    <button onClick={startReplay} className={`${styles.btn} ${styles.btnGreen}`}>
-                        <Play className={styles.iconXs} /> Play
-                    </button>
-                )}
-                <button onClick={stopReplay} className={`${styles.btn} ${styles.btnGray}`}>
-                    <X className={styles.iconXs} /> Stop
-                </button>
-                <div className={styles.replaySpeedControl}>
-         
-         <select
-             className={styles.speedSelect}
-             value={replaySpeed}
-             onChange={(e) => setReplaySpeed(Number(e.target.value))}
-         >
-             <option value={0.5}>0.5x</option>
-             <option value={1}>1x</option>
-             <option value={2}>1.25x</option>
-             <option value={4}>1.5x</option>
-             <option value={8}>2x</option>
-         </select>
-     </div>
-            </div>
-           
-            {/* Show replay progress only when a route is being replayed */}
-            {currentReplayPosition && (
-                <>
-                    <div className={styles.progressTrack}>
-                        <div className={styles.progressBar} style={{ width: `${replayProgress}%` }} />
-                    </div>
-                    {/* <div className={styles.progressText}>
-                        Progress: {Math.round(replayProgress)}%
-                    </div> */}
-                </>
-            )}
-        </div>
-    </div>}
+    </div>
+    )}
 {/* )} */}
       <MapContainer
         
@@ -2406,7 +2505,7 @@ if (haltPopupRef.current && mapRef.current) { try { mapRef.current.closePopup(ha
       icon={customIcons?.deviation ?? undefined}
     >
       <Popup>
-      
+
       <div className={styles.popup}>
 <div className={`${styles.popupTitle} ${styles.titleRed}`}>Halt Info</div>
 <hr className={styles.divider} ></hr>
@@ -2414,6 +2513,31 @@ if (haltPopupRef.current && mapRef.current) { try { mapRef.current.closePopup(ha
 <div className={styles.popupBody}>Duration:<strong>  {durationHours > 0 ? `${durationHours} hour(s), ` : ''} {Math.floor(durationMins)} minute(s)</strong></div>
 <div className={styles.popupBody}>Start:<strong> {new Date(halt.start_time).toLocaleString()}</strong></div>
 <div className={styles.popupBody}>End:<strong> {new Date(halt.end_time).toLocaleString()}</strong></div>
+<div className={styles.popupBody}>
+  <a
+    href={`https://www.google.com/maps?q=${lat},${lng}`}
+    target="_blank"
+    rel="noopener noreferrer"
+    style={{
+      display: 'inline-flex',
+      alignItems: 'center',
+      gap: '4px',
+      background: '#4285F4',
+      color: 'white',
+      padding: '6px 12px',
+      borderRadius: '6px',
+      textDecoration: 'none',
+      fontSize: '12px',
+      marginTop: '8px'
+    }}
+  >
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+      <circle cx="12" cy="10" r="3"></circle>
+    </svg>
+    Open in Google Maps
+  </a>
+</div>
 </div>
       </Popup>
     </Marker>

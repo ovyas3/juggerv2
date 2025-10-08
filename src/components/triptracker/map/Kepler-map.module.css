@@ -85,7 +85,6 @@
 .replayBlock { border-top: 1px solid #e5e7eb; padding-top: 10px; }
 .replayTitle { font-size: 12px; font-weight: 600; color: #374151; margin-bottom: 8px; }
 .replayRow { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
-.replayControls { display: flex; flex-direction: column; gap: 8px; }
 .replaySpeed { display: flex; align-items: center; gap: 8px; }
 .selectXs { font-size: 12px; padding: 2px 6px; border: 1px solid #d1d5db; border-radius: 6px; }
 @media (max-width: 640px) {
@@ -667,6 +666,164 @@
 .satelliteActive { background: #eff6ff; border-color: #93c5fd; color: #1d4ed8; }
 
 /* Replay floating panel */
+/* Enhanced Replay Panel - Bottom Center */
+.enhancedReplayPanel {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1001;
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(12px);
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 16px 20px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 500px;
+  max-width: 600px;
+}
+
+.replayProgressContainer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.replayProgressBar {
+  flex: 1;
+  height: 6px;
+  background: #e5e7eb;
+  border-radius: 3px;
+  overflow: hidden;
+  position: relative;
+}
+
+.replayProgressFill {
+  height: 100%;
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.replayProgressText {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+  min-width: 40px;
+  text-align: right;
+}
+
+.replayControls {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: nowrap;
+}
+
+.replayControlBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: white;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.replayControlBtn:hover {
+  background: #f9fafb;
+  border-color: #d1d5db;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.replayControlBtn.primaryBtn {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  color: white;
+  border: none;
+}
+
+.replayControlBtn.primaryBtn:hover {
+  background: linear-gradient(135deg, #2563eb, #7c3aed);
+  box-shadow: 0 6px 12px rgba(59, 130, 246, 0.3);
+}
+
+.replayControlBtn.stopBtn {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+.replayControlBtn.stopBtn:hover {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.replayControlBtn.closeBtn {
+  background: #fee2e2;
+  color: #dc2626;
+  border-color: #fecaca;
+}
+
+.replayControlBtn.closeBtn:hover {
+  background: #fecaca;
+  border-color: #fca5a5;
+}
+
+.replayControlBtn.fenceActiveBtn {
+  background: #10b981;
+  color: white;
+  border-color: #059669;
+}
+
+.replayControlBtn.fenceActiveBtn:hover {
+  background: #059669;
+  border-color: #047857;
+}
+
+.replaySpeedWrapper {
+  margin-left: 8px;
+  padding-left: 8px;
+  border-left: 1px solid #e5e7eb;
+}
+
+.replaySpeedSelect {
+  padding: 8px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: white;
+  color: #374151;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 70px;
+}
+
+.replaySpeedSelect:hover {
+  border-color: #d1d5db;
+  background: #f9fafb;
+}
+
+.replaySpeedSelect:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Old replay panel styles - keep for compatibility */
 .replayPanel {
   position: absolute; left: 10px; bottom: 16px; z-index: 801;
   background: rgba(255,255,255,.95); border: 1px solid #e5e7eb; border-radius: 10px; padding: 16px; min-width: 280px;
@@ -993,5 +1150,34 @@
     left: 4px;
     width: 220px;
     max-height: 250px;
+  }
+
+  .enhancedReplayPanel {
+    min-width: 320px;
+    max-width: 90vw;
+    bottom: 12px;
+    padding: 12px 16px;
+  }
+
+  .replayControlBtn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .replayControlBtn.primaryBtn {
+    width: 42px;
+    height: 42px;
+  }
+
+  .replayControls {
+    gap: 6px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+  }
+
+  .replaySpeedSelect {
+    min-width: 60px;
+    padding: 6px 8px;
+    font-size: 12px;
   }
 }
