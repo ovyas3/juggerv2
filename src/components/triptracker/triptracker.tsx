@@ -1606,6 +1606,8 @@ const totalQuantity = apiData?.invoices?.reduce((sum:number, invoice:Invoice) =>
 
           {/* Right Sidebar */}
           <div className="sidebar-right">
+            {/* Device Tracking Status - Hidden for now */}
+            {false && (
             <div className="card">
               <div className="card-header">
                 <div className="card-title">
@@ -1752,10 +1754,11 @@ const totalQuantity = apiData?.invoices?.reduce((sum:number, invoice:Invoice) =>
                     </div>
                   </div>
                 </div>
-               
+
               )}
             </div>
-         
+            )}
+
             <div className="card timeline-card">
               <div className="card-header timeline-header">
                 <div className="tab-container">
