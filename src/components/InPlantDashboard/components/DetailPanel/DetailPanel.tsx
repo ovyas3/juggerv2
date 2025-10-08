@@ -285,11 +285,11 @@ const DetailPanel: React.FC<DetailPanelProps> = ({ vehicle, onClose, isOpen }) =
                   {item.duration !== undefined && (
                     <div className="stage-duration">
                       Duration: <strong>{formatDuration(item.duration)}</strong>
-                      {item.status === 'current' && vehicle.currentStage.expectedDuration && (
+                      {/* {item.status === 'current' && vehicle.currentStage.expectedDuration > 0 && (
                         <span className={`expected ${item.duration > vehicle.currentStage.expectedDuration ? 'exceeded' : ''}`}>
                           (Expected: {formatDuration(vehicle.currentStage.expectedDuration)})
                         </span>
-                      )}
+                      )} */}
                     </div>
                   )}
 
