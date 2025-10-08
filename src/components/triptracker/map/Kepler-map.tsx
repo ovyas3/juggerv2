@@ -717,13 +717,17 @@ useEffect(() => {
   if (isPausedAtDeviation && currentReplayDeviationIndex > -1 && currentReplayPosition && deviationData[currentReplayDeviationIndex]) {
     // Build a simple HTML string for the deviation popup content
     const deviation = deviationData[currentReplayDeviationIndex];
+    // const durationInMinutes = Math.floor(deviation.duration / 60); // Convert seconds to minutes
+    const durationHours = Math.floor(deviation.duration / 60);
+    const durationMins = deviation.duration % 60;
+    const formattedDuration = durationHours > 0 ? `${durationHours}h ${durationMins}m` : `${durationMins}m`;
     const content = `
       <div class="${styles.popup}">
         <div class="${styles.popupTitle} ${styles.titleRed}">Deviation Info</div>
         <hr class="${styles.divider}" />
         <div class="${styles.popupBody}">Reason: <strong>${deviation.reason}</strong></div>
         <div class="${styles.popupBody}">Distance: <strong>${deviation.distance}</strong></div>
-        <div class="${styles.popupBody}">Duration: <strong>${deviation.duration}</strong></div>
+        <div class="${styles.popupBody}">Duration: <strong>${formattedDuration}</strong></div>
         <div class="${styles.popupBody}">Start: <strong>${deviation.startTime}</strong></div>
         <div class="${styles.popupBody}">End: <strong>${deviation.endTime}</strong></div>
       </div>
@@ -960,17 +964,24 @@ setProgressPercentage(newProgress);
       setDayRunDetails(extractedDetails);
       // Process deviation data
       const deviations = shipment?.deviation?.deviations || [];
-      const processedDeviations = deviations.map((deviation: any, index: number) => ({
-        id: index + 1,
-        path: decodePolyline(deviation.polyline),
-        reason: "Route deviation detected",
-        location: `Deviation ${index + 1}`,
-        startTime: convertUtcToIst24hr(deviation.start_time),
-        endTime: convertUtcToIst24hr(deviation.end_time),
-        distance: `${deviation.distance?.toFixed(2)} km`,
-        duration: `${Math.floor(deviation.duration / 60)} min`,
-        polyline: deviation.polyline
-      }));
+      const processedDeviations = deviations.map((deviation: any, index: number) => {
+        // const durationInMinutes = Math.floor(deviation.duration / 60);
+        const durationHours = Math.floor(deviation.duration / 60);
+        const durationMins = deviation.duration % 60;
+        const formattedDuration = durationHours > 0 ? `${durationHours}h ${durationMins}m` : `${durationMins}m`;
+
+        return {
+          id: index + 1,
+          path: decodePolyline(deviation.polyline),
+          reason: "Route deviation detected",
+          location: `Deviation ${index + 1}`,
+          startTime: convertUtcToIst24hr(deviation.start_time),
+          endTime: convertUtcToIst24hr(deviation.end_time),
+          distance: `${deviation.distance?.toFixed(2)} km`,
+          duration: formattedDuration,
+          polyline: deviation.polyline
+        };
+      });
       setDeviationData(processedDeviations);
       // Assuming it's encoded
         console.log("Decoded Day Run Polylines:", decodedDayRuns);
@@ -2495,8 +2506,9 @@ if (haltPopupRef.current && mapRef.current) { try { mapRef.current.closePopup(ha
 { shouldShowHaltMarkers  && haltPoints.map((halt, idx) => {
   const lat = halt.geo_point.coordinates[1];
   const lng = halt.geo_point.coordinates[0];
-  const durationHours = Math.floor(halt.halt_duration / 60);
-  const durationMins = halt.halt_duration % 60;
+  // const durationInMinutes = Math.floor(/ 60); // Convert seconds to minutes
+  const durationHours = Math.floor(halt.halt_duration  / 60);
+  const durationMins = halt.halt_duration  % 60;
 
   return (
     <Marker

@@ -507,7 +507,8 @@ const handleToggleMapView = () => {
 };
 
 const calculateTotalHaltDuration = (data: any[]) => {
-  const totalMinutes = data.reduce((sum, halt) => sum + (halt.halt_duration || 0), 0);
+  const totalSeconds = data.reduce((sum, halt) => sum + (halt.halt_duration || 0), 0);
+  const totalMinutes = Math.floor(totalSeconds / 60); // Convert seconds to minutes
   const hours = Math.floor(totalMinutes / 60);
   const minutes = Math.floor(totalMinutes % 60);
   return `${hours}h ${minutes}m total`;
@@ -520,7 +521,7 @@ const findLongestHalt = (data: any[]) => {
     return (current.halt_duration || 0) > (longest.halt_duration || 0) ? current : longest;
   }, data[0]);
 
-  const durationInMinutes = longestHalt.halt_duration;
+  const durationInMinutes = Math.floor(longestHalt.halt_duration / 60); // Convert seconds to minutes
   const durationHours = Math.floor(durationInMinutes / 60);
 
   // FIX: Using Math.floor() to prevent rounding up and get the correct minute value.
@@ -528,7 +529,7 @@ const findLongestHalt = (data: any[]) => {
 
   const durationText = `${durationHours}h ${remainingMinutes}m`;
   const address = longestHalt.address || 'Unknown location';
-  
+
   return `${durationText} at ${address.split(',')[0]}`;
 };
 const totalStoppagesCount = haltData.length;
