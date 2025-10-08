@@ -968,6 +968,7 @@ const totalQuantity = apiData?.invoices?.reduce((sum:number, invoice:Invoice) =>
           unique_code={uniqueCode}
           geoFenceData={apiData?.geo_fence}
           tripTrackerMethods={apiData?.trip_tracker?.methods || []}
+          shipmentData={apiData}
           // apiData={apiData}
           // tollHistoryData={tollHistoryData}
           // haltData={haltData}
@@ -1569,6 +1570,7 @@ const totalQuantity = apiData?.invoices?.reduce((sum:number, invoice:Invoice) =>
       unique_code={uniqueCode}
       geoFenceData={apiData?.geo_fence}
       tripTrackerMethods={apiData?.trip_tracker?.methods || []}
+      shipmentData={apiData}
 
       // optional callbacks if you want to control toggles from dashboard:
       // onToggleGPSRoute={() => {/* set some local state if needed */}}

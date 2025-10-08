@@ -3014,25 +3014,25 @@
   .mapfs-exit-btn {
     position: absolute;
     top: 20px;
-    right: 7px;
+    left: 360px;
     z-index: 10000;
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    
+
     background-color: rgba(255, 255, 255, 0.9); /* HIGHLIGHT: A semi-transparent white */
     backdrop-filter: blur(8px);
-    
+
     color: #111827; /* HIGHLIGHT: Dark text for contrast */
-    
+
     padding: 0.3rem 0.8rem;
-    border-radius: 9999px; 
+    border-radius: 9999px;
     border: 1px solid rgba(0, 0, 0, 0.1); /* HIGHLIGHT: A thin, subtle dark border */
-    
+
     font-size: 0.875rem;
     font-weight: 500;
     cursor: pointer;
-    
+
     transition: all 0.2s ease;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* HIGHLIGHT: Softer shadow */
   }
@@ -3042,6 +3042,33 @@
     background-color: #fff; /* HIGHLIGHT: A solid white on hover */
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* HIGHLIGHT: Slightly larger shadow on hover */
   }
+
+  /* Responsive positioning for exit button */
+  @media (max-width: 1024px) {
+    .mapfs-exit-btn {
+      left: 300px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .mapfs-exit-btn {
+      left: 260px;
+      top: 10px;
+      padding: 0.25rem 0.6rem;
+      font-size: 0.75rem;
+      gap: 0.3rem;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .mapfs-exit-btn {
+      left: 215px;
+      top: 8px;
+      padding: 0.2rem 0.5rem;
+      font-size: 0.7rem;
+    }
+  }
+
   /* Make the frame a positioning container for the spinner */
   .doc-image-frame {
     position: relative;

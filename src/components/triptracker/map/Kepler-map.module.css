@@ -578,7 +578,7 @@
 /* Live status */
 .statusOverlay {
   width: 320px;
-  position: absolute; top: 16px; left: 16px; background: rgba(255,255,255,.95);
+  position: absolute; top: 185px; left: 16px; background: rgba(255,255,255,.95);
   backdrop-filter: saturate(1.2) blur(2px);
   border: 1px solid #e5e7eb; border-radius: 10px; padding: 12px;
   box-shadow: 0 10px 15px rgba(0,0,0,.1); z-index: 1000; max-width: 320px;
@@ -609,10 +609,28 @@
 .dotGreen { background: #22c55e; }
 .dotBlue { background: #3b82f6; }
 .dotOrange { background: #f59e0b; }
+.dotPurple { background: #8b5cf6; }
 .dotBluePulse { background: #3b82f6; animation: pulse 1.2s infinite; }
 .dotPurplePulse { background: #8b5cf6; animation: pulse 1.2s infinite; }
 @keyframes pulse { 0%, 100% { opacity: .5; } 50% { opacity: 1; } }
 .mutedXs { color: #6b7280; font-size: 12px; }
+
+/* Shipment Details Overlay */
+.shipmentDetailsOverlay {
+  width: 320px;
+  position: absolute; top: 16px; left: 16px; background: rgba(255,255,255,.95);
+  backdrop-filter: saturate(1.2) blur(2px);
+  border: 1px solid #e5e7eb; border-radius: 10px; padding: 12px;
+  box-shadow: 0 10px 15px rgba(0,0,0,.1); z-index: 1000; max-width: 320px;
+  transition: left .3s ease;
+}
+.shipmentDetailsOverlay.smallText .statusTitle {
+  font-size: 10px;
+}
+
+.shipmentDetailsOverlay.smallText .statusItem span {
+  font-size: 10px;
+}
 
 /* Top-right controls */
 .topRightControls { position: absolute; top: 60px; right: 10px; display: flex; flex-direction: column;
@@ -775,7 +793,7 @@
 /* Day Run Table */
 .dayRunTable {
   position: absolute;
-  top: 290px;
+  top: 380px;
   left: 16px;
   width: 350px;
   background: rgba(255,255,255,.95);
@@ -786,7 +804,7 @@
   max-height: 300px;
   overflow: hidden;
   z-index: 1000;
-  transition: left .3s ease;
+  transition: left .3s ease, top .3s ease;
 }
 
 .tableHeader {
@@ -874,4 +892,106 @@
 .iconSm {
   width: 16px;
   height: 16px;
+}
+
+/* Responsive styles for overlays */
+@media (max-width: 1024px) {
+  .statusOverlay,
+  .shipmentDetailsOverlay {
+    width: 280px;
+    max-width: 280px;
+    padding: 10px;
+  }
+
+  .statusTitle {
+    font-size: 12px;
+  }
+
+  .statusItem {
+    font-size: 11px;
+  }
+
+  .dayRunTable {
+    top: 360px;
+    width: 300px;
+  }
+}
+
+@media (max-width: 768px) {
+  .statusOverlay,
+  .shipmentDetailsOverlay {
+    width: 240px;
+    max-width: 240px;
+    padding: 8px;
+    left: 8px;
+  }
+
+  .statusOverlay {
+    top: 155px;
+  }
+
+  .statusTitle {
+    font-size: 11px;
+    margin-bottom: 6px;
+  }
+
+  .statusItem {
+    font-size: 10px;
+    gap: 6px;
+  }
+
+  .dot {
+    width: 6px;
+    height: 6px;
+  }
+
+  .dayRunTable {
+    top: 330px;
+    left: 8px;
+    width: 260px;
+  }
+}
+
+@media (max-width: 640px) {
+  .statusOverlay,
+  .shipmentDetailsOverlay {
+    width: 200px;
+    max-width: 200px;
+    padding: 6px;
+    left: 4px;
+  }
+
+  .shipmentDetailsOverlay {
+    top: 8px;
+  }
+
+  .statusOverlay {
+    top: 135px;
+  }
+
+  .statusTitle {
+    font-size: 10px;
+    margin-bottom: 4px;
+  }
+
+  .statusItem {
+    font-size: 9px;
+    gap: 4px;
+  }
+
+  .statusItem span {
+    line-height: 1.2;
+  }
+
+  .dot {
+    width: 5px;
+    height: 5px;
+  }
+
+  .dayRunTable {
+    top: 280px;
+    left: 4px;
+    width: 220px;
+    max-height: 250px;
+  }
 }

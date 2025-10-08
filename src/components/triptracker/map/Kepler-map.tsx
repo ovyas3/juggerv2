@@ -57,6 +57,26 @@ interface KeplerMapProps {
     };
   };
   tripTrackerMethods?: string[];
+  shipmentData?: {
+    SIN?: string;
+    latest_status?: string;
+    delivery_date?: string;
+    actual_delivery_date?: string;
+    driver?: {
+      name?: string;
+      mobile?: string;
+      vehicle_no?: string;
+      vehicle_type?: {
+        name?: string;
+      };
+    };
+    trip_tracker?: {
+      last_location_address?: string;
+    };
+    deliveries?: Array<{
+      finished_at?: string;
+    }>;
+  };
 
 }
 
@@ -169,6 +189,7 @@ export default function KeplerMap({
   onToggleFullscreen,
   onToggleGPSRoute,
   onToggleDeviations,
+  shipmentData,
 }: KeplerMapProps) {
   const [isClient, setIsClient] = useState(false);
   const [leafletLoaded, setLeafletLoaded] = useState(false);
@@ -1393,6 +1414,65 @@ useEffect(() => {
   }
 
 }, [activeMode, gpsPath, simPath, appPath]);
+
+  // Status conversion function - same as main triptracker
+  const getShipmentStatus = (statusCode: string) => {
+    let status = "";
+    let statusClass = "";
+
+    switch (statusCode) {
+      case "PNDG":
+        status = "Pending";
+        statusClass = "pending";
+        break;
+      case "ALC":
+        status = "Allocated";
+        statusClass = "allocated";
+        break;
+      case "ACPT":
+        status = "Accepted";
+        statusClass = "accepted";
+        break;
+      case "ASN":
+        status = "Assigned";
+        statusClass = "assigned";
+        break;
+      case "ITNS":
+        status = "In Transit";
+        statusClass = "in-transit";
+        break;
+      case "SP":
+        status = "Towards Pickup";
+        statusClass = "in-transit";
+        break;
+      case "AP":
+        status = "At Pickup";
+        statusClass = "at-location";
+        break;
+      case "ALD":
+        status = "At Delivery";
+        statusClass = "at-location";
+        break;
+      case "ABTR":
+        status = "About to Reach";
+        statusClass = "in-transit";
+        break;
+      case "CPTD":
+        status = "Delivered";
+        statusClass = "Delivered";
+        break;
+      case "CNCL":
+        status = "Cancelled";
+        statusClass = "cancelled";
+        break;
+      default:
+        status = statusCode || "Unknown";
+        statusClass = "unknown";
+        break;
+    }
+    return { status, statusClass };
+  };
+
   const [selectedMapStyle, setSelectedMapStyle] = useState("light");
   const [showMapStyleSelector, setShowMapStyleSelector] = useState(false);
   const mapStyles = [
@@ -2767,20 +2847,59 @@ if (haltPopupRef.current && mapRef.current) { try { mapRef.current.closePopup(ha
         </div>
       )}
 
+      {/* Shipment Details */}
+      {shipmentData && (
+        <div className={`${styles.shipmentDetailsOverlay} ${showMagnifierSettings ? styles.statusShift : ""} ${!isFullscreen ? styles.smallText : ""} ${showMagnifierSettings ? styles.hideOnSettings : ""}`}>
+          <div className={styles.statusTitle}>Shipment Details</div>
+          <div className={styles.statusList}>
+            <div className={styles.statusItem}>
+              <span className={`${styles.dot} ${styles.dotGreen}`}></span>
+              <span>SIN: {shipmentData.SIN || "N/A"}</span>
+            </div>
+            <div className={styles.statusItem}>
+              <span className={`${styles.dot} ${styles.dotBlue}`}></span>
+              <span>Vehicle: {shipmentData.driver?.vehicle_no || "N/A"}</span>
+            </div>
+            <div className={styles.statusItem}>
+              <span className={`${styles.dot} ${styles.dotPurple}`}></span>
+              <span>Driver: {shipmentData.driver?.name || "N/A"}</span>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Live Tracking Status */}
       {/* <div className={`${styles.statusOverlay} ${showMagnifierSettings ? styles.statusShift : ""} ${!isFullscreen ? styles.smallText : ""}`}> */}
       <div className={`${styles.statusOverlay} ${showMagnifierSettings ? styles.statusShift : ""} ${!isFullscreen ? styles.smallText : ""} ${showMagnifierSettings ? styles.hideOnSettings : ""}`}>
         <div className={styles.statusTitle}>Live Tracking Status</div>
         <div className={styles.statusList}>
-          {/* <div className={styles.statusItem}><span className={`${styles.dot} ${styles.dotGreen}`}></span><span>GPS Signal: Strong</span></div> */}
-          <div className={styles.statusItem}><span className={`${styles.dot} ${styles.dotBlue}`}></span><span>   {progressPercentage > 0 ? (
-      <>Route Progress: {progressPercentage.toFixed(0)}%</>
-    ) : (
-      ""
-    )}
-     
-   </span></div>
-          <div className={styles.statusItem}><span className={`${styles.dot} ${styles.dotOrange}`}></span><span>ETA: {eta || "N/A"}</span></div>
+          {shipmentData?.latest_status && (
+            <div className={styles.statusItem}>
+              <span className={`${styles.dot} ${styles.dotGreen}`}></span>
+              <span>Status: {getShipmentStatus(shipmentData.latest_status).status}</span>
+            </div>
+          )}
+          {progressPercentage > 0 && (
+            <div className={styles.statusItem}>
+              <span className={`${styles.dot} ${styles.dotBlue}`}></span>
+              <span>Route Progress: {progressPercentage.toFixed(0)}%</span>
+            </div>
+          )}
+          <div className={styles.statusItem}>
+            <span className={`${styles.dot} ${styles.dotOrange}`}></span>
+            <span>
+              {shipmentData?.latest_status?.toLowerCase().includes('delivered') || shipmentData?.deliveries?.[shipmentData.deliveries.length - 1]?.finished_at
+                ? `Delivered on: ${shipmentData.deliveries?.[shipmentData.deliveries.length - 1]?.finished_at ? new Date(shipmentData.deliveries[shipmentData.deliveries.length - 1].finished_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : 'N/A'}`
+                : `ETA: ${eta || "N/A"}`
+              }
+            </span>
+          </div>
+          {shipmentData?.trip_tracker?.last_location_address && (
+            <div className={styles.statusItem}>
+              <span className={`${styles.dot} ${styles.dotPurple}`}></span>
+              <span>Location: {shipmentData.trip_tracker.last_location_address.substring(3)}</span>
+            </div>
+          )}
           {isMagnifierEnabled && (
             <div className={`${styles.statusItem} ${styles.statusSplit}`}>
               <span className={`${styles.dot} ${styles.dotBluePulse}`}></span>
