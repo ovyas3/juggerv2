@@ -9,6 +9,9 @@ const nextConfig = {
         domains: ['wagon-tally-sheet.s3.ap-south-1.amazonaws.com', 's3.ap-south-1.amazonaws.com'],
     },
     // basePath: process.env.NODE_ENV === 'local' ? '' : '/dashV2',
+    experimental: {
+        missingSuspenseWithCSRBailout: false,
+    },
 };
 
 export default withNextIntl(nextConfig);
