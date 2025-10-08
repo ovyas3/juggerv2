@@ -159,17 +159,17 @@
 }
 
 .select:hover {
-  border-color: #20104d;
+  border-color: #301c6c;
 }
 
 .select:focus-within {
-  border-color: #20104d;
+  border-color: #301c6c;
   box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
   outline: none;
 }
 
 .select[data-state="open"] {
-  border-color: #20104d;
+  border-color: #301c6c;
   box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
 }
 
@@ -200,7 +200,7 @@
 }
 
 .selectItem[data-highlighted] {
-  background-color: #20104d;
+  background-color: #301c6c;
   color: white;
   outline: none;
 }
@@ -230,7 +230,7 @@
 }
 
 .button {
-  background-color: #20104d;
+  background-color: #301c6c;
   color: white;
   padding: 8px 24px;
   border-radius: 4px;
@@ -249,7 +249,7 @@
 }
 
 .button:not(:disabled):hover {
-  background-color: #433de8;
+  background-color: #3d2879;
 }
 
 .loader {

@@ -134,7 +134,7 @@ select.inputField {
 /* Fetch Button */
 .fetchBtn {
   color: #fff;
-  background: #20104d;
+  background:  #301c6c;
   border: 1px solid #20104d;
   border-radius: 4px;
   padding: 10px 20px;
@@ -146,8 +146,8 @@ select.inputField {
 }
 
 .fetchBtn:hover:not(:disabled) {
-  background: #433DE8;
-  border-color: #433DE8;
+  background: #3d2879;
+  border-color: #3d2879;
 }
 
 .fetchBtn:disabled {
@@ -169,7 +169,7 @@ select.inputField {
 
 /* Footer Submit Button */
 .dialogFooterBtn {
-  background: #20104d;
+  background: #301c6c;
   color: white;
   border: none;
   border-radius: 4px;
@@ -182,7 +182,7 @@ select.inputField {
 }
 
 .dialogFooterBtn:hover:not(:disabled) {
-  background: #433DE8;
+  background: #3d2879;
   /* transform: translateY(-1px); */
   box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3);
 }

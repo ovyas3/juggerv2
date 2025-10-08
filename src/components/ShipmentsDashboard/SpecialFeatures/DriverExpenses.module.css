@@ -230,13 +230,12 @@
   margin: 15px;
   cursor: pointer;
   border: none;
-  background-color: #20104d
-;
+  background-color: #301c6c;
   color: white;
 }
 
 .submitButton:hover {
-  background-color: #433de8;
+  background-color: #3d2879;
 }
 
 .submitButton:disabled {

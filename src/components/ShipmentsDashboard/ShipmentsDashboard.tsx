@@ -986,7 +986,7 @@ const actionMenuCategories = (shipment: Shipment) => {
           handleShareShipment(shipment);
         },
         show: true,
-        disabled: shipment.status != 'Assigned' && shipment.status != 'Completed' && shipment.status != 'Cancelled' && shipment.assigned != 'Pending'
+         disabled: shipment.status != 'Assigned' && shipment.status != 'Completed' && shipment.status != 'Cancelled' && shipment.assigned != 'Pending'
       },
       { 
         icon: Mail, 
@@ -997,7 +997,8 @@ const actionMenuCategories = (shipment: Shipment) => {
           handleMailShipment(shipment);
         },
         show: true,
-        disabled: shipment.status != 'Assigned' && shipment.status != 'Completed' && shipment.status != 'Cancelled' && shipment.assigned != 'Pending'
+
+         disabled: shipment.status != 'Assigned' && shipment.status != 'Completed' && shipment.status != 'Cancelled' && shipment.assigned != 'Pending'
       },
       { 
         icon: XCircle, 
@@ -1044,7 +1045,7 @@ const actionMenuCategories = (shipment: Shipment) => {
         show: !!shipment.carrier
       },
       { 
-        icon: Clock, 
+        icon: Clock,  
         label: "Update Delay Reason", 
         color: "text-teal-600", 
         onClick: (shipment: Shipment, e?: React.MouseEvent) => {
@@ -1064,7 +1065,7 @@ const actionMenuCategories = (shipment: Shipment) => {
           e?.stopPropagation();
           handleOpenFreightModal(shipment._id, shipment.sin, 'rate');
         },
-        show: shipment.rate?.type === 'manual' && showFreight
+         show: shipment.rate?.type === 'manual' && showFreight
       },
       { 
         icon: Truck, 
@@ -1074,7 +1075,7 @@ const actionMenuCategories = (shipment: Shipment) => {
           e?.stopPropagation();
           handleOpenFreightModal(shipment._id, shipment.sin, 'client_rate');
         },
-        show: shipment.client_rate?.type === 'manual' && showFreight
+         show: shipment.client_rate?.type === 'manual' && showFreight
       },
       { 
         icon: CreditCard, 
@@ -1191,13 +1192,13 @@ const actionMenuCategories = (shipment: Shipment) => {
         icon: Upload, 
         label: "Upload ePOD", 
         color: "text-green-600",
-        show: shipment.isOwnFleet_shipment && !shipment.carrier && (roles.owner || roles.fleet)
+        // show: shipment.isOwnFleet_shipment && !shipment.carrier && (roles.owner || roles.fleet)
       },
       { 
         icon: Upload, 
         label: "Request ePOD", 
         color: "text-green-600",
-        show: shipment.isOwnFleet_shipment && !shipment.carrier && (roles.owner || roles.fleet)
+        // show: shipment.isOwnFleet_shipment && !shipment.carrier && (roles.owner || roles.fleet)
       },
       { 
         icon: Upload, 
@@ -3247,9 +3248,9 @@ const [isLoading, setIsLoading] = useState(false);
   </Select>
 </div>
 
-          <div className={styles.button} onClick={toggleAnalyticsView}>
+          {/* <div className={styles.button} onClick={toggleAnalyticsView}>
             {isAnalyticsView ? "Table View" : "Analytics View"}
-          </div>
+          </div> */}
 
           <div className={styles.button} onClick={toggleCompactView}>
             {isCompactView ? "Comfortable" : "Compact"}
