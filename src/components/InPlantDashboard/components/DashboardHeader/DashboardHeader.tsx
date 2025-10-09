@@ -11,7 +11,7 @@ import './DashboardHeader.css';
 interface DashboardHeaderProps {
   searchQuery: string;
   onSearch: (query: string) => void;
-  onSearchResults?: (results: any[]) => void;
+  onSearchResults?: (results: any[] | null) => void;
   dateRange: 'today' | 'yesterday' | 'week' | 'custom';
   onDateRangeChange: (range: 'today' | 'yesterday' | 'week' | 'custom') => void;
   onCustomDateRangeChange?: (range: { startDate: string; endDate: string }) => void;
@@ -96,9 +96,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   const handleSearch = async () => {
     if (!searchValue.trim()) {
       onSearch('');
-      if (onSearchResults) {
-        onSearchResults([]);
-      }
+      if (onSearchResults) onSearchResults(null);
       setSearchSuggestions([]);
       setShowSuggestions(false);
       return;
@@ -326,12 +324,9 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
       value = value.toUpperCase();
     }
     setSearchValue(value);
-    
     if (value.trim() === '') {
       onSearch('');
-      if (onSearchResults) {
-        onSearchResults([]);
-      }
+      if (onSearchResults) onSearchResults(null);
       setSearchSuggestions([]);
       setShowSuggestions(false);
       return;

@@ -292,17 +292,24 @@ const InPlantDashboard: React.FC = () => {
     fetchVehicles();
   }, [dateRange, filters, customDateRange, currentPage, pageSize, isSearchActive]);
 
-  const handleSearchResults = useCallback(async (results: any[], paginationData?: any) => {
-    if (!results || results.length === 0) {
-      setSearchQuery('');
+const handleSearchResults = useCallback(
+  (results: any[] | null, paginationData?: any) => {
+    if (results === null) {
       setIsSearchActive(false);
+      setSearchQuery('');
+      setCurrentPage(0);
+      return;
+    }
+    setIsSearchActive(true);
+    setCurrentPage(0);
+    if (!results || results.length === 0) {
+      setVehicles([]);
+      setTotalCount(0);
       return;
     }
 
     try {
       setIsVehiclesLoading(true);
-      setIsSearchActive(true);
-      
       const formattedVehicles = results.map((vehicle: any) => ({
         id: vehicle.id || '',
         vehicleNumber: vehicle.vehicleNumber || '',
@@ -313,7 +320,7 @@ const InPlantDashboard: React.FC = () => {
           arrivedAt: vehicle.currentStage?.arrivedAt || new Date().toISOString(),
           duration: vehicle.currentStage?.duration || 0,
           expectedDuration: vehicle.currentStage?.expectedDuration || 0,
-          status: vehicle.currentStage?.status || 'on_time'
+          status: vehicle.currentStage?.status || 'on_time',
         },
         entryTime: vehicle.entryTime || new Date().toISOString(),
         totalDuration: vehicle.totalDuration || 0,
@@ -322,26 +329,25 @@ const InPlantDashboard: React.FC = () => {
         completedStages: vehicle.completedStages || [],
         shipper: { id: vehicle.shipper?.id || '', name: vehicle.shipper?.name || 'Unknown' },
         carrier: { id: vehicle.carrier?.id || '', name: vehicle.carrier?.name || 'Unknown' },
-        driver: { 
-          id: vehicle.driver?.id || '', 
-          name: vehicle.driver?.name || 'Unknown', 
-          phone: vehicle.driver?.phone || '' 
+        driver: {
+          id: vehicle.driver?.id || '',
+          name: vehicle.driver?.name || 'Unknown',
+          phone: vehicle.driver?.phone || '',
         },
         shipmentId: vehicle.sin || '',
-        orderReference: vehicle.orderReference || ''
+        orderReference: vehicle.orderReference || '',
       }));
       setVehicles(formattedVehicles);
-      setCurrentPage(0);
-      if (paginationData) {
-        setTotalCount(paginationData.total || 0);
-      }
+      if (paginationData) setTotalCount(paginationData.total || 0);
     } catch (error) {
-      console.error('Error formatting search results:', error);
-      showMessage('Error processing search results', 'error');
+      console.error('Error processing search results:', error);
     } finally {
       setIsVehiclesLoading(false);
     }
-  }, [showMessage]);
+  },
+  [showMessage]
+);
+
   
   
   
