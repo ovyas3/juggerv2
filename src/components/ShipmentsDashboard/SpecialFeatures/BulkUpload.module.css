@@ -96,7 +96,7 @@
 }
 
 .uploadIcon {
-  color: #20104d
+  color: #301c6c
 ;
 }
 
@@ -115,7 +115,7 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  color: #20104d
+  color: #301c6c
 ;
   text-decoration: none;
   font-size: 14px;
@@ -188,7 +188,7 @@
 
 .fileInputLabel {
   cursor: pointer;
-  color: #20104d
+  color: #301c6c
 ;
 }
 
@@ -241,7 +241,7 @@
 }
 
 .dragDropBox.dragOver {
-  border-color: #20104d
+  border-color: #301c6c
 ; 
   background-color: #e0e7ff; 
 }
@@ -252,14 +252,14 @@
 }
 
 .dragDropBox .uploadIcon {
-  color: #20104d
+  color: #301c6c
 ; 
   margin-bottom: 8px;
 }
 
 .chooseFileButton {
 
-  background-color: #20104d
+  background-color: #301c6c
  !important; /* Ensure primary background */
   color: white !important;
   border-radius: 4px !important;
@@ -282,7 +282,7 @@
   padding: 10px 16px;
   background-color: #EDE7F6; /* Light purple */
   color: #5E35B1; /* Darker purple text */
-  border: 1px solid #20104d
+  border: 1px solid #301c6c
 ;
   border-radius: 6px;
   cursor: pointer;
@@ -294,9 +294,9 @@
 }
 
 .fileInputLabel:hover {
-  background-color: #20104d
+  background-color: #301c6c
 ;
   color: white;
-  border-color: #20104d
+  border-color: #301c6c
 ;
 }

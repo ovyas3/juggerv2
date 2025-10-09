@@ -94,7 +94,7 @@
   width: 200px;
   padding: 8px 12px;
   outline: none;
-  border: 1px solid #20104d
+  border: 1px solid #301c6c
 ;
   border-radius: 4px;
   font-size: 14px;
@@ -102,21 +102,21 @@
 }
 
 .dateInput:hover {
-  border: 1px solid #20104d
+  border: 1px solid #301c6c
 ;
   box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
 }
 
 .dateInput:focus {
   outline: none;
-  border: 1px solid #20104d
+  border: 1px solid #301c6c
 ;
   box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
 }
 
 .dateInput:focus-visible {
   outline: none;
-  border: 1px solid #20104d
+  border: 1px solid #301c6c
 ;
   box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
 }
@@ -152,17 +152,17 @@
 }
 
 .select:hover {
-  border-color: #20104d;
+  border-color: #301c6c;
 }
 
 .select:focus-within {
-  border-color: #20104d;
+  border-color: #301c6c;
   box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
   outline: none;
 }
 
 .select[data-state="open"] {
-  border-color: #20104d;
+  border-color: #301c6c;
   box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
 }
 
@@ -194,7 +194,7 @@
 }
 
 .selectItem[data-highlighted] {
-  background-color: #20104d;
+  background-color: #301c6c;
   color: white;
   outline: none;
 }
@@ -248,7 +248,7 @@
 }
 
 .submitButton {
-  background-color: #20104d;
+  background-color: #301c6c;
   color: white;
 }
 

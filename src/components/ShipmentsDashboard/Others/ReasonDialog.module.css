@@ -63,7 +63,7 @@
 
 .select:focus {
   outline: none;
-  border-color: #20104d
+  border-color: #301c6c
 ;
   box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
 }
@@ -83,7 +83,7 @@
 
 .otherReasonInput:focus {
   outline: none;
-  border-color: #20104d
+  border-color: #301c6c
 ;
   box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
 }
@@ -103,9 +103,9 @@
 }
 
 .checkboxContainer input[type="checkbox"]:checked {
-  background-color: #20104d
+  background-color: #301c6c
 ;
-  border-color: #20104d
+  border-color: #301c6c
 ;
 }
 
@@ -131,7 +131,7 @@
 }
 
 .submitButton {
-  background-color: #20104d
+  background-color: #301c6c
 ;
   color: white;
   border: none;

@@ -40,7 +40,7 @@ export default function MapsProvider({ children }: { children: React.ReactNode }
                 height: '100vh',
                 flexDirection: 'column'
             }}>
-                <Loader2  className={styles.spinner} style={{ color: "#20104d", fontSize: "2rem", width: "40px", height: "40px" }} />
+                <Loader2  className={styles.spinner} style={{ color: "#301c6c", fontSize: "2rem", width: "40px", height: "40px" }} />
                 <p>Loading...</p>
             </div>
         );

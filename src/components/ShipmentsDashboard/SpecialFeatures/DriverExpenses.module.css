@@ -395,7 +395,7 @@
 
 /* Custom styles for DatePicker focus */
 .datepickerFilled .ant-picker.ant-picker-focused {
-  border-color: #20104d
+  border-color: #301c6c
  !important;
   box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2) !important;
 }

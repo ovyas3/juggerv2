@@ -870,7 +870,7 @@ const PickupTab = ({
                                 {isSavingTimestamps[pickup._id] ? (
                                   <CircularProgress size={16} />
                                 ) : (
-                                  <SaveIcon sx={{ color: '#20104d' }} fontSize="small" />
+                                  <SaveIcon sx={{ color: '#301c6c' }} fontSize="small" />
                                 )}
                               </IconButton>
                               <IconButton
@@ -1022,7 +1022,7 @@ const PickupTab = ({
                       size="small"
                       onClick={() => handleUploadClick(pickup._id + "_doc")}
                       sx={{
-                        backgroundColor: '#20104d',
+                        backgroundColor: '#301c6c',
                         '&:hover': {
                           backgroundColor: '#271950',
                         },

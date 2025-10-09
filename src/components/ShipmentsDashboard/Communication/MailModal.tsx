@@ -104,12 +104,12 @@ const MailModal: React.FC<MailModalProps> = ({ open, onClose, shipment }) => {
               sx={{
                 '& .MuiOutlinedInput-root': {
                   '&:hover fieldset': {
-                    border: '1px solid #20104d',  
-                    borderColor: '#20104d',
+                    border: '1px solid #301c6c',  
+                    borderColor: '#301c6c',
                   },
                   '&.Mui-focused fieldset': {
-                    border: '1px solid #20104d',
-                    borderColor: '#20104d',
+                    border: '1px solid #301c6c',
+                    borderColor: '#301c6c',
                     boxShadow: '0 0 0 2px rgba(79, 70, 229, 0.2)',
                   },
                 },
@@ -125,7 +125,7 @@ const MailModal: React.FC<MailModalProps> = ({ open, onClose, shipment }) => {
               disabled={loading}
               className={styles.mailButton}
             >
-              {loading ? <CircularProgress size={24} /> : <EmailIcon style={{color:"#20104d", width:"24px", height:"24px"}} />}
+              {loading ? <CircularProgress size={24} /> : <EmailIcon style={{color:"#301c6c", width:"24px", height:"24px"}} />}
             </IconButton>
           </div>
         </div>

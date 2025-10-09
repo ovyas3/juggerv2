@@ -423,13 +423,13 @@ const DriverExpenses: React.FC<DriverExpensesProps> = ({
                         className={styles.select}
                         sx={{
                           '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                            borderColor: expense.expenseType ? '#20104d' : '#d32f2f',
+                            borderColor: expense.expenseType ? '#301c6c' : '#d32f2f',
                             borderWidth: '1px',
                             boxShadow: expense.expenseType ? '0 0 0 2px rgba(79, 70, 229, 0.2)' : '0 0 0 2px rgba(211, 47, 47, 0.2)',
                             // box-shadow: expense.expenseType ? '0 0 0 2px rgba(79, 70, 229, 0.2)' : '0 0 0 2px rgba(211, 47, 47, 0.2)',
                           },
                           '&.Mui-focused:not(.Mui-error) .MuiOutlinedInput-notchedOutline': {
-                            borderColor: '#20104d',
+                            borderColor: '#301c6c',
                             borderWidth: '1px',
                             boxShadow: '0 0 0 2px rgba(79, 70, 229, 0.2)',
                             // box-shadow: '0 0 0 2px rgba(79, 70, 229, 0.2)',
@@ -465,12 +465,12 @@ const DriverExpenses: React.FC<DriverExpensesProps> = ({
                         className={styles.select}
                         sx={{
                           '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                            borderColor: expense.paymentMode ? '#20104d' : '#d32f2f',
+                            borderColor: expense.paymentMode ? '#301c6c' : '#d32f2f',
                             borderWidth: '1px',
                             boxShadow: expense.paymentMode ? '0 0 0 2px rgba(79, 70, 229, 0.2)' : '0 0 0 2px rgba(211, 47, 47, 0.2)',
                           },
                           '&.Mui-focused:not(.Mui-error) .MuiOutlinedInput-notchedOutline': {
-                            borderColor: '#20104d',
+                            borderColor: '#301c6c',
                             borderWidth: '1px',
                             boxShadow: '0 0 0 2px rgba(79, 70, 229, 0.2)',
                           }
@@ -500,7 +500,7 @@ const DriverExpenses: React.FC<DriverExpensesProps> = ({
   }}
   sx={{
     '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
-      borderColor: '#20104d',
+      borderColor: '#301c6c',
       borderWidth: '1px',
       boxShadow: '0 0 0 2px rgba(79, 70, 229, 0.2)',
     }
@@ -528,12 +528,12 @@ const DriverExpenses: React.FC<DriverExpensesProps> = ({
                       helperText={!expense.expenseAmount && expense.expenseAmount !== 0 ? 'Required' : ''}
                       sx={{
                         '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                          borderColor: (expense.expenseAmount && expense.expenseAmount > 0) ? '#20104d' : '#d32f2f',
+                          borderColor: (expense.expenseAmount && expense.expenseAmount > 0) ? '#301c6c' : '#d32f2f',
                           borderWidth: '1px',
                           boxShadow: (expense.expenseAmount && expense.expenseAmount > 0) ? '0 0 0 2px rgba(79, 70, 229, 0.2)' : '0 0 0 2px rgba(211, 47, 47, 0.2)',
                         },
                         '& .MuiOutlinedInput-root.Mui-focused:not(.Mui-error) .MuiOutlinedInput-notchedOutline': {
-                          borderColor: '#20104d',
+                          borderColor: '#301c6c',
                           borderWidth: '1px',
                           boxShadow: '0 0 0 2px rgba(79, 70, 229, 0.2)',
                         }
@@ -555,7 +555,7 @@ const DriverExpenses: React.FC<DriverExpensesProps> = ({
   }}
   sx={{
     '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
-      borderColor: '#20104d',
+      borderColor: '#301c6c',
       borderWidth: '1px',
       boxShadow: '0 0 0 2px rgba(79, 70, 229, 0.2)',
     }
@@ -579,12 +579,12 @@ const DriverExpenses: React.FC<DriverExpensesProps> = ({
                         className={styles.commentField}
                         sx={{
                           '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                            borderColor: expense.comment ? '#20104d' : '#d32f2f',
+                            borderColor: expense.comment ? '#301c6c' : '#d32f2f',
                             borderWidth: '1px',
                             boxShadow: expense.comment ? '0 0 0 2px rgba(79, 70, 229, 0.2)' : '0 0 0 2px rgba(211, 47, 47, 0.2)',
                           },
                           '& .MuiOutlinedInput-root.Mui-focused:not(.Mui-error) .MuiOutlinedInput-notchedOutline': {
-                            borderColor: '#20104d',
+                            borderColor: '#301c6c',
                             borderWidth: '1px',
                             boxShadow: '0 0 0 2px rgba(79, 70, 229, 0.2)',
                           }
@@ -613,7 +613,7 @@ const DriverExpenses: React.FC<DriverExpensesProps> = ({
                         className={styles.iconButton}
                         sx={{ color: "#3f84a7" }}
                       >
-                        <ContentCopyIcon fontSize="small" style={{ color: "#20104d" }} />
+                        <ContentCopyIcon fontSize="small" style={{ color: "#301c6c" }} />
                       </IconButton>
 
                       {index === expenses.length - 1 && (
@@ -624,7 +624,7 @@ const DriverExpenses: React.FC<DriverExpensesProps> = ({
                           className={styles.iconButton}
                           sx={{ color: "#2962Ff" }}
                         >
-                          <AddCircleOutlineIcon fontSize="small" style={{ color: "#20104d" }} />
+                          <AddCircleOutlineIcon fontSize="small" style={{ color: "#301c6c" }} />
                         </IconButton>
                       )}
                     </div>

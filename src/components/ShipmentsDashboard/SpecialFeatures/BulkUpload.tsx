@@ -229,7 +229,7 @@ const BulkUpload: React.FC<BulkUploadProps> = ({
                       borderColor: 'rgba(0,0,0,0.23)',
                     },
                     '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                      borderColor: '#20104d',
+                      borderColor: '#301c6c',
                     },
                     '& .MuiSelect-select': {
                       minHeight: 0,
@@ -268,12 +268,12 @@ const BulkUpload: React.FC<BulkUploadProps> = ({
               mb: 2,
               backgroundColor: "#EDE7F6",
               color: "#5E35B1",
-              border: "1px solid #20104d",
+              border: "1px solid #301c6c",
               textTransform: "none",
               "&:hover": {
-                backgroundColor: "#20104d",
+                backgroundColor: "#301c6c",
                 color: "white",
-                border: "1px solid #20104d",
+                border: "1px solid #301c6c",
               },
             }}
             disabled={loading}

@@ -155,19 +155,45 @@ export const ShipmentsTable: React.FC<ShipmentsTableProps> = ({
   const [actionSearchState, setActionSearchState] = useState("");
   const [showDownLoadLoader, setShowDownLoadLoader] = useState(false);
   const [showOrdersPopup, setShowOrdersPopup] = useState(false);
+  const [showInvoicePopup, setShowInvoicePopup] = useState(false);
   const [selectedOrders, setSelectedOrders] = useState<string[]>([]);
+  const [ordersPopup, setOrdersPopup] = useState<{
+    open: boolean;
+    orders: string[];
+    title: string;
+    sin: string;
+  }>({ open: false, orders: [], title: '', sin: '' });
+  const [invoicePopup, setInvoicePopup] = useState<{
+    open: boolean;
+    orders: string[];
+    title: string;
+    sin: string;
+  }>({ open: false, orders: [], title: '', sin: '' });
 
 
 
-  const handleBubbleClick = (orders: string[], e: React.MouseEvent) => {
+  const handleBubbleClick = (orders: string[], sin: string, e: React.MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
-    setSelectedOrders(orders);
     setShowOrdersPopup(true);
+    setOrdersPopup((s) => ({ ...s, open: true, orders, title: 'Sale Orders', sin }));
+  };
+
+  const handleBubbleClickForInvoice = (orders: string[], sin: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    setShowInvoicePopup(true);
+    setInvoicePopup((s) => ({ ...s, open: true, orders, title: 'Invoice', sin }));
   };
 
   const closeOrdersPopup = () => {
     setShowOrdersPopup(false);
+    setOrdersPopup((s) => ({ ...s, open: false }));
+  };
+
+  const closeInvoicePopup = () => {
+    setShowInvoicePopup(false);
+    setInvoicePopup((s) => ({ ...s, open: false }));
   };
 
   const shouldShowAction = (actionName: string): boolean => {
@@ -601,22 +627,17 @@ const  renderConsentAndSubscriptionIcons = (shipment: any, openSubscribeModal: (
                 {isMykl && <td className={`${styles.matCell} ${styles.matColumnDestinationCode}`}>
                   {shipment.destination_code || "-"}
                 </td>}
-                {/* {isMykl && <td className={`${styles.matCell} ${styles.matColumnDestinationCode}`}>
-                  {
-                  // shipment.others||
-                   "-"}
-                </td>} */}
-                {isMykl && <td className={styles.matCell}>
-                  {/* {shipment.others
+                {isMykl && <td className={`${styles.matCell} ${styles.matColumnDestinationCode}`}>
+                {shipment.others
                     ? (() => {
-                        const orders = shipment.others.split(",");
+                        const invoices = shipment?.others?.invoice?.split(",");
                         return (
                           <span style={{ display: "flex", alignItems: "center",justifyContent: "center", gap: 8 }}>
-                            <span>{orders[0]}</span>
-                            {orders.length > 1 && (
+                            <span>{invoices ? invoices[0] : "-"}</span>
+                            {invoices?.length > 1 && (
                               <span
                                 className={`${styles.buble_round} no-row-click`}
-                                onClick={(e) => handleBubbleClick(orders.slice(1), e)}
+                                onClick={(e) => handleBubbleClickForInvoice(invoices?.slice(1), shipment.sin, e)}
                                 style={{
                                   background: "#EDE7F6",
                                   borderRadius: "50%",
@@ -631,17 +652,14 @@ const  renderConsentAndSubscriptionIcons = (shipment: any, openSubscribeModal: (
                                   color: "#5e35b1"
                                 }}
                               >
-                                +{orders.length - 1}
+                                +{invoices?.length - 1}
                               </span>
                             )}
                           </span>
                         );
                       })()
-                    :  */}
-                    -
-                    {/* } */}
-                </td>
-                }
+                    : "-"}
+                </td>}
 
                 <td
                   className={`${styles.matCell} ${styles.matColumnSpotDriver}`}
@@ -718,7 +736,7 @@ const  renderConsentAndSubscriptionIcons = (shipment: any, openSubscribeModal: (
                             {orders.length > 1 && (
                               <span
                                 className={`${styles.buble_round} no-row-click`}
-                                onClick={(e) => handleBubbleClick(orders.slice(1), e)}
+                                onClick={(e) => handleBubbleClick(orders.slice(1), shipment.sin, e)}
                                 style={{
                                   background: "#EDE7F6",
                                   borderRadius: "50%",
@@ -875,10 +893,22 @@ const  renderConsentAndSubscriptionIcons = (shipment: any, openSubscribeModal: (
       </table>
       {showOrdersPopup && (
         <OrdersPopup 
-          orders={selectedOrders} 
+          orders={ordersPopup.orders} 
           onClose={closeOrdersPopup} 
+          title="Additional Sale Order"
+          sin={ordersPopup.sin}
         />
       )}
+      {
+        showInvoicePopup && (
+          <OrdersPopup 
+            orders={invoicePopup.orders} 
+            onClose={closeInvoicePopup} 
+            title="Invoice"
+            sin={invoicePopup.sin}
+          />
+        )
+      }
     </div>
   );
 };

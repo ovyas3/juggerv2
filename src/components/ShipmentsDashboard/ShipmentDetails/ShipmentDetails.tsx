@@ -430,7 +430,7 @@ const ShipmentDetails: React.FC<ShipmentDetailsProps> = ({
             variant="scrollable"
             scrollButtons="auto"
             textColor="inherit"
-            TabIndicatorProps={{ style: { backgroundColor: "#20104d" } }}
+            TabIndicatorProps={{ style: { backgroundColor: "#301c6c" } }}
           >
             {visibleTabs.map((tab, index) => (
               <Tab
@@ -438,7 +438,7 @@ const ShipmentDetails: React.FC<ShipmentDetailsProps> = ({
                 key={index}
                 sx={{
                   textTransform: "capitalize",
-                  "&.Mui-selected": { color: "#20104d" },
+                  "&.Mui-selected": { color: "#301c6c" },
                 }}
               />
             ))}

@@ -44,7 +44,7 @@ const Page = () => {
         visible={true}
         height="100"
         width="100"
-        color="#20104d"
+        color="#301c6c"
         ariaLabel="three-circles-loading"
         wrapperStyle={{}}
         wrapperClass=""
