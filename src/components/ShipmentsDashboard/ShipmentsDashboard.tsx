@@ -762,13 +762,21 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
     setSelectedShipment(shipment);
     setShowDriverExpenses(true);
   };
+
+  const handleOpenEpodDetails = (shipmentId: string) => {
+    setSelectedShipmentId(shipmentId);
+    setDefaultDetailsTab("Delivery"); // Set the target tab label to Delivery
+    setIsDetailsModalOpen(true);
+  };
   const handleViewDetails = (shipmentId: string) => {
     setSelectedShipmentId(shipmentId);
+    setDefaultDetailsTab(undefined);
     setIsDetailsModalOpen(true);
   };
   const handleCloseDetails = () => {
     setIsDetailsModalOpen(false);
     setSelectedShipmentId(null);
+    setDefaultDetailsTab(undefined); 
   };
 
   const handleFlushFreight = async (shipment: Shipment) => {
@@ -1192,13 +1200,22 @@ const actionMenuCategories = (shipment: Shipment) => {
         icon: Upload, 
         label: "Upload ePOD", 
         color: "text-green-600",
-        // show: shipment.isOwnFleet_shipment && !shipment.carrier && (roles.owner || roles.fleet)
+        onClick: (shipment: Shipment, e?: React.MouseEvent) => {
+          e?.stopPropagation();
+          handleOpenEpodDetails(shipment._id); // <-- Use the new handler
+        },
+        show: shipment.isOwnFleet_shipment && !shipment.carrier && (roles.owner || roles.fleet)
       },
+      // --- UPDATED: Request ePOD ---
       { 
         icon: Upload, 
         label: "Request ePOD", 
         color: "text-green-600",
-        // show: shipment.isOwnFleet_shipment && !shipment.carrier && (roles.owner || roles.fleet)
+        onClick: (shipment: Shipment, e?: React.MouseEvent) => {
+          e?.stopPropagation();
+          handleOpenEpodDetails(shipment._id); // <-- Use the new handler
+        },
+        show: shipment.isOwnFleet_shipment && !shipment.carrier && (roles.owner || roles.fleet)
       },
       { 
         icon: Upload, 
@@ -3463,7 +3480,7 @@ const [isLoading, setIsLoading] = useState(false);
           isOpen={isDetailsModalOpen}
           onClose={handleCloseDetails}
           shipmentId={selectedShipmentId}
-      
+          defaultTab={defaultDetailsTab}
         />
       )}
       {showActiveCarriersPopup && (

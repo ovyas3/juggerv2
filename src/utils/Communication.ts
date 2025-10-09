@@ -13,6 +13,7 @@ const prefix = [
   environment.API_URL_NEW_2,
   environment.API_URL_NEW_3,
   environment.API_URL_NEW_4,
+  environment.API_URL_NEW_5,
   environment.NEXT_PUBLIC_GOOGLE_MAP_API_KEY,
 ]
 

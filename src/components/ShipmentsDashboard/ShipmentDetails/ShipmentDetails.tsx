@@ -29,7 +29,7 @@ import DeliveryTab from "./DeliveryTab";
 import FreightTab from "./CarrierInvoiceTab";
 import FourPlInvoiceTab from "./FourPlInvoiceTab";
 import LorryReceiptTab from "./LorryReceiptTab";
-import ClearIcon from '@mui/icons-material/Clear';
+import ClearIcon from "@mui/icons-material/Clear";
 import ChartTab from "./ChartTab";
 import MaterialsTab from "./MaterialsTab";
 import EventLogTab from "./EventLogTab";
@@ -75,6 +75,7 @@ interface ShipmentDetailsProps {
   isOpen: boolean;
   onClose: () => void;
   shipmentId: string | null;
+  defaultTab?: string;
 }
 
 interface Shipper {
@@ -86,6 +87,7 @@ const ShipmentDetails: React.FC<ShipmentDetailsProps> = ({
   isOpen,
   onClose,
   shipmentId,
+  defaultTab,
 }) => {
   const [activeTab, setActiveTab] = useState(0);
   const [shipmentData, setShipmentData] = useState<any>(null);
@@ -118,92 +120,122 @@ const ShipmentDetails: React.FC<ShipmentDetailsProps> = ({
     !shipmentData?.carrier_invoices?.length;
   const canEditDeliveries = isShipmentManagement || enableDeliveryEdit;
 
- // In ShipmentDetails.tsx
+  // In ShipmentDetails.tsx
 
- const fetchDetails = useCallback(async () => {
-  if (!shipmentId) return;
-  setIsLoading(true);
-  try {
+  const fetchDetails = useCallback(async () => {
+    if (!shipmentId) return;
+    setIsLoading(true);
+    try {
       const [shipmentResponse, constantsResponse] = await Promise.all([
-          httpsGet(`shipment/one?shipmentId=${shipmentId}`),
-          httpsGet(`settings/constants`),
+        httpsGet(`shipment/one?shipmentId=${shipmentId}`),
+        httpsGet(`settings/constants`),
       ]);
 
       const shippersRaw = localStorage.getItem("shippers");
       const shippers = shippersRaw ? JSON.parse(shippersRaw) : [];
-      const currentShipperId = localStorage.getItem('shipper_id');
-      const activeShipper = shippers.find((s:any) => s._id === currentShipperId) || shippers[0];
+      const currentShipperId = localStorage.getItem("shipper_id");
+      const activeShipper =
+        shippers.find((s: any) => s._id === currentShipperId) || shippers[0];
 
       if (shipmentResponse.statusCode === 200) {
-          const apiDetail = shipmentResponse.data;
+        const apiDetail = shipmentResponse.data;
 
-          const fullShipmentData = {
-              ...apiDetail,
-              constants: constantsResponse.data,
-              shippers,
-          };
+        const fullShipmentData = {
+          ...apiDetail,
+          constants: constantsResponse.data,
+          shippers,
+        };
 
-          const displayStatus = getShipmentStatusName(apiDetail.latest_status);
+        const displayStatus = getShipmentStatusName(apiDetail.latest_status);
 
-          const displayDate = apiDetail.created_at
-              ? format(new Date(apiDetail.created_at), "dd-MMM-yyyy hh:mm a")
-              : "...";
-          setShipmentData({ ...fullShipmentData, displayStatus, displayDate });
+        const displayDate = apiDetail.created_at
+          ? format(new Date(apiDetail.created_at), "dd-MMM-yyyy hh:mm a")
+          : "...";
+        setShipmentData({ ...fullShipmentData, displayStatus, displayDate });
 
-          const parentName = activeShipper?.parent_name || apiDetail.organization?.name || "";
+        const parentName =
+          activeShipper?.parent_name || apiDetail.organization?.name || "";
 
-          setIsMYKL(parentName === "MYK Laticrete India Private Limited");
-          setIsEmami(parentName === "Emami Limited");
-          setIsTata(parentName === "Tata Power Ltd");
-          setIsJSPL(parentName === "JSP" || parentName === "JSPL Angul");
-          setIsTechnova(parentName === "TechNova Imaging Systems Pvt Ltd");
-          setIsRSPL(parentName === "RSPL Limited");
-          setIsBMWIL(parentName === "BMWISL");
+        setIsMYKL(parentName === "MYK Laticrete India Private Limited");
+        setIsEmami(parentName === "Emami Limited");
+        setIsTata(parentName === "Tata Power Ltd");
+        setIsJSPL(parentName === "JSP" || parentName === "JSPL Angul");
+        setIsTechnova(parentName === "TechNova Imaging Systems Pvt Ltd");
+        setIsRSPL(parentName === "RSPL Limited");
+        setIsBMWIL(parentName === "BMWISL");
 
-          setShowFreight(
-              userRoles.owner ||
-              userRoles.finance ||
-              userRoles.ratecard ||
-              userRoles.unit_admin
-          );
+        setShowFreight(
+          userRoles.owner ||
+            userRoles.finance ||
+            userRoles.ratecard ||
+            userRoles.unit_admin
+        );
 
-          setOwnFleet(apiDetail.own_fleet || false);
-          setShipmentType(activeShipper?.type || "normal");
+        setOwnFleet(apiDetail.own_fleet || false);
+        setShipmentType(activeShipper?.type || "normal");
 
-          const hasCustomerData = apiDetail.deliveries?.some(
-              (d:any) => d.customer_data?.length > 0
-          );
-          setCustomerData(hasCustomerData ? [{}] : []);
-          
-          // --- ADDED LOGIC TO CALCULATE OBD NUMBER ---
-          let obdCount = 0;
-          if (apiDetail.invoices && apiDetail.invoices.length > 0) {
-              apiDetail.invoices.forEach((invoiceGroup: any) => {
-                  (invoiceGroup.invoice || []).forEach((inv: any) => {
-                      if (inv.invoice_products?.length > 0) {
-                          obdCount++;
-                      }
-                  });
+        const formatCustomerData = (data: any[]) => {
+          const customerDataMap = new Map<string, any>();
+          data.forEach((item) => {
+            const key = item.customer_order_number;
+            if (!customerDataMap.has(key)) {
+              customerDataMap.set(key, {
+                customer_order_number: key,
+                customer_name: "", // Not available in the provided JSON, defaults to empty/NA
+                materials: [],
               });
-          }
-          setObdNumber(obdCount);
-          // --- END ADDED LOGIC ---
+            }
+            const customer = customerDataMap.get(key);
+            customer.materials.push({
+              description: item.description,
+              uom: item.uom,
+              quantity: item.quantity,
+            });
+          });
+          return Array.from(customerDataMap.values());
+        };
 
+        const customerDataList: any[] = [];
+        if (apiDetail.deliveries) {
+          apiDetail.deliveries.forEach((delivery: any) => {
+            if (delivery.customer_data?.length > 0) {
+              customerDataList.push({
+                delivery: delivery.sequence,
+                name: delivery.location.name.trim(),
+                customer_materials: formatCustomerData(delivery.customer_data),
+              });
+            }
+          });
+        }
+        setCustomerData(customerDataList);
+
+        let obdCount = 0;
+        if (apiDetail.invoices && apiDetail.invoices.length > 0) {
+          apiDetail.invoices.forEach((invoiceGroup: any) => {
+            (invoiceGroup.invoice || []).forEach((inv: any) => {
+              if (inv.invoice_products?.length > 0) {
+                obdCount++;
+              }
+            });
+          });
+        }
+        setObdNumber(obdCount);
       } else {
-          console.error("Failed to fetch shipment details");
+        console.error("Failed to fetch shipment details");
       }
-  } catch (error) {
+    } catch (error) {
       console.error("Error fetching shipment details:", error);
-  } finally {
+    } finally {
       setIsLoading(false);
-  }
-}, [shipmentId, userRoles]); // Added userRoles to dependency array for correctness
+    }
+  }, [shipmentId, userRoles]); // Added userRoles to dependency array for correctness
 
   useEffect(() => {
     if (isOpen) {
       fetchDetails();
     }
   }, [isOpen, fetchDetails]);
+  
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) =>
     setActiveTab(newValue);
@@ -223,7 +255,7 @@ const ShipmentDetails: React.FC<ShipmentDetailsProps> = ({
           showFreight={showFreight}
           ownFleet={ownFleet}
           type={shipmentType}
-          isMykl = {isMYKL}
+          isMykl={isMYKL}
           isTata={isTata}
         />
       ),
@@ -249,11 +281,11 @@ const ShipmentDetails: React.FC<ShipmentDetailsProps> = ({
           canEditInvoices={canEditPickups}
           ownFleet={ownFleet}
           userRoles={userRoles}
-          isTechnova = {isTechnova}
-          isEmami = {isEmami}
-          isTata = {isTata}
-          isBMWIL = {isBMWIL}
-          isJSPL = {isjSPL}
+          isTechnova={isTechnova}
+          isEmami={isEmami}
+          isTata={isTata}
+          isBMWIL={isBMWIL}
+          isJSPL={isjSPL}
         />
       ),
     },
@@ -272,9 +304,9 @@ const ShipmentDetails: React.FC<ShipmentDetailsProps> = ({
           userRoles={userRoles}
           isShipmentManagement={isShipmentManagement}
           ownFleet={ownFleet}
-          isTechnova = {isTechnova}
-          isEmami = {isEmami}
-          isBMWIL = {isBMWIL}
+          isTechnova={isTechnova}
+          isEmami={isEmami}
+          isBMWIL={isBMWIL}
           materials={shipmentData?.materials}
         />
       ),
@@ -294,11 +326,11 @@ const ShipmentDetails: React.FC<ShipmentDetailsProps> = ({
         />
       ),
     },
-    {
-      label: "4PL Invoice",
-      visible: shipmentType === "4pl" && showFreight,
-      component: <FourPlInvoiceTab shipmentData={shipmentData} />,
-    },
+    // {
+    //   label: "4PL Invoice",
+    //   visible: shipmentType === "4pl" && showFreight,
+    //   component: <FourPlInvoiceTab shipmentData={shipmentData} />,
+    // },
     {
       label: "LR",
       visible: true,
@@ -308,38 +340,63 @@ const ShipmentDetails: React.FC<ShipmentDetailsProps> = ({
           onDataChange={fetchDetails}
           userRoles={userRoles}
           ownFleet={ownFleet}
-          isTechnova = {isTechnova}
+          isTechnova={isTechnova}
         />
       ),
     },
-    // {
-    //   label: "Chart",
-    //   visible: isTechnova,
-    //   component: <ChartTab shipmentData={shipmentData} />,
-    // },
-    // {
-    //   label: "Materials",
-    //   visible: customerData.length > 0 || isRSPL || isMYKL,
-    //   component: <MaterialsTab shipmentData={shipmentData} />,
-    // },
+    {
+      label: "Temperature",
+      visible: isTechnova,
+      component: <ChartTab shipmentData={shipmentData} />,
+    },
+    {
+      label: "Materials", // Index 10 in Angular, map to the next available index here
+      visible: customerData.length > 0 || isRSPL,
+      component: (
+        <MaterialsTab
+          customerData={customerData}
+          isRSPL={isRSPL}
+          rsplTotalWeight={shipmentData?.per_vehicle_weight || 0} // Assuming this might be available in shipmentData
+          uom={shipmentData?.uom || ""}
+          commercialInvoices={
+            shipmentData?.invoices?.flatMap(
+              (group: any) => group.commercial_invoices || []
+            ) || []
+          } // Simplified data extraction
+        />
+      ),
+    },
     {
       label: "Event Log",
       visible: isMYKL,
-      component: (
-        <EventLogTab 
-          shipmentData={shipmentData} 
-          isMYKL={isMYKL} 
-        />
-      ),
+      component: <EventLogTab shipmentData={shipmentData} isMYKL={isMYKL} />,
     },
-    // {
-    //   label: "Bill To",
-    //   visible: isTechnova,
-    //   component: <BillToTab shipmentData={shipmentData} />,
-    // },
+    {
+      label: "Bill To",
+      visible: isTechnova,
+      component: <BillToTab shipmentData={shipmentData} />,
+    },
   ];
 
   const visibleTabs = tabsConfig.filter((tab) => tab.visible);
+
+  useEffect(() => {
+    // Only run this logic once when the modal opens and tabs/data are ready
+    if (isOpen && defaultTab && visibleTabs.length > 0) {
+      const targetIndex = visibleTabs.findIndex(
+        (tab) => tab.label === defaultTab
+      );
+      if (targetIndex !== -1) {
+        setActiveTab(targetIndex);
+      } else {
+        // Fallback to default tab (index 0) if target is not found/visible
+        setActiveTab(0);
+      }
+    } else if (isOpen && !defaultTab) {
+      // Ensure we start at 0 if no specific tab is requested
+      setActiveTab(0);
+    }
+  }, [isOpen, defaultTab, visibleTabs.length]);
 
   return (
     <Modal

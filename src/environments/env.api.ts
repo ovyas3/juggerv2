@@ -14,5 +14,6 @@ export const environment = {
     API_URL_NEW_2: 'https://dev-api.instavans.com/api/thor/v2/',
     API_URL_NEW_3: 'https://dev-api.instavans.com/api/panther/',
     API_URL_NEW_4: 'https://dev-api.instavans.com/api/flash/',
+    API_URL_NEW_5: 'https://live-api.instavans.com/api/thor//v2/',
     NEXT_PUBLIC_GOOGLE_MAP_API_KEY:'AIzaSyDr0k02Q0b6SF2xum80HvY7I4kAWUCOR2U'
 }
