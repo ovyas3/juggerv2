@@ -383,30 +383,31 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
-    
+
     setSearchValue('');
     setSearchSuggestions([]);
     setShowSuggestions(false);
+
     onSearch('');
     if (onSearchResults) {
-      onSearchResults([]);
+      onSearchResults(null);
     }
-    
+
     onFiltersChange({
       status: 'all',
       stage: 'all',
       duration: 'all',
       quickFilter: 'all'
     });
-    
+
     if (onDateRangeChange) {
       onDateRangeChange('today');
     }
-    
+
     await new Promise(resolve => setTimeout(resolve, 1000));
     setIsRefreshing(false);
   };
-  
+
 
   const handleExportClick = async () => {
     console.log('DEBUG-HEADER: Export CLICK EVENT RECEIVED.'); 
