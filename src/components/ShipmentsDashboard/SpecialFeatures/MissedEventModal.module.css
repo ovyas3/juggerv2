@@ -86,7 +86,8 @@
 
 .inputField:focus {
   outline: none;
-  border-color: #4F46E5;
+  border-color: #301c6c
+;
   box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
 }
 
@@ -133,8 +134,8 @@ select.inputField {
 /* Fetch Button */
 .fetchBtn {
   color: #fff;
-  background: #4F46E5;
-  border: 1px solid #4F46E5;
+  background:  #301c6c;
+  border: 1px solid #301c6c;
   border-radius: 4px;
   padding: 10px 20px;
   cursor: pointer;
@@ -145,8 +146,8 @@ select.inputField {
 }
 
 .fetchBtn:hover:not(:disabled) {
-  background: #433DE8;
-  border-color: #433DE8;
+  background: #3d2879;
+  border-color: #3d2879;
 }
 
 .fetchBtn:disabled {
@@ -168,7 +169,7 @@ select.inputField {
 
 /* Footer Submit Button */
 .dialogFooterBtn {
-  background: #4F46E5;
+  background: #301c6c;
   color: white;
   border: none;
   border-radius: 4px;
@@ -181,7 +182,7 @@ select.inputField {
 }
 
 .dialogFooterBtn:hover:not(:disabled) {
-  background: #433DE8;
+  background: #3d2879;
   /* transform: translateY(-1px); */
   box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3);
 }
@@ -212,7 +213,7 @@ select.inputField {
 .dataTextarea {
   width: 100%;
   height: 108px;
-  border: 1px solid #4F46E5;
+  border: 1px solid #301c6c;
   border-radius: 4px;
   padding: 8px;
   font-family: monospace;
@@ -225,7 +226,7 @@ select.inputField {
 
 .dataTextarea:focus {
   outline: none;
-  border-color: #4F46E5;
+  border-color: #301c6c;
   box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
 }
 
@@ -246,17 +247,17 @@ select.inputField {
 }
 
 .select:hover {
-  border-color: #4F46E5;
+  border-color: #301c6c;
 }
 
 .select:focus-within {
-  border-color: #4F46E5;
+  border-color: #301c6c;
   box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
   outline: none;
 }
 
 .select[data-state="open"] {
-  border-color: #4F46E5;
+  border-color: #301c6c;
   box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
 }
 
@@ -287,7 +288,7 @@ select.inputField {
 }
 
 .selectItem[data-highlighted] {
-  background-color: #4F46E5;
+  background-color: #301c6c;
   color: white;
   outline: none;
 }
@@ -330,7 +331,7 @@ select.inputField {
   height: 16px;
   margin: -8px 0 0 -8px;
   border: 2px solid #f3f3f3;
-  border-top: 2px solid #4F46E5;
+  border-top: 2px solid #301c6c;
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }

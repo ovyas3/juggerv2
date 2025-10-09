@@ -1,0 +1,171 @@
+.bodySection {
+ 
+    height: 100%;
+    overflow-y: auto;
+
+    
+    /* FIX: Remove outer border (handled by removing border from .toggleViewMain) */
+}
+
+.toggleViewMain.materials {
+    /* FIX: Removed outer border by setting to none/transparent */
+    border: none;
+    border-radius: 0;
+
+ 
+ 
+}
+
+.materialTitle {
+    font-size: 16px;
+    font-weight: bold;
+    color: #09337e; /* Primary color */
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    /* FIX: Removed border-bottom below Product Description */
+    border-bottom: none; 
+    padding-bottom: 5px;
+}
+
+.materialBody {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding-right: 15px;
+}
+
+.delivery {
+    padding-bottom: 15px;
+    border-bottom: 1px dashed #e0e0e0;
+}
+
+.delivery:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.deliveryTitle {
+    font-size: 14px;
+    font-weight: bold;
+    color: #333;
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.dropIcon {
+    /* Mimics the Angular Drop icon label style */
+    display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: #d8511f; /* Orange color from Delivery Tab */
+  color: white;
+  font-weight: bold;
+  font-size: 0.8rem;
+  margin-right: 8px;
+}
+
+.customerData {
+    margin-left: 10px;
+    margin-top: 10px;
+}
+
+.customerId {
+    font-size: 14px;
+    font-weight: 700; /* FIX: Highlight reference number */
+    color: #000;
+    margin-bottom: 8px;
+    padding-left: 5px;
+}
+
+.materialsTableContainer {
+    margin-left: 5px;
+}
+
+.materialsTable {
+    width: 100%;
+    /* border-collapse: collapse; */
+    table-layout: fixed; 
+}
+
+.tableHeaderRow {
+    background-color: #f0f0f0; 
+}
+
+.tableCell {
+    padding: 8px 10px !important;
+    border: 1px solid #ddd;
+    font-size: 13px;
+    color: #333;
+    /* FIX: Center align all table cell content */
+    text-align: center; 
+}
+
+/* Specific column widths for cells in the table body rows */
+.tableBodyRow .tableCell:nth-child(1) {
+    width: 10%; /* Item Name */
+}
+.tableBodyRow .tableCell:nth-child(2) {
+    width: 45%; /* Total Quantity */
+}
+.tableBodyRow .tableCell:nth-child(3) {
+    width: 25%; /* UOM */
+}
+.tableBodyRow .tableCell:nth-child(3) {
+    width: 20%; /* UOM */
+}
+
+/* Specific column widths for cells in the table header row */
+.tableHeaderRow .tableCell:nth-child(1) {
+    width: 10%; /* Item Name */
+}
+.tableHeaderRow .tableCell:nth-child(2) {
+    width: 45%; /* Total Quantity */
+}
+.tableHeaderRow .tableCell:nth-child(3) {
+    width: 25%; /* UOM */
+}
+.tableBodyRow .tableCell:nth-child(3) {
+    width: 20%; /* UOM */
+}
+
+/* Ensure header cells are centered and use header background */
+.tableHeaderRow .tableCell {
+    font-weight: bold;
+    background-color: #edf0f7;
+    color: #09337e;
+    text-transform: capitalize;
+    text-align: center; 
+}
+
+/* RSPL specific styles */
+.rsplTotalWeight {
+    color: #104AB3;
+    text-decoration: underline;
+    font-weight: bold;
+    display: block;
+    margin-bottom: 15px;
+    font-size: 14px;
+}
+
+.customerTitle {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: #555;
+}
+
+.showMaterials {
+    margin-left: 50px;
+    display: flex;
+    flex-direction: column;
+}
+
+.materialItem {
+    margin-top: 6px;
+    font-size: 13px;
+    color: #333;
+}

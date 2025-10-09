@@ -13,6 +13,7 @@ const prefix = [
   environment.API_URL_NEW_2,
   environment.API_URL_NEW_3,
   environment.API_URL_NEW_4,
+  environment.API_URL_NEW_5,
   environment.NEXT_PUBLIC_GOOGLE_MAP_API_KEY,
 ]
 
@@ -110,57 +111,60 @@ const httpsPost = async (path: string, data: any, router: any = null, type = 0, 
     return response?.data || response;
 };
 
-const httpsPut = async (path: string, data: any, router: any = null, type = 0, isFile = false) => {
+const httpsPut = async (
+  path: string,
+  data: any,
+  router: any = null,
+  type = 0,
+  isFile = false
+) => {
   const auth = getAuth();
   const authorization = {
     Authorization: auth,
   };
   const headers = {
     Authorization: auth,
-    'Content-Type': 'multipart/form-data'
+    'Content-Type': 'multipart/form-data',
   };
   const url = prefix[type] + path;
   let config;
   if (isFile) {
     config = {
-      method: "PUT",
+      method: 'PUT',
       url,
       headers: headers,
       data,
     };
   } else {
     config = {
-      method: "PUT",
+      method: 'PUT',
       url,
       headers: authorization,
       data,
     };
   }
   const response = await axios(config)
-    .then((res) => res)
-    .catch((err) => {
-      if (axios.isAxiosError(err) && err.response?.status === 401 && !redirectInProgress) {
-        redirectInProgress = true
-        if(url.includes('shipper_user/signin')) {
-          return err.response.data 
-        }
-        const fromRms = Boolean(localStorage.getItem('isSDLogin'))
-        if(fromRms) {
-          router.push('/signin')
+    .then(res => res)
+    .catch(err => {
+      if (
+        axios.isAxiosError(err) &&
+        err.response?.status === 401 &&
+        !redirectInProgress
+      ) {
+        redirectInProgress = true;
+        const fromRms = Boolean(localStorage.getItem('isRmsLogin'));
+        if (fromRms) {
+          router.push('/signin');
         } else {
-          if(prefix[0].includes('dev')){
-            router.push(`${parent[0]}/login`);
-          }else{
-            router.push(`${parent[1]}/login`);
-          }
+          router.push(process.env.NEXT_PUBLIC_SMARTSHIPPER);
         }
         deleteAllCache();
       } else {
-        redirectInProgress = false
+        redirectInProgress = false;
       }
-      return err.response.data 
+      return err.response?.data;
     });
-  return response?.data || response;
+  return response?.data;
 };
 
 const apiCall = async (config: any) => {

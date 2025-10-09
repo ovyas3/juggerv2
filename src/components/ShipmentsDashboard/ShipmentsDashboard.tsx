@@ -51,6 +51,7 @@ import SubscribeModal from "./Communication/SubscribeModal";
 import { ShipmentsTable } from "./ShipmentsTable";
 import { AnalyticsView } from "./AnalyticsView";
 import { AdvancedFilter } from "./AdvancedFilter/AdvancedFilter";
+import ShipmentDetails from "./ShipmentDetails/ShipmentDetails"; 
 import LocationModal from "../ShipmentsDashboard/LocationTracking/LocationModal";
 import ActiveCarriersModal from "../ShipmentsDashboard/SpecialFeatures/ActiveCarriersModal";
 import RerunShipmentModal from "../ShipmentsDashboard/ShipmentManagement/RerunShipmentModal";
@@ -361,13 +362,16 @@ const ShipmentsDashboard: React.FC = () => {
   const [shipmentType, setShipmentType] = useState<
     "all" | "outbound" | "inbound" | "others"
   >("all");
-  const [isLoading, setIsLoading] = useState(false);
+  const [advancedFilterApplied, setAdvancedFilterApplied] = useState(false);
+
   const [showButtons, setShowButtons] = useState(false);
   const [isAnalyticsView, setIsAnalyticsView] = useState(false);
   const [isCompactView, setIsCompactView] = useState(true);
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+  const [selectedShipmentId, setSelectedShipmentId] = useState<string | null>(null);
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
-  // Inside ShipmentsDashboard.js, with other state variables
-const [rawShipmentResponse, setRawShipmentResponse] = useState<any | null>(null);
+  const [defaultDetailsTab, setDefaultDetailsTab] = useState<string | undefined>(undefined);
+
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(0);
@@ -513,6 +517,7 @@ const [rawShipmentResponse, setRawShipmentResponse] = useState<any | null>(null)
     []
   );
   const [isTechnova, setIsTechnova] = useState(false);
+  const [isTata, setIsTata] = useState(false);
   const initialLoadDone = useRef(false);
   const [showVideo, setShowVideo] = useState(false);
   const [videoUrl, setVideoUrl] = useState("");
@@ -581,6 +586,7 @@ const [selectedShipmentForManagedBy, setSelectedShipmentForManagedBy] = useState
 const [showRetriggerEventModal, setShowRetriggerEventModal] = useState(false);
 const [selectedShipmentForRetrigger, setSelectedShipmentForRetrigger] = useState<Shipment | null>(null);
 const [showDriverExpenses, setShowDriverExpenses] = useState(false);
+const [rawShipmentResponse, setRawShipmentResponse] = useState<any>(null);
 
 // Add this near other state declarations
 const [isGeofenceEditorOpen, setIsGeofenceEditorOpen] = useState(false);
@@ -704,6 +710,26 @@ useEffect(() => {
   }
 }, []);
 
+useEffect(() => {
+  // Read 'shippers' from localStorage and parse
+  try {
+    const shipperData = JSON.parse(localStorage.getItem("shippers") || "[]");
+    console.log("Shipper data from localStorage:", shipperData[0].parent_name);
+    if (
+      shipperData &&
+      shipperData.length > 0 &&
+      shipperData[0].parent_name === "Tata Power Ltd"
+    ) {
+      setIsTata(true);
+      console.log("isTata set to true");
+    } else {
+      setIsTata(false);
+    }
+  } catch (error) {
+    setIsTata(false);
+  }
+}, []);
+
 
 // Add this with other handler functions
 const handleOpenGeofenceEditor = (shipment: Shipment) => {
@@ -736,7 +762,22 @@ const handleOpenGeofenceEditor = (shipment: Shipment) => {
     setSelectedShipment(shipment);
     setShowDriverExpenses(true);
   };
-  
+
+  const handleOpenEpodDetails = (shipmentId: string) => {
+    setSelectedShipmentId(shipmentId);
+    setDefaultDetailsTab("Delivery"); // Set the target tab label to Delivery
+    setIsDetailsModalOpen(true);
+  };
+  const handleViewDetails = (shipmentId: string) => {
+    setSelectedShipmentId(shipmentId);
+    setDefaultDetailsTab(undefined);
+    setIsDetailsModalOpen(true);
+  };
+  const handleCloseDetails = () => {
+    setIsDetailsModalOpen(false);
+    setSelectedShipmentId(null);
+    setDefaultDetailsTab(undefined); 
+  };
 
   const handleFlushFreight = async (shipment: Shipment) => {
     closeAllDialogs();
@@ -915,6 +956,14 @@ const handleAddDriverExpenses = (shipment: Shipment) => {
   handleDriverExpenseClick(shipment);
 };
 
+  const handleOpenDetailsOnTab = (shipment: Shipment, tab: string) => {
+    closeAllDialogs();
+    setDefaultDetailsTab(tab);
+    setSelectedShipmentId(shipment._id);
+    setIsDetailsModalOpen(true);
+  };
+
+
   const handleCreatePaymentAdvice = (shipment: Shipment) => {
     closeAllDialogs();
     setSelectedShipmentForPayment(shipment);
@@ -929,29 +978,44 @@ const actionMenuCategories = (shipment: Shipment) => {
         icon: Eye, 
         label: "View", 
         color: "text-blue-600",
-        show: true
+        show: true,
+        onClick: (shipment: Shipment, e?: React.MouseEvent) => {
+          e?.stopPropagation();
+          closeAllDialogs();
+          handleViewDetails(shipment._id);
+        }
       },
       { 
         icon: Share2, 
         label: "Share", 
         color: "text-blue-500", 
-        onClick: () => handleShareShipment(shipment),
+        onClick: (shipment: Shipment, e?: React.MouseEvent) => {
+          e?.stopPropagation();
+          handleShareShipment(shipment);
+        },
         show: true,
-        disabled: shipment.status != 'Assigned' && shipment.status != 'Completed' && shipment.status != 'Cancelled' && shipment.assigned != 'Pending'
+         disabled: shipment.status != 'Assigned' && shipment.status != 'Completed' && shipment.status != 'Cancelled' && shipment.assigned != 'Pending'
       },
       { 
         icon: Mail, 
         label: "Mail", 
         color: "text-orange-600", 
-        onClick: () => handleMailShipment(shipment),
+        onClick: (shipment: Shipment, e?: React.MouseEvent) => {
+          e?.stopPropagation();
+          handleMailShipment(shipment);
+        },
         show: true,
-        disabled: shipment.status != 'Assigned' && shipment.status != 'Completed' && shipment.status != 'Cancelled' && shipment.assigned != 'Pending'
+
+         disabled: shipment.status != 'Assigned' && shipment.status != 'Completed' && shipment.status != 'Cancelled' && shipment.assigned != 'Pending'
       },
       { 
         icon: XCircle, 
         label: "Cancel", 
         color: "text-red-600", 
-        onClick: () => handleCancelShipment(shipment),
+        onClick: (shipment: Shipment, e?: React.MouseEvent) => {
+          e?.stopPropagation();
+          handleCancelShipment(shipment);
+        },
         show: shipment.status !== 'Completed' && shipment.status !== 'Cancelled'
       },
     ],
@@ -961,7 +1025,10 @@ const actionMenuCategories = (shipment: Shipment) => {
         icon: Download, 
         label: "SIM Tracking", 
         color: "text-amber-600", 
-        onClick: () => handleSimTracking(shipment),
+        onClick: (shipment: Shipment, e?: React.MouseEvent) => {
+          e?.stopPropagation();
+          handleSimTracking(shipment);
+        },
         show: showTracking,
         disabled: (shipment.status === 'Completed' || shipment.status === 'Assigned' || shipment.status === 'Cancelled')
       },
@@ -969,21 +1036,30 @@ const actionMenuCategories = (shipment: Shipment) => {
         icon: WifiOff, 
         label: "GPS Disconnection Reason", 
         color: "text-teal-600", 
-        onClick: () => handleOpenReasonDialog('gps', shipment._id, shipment.sin),
+        onClick: (shipment: Shipment, e?: React.MouseEvent) => {
+          e?.stopPropagation();
+          handleOpenReasonDialog('gps', shipment._id, shipment.sin);
+        },
         show: true
       },
       { 
         icon: Wifi, 
         label: "Add GPS Connection", 
         color: "text-amber-600", 
-        onClick: () => handleOpenGpsModal(shipment),
+        onClick: (shipment: Shipment, e?: React.MouseEvent) => {
+          e?.stopPropagation();
+          handleOpenGpsModal(shipment);
+        },
         show: !!shipment.carrier
       },
       { 
-        icon: Clock, 
+        icon: Clock,  
         label: "Update Delay Reason", 
         color: "text-teal-600", 
-        onClick: () => handleOpenReasonDialog('delay', shipment._id, shipment.sin),
+        onClick: (shipment: Shipment, e?: React.MouseEvent) => {
+          e?.stopPropagation();
+          handleOpenReasonDialog('delay', shipment._id, shipment.sin);
+        },
         show: true
       },
     ],
@@ -993,21 +1069,30 @@ const actionMenuCategories = (shipment: Shipment) => {
         icon: Truck, 
         label: "Update Carrier Freight", 
         color: "text-gray-600", 
-        onClick: () => handleOpenFreightModal(shipment._id, shipment.sin, 'rate'),
-        show: shipment.rate?.type === 'manual' && showFreight
+        onClick: (shipment: Shipment, e?: React.MouseEvent) => {
+          e?.stopPropagation();
+          handleOpenFreightModal(shipment._id, shipment.sin, 'rate');
+        },
+         show: shipment.rate?.type === 'manual' && showFreight
       },
       { 
         icon: Truck, 
         label: "Update Client Freight", 
         color: "text-yellow-600", 
-        onClick: () => handleOpenFreightModal(shipment._id, shipment.sin, 'client_rate'),
-        show: shipment.client_rate?.type === 'manual' && showFreight
+        onClick: (shipment: Shipment, e?: React.MouseEvent) => {
+          e?.stopPropagation();
+          handleOpenFreightModal(shipment._id, shipment.sin, 'client_rate');
+        },
+         show: shipment.client_rate?.type === 'manual' && showFreight
       },
       { 
         icon: CreditCard, 
         label: "Create Payment Advice", 
         color: "text-indigo-600", 
-        onClick: () => handleCreateAdvancePayment(shipment),
+        onClick: (shipment: Shipment, e?: React.MouseEvent) => {
+          e?.stopPropagation();
+          handleCreateAdvancePayment(shipment);
+        },
         show: !shipment.isOwnFleet_shipment && shipment.status !== 'Cancelled'
       },
       { icon: FileText, label: "Change Invoice Type", color: "text-brown-600", onClick: handleChangeInvoiceType, show: true },
@@ -1018,21 +1103,30 @@ const actionMenuCategories = (shipment: Shipment) => {
         icon: PlusCircle, 
         label: "Add DO Details", 
         color: "text-blue-600", 
-        onClick: () => handleAddDODetails(shipment),
+        onClick: (shipment: Shipment, e?: React.MouseEvent) => {
+          e?.stopPropagation();
+          handleAddDODetails(shipment);
+        },
         show: shipment.status === 'Accepted'
       },
       { 
         icon: Edit, 
         label: "Update Shipment Status", 
         color: "text-yellow-600", 
-        onClick: () => handleUpdateShipmentStatus(shipment),
+        onClick: (shipment: Shipment, e?: React.MouseEvent) => {
+          e?.stopPropagation();
+          handleUpdateShipmentStatus(shipment);
+        },
         show: (roles.shipment_admin || roles.owner) && shipment.status === 'In Transit'
       },
       { 
         icon: CheckCircle, 
         label: "Complete Shipment", 
         color: "text-green-600", 
-        onClick: () => handleCompleteShipment(shipment),
+        onClick: (shipment: Shipment, e?: React.MouseEvent) => {
+          e?.stopPropagation();
+          handleCompleteShipment(shipment);
+        },
         show: (functions.shipment_management || (roles.owner || roles.fleet)) && 
               (!shipment.inboundShippers || 
                (selectedShipperLocationID === shipment.lastDeliveryLocation) || 
@@ -1043,7 +1137,10 @@ const actionMenuCategories = (shipment: Shipment) => {
         icon: CheckCircle, 
         label: "Submit Mark As Arrived", 
         color: "text-green-600", 
-        onClick: () => handleMarkAsArrived(shipment),
+        onClick: (shipment: Shipment, e?: React.MouseEvent) => {
+          e?.stopPropagation();
+          handleMarkAsArrived(shipment);
+        },
         show: functions.shipment_management || (roles.owner || roles.fleet),
         disabled: (shipment.status === 'Completed' || shipment.status === 'Cancelled')
       },
@@ -1059,7 +1156,10 @@ const actionMenuCategories = (shipment: Shipment) => {
             icon: AlertCircle, 
             label: "Mark Fault Device", 
             color: "text-red-600", 
-            onClick: () => handleMarkFaultDevice(shipment),
+            onClick: (shipment: Shipment, e?: React.MouseEvent) => {
+              e?.stopPropagation();
+              handleMarkFaultDevice(shipment);
+            },
             show: shipment.assigned_driver?.vehicle && !!shipment.assigned_driver.vehicle.gps
           } as const]: []),
       ...(parentFlags.isjspl
@@ -1067,7 +1167,10 @@ const actionMenuCategories = (shipment: Shipment) => {
             icon: AlertCircle, 
             label: "Missed Event", 
             color: "text-red-600", 
-            onClick: () => handleMissedEvent(shipment),
+            onClick: (shipment: Shipment, e?: React.MouseEvent) => {
+              e?.stopPropagation();
+              handleMissedEvent(shipment);
+            },
             show: true
           } as const] : []),
     ],
@@ -1077,33 +1180,51 @@ const actionMenuCategories = (shipment: Shipment) => {
         icon: FileText, 
         label: "Upload Approval Documents", 
         color: "text-purple-600", 
-        onClick: () => handleUploadApprovalDocuments(shipment),
+        onClick: (shipment: Shipment, e?: React.MouseEvent) => {
+          e?.stopPropagation();
+          handleUploadApprovalDocuments(shipment);
+        },
         show: shipment.rate?.type === 'manual'
       },
       { 
         icon: Package, 
         label: "View Epods", 
         color: "text-brown-600", 
-        onClick: () => handleViewEpods(shipment),
+        onClick: (shipment: Shipment, e?: React.MouseEvent) => {
+          e?.stopPropagation();
+          handleViewEpods(shipment);
+        },
         show: !!shipment.carrier
       },
       { 
         icon: Upload, 
         label: "Upload ePOD", 
         color: "text-green-600",
+        onClick: (shipment: Shipment, e?: React.MouseEvent) => {
+          e?.stopPropagation();
+          handleOpenEpodDetails(shipment._id); // <-- Use the new handler
+        },
         show: shipment.isOwnFleet_shipment && !shipment.carrier && (roles.owner || roles.fleet)
       },
+      // --- UPDATED: Request ePOD ---
       { 
         icon: Upload, 
         label: "Request ePOD", 
         color: "text-green-600",
+        onClick: (shipment: Shipment, e?: React.MouseEvent) => {
+          e?.stopPropagation();
+          handleOpenEpodDetails(shipment._id); // <-- Use the new handler
+        },
         show: shipment.isOwnFleet_shipment && !shipment.carrier && (roles.owner || roles.fleet)
       },
       { 
         icon: Upload, 
         label: "Bulk Upload - Commercial Invoices", 
         color: "text-green-600", 
-        onClick: () => handleBulkUploadCommercialInvoices(shipment),
+        onClick: (shipment: Shipment, e?: React.MouseEvent) => {
+          e?.stopPropagation();
+          handleBulkUploadCommercialInvoices(shipment);
+        },
         show: !shipment.disableInvoiceEdit && (shipmentType === 'outbound' || shipmentType === 'all')
       },
     ],
@@ -1113,7 +1234,10 @@ const actionMenuCategories = (shipment: Shipment) => {
         icon: UserPlus, 
         label: "Add Managed By", 
         color: "text-blue-600", 
-        onClick: () => handleAddManagedBy(shipment),
+        onClick: (shipment: Shipment, e?: React.MouseEvent) => {
+          e?.stopPropagation();
+          handleAddManagedBy(shipment);
+        },
         show: !!shipment.isOwnFleet_shipment
       },
       ...(parentFlags.isMykl
@@ -1121,19 +1245,31 @@ const actionMenuCategories = (shipment: Shipment) => {
             icon: RefreshCw, 
             label: "ReTrigger Missed Events", 
             color: "text-blue-600", 
-            onClick: () => handleRetriggerMissedEvents(shipment),
+            onClick: (shipment: Shipment, e?: React.MouseEvent) => {
+              e?.stopPropagation();
+              handleRetriggerMissedEvents(shipment);
+            },
             show: true
           } as const]: []),
       { 
         icon: Plus, 
         label: "Add Driver Expenses", 
         color: "text-green-600", 
-        onClick: () => handleAddDriverExpenses(shipment),
+        onClick: (shipment: Shipment, e?: React.MouseEvent) => {
+          e?.stopPropagation();
+          handleAddDriverExpenses(shipment);
+        },
         show: ((shipment.isOwnFleet_shipment && !shipment.carrier) || 
                shipment.status === 'Completed') && !!shipment.isVehicleId
       },
-      { icon: Plus, label: "Add/Edit Geofence", color: "text-green-600", onClick: () => handleOpenGeofenceEditor(shipment), show: true },
-      { icon: Truck, label: "Flush Freight", color: "text-gray-600", onClick: () => handleFlushFreight(shipment), show: true },
+      { icon: Plus, label: "Add/Edit Geofence", color: "text-green-600", onClick: (shipment: Shipment, e?: React.MouseEvent) => {
+        e?.stopPropagation();
+        handleOpenGeofenceEditor(shipment);
+      }, show: true },
+      { icon: Truck, label: "Flush Freight", color: "text-gray-600", onClick: (shipment: Shipment, e?: React.MouseEvent) => {
+        e?.stopPropagation();
+        handleFlushFreight(shipment);
+      }, show: true },
     ],
     
     "Location & Routes": [
@@ -1141,7 +1277,10 @@ const actionMenuCategories = (shipment: Shipment) => {
         icon: Edit, 
         label: "Edit Pickup Location", 
         color: "text-pink-600", 
-        onClick: () => handleOpenEditLocation(shipment, 'pickup'), 
+        onClick: (shipment: Shipment, e?: React.MouseEvent) => {
+          e?.stopPropagation();
+          handleOpenEditLocation(shipment, 'pickup'); 
+        },
         show: true,
         disabled: ['Completed', 'Cancelled'].includes(shipment.status) 
       },
@@ -1149,7 +1288,10 @@ const actionMenuCategories = (shipment: Shipment) => {
         icon: Edit, 
         label: "Edit Delivery Location", 
         color: "text-pink-600", 
-        onClick: () => handleOpenEditLocation(shipment, 'delivery'), 
+        onClick: (shipment: Shipment, e?: React.MouseEvent) => {
+          e?.stopPropagation();
+          handleOpenEditLocation(shipment, 'delivery'); 
+        },
         show: true,
         disabled: ['Completed', 'Cancelled'].includes(shipment.status) 
       },
@@ -1157,17 +1299,28 @@ const actionMenuCategories = (shipment: Shipment) => {
         icon: Calculator, 
         label: "Recalculate Distance", 
         color: "text-pink-600", 
-        onClick: () => handleRecalculateDistanceClick(shipment),
+        onClick: (shipment: Shipment, e?: React.MouseEvent) => {
+          e?.stopPropagation();
+          handleRecalculateDistanceClick(shipment);
+        },
         show: true
       },
       { 
         icon: Route, 
         label: "Pull Freight with Routes", 
         color: "text-brown-600", 
-        onClick: () => handlePullFreightWithRoutes(shipment),
+        onClick: (shipment: Shipment, e?: React.MouseEvent) => {
+          e?.stopPropagation();
+          handlePullFreightWithRoutes(shipment);
+        },
         show: true
       },
-      { icon: DoorOpen, label: "Recalculate Customer Gate In/Out", color: "text-pink-600", onClick: (shipment: Shipment) => handleRecalculateGateInOut(shipment), disabled: (shipment: Shipment) => ["Completed", "Cancelled"].includes(shipment.status), show: shipment.trip_tracker?.methods?.includes('GPS') },
+      { icon: DoorOpen, label: "Recalculate Customer Gate In/Out", color: "text-pink-600", onClick: (shipment: Shipment, e?: React.MouseEvent) => {
+        e?.stopPropagation();
+        handleRecalculateGateInOut(shipment);
+      }, 
+      disabled: (shipment: Shipment) => ["Completed", "Cancelled"].includes(shipment.status), show: shipment.trip_tracker?.methods?.includes('GPS') 
+      },
       // { 
       //   icon: RefreshCw, 
       //   label: "Rerun", 
@@ -1248,6 +1401,23 @@ useEffect(() => {
   setShowTracking(environment === 'development' || process.env.NEXT_PUBLIC_COUNTRY === 'IN');
 }, []);
 
+useEffect(() => {
+  setShipmentsFilter((prev: any) => ({
+    ...prev,
+    type_filter: shipmentType === 'all' ? undefined : shipmentType
+  }));
+}, [shipmentType]);
+
+useEffect(() => {
+  if (inputQuery === '') {
+    setShipmentsFilter((prev: any) => {
+      const newFilter = { ...prev };
+      delete newFilter[searchValue];
+      return newFilter;
+    });
+    fetchShipments();
+  }
+}, [inputQuery]);
 
 const closeActionMenu = () => {
   console.log("closeActionMenu executed, closing dropdown");
@@ -1386,7 +1556,7 @@ const closeActionMenu = () => {
   ) => {
     setShipmentType(type);
     setCurrentPage(0);
-    fetchShipments(type);
+    fetchShipments({ type_filter: type });
   };
 
   const handleSubFilterSelect = (filterKey: string) => {
@@ -1462,6 +1632,7 @@ const closeActionMenu = () => {
 
   const clearFilters = () => {
     setFromDate("");
+    setSearchType("");
     setToDate("");
     setInvoiceNo("");
     setLrNumber("");
@@ -1470,6 +1641,7 @@ const closeActionMenu = () => {
     setSelectedDeliveries([]);
     setSelectedCarriers([]);
     setShipmentStatusName([]);
+    setAdvancedFilterApplied(false); 
     setMobile("");
     setVehicleNo("");
     setShipmentSIN("");
@@ -1481,6 +1653,16 @@ const closeActionMenu = () => {
     setSelectedSegmentation([]);
     setOdcFilter(false);
     setSelectedSubFilters([]);
+    setInputQuery("");           // NEW: clear the text box
+    setSearchValue("");          // NEW: drop the active search key
+  
+    // NEW: ensure no stale search fields remain in request payload
+    setShipmentsFilter((prev: any) => {
+      const next = { ...prev };
+      SearchTypes.forEach(t => delete (next as any)[t.value]);
+      return next;
+    });
+  
 
     fetchShipments();
   };
@@ -1579,6 +1761,8 @@ const closeActionMenu = () => {
     });
   };
 
+  
+
   const timeConvert = (seconds: number) => {
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
@@ -1604,14 +1788,17 @@ const closeActionMenu = () => {
     Object.assign(filters, type);
   }
 
-    const filterType = shipmentType;
+  const filterType = type.type_filter || shipmentType;
 
-    if (filterType !== "all") {
-      filters.type_filter = filterType;
-    }
+  if (filterType && filterType !== "all") {
+    filters.type_filter = filterType;
+  }
 
     filters.limit = pageSize;
     filters.skip = currentPage * pageSize;
+
+    setSelectedShipmentsArray([]);
+    setShowButtons(false);
 
     if (inputQuery !== "" && inputQuery.length > 0 && searchValue) {
       if (searchValue === "vehicle_no") {
@@ -1622,11 +1809,6 @@ const closeActionMenu = () => {
     }
 
     setSelectedShipmentsArray([]);
-
-    if (shipmentType === "all") {
-      delete filters.dashboard_filter;
-      delete filters.type_filter;
-    }
 
     setShowButtons(false);
 
@@ -2103,6 +2285,19 @@ const closeActionMenu = () => {
     }
   };
 
+  const debouncedSearch = useCallback(
+    debounce((query) => {
+      // Pass the query as 'searchIndex' in the filters object
+      const filters: any = { searchIndex: query };
+      // Add other existing filters
+      if (odcFilter !== null) {
+        filters.odc = odcFilter;
+      }
+      fetchShipments(filters);
+    }, 50), // 500ms delay
+    [odcFilter, fetchShipments]
+  );
+
   useEffect(() => {
     console.log("Triggered useEffect");
     if (!initialLoadDone.current) {
@@ -2472,7 +2667,8 @@ const renderLastLocationCell = (shipment: any) => {
     }
 
     try {
-      setIsLoading(true);
+      setIsLoading(false);
+      setShowLoader(true); 
       const response = await httpsPost(
         "jde/vehicleArrival",
         selectedShipmentsArray
@@ -2593,14 +2789,14 @@ const handleOpenEditLocation = (shipment: any, type: 'pickup' | 'delivery') => {
   if (type === 'pickup' && shipment.from && shipment.from.length > 0) {
     const location = shipment.from[0].location;
     combinedLocation = `${location.name} - ${location.area}${location.city ? ` - ${location.city}` : ''}`;
-    pickupId = shipment.from[0].id;
+    pickupId = shipment.from[0]._id;
     pickupCity = location.city || '';
   }
   
   if (type === 'delivery' && shipment.to && shipment.to.length > 0) {
     const location = shipment.to[0].location;
     combinedLocation = `${location.name} - ${location.area}${location.city ? ` - ${location.city}` : ''}`;
-    deliveryId = shipment.to[0].id;
+    deliveryId = shipment.to[0]._id;
   }
   
   if (shipment.triptracker?.lastlocation) {
@@ -2666,6 +2862,15 @@ const changeSearchType = (typeName: string, typeValue: string) => {
 };
 
 const applyFilter = () => {
+  if (inputQuery.trim() === '') {
+    setShipmentsFilter((prev: any) => ({
+      ...prev,
+      type_filter: shipmentType === 'all' ? undefined : shipmentType
+    }));
+    fetchShipments();
+    return;
+  }
+
   if (inputQuery.length <= 3) {
     showMessage('Enter at least 4 characters to Search', 'error');
     return;
@@ -2858,7 +3063,7 @@ const applyFilter = () => {
     setShowMissedShipmentModal(true);
   }
 };
-
+const [isLoading, setIsLoading] = useState(false);
   return (
     <div className={styles.main}>
       <div className={styles.tabsContainer}>
@@ -2904,7 +3109,8 @@ const applyFilter = () => {
           onSendEPOD={updateEPODBackToJDE}
           onFetchInvoiceDetails={fetchInvoiceDetails}
           onBulkUpload={() => openBulkUpload("shipment")}
-          isTechnova={parentFlags.isTechnova}
+          isTechnova={isTechnova}
+          isTata={isTata}
           isLoading={isLoading}
           isjspl={parentFlags.isjspl}
           hasSelectedShipments={selectedShipmentsArray.length > 0}
@@ -3001,22 +3207,25 @@ const applyFilter = () => {
     </Select>
     
     <div className={styles.searchInputContainer}>
-      <input
-        type="text"
-        placeholder="Search ..."
-        name="filter"
-        value={inputQuery}
-        onChange={(e) => setInputQuery(e.target.value)}
-        className={styles.inputSearch}
-        onKeyPress={(e) => {
-          if (e.key === 'Enter') {
-            applyFilter();
-          }
-        }}
-      />
+    <input
+      type="text"
+      placeholder="Search ..."
+      name="filter"
+      className={styles.inputSearch}
+      value={inputQuery}
+      onChange={(e) => {
+        const query = e.target.value;
+        setInputQuery(query);
+        // Call the debounced function with the new input value
+        if (query.length === 0 || query.length > 1) { // You can set a minimum length here
+          debouncedSearch(query);
+        }
+      }}
+      // Remove the onKeyPress handler completely
+    />
       <Search
         className={styles.searchIcon}
-        onClick={applyFilter}
+    
       />
     </div>
   </div>
@@ -3025,7 +3234,7 @@ const applyFilter = () => {
 
         <div className={styles.buttonContainer}>
           <div
-            className={`${styles.button} ${styles.advancedSearchSubmitButton}`}
+            className={`${styles.button} ${styles.advancedSearch} ${advancedFilterApplied ? styles.advancedActive : ""}`}
             role="button"
             tabIndex={0}
             onClick={() => setShowAdvancedSearch((prev) => !prev)}
@@ -3056,9 +3265,9 @@ const applyFilter = () => {
   </Select>
 </div>
 
-          <div className={styles.button} onClick={toggleAnalyticsView}>
+          {/* <div className={styles.button} onClick={toggleAnalyticsView}>
             {isAnalyticsView ? "Table View" : "Analytics View"}
-          </div>
+          </div> */}
 
           <div className={styles.button} onClick={toggleCompactView}>
             {isCompactView ? "Comfortable" : "Compact"}
@@ -3089,15 +3298,21 @@ const applyFilter = () => {
           allCarriers={allCarriers}
           limit={pageSize}
           skip={currentPage * pageSize}
+          odcFilter={odcFilter}
           segmentations={segmentations}
           pickLocations={pickupLocations}
           deliverLocations={deliveryLocations}
           shipStatus={shipmentStatus}
           onApply={(filters) => {
+            const hasAny = Object.values(filters || {}).some((v: any) =>
+              Array.isArray(v) ? v.length > 0 : (v ?? "") !== "" && String(v).trim() !== ""
+            );
+            setAdvancedFilterApplied(hasAny);
             console.log("Applied filters:", filters);
           }}
           onClear={() => {
             console.log("Filters cleared");
+            setAdvancedFilterApplied(false);
           }}
           onClose={() => {
             console.log("Close filter");
@@ -3224,6 +3439,7 @@ const applyFilter = () => {
                 setActionSearch={setActionSearch}
                 actionMenuCategories={actionMenuCategories}
                 renderStatusCell={renderStatusCell}
+                onViewDetails={handleViewDetails}
                 renderLocationCell={renderLocationCell}
                 renderDateTimeCell={renderDateTimeCell}
                 renderVehicleCell={renderVehicleCell}
@@ -3257,6 +3473,14 @@ const applyFilter = () => {
           open={modalOpen}
           onClose={closeSubscribeModal}
           shipment={selectedShipment}
+        />
+      )}
+      {isDetailsModalOpen && selectedShipmentId && (
+        <ShipmentDetails
+          isOpen={isDetailsModalOpen}
+          onClose={handleCloseDetails}
+          shipmentId={selectedShipmentId}
+          defaultTab={defaultDetailsTab}
         />
       )}
       {showActiveCarriersPopup && (
@@ -3790,10 +4014,20 @@ const applyFilter = () => {
     }}
   />
 )}
-
-     </div>
+ </div>
   );
+
+  
 };
+
+function debounce<T extends (...args: any[]) => void>(func: T, delay: number): (...args: Parameters<T>) => void {
+  let timeout: ReturnType<typeof setTimeout>;
+  return function(this: any, ...args: Parameters<T>) {
+    const context = this;
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func.apply(context, args), delay);
+  };
+}
 
 
 

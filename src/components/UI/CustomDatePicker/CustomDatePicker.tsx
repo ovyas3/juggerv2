@@ -19,6 +19,8 @@ interface CustomDatePickerProps {
   minSelectableDate?: Date;
   maxSelectableDate?: Date;
   onDateValidation?: (isValid: boolean) => void;
+  disabled?: boolean;
+  sx?: object; // Add sx prop to the interface to be passed to the outer div
 }
 
 const CustomDatePicker: React.FC<CustomDatePickerProps> = ({
@@ -31,6 +33,8 @@ const CustomDatePicker: React.FC<CustomDatePickerProps> = ({
   minSelectableDate,
   maxSelectableDate,
   onDateValidation,
+  disabled,
+  sx, // Destructure the sx prop
 }) => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(defaultDate || value);
   const [error, setError] = useState<string>("");
@@ -78,8 +82,9 @@ const CustomDatePicker: React.FC<CustomDatePickerProps> = ({
         alignItems: "center",
         paddingLeft: 8,
         cursor: "pointer",
+        ...sx, // Apply custom styles here
       }}
-      onClick={() => !open && setOpen(true)}
+      onClick={() => !open && !disabled && setOpen(true)} // Prevent opening when disabled
     >
       <div style={{ height: 16, width: 16, marginBottom: 4 }}>
         <Image src={calenderIcon} alt="calendar icon" />
@@ -94,6 +99,7 @@ const CustomDatePicker: React.FC<CustomDatePickerProps> = ({
             format="DD/MM/YYYY"
             value={selectedDate ? dayjs(selectedDate) : null}
             onChange={handleDateChange}
+            disabled={disabled} // Pass the disabled prop here
             minDate={minSelectableDate ? dayjs(minSelectableDate) : undefined}
             maxDate={maxSelectableDate ? dayjs(maxSelectableDate) : undefined}
             slotProps={{

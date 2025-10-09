@@ -15,8 +15,8 @@
   font-size: 16px;
   font-weight: 400;
   color: #fff;
-  background-color: #4f46e5;
-  background-color: #4f46e5;
+  background-color: #301c6c;
+  background-color: #301c6c;
   margin: 0;
 }
 
@@ -70,11 +70,11 @@
 }
 
 .selectTrigger:hover {
-  border: 1px solid #4F46E5
+  border: 1px solid #301c6c
 }
 
 .selectTrigger:focus {
-  border-color: #4f46e5;
+  border-color: #301c6c;
   box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
   outline: none;
 }
@@ -142,7 +142,7 @@
 }
 
 .submitButton {
-  background-color: #ee1f53;
+  background-color: #e03e3e;
   color: white;
   text-transform: none;
   padding: 6px 16px;

@@ -1,0 +1,1054 @@
+/* Dashboard Header Styles */
+.dashboard-header {
+  background: rgb(249, 249, 255);
+  padding: 0.75rem 1.5rem;
+  transition: all 0.2s ease;
+  position: relative;
+  z-index: 100; 
+  overflow: visible;
+}
+
+/* When collapsed, only show the header-top with minimal height */
+.dashboard-header.collapsed {
+  padding: 0.5rem 1.5rem;
+}
+.uppercase-input {
+  text-transform: uppercase;
+}
+.header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 48px;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.header-center,
+.header-right,
+.header-filters {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.dashboard-header:not(.expanded) .header-center,
+.dashboard-header:not(.expanded) .header-right,
+.dashboard-header:not(.expanded) .header-filters {
+  opacity: 0;
+  height: 0;
+  overflow: hidden;
+  transform: translateY(-10px);
+  pointer-events: none;
+}
+
+.dashboard-header.expanded .header-center,
+.dashboard-header.expanded .header-right,
+.dashboard-header.expanded .header-filters {
+  opacity: 1;
+  height: auto;
+  /* transform: translateY(0); */
+  pointer-events: auto;
+}
+
+/* Left Section */
+.header-left {
+  flex-shrink: 0;
+}
+
+.dashboard-title {
+  font-size: var(--text-xl);
+  font-weight: var(--font-bold);
+  color: var(--text-primary);
+  margin: 0;
+  line-height: 1.2;
+}
+.selectItem[data-state='checked'] > :global([data-radix-select-item-indicator]) {
+  display: none !important;
+}
+
+/* Also ensure any SVG inside a checked SelectItem is hidden, in case the indicator is an SVG */
+.selectItem[data-state='checked'] svg { 
+  display: none !important; 
+}
+
+/* Your existing attempt (keep it, but make sure the above is added/corrected) */
+.selectContent1 :global([data-radix-select-item-indicator]) { 
+  display: none !important; 
+}
+.plant-name {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  margin-left: var(--spacing-sm);
+}
+
+/* Center Section */
+.header-center {
+  /* flex: 1; */
+  display: flex;
+  /* justify-content: center; */
+  justify-content: flex-start;
+  /* max-width:300px; */
+}
+
+.date-selector {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--border-medium);
+  border-radius: 8px;
+  background: var(--bg-primary);
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  width: 200px;
+  position: relative;
+}
+
+.date-selector:hover {
+  border-color: var(--primary-blue);
+  box-shadow: var(--shadow-sm);
+}
+
+.date-icon {
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  flex-shrink: 0;
+  position: relative;
+  z-index: auto; 
+}
+
+.search-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon {
+  position: absolute;
+  left: var(--spacing-md);
+  color: var(--text-secondary);
+  pointer-events: none;
+}
+
+.search-input {
+  padding: var(--spacing-sm) var(--spacing-sm) var(--spacing-sm) 40px;
+  border: 1px solid var(--border-medium);
+  border-radius: 8px;
+  font-size: var(--text-base);
+  width: 280px;
+  transition: var(--transition-smooth);
+}
+
+/* .search-input:focus {
+  border-color: #2f2b74;
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+  outline: none;
+} */
+
+.search-input::placeholder {
+  color: var(--text-tertiary);
+}
+
+.action-btn {
+  padding: var(--spacing-sm);
+  border: 1px solid var(--border-medium);
+  border-radius: 8px;
+
+  background: var(--bg-primary);
+  color: #301c6c;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+}
+
+.action-btn:hover {
+  border-color: #301c6c;
+  color: #301c6c;
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+}
+
+.action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.action-btn.refreshing {
+  color: #301c6c;
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}
+.divider{
+  border: 0.5px solid var(--border-light);
+  z-index: 1;
+  margin-top: 5px;
+}
+/* Quick Filters */
+.header-filters {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-lg);
+  padding-top: var(--spacing-md);
+  margin-top: 10px;
+  position: relative;
+  z-index: 1;
+}
+
+.quick-filters {
+  display: flex;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+}
+
+.filter-chip {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-md);
+  border: 1px solid #301c6c;
+  border-radius: 20px;
+  background: #301c6c;
+  font-size: var(--text-sm);
+  color: #fff;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  white-space: nowrap;
+}
+
+.filter-chip:hover {
+  background: #35198a;
+  border-color: #35198a;
+}
+
+.filter-chip.active {
+  background: #322c8e;
+  border-color: #322c8e;
+  color: white;
+  box-shadow: 0 0 0 2px #09009f59;
+}
+
+.filter-count {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-size: var(--text-xs);
+  font-weight: var(--font-medium);
+}
+
+.filter-chip:not(.active) .filter-count {
+  background: var(--bg-tertiary);
+  color: var(--text-tertiary);
+}
+
+.advanced-filters-toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid #301c6c;
+  border-radius: 8px;
+  background: #301c6c;
+  font-size: var(--text-sm);
+  color: #fff;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  white-space: nowrap;
+  z-index: 1;
+  position: relative;
+}
+
+.advanced-filters-toggle:hover {
+  border-color: #35198a;
+  background-color: #35198a;
+}
+/* 
+.advanced-filters-toggle .rotated {
+  transform: rotate(180deg);
+} */
+
+.advanced-filters-toggle.active {
+  background: #3932ae;
+  border-color: #3932ae;
+  color: white;
+  box-shadow: 0 0 0 2px #09009f59;
+}
+
+/* Advanced Filters Panel */
+.advanced-filters-panel {
+  margin-top: var(--spacing-md);
+  padding: var(--spacing-lg);
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  background: rgb(249, 249, 255);
+  animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.filters-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--spacing-lg);
+  align-items: end;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.filter-group label {
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--text-primary);
+}
+
+.filter-group select {
+  padding: var(--spacing-sm);
+  border: 1px solid var(--border-medium);
+  border-radius: 6px;
+  font-size: var(--text-base);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.filter-group select:focus {
+  border-color: var(--primary-blue);
+  outline: none;
+  box-shadow: 0 0 0 2px var(--primary-light);
+}
+
+.filter-actions {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.reset-filters-btn,
+.apply-filters-btn {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: 6px;
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  white-space: nowrap;
+}
+
+.reset-filters-btn {
+  border: 1px solid var(--border-medium);
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+}
+
+.reset-filters-btn:hover {
+  border-color: var(--danger-red);
+  color: var(--danger-red);
+}
+
+.apply-filters-btn {
+  border: 1px solid #301c6c;
+  background: #301c6c;
+  color: white;
+}
+
+.apply-filters-btn:hover {
+  background: #35198a;
+  border-color: #35198a;
+}
+
+/* Refresh Indicator */
+.refresh-indicator {
+  position: absolute;
+  bottom: -40px;
+  right: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  background: var(--bg-primary);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: 4px;
+  border: 1px solid var(--border-light);
+}
+
+.refresh-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--success-green);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.last-updated {
+  margin-left: var(--spacing-md);
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .header-top {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--spacing-md);
+  }
+
+  .header-center {
+    max-width: none;
+    justify-content: flex-start;
+  }
+
+  .header-right {
+    justify-content: space-between;
+  }
+
+  .search-input {
+    width: 200px;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-header {
+    padding: var(--spacing-sm) 0;
+  }
+
+  .dashboard-title {
+    font-size: var(--text-xl);
+  }
+
+  .plant-name {
+    display: block;
+    margin-left: 0;
+    margin-top: var(--spacing-xs);
+  }
+
+  .search-input {
+    width: 150px;
+  }
+
+  .quick-filters {
+    overflow-x: auto;
+    padding-bottom: var(--spacing-xs);
+  }
+
+  .filters-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .filter-actions {
+    grid-column: 1 / -1;
+    justify-content: stretch;
+  }
+
+  .reset-filters-btn,
+  .apply-filters-btn {
+    flex: 1;
+  }
+
+  .refresh-indicator {
+    position: relative;
+    bottom: auto;
+    right: auto;
+    margin-top: var(--spacing-sm);
+    justify-content: center;
+  }
+}
+
+.select {
+  min-width:130px;
+  min-height: 36px;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  font-size: 14px;
+  background-color: white;
+  transition: all 0.3s;
+  cursor: pointer;
+  display: flex;
+  margin-top: 19px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+}
+
+.select:hover {
+  border-color: #4F46E5;
+}
+
+.select:focus-within {
+  border-color: #4F46E5;
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+  outline: none;
+}
+
+.select[data-state="open"] {
+  border-color: #302b82;
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+}
+
+.selectContent {
+  background: white;
+  border-radius: 6px;
+  box-shadow: 0 3px 6px -4px rgba(0, 0, 0, 0.12), 
+              0 6px 16px 0 rgba(0, 0, 0, 0.08), 
+              0 9px 28px 8px rgba(0, 0, 0, 0.05);
+  padding: 4px;
+  z-index: 1000;
+  max-height: 100px;
+  overflow-y: auto;
+  width: 397px !important;
+  margin-top: 7px;
+}
+
+.selectContent1 {
+  background: white;
+  border-radius: 6px;
+  box-shadow: 0 3px 6px -4px rgba(0, 0, 0, 0.12), 
+              0 6px 16px 0 rgba(0, 0, 0, 0.08), 
+              0 9px 28px 8px rgba(0, 0, 0, 0.05);
+  padding: 4px;
+  z-index: 1000;
+  /* max-height: 250px; */
+  min-height:120px;
+  overflow-y: auto;
+  width: 130px !important;
+  scroll-behavior: auto !important; 
+  margin-top: 7px;
+}
+
+.selectUnitContent {
+  background: white;
+  border-radius: 6px;
+  box-shadow: 0 3px 6px -4px rgba(0, 0, 0, 0.12), 
+              0 6px 16px 0 rgba(0, 0, 0, 0.08), 
+              0 9px 28px 8px rgba(0, 0, 0, 0.05);
+  padding: 4px;
+  z-index: 1000;
+  max-height: 250px;
+  overflow-y: auto;
+  width: 150px !important;
+  margin-top: 7px;
+}
+
+.selectItem {
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #333;
+  transition: all 0.2s;
+}
+
+.selectItem:hover {
+  background-color: #f5f5f5;
+}
+
+.selectItem[data-highlighted] {
+  background-color: #191647;
+  color: white;
+  outline: none;
+}
+
+.selectValue {
+  color: #333;
+  width: 100%;
+  text-align: left;
+  flex: 1;
+}
+
+.selectItem:global([data-state='checked']) svg { 
+  display: none !important; 
+}
+
+.selectContent :global([data-radix-select-item-indicator]) { 
+  display: none !important; 
+}
+.selectItem:global([data-state='checked']) svg { 
+  display: none !important; 
+}
+
+.perPageContent:global([data-radix-select-item-indicator]) { 
+  display: none !important; 
+}
+.perPageItem[data-state='checked'] > svg { display: none !important; }
+
+.perPageItem :global([data-radix-select-item-indicator]) { 
+  display: none !important; 
+}
+
+.selectItem :global(.radix-select-item-indicator) { display: none !important; }
+.selectItem :global([data-state='checked']) svg { display: none !important; }
+
+
+.date-range-container {
+  display: flex;
+  gap: 16px;
+  flex-direction: row; 
+  align-items: flex-start;
+  flex-wrap: wrap;
+  --date-pickers-height: 64px;     /* adjust to your picker’s height */
+  min-height: var(--date-pickers-height);
+
+}
+
+.date-pickers-container {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.date-picker-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: auto; 
+}
+
+.date-picker-label {
+  font-size: 12px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.date-picker {
+  height: 40px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  background: white;
+  transition: all 0.2s;
+  padding: 8px 12px;
+  font-size: 14px;
+  color: #374151;
+}
+
+.date-picker:hover,
+.date-picker:focus,
+.date-picker-focused {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.date-picker .ant-picker-input > input {
+  font-size: 14px;
+  color: #374151;
+}
+
+
+@media (max-width: 768px) {
+  .date-range-container {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .date-pickers-container {
+    width: 100%;
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .date-picker-group {
+    width: 100%;
+  }
+  
+  .date-picker {
+    width: 100%;
+  }
+}
+
+.custom-date-range-picker,
+.ant-picker-range,
+.ant-picker-dropdown-range {
+  display: none;
+}
+/* To ensure the select dropdown arrow is always pointing down and never rotates */
+.select[data-state='open'] :global([data-radix-select-icon]) {
+  transform: none !important; /* Prevents the arrow from rotating when open */
+}
+.select :global([data-radix-select-icon]) {
+  /* This ensures the base state is a down arrow (0 degrees) if needed */
+  transform: rotate(0deg) !important; 
+}
+/* keep what you have, but change the sizing like this */
+.selectContent,
+.selectContent1 {
+  background: white;
+  border-radius: 6px;
+  box-shadow: 0 3px 6px -4px rgba(0,0,0,.12),
+              0 6px 16px 0 rgba(0,0,0,.08),
+              0 9px 28px 8px rgba(0,0,0,.05);
+  padding: 4px 0;                /* tidy vertical padding */
+  z-index: 1000;
+  min-height: 150px;             /* 👈 cap height so it scrolls when long */
+  overflow-y: auto;              /* 👈 native scroll */
+  margin-top: 7px;
+  /* optional niceties */
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+.selectContent2 {
+  background: white;
+  border-radius: 6px;
+  box-shadow: 0 3px 6px -4px rgba(0,0,0,.12),
+              0 6px 16px 0 rgba(0,0,0,.08),
+              0 9px 28px 8px rgba(0,0,0,.05);
+  padding: 4px 0;                /* tidy vertical padding */
+  z-index: 1000;
+  min-height: 150px;             /* 👈 cap height so it scrolls when long */
+  overflow-y: auto;              /* 👈 native scroll */
+  margin-top: 7px;
+  /* optional niceties */
+  overscroll-behavior: contain;
+  min-width:400px;
+  scrollbar-gutter: stable;
+}
+
+/* remove any forced min-height on the small menu */
+.selectContent1 { min-height: auto; /* was 120px */ }
+/* Radix scroll buttons show the chevrons; just hide them */
+.selectContent  [data-radix-select-scroll-up-button],
+.selectContent  [data-radix-select-scroll-down-button],
+.selectContent1 [data-radix-select-scroll-up-button],
+.selectContent1 [data-radix-select-scroll-down-button],
+.selectContent  button[aria-label="Scroll up"],
+.selectContent  button[aria-label="Scroll down"],
+.selectContent1 button[aria-label="Scroll up"],
+.selectContent1 button[aria-label="Scroll down"] {
+  display: none !important;
+}
+
+
+.searchInputContainer {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-width: 300px;
+  margin-right: 12px;
+  z-index: 1000;
+}
+
+.inputSearch {
+  outline: none;
+  background: #ffffff;
+  height: 38px;
+  font-size: 14px;
+  font-family: "Muli", sans-serif;
+  padding: 0 36px 0 12px;
+  /* border-radius: 4px; */
+  border-top-right-radius: 4px;
+  border-bottom-right-radius: 4px;
+  border: 1.4px solid #e0e0e0;
+  width: 100%;
+  transition: border-color 0.2s ease;
+}
+
+.inputSearch:focus {
+  /* border-color: #301c6c; */
+}
+.inputSearch:focus {
+  /* Set border to default and remove all glow/outline */
+  border-color: #e0e0e0 !important; /* Keep the non-focused border color */
+  box-shadow: none !important;      /* Remove any box shadow/glow */
+  outline: none !important;         /* Remove default browser outline */
+}
+
+.searchIcon {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  color: #5e6488;
+  transition: color 0.2s ease;
+}
+
+.searchIcon:hover {
+  color: #271260;
+}
+
+.searchTypeSelect {
+  min-width: 120px;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  border-right: none;
+}
+
+.searchTypeSelect > div {
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.searchTypeSelect button {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  height: 38px;
+  background-color: #f5f5f5;
+  border-color: #e0e0e0;
+  color: #333;
+  font-size: 14px;
+}
+
+.searchTypeSelect button:hover {
+  background-color: #e8e8e8;
+}
+
+.search-suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-top: none;
+  border-radius: 0 0 4px 4px;
+  max-height: 250px;
+  overflow-y: auto;
+  z-index: 1001;
+  box-shadow: 0 8px 16px -2px rgba(0, 0, 0, 0.15), 0 4px 8px -2px rgba(0, 0, 0, 0.1);
+  margin-top: 2px;
+}
+
+
+.suggestion-item {
+  padding: 10px 12px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #333;
+  position: relative;
+  transition: background-color 0.2s ease;
+  border-bottom: 1px solid #f0f0f0;
+  z-index: 9999 !important;
+}
+
+.suggestion-item:last-child {
+  border-bottom: none;
+}
+
+.suggestion-item:hover {
+  background-color: #f5f5f5;
+  color: #20104d;
+}
+
+.suggestion-item:active {
+  background-color: #e8e8e8;
+}
+
+.perPageSelect {
+  /* width: 140px;
+  height: 32px; */
+  width: 200px;
+  border: 2px solid #c3c9e8; /* subtle blue-gray */
+  /* border-radius: 8px; */
+  border-top-left-radius: 8px !important;
+  border-bottom-left-radius: 8px !important;
+  border-top-right-radius: 0px !important;
+  border-bottom-right-radius: 0px !important;
+  font-size: 14px;
+  box-shadow: none;
+  transition: border 0.2s;
+  appearance: none;
+  padding: 4px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+    text-align: center;
+    border-radius: 4px;
+    /* padding: 8px 12px; */
+    cursor: pointer;
+    font-weight: bold;
+    background-color: 
+#301c6c;
+    color: #ffffff;
+    border: none;
+    white-space: nowrap;
+    height: 38px;
+}
+/* .perSinSelect {
+  width: 140px;
+  height: 38px;
+  background: #fff;
+  border: 2px solid #c3c9e8;
+  border-radius: 0px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #22223b;
+  box-shadow: none;
+  transition: border 0.2s;
+  appearance: none;
+  padding: 4px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+} */
+.perPageItem[data-state='checked'] svg { 
+  display: none !important; 
+}
+/* .perPageSelect:focus {
+  border-color: #301c6c
+
+} */
+.perPageSelect:focus,
+.perPageSelect:focus-within { /* Use :focus-within to cover the Radix component wrapper */
+  border-color: #c3c9e8 !important; /* Revert to the default subtle border color */
+  box-shadow: none !important;      /* Remove the glow effect */
+  outline: none !important;         /* Ensure no standard browser outline appears */
+}
+.perPageContent [data-radix-select-item-indicator],
+.selectContent  [data-radix-select-item-indicator],
+.selectContent1 [data-radix-select-item-indicator],
+.selectContent2 [data-radix-select-item-indicator] {
+  display: none !important;
+}
+/* If a theme draws the tick with pseudo-elements, nuke them */
+.perPageItem::before,
+.perPageItem::after,
+.selectItem::before,
+.selectItem::after {
+  content: none !important;
+  display: none !important;
+}
+.uppercase-input::placeholder {
+  text-transform: none; 
+}
+/* Ensure the Select itself does not add a box-shadow when open */
+.select[data-state="open"] {
+  border-color: #d9d9d9 !important; /* Revert to a neutral border color */
+  box-shadow: none !important;      /* Remove the glow when the dropdown is open */
+}
+.perPageContent {
+  background: #fff;
+  border: 1px solid #c3c9e8;
+  border-radius: 8px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 8px 0;
+  width: 130px;
+  z-index:200;
+}
+
+/* Styles for each individual option in the dropdown list */
+.perPageItem {
+  font-size: 14px;
+  font-weight: 500;
+  color: #22223b;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+/* Styles for the hovered option */
+.perPageItem:hover {
+  background-color: #f0f4ff;
+}
+.date-picker:hover,
+.date-picker:focus,
+.date-picker-focused {
+  /* CHANGE THESE LINES */
+  border-color: #694bc4; /* Changed from #3b82f6 (blue) to purple */
+  box-shadow: 0 0 0 2px rgba(104, 69, 210, 0.4); /* Changed from blue rgba to purple rgba */
+}
+.perPageItem > .lucide-check, 
+.perPageItem > svg,
+.perPageItem > span[role="status"] {
+  /* Common selectors for the icon/tick element */
+  display: none !important; /* Hide the element entirely */
+  width: 0 !important;
+  height: 0 !important;
+  visibility: hidden;
+}
+
+/* If the library uses a special class on the SelectItem to pad for the tick, 
+   you may need to remove that padding too */
+.perPageItem {
+  padding-right: var(--your-default-padding) !important; /* Adjust padding if necessary */
+}
+.selectContent [data-radix-select-item-indicator],
+.selectContent1 [data-radix-select-item-indicator],
+.selectContent2 [data-radix-select-item-indicator],
+.perPageContent [data-radix-select-item-indicator] {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  /* Add padding reset to prevent space from being left behind */
+  padding: 0 !important; 
+  margin: 0 !important;
+}
+
+/* FIX: Target the checkmark (SVG) directly inside a checked SelectItem */
+/* This handles cases where the indicator might be an SVG not wrapped in the Radix indicator element */
+.selectItem[data-state='checked'] > svg,
+.selectItem[data-state='checked'] > span > svg, /* covers nested SVG */
+.perPageItem[data-state='checked'] > svg,
+.perPageItem[data-state='checked'] > span > svg {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* Cleanup: Remove redundant or less specific selectors if they exist */
+/* You had a few attempts; ensure the working ones are kept, and others are removed/modified */
+
+/* Ensure the selectors near the end are updated as follows: */
+.perPageContent [data-radix-select-item-indicator],
+.selectContent  [data-radix-select-item-indicator],
+.selectContent1 [data-radix-select-item-indicator],
+.selectContent2 [data-radix-select-item-indicator] {
+  display: none !important;
+}
+
+.perPageItem:global([data-state='checked']) svg,
+.selectItem:global([data-state='checked']) svg {
+  display: none !important;
+}
+
+.filter-active-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10b981; 
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+  animation: pulse-dot 2s ease-in-out infinite;
+  margin-left: 4px;
+}
+
+@keyframes pulse-dot {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.1);
+  }
+}

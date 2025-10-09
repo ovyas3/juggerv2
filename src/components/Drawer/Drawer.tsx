@@ -63,6 +63,8 @@ import HelpActive from "@/assets/help_active.svg";
 import HelpInactive from "@/assets/help_inactive.svg";
 import { environment } from '@/environments/env.api';
 import { useTranslations } from 'next-intl';
+import ShipmentActive from "@/assets/shipments-active.svg";
+import ShipmentInactive from "@/assets/shipments-inactive.svg";
 
 interface NavItem {
     id: string;
@@ -174,8 +176,16 @@ const navigationItems: NavItem[] = [
         id: 'shipmentsDashboard',
         label: 'Shipments List',
         icon: '',
-        activeIcon: RouteActiveIcon,
-        inactiveIcon: RouteInactiveIcon,
+        activeIcon: ShipmentActive,
+        inactiveIcon: ShipmentInactive,
+        isImageIcon: true
+    },
+    {
+        id: 'inplant-dashboard',
+        label: 'In-Plant Dashboard',
+        icon: '',
+        activeIcon: InPlantOverviewActive,
+        inactiveIcon: InPlantOverviewInactive,
         isImageIcon: true
     },
     {
@@ -538,16 +548,7 @@ function SideDrawer() {
                     isActive={active === item.id}
                     isHovered={hoveredId === item.id}
                     isOpen={open}
-                    onClick={() => {
-                        if (item.id === 'controlRoom') {
-                            router.back();
-                            setActive('controlRoom');
-                        } else if (item.route) {
-                            handleShipperRouting(item.route);
-                        } else {
-                            handleRouting(item.id);
-                        }
-                    }}
+                    onClick={() => item.route ? handleShipperRouting(item.route) : handleRouting(item.id)}
                     onMouseEnter={() => setHoveredId(item.id)}
                     onMouseLeave={() => setHoveredId(null)}
                     active={active}

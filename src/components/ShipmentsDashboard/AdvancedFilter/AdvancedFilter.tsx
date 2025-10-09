@@ -60,6 +60,7 @@ interface AdvancedFilterProps {
   segmentations?: Segmentation[];
   deliverLocations: Location[];
   shipStatus: ShipStatus[];
+  odcFilter: boolean;
   onApply: (filters: Partial<FilterPayload>) => void;
   onClear: () => void;
   onClose: () => void;
@@ -82,6 +83,7 @@ interface FilterPayload {
   to: string | number; 
   commercial_invoice: boolean | null;
   deliveries: string[];
+  odc: boolean;
   // from: string;
   // to: string;
   trans_vehicle: boolean;
@@ -105,6 +107,7 @@ export const AdvancedFilter: React.FC<AdvancedFilterProps> = ({
   onApply,
   onClear,
   onClose,
+  odcFilter,
   limit,
   skip,
 }) => {
@@ -345,6 +348,7 @@ const handleApply = async () => {
       nonTracking: nonTracking === "" ? undefined : nonTracking === "Not Tracking",
       vehicle_no: vehicleNo || undefined,
       mobile: mobile || undefined,
+      odc: odcFilter,
       // You may need to add limit, skip, and other default values here
       // limit: 25,
       // skip: 0,
@@ -362,6 +366,10 @@ const handleApply = async () => {
 
   try {
     const response = await httpsPost("shipment/many", cleanPayload, {}, 5);
+    if (response.statusCode === 200) { // Assuming a successful response structure
+      console.log("API response received successfully. Calling onApply with payload.");
+      onApply(cleanPayload); // <--- THIS IS THE CRITICAL FIX
+    }
 
       if (!response.ok) {
           // Handle HTTP errors
@@ -378,6 +386,7 @@ const handleApply = async () => {
       console.error("Error applying filters:", error);
       // You could also set a state to show an error message to the user
   }
+  onClose();
 };
 
 // ... (rest of your component code)

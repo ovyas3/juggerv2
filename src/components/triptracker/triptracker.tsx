@@ -155,6 +155,8 @@ const [confirm, setConfirm] = useState<{ open: boolean; kind?: "deviation" | "st
 const [showDeviationsOnMap, setShowDeviationsOnMap] = useState(false);
 const [showStoppagesOnMap, setShowStoppagesOnMap] = useState(false);
 const [destinations, setDestinations] = useState<FormattedLocation[]>([]);
+const [deviationCount, setDeviationCount] = useState(0);
+const [totalDeviationDistance, setTotalDeviationDistance] = useState(0);
 
 const formatEta = (utcString: any) => {
   if (!utcString) return 'N/A';
@@ -231,10 +233,10 @@ const confirmYes = () => {
   } else if (confirm.kind === "deviation") {
     setMapState({ mode: 'map', showHalts: false, showDeviations: true });
     // Handle deviation confirmation
-    // setMapMode("map");
-    // setShowDeviationsOnMap(true);
-    // setShowHaltPointsOnMap(false);
-    // setShowStoppagesOnMap(false);
+    setShowDeviationsOnMap(true);
+    setShowHaltPointsOnMap(false);
+    setShowStoppagesOnMap(false);
+    console.log("Confirming deviation. showDeviationsOnMap is now true.");
   }
   // Close the confirmation popup
   closeConfirm();
@@ -256,7 +258,6 @@ const confirmYes = () => {
     setOpenTooltipId(openTooltipId === kpiId ? null : kpiId);
   }
   const getShipmentStatus = (statusCode: string) => {
-    console.log("shipment is called");
     let status = "";
   
     let statusClass = "";
@@ -343,6 +344,14 @@ useEffect(() => {
       if (!shipmentResponse.ok) throw new Error(`Shipment API error! Status: ${shipmentResponse.status}`);
       const shipmentData = await shipmentResponse.json();
       setApiData(shipmentData.shipment);
+      // Extract deviation count and total distance
+      const deviations = shipmentData.shipment.deviation?.deviations || [];
+      const deviationCountFromApi = deviations.length;
+      const totalDistanceOffRoute = deviations.reduce((sum: number, deviation: any) => {
+        return sum + (deviation.distance || 0);
+      }, 0);
+      setDeviationCount(deviationCountFromApi);
+      setTotalDeviationDistance(totalDistanceOffRoute);
       const allPickups  = shipmentData.shipment.pickups;
       setIntermediates(allPickups.slice(1).map((p:ShipmentStop)=> ({
         ...p,
@@ -498,20 +507,33 @@ const handleToggleMapView = () => {
 };
 
 const calculateTotalHaltDuration = (data: any[]) => {
+  // Check if 'data' is an array and has items before calling reduce
+  if (!Array.isArray(data) || data.length === 0) {
+    // Return a default value immediately if data is not a valid array
+    return '0h 0m total'; 
+  }
+
+  // Proceed with reduce only if 'data' is confirmed to be an array
   const totalMinutes = data.reduce((sum, halt) => sum + (halt.halt_duration || 0), 0);
   const hours = Math.floor(totalMinutes / 60);
   const minutes = Math.floor(totalMinutes % 60);
+  
   return `${hours}h ${minutes}m total`;
 };
 
 
 const findLongestHalt = (data: any[]) => {
-  if (data.length === 0) return 'N/A';
+  // FIX: Check if data is an Array OR if it's null/undefined/empty
+  if (!Array.isArray(data) || data.length === 0) {
+    return 'N/A';
+  }
+  
+  // Start the reduce with a guaranteed initial value that matches the structure
   const longestHalt = data.reduce((longest, current) => {
     return (current.halt_duration || 0) > (longest.halt_duration || 0) ? current : longest;
-  }, data[0]);
+  }, data[0]); // Using data[0] is safe now because we've checked data.length > 0
 
-  const durationInMinutes = longestHalt.halt_duration;
+  const durationInMinutes = longestHalt.halt_duration || 0; // Use 0 as fallback
   const durationHours = Math.floor(durationInMinutes / 60);
 
   // FIX: Using Math.floor() to prevent rounding up and get the correct minute value.
@@ -948,14 +970,17 @@ const totalQuantity = apiData?.invoices?.reduce((sum:number, invoice:Invoice) =>
         <KeplerMap
           showGPSRoute
           showDeviations={showDeviationsOnMap}
+          setShowDeviations={() => setShowDeviationsOnMap(prev => !prev)}
           // showHaltPoints={showHaltPointsOnMap}
           showHaltPoints={showHaltPointsOnMap}
-          showStoppages={showStoppagesOnMap} 
+          showStoppages={showStoppagesOnMap}
           showGeofence
           isFullscreen
           isSatelliteView={isSatelliteViewLocal}
           onToggleFullscreen={() => setIsMapFull(false)}
           unique_code={uniqueCode}
+          geoFenceData={apiData?.geo_fence}
+          tripTrackerMethods={apiData?.trip_tracker?.methods || []}
           // apiData={apiData}
           // tollHistoryData={tollHistoryData}
           // haltData={haltData}
@@ -1137,22 +1162,18 @@ const totalQuantity = apiData?.invoices?.reduce((sum:number, invoice:Invoice) =>
   onClick={() => handleKpiClick("route-deviations")}
 >
           <div className="kpi-icon-badge"><GitBranch className="kpi-icon" /></div>
-            <div className="kpi-value">2</div>
+            <div className="kpi-value">{deviationCount}</div>
             <div className="kpi-label">Route deviations</div>
             <div className="tooltip-content tooltip-lg">
       <div className="tooltip-title">Route Deviations</div>
 
       <div className="tooltip-row">
         <span className="tooltip-key">Total deviations:</span>
-        <span className="tooltip-val">2</span>
+        <span className="tooltip-val">{deviationCount}</span>
       </div>
       <div className="tooltip-row">
         <span className="tooltip-key">Distance off-route:</span>
-        <span className="tooltip-val">2.5km</span>
-      </div>
-      <div className="tooltip-row">
-        <span className="tooltip-key">Time impact:</span>
-        <span className="tooltip-val">+15min</span>
+        <span className="tooltip-val">{totalDeviationDistance.toFixed(1)}km</span>
       </div>
 
    
@@ -1491,15 +1512,15 @@ const totalQuantity = apiData?.invoices?.reduce((sum:number, invoice:Invoice) =>
     Full Screen Map
   </button>
   </div>
-{/* </div>           {mapState.mode === "location" && (
+                  {mapState.mode === "location" && (
                   <div className="map-filter-buttons">
                     <button className="filter-button deviation"  onClick={() => openConfirm("deviation")}  >
-                      <Navigation className="filter-icon" />2 deviations
+                      <Navigation className="filter-icon" />{deviationCount} deviations
                     </button>
                     <button className="filter-button stoppage" onClick={() => openConfirm("stoppage")}  >
                       <AlertTriangle className="filter-icon" />{totalStoppagesCount} Long Stoppages
                     </button>
-                  </div>)} */}
+                  </div>)}
                   {mapState.mode === "location" && (
                   <div className="current-location-box">
                     <div className="location-header">
@@ -1553,11 +1574,14 @@ const totalQuantity = apiData?.invoices?.reduce((sum:number, invoice:Invoice) =>
     <KeplerMap
       showGPSRoute
       showDeviations={showDeviationsOnMap}
+      setShowDeviations={() => setShowDeviationsOnMap(prev => !prev)}
       showGeofence
       isFullscreen={false}
       isSatelliteView={isSatelliteViewLocal}
       onToggleFullscreen={() => setIsMapFull(true)}
       unique_code={uniqueCode}
+      geoFenceData={apiData?.geo_fence}
+      tripTrackerMethods={apiData?.trip_tracker?.methods || []}
 
       // optional callbacks if you want to control toggles from dashboard:
       // onToggleGPSRoute={() => {/* set some local state if needed */}}

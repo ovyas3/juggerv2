@@ -14,8 +14,19 @@
     display: flex;
     justify-content: space-between;
     padding-inline: 12px;
+    padding-block: 8px; 
     padding-top: 12px;
     align-items: center;
+}
+#dropdownLabel > div:first-child { 
+    /* 1. Essential for single-line overflow */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    
+    /* 2. Constrain width to make space for the icon and padding */
+    max-width: 85%; 
+    display: block; 
 }
 
 #dropdownOptions{

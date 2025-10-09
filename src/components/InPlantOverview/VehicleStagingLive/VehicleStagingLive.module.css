@@ -7,6 +7,15 @@
     background-color: #ffffff;
 }
 
+.mainDashboard {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    background-color: rgb(249, 249, 255);
+    min-height: 10vh;
+}
+
 .container {
     display: flex;
     flex-direction: column;
@@ -15,6 +24,18 @@
     background: #ffffff;
     height: 100%;
     width: 100%;
+}
+
+.dashboardContainer {
+    display: flex;
+    flex-direction: column;
+    background: rgb(249, 249, 255);
+    height: 100%;
+    width: 100%;
+    padding: 0px;
+    margin-top: 35px;
+    align-items: center;
+    justify-content: center;
 }
 
 .title {
@@ -34,6 +55,7 @@
     margin: 2rem 0;
     border: 1px solid #f0f0f0;
     position: relative;
+    transition: all 0.3s ease;
 }
 
 .table {
@@ -69,6 +91,7 @@
 .table th:hover {
     background-color: rgba(255, 255, 255, 0.1);
     color: #ffffff;
+
 }
 
 .table th::after {
@@ -83,9 +106,16 @@
     transition: background-color 0.2s;
 }
 
-.table th:hover::after {
+/* .table th:hover::after {
     background-color: #60a5fa;
     box-shadow: 0 0 8px rgba(96, 165, 250, 0.6);
+} */
+.table th:hover::after {
+    /* REMOVE hover effects on the decorative dot to ensure nothing obscures the text */
+    /* background-color: #60a5fa; */
+    /* box-shadow: 0 0 8px rgba(96, 165, 250, 0.6); */
+    background-color: rgba(255, 255, 255, 0.3); /* Revert to default non-hover state */
+    box-shadow: none; /* Remove glowing effect */
 }
 
 .table td {
@@ -102,7 +132,7 @@
     cursor: pointer;
 }
 
-.table td:hover::before {
+/* .table td:hover::before {
     content: "";
     position: absolute;
     top: 0;
@@ -113,6 +143,9 @@
     pointer-events: none;
     box-sizing: border-box;
     z-index: 1;
+} */
+.table td:not(:first-child):hover::after {
+    transform: scaleX(1); /* 👈 This makes the line appear on hover */
 }
 
 .table tbody tr {
@@ -129,16 +162,16 @@
 
 .totalRow {
     font-weight: 600;
-    background-color: #f0f9ff !important;
+    background-color: #f0f9ff;
 }
 
 .totalRow td {
     color: #0c4a6e;
-    border-top: 2px solid #bae6fd;
+    border-top: 2px solid #a7b2ff;
 }
 
 .totalRow td:hover {
-    background-color: #e0f2fe !important;
+    background-color: #e0f2fe;
 }
 
 .table th:first-child,
@@ -217,18 +250,18 @@
     overflow: hidden;
 }
 
-.table td:not(:first-child)::after {
+/* .table td:not(:first-child)::after {
     content: "";
     position: absolute;
     bottom: 0;
     left: 0;
     width: 100%;
     height: 2px;
-    background: linear-gradient(to right, transparent, #0ea5e9, transparent);
+    background: linear-gradient(to right, transparent, #8c8fee, transparent);
     transform: scaleX(0);
     transition: transform 0.3s ease;
     opacity: 0.5;
-}
+} */
 
 .table td:not(:first-child):hover::after {
     transform: scaleX(1);
@@ -239,8 +272,7 @@
     flex-direction: column;
     gap: 12px;
     padding: 16px;
-    max-width: 600px;
-    margin: 0 auto;
+    transition: all 0.3s ease;
 }
 
 .dateContainer {
@@ -250,6 +282,11 @@
     gap: 16px;
     width: 100%;
     margin-bottom: 16px;
+}
+
+.dateContainer.collapsed {
+    margin-bottom: 0;
+    padding-bottom: 0;
 }
 
 .exportButton {
@@ -281,8 +318,172 @@
     height: 16px;
 }
 
+.dashboardExportButton {
+    border: 1px solid #301c6c;
+    border-radius: 8px;
+    background: #301c6c;
+    color: white;
+    transition: all 0.2s ease;
+}
+
+.dashboardExportButton:hover {
+    background: #3f2a7a;
+    border-color: #3f2a7a;
+}
+
 @media (max-width: 767px) {
     .container {
         padding: 1rem;
     }
+}
+
+.dashboardTable thead {
+    background: linear-gradient(to right, #301c6c, #3f2a7a) !important;
+}
+
+.dashboardTable thead th {
+    border-bottom: 2px solid #4a3a8a !important;
+    background: transparent !important;
+}
+
+.dashboardTable thead th:hover {
+    background-color: rgba(48, 28, 108, 0.8) !important;
+}
+
+.dashboardTable thead th::after {
+    background-color: rgba(255, 255, 255, 0.5) !important;
+}
+
+.dashboardTable thead th:hover::after {
+    background-color: #ffffff !important;
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.8) !important;
+}
+
+.dashboardTable td:not(:first-child)::after {
+    background-color: #e9e1ff !important;
+}
+
+.dashboardTable td:hover::before,
+.dashboardTable td:active {
+    background-color: #f5f0ff !important;
+}
+
+/* .dashboardTable td:hover {
+    background-color: #f9f6ff !important;
+} */
+
+.dashboardTable thead {
+    background: linear-gradient(to right, #1e293b, #334155);
+}
+
+.dashboardTable th {
+    border-bottom: 2px solid #475569;
+}
+
+.dashboardTable th:hover {
+    background-color: rgba(30, 41, 59, 0.8);
+}
+
+.dashboardTable th::after {
+    background-color: rgba(255, 255, 255, 0.5);
+}
+
+.dashboardTable th:hover::after {
+    background-color: #ffffff;
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+}
+
+.dashboardTable th:hover::after {
+    background-color: #8b5cf6;
+    box-shadow: 0 0 8px rgba(139, 92, 246, 0.6);
+}
+
+.dashboardTable td {
+    padding: 16px 24px;
+    border-bottom: 1px solid #e9d5ff;
+    color: #4b3a70;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.dashboardTable td:hover {
+    background-color: #f5f3ff;
+    color: #4c1d95;
+    cursor: pointer;
+}
+
+.dashboardTable td:hover::before {
+    border: 2px solid #7c3aed;
+}
+.dashboardTable tbody tr:hover {
+    background-color: #f8f5ff;
+}
+
+.dashboardRow {
+    font-weight: 600;
+    background-color: #f5f3ff !important;
+}
+
+.dashboardRow td {
+    color: #4c1d95;
+    border-top: 2px solid #d8b4fe;
+}
+
+.dashboardRow td:hover {
+    background-color: #ede9fe !important;
+    color: #4c1d95 !important; 
+}
+
+.dashboardTable th:first-child,
+.dashboardTable td:first-child {
+    background: white;
+    color: #1e1b4b;
+    border-right: 1px solid #f0e9ff;
+}
+
+.dashboardTable th:first-child {
+    background: linear-gradient(to right, #4c1d95, #5b21b6);
+    color: white;
+}
+.dashboardTable td:first-child::after,
+.dashboardTable th:first-child::after {
+    background: linear-gradient(to right, rgba(76, 29, 149, 0.2), transparent);
+}
+
+.dashboardTable tbody tr:nth-child(even):not(.dashboardRow) {
+    background-color: #faf5ff;
+}
+
+.dashboardTable tbody tr:nth-child(even):not(.dashboardRow) td:first-child {
+    background-color: #faf5ff;
+}
+
+.dashboardTable tbody tr:nth-child(even):not(.dashboardRow):hover {
+    background-color: #f3e8ff;
+}
+
+.dashboardTable tbody tr:nth-child(even):not(.dashboardRow):hover td:first-child {
+    background-color: #f3e8ff;
+}
+
+.title {
+    font-size: var(--text-xl);
+    font-weight: var(--font-bold);
+    color: var(--text-primary);
+    margin: 0;
+    line-height: 1.2;
+}
+
+.collapsedContent {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+    margin: 0;
+    padding: 0;
+}
+
+.expandedContent {
+    max-height: 1000px;
+    transition: max-height 0.3s ease-in;
+    width: 100%;
 }

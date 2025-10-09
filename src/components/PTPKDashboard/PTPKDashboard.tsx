@@ -35,9 +35,9 @@ export default function PTPKDashboard() {
   const [selectedRegion, setSelectedRegion] = useState("All")
   const [isFilterOpen, setIsFilterOpen] = useState(false)
   const [selectedMaterials, setSelectedMaterials] = useState<string[]>([])
-  const [selectedDateFilter, setSelectedDateFilter] = useState("MTD")
-  const [fromDate, setFromDate] = useState(dayjs().startOf("month").format("YYYY-MM-DD"))
-  const [toDate, setToDate] = useState(dayjs().format("YYYY-MM-DD"))
+  const [selectedDateFilter, setSelectedDateFilter] = useState("Custom")
+  const [fromDate, setFromDate] = useState("2025-07-20")
+  const [toDate, setToDate] = useState("2025-07-22")
 
   const [zoneOptions, setZoneOptions] = useState<FilterOption[]>([])
   const [stateOptions, setStateOptions] = useState<FilterOption[]>([])
@@ -54,27 +54,27 @@ export default function PTPKDashboard() {
   const [filters, setFilters] = useState<any>({})
   const [filtersDate, setDateFilters] = useState<any>({})
   const [activeTab, setActiveTab] = useState("data")
-  const [hasAdvancedFilters, setHasAdvancedFilters] = useState(false)
+  const [hasActiveFilters, setHasActiveFilters] = useState(false)
 
   const [distanceFrom, setDistanceFrom] = useState<string>("")
   const [distanceTo, setDistanceTo] = useState<string>("")
-  const [dateType, setDateType] = useState<'approve' | 'gateout'>('approve');
 
   useEffect(() => {
     if (activeTab === "data") {
       fetchMetricsData()
+      fetchTableData()
     }
   }, [filters, activeTab])
 
   useEffect(() => {
-    const isAnyAdvancedFilterActive =
+    const isAnyFilterActive =
       (filters.zones && filters.zones.length > 0) ||
       (filters.states && filters.states.length > 0) ||
       (filters.materials && filters.materials.length > 0) ||
-      (filters.gt_dist !== undefined && filters.gt_dist !== "") ||
-      (filters.lt_dist !== undefined && filters.lt_dist !== "")
+      filters.gt_dist !== undefined ||
+      filters.lt_dist !== undefined
 
-    setHasAdvancedFilters(isAnyAdvancedFilterActive)
+    setHasActiveFilters(isAnyFilterActive)
   }, [filters])
 
   const fetchDropdownData = async (zoneFilter?: string | string[]) => {
@@ -152,8 +152,8 @@ export default function PTPKDashboard() {
     const selectedStates = stateOptions.filter((opt) => opt.selected).map((opt) => opt.label)
     const selectedMaterials = materialOptions.filter((opt) => opt.selected).map((opt) => opt.label)
 
-    const startDate = fromDate ? fromDate : dayjs().startOf("month").toISOString()
-    const endDate = toDate ? toDate : dayjs().toISOString()
+    const startDate = fromDate ? fromDate : new Date().toISOString()
+    const endDate = toDate ? toDate : new Date().toISOString()
 
     const payload: any = {
       period: selectedDateFilter,
@@ -188,14 +188,12 @@ export default function PTPKDashboard() {
     setSelectedDateFilter(payload.period)
     setFilters(payload)
     setIsFilterOpen(false)
-    setDateType(payload.dateType)
   }
 
   const fetchMetricsData = useCallback(async () => {
     setIsLoadingMetrics(true)
     try {
-      const { dateType, ...filtersForKpis } = filters;
-      const response = await httpsPost("ptpk/kpis", filtersForKpis, {}, 1);
+      const response = await httpsPost("ptpk/kpis", filters, {}, 1)
       if (response.statusCode === 200 && response.data) {
         setMetricsData(response.data)
       } else {
@@ -212,7 +210,7 @@ export default function PTPKDashboard() {
 
   useEffect(() => {
     const payload = {
-      period: "MTD",
+      period: "Custom",
       startDate: dayjs().startOf("month").toISOString(),
       endDate: dayjs().toISOString(),
     }
@@ -224,10 +222,7 @@ export default function PTPKDashboard() {
   const fetchTableData = useCallback(async () => {
     setIsLoadingTable(true)
     try {
-      const response = await httpsPost("ptpk/table", {
-        ...filters,
-        dateType,
-      }, {}, 1)
+      const response = await httpsPost("ptpk/table", filters, {}, 1)
       if (response.statusCode === 200 && response.data) {
         setTableData(response.data.modes)
       } else {
@@ -240,13 +235,11 @@ export default function PTPKDashboard() {
     } finally {
       setIsLoadingTable(false)
     }
-  }, [filters, dateType])
+  }, [filters])
 
   useEffect(() => {
-    if (activeTab === "data") {
-      fetchTableData();
-    }
-  }, [dateType, activeTab, fetchTableData]);
+    fetchTableData()
+  }, [])
 
   const resetFilterSelections = () => {
     setZoneOptions((prev) => prev.map((opt) => ({ ...opt, selected: false })))
@@ -255,43 +248,23 @@ export default function PTPKDashboard() {
 
     setDistanceFrom("")
     setDistanceTo("")
-  
+
     const resetPayload = {
-      period: "MTD",
+      period: "Custom",
       startDate: dayjs().startOf("month").toISOString(),
       endDate: dayjs().toISOString(),
     }
+
     setFromDate(dayjs().startOf("month").format("YYYY-MM-DD"))
     setToDate(dayjs().format("YYYY-MM-DD"))
-    setSelectedDateFilter("MTD")
+    setSelectedDateFilter("Custom")
     setFilters(resetPayload)
     setIsFilterOpen(false)
-    setDateType('approve')
-  }
 
-  // New function to clear ONLY advanced filters, keeping the date range
-  const clearAdvancedFilters = () => {
-    // Reset advanced filter state
-    setZoneOptions((prev) => prev.map((opt) => ({ ...opt, selected: false })))
-    setStateOptions((prev) => prev.map((opt) => ({ ...opt, selected: false })))
-    setMaterialOptions((prev) => prev.map((opt) => ({ ...opt, selected: false })))
-    setDistanceFrom("")
-    setDistanceTo("")
-    
-    // Create new payload with advanced filters cleared, but date filters kept
-    const payload = {
-      period: selectedDateFilter,
-      startDate: dayjs(fromDate).toISOString(),
-      endDate: dayjs(toDate).toISOString(),
-    }
-    
-    setFilters(payload)
-    setIsFilterOpen(false)
+    // Recall APIs
+    fetchMetricsData()
+    fetchTableData()
   }
-
-  const handleDateTypeChange = (newDateType: 'approve' | 'gateout') => {
-    setDateType(newDateType);
-  };
 
   return (
     <div className={styles.dashboardContainer}>
@@ -317,8 +290,7 @@ export default function PTPKDashboard() {
                 <FilterBar
                   onFilterClick={() => setIsFilterOpen(true)}
                   onApplyFilters={(appliedFilters) => applyFiltersFromBar(appliedFilters)}
-                  resetAllFilters={resetFilterSelections} // This button clears everything
-                  hasActiveFilters={hasAdvancedFilters}
+                  hasActiveFilters={hasActiveFilters}
                 />
               </div>
             </div>
@@ -338,7 +310,7 @@ export default function PTPKDashboard() {
                 distanceTo={distanceTo}
                 setDistanceFrom={setDistanceFrom}
                 setDistanceTo={setDistanceTo}
-                resetFilters={clearAdvancedFilters} // This button now only clears advanced filters
+                resetFilters={resetFilterSelections}
               />
             )}
 
@@ -348,8 +320,6 @@ export default function PTPKDashboard() {
               filters={filters}
               metricsData={metricsData}
               isLoadingMetrics={isLoadingMetrics}
-              dateType={dateType}
-              onDateTypeChange={handleDateTypeChange}
             />
           </Tabs>
         </div>

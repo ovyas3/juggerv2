@@ -2,6 +2,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { RefreshCw, RotateCw, Send, FileText, Upload, MoreHorizontal, AlertCircle } from "lucide-react";
 import styles from "./HeaderActions.module.css";
+import BulkEpodUpload from "../SpecialFeatures/BulkEpodUpload";
 import BulkUpload from "../SpecialFeatures/BulkUpload";
 
 interface HeaderActionsProps {
@@ -14,6 +15,7 @@ interface HeaderActionsProps {
   isjspl?:boolean;
   isLoading?: boolean;
   hasSelectedShipments?: boolean;
+  isTata?: boolean;
   onMissedShipment?: () => void; 
 }
 
@@ -27,11 +29,13 @@ const HeaderActions: React.FC<HeaderActionsProps> = ({
   isjspl=false,
   isLoading = false,
   hasSelectedShipments = false,
+  isTata = false,
   onMissedShipment,
 }) => {
   const [open, setOpen] = useState(false);
   const [showBulkUpload, setShowBulkUpload] = useState(false);
   const [bulkUploadType, setBulkUploadType] = useState<"shipment">("shipment");
+  const [showBulkEpodUpload, setShowBulkEpodUpload] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -99,6 +103,8 @@ const HeaderActions: React.FC<HeaderActionsProps> = ({
               Update Vehicle Arrival
             </button>
 
+            
+
             <button
               className={styles.menuItem}
               role="menuitem"
@@ -125,6 +131,7 @@ const HeaderActions: React.FC<HeaderActionsProps> = ({
               Fetch Invoice Details
             </button>
             </>)}
+
             <button
               className={styles.menuItem}
               role="menuitem"
@@ -134,6 +141,20 @@ const HeaderActions: React.FC<HeaderActionsProps> = ({
               <Upload className={styles.lucideIcon} />
               Bulk Upload
             </button>
+
+            {isTata && (
+              <button
+                className={styles.menuItem}
+                role="menuitem"
+                onClick={() => {
+                  setOpen(false);
+                  setShowBulkEpodUpload(true);
+                }}
+              >
+                <Upload className={styles.lucideIcon} />
+                Bulk ePOD Upload
+              </button>
+            )}
             {isjspl && (
             <button
               className={styles.menuItem}
@@ -146,7 +167,8 @@ const HeaderActions: React.FC<HeaderActionsProps> = ({
             >
               <AlertCircle className={styles.lucideIcon} />
               Missed Shipment
-            </button>)}
+            </button>)
+            }
 
           </div>
         )}
@@ -158,6 +180,14 @@ const HeaderActions: React.FC<HeaderActionsProps> = ({
           open={showBulkUpload}
           onClose={() => setShowBulkUpload(false)}
           type={bulkUploadType}
+        />
+      )}
+
+      {showBulkEpodUpload && (
+        <BulkEpodUpload
+          open={showBulkEpodUpload}
+          onClose={() => setShowBulkEpodUpload(false)}
+          onUploadSuccess={onFetchShipments}
         />
       )}
     </div>

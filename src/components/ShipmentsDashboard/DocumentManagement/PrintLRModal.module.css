@@ -18,9 +18,9 @@
   align-items: center;
 
   width: 100%;
-  border: 2px solid #4F46E5;
+  border: 2px solid rgb(48, 28, 108);
   padding: 0 10px;
-  background-color: #4F46E5;
+  background-color: rgb(48, 28, 108);
   margin: 0 auto;
   border-radius: 1px;
   color: #fff;
@@ -79,7 +79,7 @@
   width: 80px;
   padding: 8px 4px;
   color: #fff;
-  background-color: #4F46E5;
+  background-color: rgb(48, 28, 108);
   font-size: 13px;
   cursor: pointer;
   margin-top: 1px;

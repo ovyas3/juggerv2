@@ -112,7 +112,7 @@
 .browseButton:hover,
 .browseButton:focus {
   background-color: #ececec;
-  border-color: #4F46E5;
+  border-color: rgb(48, 28, 108);
   color: #222;
   box-shadow: 0 0 0 2px #ede9fe;
 }
@@ -156,7 +156,7 @@
 }
 
 .button {
-  background-color: #4F46E5;
+  background-color: rgb(48, 28, 108);
   color: white;
   padding: 8px 24px;
   border-radius: 4px;
@@ -166,7 +166,7 @@
 }
 
 .submitButton:not(.disabled) .button:hover {
-  background-color: #433DE8;
+  background-color:  #3d2879;
 }
 
 /* Loader styles */

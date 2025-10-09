@@ -11,7 +11,7 @@
   position: sticky;
   top: 0;             /* pin at the top */
   z-index: 5;         /* above body cells */
-  background: #ebeef7;    /* avoid text blending while scrolling */
+  background: #ebeef7;   
 }
 .matHeaderRow {
   position: relative;   /* no sticky here */
@@ -46,8 +46,6 @@
   left: 0;   
   background: #fff;     /* so it doesn't show content underneath */
 }
-/* --- Sticky column fixes for Pickup, Delivery, Carrier --- */
-
 /* Replace border-right with inset shadow to avoid white gap while scrolling */
 
 
@@ -162,15 +160,16 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background-color: #4f46e5;
+  background-color: #3d2879;
   color: #ffffff;
-  border-color: #4f46e5;
+  border-color: #3d2879;
   border: none;
   cursor: pointer;
 }
 
 .matStrokedButton:hover {
-  background-color: #4338ca;
+  background-color: #3d2879
+;
 }
 
 .matStrokedButton .matIcon {
@@ -536,6 +535,8 @@
 .buttonContainer {
   display: flex;
   align-items: center;
+/* padding-right:100px ; */
+
   gap: 10px; /* Adds consistent spacing between all buttons */
 }
 
@@ -549,7 +550,7 @@
   font-size: 14px;
   cursor: pointer;
   font-weight: bold;
-  background-color: #4f46e5;
+  background-color: #3d2879;
   color: #ffffff;
   border: none;
   white-space: nowrap; /* Prevents text from wrapping */
@@ -557,7 +558,8 @@
 }
 
 .button:hover {
-  background-color: #4338ca;
+  background-color: #3d2879
+;
 }
 
 .matSelect {
@@ -585,6 +587,12 @@
   display: flex;
   flex-direction: row;
 }
+.advancedActive {
+  /* subtle outer ring to signal filters are active */
+  box-shadow: 0 0 0 3px rgba(124, 7, 208, 0.35); /* indigo-ish */
+  border-radius: 5px; /* match your button’s radius */
+}
+
 
 .customSelectButton {
   -webkit-appearance: none;
@@ -596,7 +604,7 @@
   font-size: 14px;
   cursor: pointer;
   font-weight: bold;
-  background-color: #4f46e5;
+  background-color: #3d2879;
   color: #ffffff;
   border: none;
   height: 38px; /* Match input height */
@@ -604,7 +612,8 @@
 }
 
 .customSelectButton:hover {
-  background-color: #4338ca;
+  background-color:  #3d2879
+;
 }
 
 .submitButton .button {
@@ -618,14 +627,15 @@
   margin-bottom: 1px;
   margin-right: 10px;
   font-weight: bold;
-  background-color: #4f46e5;
+  background-color: #3d2879;
   color: #ffffff;
-  border-color: #4f46e5;
+  border-color: #3d2879;
   border: none;
 }
 
 .submitButton .button:hover {
-  background-color: #4338ca;
+  background-color: #3d2879
+;
 }
 
 .commercialInvoiceBtn {
@@ -645,14 +655,15 @@
   margin-bottom: 1px;
   margin-right: 10px;
   font-weight: bold;
-  background-color: #4f46e5;
+  background-color: #3d2879;
   color: #ffffff;
-  border-color: #4f46e5;
+  border-color: #3d2879;
   border: none;
 }
 
 .commercialInvoiceSubmit:hover {
-  background-color: #4338ca;
+  background-color: #3d2879
+;
 }
 
 .commercialInvoiceSubmit .matSelectPlaceholder {
@@ -695,7 +706,7 @@
   font-size: 20px;
   font-weight: 600;
   border-bottom: 1px solid #e5e5e5;
-  background-color: #4f46e5;
+  background-color: #3d2879;
   color: #ffffff;
 }
 /* Close button */
@@ -863,7 +874,7 @@
   position: sticky;
   right: 0;
   z-index: 1; /* A z-index is crucial to keep the column on top of others when scrolling */
-  background-color: #ebeef7; /* Match your table background to avoid seeing content underneath */
+  background-color: #ebeef7; 
 }
 
 .matHeaderRow {
@@ -1243,9 +1254,6 @@ table.matTable {
   max-width: 280px !important;
 }
 
-
-
-
 .matColumnSno {
   min-width: 50px !important;
   max-width: 50px !important;
@@ -1372,7 +1380,6 @@ table.matTable {
   border-left: none !important; 
 }
 
-
 .matHeaderCell.matColumnLastLocation {
   border-right: solid 1px #d2d2d2 !important;
 }
@@ -1384,8 +1391,6 @@ table.matTable {
 .matHeaderCell.matColumnCarrier {
   white-space: nowrap;
 }
-
-
 
 .matPaginator {
   position: relative;
@@ -3225,7 +3230,7 @@ select.didFloatingSelect::-ms-expand {
 .paginationButton {
   width: 32px !important; /* Smaller button */
   height: 32px !important;
-  background: #4f46e5 !important;
+  background: #3d2879 !important;
   border: none !important;
   border-radius: 8px !important;
   color: #fff !important;
@@ -3516,6 +3521,14 @@ select.didFloatingSelect::-ms-expand {
   border-color: #3b82f6;
   box-shadow: 0 0 0 1px #3b82f6;
 }
+.spinner {
+  border: 4px solid #f3f3f3; /* Light grey */
+  border-top: 4px solid #3498db; /* Blue color */
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
 
 .actionSection {
   padding: 4px 0;
@@ -3654,17 +3667,17 @@ select.didFloatingSelect::-ms-expand {
   background: rgba(248, 250, 252, 0.8);
   border-radius: 8px;
   padding: 12px;
-  border: 1px solid rgba(139, 92, 246, 0.1);
+  border: 1px solid rgba(53, 30, 107, 0.1);
 }
 
 .actionCategoryHeader {
   font-size: 11px;
   font-weight: 600;
-  color: #8b5cf6;
+  color: #3d2879;
   letter-spacing: 0.5px;
   margin-bottom: 8px;
   padding-bottom: 4px;
-  border-bottom: 1px solid rgba(139, 92, 246, 0.1);
+  border-bottom: 1px solid rgba(28, 13, 61, 0.1);
 }
 
 .actionCategoryItems {
@@ -3682,11 +3695,25 @@ select.didFloatingSelect::-ms-expand {
   font-size: 12px;
   transition: all 0.2s ease;
   cursor: pointer;
+  border: 1px solid #dcdae21a;
 }
 
 .actionMenuItem:hover {
-  background: rgba(139, 92, 246, 0.1);
-  transform: translateX(2px);
+    border: 1px solid #3d2879;
+    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+    outline: none;
+}
+
+.actionMenuItem:focus {
+  border: 1px solid #3d2879;
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+  outline: none;
+}
+
+.actionMenuItem:active {
+  border: 1px solid #3d2879;
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+  outline: none;
 }
 
 .actionMenuIcon {
@@ -3710,7 +3737,7 @@ select.didFloatingSelect::-ms-expand {
 .actionSearchInput {
   width: 100%;
   padding: 8px 12px 8px 36px;
-  border: 1px solid rgba(139, 92, 246, 0.2);
+  border: 1px solid rgba(23, 12, 49, 0.2);
   border-radius: 6px;
   font-size: 12px;
   background: rgba(248, 250, 252, 0.8);
@@ -3730,7 +3757,7 @@ select.didFloatingSelect::-ms-expand {
   transform: translateY(-50%);
   width: 14px;
   height: 14px;
-  color: #4f46e5;
+  color: #3d2879;
 }
 .actionsMenuButton {
   display: flex;
@@ -3740,11 +3767,12 @@ select.didFloatingSelect::-ms-expand {
   width: 36px;
   border: 2px solid #e3e4fe;
   border-radius: 8px;
-  background: #4f46e5;
+  background: #3d2879;
   transition: all 0.2s ease;
   cursor: pointer;
   box-sizing: border-box;
   outline: none;
+
   padding: 0; /* no additional padding needed */
   margin: 0 auto; /* ensures horizontal centering if cell is not center-aligned */
 }
@@ -3759,13 +3787,13 @@ select.didFloatingSelect::-ms-expand {
 .actionsMenuButton:hover,
 .actionsMenuButton:focus {
   background: #fafaff;
-  border-color: #7c3aed; /* purple border on hover/focus */
+  border-color: #3d2879; /* purple border on hover/focus */
   box-shadow: 0 0 0 2px #e6e6fa;
 }
 
 .actionsMenuButton:active {
   background: #f5f3ff;
-  border-color: #7c3aed;
+  border-color: #3d2879;
   box-shadow: 0 0 4px #c3bff4;
 }
 .actionIcon {
@@ -3775,26 +3803,32 @@ select.didFloatingSelect::-ms-expand {
   margin: 0 auto; /* horizontal centering if needed */
   color: #fff;
 }
+.actionsMenuButton:active .actionIcon:hover{
+  color: #3d2879;
+}
 
 .actionIcon:hover {
   /* background: #e3e4fe; */
-  color: #4f46e5;
+  color: #3d2879;
 }
 
 .actionsMenuButton:hover .actionIcon,
 .actionsMenuButton:focus .actionIcon,
 .actionsMenuButton:active .actionIcon {
-  color: #4f46e5;
+  color: #3d2879;
 }
-
+.actionsMenuButton[aria-expanded="true"]:hover .actionIcon {
+  color: #3d2879;
+}
 /* If your dropdown library adds data-state attribute when open */
 .actionsMenuButton[data-state="open"] .actionIcon {
-  color: #4f46e5;
+  color: #3d2879;
 }
 
 /* Alternative: target when button has aria-expanded=true */
 .actionsMenuButton[aria-expanded="true"] .actionIcon {
   color: #fff;
+  /* color: #3d2879; */
 }
 
 @keyframes scaleIn {
@@ -3902,7 +3936,7 @@ select.didFloatingSelect::-ms-expand {
     /* padding: 8px 12px; */
     cursor: pointer;
     font-weight: bold;
-    background-color: #4f46e5;
+    background-color: #3d2879;
     color: #ffffff;
     border: none;
     white-space: nowrap;
@@ -3929,7 +3963,8 @@ select.didFloatingSelect::-ms-expand {
   display: none;
 }
 .perPageSelect:focus {
-  border-color: #2563eb; /* blue on focus */
+  border-color: #3d2879
+; /* blue on focus */
 }
 .perPageContent {
   background: #fff;
@@ -4163,7 +4198,7 @@ select.didFloatingSelect::-ms-expand {
 }
 
 .searchIcon:hover {
-  color: #4f46e5;
+  color: #3d2879;
 }
 
 .inputSearch {
@@ -4179,7 +4214,7 @@ select.didFloatingSelect::-ms-expand {
   /* border-left: none; */
   width: 100%;
   flex: 1;
-  border: 1.4px solid #4f46e5;
+  border: 1.4px solid #3d2879;
 }
 
 .perSinSelect {
@@ -4196,25 +4231,25 @@ select.didFloatingSelect::-ms-expand {
   font-weight: 500;
   box-shadow: none;
   transition: border 0.2s;
-  background-color: #4f46e5;
+  background-color: #3d2879;
   color: #fff;
-  border: 2px solid #4f46e5;
+  border: 2px solid #3d2879;
   padding: 0px 10px;
 }
 
 .perSinSelect:hover {
-  border-color: #4f46e5;
-  background-color: #4f46e5;
+  border-color: #3d2879;
+  background-color: #3d2879;
 }
 
 .perSinSelect:active {
-  border-color: #4f46e5 !important;
-  background-color: #4f46e5 !important;
+  border-color: #3d2879 !important;
+  background-color: #3d2879 !important;
 }
 
 .perSinSelect:focus {
-  border-color: #4f46e5 !important;
-  background-color: #4f46e5 !important;
+  border-color: #3d2879 !important;
+  background-color: #3d2879 !important;
 }
 
 .filterGroup {
@@ -4247,12 +4282,12 @@ select.didFloatingSelect::-ms-expand {
 }
 
 .checkboxLabel input[type="checkbox"]:hover {
-  border-color: #4f46e5;
+  border-color: #3d2879;
 }
 
 .checkboxLabel input[type="checkbox"]:checked {
-  background-color: #4f46e5;
-  border-color: #4f46e5;
+  background-color: #3d2879;
+  border-color: #3d2879;
 }
 
 .checkboxLabel input[type="checkbox"]:checked::after {
@@ -4268,7 +4303,7 @@ select.didFloatingSelect::-ms-expand {
 
 /* Focus state for accessibility */
 .checkboxLabel input[type="checkbox"]:focus {
-  outline: 2px solid #4f46e5;
+  outline: 2px solid #3d2879;
   outline-offset: 2px;
 }
 
@@ -4277,12 +4312,13 @@ select.didFloatingSelect::-ms-expand {
 }
 
 .helpIcon {
-  color: #4f46e5; /* or any color that matches your design */
+  color: #3d2879; /* or any color that matches your design */
   cursor: pointer;
 }
 
 .helpIcon:hover {
-  color: #4338ca; /* slightly darker on hover */
+  color: #3d2879
+; /* slightly darker on hover */
 }
 
 .shipmentInfo {
@@ -4305,7 +4341,7 @@ select.didFloatingSelect::-ms-expand {
 .shipmentSin {
   font-family: monospace;
   font-weight: 600;
-  color: #5e35b1;
+  color: #3d2879;
 }
 
 .actionMenuSearch {
@@ -4349,11 +4385,20 @@ select.didFloatingSelect::-ms-expand {
 /* .actionCategory:not(:last-child) {
   margin-bottom: 12px;
 } */
+ /* ShipmentsDashboard.module.css */
+
+/* This targets the input when it has the class 'checkboxChecked' */
+.checkboxChecked {
+  /* Note: browser support for custom styling native checkboxes is poor/inconsistent. */
+  /* This is mostly for basic changes like background or border, if the browser allows. */
+  accent-color: #3d2879; /* Blue color for modern browsers */
+  border-color: #3d2879;
+}
 
 .actionCategoryHeader {
   font-weight: 600;
   font-size: 12px;
-  color: #8b5cf6;
+  color: #3d2879;
   padding: 4px 0;
 }
 
@@ -4383,7 +4428,7 @@ select.didFloatingSelect::-ms-expand {
 }
 
 .TableSearchIcon:hover {
-  color: #4f46e5;
+  color: #3d2879;
 }
 
 .actionSearchContainer {
@@ -4391,4 +4436,50 @@ select.didFloatingSelect::-ms-expand {
   flex-direction: row-reverse;
   width: 100%;
   position: relative;
+}
+
+.actionMenuItem:disabled,
+.actionMenuItem[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed !important;
+  background-color: #f3f4f6 !important;
+  color: #6b7280 !important;
+}
+
+.actionMenuItem:disabled .actionMenuIcon,
+.actionMenuItem[disabled] .actionMenuIcon {
+  opacity: 0.6;
+}
+
+.actionMenuItem:disabled .actionLabel,
+.actionMenuItem[disabled] .actionLabel {
+  color: #6b7280 !important;
+}
+
+.actionMenuItem {
+  display: flex;
+  align-items: center;
+  color: var(--foreground);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.actionMenuItem:hover:not(.actionMenuItemDisabled) {
+  background-color: var(--accent);
+}
+
+.actionMenuItemDisabled {
+  opacity: 0.6;
+  cursor: not-allowed !important;
+  background-color: #f3f4f6 !important;
+  pointer-events: none;
+}
+
+.actionMenuIconDisabled {
+  opacity: 0.6;
+}
+
+.actionLabelDisabled {
+  color: #6b7280 !important;
 }

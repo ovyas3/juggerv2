@@ -1,0 +1,72 @@
+.bodySection {
+    padding: 10px;
+    overflow-y: auto;
+}
+
+.deliveryHeader {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-top: 10px;
+}
+
+.dropIcon {
+    display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: #d8511f; /* Orange color from Delivery Tab */
+  color: white;
+  font-weight: bold;
+  font-size: 0.8rem;
+  margin-right: 8px;
+}
+
+.deliveryName {
+    margin-left: 10px;
+    font-weight: bold;
+    font-size: 16px;
+    color: #333;
+}
+
+.tableContainer {
+    margin-top: 10px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24); /* Equivalent to mat-elevation-z8 */
+}
+
+.billToTable {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.tableHeaderRow {
+    background-color: #f2f2f2;
+}
+
+.tableCell {
+    padding: 12px !important;
+    font-weight: normal;
+    font-size: 13px;
+    /* Styles applied directly from Angular template's inline styles */
+    text-align: center !important;
+    border-bottom: 1px solid #ddd !important;
+    word-break: break-word;
+}
+
+/* Header specific styles */
+.tableHeaderRow .tableCell {
+    font-weight: bold;
+    background-color: #edf0f7;
+    color: #09337e;
+    text-transform: capitalize;
+    text-align: center; 
+}
+
+/* Body row background */
+.tableBodyRow {
+    background-color: #fff;
+}

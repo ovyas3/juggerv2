@@ -1326,7 +1326,22 @@
   .filter-button.stoppage:hover {
     background-color: #fff7ed;
   }
-  
+
+  .filter-button.fence-path {
+    border: 1px solid #bbf7d0;
+    color: #059669;
+  }
+
+  .filter-button.fence-path:hover {
+    background-color: #f0fdf4;
+  }
+
+  .filter-button.fence-path.active {
+    background-color: #10b981;
+    color: white;
+    border-color: #10b981;
+  }
+
   .filter-icon {
     height: 0.875rem;
     width: 0.875rem;

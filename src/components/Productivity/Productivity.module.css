@@ -89,7 +89,8 @@
 }
 
 .toggleInput:checked+.slider {
-    background-color: #4f46e5;
+    background-color: #20104d
+;
 }
 
 .toggleInput:checked+.slider:before {
@@ -114,15 +115,18 @@
     appearance: none;
     width: 1.2rem;
     height: 1.2rem;
-    border: 2px solid #4f46e5;
+    border: 2px solid #20104d
+;
     border-radius: 50%;
     margin: 0;
     cursor: pointer;
 }
 
 .radioInput:checked {
-    background-color: #4f46e5;
-    border: 2px solid #4f46e5;
+    background-color: #20104d
+;
+    border: 2px solid #20104d
+;
     box-shadow: inset 0 0 0 3px white;
 }
 

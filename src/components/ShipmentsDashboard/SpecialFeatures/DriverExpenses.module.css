@@ -230,12 +230,12 @@
   margin: 15px;
   cursor: pointer;
   border: none;
-  background-color: #4f46e5;
+  background-color: #301c6c;
   color: white;
 }
 
 .submitButton:hover {
-  background-color: #433de8;
+  background-color: #3d2879;
 }
 
 .submitButton:disabled {
@@ -395,7 +395,8 @@
 
 /* Custom styles for DatePicker focus */
 .datepickerFilled .ant-picker.ant-picker-focused {
-  border-color: #4f46e5 !important;
+  border-color: #301c6c
+ !important;
   box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2) !important;
 }
 

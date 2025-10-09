@@ -158,12 +158,12 @@ const CancelShipmentModal: React.FC<CancelShipmentModalProps> = ({
               sx={{
                 '& .MuiOutlinedInput-root': {
                   '&:hover fieldset': {
-                    border: '1px solid #4F46E5',  
-                    borderColor: '#4F46E5',
+                    border: '1px solid #301c6c',  
+                    borderColor: '#301c6c',
                   },
                   '&.Mui-focused fieldset': {
-                    border: '1px solid #4F46E5',
-                    borderColor: '#4F46E5',
+                    border: '1px solid #301c6c',
+                    borderColor: '#301c6c',
                     boxShadow: '0 0 0 2px rgba(79, 70, 229, 0.2)',
                   },
                 },

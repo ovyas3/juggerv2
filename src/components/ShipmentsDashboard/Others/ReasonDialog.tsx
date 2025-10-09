@@ -1,10 +1,18 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { httpsGet, httpsPost } from "@/utils/Communication";
 import ModalHeader from "@/components/UI/ModalHeader/ModalHeader";
 import styles from "./ReasonDialog.module.css";
 import { useSnackbar } from "@/hooks/snackBar";
 import { format } from "date-fns";
+import advanceStyles from "@/components/ShipmentsDashboard/Financial/CreatePaymentAdvanceModal.module.css";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/UI/select";
 
 interface ReasonHistory {
   updated_at: string;
@@ -99,6 +107,15 @@ const ReasonDialog: React.FC<ReasonDialogProps> = ({
       setLoading(false);
     }
   };
+  
+  const normalizedReasons = useMemo(
+    () =>
+      reasons.map((g: { name: string; groupValues: string[] }) => ({
+        ...g,
+        groupValues: g.groupValues.filter((v) => v !== "Others"),
+      })),
+    [reasons]
+  );
 
   const handleSubmit = async () => {
     if (!selectedReason) return;
@@ -160,35 +177,60 @@ const ReasonDialog: React.FC<ReasonDialogProps> = ({
           <div className={styles.formSection}>
             <div className={styles.inputGroup}>
               <label className={styles.label}>
-                {isDelayReason
-                  ? "Select Delay Reason"
-                  : "Select GPS Disconnection Reason"}
+                {isDelayReason ? "Select Delay Reason" : "Select GPS Disconnection Reason"}
               </label>
-              <select
-                className={styles.select}
-                value={selectedReason}
-                onChange={(e) => setSelectedReason(e.target.value)}
-                disabled={loading}
-              >
-                <option value="">Select a reason</option>
-                {reasons.map((group, i) => (
-                  <optgroup key={i} label={group.name}>
-                    {group.groupValues.map((reason, j) => (
-                      <option key={`${i}-${j}`} value={reason}>
-                        {reason}
-                      </option>
+
+              <div className={advanceStyles.select}>
+                <Select
+                  value={selectedReason}
+                  onValueChange={setSelectedReason}
+                  disabled={loading}
+                >
+                  <SelectTrigger
+                    className={advanceStyles.selectTrigger}
+                    data-disabled={loading ? "" : undefined}
+                  >
+                    <SelectValue placeholder="Select a reason" />
+                  </SelectTrigger>
+
+                  <SelectContent className={advanceStyles.selectContent}>
+                    {normalizedReasons.map((group: { name: string; groupValues: string[] }, i: number) => (
+                      <React.Fragment key={group.name || i}>
+                        {/* Group label as non-selectable header */}
+                        <SelectItem
+                          value={`__group__${i}`}
+                          disabled
+                          className={advanceStyles.selectItem}
+                        >
+                          {group.name}
+                        </SelectItem>
+
+                        {group.groupValues.map((reason: string, j: number) => (
+                          <SelectItem
+                            key={`${i}-${j}`}
+                            value={reason}
+                            className={advanceStyles.selectItem}
+                          >
+                            {reason}
+                          </SelectItem>
+                        ))}
+                      </React.Fragment>
                     ))}
-                  </optgroup>
-                ))}
-                <option value="Others">Others</option>
-              </select>
+
+                    {/* Preserve separate trailing "Others" option exactly like current UI */}
+                    <SelectItem value="Others" className={advanceStyles.selectItem}>
+                      Others
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
 
               {selectedReason === "Others" && (
                 <div className={styles.otherReasonContainer}>
                   <input
-                    type="text"
                     className={styles.otherReasonInput}
-                    placeholder="Please specify reason"
+                    type="text"
+                    placeholder="Enter other reason"
                     value={otherReason}
                     onChange={(e) => setOtherReason(e.target.value)}
                     disabled={loading}
@@ -197,7 +239,7 @@ const ReasonDialog: React.FC<ReasonDialogProps> = ({
               )}
 
               {/* {isDelayReason && ( */}
-                <div className={styles.checkboxContainer}>
+              <div className={styles.checkboxContainer}>
                   <input
                     type="checkbox"
                     id="notifyCheckbox"

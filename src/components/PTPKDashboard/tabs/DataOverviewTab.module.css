@@ -125,7 +125,7 @@
 }
 
 .tableHeader {
-  background: linear-gradient(135deg, #0f172a 0%, #1e40af 50%, #4338ca 100%);
+  background: linear-gradient(135deg, #0f172a 0%, #1e40af 50%, #271950 100%);
   color: white;
   position: relative;
   overflow: hidden;
@@ -326,7 +326,8 @@
 
 .exportButton {
   padding: 0.5rem 1rem;
-  background: linear-gradient(135deg, #2563eb, #4f46e5);
+  background: linear-gradient(135deg, #2563eb, #301c6c
+);
   color: white;
   font-size: 0.875rem;
   font-weight: 500;
@@ -341,7 +342,7 @@
 }
 
 .exportButton:hover {
-  background: linear-gradient(135deg, #1d4ed8, #4338ca);
+  background: linear-gradient(135deg, #1d4ed8, #271950);
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
 }
 
@@ -930,7 +931,7 @@
 
 .summaryTotalLabel {
   font-weight: 900;
-  color: #4338ca;
+  color: #271950;
   font-size: 0.75rem;
 }
 
@@ -970,7 +971,7 @@
 }
 
 .summaryCellContent {
-  color: #4338ca;
+  color: #271950;
   font-size: 0.875rem;
 }
 

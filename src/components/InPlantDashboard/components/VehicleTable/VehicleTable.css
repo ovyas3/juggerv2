@@ -1,0 +1,1170 @@
+/* Vehicle Table Styles */
+:root {
+  --select-accent: #20104d;          /* ← your dark purple */
+  --select-accent-contrast: #ffffff; /* text/icon on top */
+}
+.vehicle-table-container {
+  background: var(--bg-primary);
+  border-radius: 8px;
+  overflow: hidden;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-lg) var(--spacing-lg) var(--spacing-md);
+  border-bottom: 1px solid var(--border-light);
+  background: var(--bg-secondary);
+}
+
+.table-header h3 {
+  font-size: var(--text-lg);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.table-count {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  font-weight: var(--font-medium);
+}
+
+/* Table Wrapper */
+.table-wrapper {
+  overflow-x: auto;
+  max-height: 400px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.vehicle-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+}
+
+/* Table Header */
+.vehicle-table thead th {
+  background: #301c6c;
+  padding: var(--spacing-md) var(--spacing-md);
+  text-align: center;
+  font-weight: var(--font-semibold);
+  color: #fff;
+  border-bottom: 1px solid var(--border-light);
+  position: sticky;
+  top: 0;
+  z-index: 5;
+}
+
+.sno-header {
+  width: 60px;
+  text-align: center !important;
+  font-weight: var(--font-semibold);
+  color: var(--text-secondary);
+  padding: var(--spacing-md) var(--spacing-sm) !important;
+  border-right: 1px solid var(--border-light);
+}
+
+.status-header { width: 40px; border-right: 1px solid var(--border-light);}
+.shipment-header { width: 120px; border-right: 1px solid var(--border-light); }
+.vehicle-header { width: 120px; border-right: 1px solid var(--border-light); }
+.stage-header { width: 140px; border-right: 1px solid var(--border-light); }
+.time-header { width: 100px; border-right: 1px solid var(--border-light); }
+.duration-header { width: 90px; border-right: 1px solid var(--border-light); }
+.progress-header { width: 180px; border-right: 1px solid var(--border-light); }
+.company-header { width: 180px; border-right: 1px solid var(--border-light); }
+.actions-header { width: 80px; border-right: 1px solid var(--border-light); position: relative; }
+.expand-header { width: 40px }
+
+/* Table Rows */
+.vehicle-row {
+  /* border-bottom: 1px solid var(--border-light); */
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+
+.vehicle-row:hover {
+  background: var(--bg-hover);
+}
+
+.vehicle-row.selected {
+  background: var(--primary-light);
+  border-left: 4px solid #301c6c;
+}
+
+.vehicle-row:nth-child(even) {
+  background: var(--bg-secondary);
+}
+
+.vehicle-row:nth-child(even):hover {
+  background: var(--bg-hover);
+}
+
+.vehicle-row.selected:nth-child(even) {
+  background: var(--primary-light);
+}
+
+.vehicle-row td {
+  padding: var(--spacing-md);
+  vertical-align: middle;
+  border-bottom: 1px solid var(--border-light); 
+  text-align: center; 
+}
+
+/* Status Cell */
+.status-cell {
+  text-align: center;
+  width: 40px;
+}
+
+.status-icon {
+  flex-shrink: 0;
+}
+
+.status-icon.on-track {
+  color: var(--success-green);
+}
+
+.status-icon.at-risk {
+  color: var(--warning-amber);
+}
+
+.status-icon.delayed {
+  color: var(--danger-red);
+}
+
+.status-icon.completed {
+  color: var(--neutral-gray);
+}
+
+.status-icon.on-hold {
+  color: var(--text-primary);
+}
+
+.status-icon.default {
+  color: var(--info-blue);
+}
+
+/* Vehicle Cell */
+.vehicle-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.vehicle-number {
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+  font-family: 'Roboto Mono', monospace;
+}
+
+.vehicle-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+}
+
+/* Stage Cell */
+.stage-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.stage-name {
+  font-weight: var(--font-medium);
+  color: var(--text-primary);
+}
+
+.stage-location {
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+}
+
+/* Time Cell */
+.time-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.entry-time {
+  font-weight: var(--font-medium);
+  color: var(--text-primary);
+  font-family: 'Roboto Mono', monospace;
+}
+
+.time-label {
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+}
+
+/* Duration Cell */
+.duration-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.duration-value {
+  font-weight: var(--font-semibold);
+  font-family: 'Roboto Mono', monospace;
+}
+
+.duration-value.on_track {
+  color: var(--success-green);
+}
+
+.duration-value.at_risk {
+  color: var(--warning-amber);
+}
+
+.duration-value.delayed {
+  color: var(--danger-red);
+}
+
+.duration-value.completed {
+  color: var(--neutral-gray);
+}
+
+.duration-stage {
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+}
+
+/* Progress Cell */
+.progress-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.progress-bar {
+  height: 6px;
+  background: var(--bg-tertiary);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  transition: var(--transition-smooth);
+  border-radius: 3px;
+}
+
+.progress-stages {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--text-xs);
+}
+
+.progress-stage {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: var(--font-bold);
+  border: 1.5px solid #d1d5db;
+  background: #f3f4f6;
+  color: #9ca3af;
+  transition: all 0.3s ease;
+}
+
+.progress-stage.completed {
+  background: var(--success-green);
+  border-color: var(--success-green);
+  color: white;
+}
+
+.progress-stage.current {
+  background: var(--info-blue);
+  border-color: var(--info-blue);
+  color: white;
+  animation: pulse 2s infinite;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+.progress-stages::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #e5e7eb;
+  z-index: -1;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+  }
+}
+
+/* Company Cell */
+.company-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.shipper,
+.carrier {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  font-size: var(--text-xs);
+}
+
+.shipper {
+  color: var(--text-primary);
+  font-weight: var(--font-medium);
+}
+
+.carrier {
+  color: var(--text-secondary);
+}
+
+/* Actions Cell */
+.actions-cell {
+  text-align: center;
+  padding: var(--spacing-md) var(--spacing-sm);
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  background: var(--bg-primary);
+  position: relative;
+  vertical-align: middle;
+  border-right: 1px solid var(--border-light);
+}
+
+.actions-cell > div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.action-btn {
+  background: none;
+  border: 1px solid var(--border-medium);
+  border-radius: 6px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: var(--transition-smooth);
+}
+
+.action-btn:hover {
+  /* border-color: var(--primary-blue); */
+  color: var(--primary-blue);
+}
+
+/* Expand Cell */
+.expand-cell {
+  text-align: center;
+}
+
+.expand-icon {
+  color: var(--text-tertiary);
+  transition: var(--transition-smooth);
+}
+
+.expand-icon.expanded {
+  transform: rotate(90deg);
+  color: var(--primary-blue);
+}
+
+/* Table Footer */
+.table-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-sm) var(--spacing-lg);
+  background: var(--bg-tertiary);
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+}
+
+.pagination-info {
+  font-weight: var(--font-medium);
+}
+
+.auto-refresh-info {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.pagination-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background-color: #fff;
+  border: 1px solid #e5e7eb;
+  border-bottom: none;
+  gap: 16px;
+}
+
+.pagination-controls.bottom {
+  border-top: 1px solid #e5e7eb;
+  border-bottom: 1px solid #e5e7eb;
+  margin-bottom: 16px;
+  border-radius: 0 0 8px 8px;
+}
+
+.pagination-left, 
+.pagination-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Custom Select Styling */
+.page-size-select {
+  width: 90px;
+  height: 32px;
+  padding: 0 12px;
+  /* border-radius: 4px;
+  border: 1px solid #d1d5db;
+  background-color: #fff; */
+  border-radius: 10px !important;          /* rounded corners */
+  background:white;             /* solid white */
+  border: 1px solid rgba(0,0,0,0.18);   /* crisper edge so white pops */
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  font-size: 14px;
+  color: #111827;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+}
+
+.page-size-select:hover {
+  border-color: #9ca3af;
+}
+.select[data-state="open"] {
+  border-color: #302b82;
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+}
+
+.page-size-select:focus {
+  outline: none;
+  border-color: #302b82;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.page-size-content {
+  min-width: 70px !important;
+
+  padding: 4px;
+  background-color: #fff;
+  border-radius: 6px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  z-index: 9999;
+
+}
+
+.page-size-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  /* min-width: 70px; */
+  width: auto !important; 
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 14px;
+  line-height: 1.25rem;
+  color: #111827;
+  cursor: pointer !important;
+  outline: none;
+  user-select: none;
+  z-index: 100;
+}
+
+.page-size-item[data-highlighted] {
+  background-color: #f3f4f6;
+  color: #111827;
+}
+/* --- NEW RULE TO HIDE THE TICK MARK --- */
+
+/* 1. Target the indicator element inside the selected item */
+.page-size-item[data-state='checked'] [data-radix-select-item-indicator], 
+.page-size-item[data-state='checked'] .SelectItemIndicator,
+.page-size-item[data-state='checked'] svg {
+    /* Use !important to override any inline or library styles */
+    display: none !important;
+}
+
+/* 2. Remove space for the tick mark from the selected item's padding
+   (The library often adds extra right padding to checked items) */
+.page-size-item[data-state='checked'] {
+  background-color:  #111827;
+  font-weight: 500;
+  /* Adjust padding back to non-checked state's padding to align content */
+  padding: 8px 12px; /* Resetting to padding without indicator space */
+}
+
+.page-size-item[data-state='checked'] {
+  background-color:  #111827;
+  font-weight: 500;
+  cursor: pointer !important;
+}
+
+/* Pagination Buttons */
+.pagination-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid #d1d5db;
+  background-color: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: #4b5563;
+}
+
+.pagination-button:not(:disabled):hover {
+  background-color: #f3f4f6;
+  border-color: #9ca3af;
+  color: #1f2937;
+}
+
+.pagination-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: #f9fafb;
+}
+
+/* Page Info */
+.page-info {
+  font-size: 14px;
+  color: #4b5563;
+  min-width: 80px;
+  text-align: center;
+}
+
+.results-count {
+  font-size: 14px;
+  color: #4b5563;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .pagination-controls {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .pagination-left,
+  .pagination-right {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .page-info {
+    min-width: auto;
+  }
+}
+
+/* Dark Mode Support */
+[data-theme='dark'] .pagination-controls {
+  background-color: #1f2937;
+  border-color: #374151;
+}
+
+[data-theme='dark'] .page-size-select,
+[data-theme='dark'] .pagination-button {
+  background-color: #374151;
+  border-color: #4b5563;
+  color: #e5e7eb;
+}
+
+[data-theme='dark'] .page-size-content {
+  background-color: #1f2937;
+  border: 1px solid #374151;
+}
+
+[data-theme='dark'] .page-size-item {
+  color: #e5e7eb;
+}
+
+[data-theme='dark'] .page-size-item[data-highlighted] {
+  background-color: #374151;
+  color: #ffffff;
+}
+
+[data-theme='dark'] .page-size-item[data-state='checked'] {
+  background-color: #374151;
+  color: #ffffff;
+}
+
+[data-theme='dark'] .pagination-button:not(:disabled):hover {
+  background-color: #4b5563;
+  border-color: #6b7280;
+}
+
+[data-theme='dark'] .page-info,
+[data-theme='dark'] .results-count {
+  color: #d1d5db;
+}
+
+[data-theme='dark'] .pagination-button:disabled {
+  background-color: #374151;
+  color: #6b7280;
+}
+
+/* Loading Skeleton */
+.loading-skeleton {
+  padding: var(--spacing-lg);
+}
+
+.skeleton-row {
+  height: 60px;
+  background: linear-gradient(90deg, var(--bg-tertiary) 25%, var(--bg-secondary) 50%, var(--bg-tertiary) 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+  border-radius: 8px;
+  margin-bottom: var(--spacing-sm);
+}
+
+.skeleton-row:last-child {
+  margin-bottom: 0;
+}
+
+/* Empty State */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-xl);
+  text-align: center;
+}
+
+.empty-icon {
+  color: var(--text-tertiary);
+  margin-bottom: var(--spacing-md);
+}
+
+.empty-state h4 {
+  font-size: var(--text-lg);
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-sm) 0;
+}
+
+.empty-state p {
+  color: var(--text-secondary);
+  margin: 0;
+  max-width: 300px;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .vehicle-table {
+    font-size: var(--text-xs);
+  }
+
+  .vehicle-row td {
+    padding: var(--spacing-sm);
+  }
+
+  .company-header,
+  .progress-header {
+    display: none;
+  }
+
+  .company-cell,
+  .progress-cell {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .vehicle-table-container {
+    border-radius: 8px;
+  }
+
+  .table-header {
+    padding: var(--spacing-md);
+  }
+
+  .table-header h3 {
+    font-size: var(--text-base);
+  }
+
+  .table-wrapper {
+    max-height: 400px;
+  }
+
+  .duration-header,
+  .actions-header {
+    display: none;
+  }
+
+  .duration-cell,
+  .actions-cell {
+    display: none;
+  }
+
+  .vehicle-row td {
+    padding: var(--spacing-sm);
+  }
+
+  .table-footer {
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    text-align: center;
+  }
+}
+
+@media (max-width: 640px) {
+  /* Convert to card layout on very small screens */
+  .table-wrapper {
+    display: none;
+  }
+
+  .table-footer {
+    display: none;
+  }
+
+  .vehicle-cards {
+    display: block;
+    padding: var(--spacing-md);
+  }
+
+  .vehicle-card {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-light);
+    border-radius: 8px;
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-sm);
+    cursor: pointer;
+    transition: var(--transition-smooth);
+  }
+
+  .vehicle-card:hover {
+    border-color: var(--primary-blue);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .vehicle-card.selected {
+    border-color: var(--primary-blue);
+    background: var(--primary-light);
+  }
+}
+
+/* Accessibility */
+.vehicle-row:focus {
+  /* outline: 2px solid var(--primary-blue);
+  outline-offset: -2px; */
+  outline: none !important;
+  outline-offset: 0 !important;
+}
+.vehicle-row:focus { outline: none !important; }
+
+
+.vehicle-row:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .vehicle-table {
+    border: 2px solid var(--border-dark);
+  }
+
+  .vehicle-row {
+    border-bottom: 2px solid var(--border-medium);
+  }
+
+  .vehicle-row:hover,
+  .vehicle-row.selected {
+    border-left: 6px solid var(--primary-blue);
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .vehicle-row {
+    transition: none;
+  }
+
+  .progress-fill {
+    transition: none;
+  }
+
+  .expand-icon {
+    transition: none;
+  }
+
+  .progress-stage.current {
+    animation: none;
+  }
+
+  .skeleton-row {
+    animation: none;
+    background: var(--bg-tertiary);
+  }
+}
+
+.stage-cell {
+  width: 140px;
+}
+
+.sno-cell {
+  text-align: center;
+  padding: var(--spacing-md) var(--spacing-sm);
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  border-right: 1px solid var(--border-light);
+  background: var(--bg-primary);
+  vertical-align: middle;
+}
+
+.status-cell {
+  text-align: center;
+  padding: var(--spacing-md) var(--spacing-sm);
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  border-right: 1px solid var(--border-light);
+  background: var(--bg-primary);
+}
+
+.vehicle-cell {
+  text-align: center;
+  padding: var(--spacing-md) var(--spacing-sm);
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  border-right: 1px solid var(--border-light);
+  background: var(--bg-primary);
+}
+
+.shipment-cell {
+  text-align: center;
+  padding: var(--spacing-md) var(--spacing-sm);
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  border-right: 1px solid var(--border-light);
+  background: var(--bg-primary);
+}
+
+.stage-cell {
+  text-align: center;
+  padding: var(--spacing-md) var(--spacing-sm);
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  border-right: 1px solid var(--border-light);
+  background: var(--bg-primary);
+}
+
+.time-cell {
+  text-align: center;
+  padding: var(--spacing-md) var(--spacing-sm);
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  border-right: 1px solid var(--border-light);
+  background: var(--bg-primary);
+}
+
+.duration-cell {
+  text-align: center;
+  padding: var(--spacing-md) var(--spacing-sm);
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  border-right: 1px solid var(--border-light);
+  background: var(--bg-primary);
+}
+
+.progress-cell {
+  text-align: center;
+  padding: var(--spacing-md) var(--spacing-sm);
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  border-right: 1px solid var(--border-light);
+  background: var(--bg-primary);
+  position: relative;
+  width: 280px; 
+}
+
+.company-cell {
+  text-align: center;
+  padding: var(--spacing-md) var(--spacing-sm);
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  border-right: 1px solid var(--border-light);
+  background: var(--bg-primary);
+}
+
+.actions-cell {
+  text-align: center;
+  padding: var(--spacing-md) var(--spacing-sm);
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  background: var(--bg-primary);
+  /* CRITICAL FIXES: Set position: relative and center button manually */
+  position: relative; /* <-- ADD THIS: Makes the cell the positioning context */
+  vertical-align: middle; /* Ensures content is vertically aligned */
+  border-right: 1px solid var(--border-light); /* ADD THIS LINE */
+}
+
+/* Ensure the button is centered without using flex on the cell */
+.actions-cell > div { 
+  display: flex;
+  justify-content: center;
+}
+
+.expand-cell {
+  text-align: center;
+  padding: var(--spacing-md) var(--spacing-sm);
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  border-right: 1px solid var(--border-light);
+  background: var(--bg-primary);
+}
+
+/* --- Wider trigger (the closed select box) --- */
+.page-size-select {
+  width: 90px;               /* was 140px — pick your number */
+}
+
+/* --- Wider dropdown panel (Radix portal) --- */
+/* Radix adds data attributes to the content + viewport; target those */
+[data-radix-select-content] {
+  min-width: 90px !important;  /* ensure panel is at least this wide */
+}
+
+[data-radix-select-viewport] {
+  min-width: 90px !important;  /* keep the items area in sync */
+}
+
+/* Optional: make each item fill the panel width neatly */
+.page-size-item {
+ 
+  box-sizing: border-box;
+}
+[data-radix-select-content] [role="option"] {
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin: 4px 8px;      /* adds the “pill in menu” spacing */
+  outline: none;
+}
+
+/* Hover / keyboard highlight */
+[role="option"][data-highlighted] {
+  background: var(--select-accent);
+  color: var(--select-accent-contrast);
+}
+
+/* Selected item (with the checkmark) */
+[role="option"][data-state="checked"] {
+  background: var(--select-accent);
+  color: var(--select-accent-contrast);
+}
+
+/* Ensure the checkmark/indicator also flips to white */
+[role="option"][data-highlighted] [data-radix-select-item-indicator],
+[role="option"][data-state="checked"] [data-radix-select-item-indicator] {
+  color: var(--select-accent-contrast);
+}
+
+/* Optional: sharpen the dropdown surface (panel) */
+[data-radix-select-content] {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow:
+    0 10px 24px rgba(0,0,0,0.14),
+    0 4px 10px rgba(0,0,0,0.10);
+}
+/* Hide the checkmark indicator everywhere */
+[data-radix-select-item-indicator],
+.SelectItemIndicator {
+  display: none !important;
+}
+/* Styling for the 'Rows per page' dropdown menu content */
+.selectcontent {
+  min-width: 70px; 
+  background-color: white; 
+  /* 🛑 ADDED: Border radius for rounded corners */
+  border-radius: 6px; 
+  /* Optional: Keep z-index high, although page-size-content usually handles this */
+  z-index: 9999;
+  /* Optional: Inherit padding/shadow from previous styling if necessary, but this sets the basics */
+  padding: 4px;
+  /* box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); */
+}
+
+/* Remove the extra right-side space Radix leaves for the indicator */
+.page-size-item,
+[role="option"][data-radix-collection-item] {
+  padding-right: 12px !important; /* match your normal item padding */
+}
+/* 🛑 CRITICAL FIX: Ensure the tick mark is hidden inside the custom dropdown */
+.selectcontent [data-radix-select-item-indicator],
+.selectcontent .SelectItemIndicator,
+.selectcontent svg {
+  display: none !important;
+}
+
+/* 🛑 Layout Fix: Remove the space reserved for the tick on ALL items */
+.page-size-item,
+[data-radix-select-content] [role="option"] {
+  padding-right: 12px !important; /* Forces uniform padding, removing the tick space */
+  /* Re-aligns text to the left */
+  justify-content: flex-start !important; 
+}
+/* Styling for focused/highlighted state (the blue line appears here) */
+[role="option"][data-highlighted] {
+  background: var(--select-accent);
+  color: var(--select-accent-contrast);
+  /* 🛑 FIX: Explicitly remove the browser/Radix outline */
+  outline: none !important; 
+}
+
+/* Also ensure the checked state doesn't have an outline */
+[role="option"][data-state="checked"] {
+  background: var(--select-accent);
+  color: var(--select-accent-contrast);
+  /* 🛑 FIX: Explicitly remove the browser/Radix outline */
+  outline: none !important; 
+}
+/* Panel width can be slim; we only need enough for the numbers */
+.page-size-content[data-radix-select-content] {
+  min-width: 70px !important;     /* was 200px in your file */
+  padding: 8px;
+  border-radius: 10px;
+}
+
+/* ⛔️ REMOVE any rule that makes items full-width.
+   You currently have:
+   .page-size-item { width: 100%; box-sizing: border-box; }
+   Delete it or override it like this: */
+   .pagination-rows-per-page {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+/* VehicleTable.css */
+
+/* --- ADD NEW POPUP STYLES AT THE END OF THE FILE --- */
+
+.action-popup {
+  position: absolute;
+  top: 50%; /* Position below the button */
+  right: 0;  /* Align to the right of the button */
+  z-index: 20; /* Ensure it floats above the table */
+  min-height:20px;
+  min-width: 120px;
+  background-color: white;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  margin-top: 8px; /* Spacing below the button */
+  
+  /* Styling for the content */
+  padding: 4px;
+  border: 1px solid #e5e7eb;
+}
+
+.popup-item {
+  padding: 8px 12px;
+  font-size: 12px;
+  /* color: var(--text-primary); */
+  cursor: pointer;
+  border-radius: 4px;
+  /* transition: background-color 0.15s; */
+}
+
+
+
+/* Dark Mode support for popup */
+[data-theme='dark'] .action-popup {
+  background-color: #374151;
+  border-color: #4b5563;
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
+}
+
+[data-theme='dark'] .popup-item {
+  color: #e5e7eb;
+}
+
+[data-theme='dark'] .popup-item:hover {
+  background-color: #4b5563;
+  color: #fff;
+}
+.pagination-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+/* VehicleTable.css */
+
+/* --- Add these styles for the modal buttons --- */
+
+/* Base styles for the Cancel button */
+.cancel-btn-modal {
+  padding: 8px 15px;
+  background: #d8511f; /* Current background color (Orange/Red) */
+  color: #fff; 
+  border: 1px solid #d1d5db; 
+  border-radius: 4px; 
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s ease-in-out; /* Add transition for smoothness */
+  border: none;
+}
+
+/* Hover background color for Cancel button: slightly darker red */
+.cancel-btn-modal:hover {
+  background: #b94218; /* Darker shade of red/orange */
+  border-color: #b94218;
+}
+
+/* Base styles for the Submit button */
+.submit-btn-modal {
+  padding: 8px 15px;
+  background: #20104d; /* Current background color (Dark Purple) */
+  color: white; 
+  border: none; 
+  border-radius: 4px; 
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s ease-in-out; /* Add transition for smoothness */
+  border: none;
+}
+
+/* Hover background color for Submit button: slightly lighter purple */
+.submit-btn-modal:hover {
+  background: #302b82; /* Lighter shade of dark purple */
+}
+.vehicle-row.selected td {
+  background: #d8c9f91a
+}

@@ -1,0 +1,975 @@
+# InPlant Dashboard - Comprehensive Design Document
+
+## 1. Executive Summary
+
+### Purpose
+Create a real-time visibility dashboard for in-plant vehicle movement tracking, enabling clients to monitor shipments from external parking through gate-out, with historical data access capabilities.
+
+### Target Users
+- Plant managers
+- Logistics coordinators
+- Client stakeholders monitoring their shipments
+- Operations teams
+
+### Screen Constraints
+- Primary resolution: 1300px × 720px
+- Must be fully functional without scrolling for active monitoring
+- Responsive design for larger screens
+
+---
+
+## 2. Information Architecture
+
+### 2.1 Primary User Goals
+1. **Monitor Active Shipments** - See current status of all vehicles in plant
+2. **Identify Bottlenecks** - Spot delays and congestion points quickly
+3. **Track Individual Vehicles** - Find specific shipment details
+4. **Historical Analysis** - Review past operations for patterns
+5. **Take Action** - Export data, generate reports, escalate issues
+
+### 2.2 Data Hierarchy
+```
+Level 1: Plant-wide Metrics (Top Priority - Always Visible)
+├── Total active vehicles
+├── Average processing time
+├── Current delays/alerts
+└── Stage-wise distribution
+
+Level 2: Stage Flow Visualization (High Priority - Always Visible)
+├── Vehicle count at each stage
+├── Stage health indicators
+└── Flow rate/throughput
+
+Level 3: Vehicle List (Primary Content)
+├── Real-time vehicle status
+├── Key identifiers
+├── Current location
+└── Time metrics
+
+Level 4: Individual Vehicle Details (On-Demand)
+├── Complete journey timeline
+├── Documents and weights
+├── Driver/transporter info
+└── Delay reasons
+```
+
+---
+
+## 3. Layout Design Specification
+
+### 3.1 Screen Layout (1300px × 720px)
+
+```
+┌──────────────────────────────────────────────────────────────────┐
+│ HEADER BAR - 60px                                                 │
+│ Logo │ Dashboard Title │ Date Filter │ Search │ Actions │ User   │
+├──────────────────────────────────────────────────────────────────┤
+│ METRICS BAR - 80px                                                │
+│ [Active: 23] [Avg Time: 2h 15m] [Delayed: 5] [Completed: 142]   │
+├──────────────────────────────────────────────────────────────────┤
+│ STAGE FLOW - 90px                                                 │
+│ Ext Parking(8) → Entry(4) → Weighing(3) → Loading(5) → Out(3)   │
+│    [Timeline visualization with counts and health indicators]     │
+├──────────────────────────────────────────────────────────────────┤
+│ CONTENT AREA - 460px                                              │
+│ ┌────────────────────────────────────────────────────────────┐  │
+│ │ VEHICLE TABLE with 10 rows visible                          │  │
+│ │ [Optimized columns for quick scanning]                      │  │
+│ └────────────────────────────────────────────────────────────┘  │
+├──────────────────────────────────────────────────────────────────┤
+│ FOOTER BAR - 30px                                                 │
+│ Pagination │ Auto-refresh: ON (30s) │ Last updated: 12:45:30     │
+└──────────────────────────────────────────────────────────────────┘
+```
+
+### 3.2 Responsive Breakpoints
+- **1920px+**: Expanded view with additional columns
+- **1300px**: Primary target (optimized)
+- **1024px**: Tablet mode (reduced columns)
+- **768px**: Mobile landscape (stacked layout)
+
+---
+
+## 4. Component Specifications
+
+### 4.1 Header Bar (60px height)
+
+#### Left Section (400px)
+```
+[Logo 40×40] InPlant Dashboard - [Client Name]
+```
+
+#### Center Section (500px)
+```
+Date Range Selector:
+┌─────────────────────────────────────────┐
+│ [Today ▼] or [From: DD/MM/YY To: DD/MM/YY] │
+└─────────────────────────────────────────┘
+
+Quick Filters:
+[All] [Active] [Delayed] [Last 24h] [Last 7d]
+```
+
+#### Right Section (400px)
+```
+[🔍 Search: Vehicle/Driver] [↻ Refresh] [⋮ Menu] [👤 User]
+```
+
+---
+
+### 4.2 Metrics Bar (80px height)
+
+Four key metric cards in a row:
+
+```
+┌─────────────┬─────────────┬─────────────┬─────────────┐
+│ ACTIVE      │ AVG TIME    │ DELAYED     │ COMPLETED   │
+│ VEHICLES    │ IN PLANT    │ (>2hrs)     │ TODAY       │
+│    23       │  2h 15m     │     5       │    142      │
+│  ↑ 3        │  ↓ 15m      │  ↑ 2        │  ↑ 12       │
+└─────────────┴─────────────┴─────────────┴─────────────┘
+```
+
+**Metric Card Specification:**
+- Width: 300px each with 25px gap
+- Font size: Label 12px, Value 28px bold, Trend 14px
+- Colors: 
+  - Normal: Blue (#2563EB)
+  - Warning: Amber (#F59E0B)
+  - Critical: Red (#DC2626)
+  - Success: Green (#10B981)
+- Trend indicators: Show change from yesterday
+
+---
+
+### 4.3 Stage Flow Visualization (90px height)
+
+#### Visual Design
+```
+[Ext Parking] ──→ [Entry Gate] ──→ [Weighing] ──→ [Loading] ──→ [Weight Out] ──→ [Gate Out]
+     8                  4               3              5               3               0
+  ⬤ 🟢             ⬤ 🟢          ⬤ 🟡         ⬤ 🟢          ⬤ 🟢          ⬤ ⚪
+ [1h 20m avg]    [15m avg]    [45m avg]    [1h 30m avg]  [20m avg]    [10m avg]
+```
+
+**Stage Card Specifications:**
+- Width: 180px each
+- Arrow connector: 30px
+- Total width: 1260px (fits 1300px with margins)
+
+**Health Indicators:**
+- 🟢 Green: All vehicles within SLA
+- 🟡 Yellow: 1-2 vehicles exceeding threshold
+- 🔴 Red: 3+ vehicles delayed
+- ⚪ Gray: No vehicles at stage
+
+**Interaction:**
+- Click stage to filter table
+- Hover shows detailed breakdown
+- Visual emphasis on selected stage
+
+---
+
+### 4.4 Vehicle Table (460px content area)
+
+#### Column Structure (1300px total width)
+
+| Column | Width | Content | Justification |
+|--------|-------|---------|---------------|
+| Status Indicator | 40px | Color dot + icon | Visual scanning |
+| Vehicle Number | 120px | MH12AB1234 | Primary identifier |
+| Current Stage | 140px | Loading Bay 3 | Location clarity |
+| Entry Time | 100px | 14:30 | Temporal context |
+| Duration | 90px | 2h 15m | Time tracking |
+| Progress | 180px | Visual bar | Quick comprehension |
+| Shipper/Carrier | 180px | Company name | Responsibility |
+| Actions | 80px | Icons | Quick access |
+| Expand | 40px | Chevron | Details view |
+
+**Total: 970px (leaving 330px for padding and scrollbar)**
+
+#### Row Specifications
+- Row height: 46px
+- 10 rows visible = 460px
+- Alternating row colors for readability
+- Hover state: Elevated shadow
+- Active row: Blue left border (4px)
+
+#### Status Indicator Visual Language
+
+```
+🟢 On Track:     ⬤ Green dot - All stages within SLA
+🟡 At Risk:      ⬤ Yellow dot - Approaching threshold (80% of SLA)
+🔴 Delayed:      ⬤ Red dot - Exceeded SLA
+🔵 In Progress:  ⬤ Blue dot - Currently being processed
+⚪ Completed:    ⬤ Gray dot - Exited plant
+⚫ On Hold:      ⬤ Black dot - Issue/blocked
+```
+
+#### Progress Bar Design
+```
+[████████░░░░░░░░░░] 40% Complete
+ ExtPark Entry Weigh Load WeightOut GateOut
+    ✓      ✓     ✓    →
+```
+- Green: Completed stages
+- Blue: Current stage (animated pulse)
+- Gray: Pending stages
+- Shows exact position in workflow
+
+---
+
+### 4.5 Detail Side Panel (Overlay)
+
+**Trigger:** Click anywhere on table row (except action buttons)
+
+**Panel Specifications:**
+- Width: 480px
+- Slides from right
+- Overlay backdrop: rgba(0,0,0,0.3)
+- Animation: 200ms ease-out
+
+**Content Structure:**
+
+```
+┌─────────────────────────────────────────────┐
+│ ✕                    VEHICLE DETAILS         │ 60px header
+├─────────────────────────────────────────────┤
+│ Vehicle: MH12AB1234                          │
+│ Driver: John Doe | +91-9876543210           │
+│ Transporter: ABC Logistics                   │
+│ Shipper: XYZ Industries                      │
+├─────────────────────────────────────────────┤
+│ JOURNEY TIMELINE (Scrollable)                │ 560px
+│                                              │
+│ ● Gate Entry          14:30  ✓              │
+│ ├─ Security Check     14:32                 │
+│ └─ Document Verified  14:35                 │
+│                                              │
+│ ● Weight In           14:40  ✓              │
+│ ├─ Tare Weight: 8,500 kg                   │
+│ └─ Slip: #WB-1234                           │
+│                                              │
+│ ● Loading Bay 3       15:00  → (Current)    │
+│ ├─ Duration: 1h 15m                         │
+│ ├─ Expected: 45m (DELAYED)                  │
+│ └─ Assigned: Operator #23                   │
+│                                              │
+│ ○ Weight Out          --:--  (Pending)      │
+│ ○ Gate Out            --:--  (Pending)      │
+│                                              │
+├─────────────────────────────────────────────┤
+│ [Export PDF] [Send Alert] [Add Note]        │ 60px footer
+└─────────────────────────────────────────────┘
+```
+
+**Timeline Item Design:**
+- Completed: Solid green circle, checkmark
+- Current: Blue circle with pulse animation
+- Pending: Gray outline circle
+- Delayed: Red background on duration
+- Each item expandable for notes/photos
+
+---
+
+## 5. Color Palette
+
+### Primary Colors
+```css
+--primary-blue: #2563EB;      /* Primary actions, current stage */
+--primary-dark: #1E40AF;      /* Hover states */
+--primary-light: #DBEAFE;     /* Backgrounds */
+```
+
+### Status Colors
+```css
+--success-green: #10B981;     /* On-time, completed */
+--warning-amber: #F59E0B;     /* At-risk, approaching threshold */
+--danger-red: #DC2626;        /* Delayed, critical */
+--info-blue: #3B82F6;         /* In-progress, informational */
+--neutral-gray: #6B7280;      /* Pending, inactive */
+```
+
+### Background Colors
+```css
+--bg-primary: #FFFFFF;        /* Main background */
+--bg-secondary: #F9FAFB;      /* Alternating rows, cards */
+--bg-tertiary: #F3F4F6;       /* Disabled, subtle sections */
+--bg-hover: #F0F9FF;          /* Interactive hover */
+```
+
+### Text Colors
+```css
+--text-primary: #111827;      /* Main content */
+--text-secondary: #6B7280;    /* Labels, secondary info */
+--text-tertiary: #9CA3AF;     /* Placeholders, disabled */
+```
+
+### Border Colors
+```css
+--border-light: #E5E7EB;      /* Table borders, dividers */
+--border-medium: #D1D5DB;     /* Input borders */
+--border-dark: #9CA3AF;       /* Emphasis borders */
+```
+
+---
+
+## 6. Typography
+
+### Font Family
+```css
+--font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+--font-mono: 'Roboto Mono', 'Courier New', monospace; /* For vehicle numbers, times */
+```
+
+### Font Scales
+```css
+--text-xs: 11px;      /* Footnotes, captions */
+--text-sm: 13px;      /* Table cells, labels */
+--text-base: 15px;    /* Body text */
+--text-lg: 17px;      /* Section headers */
+--text-xl: 20px;      /* Card headers */
+--text-2xl: 24px;     /* Page title */
+--text-3xl: 32px;     /* Metric values */
+```
+
+### Font Weights
+```css
+--font-normal: 400;
+--font-medium: 500;
+--font-semibold: 600;
+--font-bold: 700;
+```
+
+---
+
+## 7. Data Model & API Requirements
+
+### 7.1 Real-time Data Endpoint
+
+```typescript
+GET /api/v1/inplant/dashboard/live
+
+Response:
+{
+  "metadata": {
+    "plantId": "PLT-001",
+    "plantName": "Mumbai Distribution Center",
+    "timestamp": "2025-09-29T14:30:00Z",
+    "autoRefreshInterval": 30
+  },
+  "metrics": {
+    "activeVehicles": 23,
+    "averageProcessingTime": 135, // minutes
+    "delayedVehicles": 5,
+    "completedToday": 142,
+    "trends": {
+      "activeVehiclesTrend": 3,
+      "avgTimeTrend": -15,
+      "delayedTrend": 2,
+      "completedTrend": 12
+    }
+  },
+  "stageDistribution": [
+    {
+      "stageId": "EXT_PARKING",
+      "stageName": "External Parking",
+      "vehicleCount": 8,
+      "averageTime": 80, // minutes
+      "healthStatus": "normal", // normal, warning, critical
+      "slaThreshold": 120,
+      "order": 1
+    },
+    // ... other stages
+  ],
+  "vehicles": [
+    {
+      "id": "VEH-12345",
+      "vehicleNumber": "MH12AB1234",
+      "currentStage": {
+        "stageId": "LOADING",
+        "stageName": "Loading Bay 3",
+        "location": "Bay 3",
+        "arrivedAt": "2025-09-29T13:00:00Z",
+        "duration": 90, // minutes
+        "expectedDuration": 45,
+        "status": "delayed" // on_time, at_risk, delayed
+      },
+      "entryTime": "2025-09-29T12:00:00Z",
+      "totalDuration": 150, // minutes
+      "overallStatus": "delayed", // on_track, at_risk, delayed, completed, on_hold
+      "progress": 60, // percentage
+      "completedStages": ["EXT_PARKING", "ENTRY_GATE", "WEIGHING"],
+      "shipper": {
+        "id": "SHP-001",
+        "name": "XYZ Industries"
+      },
+      "carrier": {
+        "id": "CAR-001",
+        "name": "ABC Logistics"
+      },
+      "driver": {
+        "name": "John Doe",
+        "phone": "+919876543210"
+      },
+      "shipmentId": "SHP-2024-001",
+      "orderReference": "ORD-12345"
+    }
+    // ... more vehicles
+  ],
+  "pagination": {
+    "page": 1,
+    "pageSize": 10,
+    "totalRecords": 23,
+    "totalPages": 3
+  }
+}
+```
+
+### 7.2 Historical Data Endpoint
+
+```typescript
+GET /api/v1/inplant/dashboard/historical?from=2025-09-28&to=2025-09-29&page=1&pageSize=20
+
+// Similar structure but with completed vehicles
+```
+
+### 7.3 Vehicle Detail Endpoint
+
+```typescript
+GET /api/v1/inplant/vehicles/{vehicleId}/timeline
+
+Response:
+{
+  "vehicleId": "VEH-12345",
+  "vehicleNumber": "MH12AB1234",
+  "timeline": [
+    {
+      "stageId": "ENTRY_GATE",
+      "stageName": "Gate Entry",
+      "entryTime": "2025-09-29T12:00:00Z",
+      "exitTime": "2025-09-29T12:10:00Z",
+      "duration": 10,
+      "status": "completed",
+      "events": [
+        {
+          "eventType": "security_check",
+          "eventTime": "2025-09-29T12:02:00Z",
+          "performedBy": "Security Officer #12",
+          "notes": "Documents verified"
+        }
+      ],
+      "documents": [
+        {
+          "type": "entry_pass",
+          "documentUrl": "/documents/EP-12345.pdf",
+          "uploadedAt": "2025-09-29T12:05:00Z"
+        }
+      ]
+    },
+    {
+      "stageId": "WEIGHING",
+      "stageName": "Weight In",
+      "entryTime": "2025-09-29T12:10:00Z",
+      "exitTime": "2025-09-29T12:25:00Z",
+      "duration": 15,
+      "status": "completed",
+      "weighingData": {
+        "tareWeight": 8500,
+        "weightSlipNumber": "WB-1234",
+        "operatorId": "OP-45"
+      }
+    }
+    // ... more stages
+  ]
+}
+```
+
+### 7.4 Filter & Search Endpoint
+
+```typescript
+GET /api/v1/inplant/dashboard/filter?
+  status=delayed&
+  stage=LOADING&
+  vehicleNumber=MH12&
+  dateFrom=2025-09-29&
+  dateTo=2025-09-29
+
+// Returns filtered vehicle list
+```
+
+---
+
+## 8. Interaction Patterns
+
+### 8.1 Search Functionality
+
+**Vehicle/Driver Search:**
+- Real-time search as user types (debounced 300ms)
+- Search across: Vehicle number, driver name, shipment ID
+- Highlights matching results in table
+- Clear search button (×)
+- Recent searches dropdown (last 5)
+
+**Keyboard Shortcuts:**
+- `Ctrl/Cmd + K`: Focus search
+- `Esc`: Clear search and close modals
+- `↑↓`: Navigate table rows
+- `Enter`: Open detail panel for selected row
+
+### 8.2 Filtering
+
+**Quick Filters (Chip Style):**
+- Single select: [All] [Active] [Completed] [On Hold]
+- Status: [Delayed] [At Risk] [On Track]
+- Time: [Last Hour] [Last 4h] [Today] [Yesterday]
+- Active filter has blue background, count badge
+
+**Advanced Filters (Collapse Panel):**
+```
+┌─────────────────────────────────────────┐
+│ Advanced Filters                    [×] │
+├─────────────────────────────────────────┤
+│ Stage:         [All Stages ▼]           │
+│ Shipper:       [All Shippers ▼]         │
+│ Carrier:       [All Carriers ▼]         │
+│ Date Range:    [From] [To]              │
+│ Duration:      [Min] - [Max] minutes    │
+│                                          │
+│           [Reset] [Apply Filters]       │
+└─────────────────────────────────────────┘
+```
+
+### 8.3 Date Range Selection
+
+**Preset Options:**
+- Today (default for active view)
+- Yesterday
+- Last 7 days
+- Last 30 days
+- Custom Range
+
+**Custom Range Picker:**
+- Calendar popup
+- Quick select: Start of day, End of day
+- Max range: 90 days for performance
+
+### 8.4 Refresh Behavior
+
+**Auto-refresh:**
+- Default: 30 seconds
+- Options: 15s, 30s, 60s, Off
+- Pause on detail panel open
+- Visual countdown indicator
+- "New data available" notification with manual refresh option
+
+**Manual Refresh:**
+- Button click or `Ctrl/Cmd + R`
+- Loading spinner on button
+- Brief flash animation on updated rows
+- Toast notification: "Updated 5 vehicles"
+
+### 8.5 Sorting
+
+**Sortable Columns:**
+- Vehicle Number (alphanumeric)
+- Current Stage (by stage order)
+- Entry Time (chronological)
+- Duration (numeric)
+
+**Sort Indicator:**
+- ↑ Ascending
+- ↓ Descending
+- Default: Entry Time (newest first)
+
+### 8.6 Export Functionality
+
+**Export Options:**
+```
+[Export ▼]
+  ├─ Current View (CSV)
+  ├─ Current View (PDF)
+  ├─ All Active Vehicles (Excel)
+  └─ Detailed Report (PDF)
+```
+
+**Export Configuration:**
+- Includes applied filters
+- Timestamp in filename
+- Logo and plant name in header
+- Page numbers for PDF
+
+---
+
+## 9. Responsive Behavior
+
+### 9.1 Breakpoint Strategy
+
+**Desktop (1920px+):**
+- Show additional columns: Driver Phone, Order Reference
+- Wider detail panel (600px)
+- Side-by-side filters
+
+**Target (1300px - 1919px):**
+- Optimized primary layout
+- All essential features visible
+
+**Tablet (1024px - 1299px):**
+- Remove Progress column
+- Combine Shipper/Carrier into one column
+- Narrower detail panel (400px)
+
+**Mobile Landscape (768px - 1023px):**
+- Hide stage flow visualization
+- Show stage count in metrics bar
+- Card-based vehicle list instead of table
+- Bottom sheet for details
+
+### 9.2 Mobile Card Design (768px)
+
+```
+┌─────────────────────────────────────┐
+│ 🟡 MH12AB1234        2h 15m         │
+│ Loading Bay 3                       │
+│ ABC Logistics → XYZ Industries      │
+│ Entry: 14:30 | Status: Delayed      │
+│ [████████░░░░] 60%          [›]    │
+└─────────────────────────────────────┘
+```
+
+---
+
+## 10. Error States & Empty States
+
+### 10.1 Loading States
+
+**Initial Load:**
+- Full page skeleton loader
+- Shimmer effect on table rows
+- Metric cards with loading pulse
+
+**Refresh:**
+- Inline spinner on refresh button
+- Table remains visible with slight opacity
+- "Updating..." text
+
+### 10.2 Error States
+
+**API Error:**
+```
+┌──────────────────────────────────────┐
+│  ⚠️  Unable to load dashboard data   │
+│                                       │
+│  The connection to the server was    │
+│  interrupted. Please try again.      │
+│                                       │
+│        [Retry] [Contact Support]     │
+└──────────────────────────────────────┘
+```
+
+**Partial Load Error:**
+- Show available data
+- Error toast: "Some data couldn't be loaded"
+- Retry button in affected section
+
+### 10.3 Empty States
+
+**No Active Vehicles:**
+```
+┌──────────────────────────────────────┐
+│         📦                            │
+│  No active vehicles in plant          │
+│                                       │
+│  All shipments have been processed.   │
+│  New vehicles will appear here when   │
+│  they enter the plant.                │
+└──────────────────────────────────────┘
+```
+
+**No Search Results:**
+```
+┌──────────────────────────────────────┐
+│         🔍                            │
+│  No vehicles found for "MH12XY"       │
+│                                       │
+│  Try adjusting your search or filters │
+│         [Clear Search]                │
+└──────────────────────────────────────┘
+```
+
+**No Historical Data:**
+```
+┌──────────────────────────────────────┐
+│         📅                            │
+│  No data for selected date range      │
+│                                       │
+│  Try selecting a different date range │
+└──────────────────────────────────────┘
+```
+
+---
+
+## 11. Performance Optimization
+
+### 11.1 Front-end Optimization
+
+**Virtual Scrolling:**
+- Implement for tables with >100 rows
+- Render only visible rows + buffer (5 rows)
+- Maintain scroll position on refresh
+
+**Data Management:**
+- Cache API responses (5 minutes)
+- Implement optimistic updates
+- WebSocket for real-time updates (future enhancement)
+- Local storage for user preferences
+
+**Bundle Optimization:**
+- Code splitting by route
+- Lazy load detail panel
+- Optimize images and icons
+- Tree-shake unused libraries
+
+### 11.2 API Optimization
+
+**Pagination:**
+- Default: 20 items per page
+- Max: 100 items per page
+- Cursor-based for large datasets
+
+**Caching Headers:**
+- Live data: no-cache
+- Historical data: 5 minutes
+- Static assets: 1 year
+
+**Request Optimization:**
+- Debounce search: 300ms
+- Throttle refresh: Min 10s
+- Batch filter requests
+
+### 11.3 Rendering Performance
+
+**Target Metrics:**
+- First Contentful Paint: < 1.5s
+- Time to Interactive: < 3s
+- Auto-refresh impact: < 100ms
+- Table sort/filter: < 200ms
+
+---
+
+## 12. Accessibility Standards
+
+### 12.1 WCAG 2.1 AA Compliance
+
+**Color Contrast:**
+- Text: Minimum 4.5:1 ratio
+- Large text: Minimum 3:1 ratio
+- Status colors tested with color-blind simulators
+- Never rely on color alone (use icons + text)
+
+**Keyboard Navigation:**
+- All interactive elements tabbable
+- Visible focus indicators (2px blue outline)
+- Skip to main content link
+- Escape key closes modals/panels
+- Arrow keys navigate table
+
+**Screen Reader Support:**
+- Semantic HTML (table, nav, main, aside)
+- ARIA labels for icons and status
+- ARIA live regions for updates
+- Alt text for all images
+- Table headers properly associated
+
+### 12.2 ARIA Implementation
+
+```html
+<!-- Metrics -->
+<div role="region" aria-label="Key Metrics">
+  <div role="status" aria-live="polite">
+    <span aria-label="Active Vehicles">23</span>
+  </div>
+</div>
+
+<!-- Table -->
+<table role="grid" aria-label="Vehicle List">
+  <caption>Current Active Vehicles</caption>
+  <thead>
+    <tr role="row">
+      <th role="columnheader" aria-sort="ascending">Vehicle Number</th>
+    </tr>
+  </thead>
+</table>
+
+<!-- Status Indicators -->
+<span 
+  class="status-dot status-delayed" 
+  role="img" 
+  aria-label="Delayed">
+  ⬤
+</span>
+```
+
+---
+
+## 13. Browser Support
+
+### 13.1 Supported Browsers
+
+**Desktop:**
+- Chrome 90+ (primary)
+- Firefox 88+
+- Safari 14+
+- Edge 90+
+
+**Mobile:**
+- Chrome Android 90+
+- Safari iOS 14+
+
+### 13.2 Fallbacks
+
+**CSS Features:**
+- Flexbox (required)
+- Grid (required)
+- CSS Variables (required)
+- Animations (graceful degradation)
+
+**JavaScript Features:**
+- ES6+ (transpile for older browsers)
+- Fetch API (required)
+- WebSocket (progressive enhancement)
+
+---
+
+## 14. Security Considerations
+
+### 14.1 Data Security
+
+**Authentication:**
+- JWT token-based auth
+- Token refresh mechanism
+- Session timeout: 8 hours
+- Multi-factor authentication support
+
+**Authorization:**
+- Role-based access control (RBAC)
+- Plant-level data isolation
+- Client-specific data filtering
+- Audit logs for sensitive actions
+
+### 14.2 Client-side Security
+
+**XSS Prevention:**
+- Sanitize all user inputs
+- Content Security Policy headers
+- Escape HTML in dynamic content
+
+**Data Protection:**
+- No sensitive data in localStorage
+- Secure cookie settings
+- HTTPS only
+- No client-side caching of sensitive info
+
+---
+
+## 15. Testing Strategy
+
+### 15.1 Unit Testing
+- Component rendering
+- Data transformation logic
+- Utility functions
+- Coverage target: 80%
+
+### 15.2 Integration Testing
+- API integration
+- Data flow between components
+- Filter and search functionality
+- Export features
+
+### 15.3 E2E Testing
+
+**Critical User Flows:**
+1. View active vehicles → Select vehicle → View details
+2. Apply filters → Verify filtered results
+3. Search vehicle → Open detail panel → Close
+4. Switch date ranges → Verify historical data
+5. Export data → Verify file download
+6. Auto-refresh → Verify data updates
+
+### 15.4 Performance Testing
+- Load time under various network conditions
+- Table rendering with 1000+ rows
+- Memory leak detection
+- Auto-refresh performance impact
+
+### 15.5 Accessibility Testing
+- Keyboard navigation flow
+- Screen reader compatibility
+- Color contrast validation
+- ARIA implementation verification
+
+---
+
+## 16. Future Enhancements
+
+### Phase 2 Features
+1. **Real-time Alerts**
+   - Push notifications for delays
+   - Configurable alert thresholds
+   - Email/SMS notifications
+
+2. **Advanced Analytics**
+   - Stage-wise bottleneck analysis
+   - Trend graphs and charts
+   - Predictive delay warnings
+   - Performance benchmarks
+
+3. **Customization**
+   - User-defined columns
+   - Saved filter presets
+   - Custom dashboard layouts
+   - Theme customization
+
+4. **Collaboration**
+   - Comments on vehicles
+   - @mentions for team members
+   - Shared views and filters
+   - Activity feed
+
+5. **Integration**
+   - WhatsApp notifications
+   - GPS tracking integration
+   - Document management
+   - IoT sensor data
+
+### Phase 3 Features
+1. **Mobile Apps** (iOS/Android)
+2. **Offline Mode** with sync
+3. **Voice Commands** for hands-free operation
+4. **AI-powered Insights** and recommendations
+5. **Multi-plant Dashboard** for enterprise
+
+---
+
+## 17. Implementation Checklist
+
+### Pre-development
+- [ ] Review design with stakeholders
+- [ ] Validate API contract
+- [ ] Set up development environment
+- [ ] Configure CI/CD pipeline
+
+### Development Phase 1 (Core)
+- [ ] Project scaffolding and dependencies
+- [ ] API integration layer
+- [ ] Header bar component
+- [ ] Metrics bar component
+- [ ] Stage flow visualization
+- [ ] Vehicle table component
+- [ ] Basic filtering and search
+- [ ] Pagination
+
+### Development Phase 2 (Enhancement)
+- [ ] Detail side panel
+- [ ] Advanced filters
+- [ ] Export functionality

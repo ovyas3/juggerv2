@@ -111,13 +111,13 @@
   }
   
   .filterButtonActive {
-      background-color: #3b82f6; 
-      border-color: #3b82f6;
+      background-color: #301c6c; 
+      border-color:#301c6c;
       color: white;
   }
   .filterButtonActive:hover {
-      background-color: #2563eb; 
-      border-color: #2563eb;
+      background-color: #301c6c; 
+      border-color: #301c6c;
   }
   
   .dropdownArrow {
@@ -146,7 +146,7 @@
     background: none;
     border: none;
     font-size: 13px; 
-    color: #1e40af;
+    color: #301c6c;
     cursor: pointer;
     padding: 0;
   }
@@ -180,8 +180,8 @@
   }
   
   .checked {
-    background-color: #3b82f6; 
-    border-color: #3b82f6;
+    background-color: #301c6c; 
+    border-color: #301c6c;
     color: white;
   }
   .searchContainer {
@@ -217,7 +217,7 @@
     transition: border-color 0.2s;
   }
   .searchInput:focus {
-    border-color: #1e40af;
+    border-color: #301c6c;
     box-shadow: 0 0 0 2px rgba(30, 64, 175, 0.1);
   }
   

@@ -69,14 +69,14 @@
   }
   
   .uploadArea:hover, .dragOver {
-    border-color: #4f46e5;
+    border-color: rgb(48, 28, 108);
     background-color: #f5f3ff;
   }
   
   .uploadIcon {
     font-size: 36px;
     margin-bottom: 12px;
-    color: #4f46e5;
+    color: rgb(48, 28, 108);
   }
   
   .uploadText {
@@ -191,13 +191,13 @@
   }
   
   .submitButton {
-    background-color: #4f46e5;
+    background-color: rgb(48, 28, 108);
     color: white;
-    border: 1px solid #4f46e5;
+    border: 1px solid rgb(48, 28, 108);
   }
   
   .submitButton:hover {
-    background-color: #4338ca;
+    background-color: #271950;
   }
   
   .submitButton:disabled {

@@ -62,7 +62,7 @@
 }
 
 .rerunBtn {
-  background-color: #4646e5 !important;
+  background-color:  #301c6c !important;
   color: #fff !important;
   width: 102px;
   height: 38px;
@@ -75,12 +75,12 @@
   box-shadow: none;
   text-transform: none !important;
   cursor: pointer;
-  border: 1px solid #4646e5 !important;
+  border: 1px solid  #301c6c !important;
 }
 
 .rerunBtn:hover {
-  background-color: #4338ca !important;
-  border: 1px solid #4338ca !important;
+  background-color: #3d2879 !important;
+  border: 1px solid #3d2879!important;
 }
 
 .rerunBtn:disabled {
@@ -112,12 +112,12 @@
 }
 
 .selectField:hover > div {
-  border-color: #4f46e5 !important;
+  border-color: #301c6c !important;
   box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2) !important;
 }
 
 .selectField > div.Mui-focused {
-  border-color: #4f46e5 !important;
+  border-color: #301c6c !important;
   box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2) !important;
 }
 
@@ -139,12 +139,12 @@
 .datePicker:focus,
 .datePicker:focus-within {
   outline: none;
-  border-color: #4f46e5 !important;
+  border-color: #301c6c !important;
   box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2) !important;
 }
 
 .datePicker:hover {
-  border-color: #4f46e5 !important;
+  border-color: #301c6c !important;
   box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2) !important;
 }
 

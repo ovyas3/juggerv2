@@ -92,6 +92,7 @@ interface ShipmentsTableProps {
   handleSelectShipment: (id: string, checked: boolean) => void;
   copyDestinationCode: any;
   openLocationsPopup: any;
+  onViewDetails: (shipmentId: string) => void;
   formatCurrency: (amount: number) => string;
   renderLastLocationCell: (shipment: Shipment) => React.ReactNode;
   actionMenuOpenId: string | null;
@@ -136,6 +137,7 @@ export const ShipmentsTable: React.FC<ShipmentsTableProps> = ({
   copyDestinationCode,
   openLocationsPopup,
   formatCurrency,
+  onViewDetails,
   actionMenuOpenId,
   setActionMenuOpenId,
   closeActionMenu,
@@ -153,15 +155,45 @@ export const ShipmentsTable: React.FC<ShipmentsTableProps> = ({
   const [actionSearchState, setActionSearchState] = useState("");
   const [showDownLoadLoader, setShowDownLoadLoader] = useState(false);
   const [showOrdersPopup, setShowOrdersPopup] = useState(false);
+  const [showInvoicePopup, setShowInvoicePopup] = useState(false);
   const [selectedOrders, setSelectedOrders] = useState<string[]>([]);
+  const [ordersPopup, setOrdersPopup] = useState<{
+    open: boolean;
+    orders: string[];
+    title: string;
+    sin: string;
+  }>({ open: false, orders: [], title: '', sin: '' });
+  const [invoicePopup, setInvoicePopup] = useState<{
+    open: boolean;
+    orders: string[];
+    title: string;
+    sin: string;
+  }>({ open: false, orders: [], title: '', sin: '' });
 
-  const handleBubbleClick = (orders: string[]) => {
-    setSelectedOrders(orders);
+
+
+  const handleBubbleClick = (orders: string[], sin: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
     setShowOrdersPopup(true);
+    setOrdersPopup((s) => ({ ...s, open: true, orders, title: 'Sale Orders', sin }));
+  };
+
+  const handleBubbleClickForInvoice = (orders: string[], sin: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    setShowInvoicePopup(true);
+    setInvoicePopup((s) => ({ ...s, open: true, orders, title: 'Invoice', sin }));
   };
 
   const closeOrdersPopup = () => {
     setShowOrdersPopup(false);
+    setOrdersPopup((s) => ({ ...s, open: false }));
+  };
+
+  const closeInvoicePopup = () => {
+    setShowInvoicePopup(false);
+    setInvoicePopup((s) => ({ ...s, open: false }));
   };
 
   const shouldShowAction = (actionName: string): boolean => {
@@ -340,6 +372,11 @@ const  renderConsentAndSubscriptionIcons = (shipment: any, openSubscribeModal: (
             >
               Destination Code
             </th>}
+            {isMykl && <th
+              className={`${styles.matHeaderCell} ${styles.matColumnDestinationCode}`}
+            >
+             Invoice No
+            </th>}
             <th
               className={`${styles.matHeaderCell} ${styles.matColumnSpotDriver}`}
             >
@@ -402,10 +439,20 @@ const  renderConsentAndSubscriptionIcons = (shipment: any, openSubscribeModal: (
             </tr>
           ) : (
             shipmentsArray.map((shipment, index) => (
-              <tr key={shipment._id} className={styles.matRow}>
+              <tr 
+                key={shipment._id} 
+                className={styles.matRow}
+                onClick={(e) => {
+                  if (!(e.target as HTMLElement).closest('button, a, input, [role="button"], .no-row-click')) {
+                    onViewDetails(shipment._id);
+                  }
+                }}
+                style={{ cursor: 'pointer' }}
+              >
                 <td className={`${styles.matCell} ${styles.matColumnSelect}`}>
                   <input
                     type="checkbox"
+                    className={ styles.checkboxChecked }
                     checked={selectedShipmentsArray.includes(shipment._id)}
                     onChange={(e) => {
                       e.stopPropagation();
@@ -580,6 +627,39 @@ const  renderConsentAndSubscriptionIcons = (shipment: any, openSubscribeModal: (
                 {isMykl && <td className={`${styles.matCell} ${styles.matColumnDestinationCode}`}>
                   {shipment.destination_code || "-"}
                 </td>}
+                {isMykl && <td className={`${styles.matCell} ${styles.matColumnDestinationCode}`}>
+                {shipment.others
+                    ? (() => {
+                        const invoices = shipment?.others?.invoice?.split(",");
+                        return (
+                          <span style={{ display: "flex", alignItems: "center",justifyContent: "center", gap: 8 }}>
+                            <span>{invoices ? invoices[0] : "-"}</span>
+                            {invoices?.length > 1 && (
+                              <span
+                                className={`${styles.buble_round} no-row-click`}
+                                onClick={(e) => handleBubbleClickForInvoice(invoices?.slice(1), shipment.sin, e)}
+                                style={{
+                                  background: "#EDE7F6",
+                                  borderRadius: "50%",
+                                  padding: "0px 3px",
+                                  fontSize: "12px",
+                                  width: "22px",
+                                  height: "22px",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  cursor: "pointer",
+                                  color: "#5e35b1"
+                                }}
+                              >
+                                +{invoices?.length - 1}
+                              </span>
+                            )}
+                          </span>
+                        );
+                      })()
+                    : "-"}
+                </td>}
 
                 <td
                   className={`${styles.matCell} ${styles.matColumnSpotDriver}`}
@@ -655,8 +735,8 @@ const  renderConsentAndSubscriptionIcons = (shipment: any, openSubscribeModal: (
                             <span>{orders[0]}</span>
                             {orders.length > 1 && (
                               <span
-                                className={styles.buble_round}
-                                onClick={() => handleBubbleClick(orders.slice(1))}
+                                className={`${styles.buble_round} no-row-click`}
+                                onClick={(e) => handleBubbleClick(orders.slice(1), shipment.sin, e)}
                                 style={{
                                   background: "#EDE7F6",
                                   borderRadius: "50%",
@@ -701,29 +781,38 @@ const  renderConsentAndSubscriptionIcons = (shipment: any, openSubscribeModal: (
                 <td
                   className={`${styles.cellActions} ${styles.matColumnActions} ${styles.stickyRight}`}
                 >
-                  <div className={styles.quickActions}>
+                  <div className={`${styles.quickActions} no-row-click`}>
                     <DropdownMenu
                       open={actionMenuOpenId === shipment._id}
                       onOpenChange={(open) => {
                         setActionMenuOpenId(open ? shipment._id : null);
                       }}
+                      modal={false}
                     >
                       <DropdownMenuTrigger asChild>
                         <button
-                          className={styles.actionsMenuButton}
+                          className={`${styles.actionsMenuButton} no-row-click`}
                           title="More actions"
-                          onClick={() => setActionMenuOpenId(shipment._id)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            e.preventDefault(); 
+                            setActionMenuOpenId(shipment._id)
+                          }}
                         >
                           <MoreHorizontal className={styles.actionIcon} />
                         </button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent
                         align="end"
-                        className={styles.actionMenuDropdown}
+                        className={`${styles.actionMenuDropdown} no-row-click`}
                         onInteractOutside={() => {
                           setActionSearchState("");
+                          setActionMenuOpenId(null);
                         }}
                         sideOffset={15}
+                        onClick={(e) => {
+                          e.stopPropagation(); 
+                        }}
                       >
                         <div className={styles.actionMenuSearch}>
                           <div className={styles.actionSearchContainer}>
@@ -768,18 +857,24 @@ const  renderConsentAndSubscriptionIcons = (shipment: any, openSubscribeModal: (
                                    return (
                                      <DropdownMenuItem
                                        key={index}
-                                       className={`${styles.actionMenuItem} ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                       disabled={isDisabled}
+                                       className={`${styles.actionMenuItem} ${isDisabled ? styles.actionMenuItemDisabled : ''}`}
                                        onSelect={(e) => {
+                                         if (isDisabled) {
+                                           e.preventDefault();
+                                           return;
+                                         }
                                          e.preventDefault();
-                                         if (!isDisabled && item.onClick) {
+                                         if (item.onClick) {
                                            item.onClick(shipment);
                                          }
                                          closeActionMenu();
                                        }}
+                                       aria-disabled={isDisabled}
                                      >
-                                       <IconComponent className={`${styles.actionMenuIcon} ${item.color}`} />
-                                       <span className={styles.actionLabel}>{item.label}</span>
+                                       <IconComponent className={`${styles.actionMenuIcon} ${item.color} ${isDisabled ? styles.actionMenuIconDisabled : ''}`} />
+                                       <span className={`${styles.actionLabel} ${isDisabled ? styles.actionLabelDisabled : ''}`}>
+                                         {item.label}
+                                       </span>
                                      </DropdownMenuItem>
                                    );
                                  })}
@@ -798,10 +893,22 @@ const  renderConsentAndSubscriptionIcons = (shipment: any, openSubscribeModal: (
       </table>
       {showOrdersPopup && (
         <OrdersPopup 
-          orders={selectedOrders} 
+          orders={ordersPopup.orders} 
           onClose={closeOrdersPopup} 
+          title="Additional Sale Order"
+          sin={ordersPopup.sin}
         />
       )}
+      {
+        showInvoicePopup && (
+          <OrdersPopup 
+            orders={invoicePopup.orders} 
+            onClose={closeInvoicePopup} 
+            title="Invoice"
+            sin={invoicePopup.sin}
+          />
+        )
+      }
     </div>
   );
 };
