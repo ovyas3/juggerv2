@@ -497,7 +497,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
 
         {isExpanded && (
           <>
-            <div className="header-center">
+            {/* <div className="header-center">
               <div className="date-range-container">
                 <Select 
                   value={dateRange} 
@@ -552,7 +552,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                   </div>
                 )}
               </div>
-            </div>
+            </div> */}
 
             <div className="header-right">
               <div className="searchInputContainer"

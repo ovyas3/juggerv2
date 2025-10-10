@@ -56,7 +56,7 @@ export default function VehicleStagingLive({
     // Date States
     const today: any = new Date();
     const oneWeekAgo: any = new Date();
-    oneWeekAgo.setDate(today.getDate() - 7);
+    oneWeekAgo.setDate(today.getDate() - 1);
     const [startDate, setStartDate] = useState<any>(oneWeekAgo);
     const [endDate, setEndDate] = useState<any>(today);
 
