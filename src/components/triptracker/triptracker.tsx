@@ -1121,7 +1121,7 @@ const totalQuantity = apiData?.invoices?.reduce((sum:number, invoice:Invoice) =>
 >
           <div className="kpi-icon-badge"><PauseCircle className="kpi-icon" /></div>
             <div className="kpi-value">{totalStoppagesCount || 0}</div>
-            <div className="kpi-label">Long Stoppages  { parseInt(totalHaltDurationText, 10) > 9 && (
+            <div className="kpi-label">Stoppages  { parseInt(totalHaltDurationText, 10) > 9 && (
     <span> (&gt;9 hrs)</span>)}</div>
             {/* <span className="tooltip-content">3 extended stops during journey</span> */}
             <div className="tooltip-content tooltip-lg">
@@ -1507,7 +1507,7 @@ const totalQuantity = apiData?.invoices?.reduce((sum:number, invoice:Invoice) =>
                       <Navigation className="filter-icon" />{deviationCount} deviations
                     </button>
                     <button className="filter-button stoppage" onClick={() => openConfirm("stoppage")}  >
-                      <AlertTriangle className="filter-icon" />{totalStoppagesCount} Long Stoppages
+                      <AlertTriangle className="filter-icon" />{totalStoppagesCount} Stoppages
                     </button>
                   </div>)}
                   {mapState.mode === "location" && (
@@ -1587,7 +1587,7 @@ const totalQuantity = apiData?.invoices?.reduce((sum:number, invoice:Invoice) =>
             </div>
 
            
-             <div className="card ad-card">
+            {/* <div className="card ad-card">
               <div className="ad-content">
                 <div className="ad-header">
                   <div className="ad-icon-wrapper">
@@ -1601,7 +1601,7 @@ const totalQuantity = apiData?.invoices?.reduce((sum:number, invoice:Invoice) =>
                 </p>
                 <button className="ad-button">Learn More</button>
               </div>
-            </div>
+            </div> */}
           </div>
 
           {/* Right Sidebar */}

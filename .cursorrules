@@ -1,0 +1,656 @@
+# Juggernaut - Next.js Dashboard Project Rules
+
+## Documentation
+
+📘 **[Design System](./docs/DESIGN_SYSTEM.md)** - Complete color palette, typography, spacing, and visual design standards
+📘 **[Style Guide](./docs/STYLE_GUIDE.md)** - Component patterns, examples, and implementation details
+
+## Project Context
+- **Next.js Version**: 14.2.3 (App Router)
+- **React Version**: 18.3.1
+- **TypeScript**: Strict mode enabled
+- **Primary Purpose**: Enterprise logistics dashboard with fleet management, trip tracking, and analytics
+
+### Tech Stack
+- **Framework**: Next.js 14 with App Router
+- **UI Libraries**: Material-UI (MUI), Ant Design, Radix UI, shadcn/ui components
+- **Styling**: CSS Modules + Tailwind utilities (hybrid approach)
+- **State Management**: React Context (SnackbarProvider, custom hooks)
+- **Data Fetching**: Axios with custom HTTP wrapper utilities
+- **Date Handling**: Luxon, dayjs, date-fns (multiple libraries in use)
+- **Maps**: Leaflet, React-Leaflet, Kepler.gl
+- **Charts**: Recharts, Chart.js, ECharts, MUI Charts
+- **Internationalization**: next-intl
+- **Forms**: React Hook Form, react-datepicker
+- **Icons**: Material-UI Icons, Lucide React, Ant Design Icons
+
+---
+
+## Directory Structure
+
+```
+src/
+├── app/                    # Next.js App Router - all routes
+│   ├── layout.tsx         # Root layout with providers
+│   ├── page.tsx           # Home page
+│   ├── globals.css        # Global CSS variables
+│   ├── [feature]/         # Feature-based routing
+│   │   ├── page.tsx       # Route page component
+│   │   └── components/    # Feature-specific components (optional)
+│   └── api/               # API routes
+├── components/            # Reusable components organized by feature
+│   ├── UI/               # Generic UI components (buttons, cards, etc.)
+│   ├── [FeatureName]/    # Feature-specific components (PascalCase)
+│   ├── Header/           # App header components
+│   └── Drawer/           # Navigation drawer components
+├── utils/                # Utility functions
+│   ├── Communication.ts  # API client functions (httpsGet, httpsPost, httpsPut)
+│   ├── dateUtils.ts      # Date manipulation utilities
+│   ├── timeService.ts    # Time conversion utilities
+│   ├── storageService.ts # Cookie/storage management
+│   ├── helper.ts         # General helper functions
+│   └── interface.ts      # Shared TypeScript interfaces
+├── services/             # Service layer
+│   └── Authenticator/    # Authentication service
+├── hooks/                # Custom React hooks
+│   └── snackBar.tsx      # Snackbar context and hook
+├── lib/                  # Library utilities
+│   └── utils.ts          # Utility helpers (cn function for classnames)
+├── assets/               # Static assets (images, icons, SVGs)
+├── environments/         # Environment configuration
+└── MapsHelper/           # Map-related utilities
+```
+
+---
+
+## Next.js Specific Rules
+
+### App Router Conventions
+- **ALL components are Client Components** - This project uses `"use client"` directive at the top of nearly every component
+- No Server Components are currently used in this codebase
+- Pages are located in `src/app/[feature]/page.tsx`
+- No API routes are extensively used (uses external APIs via axios)
+
+### File Naming
+- **Pages**: `page.tsx` (lowercase)
+- **Layouts**: `layout.tsx` (lowercase)
+- **Components**: PascalCase (e.g., `MetricCard.tsx`, `VehicleTable.tsx`)
+- **Utilities**: camelCase (e.g., `dateUtils.ts`, `helper.ts`)
+- **CSS Modules**: `ComponentName.module.css`
+- **Regular CSS**: `component.css` or `page.css`
+
+### Client Components Pattern
+```typescript
+"use client"
+
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
+
+export default function FeaturePage() {
+  // Component logic
+}
+```
+
+### Routing
+- Use Next.js App Router (`src/app/`)
+- Navigation via `useRouter()` from `next/navigation`
+- Route parameters via `useSearchParams()` for query strings
+- Wrap components using `useSearchParams()` in `<Suspense>` boundary
+
+### Image Optimization
+- Use `next/image` with `Image` component
+- Configure allowed domains in `next.config.mjs`
+- Current allowed domains: `wagon-tally-sheet.s3.ap-south-1.amazonaws.com`, `s3.ap-south-1.amazonaws.com`
+
+### Environment Variables
+- Environment-specific configurations in `src/environments/env.api.ts`
+- Use `process.env.NODE_ENV` to differentiate environments (local, dev, production)
+- No `.env` files pattern - configuration is in TypeScript files
+
+---
+
+## Component Patterns
+
+### Standard Component Structure
+```typescript
+"use client"
+
+import React from "react"
+import styles from "./ComponentName.module.css"
+import { SomeType } from "@/utils/interface"
+
+interface ComponentNameProps {
+  title: string
+  value: string
+  icon: React.ReactNode
+  onAction?: () => void
+}
+
+const ComponentName: React.FC<ComponentNameProps> = ({
+  title,
+  value,
+  icon,
+  onAction
+}) => {
+  // Component logic
+
+  return (
+    <div className={styles.container}>
+      {/* JSX */}
+    </div>
+  )
+}
+
+export default ComponentName
+```
+
+### Props Definition
+- Define props interface immediately before component
+- Use `React.FC<PropsType>` for functional components
+- Props interfaces named `[ComponentName]Props`
+- Use optional props with `?` for non-required props
+
+### Component Export
+- **Default exports** for components (not named exports)
+- Exception: UI components may export both (e.g., `export { Button, buttonVariants }`)
+
+### State Management
+- Use `useState` for local component state
+- Use `useEffect` for side effects and data fetching
+- Use Context for global state (see `SnackbarProvider` example)
+- Access context via custom hooks (e.g., `useSnackbar()`)
+
+---
+
+## Data Fetching Patterns
+
+### API Communication
+All API calls use custom HTTP utilities from `@/utils/Communication`:
+
+```typescript
+import { httpsGet, httpsPost, httpsPut } from "@/utils/Communication"
+import { useRouter } from "next/navigation"
+
+// GET request
+const fetchData = async () => {
+  const router = useRouter()
+  const response = await httpsGet("endpoint/path", 0, router)
+  return response?.data
+}
+
+// POST request
+const createData = async (data: any) => {
+  const router = useRouter()
+  const response = await httpsPost("endpoint/path", data, router, 0)
+  return response
+}
+```
+
+### HTTP Utilities Parameters
+- `httpsGet(path, type = 0, router)`
+- `httpsPost(path, data, router = null, type = 0, isFile = false)`
+- `httpsPut(path, data, router = null, type = 0, isFile = false)`
+- `type` parameter selects API base URL (0-3 index)
+
+### Authentication
+- Auth token stored in cookies via `storageService`
+- Authorization header: `bearer [token] shipper [shipper_id]`
+- 401 responses redirect to login page
+- Auth handled in `services/Authenticator/Auth.ts`
+
+### Error Handling
+- API errors caught in `.catch()` blocks
+- 401 errors trigger automatic redirect to login
+- Use `useSnackbar()` for user-facing error messages
+
+---
+
+## Styling Conventions
+
+### Hybrid Approach
+This project uses **CSS Modules + Tailwind utilities** (NOT pure Tailwind):
+
+**CSS Modules (Primary)**:
+```typescript
+import styles from "./Component.module.css"
+
+<div className={styles.container}>
+  <h1 className={styles.title}>Title</h1>
+</div>
+```
+
+**Tailwind Utilities (Secondary)**:
+```typescript
+// Used mainly in shadcn/ui components
+import { cn } from "@/lib/utils"
+
+<div className={cn("flex items-center gap-2", className)}>
+```
+
+**Material-UI Components**:
+```typescript
+import { Box, Grid, Container } from "@mui/material"
+
+<Box sx={{ padding: 2, backgroundColor: 'primary.main' }}>
+```
+
+### CSS Module Patterns
+- One `.module.css` file per component
+- Class names in camelCase (e.g., `.metricCard`, `.cardHeader`)
+- Import as `styles` object
+- Use descriptive class names
+
+### Global Styles
+- Global CSS variables in `src/app/globals.css`:
+  ```css
+  :root {
+    --primary-color: #2a9d8f;
+    --secondary-color: #e76f51;
+    --tertiary-color: #264653;
+    --background-color: #f8f9fa;
+    --card-background: #ffffff;
+    --text-primary: #1a1a1a;
+    --text-secondary: #6c757d;
+    --border-color: #e9ecef;
+  }
+  ```
+
+### Responsive Design
+- Use MUI's `useMediaQuery` hook for responsive behavior
+- Mobile-specific components in separate files (e.g., `MobileEWayBillDashboard`)
+- Breakpoints via MUI theme: `theme.breakpoints.down("sm")`
+
+---
+
+## TypeScript Standards
+
+### Strict Mode Enabled
+```json
+{
+  "compilerOptions": {
+    "strict": true,
+    "target": "es2020"
+  }
+}
+```
+
+### Type Organization
+- Shared interfaces in `src/utils/interface.ts`
+- Component-specific types defined inline with component
+- Use `interface` for object shapes (preferred)
+- Use `type` for unions, intersections, and utilities
+
+### Common Patterns
+
+**Props Interface**:
+```typescript
+interface MetricCardProps {
+  title: string
+  value: string
+  trend?: "up" | "down" | "neutral"
+  icon: React.ReactNode
+}
+```
+
+**API Response Typing**:
+```typescript
+interface ShipmentData {
+  _id: string
+  status: {
+    name: string
+    code: string
+  }
+  // ... more fields
+}
+```
+
+**Any Usage**:
+- `any` is used extensively in existing code
+- For new code, prefer specific types when possible
+- Use `any` only when dealing with complex external library types
+
+### Path Aliases
+- Use `@/` alias for imports from `src/`
+- Configured in `tsconfig.json`
+
+**Example**:
+```typescript
+import { httpsGet } from "@/utils/Communication"
+import Header from "@/components/Header/header"
+import { useSnackbar } from "@/hooks/snackBar"
+```
+
+---
+
+## Helper Functions Organization
+
+### Utility Categories
+
+**Communication** (`utils/Communication.ts`):
+- `httpsGet(path, type, router)` - GET requests
+- `httpsPost(path, data, router, type, isFile)` - POST requests
+- `httpsPut(path, data, router, type, isFile)` - PUT requests
+- `apiCall(config)` - Generic API call wrapper
+
+**Date Utilities** (`utils/dateUtils.ts`):
+- `toUTCString(date, startOfDay)` - Convert to UTC ISO string
+- `formatDate(date, format)` - Format date string
+- `getDayName(date, format)` - Get day name
+- `generateDateRange(startDate, days, format)` - Generate date array
+- `convertToUTC(date)` - Convert to UTC
+
+**Time Service** (`utils/timeService.ts`):
+- `utcToist(utc, format)` - UTC to IST conversion
+- `utcToistTime(utc, format)` - UTC to IST time
+- `getTimeWithAMPM(utc)` - Get time with AM/PM
+- `convertMsToHM(milliseconds)` - Convert milliseconds to HH:MM
+- Default export as service object
+
+**Storage Service** (`utils/storageService.ts`):
+- `setCookies(name, value, options)` - Set cookie
+- `getCookie(name, path)` - Get cookie value
+- `hasCookie(name, path)` - Check cookie exists
+- `deleteCookie(name, options)` - Delete cookie
+- `deleteAllCache(options)` - Clear all cookies
+
+**CSV Export** (`utils/jsonToCsv.ts`):
+- `jsontocsv(items, title, headers)` - Export JSON to CSV file
+
+**Class Names** (`lib/utils.ts`):
+- `cn(...inputs)` - Merge Tailwind classes using clsx + tailwind-merge
+
+### Naming Conventions
+- **Date/Time utilities**: `formatDate`, `convertToUTC`, `utcToist`
+- **API utilities**: `httpsGet`, `httpsPost`, `httpsPut`
+- **Storage utilities**: `setCookies`, `getCookie`, `deleteCookie`
+- **Converters**: `convertToISO`, `convertMsToHM`, `jsontocsv`
+- **Getters**: `getAuth`, `getCookie`, `getDayName`, `getToday`
+
+### Documentation
+- Use JSDoc comments for utility functions
+- Include parameter descriptions and return types
+- Example:
+  ```typescript
+  /**
+   * Converts a date to UTC and returns it as an ISO string
+   * @param date - Date string or dayjs object
+   * @param startOfDay - If true, sets the time to start of day (00:00:00)
+   * @returns UTC ISO string
+   */
+  export const toUTCString = (date: string | dayjs.Dayjs, startOfDay: boolean = true): string => {
+    // Implementation
+  }
+  ```
+
+---
+
+## Import Organization
+
+**Standard import order**:
+```typescript
+"use client"
+
+// 1. React imports
+import React, { useState, useEffect } from "react"
+
+// 2. Next.js imports
+import { useRouter, useSearchParams } from "next/navigation"
+import Image from "next/image"
+
+// 3. External UI library imports
+import { Box, Grid, Container } from "@mui/material"
+import { Button } from "@/components/UI/button"
+
+// 4. Internal component imports
+import Header from "@/components/Header/header"
+import MetricCard from "@/components/UI/MetricCard"
+
+// 5. Utility/service imports
+import { httpsGet } from "@/utils/Communication"
+import { formatDate } from "@/utils/dateUtils"
+import { useSnackbar } from "@/hooks/snackBar"
+
+// 6. Type imports
+import type { ShipmentData } from "@/utils/interface"
+
+// 7. Asset imports
+import BackIcon from "@/assets/back.svg"
+
+// 8. CSS imports (last)
+import styles from "./Component.module.css"
+import "./component.css"
+```
+
+---
+
+## Code Quality Rules
+
+### Client-Side Only
+- Always add `"use client"` directive at the top of component files
+- Components use browser APIs (localStorage, document, window)
+- No server-side data fetching patterns
+
+### Console Logs
+- `console.log` statements are present in the codebase
+- Remove console.logs before production deployment
+- Use `useSnackbar()` for user-facing messages instead
+
+### Error Handling
+- Always wrap API calls in try-catch or use `.catch()`
+- Handle 401 errors with automatic redirect
+- Display user-friendly error messages via Snackbar
+- Provide fallback UI for error states
+
+### Accessibility
+- Use semantic HTML elements
+- Material-UI components provide built-in accessibility
+- Include `alt` text for images
+- Use proper heading hierarchy
+
+### Performance
+- Use `dynamic` imports for heavy components (maps, charts)
+- Example:
+  ```typescript
+  const BillingDashboard = dynamic(() =>
+    import('../BillingDashboard/BillingDashboard'),
+    { ssr: false }
+  );
+  ```
+- Disable SSR for client-heavy components: `{ ssr: false }`
+- `reactStrictMode: false` is currently disabled in config
+
+### Authentication Flow
+- Check cookies for existing auth token
+- Redirect to `/signin` for RMS users, external login for others
+- Store user data in `localStorage` and cookies
+- Corporate users vs regular users have different data structures
+
+---
+
+## Common Patterns
+
+### Snackbar Notifications
+```typescript
+import { useSnackbar } from "@/hooks/snackBar"
+
+const Component = () => {
+  const { showMessage } = useSnackbar()
+
+  const handleSuccess = () => {
+    showMessage("Operation successful", "success")
+  }
+
+  const handleError = () => {
+    showMessage("Operation failed", "error", 5000) // 5 second duration
+  }
+}
+```
+
+### Router Navigation
+```typescript
+import { useRouter } from "next/navigation"
+
+const Component = () => {
+  const router = useRouter()
+
+  const navigateToPage = () => {
+    router.push('/dashboard')
+  }
+
+  const goBack = () => {
+    router.back()
+  }
+}
+```
+
+### Suspense for Search Params
+```typescript
+"use client"
+
+import { useSearchParams } from "next/navigation"
+import { Suspense } from "react"
+
+function ContentWithParams() {
+  const sp = useSearchParams()
+  const id = sp.get("id")
+
+  return <div>ID: {id}</div>
+}
+
+export default function Page() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ContentWithParams />
+    </Suspense>
+  )
+}
+```
+
+### Cookie Usage
+```typescript
+import { getCookie, setCookies } from "@/utils/storageService"
+
+const shipperId = getCookie("shipper_id")
+const isCorporate = getCookie("is_corporate_user") === "true"
+
+setCookies("user_preference", "value", { expires: 30 }) // 30 days
+```
+
+### Date Formatting
+```typescript
+import { formatDate } from "@/utils/dateUtils"
+import timeService from "@/utils/timeService"
+
+// dayjs-based
+const formatted = formatDate(date, "YYYY-MM-DD")
+
+// luxon-based
+const istDate = timeService.utcToist(utcDate, "dd-MMM-yy")
+const istTime = timeService.getTimeWithAMPM(utcDate)
+```
+
+### Dynamic Imports
+```typescript
+import dynamic from 'next/dynamic'
+
+const HeavyComponent = dynamic(() =>
+  import('./HeavyComponent'),
+  { ssr: false, loading: () => <div>Loading...</div> }
+)
+```
+
+---
+
+## Do's and Don'ts
+
+### ✅ Do:
+- Add `"use client"` at the top of every component file
+- Use CSS Modules for component-specific styles
+- Import utilities with `@/` path alias
+- Wrap API calls with router for auth redirect handling
+- Use Material-UI components for consistent UI
+- Define TypeScript interfaces for props
+- Use default exports for components
+- Handle loading and error states
+- Use Suspense when using `useSearchParams()`
+- Store auth tokens in cookies via `storageService`
+
+### ❌ Don't:
+- Don't create Server Components (not used in this project)
+- Don't use relative imports like `../../../` (use `@/` instead)
+- Don't skip TypeScript types for component props
+- Don't forget to handle 401 authentication errors
+- Don't use inline styles unless dynamically computed
+- Don't import entire icon libraries (import specific icons)
+- Don't create API routes in `app/api/` without necessity (external APIs used)
+- Don't forget to wrap components using `useSearchParams()` in Suspense
+
+---
+
+## Testing & Build
+
+### Scripts
+```bash
+npm run local      # Local development on port 4200
+npm run dev        # Dev environment on port 6050
+npm run build      # Production build
+npm run dev_build  # Dev build with increased memory
+npm run start      # Production server on port 4200
+```
+
+### Build Configuration
+- Production build uses standard `next build`
+- Dev build allocates 8GB heap space: `--max_old_space_size=8048`
+- No test scripts configured
+
+---
+
+## Notes
+
+- **Multiple UI libraries**: Project uses MUI, Ant Design, Radix UI, and custom components
+- **Date library redundancy**: Uses luxon, dayjs, and date-fns - prefer dayjs for new code
+- **Chart library variety**: Multiple chart libraries (Recharts, Chart.js, ECharts, MUI Charts) - choose based on feature requirements
+- **Authentication**: Mixed authentication sources (TMS, SD login, RMS)
+- **Internationalization**: Configured with next-intl but not extensively used
+- **Map libraries**: Leaflet for standard maps, Kepler.gl for advanced visualizations
+- **reactStrictMode**: Disabled in config (`reactStrictMode: false`)
+
+---
+
+## Project-Specific Patterns
+
+### Header Title Management
+```typescript
+// Headers dynamically show titles based on pathname
+const getHeaderTitle = () => {
+  switch (pathname) {
+    case "/externalParking":
+      return "External Parking"
+    case "/triptracker":
+      return "Trip Tracker"
+    // ... etc
+  }
+}
+```
+
+### Corporate vs Regular Users
+```typescript
+const isCorporateUser = getCookie("is_corporate_user") === "true"
+
+if (isCorporateUser) {
+  // Show corporate shipper dropdown
+  const shippers = JSON.parse(localStorage.getItem("corporate_shipper") || "[]")
+} else {
+  // Show single shipper name
+  const parentName = getCookie("parent_name")
+}
+```
+
+### Feature-Based Component Organization
+- Components grouped by feature domain (e.g., `InPlantDashboard/`, `PTPKDashboard/`)
+- Shared UI components in `components/UI/`
+- Each feature can have its own sub-components directory
+
+---
+
+**When in doubt, follow existing patterns in the codebase. This project favors consistency over perfection.**
